@@ -32,7 +32,6 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
-import './contributor-dashboard-page.component.css';
 
 @Component({
   selector: 'contributor-dashboard-page',

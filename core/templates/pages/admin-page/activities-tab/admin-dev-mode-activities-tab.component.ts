@@ -26,7 +26,6 @@ import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {Story} from 'domain/story/story.model';
-import './admin-dev-mode-activities-tab.component.css';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',

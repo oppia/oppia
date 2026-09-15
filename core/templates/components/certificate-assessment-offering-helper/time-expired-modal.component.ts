@@ -13,30 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal shown when a certificate assessment contains unanswered
- * questions.
+ * @fileoverview Modal shown when a certificate assessment session times out.
  */
 
-import {Component, Input, Optional} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-
-export const SUBMIT_ANYWAY_RESULT = 'submit-anyway';
+import {CertificateAssessmentPlayerPageConstants} from '../../pages/certificate-assessment-player-page/certificate-assessment-player-page.constants';
 
 @Component({
-  selector: 'oppia-unanswered-question-modal',
-  templateUrl: './unanswered-question-modal.component.html',
-  styleUrls: ['./unanswered-question-modal.component.css'],
+  selector: 'oppia-time-expired-modal',
+  templateUrl: './time-expired-modal.component.html',
+  styleUrls: ['./time-expired-modal.component.css'],
 })
-export class UnansweredQuestionModalComponent {
-  @Input() unansweredQuestionCount = 3;
-
+export class TimeExpiredModalComponent {
   constructor(
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef
   ) {}
 
-  goBackToAssessment(): void {
+  dismiss(): void {
     if (this.ngbActiveModal) {
       this.ngbActiveModal.dismiss();
     } else if (this.bottomSheetRef) {
@@ -44,11 +40,15 @@ export class UnansweredQuestionModalComponent {
     }
   }
 
-  submitAnyway(): void {
+  viewResults(): void {
     if (this.ngbActiveModal) {
-      this.ngbActiveModal.close(SUBMIT_ANYWAY_RESULT);
+      this.ngbActiveModal.close(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     } else if (this.bottomSheetRef) {
-      this.bottomSheetRef.dismiss(SUBMIT_ANYWAY_RESULT);
+      this.bottomSheetRef.dismiss(
+        CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
+      );
     }
   }
 }
