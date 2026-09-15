@@ -82,8 +82,8 @@
     },
     {
       "name": "blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "curriculum-admin/create-subtopic-study-guide-with-multiple-sections",
