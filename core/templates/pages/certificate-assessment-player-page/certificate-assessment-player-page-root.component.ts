@@ -29,15 +29,17 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 import {AlertsService} from 'services/alerts.service';
 import {PageHeadService} from 'services/page-head.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
 
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
-  // The state service is scoped to this component so that its state is
-  // torn down together with the page it belongs to.
+  // The state service is scoped to this component so its state resets
+  // together with the page it belongs to.
   providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
@@ -67,6 +69,9 @@ export class CertificateAssessmentPlayerPageRootComponent
   // Tracks the most recent submission so that result navigation can wait
   // until the final answers have actually been persisted.
   private pendingSubmission: Promise<void> = Promise.resolve();
+  // Set once the learner's answers have been saved, so the beforeunload
+  // guard stops warning once there is nothing left to lose.
+  private attemptIsSubmitted = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -74,7 +79,9 @@ export class CertificateAssessmentPlayerPageRootComponent
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private certificateAssessmentPlayerStateService: CertificateAssessmentPlayerStateService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private internetConnectivityService: InternetConnectivityService,
     protected pageHeadService: PageHeadService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private router: Router,
     protected translateService: TranslateService
   ) {
@@ -93,6 +100,9 @@ export class CertificateAssessmentPlayerPageRootComponent
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
+    this.preventPageUnloadEventService.addListener(() => {
+      return this.attempt !== null && !this.attemptIsSubmitted;
+    });
     await this.loadCertificateOffering();
     if (currentRoute === 'session' && !this.hasError) {
       await this.startAssessment();
@@ -144,8 +154,8 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Starts a new attempt on the server. The learner only moves to the
-   * questions once the server confirms the attempt, so a failed start
-   * request leaves any existing state untouched.
+   * questions once the server confirms the attempt; a failed start leaves
+   * them back on the intro to try again.
    */
   async startAssessment(): Promise<void> {
     try {
@@ -190,8 +200,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   /**
-   * Submits the learner's final answers exactly once and navigates to the
-   * result page.
+   * Submits the learner's final answers and navigates to the result page.
    */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
@@ -208,13 +217,22 @@ export class CertificateAssessmentPlayerPageRootComponent
           attemptId,
           answers
         );
+        this.attemptIsSubmitted = true;
         await this.navigateToResultPage();
       } catch {
-        this.alertsService.addWarning(
-          this.translateService.instant(
-            'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
-          )
-        );
+        if (!this.internetConnectivityService.isOnline()) {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_NETWORK_WARNING'
+            )
+          );
+        } else {
+          this.alertsService.addWarning(
+            this.translateService.instant(
+              'I18N_CERTIFICATE_ASSESSMENT_SUBMIT_WARNING'
+            )
+          );
+        }
       } finally {
         this.isSubmissionInProgress = false;
       }
@@ -228,6 +246,7 @@ export class CertificateAssessmentPlayerPageRootComponent
   }
 
   ngOnDestroy(): void {
+    this.preventPageUnloadEventService.removeListener();
     super.ngOnDestroy();
   }
 

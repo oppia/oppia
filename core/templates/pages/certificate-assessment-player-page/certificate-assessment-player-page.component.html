@@ -7,11 +7,13 @@
                                                   [currentQuestion]="currentQuestion"
                                                   [currentQuestionIndex]="currentQuestionIndex"
                                                   [totalQuestions]="totalQuestionCount"
-                                                  [progressPercentage]="progressPercentage"
                                                   [isLastQuestion]="isLastQuestion"
                                                   [interactionHtml]="getInteractionHtml()"
+                                                  [questionStatuses]="questionStatuses"
+                                                  [questionIndexes]="getQuestionIndexes()"
                                                   (previousQuestion)="previousQuestion()"
                                                   (nextQuestion)="nextQuestion()"
+                                                  (navigateToQuestion)="navigateToQuestion($event)"
                                                   (submitAssessment)="submitAssessment()">
   </oppia-certificate-assessment-conversation-skin>
 </div>

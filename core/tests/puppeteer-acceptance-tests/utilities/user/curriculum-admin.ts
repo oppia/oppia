@@ -29,6 +29,8 @@ const classroomBannerImage = testConstants.data.classroomBannerImage;
 const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
+const certificateCreatorDashboardUrl =
+  testConstants.URLs.CertificateCreatorDashboard;
 
 const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
@@ -313,6 +315,27 @@ const solutionFloatTextField =
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const createQuestionButton = 'div.e2e-test-create-question';
+const questionDifficultyHeaderSelector = '.e2e-test-question-difficulty-header';
+const questionDifficultyContainerSelector =
+  '.e2e-test-question-difficulty-container';
+const newCertificateButton = '.e2e-test-new-certificate-btn';
+const certificateTitleInput = '.e2e-test-certificate-title-input';
+const certificateDescriptionInput = '.e2e-test-certificate-description-input';
+const certificateTotalQuestionsInput =
+  '.e2e-test-certificate-total-questions-input';
+const certificateClassroomSelect = '.e2e-test-certificate-classroom-select';
+const certificateOutcomeInput = '.e2e-test-certificate-outcome-input';
+const addCertificateOutcomeButton = '.e2e-test-certificate-add-outcome';
+const certificateDetailsNextButton =
+  '.e2e-test-certificate-offering-details-next-button';
+const topicRowSelector = '.e2e-test-topic-row';
+const addTopicButton = '.e2e-test-add-topic-button';
+const selectedTopicsSummary = '.e2e-test-selected-topics-summary';
+const topicsNextButton = '.e2e-test-topics-next-button';
+const certificateReviewContainer = '.e2e-test-certificate-review-container';
+const reviewOverallStatusSelector = '.e2e-test-review-overall-status';
+const certificateReviewSaveButton = '.e2e-test-certificate-review-save-btn';
+const confirmSaveCertificateButton = '.e2e-test-confirm-save-certificate';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
@@ -715,11 +738,61 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Create a basic algebra question in the skill editor page.
+   * Create questions with specified difficulty levels in the skill editor.
+   * @param {string} skillName - The name of the skill.
+   * @param {Object} questionCountsByDifficulty - The number of questions to
+   * create at each difficulty level.
    */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
+  async createQuestionsForSkillWithDifficulties(
+    skillName: string,
+    questionCountsByDifficulty: {Easy: number; Medium: number; Hard: number}
+  ): Promise<void> {
+    const difficulties: ('Easy' | 'Medium' | 'Hard')[] = [
+      'Easy',
+      'Medium',
+      'Hard',
+    ];
+    for (const difficulty of difficulties) {
+      for (let i = 0; i < questionCountsByDifficulty[difficulty]; i++) {
+        await this.addBasicAlgebraQuestionToSkill(skillName, difficulty);
+      }
+    }
+  }
+
+  /**
+   * Create a basic algebra question in the skill editor page.
+   * @param {string} skillName - The name of the skill.
+   * @param {'Easy'|'Medium'|'Hard'} difficulty - The difficulty level at
+   * which the question is linked to the skill. The difficulty radio is only
+   * rendered for levels that have a rubric explanation, so rubrics must be
+   * filled before calling this function with 'Easy' or 'Hard'.
+   */
+  async addBasicAlgebraQuestionToSkill(
+    skillName: string,
+    difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
+  ): Promise<void> {
     await this.openSkillEditor(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
+    // The difficulty section loads asynchronously with the question editor,
+    // so wait for its header before selecting a level.
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(questionDifficultyContainerSelector))
+    ) {
+      await this.clickOnElementWithSelector(questionDifficultyHeaderSelector);
+      await this.expectElementToBeVisible(questionDifficultyContainerSelector);
+    }
+    const difficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
+    await this.clickOnElementWithSelector(difficultySelector);
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && element.classList.contains('mat-radio-checked');
+      },
+      {},
+      difficultySelector
+    );
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.typeInInputField(richTextAreaField, 'Add 1+2');
@@ -3146,6 +3219,193 @@ export class CurriculumAdmin extends TopicManager {
 
       await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
+  }
+
+  /**
+   * Creates a certificate assessment offering with the given details, selects
+   * the given topics, and publishes it so that it becomes Available to
+   * learners in the classroom.
+   * @param {Object} params.title - The certificate offering title.
+   * @param {string} params.description - The certificate offering description.
+   * @param {number} params.totalQuestionCount - The total assessment question
+   *   count.
+   * @param {string} params.classroomName - The classroom to associate the
+   *   certificate with.
+   * @param {string[]} params.outcomes - The demonstrated skill outcomes.
+   * @param {string[]} params.topicNames - The topics to include in the
+   *   assessment.
+   */
+  async createCertificateOfferingAndPublish(params: {
+    title: string;
+    description: string;
+    totalQuestionCount: number;
+    classroomName: string;
+    outcomes: string[];
+    topicNames: string[];
+  }): Promise<void> {
+    await this.goto(certificateCreatorDashboardUrl);
+    await this.clickAndWaitForNavigation(newCertificateButton, true);
+
+    await this.typeInInputField(certificateTitleInput, params.title);
+    await this.typeInInputField(
+      certificateDescriptionInput,
+      params.description
+    );
+    await this.typeInInputField(
+      certificateTotalQuestionsInput,
+      params.totalQuestionCount.toString()
+    );
+
+    const classroomId = await this.page.$eval(
+      certificateClassroomSelect,
+      (selectElement, classroomName) => {
+        const option = Array.from(
+          (selectElement as HTMLSelectElement).options
+        ).find(option => option.textContent?.trim() === classroomName);
+        if (!option) {
+          throw new Error(`${classroomName} classroom option not found.`);
+        }
+        return option.value;
+      },
+      params.classroomName
+    );
+    await this.select(certificateClassroomSelect, classroomId);
+
+    await this.typeInInputField(
+      `${certificateOutcomeInput}:first-of-type`,
+      params.outcomes[0]
+    );
+    await this.clickOnElementWithSelector(addCertificateOutcomeButton);
+    await this.typeInInputField(
+      `${certificateOutcomeInput}:last-of-type`,
+      params.outcomes[1]
+    );
+    await this.clickOnElementWithSelector(certificateDetailsNextButton);
+
+    await this.expectElementToBeVisible(topicRowSelector);
+    for (const topicName of params.topicNames) {
+      await this.page.evaluate(
+        (topicName, rowSelector, addButtonSelector) => {
+          const topicRows = Array.from(
+            document.querySelectorAll<HTMLElement>(rowSelector)
+          );
+          const topicRow = topicRows.find(row =>
+            row.textContent?.includes(topicName)
+          );
+          const addButton =
+            topicRow?.querySelector<HTMLButtonElement>(addButtonSelector);
+          if (!addButton) {
+            throw new Error(`Could not find the add button for ${topicName}.`);
+          }
+          addButton.click();
+        },
+        topicName,
+        topicRowSelector,
+        addTopicButton
+      );
+    }
+    await this.expectTextContentToBe(
+      selectedTopicsSummary,
+      `All ${params.topicNames.length} topics selected.`
+    );
+    await this.clickOnElementWithSelector(topicsNextButton);
+
+    await this.expectElementToBeVisible(certificateReviewContainer);
+    await this.expectElementContentToContain(
+      reviewOverallStatusSelector,
+      'Requirements Met'
+    );
+    await this.clickOnElementWithSelector(certificateReviewSaveButton);
+    await this.expectElementToBeVisible(confirmSaveCertificateButton);
+    await this.clickOnElementWithSelector(confirmSaveCertificateButton);
+    await this.expectToastMessage('Certificate created.');
+    await this.page.waitForSelector(
+      '.oppia-certificate-result-modal .modal-body',
+      {
+        visible: true,
+      }
+    );
+  }
+
+  /**
+   * Creates the curriculum needed for certificate assessment tests: a
+   * classroom with topics, skills with linked questions and completed
+   * diagnostic tests.
+   * @param {Object[]} skillConfigs - The topics and skills to create, along
+   * with their question counts and rubric difficulties.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} classroomUrlFragment - The URL fragment of the classroom.
+   * @param {string} classroomIntro - The classroom intro text.
+   * @param {string} classroomObjective - The classroom objective text.
+   * @param {string} classroomConclusion - The classroom conclusion text.
+   */
+  async createCertificateAssessmentTestSetup(
+    skillConfigs: {
+      topicName: string;
+      subtopicName: string;
+      skillName: string;
+      questionCountsByDifficulty: {
+        Easy: number;
+        Medium: number;
+        Hard: number;
+      };
+      rubricDifficulties: ('Easy' | 'Medium' | 'Hard')[];
+    }[],
+    classroomName: string,
+    classroomUrlFragment: string,
+    classroomIntro: string,
+    classroomObjective: string,
+    classroomConclusion: string
+  ): Promise<void> {
+    const classroomTopicNames = Array.from(
+      new Set(skillConfigs.map(config => config.topicName))
+    );
+
+    for (const config of skillConfigs) {
+      await this.createTopic(
+        config.topicName,
+        config.topicName.toLowerCase().replace(/ /g, '-')
+      );
+      await this.createSubtopicForTopic(
+        config.subtopicName,
+        config.subtopicName.toLowerCase().replace(/ /g, '-'),
+        config.topicName
+      );
+      await this.createSkillForTopic(config.skillName, config.topicName, false);
+      await this.openSkillEditor(config.skillName);
+
+      for (const difficulty of config.rubricDifficulties) {
+        await this.updateRubric(
+          difficulty,
+          `${config.skillName} - ${difficulty} rubric explanation.`
+        );
+      }
+
+      await this.publishUpdatedSkill(`Added rubrics for ${config.skillName}.`);
+      await this.createQuestionsForSkillWithDifficulties(
+        config.skillName,
+        config.questionCountsByDifficulty
+      );
+      await this.assignSkillToSubtopicInTopicEditor(
+        config.skillName,
+        config.subtopicName,
+        config.topicName
+      );
+      await this.addSkillToDiagnosticTest(config.skillName, config.topicName);
+      await this.publishDraftTopic(config.topicName);
+    }
+
+    await this.createNewClassroom(classroomName, classroomUrlFragment);
+    await this.updateClassroom(
+      classroomName,
+      classroomIntro,
+      classroomObjective,
+      classroomConclusion
+    );
+    for (const topicName of classroomTopicNames) {
+      await this.addTopicToClassroom(classroomName, topicName);
+    }
+    await this.publishClassroom(classroomName);
   }
 }
 

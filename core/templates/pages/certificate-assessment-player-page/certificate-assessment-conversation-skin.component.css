@@ -15,28 +15,80 @@
   padding: 20px 20px 16px;
 }
 
-.certificate-assessment-question-player-progress {
-  background-color: #fff;
-  border: 2px solid #0d48a1;
-  border-radius: 10px;
-  box-sizing: border-box;
-  height: 20px;
-  overflow: hidden;
-  width: 100%;
+.certificate-assessment-question-index-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
 
-.certificate-assessment-progress-meta {
+.certificate-assessment-index-box {
   align-items: center;
-  color: #334e68;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  color: #333;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 36px;
+  width: 36px;
+}
+
+.certificate-assessment-index-box:hover {
+  opacity: 0.8;
+}
+
+.certificate-assessment-index-box.visited {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.certificate-assessment-index-box.attempted {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.certificate-assessment-progress-legend {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.certificate-assessment-legend-item {
+  align-items: center;
+  color: #555;
   display: flex;
   font-family: 'Roboto', sans-serif;
-  font-size: 15px;
-  font-style: italic;
-  justify-content: flex-end;
-  margin-top: 10px;
+  font-size: 12px;
+  gap: 6px;
 }
-.certificate-assessment-current-progress {
-  color: rgba(0, 0, 0, .87);
+
+.certificate-assessment-legend-box {
+  border-radius: 4px;
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+}
+
+.certificate-assessment-legend-box.unvisited {
+  background-color: #fff;
+  border: 2px solid #ccc;
+}
+
+.certificate-assessment-legend-box.visited {
+  background-color: #fff3cd;
+  border: 2px solid #ffc107;
+}
+
+.certificate-assessment-legend-box.attempted {
+  background-color: #d4edda;
+  border: 2px solid #28a745;
 }
 
 .certificate-assessment-question-counter {
@@ -124,12 +176,6 @@
   margin-top: 20px;
 }
 
-.certificate-assessment-progress-fill {
-  background: #0d48a1;
-  border-radius: 8px;
-  height: 16px;
-}
-
 .conversation-skin-interaction-container {
   padding: 0 30px 10px;
 }
@@ -142,7 +188,7 @@
   .certificate-assessment-progress-card,
   .certificate-assessment-question-card,
   .certificate-assessment-actions {
-    width: 50%
+    max-width: 90%;
   }
 
   .certificate-assessment-question-card {

@@ -13,34 +13,8 @@
       </ul>
     </div>
 
-    <h2 class="topics-heading">{{ topicsHeadingI18nKey | translate }}</h2>
-    <p class="topics-subtext">
-       {{ topicsSubtextI18nKey | translate }}
-    </p>
-
-    <div class="topics-row">
-      <div class="topic-tile" *ngFor="let topicSummary of recommendedTopicSummaries">
-        <div class="recommended-topic-card">
-          <img class="recommended-topic-thumbnail"
-               [src]="getTopicThumbnailUrl(topicSummary)"
-               alt="">
-          <div class="recommended-topic-details">
-            <div class="recommended-topic-title">{{ topicSummary.getName() }}</div>
-            <div class="recommended-topic-lessons-count">
-              {{ topicSummary.getTotalPublishedNodeCount() }}
-              <span [innerHTML]="lessonsCountI18nKey | translate: {
-                  lessonCountValue: topicSummary.getTotalPublishedNodeCount(),
-                  messageFormat: true
-                }">
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="cta-row">
-      <button type="button" class="continue-button" (click)="onContinue()">
+      <button type="button" class="continue-button e2e-test-continue-button" (click)="onContinue()">
             {{ continueButtonI18nKey | translate }}
       </button>
     </div>

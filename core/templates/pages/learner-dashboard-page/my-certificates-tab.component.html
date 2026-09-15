@@ -36,19 +36,19 @@
       </thead>
       <tbody>
         <tr *ngFor="let attempt of filteredAttempts"
-            class="certificates-table-row">
+            class="certificates-table-row e2e-test-certificate-attempt-row">
           <td class="certificate-title-cell">
-            <a class="certificate-title-link"
+            <a class="certificate-title-link e2e-test-certificate-attempt-title"
                [routerLink]="'/certificate-assessment-result/' + attempt.attempt_id">
               {{ attempt.title | titlecase }}
             </a>
           </td>
           <td class="subject-cell">{{ getSubjectName(attempt.classroom_id) | titlecase }}</td>
           <td class="attempt-cell">{{ attempt.attempt_index }}</td>
-          <td class="score-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+          <td class="score-cell e2e-test-certificate-attempt-score" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
             {{ attempt.total_score | number: '1.0-0' }}%
           </td>
-          <td class="status-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+          <td class="status-cell e2e-test-certificate-attempt-status" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
             {{ getStatusLabel(attempt) | translate }}
           </td>
           <td class="date-cell">{{ attempt.started_at | date: 'MMM d, y' }}</td>

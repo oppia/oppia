@@ -228,7 +228,24 @@
   }
 
   .oppia-certificate-offering-available-page-header h1 {
-    font-size: 1.7rem;
+    font-size: 2.7rem;
+  }
+
+  .oppia-certificate-offering-available-page-exit-button.btn-primary {
+    margin: 0 0 0 260px;
+    width: 120px;
+  }
+
+  .oppia-certificate-offering-available-page-intro {
+    font-size: 15px;
+  }
+
+  .oppia-certificate-offering-available-page-panel h2 {
+    font-size: 30px;
+  }
+
+  .oppia-certificate-offering-available-page-footnote {
+    font-size: 15px;
   }
 
   .oppia-certificate-offering-available-page-tile-top {
@@ -239,7 +256,16 @@
     text-align: left;
   }
 
+  .oppia-certificate-offering-available-page-status {
+    font-size: 1.5rem;
+    width: 120px;
+  }
+
   .oppia-certificate-offering-available-page-actions {
     flex-direction: column;
+  }
+
+  .oppia-certificate-offering-available-page-actions .btn-outline-primary {
+    min-width: 0;
   }
 }

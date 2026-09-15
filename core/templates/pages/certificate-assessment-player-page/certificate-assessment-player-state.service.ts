@@ -17,9 +17,7 @@
  * certificate assessment journey (intro -> instructions -> questions).
  *
  * Every "fresh start" decision lives here on purpose so that components
- * cannot drift apart: an attempt belongs to exactly one navigation lifecycle.
- * It is wiped once, when a replacement attempt successfully begins (see
- * `beginNewAttempt`), and never by mere navigation.
+ * cannot drift apart: a brand-new attempt always begins cleanly.
  */
 
 import {Injectable} from '@angular/core';
@@ -42,9 +40,8 @@ export class CertificateAssessmentPlayerStateService {
   }
 
   /**
-   * Marks the start of a brand-new attempt. This is the only place that
-   * resets state, so a fresh attempt always starts clean and a failed
-   * start request can never silently extend an old one.
+   * Marks the start of a brand-new attempt. The previous attempt is
+   * replaced, so a fresh attempt always starts clean.
    */
   beginNewAttempt(attempt: CertificateAssessmentAttemptData): void {
     this.attempt = attempt;

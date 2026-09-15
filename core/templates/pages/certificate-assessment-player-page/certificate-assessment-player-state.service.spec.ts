@@ -105,34 +105,36 @@ describe('CertificateAssessmentPlayerStateService', () => {
     );
   });
 
-  it('should move to the questions stage and register the attempt', () => {
-    service.beginNewAttempt(mockAttempt);
+  describe('beginning a new attempt', () => {
+    it('should move to the questions stage', () => {
+      service.beginNewAttempt(mockAttempt);
 
-    expect(service.currentStage).toBe(
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-    );
-    expect(service.getAttempt()).toEqual(mockAttempt);
-  });
+      expect(service.currentStage).toBe(
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+      );
+      expect(service.getAttempt()).toEqual(mockAttempt);
+    });
 
-  it('should replace the previous attempt when a new one begins', () => {
-    service.beginNewAttempt(mockAttempt);
+    it('should replace the previous attempt when a new one begins', () => {
+      service.beginNewAttempt(mockAttempt);
 
-    const replacementAttempt =
-      CertificateAssessmentAttemptData.createFromBackendDict({
-        attempt_id: 'attempt-5678',
-        questions: [
-          {
-            question_id: 'question_1',
-            question_version: 1,
-            question_state_data: mockStateData,
-          },
-        ],
-      });
-    service.beginNewAttempt(replacementAttempt);
+      const replacementAttempt =
+        CertificateAssessmentAttemptData.createFromBackendDict({
+          attempt_id: 'attempt-5678',
+          questions: [
+            {
+              question_id: 'question_1',
+              question_version: 1,
+              question_state_data: mockStateData,
+            },
+          ],
+        });
+      service.beginNewAttempt(replacementAttempt);
 
-    expect(service.getAttempt()).toEqual(replacementAttempt);
-    expect(service.currentStage).toBe(
-      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
-    );
+      expect(service.getAttempt()).toEqual(replacementAttempt);
+      expect(service.currentStage).toBe(
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS
+      );
+    });
   });
 });
