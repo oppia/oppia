@@ -208,6 +208,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let classificationSpy: jasmine.SpyObj<AnswerClassificationService>;
   let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
   let currentInteractionServiceSpy: jasmine.SpyObj<CurrentInteractionService>;
+  let internetConnectivityServiceSpy: jasmine.SpyObj<InternetConnectivityService>;
 
   const setup = async (
     attempt: CertificateAssessmentAttemptData | null = makeAttempt()
@@ -262,6 +263,11 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       'setOnSubmitFn',
       'clearOnSubmitFn',
     ]);
+    internetConnectivityServiceSpy = jasmine.createSpyObj(
+      'InternetConnectivityService',
+      ['isOnline']
+    );
+    internetConnectivityServiceSpy.isOnline.and.returnValue(true);
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
@@ -297,13 +303,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         },
         {
           provide: InternetConnectivityService,
-          useValue: jasmine.createSpyObj('InternetConnectivityService', [
-            'isOnline',
-          ]),
-        },
-        {
-          provide: TranslateService,
-          useValue: jasmine.createSpyObj('TranslateService', ['instant']),
+          useValue: internetConnectivityServiceSpy,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

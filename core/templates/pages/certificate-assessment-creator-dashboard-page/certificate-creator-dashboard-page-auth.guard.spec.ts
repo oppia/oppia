@@ -91,10 +91,7 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
-    const getUserInfoAsyncSpy = spyOn(
-      userService,
-      'getUserInfoAsync'
-    ).and.returnValue(
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
       Promise.resolve(
         new UserInfo([], false, true, false, false, false, '', '', '', true)
       )
@@ -111,7 +108,7 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(userService.getUserInfoAsync).toHaveBeenCalledTimes(1);
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
@@ -149,7 +146,7 @@ describe('CertificateCreatorDashboardPageAuthGuard', () => {
       Promise.resolve(true)
     );
     const replaceStateSpy = spyOn(location, 'replaceState');
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
       Promise.resolve(UserInfo.createDefault())
     );
 

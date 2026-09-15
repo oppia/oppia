@@ -42,6 +42,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let playerStateService: CertificateAssessmentPlayerStateService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
+  let internetConnectivityService: jasmine.SpyObj<InternetConnectivityService>;
+  let preventPageUnloadEventService: jasmine.SpyObj<PreventPageUnloadEventService>;
 
   const mockOffering = new CertificateAssessmentOfferingData(
     'cert-123',
@@ -152,6 +154,16 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
+    const internetConnectivityServiceSpy = jasmine.createSpyObj(
+      'InternetConnectivityService',
+      ['isOnline']
+    );
+    internetConnectivityServiceSpy.isOnline.and.returnValue(true);
+    const preventPageUnloadEventServiceSpy = jasmine.createSpyObj(
+      'PreventPageUnloadEventService',
+      ['addListener', 'removeListener']
+    );
+
     const playerStateServiceInstance =
       new CertificateAssessmentPlayerStateService();
     component = new CertificateAssessmentPlayerPageRootComponent(
@@ -160,9 +172,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiServiceSpy,
       playerStateServiceInstance,
       {} as ClassroomBackendApiService,
-      {} as InternetConnectivityService,
+      internetConnectivityService,
       {} as PageHeadService,
-      {} as PreventPageUnloadEventService,
+      preventPageUnloadEventService,
       routerSpy,
       translateServiceSpy
     );
@@ -172,6 +184,8 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiServiceSpy;
     router = routerSpy;
     translateService = translateServiceSpy;
+    internetConnectivityService = internetConnectivityServiceSpy;
+    preventPageUnloadEventService = preventPageUnloadEventServiceSpy;
   };
 
   beforeEach(async () => {
@@ -250,9 +264,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
-      {} as InternetConnectivityService,
+      internetConnectivityService,
       {} as PageHeadService,
-      {} as PreventPageUnloadEventService,
+      preventPageUnloadEventService,
       router,
       translateService
     );
@@ -558,9 +572,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
-      {} as InternetConnectivityService,
+      internetConnectivityService,
       {} as PageHeadService,
-      {} as PreventPageUnloadEventService,
+      preventPageUnloadEventService,
       router,
       translateService
     );
@@ -589,9 +603,9 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService,
       playerStateService,
       classroomBackendApiServiceSpy,
-      {} as InternetConnectivityService,
+      internetConnectivityService,
       {} as PageHeadService,
-      {} as PreventPageUnloadEventService,
+      preventPageUnloadEventService,
       router,
       translateService
     );
