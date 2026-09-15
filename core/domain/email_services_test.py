@@ -350,3 +350,162 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(
             textwrap.dedent(expected_email_log).strip(), response.strip()
         )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_to_recipients_data_properly_sent(self) -> None:
+        """Verifies that the data sent in send_mail_to_recipients is correct."""
+        email_services.send_mail_to_recipients(
+            self.system_email_address,
+            [self.admin_email_address],
+            'subject',
+            'body',
+            'html',
+        )
+        messages = self._get_sent_email_messages(self.admin_email_address)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].subject, 'subject')
+        self.assertEqual(messages[0].body, 'body')
+        self.assertEqual(messages[0].html, 'html')
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_to_recipients_sends_to_all_recipients(self) -> None:
+        """Verifies that all recipients receive the batch email."""
+        recipient_emails = ['recipient1@example.com', 'recipient2@example.com']
+        email_services.send_mail_to_recipients(
+            self.system_email_address,
+            recipient_emails,
+            'subject',
+            'body',
+            'html',
+        )
+        for recipient_email in recipient_emails:
+            messages = self._get_sent_email_messages(recipient_email)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, recipient_emails)
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_to_recipients_bcc_admin_flag(self) -> None:
+        """Verifies that the bcc admin flag works in send_mail_to_recipients."""
+        email_services.send_mail_to_recipients(
+            self.system_email_address,
+            [self.admin_email_address],
+            'subject',
+            'body',
+            'html',
+            bcc_admin=True,
+        )
+        messages = self._get_sent_email_messages(self.admin_email_address)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].bcc, self.admin_email_address)
+
+    def test_send_mail_to_recipients_rejects_malformed_recipient(self) -> None:
+        """Tests that a malformed recipient email raises a ValueError."""
+        malformed_recipient_emails = [None]
+        email_exception = self.assertRaisesRegex(
+            ValueError,
+            'Malformed recipient email address: %s'
+            % malformed_recipient_emails[0],
+        )
+        with email_exception:
+            email_services.send_mail_to_recipients(
+                'sender@example.com',
+                # TODO(#13528): Here we use MyPy ignore because the batch
+                # function expects str, and the case when the recipient_email
+                # is malformed must be tested, this is why ignore[arg-type]
+                # is used here.
+                malformed_recipient_emails,  # type: ignore[arg-type]
+                'subject',
+                'body',
+                'html',
+            )
+
+    def test_send_mail_to_recipients_rejects_malformed_sender(self) -> None:
+        """Tests that a malformed sender email raises a ValueError."""
+        email_exception = self.assertRaisesRegex(
+            ValueError,
+            'Malformed sender email address: x@x@x',
+        )
+        with email_exception:
+            email_services.send_mail_to_recipients(
+                'x@x@x',
+                ['recipient@example.com'],
+                'subject',
+                'body',
+                'html',
+            )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_to_recipients_raises_on_send_failure(self) -> None:
+        """Tests that an unsuccessful send raises an exception."""
+        email_exception = self.assertRaisesRegex(
+            Exception,
+            'Emails to 1 recipients failed to send',
+        )
+        swap_send_email_to_recipients = self.swap(
+            platform_email_services,
+            'send_email_to_recipients',
+            lambda *_: False,
+        )
+        with email_exception, swap_send_email_to_recipients:
+            email_services.send_mail_to_recipients(
+                self.system_email_address,
+                [self.admin_email_address],
+                'subject',
+                'body',
+                'html',
+            )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_to_recipients_not_sent_when_server_cannot_send(
+        self,
+    ) -> None:
+        """Tests that no email is sent when SERVER_CAN_SEND_EMAILS is False."""
+        email_services.send_mail_to_recipients(
+            self.system_email_address,
+            [self.admin_email_address],
+            'subject',
+            'body',
+            'html',
+        )
+        messages = self._get_sent_email_messages(self.admin_email_address)
+        self.assertEqual(len(messages), 0)

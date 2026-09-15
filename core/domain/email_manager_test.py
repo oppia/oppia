@@ -9852,3 +9852,287 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
 
         models_after = len(email_models.SentEmailModel.query().fetch())
         self.assertEqual(models_before, models_after)
+
+
+class BulkEmailTests(test_utils.EmailTestBase):
+    """Tests for the batch email sending function."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup('bulk-email-recipient-1@example.com', 'bulkemailrecipient1')
+        self.signup('bulk-email-recipient-2@example.com', 'bulkemailrecipient2')
+        self.recipient_1_id = self.get_user_id_from_email(
+            'bulk-email-recipient-1@example.com'
+        )
+        self.recipient_2_id = self.get_user_id_from_email(
+            'bulk-email-recipient-2@example.com'
+        )
+        self.recipient_1_email = 'bulk-email-recipient-1@example.com'
+        self.recipient_2_email = 'bulk-email-recipient-2@example.com'
+        self.system_email_address = 'system@example.com'
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_sends_to_all_recipients(self) -> None:
+        """Verifies that the bulk email is sent to all recipients."""
+        email_manager.send_bulk_email_to_recipients(
+            [self.recipient_1_id, self.recipient_2_id],
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+            'Email Subject',
+            'Email Body',
+            self.system_email_address,
+        )
+        for email in [self.recipient_1_email, self.recipient_2_email]:
+            messages = self._get_sent_email_messages(email)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject, 'Email Subject')
+            self.assertEqual(messages[0].body, 'Email Body')
+
+        all_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(all_models), 2)
+        for email in [self.recipient_1_email, self.recipient_2_email]:
+            messages = self._get_sent_email_messages(email)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject, 'Email Subject')
+            self.assertEqual(messages[0].body, 'Email Body')
+
+        all_models = email_models.SentEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 2)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_with_invalid_sender_raises(self) -> None:
+        """Verifies that an invalid sender raises an exception."""
+        with self.assertRaisesRegex(Exception, 'Invalid sender_id'):
+            email_manager.send_bulk_email_to_recipients(
+                [self.recipient_1_id],
+                self.recipient_1_id,
+                feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                'Email Subject',
+                'Email Body',
+                self.system_email_address,
+            )
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_skips_duplicate_message(self) -> None:
+        """Verifies that a duplicate message is skipped for a recipient."""
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000
+        )
+
+        cleaned_html_body = html_cleaner.clean('Email Body')
+        raw_plaintext_body = (
+            cleaned_html_body.replace('<br/>', '\n')
+            .replace('<br>', '\n')
+            .replace('<li>', '<li>- ')
+            .replace('</p><p>', '</p>\n<p>')
+        )
+        cleaned_plaintext_body = html_cleaner.strip_html_tags(
+            raw_plaintext_body
+        )
+
+        with duplicate_email_ctx:
+            email_models.SentEmailModel.create(
+                self.recipient_1_id,
+                self.recipient_1_email,
+                feconf.SYSTEM_COMMITTER_ID,
+                self.system_email_address,
+                feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                'Email Subject',
+                cleaned_plaintext_body,
+                utils.get_current_utc_datetime(),
+            )
+
+            email_manager.send_bulk_email_to_recipients(
+                [self.recipient_1_id, self.recipient_2_id],
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                'Email Subject',
+                'Email Body',
+                self.system_email_address,
+            )
+
+            messages_1 = self._get_sent_email_messages(self.recipient_1_email)
+            self.assertEqual(len(messages_1), 0)
+            messages_2 = self._get_sent_email_messages(self.recipient_2_email)
+            self.assertEqual(len(messages_2), 1)
+
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            self.assertEqual(len(all_models), 2)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_returns_if_html_body_mismatch(self) -> None:
+        """Verifies that no email is sent if cleaned HTML differs."""
+        log_new_error_counter = test_utils.CallCounter(logging.error)
+        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with log_new_error_ctx:
+                email_manager.send_bulk_email_to_recipients(
+                    [self.recipient_1_id],
+                    feconf.SYSTEM_COMMITTER_ID,
+                    feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                    'Email Subject',
+                    '<script>alert(1)</script>',
+                    self.system_email_address,
+                )
+        self.assertEqual(log_new_error_counter.times_called, 1)
+        self.assertIn('does not match cleaned HTML body', logs[0])
+        messages = self._get_sent_email_messages(self.recipient_1_email)
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_does_nothing_for_empty_recipient_list(
+        self,
+    ) -> None:
+        """Verifies that no email is sent for an empty recipient list."""
+        email_manager.send_bulk_email_to_recipients(
+            [],
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+            'Email Subject',
+            'Email Body',
+            self.system_email_address,
+        )
+        all_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(all_models), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_skips_user_without_email(self) -> None:
+        """Verifies that a recipient without an email is skipped."""
+        mock_get_email = self.swap(
+            user_services,
+            'get_email_from_user_id',
+            lambda _user_id: None,
+        )
+        with mock_get_email:
+            email_manager.send_bulk_email_to_recipients(
+                [self.recipient_1_id],
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                'Email Subject',
+                'Email Body',
+                self.system_email_address,
+            )
+        messages = self._get_sent_email_messages(self.recipient_1_email)
+        self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+        ]
+    )
+    def test_send_bulk_email_enqueues_retry_on_failure(self) -> None:
+        """Verifies that a retry task is enqueued for each recipient on failure."""
+
+        def mock_send_mail_to_recipients(*_args: str, **_kwargs: str) -> None:
+            raise Exception('Simulated email failure')
+
+        enqueued_tasks: List[Tuple[str, Dict[str, str]]] = []
+
+        def mock_enqueue_task(
+            url: str, payload: Dict[str, str], _delay: int
+        ) -> None:
+            enqueued_tasks.append((url, payload))
+
+        send_mail_swap = self.swap(
+            email_services,
+            'send_mail_to_recipients',
+            mock_send_mail_to_recipients,
+        )
+        enqueue_task_swap = self.swap(
+            taskqueue_services, 'enqueue_task', mock_enqueue_task
+        )
+        models_before = len(email_models.SentEmailModel.query().fetch())
+
+        with send_mail_swap, enqueue_task_swap:
+            email_manager.send_bulk_email_to_recipients(
+                [self.recipient_1_id, self.recipient_2_id],
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
+                'Email Subject',
+                'Email Body',
+                self.system_email_address,
+            )
+
+        self.assertEqual(len(enqueued_tasks), 2)
+        for url, payload in enqueued_tasks:
+            self.assertEqual(url, feconf.TASK_URL_RETRY_FAILED_EMAIL)
+            self.assertEqual(payload['subject'], 'Email Subject')
+        models_after = len(email_models.SentEmailModel.query().fetch())
+        self.assertEqual(models_before, models_after)

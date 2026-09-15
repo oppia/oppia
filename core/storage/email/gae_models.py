@@ -81,6 +81,7 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
             feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
+            feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
             (feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),
         ],
     )

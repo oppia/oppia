@@ -185,6 +185,104 @@ def send_mail(
             )
 
 
+def send_mail_to_recipients(
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc_admin: bool = False,
+) -> None:
+    """Sends an email to multiple recipients in a single batch.
+
+    This function is the batch counterpart of send_mail(). It validates the
+    sender and all recipient email addresses, then delegates a single call
+    to the underlying email service. It is the responsibility of the email
+    service to chunk the recipients into provider-sized messages (for
+    example, up to 1,000 recipients per Mailgun request).
+
+    Args:
+        sender_email: str. The email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+            'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
+        recipient_emails: list(str). The email addresses of the recipients.
+            Format must be utf-8.
+        subject: str. The subject line of the email. Format must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Format must be
+            utf-8.
+        html_body: str. The HTML body of the email. Must fit in a datastore
+            entity. Format must be utf-8.
+        bcc_admin: bool. Whether to bcc ADMIN_EMAIL_ADDRESS on the email.
+
+    Raises:
+        ValueError. Any recipient email address is malformed.
+        ValueError. The sender email address is malformed.
+        Exception. The email was not sent correctly. In other words, the
+            send_email_to_recipients() function returned False (signifying
+            the API returned a bad status code).
+    """
+    for recipient_email in recipient_emails:
+        if not _is_email_valid(recipient_email):
+            raise ValueError(
+                'Malformed recipient email address: %s' % recipient_email
+            )
+
+    if not _is_sender_email_valid(sender_email):
+        raise ValueError('Malformed sender email address: %s' % sender_email)
+
+    admin_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(admin_email_address, str)
+    bcc = [admin_email_address] if bcc_admin else None
+
+    logging.info(
+        convert_email_to_loggable_string(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            None,
+            bcc,
+            '',
+            None,
+            None,
+        )
+    )
+
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if server_can_send_emails:
+        response = email_services.send_email_to_recipients(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            None,
+            bcc,
+            '',
+            None,
+            None,
+        )
+
+        if not response:
+            raise Exception(
+                (
+                    'Emails to %d recipients failed to send. Please try '
+                    'again later or contact us to report a bug at '
+                    'https://www.oppia.org/contact.'
+                )
+                % len(recipient_emails)
+            )
+
+
 def convert_email_to_loggable_string(
     sender_email: str,
     recipient_emails: List[str],
