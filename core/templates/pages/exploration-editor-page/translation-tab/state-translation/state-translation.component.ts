@@ -48,7 +48,12 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {BaseTranslatableObject} from 'interactions/rule-input-defs';
+import {
+  BaseTranslatableObject,
+  InteractionRuleInputs,
+  TranslatableSetOfNormalizedString,
+  TranslatableSetOfUnicodeString,
+} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
@@ -132,7 +137,13 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
-  getRequiredHtml(subtitledHtml: SubtitledHtml): string {
+  getRequiredHtml(
+    subtitledHtml: SubtitledHtml | SubtitledUnicode | null
+  ): string {
+    if (!(subtitledHtml instanceof SubtitledHtml)) {
+      return '';
+    }
+
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
     }
@@ -161,7 +172,27 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return translationContent.translation as string;
   }
 
-  getRequiredUnicode(subtitledUnicode: SubtitledUnicode): string {
+  getHtmlOrNull(content: SubtitledHtml | SubtitledUnicode): string | null {
+    return content instanceof SubtitledHtml ? content.html : null;
+  }
+
+  getUnicodeOrNull(content: SubtitledHtml | SubtitledUnicode): string | null {
+    return content instanceof SubtitledUnicode ? content.unicode : null;
+  }
+
+  getSolutionExplanation(
+    solution: Solution | SubtitledHtml
+  ): SubtitledHtml | null {
+    return solution instanceof Solution ? solution.explanation : null;
+  }
+
+  getRequiredUnicode(
+    subtitledUnicode: SubtitledHtml | SubtitledUnicode | null
+  ): string {
+    if (!(subtitledUnicode instanceof SubtitledUnicode)) {
+      return '';
+    }
+
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledUnicode.unicode;
     }
@@ -316,13 +347,28 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   getHumanReadableRuleInputValues(
-    inputValue: {normalizedStrSet: string[]; unicodeStrSet: string[]},
+    inputValue:
+      | InteractionRuleInputs
+      | TranslatableSetOfNormalizedString
+      | TranslatableSetOfUnicodeString,
     inputType: string
   ): string {
     if (inputType === 'TranslatableSetOfNormalizedString') {
-      return '[' + inputValue.normalizedStrSet.join(', ') + ']';
+      return (
+        '[' +
+        (inputValue as TranslatableSetOfNormalizedString).normalizedStrSet.join(
+          ', '
+        ) +
+        ']'
+      );
     } else if (inputType === 'TranslatableSetOfUnicodeString') {
-      return '[' + inputValue.unicodeStrSet.join(', ') + ']';
+      return (
+        '[' +
+        (inputValue as TranslatableSetOfUnicodeString).unicodeStrSet.join(
+          ', '
+        ) +
+        ']'
+      );
     } else {
       throw new Error(`The ${inputType} type is not implemented.`);
     }
@@ -332,7 +378,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     defaultOutcome: Outcome | null,
     interactionId: string,
     answerGroupCount: number,
-    shortenRule: string
+    shortenRule: boolean
   ): string {
     if (!defaultOutcome) {
       return '';

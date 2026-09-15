@@ -66,6 +66,17 @@ export class InputResponsePairComponent {
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
+  getLearnerInputAsString(): string {
+    if (
+      typeof this.data.learnerInput === 'object' &&
+      this.data.learnerInput !== null &&
+      'answerDetails' in this.data.learnerInput
+    ) {
+      return (this.data.learnerInput as {answerDetails: string}).answerDetails;
+    }
+    return this.data.learnerInput as string;
+  }
+
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
       return this.data.oppiaResponse.includes('oppia-noninteractive-video');

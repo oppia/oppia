@@ -241,6 +241,30 @@ describe('InputResponsePairComponent', () => {
     expect(component.getShortAnswerHtml()).toBe('Short Answer');
   });
 
+  it('should return the learner answer as a string', () => {
+    component.data = {
+      // This throws "Type '{ answerDetails: string; }' is not assignable to
+      // type 'string'.". We need to suppress this error because the learner
+      // answer can have the "answerDetails" object at runtime.
+      // @ts-ignore
+      learnerInput: {
+        answerDetails: 'Answer Details',
+      },
+      oppiaResponse: 'oppia-noninteractive-video-response',
+      isHint: true,
+    };
+
+    expect(component.getLearnerInputAsString()).toBe('Answer Details');
+
+    component.data = {
+      learnerInput: 'Answer',
+      oppiaResponse: 'oppia-noninteractive-video-response',
+      isHint: true,
+    };
+
+    expect(component.getLearnerInputAsString()).toBe('Answer');
+  });
+
   it('should check if the current card is at the end of the transcript', () => {
     spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
 

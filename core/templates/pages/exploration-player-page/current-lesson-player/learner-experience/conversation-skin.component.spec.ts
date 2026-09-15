@@ -2478,5 +2478,21 @@ describe('Conversation skin component', () => {
       isInQuestionModeSpy.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
     }));
+
+    it('should report whether the skin is in editor preview mode', () => {
+      componentInstance._editorPreviewMode = false;
+      expect(componentInstance.isInPreviewMode).toBeFalse();
+
+      componentInstance._editorPreviewMode = true;
+      expect(componentInstance.isInPreviewMode).toBeTrue();
+    });
+
+    it('should report whether the skin should open in a new window', () => {
+      componentInstance.isIframed = false;
+      expect(componentInstance.openInNewWindow).toBeFalse();
+
+      componentInstance.isIframed = true;
+      expect(componentInstance.openInNewWindow).toBeTrue();
+    });
   });
 });

@@ -273,4 +273,12 @@ describe('Progress nav component', () => {
 
     expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
   });
+
+  it('should return the continue button text from the interaction args', () => {
+    componentInstance.interactionCustomizationArgs = {
+      buttonText: {value: {html: 'Next', unicode: 'Next', contentId: null}},
+    };
+
+    expect(componentInstance.getContinueButtonText()).toBe('Next');
+  });
 });

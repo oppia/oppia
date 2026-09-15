@@ -41,7 +41,10 @@ import {
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
 import './progress-nav.component.css';
-import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {
+  ContinueCustomizationArgs,
+  InteractionCustomizationArgs,
+} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
 
@@ -146,6 +149,11 @@ export class ProgressNavComponent {
         }
       )
     );
+  }
+
+  getContinueButtonText(): string {
+    return (this.interactionCustomizationArgs as ContinueCustomizationArgs)
+      .buttonText.value.unicode;
   }
 
   skipCurrentQuestion(): void {

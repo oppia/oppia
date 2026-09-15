@@ -33,16 +33,6 @@ core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component
 core/templates/pages/exploration-editor-page/history-tab/history-tab.component.ts
 core/templates/pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component.ts
 core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.ts
-core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts
-core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/progress-nav.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/input-response-pair.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component.ts
-core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component.ts
-core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component.ts
-core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component.ts
 core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component.ts
 core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.ts
 core/templates/pages/exploration-player-page/new-lesson-player/sidebar-components/lesson-player-sidebar.component.ts

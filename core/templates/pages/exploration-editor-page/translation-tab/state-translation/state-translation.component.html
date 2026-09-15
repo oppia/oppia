@@ -99,7 +99,7 @@
             </oppia-response-header>
           </a>
           <div *ngIf="activeCustomizationArgContentIndex === index">
-            <div class="oppia-editor-card-section" *ngIf="caContent.content._html">
+            <div class="oppia-editor-card-section" *ngIf="getHtmlOrNull(caContent.content)">
               <span *ngIf="!getRequiredHtml(caContent.content)" class="oppia-placeholder" tabindex="0">
                 {{ getEmptyContentMessage() }}
               </span>
@@ -113,8 +113,8 @@
                 </oppia-rte-output-display>
               </span>
             </div>
-            <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
-              <span *ngIf="!caContent.content._unicode" class="oppia-placeholder" tabindex="0">
+            <div class="oppia-editor-card-section" *ngIf="getUnicodeOrNull(caContent.content)">
+              <span *ngIf="!getUnicodeOrNull(caContent.content)" class="oppia-placeholder" tabindex="0">
                 {{ getEmptyContentMessage() }}
               </span>
               <span>
@@ -208,10 +208,10 @@
                (keydown.enter)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
                [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
                [ngStyle]="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
-              <oppia-response-header [index]="index"
-                                     [isActive]="index === activeAnswerGroupIndex"
-                                     [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
-                                     [shortSummary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
+              <oppia-response-header [index]="stateAnswerGroups.length"
+                                     [isActive]="activeAnswerGroupIndex === stateAnswerGroups.length"
+                                     [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateAnswerGroups.length, false)"
+                                     [shortSummary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateAnswerGroups.length, true)"
                                      [outcome]="stateDefaultOutcome"
                                      [defaultOutcome]="true"
                                      [isResponse]="true"
@@ -272,13 +272,13 @@
     </div>
 
     <div *ngIf="isActive(TAB_ID_SOLUTION)" class="translation-state-content e2e-test-solution-text">
-      <span *ngIf="!getRequiredHtml(stateSolution.explanation)" class="oppia-placeholder" tabindex="0">
+      <span *ngIf="!getRequiredHtml(getSolutionExplanation(stateSolution))" class="oppia-placeholder" tabindex="0">
         {{ getEmptyContentMessage() }}
       </span>
       <span tabindex="0">
         <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                   (click)="onContentClick($event)"
-                                  [rteString]="getRequiredHtml(stateSolution.explanation)"
+                                  [rteString]="getRequiredHtml(getSolutionExplanation(stateSolution))"
                                   class="oppia-rte-editor">
         </oppia-rte-output-display>
       </span>
