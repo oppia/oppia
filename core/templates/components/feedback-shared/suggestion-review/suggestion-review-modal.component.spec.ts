@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
+ * @fileoverview Unit tests for SuggestionReviewModalComponent.
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-import {LearnerDashboardSuggestionModalComponent} from './learner-dashboard-suggestion-modal.component';
+import {SuggestionReviewModalComponent} from './suggestion-review-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
   close(): void {
@@ -33,21 +33,18 @@ class MockActiveModal {
   }
 }
 
-describe('Learner Dashboard Suggestion Modal Component', () => {
+describe('Suggestion Review Modal Component', () => {
   let description = 'This is a description string';
   let newContent = 'new content';
   let oldContent = 'old content';
 
-  let component: LearnerDashboardSuggestionModalComponent;
-  let fixture: ComponentFixture<LearnerDashboardSuggestionModalComponent>;
+  let component: SuggestionReviewModalComponent;
+  let fixture: ComponentFixture<SuggestionReviewModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LearnerDashboardSuggestionModalComponent,
-        MockTranslatePipe,
-      ],
+      declarations: [SuggestionReviewModalComponent, MockTranslatePipe],
       providers: [
         {
           provide: NgbActiveModal,
@@ -59,7 +56,7 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LearnerDashboardSuggestionModalComponent);
+    fixture = TestBed.createComponent(SuggestionReviewModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     component.newContent = newContent;
