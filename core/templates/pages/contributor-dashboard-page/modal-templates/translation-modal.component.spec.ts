@@ -50,6 +50,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {TranslateTextService} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {TranslateTextBackendApiService} from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -112,6 +113,9 @@ class MockPlatformFeatureService {
       EnableTranslationOppsWithNewOppModels: {
         isEnabled: false,
       },
+      EnableAutomaticTranslationSuggestions: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -120,6 +124,7 @@ describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
   let translateTextService: TranslateTextService;
+  let translateTextBackendApiService: TranslateTextBackendApiService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -234,6 +239,9 @@ describe('Translation Modal Component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
+    translateTextBackendApiService = TestBed.inject(
+      TranslateTextBackendApiService
+    );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -1721,6 +1729,72 @@ describe('Translation Modal Component', () => {
       expect(component.getFormattedContentType('misconception_feedback')).toBe(
         'misconception feedback'
       );
+    });
+  });
+
+  describe('generateTranslation', () => {
+    it('should generate translation successfully', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(Promise.resolve('<p>hola</p>'));
+
+      component.generateTranslation();
+
+      expect(component.isGeneratingTranslation).toBeTrue();
+      flushMicrotasks();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledWith('hello', 'en', 'es');
+      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
+    }));
+
+    it('should handle error when generating translation', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(Promise.reject('error'));
+
+      component.generateTranslation();
+
+      expect(component.isGeneratingTranslation).toBeTrue();
+      flushMicrotasks();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledWith('hello', 'en', 'es');
+      expect(component.isGeneratingTranslation).toBeFalse();
+    }));
+
+    it('should not generate translation if already generating', () => {
+      component.isGeneratingTranslation = true;
+      spyOn(translateTextBackendApiService, 'getMachineTranslationAsync');
+
+      component.generateTranslation();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should not generate translation if data format is not html', () => {
+      component.activeDataFormat = 'unicode';
+      spyOn(translateTextBackendApiService, 'getMachineTranslationAsync');
+
+      component.generateTranslation();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).not.toHaveBeenCalled();
+      expect(component.isGeneratingTranslation).toBeFalse();
     });
   });
 });

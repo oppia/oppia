@@ -231,3 +231,72 @@
     margin: 5px;
   }
 }
+
+.oppia-auto-translate-button-container {
+  position: absolute;
+  right: 0;
+  top: 15px;
+  z-index: 100;
+}
+
+.oppia-auto-translate-button {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #555;
+  display: flex;
+  font-size: 14px;
+  height: 30px;
+  padding: 0 10px;
+}
+
+.oppia-auto-translate-button:hover {
+  background-color: #f5f5f5;
+}
+
+.oppia-translate-icon {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+.oppia-auto-translate-text {
+  font-weight: normal;
+}
+
+.oppia-auto-translate-warnings {
+  margin-top: 10px;
+}
+
+.oppia-auto-translate-red-text {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.oppia-auto-translate-grey-text {
+  color: #757575;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.oppia-auto-translate-status-text {
+  margin-bottom: 10px;
+}
+
+.oppia-auto-translate-warning-box {
+  align-items: center;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333;
+  display: flex;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.oppia-auto-translate-warning-icon {
+  color: #666;
+  font-size: 20px;
+  margin-right: 10px;
+}
