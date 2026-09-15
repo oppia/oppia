@@ -115,6 +115,14 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     );
   }
 
+  get displayedParamChanges(): ParamChange[] {
+    return this.paramChangesService.displayed as ParamChange[];
+  }
+
+  get savedParamChanges(): ParamChange[] {
+    return this.paramChangesService.savedMemento as ParamChange[];
+  }
+
   openParamChangesEditor(): void {
     if (!this.editabilityService.isEditable()) {
       return;
@@ -162,6 +170,31 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   onChangeGeneratorType(paramChange: ParamChange): void {
     paramChange.resetCustomizationArgs();
+  }
+
+  getCustomizationArgs(paramChange: ParamChange): {
+    value: string;
+    list_of_values: string[];
+  } {
+    // This returns the same customizationArgs object that is stored in the
+    // param change so that the value generator editors can update it in place
+    // via their two-way bindings. The cast is safe because the value generator
+    // editor's input type is a required-fields subset of ParamChange's
+    // customization args.
+    return paramChange.customizationArgs as {
+      value: string;
+      list_of_values: string[];
+    };
+  }
+
+  getHumanReadableArgs(paramChange: ParamChange): string {
+    const customizationArgs = this.getCustomizationArgs(paramChange);
+
+    if (paramChange.generatorId === 'Copier') {
+      return this.HUMAN_READABLE_ARGS_RENDERERS.Copier(customizationArgs);
+    }
+
+    return this.HUMAN_READABLE_ARGS_RENDERERS.RandomSelector(customizationArgs);
   }
 
   areDisplayedParamChangesValid(): boolean {

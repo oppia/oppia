@@ -35,6 +35,7 @@ import {
   DataFormatToDefaultValuesKey,
   TranslatedContent,
 } from 'domain/exploration/translated-content.model';
+import {Schema, UnicodeSchema} from 'services/schema-default-value.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {PageContextService} from 'services/page-context.service';
@@ -42,7 +43,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import './state-translation-editor.component.css';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: {
     rte_component_config_id: string;
     language: string;
@@ -52,7 +53,7 @@ interface HTMLSchema {
 
 interface ListSchema {
   type: 'list';
-  items: {type: string};
+  items: Schema;
   validators: {id: string}[];
 }
 
@@ -69,7 +70,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   activeWrittenTranslation: TranslatedContent | null = null;
   translationEditorIsOpen: boolean = false;
   dataFormat: DataFormatToDefaultValuesKey | string = '';
-  UNICODE_SCHEMA: {type: string} = {
+  UNICODE_SCHEMA: UnicodeSchema = {
     type: 'unicode',
   };
   explorationId!: string;
@@ -308,5 +309,11 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
 
   isTranslationLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isLanguageRTL(this.languageCode);
+  }
+
+  getActiveTranslationAsHtml(): string {
+    // This method is only invoked when the active written translation is in
+    // the HTML data format, so the translation is guaranteed to be a string.
+    return this.activeWrittenTranslation?.getTranslation() as string;
   }
 }

@@ -43,7 +43,7 @@ export class StateTranslationStatusGraphComponent {
     private translationStatusService: TranslationStatusService
   ) {}
 
-  nodeColors(): object {
+  nodeColors(): Record<string, string> {
     return this.translationStatusService.getAllStateStatusColors();
   }
 

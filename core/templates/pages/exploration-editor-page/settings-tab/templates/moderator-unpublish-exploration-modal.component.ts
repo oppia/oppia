@@ -19,6 +19,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'oppia-delete-exploration-modal',
@@ -32,7 +36,7 @@ export class ModeratorUnpublishExplorationModalComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() draftEmailBody!: string;
-  EMAIL_BODY_SCHEMA!: object;
+  EMAIL_BODY_SCHEMA!: Schema;
   emailBody!: string;
   willEmailBeSent: boolean = false;
 
@@ -50,15 +54,18 @@ export class ModeratorUnpublishExplorationModalComponent
         ui_config: {
           rows: 20,
         },
-      };
+      } as Schema;
     }
   }
 
-  getSchema(): object {
+  getSchema(): Schema {
     return this.EMAIL_BODY_SCHEMA;
   }
 
-  updateValue(value: string): void {
-    this.emailBody = value;
+  updateValue(value: SchemaDefaultValue): void {
+    // The schema editor can emit null for empty content; assigning it
+    // directly would save the literal string 'null' instead of an empty
+    // email body.
+    this.emailBody = typeof value === 'string' ? value : '';
   }
 }

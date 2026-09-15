@@ -33,16 +33,6 @@ core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component
 core/templates/pages/exploration-editor-page/history-tab/history-tab.component.ts
 core/templates/pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component.ts
 core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.ts
-core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts
-core/templates/pages/exploration-editor-page/preview-tab/preview-tab.component.ts
-core/templates/pages/exploration-editor-page/preview-tab/templates/preview-set-parameters-modal.component.ts
-core/templates/pages/exploration-editor-page/settings-tab/settings-tab.component.ts
-core/templates/pages/exploration-editor-page/settings-tab/templates/moderator-unpublish-exploration-modal.component.ts
-core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts
-core/templates/pages/exploration-editor-page/statistics-tab/templates/state-stats-modal.component.ts
-core/templates/pages/exploration-editor-page/translation-tab/modal-templates/add-audio-translation-modal.component.ts
-core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.ts
-core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.ts
 core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts
 core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.ts
 core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component.ts

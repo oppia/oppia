@@ -47,7 +47,7 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('pieChart') pieChart!: ElementRef;
 
   // A read-only array representing the table of chart data.
-  @Input() data!: string[];
+  @Input() data!: (string | number)[][];
   // A read-only object containing several chart options. This object
   // should have the following keys: pieHole, pieSliceTextStyleColor,
   // chartAreaWidth, colors, height, legendPosition, width.

@@ -49,10 +49,10 @@ describe('State Stats Modal Component', () => {
   };
   let visualizationsInfo = [
     {
-      data: 'Hola',
-      options: 'Options',
-      id: '1',
-      addressed_info_is_supported: true,
+      addressedInfoIsSupported: false,
+      data: [],
+      id: 'SortedTiles',
+      options: {},
     },
   ];
   let interactionArgs = {};
