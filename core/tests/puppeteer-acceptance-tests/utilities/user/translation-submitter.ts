@@ -572,7 +572,7 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   async clickOnAutoTranslateButton(): Promise<void> {
-    await this.clickOn(autoTranslateButtonSelector);
+    await this.clickOnElementWithSelector(autoTranslateButtonSelector);
   }
 }
 

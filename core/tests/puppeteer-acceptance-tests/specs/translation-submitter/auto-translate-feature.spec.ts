@@ -127,7 +127,98 @@ describe('Auto-Translate Feature', function () {
     await translationSubmitter.clickOnAutoTranslateButton();
     await translationSubmitter.page.waitForTimeout(1000);
 
+    // Click Save and close - should trigger unedited confirmation popup.
     await translationSubmitter.clickOnElementWithText('Save and close');
+    
+    // Click 'Yes, save' in the confirmation modal.
+    await translationSubmitter.clickOnElementWithText('Yes, save');
+
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+  });
+
+  it('should require opening image alt text modal before saving auto-translation with images', async function () {
+    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'Translate Text'
+    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
+
+    // We can clear request interception and set a new one.
+    // Puppeteer handles replacing interceptors if done carefully, but it's easier to just 
+    // remove all listeners and add a new one.
+    await translationSubmitter.page.removeAllListeners('request');
+    translationSubmitter.page.on('request', request => {
+      if (request.url().includes('/generate-translation')) {
+        request.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            translated_text:
+              '<p>चित्र: <oppia-noninteractive-image alt-with-value="&quot;test alt&quot;" caption-with-value="&quot;test cap&quot;" filepath-with-value="&quot;test_image.png&quot;"></oppia-noninteractive-image></p>',
+            translation_provider: 'Google',
+          }),
+        });
+      } else {
+        request.continue();
+      }
+    });
+
+    // The first item should now be "Chapter 1" of "Math Adventures" again since we submitted the previous one?
+    // Wait, the previous test submitted the translation, so the first translation opportunity might be different now,
+    // or we might need to click on it if there are multiple. 
+    // Wait, `addExplorationDescriptionContainingBasicRTEComponents` adds state description and interaction. The previous test submitted the state description. Now we might be translating the interaction or something else.
+    // Let's just click on whatever is available for Math Adventures.
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'Chapter 1',
+      'Algebra - Math Adventures'
+    );
+
+    await translationSubmitter.clickOnAutoTranslateButton();
+    await translationSubmitter.page.waitForTimeout(1000);
+
+    // Save button should be disabled because the image hasn't been reviewed.
+    const saveButtonIsDisabled = await translationSubmitter.page.evaluate(() => {
+      const button = document.querySelector('.e2e-test-save-button') as HTMLButtonElement;
+      return button.disabled;
+    });
+    expect(saveButtonIsDisabled).toBe(true);
+
+    // The warning message should be visible.
+    const warningMessageIsVisible = await translationSubmitter.page.evaluate(() => {
+      const container = document.querySelector('.oppia-translation-error-section');
+      return container && container.textContent?.includes('Please verify that no alt text is required');
+    });
+    expect(warningMessageIsVisible).toBeTruthy();
+
+    // Open the alt text review modal (click on the image icon)
+    await translationSubmitter.page.evaluate(() => {
+      const imgIcon = document.querySelector('.oppia-noninteractive-image') as HTMLElement;
+      if (imgIcon) imgIcon.click();
+    });
+    await translationSubmitter.page.waitForTimeout(1000);
+    
+    // Close the image modal (assuming there's a close button or 'Save' button in it)
+    await translationSubmitter.page.evaluate(() => {
+      const saveBtn = document.querySelector('.modal-dialog .btn-success') as HTMLButtonElement;
+      if (saveBtn) saveBtn.click();
+    });
+    await translationSubmitter.page.waitForTimeout(1000);
+
+    // Save button should now be enabled.
+    const saveButtonIsDisabledAfter = await translationSubmitter.page.evaluate(() => {
+      const button = document.querySelector('.e2e-test-save-button') as HTMLButtonElement;
+      return button.disabled;
+    });
+    expect(saveButtonIsDisabledAfter).toBe(false);
+
+    // Save the translation.
+    await translationSubmitter.clickOnElementWithText('Save and close');
+    
+    // Click 'Yes, save' in the confirmation modal.
+    await translationSubmitter.clickOnElementWithText('Yes, save');
+
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );

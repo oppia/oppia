@@ -162,8 +162,12 @@
 }
 
 .oppia-translation-error-section {
+  background-color: #f5f5f5;
+  border-radius: 4px;
   color: red;
+  padding: 10px;
 }
+
 
 @media screen and (max-width: 700px) {
   .oppia-container-expanded {
@@ -276,6 +280,12 @@
 
 .oppia-auto-translate-grey-text {
   color: #757575;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.oppia-auto-translate-teal-text {
+  color: #009688;
   font-size: 14px;
   margin-bottom: 5px;
 }

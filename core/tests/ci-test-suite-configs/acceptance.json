@@ -521,6 +521,11 @@
       "framework": "playwright"
     },
     {
+      "name": "translation-submitter/auto-translate-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/auto-translate-feature.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/translate-exploration-in-target-language",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts",
       "framework": "puppeteer"
