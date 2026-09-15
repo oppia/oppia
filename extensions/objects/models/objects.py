@@ -42,7 +42,7 @@ if MYPY:  # pragma: no cover
         error_category: str
         error_code: str
         error_message: str
-        error_line_number: str
+        error_line_number: int
 
     class FractionDict(TypedDict):
         """Dictionary representing the Fraction object."""
@@ -858,7 +858,7 @@ class CheckedProof(BaseObject):
                 error_category: str. The category of the error.
                 error_code: str. The error code.
                 error_message: str. The error message.
-                error_line_number: str. The line number at which the
+                error_line_number: int. The line number at which the
                     error has occurred.
 
         Raises:
