@@ -439,14 +439,9 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Using Control+A to select all text, then Backspace to delete it.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
-    await this.page.keyboard.press('Backspace');
+    await element.fill('');
   }
 
   /**

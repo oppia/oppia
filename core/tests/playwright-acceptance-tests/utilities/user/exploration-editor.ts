@@ -217,6 +217,8 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
 
+const addTitleBar = 'input#explorationTitle';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Navigate to creator dashboard page.
@@ -1735,6 +1737,52 @@ export class ExplorationEditor extends BaseUser {
           `but found ${totalUsers} instead.`
       );
     }
+  }
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
+    const title = await this.page.$eval(
+      explorationSummaryTileTitleSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (title === explorationName) {
+      const explorationTileElement = await this.page.$(
+        explorationSummaryTileTitleSelector
+      );
+      await explorationTileElement?.click();
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible(
+      explorationSummaryTileTitleSelector,
+      false
+    );
+  }
+
+  async updateTitleTo(title: string): Promise<void> {
+    await this.expectElementToBeVisible(addTitleBar);
+    await this.clearAllTextFrom(addTitleBar);
+    await this.typeInInputField(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+
+    const newTitle = await this.page.$eval(addTitleBar, el =>
+      (el as HTMLInputElement).value?.trim()
+    );
+
+    // Compare first 36 characters of title.
+    if (newTitle !== title.slice(0, 36)) {
+      throw new Error(
+        `Failed to update title. Expected: ${title}, but got: ${newTitle}`
+      );
+    }
+
+    showMessage(`Title has been updated to ${newTitle}`);
   }
 }
 

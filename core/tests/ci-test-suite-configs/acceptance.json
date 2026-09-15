@@ -187,8 +187,8 @@
     },
     {
       "name": "logged-in-user/edit-avatar-and-view-exploration-from-profile-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-avatar-and-view-exploration-from-profile-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/edit-avatar-and-view-exploration-from-profile-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/manage-classroom-progress-in-learner-dashboard",

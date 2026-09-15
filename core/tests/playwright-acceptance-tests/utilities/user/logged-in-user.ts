@@ -215,6 +215,10 @@ const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const explorationSuccessfullyFlaggedMessage =
   '.e2e-test-exploration-flagged-success-message';
 
+const explorationCard = '.e2e-test-exploration-dashboard-card';
+const profileMenuLink = '.e2e-test-profile-link';
+const profileContainerSelector = '.e2e-test-profile-container';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function to add a goal in the redesigned learner dashboard.
@@ -2540,6 +2544,44 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(`Failed to check profile picture: ${error}`);
       newError.stack = (error as Error).stack;
       throw newError;
+    }
+  }
+  /**
+   * Navigates to the profile page using the profile dropdown.
+   */
+  async navigateToProfilePageUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdownToggleSelector);
+    await this.clickOnElementWithSelector(profileDropdownToggleSelector);
+
+    await this.expectElementToBeVisible(profileMenuLink);
+    await this.clickOnElementWithSelector(profileMenuLink);
+
+    await this.expectElementToBeVisible(profileContainerSelector);
+  }
+
+  /**
+   * Expects an exploration to be present in the profile page with a given title.
+   * @param {string} title - The title of the exploration.
+   */
+  async expectExplorationToBePresentInProfilePageWithTitle(
+    title: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationCard);
+    const explorations = await this.page.$$(explorationCard);
+
+    if (explorations.length === 0) {
+      throw new Error('There are no explorations authored by the creator.');
+    }
+
+    const explorationTitle = await explorations[0].$eval(
+      '.e2e-test-exp-summary-tile-title span span',
+      element => (element as HTMLElement).textContent
+    );
+
+    if (explorationTitle?.trim() === title) {
+      showMessage(`Exploration with title ${title} is present.`);
+    } else {
+      throw new Error(`Exploration with title ${title} is not present.`);
     }
   }
 }
