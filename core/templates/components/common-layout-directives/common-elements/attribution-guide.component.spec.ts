@@ -197,9 +197,7 @@ describe('Attribution Guide Component', function () {
       .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
 
-    component.htmlAttributionTooltip = MockNgbTooltip;
-
-    component.copyAttribution('attribution-html-code');
+    component.copyAttribution('attribution-html-code', MockNgbTooltip);
 
     expect(document.execCommand).toHaveBeenCalled();
     expect(MockNgbTooltip.open).toHaveBeenCalled();
@@ -222,9 +220,7 @@ describe('Attribution Guide Component', function () {
       .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
 
-    component.printAttributionTooltip = MockNgbTooltip;
-
-    component.copyAttribution('attribution-print-text');
+    component.copyAttribution('attribution-print-text', MockNgbTooltip);
 
     expect(document.execCommand).toHaveBeenCalled();
     expect(MockNgbTooltip.open).toHaveBeenCalled();
@@ -248,9 +244,8 @@ describe('Attribution Guide Component', function () {
       .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
 
-    expect(() =>
-      component.copyAttribution('attribution-html-code')
-    ).not.toThrowError();
+    component.copyAttribution('attribution-html-code', undefined);
+
     expect(document.execCommand).toHaveBeenCalled();
     expect(MockNgbTooltip.open).not.toHaveBeenCalled();
   });

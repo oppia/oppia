@@ -103,7 +103,7 @@ export class AttributionGuideComponent implements OnInit {
     return this.pageContextService.getExplorationId();
   }
 
-  copyAttribution(className: string): void {
+  copyAttribution(className: string, tooltip: NgbTooltip | undefined): void {
     const codeDiv = document.getElementsByClassName(
       className
     )[0] as HTMLElement;
@@ -120,14 +120,10 @@ export class AttributionGuideComponent implements OnInit {
     selection?.addRange(range);
     document.execCommand('copy');
     selection?.removeAllRanges();
-    this.showCopiedTooltip(className);
+    this.showCopiedTooltip(tooltip);
   }
 
-  private showCopiedTooltip(className: string): void {
-    const tooltip =
-      className === 'attribution-html-code'
-        ? this.htmlAttributionTooltip
-        : this.printAttributionTooltip;
+  private showCopiedTooltip(tooltip: NgbTooltip | undefined): void {
     if (!tooltip) {
       return;
     }
