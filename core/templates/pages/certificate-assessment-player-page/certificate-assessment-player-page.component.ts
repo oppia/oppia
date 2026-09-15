@@ -19,13 +19,11 @@
 import {
   Component,
   EventEmitter,
-  OnChanges,
   Input,
   OnDestroy,
   OnInit,
   Optional,
   Output,
-  SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Router} from '@angular/router';
@@ -50,12 +48,10 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {
   UnansweredQuestionModalComponent,
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -66,16 +62,13 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent
-  implements OnInit, OnChanges, OnDestroy
+  implements OnInit, OnDestroy
 {
   @Input() attempt: CertificateAssessmentAttemptData | null = null;
   @Input() classroomUrlFragment = '';
-  @Input() isTimeExpired = false;
   @Output() assessmentSubmitted = new EventEmitter<
     SubmitCertificateAssessmentAnswerBackendDict[]
   >();
-  @Output() viewResults = new EventEmitter<void>();
-  @Output() assessmentEnded = new EventEmitter<void>();
 
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
@@ -90,7 +83,6 @@ export class CertificateAssessmentPlayerPageComponent
   totalQuestionCount = 0;
   progressPercentage = 0;
   isLastQuestion = false;
-  hasHandledTimeExpiry = false;
   private handleSubmitFn: OnSubmitFn;
 
   constructor(
@@ -113,18 +105,6 @@ export class CertificateAssessmentPlayerPageComponent
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
     this.buildQuestions();
     this.refreshComputedFields();
-    if (this.isTimeExpired) {
-      this.handleTimeExpiry();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.isTimeExpired?.currentValue === true &&
-      !changes.isTimeExpired?.previousValue
-    ) {
-      this.handleTimeExpiry();
-    }
   }
 
   ngOnDestroy(): void {
@@ -173,40 +153,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   private isMobileScreenSize(): boolean {
     return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
-  }
-
-  openTimeExpiredModal(): void {
-    if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        } else {
-          this.assessmentEnded.emit();
-        }
-      });
-      return;
-    }
-    const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-    modalRef.result
-      .then(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        }
-      })
-      .catch(() => {
-        this.assessmentEnded.emit();
-      });
   }
 
   openUnansweredQuestionModal(
@@ -335,15 +281,6 @@ export class CertificateAssessmentPlayerPageComponent
         this.assessmentSubmitted.emit(answers);
       }
     );
-  }
-
-  private handleTimeExpiry(): void {
-    if (this.hasHandledTimeExpiry) {
-      return;
-    }
-    this.hasHandledTimeExpiry = true;
-    this.openTimeExpiredModal();
-    this.assessmentSubmitted.emit(this.collectAnswers());
   }
 
   handleInteractionSubmit(answer: InteractionAnswer): void {
