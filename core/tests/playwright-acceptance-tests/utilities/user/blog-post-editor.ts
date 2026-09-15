@@ -37,7 +37,6 @@ const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
 
-const newPostButtonSelector = '.e2e-test-new-post-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 
 const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
