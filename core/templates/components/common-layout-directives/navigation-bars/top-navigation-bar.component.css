@@ -514,24 +514,6 @@
   margin-inline-end: 5px;
   padding-inline-start: 5px;
 }
-.oppia-top-navigation-bar .oppia-unread-feedback-indicator {
-  background-color: #f7a541;
-  border-radius: 20px;
-  bottom: 36px;
-  display: flex;
-  height: 15px;
-  justify-content: center;
-  position: absolute;
-  right: 25px;
-  width: 15px;
-}
-.oppia-top-navigation-bar .oppia-unread-feedback-number {
-  bottom: 0;
-  color: white;
-  font-size: 11px;
-  font-weight: bold;
-  position: absolute;
-}
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;
   display: flex;
