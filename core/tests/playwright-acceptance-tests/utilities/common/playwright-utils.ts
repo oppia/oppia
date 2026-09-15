@@ -182,6 +182,7 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
     await this.typeInInputField(usernameInputSelector, username);
+    await this.page.keyboard.press('Tab');
     await this.clickOnElementWithSelector(agreeToTermsCheckboxSelector);
     await this.expectElementToBeVisible(registerButtonSelector);
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
