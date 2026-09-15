@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for viewing and searching blog posts as a logged-out user.
+ * @fileoverview Acceptance Test for viewing blog posts as a logged-out user.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';

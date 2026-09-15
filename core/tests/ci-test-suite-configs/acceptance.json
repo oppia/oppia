@@ -296,8 +296,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-out-user/view-and-search-blog-posts",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-and-search-blog-posts.spec.ts",
+      "name": "logged-out-user/view-blog-posts",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-blog-posts.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -383,11 +383,6 @@
     {
       "name": "logged-out-learner/pick-a-lesson-to-learn",
       "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts",
-      "framework": "playwright"
-    },
-    {
-      "name": "logged-out-learner/search-for-a-specific-exploration",
-      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
       "framework": "playwright"
     },
     {

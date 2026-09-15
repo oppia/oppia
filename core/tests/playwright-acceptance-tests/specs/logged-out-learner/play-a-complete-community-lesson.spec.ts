@@ -122,10 +122,21 @@ test.describe('Logged-Out Learner', function () {
   });
 
   test('should use all RTE components in the exploration', async function () {
-    // Navigate to the exploration directly and verify the page loads.
-    // Expect to be on the exploration player page and there is "Lesson info" text.
+    // Navigate to community library page and expect it to contain 3
+    // different explorations.
+    // LO.4 - First step of the test is to verify that the community library page
+    // does not have any translation ids.
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    // Expect page has no translation ids.
+    await loggedOutLearner.expectPageHasNoTranslationIds();
+
+    // Navigate to the exploration and expect to be on the exploration player
+    // page.
     await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
     await loggedOutLearner.waitForPageToFullyLoad();
+    await loggedOutLearner.expectToBeOnPageAsLoggedOutUser(
+      `http://localhost:8181/explore/${explorationId}`
+    );
 
     await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');
 

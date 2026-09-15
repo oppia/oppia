@@ -77,8 +77,7 @@ const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
-const teacherStoryTaggedBlogsLink =
-  testConstants.URLs.TeacherStoryTaggedBlogsLink;
+const blogPageLink = testConstants.URLs.BlogPage;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 const testimonialCarouselNamesInTeachPage =
@@ -2207,10 +2206,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Teacher Story tagged blogs link
    */
   async clickAndVerifyBlogButtonInTeachPage(): Promise<void> {
-    await this.openExternalLink(
-      blogButtonInTeachPage,
-      teacherStoryTaggedBlogsLink
-    );
+    await this.openExternalLink(blogButtonInTeachPage, blogPageLink);
   }
 
   /**
