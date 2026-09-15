@@ -27,6 +27,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
+    feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
     role_services,
@@ -513,7 +514,16 @@ class SignupPage(
             self.redirect(return_url)
             return
 
-        self.render_template('oppia-root.mainpage.html')
+        self.render_template(
+            'oppia-root.mainpage.html',
+            values={
+                'OPPIA_FEATURE_FLAGS': (
+                    feature_flag_services.evaluate_all_feature_flag_configs(
+                        self.user_id
+                    )
+                ),
+            },
+        )
 
 
 class SignupHandlerNormalizedPayloadDict(TypedDict):

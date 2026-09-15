@@ -375,19 +375,19 @@ def swap_is_feature_flag_enabled_function(
 
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
+        user_id: Optional[str] = None,  # pylint: disable=unused-argument
         feature_flag: Optional[  # pylint: disable=unused-argument
             feature_flag_domain.FeatureFlag
         ] = None,
-        user_id: Optional[str] = None,  # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
             feature_flag_name: str. The name of the target feature flag.
-            feature_flag: FeatureFlag|None. The feature flag domain model.
             user_id: str|None. The id of the user, if logged-out user
                 then None.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
