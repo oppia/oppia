@@ -417,7 +417,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         language_code: str,
         page_size: int,
         urlsafe_start_cursor: Optional[str],
-    ) -> Tuple[Sequence['TranslationOpportunityModel'], Optional[str], bool]:
+    ) -> Tuple[Sequence[TranslationOpportunityModel], Optional[str], bool]:
         """Returns a list of translation opportunities filtered by entity type,
         topic and language code.
 

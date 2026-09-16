@@ -748,6 +748,43 @@ describe('Opportunities List Component', () => {
       expect(component.opportunities.length).toBe(20);
     }));
 
+    it('should ignore loadOpportunitiesCount result if the exact page limit is already known', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
+      let countPromiseResolver: (count: number) => void = () => {};
+      component.loadOpportunitiesCount = () =>
+        new Promise(resolve => {
+          countPromiseResolver = resolve;
+        });
+      component.loadOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: explorationOpportunitiesLoad1.slice(0, 10),
+          more: false,
+        });
+
+      component.fetchAndLoadOpportunities();
+      tick();
+
+      expect(component.totalPages).toBe(1);
+
+      countPromiseResolver(50);
+      tick();
+
+      expect(component.totalPages).toBe(1);
+    }));
+
+    it('should stop fetching if an error occurs during fetchUntilNeeded', fakeAsync(() => {
+      component.dropdownPaginationEnabled = true;
+      component.opportunities = explorationOpportunitiesLoad1.slice(0, 10);
+      component.more = true;
+      component.loadMoreOpportunities = () =>
+        Promise.reject(new Error('Network error'));
+
+      component.gotoPage(2);
+      tick();
+
+      expect(component.loadingOpportunityData).toBeFalse();
+    }));
+
     it('should hit the else branch in unpinOpportunity when indexInVisible is -1', fakeAsync(() => {
       component.opportunities = explorationOpportunitiesLoad1
         .slice(0, 10)

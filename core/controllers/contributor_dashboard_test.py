@@ -3832,13 +3832,17 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['total_count'], 1)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [
+            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION,
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+        ]
     )
-    def test_get_reviewable_translation_count(self) -> None:
+    def test_get_translation_opportunities_count_with_new_models(self) -> None:
         response = self.get_json(
-            '/opportunitiescounthandler/reviewable_translation?language_code=hi'
+            '/opportunitiescounthandler/translation?language_code=hi'
         )
-        self.assertEqual(response['total_count'], 1)
+        # It's 0 because we didn't create a TranslationOpportunityModel in setUp.
+        self.assertEqual(response['total_count'], 0)
 
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
@@ -3846,17 +3850,6 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_count_missing_language_code(self) -> None:
         self.get_json(
             '/opportunitiescounthandler/translation', expected_status_int=400
-        )
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
-    )
-    def test_get_reviewable_translation_count_missing_language_code(
-        self,
-    ) -> None:
-        self.get_json(
-            '/opportunitiescounthandler/reviewable_translation',
-            expected_status_int=400,
         )
 
     @test_utils.enable_feature_flags(

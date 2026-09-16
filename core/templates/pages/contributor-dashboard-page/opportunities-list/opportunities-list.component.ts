@@ -265,6 +265,9 @@ export class OpportunitiesListComponent {
     if (this.dropdownPaginationEnabled) {
       if (this.loadOpportunitiesCount) {
         this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
+          if (!this.more && this.opportunities.length > 0) {
+            return;
+          }
           this.totalPages = Math.max(
             1,
             Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE)
@@ -283,17 +286,9 @@ export class OpportunitiesListComponent {
           this.opportunities = opportunitiesDicts;
           this.more = more;
 
-          if (!this.more && this.dropdownPaginationEnabled) {
-            this.totalPages = Math.max(
-              1,
-              Math.ceil(
-                this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE
-              )
-            );
-            if (this.activePageNumber > this.totalPages) {
-              this.activePageNumber = this.totalPages;
-            }
-          }
+          this.activePageNumber = this._clampDropdownPages(
+            this.activePageNumber
+          );
 
           const startIndex =
             (this.activePageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
@@ -325,27 +320,24 @@ export class OpportunitiesListComponent {
       this.loadingOpportunityData = true;
 
       const fetchUntilNeeded = async () => {
-        while (endIndex > this.opportunities.length && this.more) {
-          const {opportunitiesDicts, more} = await this.loadMoreOpportunities(
-            this.searchQuery
-          );
-          this.more = more;
-          this.opportunities = this.opportunities.concat(opportunitiesDicts);
+        try {
+          while (endIndex > this.opportunities.length && this.more) {
+            const {opportunitiesDicts, more} = await this.loadMoreOpportunities(
+              this.searchQuery
+            );
+            this.more = more;
+            this.opportunities = this.opportunities.concat(opportunitiesDicts);
+          }
+        } catch (error) {
+          this.loadingOpportunityData = false;
+          return;
         }
       };
 
       fetchUntilNeeded().then(() => {
-        if (!this.more && this.dropdownPaginationEnabled) {
-          this.totalPages = Math.max(
-            1,
-            Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
-          );
-          if (pageNumber > this.totalPages) {
-            pageNumber = this.totalPages;
-            startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
-            endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
-          }
-        }
+        pageNumber = this._clampDropdownPages(pageNumber);
+        startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+        endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
 
         this.visibleOpportunities = this.opportunities.slice(
           startIndex,
@@ -361,17 +353,9 @@ export class OpportunitiesListComponent {
         this.activePageNumber = pageNumber;
       });
     } else {
-      if (!this.more && this.dropdownPaginationEnabled) {
-        this.totalPages = Math.max(
-          1,
-          Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
-        );
-        if (pageNumber > this.totalPages) {
-          pageNumber = this.totalPages;
-          startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
-          endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
-        }
-      }
+      pageNumber = this._clampDropdownPages(pageNumber);
+      startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
+      endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
 
       this.visibleOpportunities = this.opportunities.slice(
         startIndex,
@@ -395,6 +379,19 @@ export class OpportunitiesListComponent {
   ): boolean {
     const lastPageNumber = Math.ceil(opportunities.length / pageSize);
     return activePageNumber >= lastPageNumber && !moreResults;
+  }
+
+  private _clampDropdownPages(pageNumber: number): number {
+    if (!this.more && this.dropdownPaginationEnabled) {
+      this.totalPages = Math.max(
+        1,
+        Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
+      );
+      if (pageNumber > this.totalPages) {
+        return this.totalPages;
+      }
+    }
+    return pageNumber;
   }
 
   onChangeLanguage(languageCode: string): void {

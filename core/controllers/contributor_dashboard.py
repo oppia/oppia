@@ -1111,18 +1111,20 @@ class OpportunitiesCountHandler(
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             if language_code is None:
                 raise self.InvalidInputException('language_code is required')
-            count = opportunity_services.get_translation_opportunities_count(
-                language_code, topic_name
-            )
-        elif opportunity_type == 'reviewable_translation':
-            if language_code is None:
-                raise self.InvalidInputException('language_code is required')
-            # For reviewable translations, we just return the full count
-            # since the reviewer tab actually fetches all and paginates on the frontend.
-            # We use the same filter as the list fetcher.
-            count = opportunity_services.get_translation_opportunities_count(
-                language_code, topic_name
-            )
+
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+                self.user_id,
+            ):
+                count = opportunity_services.get_translation_opportunities_count_with_new_models(
+                    feconf.ENTITY_TYPE_EXPLORATION, language_code, topic_name
+                )
+            else:
+                count = (
+                    opportunity_services.get_translation_opportunities_count(
+                        language_code, topic_name
+                    )
+                )
         else:
             raise self.NotFoundException
 
