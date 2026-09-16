@@ -18,7 +18,6 @@
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './coord-two-dim-editor.component.css';
 import {
   icon,
   latLng,
