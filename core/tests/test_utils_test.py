@@ -897,7 +897,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_assert_dict_contains_subset_raises_for_missing_key_only(
         self,
     ) -> None:
-        with self.assertRaisesRegex(AssertionError, "Missing: \\['a'\\]$"):
+        with self.assertRaisesRegex(AssertionError, 'Missing: \\[\'a\'\\]$'):
             self.assertDictContainsSubset({'a': 1}, {})
 
     def test_assert_dict_contains_subset_raises_for_mismatch_only(self) -> None:
