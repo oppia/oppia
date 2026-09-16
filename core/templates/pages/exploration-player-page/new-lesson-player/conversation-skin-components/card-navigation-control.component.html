@@ -13,7 +13,11 @@
         </button>
       </ng-container>
     </div>
-    <oppia-progress-tracker *ngIf="progressTrackerIsVisible" [userIsLoggedIn]="userIsLoggedIn" [ngClass]="{ 'hide-save-btn': userIsLoggedIn }"></oppia-progress-tracker>
+  <oppia-progress-tracker
+    *ngIf="progressTrackerIsVisible"
+    [userIsLoggedIn]="userIsLoggedIn"
+    [ngClass]="{ 'hide-save-btn': userIsLoggedIn, 'sidebar-expanded': getSidebarIsExpanded() }">
+  </oppia-progress-tracker>
     <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
       <button mat-raised-button
               (click)="moveForwardByOneCard()"

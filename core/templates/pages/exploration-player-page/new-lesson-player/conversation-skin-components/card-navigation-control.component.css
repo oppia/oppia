@@ -126,6 +126,10 @@ oppia-progress-tracker {
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
+oppia-progress-tracker.sidebar-expanded {
+  left: calc(50% - 121.5px);
+}
+
 .card-navigation-control.row {
   display: flex;
   flex-direction: row;
