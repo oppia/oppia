@@ -314,6 +314,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   getActiveTranslationAsHtml(): string {
     // This method is only invoked when the active written translation is in
     // the HTML data format, so the translation is guaranteed to be a string.
-    return this.activeWrittenTranslation?.getTranslation() as string;
+    const translation = this.activeWrittenTranslation?.getTranslation();
+    return typeof translation === 'string' ? translation : '';
   }
 }

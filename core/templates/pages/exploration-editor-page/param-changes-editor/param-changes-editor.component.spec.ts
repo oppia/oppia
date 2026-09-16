@@ -128,6 +128,15 @@ describe('Param Changes Editor Component', () => {
     expect(component.paramNameChoices).toEqual([]);
   });
 
+  it('should return the displayed and saved param changes', () => {
+    const paramChange = ParamChange.createDefault('x');
+    component.paramChangesService.displayed = [paramChange];
+    component.paramChangesService.savedMemento = [paramChange];
+
+    expect(component.displayedParamChanges).toEqual([paramChange]);
+    expect(component.savedParamChanges).toEqual([paramChange]);
+  });
+
   it(
     'should reset customization args from param change when changing ' +
       'generator type',

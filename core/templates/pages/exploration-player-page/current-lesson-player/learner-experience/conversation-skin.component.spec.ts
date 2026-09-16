@@ -2481,18 +2481,18 @@ describe('Conversation skin component', () => {
 
     it('should report whether the skin is in editor preview mode', () => {
       componentInstance._editorPreviewMode = false;
-      expect(componentInstance.isInPreviewMode).toBeFalse();
+      expect(componentInstance.isInPreviewMode).toBe(false);
 
       componentInstance._editorPreviewMode = true;
-      expect(componentInstance.isInPreviewMode).toBeTrue();
+      expect(componentInstance.isInPreviewMode).toBe(true);
     });
 
     it('should report whether the skin should open in a new window', () => {
       componentInstance.isIframed = false;
-      expect(componentInstance.openInNewWindow).toBeFalse();
+      expect(componentInstance.openInNewWindow).toBe(false);
 
       componentInstance.isIframed = true;
-      expect(componentInstance.openInNewWindow).toBeTrue();
+      expect(componentInstance.openInNewWindow).toBe(true);
     });
   });
 });

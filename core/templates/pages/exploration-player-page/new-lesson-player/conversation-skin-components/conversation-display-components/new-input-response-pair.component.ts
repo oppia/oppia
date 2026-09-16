@@ -105,15 +105,21 @@ export class NewInputResponsePairComponent {
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
+  private isLearnerInputWithAnswerDetails(
+    learnerInput: InputResponsePair['learnerInput']
+  ): learnerInput is {answerDetails: string} {
+    return (
+      typeof learnerInput === 'object' &&
+      learnerInput !== null &&
+      'answerDetails' in learnerInput
+    );
+  }
+
   getLearnerInputAsString(): string {
-    if (
-      typeof this.data.learnerInput === 'object' &&
-      this.data.learnerInput !== null &&
-      'answerDetails' in this.data.learnerInput
-    ) {
-      return (this.data.learnerInput as {answerDetails: string}).answerDetails;
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      return this.data.learnerInput.answerDetails;
     }
-    return this.data.learnerInput as string;
+    return this.data.learnerInput;
   }
 
   isVideoRteElementPresentInResponse(): boolean {
@@ -152,7 +158,11 @@ export class NewInputResponsePairComponent {
     );
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+      this.convertAnswerToLocalFormat(
+        this.isLearnerInputWithAnswerDetails(this.data.learnerInput)
+          ? this.data.learnerInput.answerDetails
+          : this.data.learnerInput
+      ),
       interaction.id,
       interaction.customizationArgs
     );
@@ -169,9 +179,8 @@ export class NewInputResponsePairComponent {
     );
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
-    if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
-      shortAnswerHtml = (this.data.learnerInput as {answerDetails: string})
-        .answerDetails;
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      shortAnswerHtml = this.data.learnerInput.answerDetails;
     } else if (
       this.data &&
       interaction.id &&
@@ -180,7 +189,7 @@ export class NewInputResponsePairComponent {
       ].needs_summary
     ) {
       shortAnswerHtml = this.explorationHtmlFormatterService.getShortAnswerHtml(
-        this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+        this.convertAnswerToLocalFormat(this.data.learnerInput),
         interaction.id,
         interaction.customizationArgs
       );

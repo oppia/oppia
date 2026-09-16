@@ -840,6 +840,17 @@ describe('Feedback updates page', () => {
 
       expect(result).toBe('шеллы');
     });
+
+    it('should show suggestion modal with the given suggestion details', () => {
+      component.showSuggestionModal(
+        '<p>New content</p>',
+        '<p>Old content</p>',
+        'Suggestion'
+      );
+      component.showSuggestionModal(null, null, null);
+
+      fixture.detectChanges();
+    });
   });
 
   describe('when fetching dashboard data fails', () => {

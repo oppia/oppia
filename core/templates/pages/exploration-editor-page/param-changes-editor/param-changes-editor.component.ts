@@ -109,17 +109,22 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   drop(event: CdkDragSortEvent<ParamChange[]>): void {
     moveItemInArray(
-      this.paramChangesService.displayed as ParamChange[],
+      this.displayedParamChanges,
       event.previousIndex,
       event.currentIndex
     );
   }
 
   get displayedParamChanges(): ParamChange[] {
+    // The "displayed" property of the service is typed as a union of all state
+    // property values, but its runtime value is always a ParamChange[] array.
     return this.paramChangesService.displayed as ParamChange[];
   }
 
   get savedParamChanges(): ParamChange[] {
+    // The "savedMemento" property of the service is typed as a union of all
+    // state property values, but its runtime value is always a ParamChange[]
+    // array.
     return this.paramChangesService.savedMemento as ParamChange[];
   }
 
@@ -180,7 +185,8 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     // param change so that the value generator editors can update it in place
     // via their two-way bindings. The cast is safe because the value generator
     // editor's input type is a required-fields subset of ParamChange's
-    // customization args.
+    // customization args, and only the generator-matching field is ever read
+    // or written at runtime.
     return paramChange.customizationArgs as {
       value: string;
       list_of_values: string[];

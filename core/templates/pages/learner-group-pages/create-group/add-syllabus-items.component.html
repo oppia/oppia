@@ -31,7 +31,7 @@
                    [placeholder]="searchBarPlaceholder"
                    [(ngModel)]="searchQuery"
                    (ngModelChange)="onSearchQueryChangeExec()"
-                   [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+                   [ngModelOptions]="{ updateOn: 'blur', standalone: true }"
                    aria-label="Search bar"
                    (keydown.enter)="$event.target.blur()"
                    (input)="searchToBeExec($event)">
@@ -52,7 +52,7 @@
         <ul ngbDropdownMenu
             class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.types.masterList">
+          <ng-container *ngFor="let item of selectionDetails.types.masterList; let first = first; let last = last">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
@@ -84,7 +84,7 @@
         <ul ngbDropdownMenu
             class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.categories.masterList">
+          <ng-container *ngFor="let item of selectionDetails.categories.masterList; let first = first; let last = last">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
@@ -115,7 +115,7 @@
         </button>
         <ul ngbDropdownMenu class="oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
+          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; let first = first; let last = last">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>

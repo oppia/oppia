@@ -241,12 +241,43 @@ describe('NewInputResponsePairComponent', () => {
     expect(component.getShortAnswerHtml()).toBe('Short Answer');
   });
 
+  it('should return an empty string if the interaction does not need a summary', () => {
+    (playerTranscriptService.getCard as jasmine.Spy).and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'Continue',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: {
+                content_id: null,
+                unicode_str: 'Continue',
+              },
+            },
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
+    );
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: 'oppia-noninteractive-video-response',
+      isHint: true,
+    };
+
+    expect(component.getShortAnswerHtml()).toBe('');
+  });
+
   it('should return the learner answer as a string', () => {
     component.data = {
-      // This throws "Type '{ answerDetails: string; }' is not assignable to
-      // type 'string'.". We need to suppress this error because the learner
-      // answer can have the "answerDetails" object at runtime.
-      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details',
       },

@@ -54,7 +54,7 @@ export class ModeratorUnpublishExplorationModalComponent
         ui_config: {
           rows: 20,
         },
-      } as Schema;
+      };
     }
   }
 

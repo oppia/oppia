@@ -304,11 +304,11 @@ describe('AddSyllabusItemsComponent', () => {
     component.searchQuery = 'hello';
     component.ngOnInit();
 
-    const search = {
-      target: {
-        value: 'search',
-      },
-    };
+    const search = new Event('change');
+    Object.defineProperty(search, 'target', {
+      value: {value: 'search'},
+      configurable: true,
+    });
 
     spyOn(component, 'onSearchQueryChangeExec');
     component.searchToBeExec(search);

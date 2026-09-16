@@ -25,7 +25,7 @@
       </div>
 
       <!-- End card display -->
-      <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
+      <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (getIsInStoryMode() || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
            class="new-conversation-skin-next-lesson-wrapper">
         <div class="new-conversation-skin-next-lesson-text-container">
           <span class="new-conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>

@@ -176,6 +176,43 @@ describe('InputResponsePairComponent', () => {
     expect(component.getAnswerHtml()).toBe('<p> HTML Answer </p>');
   });
 
+  it('should get answer html using the answer details object', () => {
+    spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
+      '<p> HTML Answer </p>'
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'TextInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: {content_id: null, unicode_str: ''}},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
+    );
+    component.data = {
+      learnerInput: {
+        answerDetails: 'Answer Details',
+      },
+      oppiaResponse: 'oppia-noninteractive-video-response',
+      isHint: true,
+    };
+
+    expect(component.getAnswerHtml()).toBe('<p> HTML Answer </p>');
+  });
+
   it('should toggle popover when user clicks on it', () => {
     // This throws "Type '{ toggle: () => void; }' is missing the following
     // properties from type 'NgbPopover': _elementRef, _renderer, _ngZone,
@@ -241,12 +278,43 @@ describe('InputResponsePairComponent', () => {
     expect(component.getShortAnswerHtml()).toBe('Short Answer');
   });
 
+  it('should return an empty string if the interaction does not need a summary', () => {
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'Continue',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: {
+                content_id: null,
+                unicode_str: 'Continue',
+              },
+            },
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
+    );
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: 'oppia-noninteractive-video-response',
+      isHint: true,
+    };
+
+    expect(component.getShortAnswerHtml()).toBe('');
+  });
+
   it('should return the learner answer as a string', () => {
     component.data = {
-      // This throws "Type '{ answerDetails: string; }' is not assignable to
-      // type 'string'.". We need to suppress this error because the learner
-      // answer can have the "answerDetails" object at runtime.
-      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details',
       },

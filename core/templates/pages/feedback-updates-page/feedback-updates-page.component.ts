@@ -411,4 +411,15 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   decodePngURIData(base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
   }
+
+  showSuggestionModal(
+    suggestionHtml: string | null,
+    currentContentHtml: string | null,
+    description: string | null
+  ): void {
+    // This method is a placeholder for the "View suggestion" button in the
+    // page template. The feature is planned to display the suggestion contents
+    // in a modal, and will be implemented in a follow-up.
+    return;
+  }
 }

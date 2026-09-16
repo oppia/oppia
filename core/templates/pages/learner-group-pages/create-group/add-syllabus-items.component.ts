@@ -250,12 +250,12 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   /**
    * Opens the submenu.
-   * @param {KeyboardEvent} evt
+   * @param {Event} evt
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
-    this.navigationService.openSubmenu(evt, menuName);
+  openSubmenu(evt: Event, menuName: string): void {
+    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
   }
 
   onSearchQueryChangeExec(): void {
@@ -288,8 +288,8 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchToBeExec(e: {target: {value: string}}): void {
-    this.searchQueryChanged.next(e.target.value);
+  searchToBeExec(e: Event): void {
+    this.searchQueryChanged.next((e.target as HTMLInputElement).value);
   }
 
   isValidSearch(): boolean {

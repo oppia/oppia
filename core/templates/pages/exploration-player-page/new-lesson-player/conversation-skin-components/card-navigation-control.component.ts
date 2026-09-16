@@ -40,10 +40,7 @@ import {
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
 import './card-navigation-control.component.css';
-import {
-  ContinueCustomizationArgs,
-  InteractionCustomizationArgs,
-} from 'interactions/customization-args-defs';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
 
@@ -157,8 +154,13 @@ export class CardNavigationControlComponent {
   }
 
   getContinueButtonText(): string {
-    return (this.interactionCustomizationArgs as ContinueCustomizationArgs)
-      .buttonText.value.unicode;
+    if (
+      !this.interactionCustomizationArgs ||
+      !('buttonText' in this.interactionCustomizationArgs)
+    ) {
+      return '';
+    }
+    return this.interactionCustomizationArgs.buttonText.value.unicode;
   }
 
   skipCurrentQuestion(): void {
