@@ -264,17 +264,9 @@ class ContributionOpportunitiesHandler(
             )
 
         skill_ids = [opp['id'] for opp in opportunities]
-        in_review_suggestions = (
-            suggestion_services.get_question_suggestions_in_review_by_skill_ids(
-                skill_ids
-            )
+        skill_id_to_in_review_count = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            skill_ids
         )
-        skill_id_to_in_review_count: Dict[str, int] = {}
-        for suggestion in in_review_suggestions:
-            if suggestion is not None:
-                skill_id_to_in_review_count[suggestion.target_id] = (
-                    skill_id_to_in_review_count.get(suggestion.target_id, 0) + 1
-                )
 
         for opp in opportunities:
             opp['questions_in_review_count'] = skill_id_to_in_review_count.get(
