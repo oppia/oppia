@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,6 +93,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   statusMessage: string = '';
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
+  isAutoTranslationEnabled: boolean = false;
 
   USER_FILTER_CRITERION_ROLE: string;
   USER_FILTER_CRITERION_USERNAME: string;
@@ -207,6 +208,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   ngOnInit(): void {
     this.isNewUiEnabled =
       this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled;
+    this.isAutoTranslationEnabled =
+      this.platformFeatureService.status.EnableAutomaticTranslationSuggestions.isEnabled;
     this.userService.getUserInfoAsync().then(userInfo => {
       let translationCategories = {};
       let questionCategories = {};

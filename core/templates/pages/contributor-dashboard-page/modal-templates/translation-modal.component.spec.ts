@@ -50,6 +50,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {TranslateTextService} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {TranslateTextBackendApiService} from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -57,6 +58,7 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
+import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
@@ -79,6 +81,13 @@ class MockConfirmTranslationExitModal {
 }
 
 class MockConfirmFormulaAsTextModal {
+  componentInstance = {};
+  result = Promise.resolve();
+  close(): void {}
+  dismiss(): void {}
+}
+
+class MockTranslationModalUneditedConfirmationModal {
   componentInstance = {};
   result = Promise.resolve();
   close(): void {}
@@ -112,6 +121,9 @@ class MockPlatformFeatureService {
       EnableTranslationOppsWithNewOppModels: {
         isEnabled: false,
       },
+      EnableAutomaticTranslationSuggestions: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -120,6 +132,7 @@ describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
   let translateTextService: TranslateTextService;
+  let translateTextBackendApiService: TranslateTextBackendApiService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -186,6 +199,7 @@ describe('Translation Modal Component', () => {
         WrapTextWithEllipsisPipe,
         ConfirmTranslationExitModalComponent,
         ConfirmFormulaAsTextModalComponent,
+        TranslationModalUneditedConfirmationModalComponent,
         MockTranslatePipe,
       ],
       providers: [
@@ -207,6 +221,10 @@ describe('Translation Modal Component', () => {
         {
           provide: ConfirmFormulaAsTextModalComponent,
           useClass: MockConfirmFormulaAsTextModal,
+        },
+        {
+          provide: TranslationModalUneditedConfirmationModalComponent,
+          useClass: MockTranslationModalUneditedConfirmationModal,
         },
         {
           provide: WindowRef,
@@ -234,6 +252,9 @@ describe('Translation Modal Component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
+    translateTextBackendApiService = TestBed.inject(
+      TranslateTextBackendApiService
+    );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -1157,7 +1178,7 @@ describe('Translation Modal Component', () => {
           '<oppia-noninteractive-' +
           'image alt-with-value="&amp;quot;Image description&amp;quot;' +
           '" caption-with-value="&amp;quot;New caption&amp;quot;"' +
-          ' filepath-with-value="&amp;quot;img_20210129_210552_zbv0mdty9' +
+          ' filepath-with-value="&amp;quot;img_20210129_210552_zbv0mdty' +
           '4_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
@@ -1181,7 +1202,7 @@ describe('Translation Modal Component', () => {
           '<oppia-noninteractive' +
           '-image alt-with-value="&amp;quot;New description&amp;quot;"' +
           ' caption-with-value="&amp;quot;Image caption&amp;quot;"' +
-          ' filepath-with-value="&amp;quot:img_20210129_210552_zbv0mdty9' +
+          ' filepath-with-value="&amp;quot:img_20210129_210552_zbv0mdty' +
           '4_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
@@ -1367,6 +1388,7 @@ describe('Translation Modal Component', () => {
             WrapTextWithEllipsisPipe,
             ConfirmTranslationExitModalComponent,
             ConfirmFormulaAsTextModalComponent,
+            TranslationModalUneditedConfirmationModalComponent,
             MockTranslatePipe,
           ],
           providers: [
@@ -1722,5 +1744,181 @@ describe('Translation Modal Component', () => {
         'misconception feedback'
       );
     });
+  });
+
+  describe('generateTranslation', () => {
+    it('should generate translation successfully', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(Promise.resolve({
+        translated_text: '<p>hola</p>',
+        translation_provider: 'Google'
+      }));
+
+      component.generateTranslation();
+
+      expect(component.isGeneratingTranslation).toBeTrue();
+      flushMicrotasks();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledWith('hello', 'en', 'es');
+      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
+    }));
+
+    it('should handle error when generating translation', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(Promise.reject('error'));
+
+      component.generateTranslation();
+
+      expect(component.isGeneratingTranslation).toBeTrue();
+      flushMicrotasks();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledWith('hello', 'en', 'es');
+      expect(component.isGeneratingTranslation).toBeFalse();
+    }));
+
+    it('should not generate translation if already generating', () => {
+      component.isGeneratingTranslation = true;
+      spyOn(translateTextBackendApiService, 'getMachineTranslationAsync');
+
+      component.generateTranslation();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should not generate translation if data format is not html', () => {
+      component.activeDataFormat = 'unicode';
+      spyOn(translateTextBackendApiService, 'getMachineTranslationAsync');
+
+      component.generateTranslation();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).not.toHaveBeenCalled();
+      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(component.hasIncompleteTranslationError).toBeFalse();
+    });
+
+    it('should open unedited confirmation modal if translation is auto-generated and unedited', fakeAsync(() => {
+      spyOn(translateTextService, 'suggestTranslatedText').and.callFake(
+        (
+          _translationHtml,
+          _languageCode,
+          _imagesData,
+          _dataFormat,
+          successCallback,
+          _errorCallback
+        ) => {
+          successCallback();
+        }
+      );
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: {},
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+
+      component.isTranslationAutoGenerated = true;
+      component.activeWrittenTranslation = 'unchanged translation';
+      component.autoGeneratedTranslation = 'unchanged translation';
+      component.loadingData = false;
+      component.uploadingTranslation = false;
+
+      component.suggestTranslatedText();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        TranslationModalUneditedConfirmationModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      expect(translateTextService.suggestTranslatedText).toHaveBeenCalled();
+    }));
+
+    it('should not suggest translated text if unedited confirmation modal is cancelled', fakeAsync(() => {
+      spyOn(translateTextService, 'suggestTranslatedText');
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: {},
+          result: Promise.reject(),
+        } as NgbModalRef;
+      });
+
+      component.isTranslationAutoGenerated = true;
+      component.activeWrittenTranslation = 'unchanged translation';
+      component.autoGeneratedTranslation = 'unchanged translation';
+      component.loadingData = false;
+      component.uploadingTranslation = false;
+
+      component.suggestTranslatedText();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        TranslationModalUneditedConfirmationModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      expect(translateTextService.suggestTranslatedText).not.toHaveBeenCalled();
+    }));
+
+    it('should update translated text and open unedited confirmation modal if modifyTranslationOpportunity is present', fakeAsync(() => {
+      component.modifyTranslationOpportunity = {
+        id: '1',
+        heading: 'Heading',
+        subheading: 'subheading',
+        progressPercentage: '20',
+        actionButtonTitle: 'Action Button',
+        inReviewCount: 12,
+        totalCount: 50,
+        translationsCount: 20,
+        reviewerOnlyContentCount: 0,
+      };
+      // @ts-ignore
+      component.opportunity = null;
+
+      spyOn(activeModal, 'close');
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: {},
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+
+      component.isTranslationAutoGenerated = true;
+      component.activeWrittenTranslation = 'unchanged translation';
+      component.autoGeneratedTranslation = 'unchanged translation';
+      component.loadingData = false;
+      component.uploadingTranslation = false;
+
+      component.updateTranslatedText();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        TranslationModalUneditedConfirmationModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      expect(activeModal.close).toHaveBeenCalledWith('unchanged translation');
+    }));
   });
 });
