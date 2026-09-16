@@ -386,6 +386,11 @@
       "framework": "playwright"
     },
     {
+      "name": "logged-out-learner/browse-and-verify-lessons-in-the-community-library",
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/browse-and-verify-lessons-in-the-community-library.spec.ts",
+      "framework": "playwright"
+    },
+    {
       "name": "logged-out-learner/visits-the-community-library-and-look-around",
       "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts",
       "framework": "playwright"

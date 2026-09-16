@@ -63,6 +63,12 @@ const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const closeAttributionModalButton = '.attribution-modal button';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
+const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const mobileLessonCardSelector = '.mobile-activity-summary-card';
+const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+const mobileExplorationViewsSelector =
+  '.mobile-activity-card-summary-elements li:first-child span:first-child';
 const progressBarSelector = '.oppia-progress-bar';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
 const suggestionSection = '.suggested-for-you-section';
@@ -1219,6 +1225,115 @@ export class LoggedOutUser extends BaseUser {
     for (const tag of expectedTags) {
       if (!tags.includes(tag)) {
         throw new Error(`Tag ${tag} not found.`);
+      }
+    }
+  }
+
+  /**
+   * Checks if an exploration has a specific rating.
+   *
+   * @param {number} expectedRating - The expected rating of the exploration.
+   * @param {string} expectedExplorationName - The name of the exploration to check.
+   */
+  async expectLessonsToHaveRating(
+    expectedRating: number,
+    expectedExplorationName: string
+  ): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? mobileLessonCardSelector
+      : lessonCardSelector;
+    const cardTitleSelector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
+    try {
+      await this.expectElementToBeVisible(cardSelector);
+      const cards = await this.page.$$(cardSelector);
+      for (const card of cards) {
+        await this.expectElementToBeVisible(cardTitleSelector);
+        const titleElement = await card.$(cardTitleSelector);
+        if (!titleElement) {
+          throw new Error('Title element not found in lesson card.');
+        }
+        const titleText = await this.getTextContent(titleElement);
+        if (titleText === expectedExplorationName) {
+          // The mobile activity summary card does not render a rating, so the
+          // rating can only be checked on the desktop card.
+          if (!this.isViewportAtMobileWidth()) {
+            await this.expectElementToBeVisible(explorationRatingSelector);
+            const ratingElement = await card.$(explorationRatingSelector);
+            if (ratingElement) {
+              const ratingSpan = await ratingElement.$('span:nth-child(2)');
+              if (!ratingSpan) {
+                throw new Error(
+                  `Rating span not found for exploration "${expectedExplorationName}".`
+                );
+              }
+              const ratingText = await this.getTextContent(ratingSpan);
+              const rating = parseFloat(ratingText);
+              if (rating !== expectedRating) {
+                throw new Error(
+                  `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+                );
+              }
+              return;
+            }
+          }
+          return;
+        }
+      }
+      throw new Error(
+        `Exploration "${expectedExplorationName}" not found in exploration titles.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check rating of exploration: ${error}`
+      );
+      if (error instanceof Error) {
+        newError.stack = error.stack;
+      }
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if the views of a lesson card matches the expected views.
+   * @param {number} expectedViews - The expected views of the card.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async expectLessonViewsToBe(
+    expectedViews: number,
+    explorationName: string
+  ): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? mobileLessonCardSelector
+      : lessonCardSelector;
+    const cardTitleSelector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
+    const viewsSelector = this.isViewportAtMobileWidth()
+      ? mobileExplorationViewsSelector
+      : explorationViewsSelector;
+    await this.expectElementToBeVisible(cardSelector);
+    const cards = await this.page.$$(cardSelector);
+    for (const card of cards) {
+      await this.expectElementToBeVisible(cardTitleSelector);
+      const titleElement = await card.$(cardTitleSelector);
+      if (!titleElement) {
+        throw new Error('Title element not found in lesson card.');
+      }
+      const titleText = await this.getTextContent(titleElement);
+      if (titleText === explorationName) {
+        await this.expectElementToBeVisible(viewsSelector);
+        const views = await card.$eval(viewsSelector, el =>
+          parseInt(el?.textContent?.trim() ?? '0', 10)
+        );
+
+        if (views !== expectedViews) {
+          throw new Error(
+            `Expected views to be ${expectedViews}, but found ${views}`
+          );
+        }
+        return;
       }
     }
   }

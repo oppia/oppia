@@ -119,6 +119,9 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
+      // Skips to the main content.
+      await loggedOutUser.verifyFocusAfterShortcut('s');
+
       await loggedOutUser.continueToNextCard();
 
       // Expects the focus to be on the back button in lesson player.
