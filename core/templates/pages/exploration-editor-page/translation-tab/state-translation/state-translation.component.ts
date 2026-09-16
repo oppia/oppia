@@ -253,7 +253,15 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       activeContentId = this.stateContent.contentId;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
       if (this.initActiveContentId) {
-        this.activeAnswerGroupIndex = this.initActiveIndex;
+        const isValidAnswerGroupIndex =
+          typeof this.initActiveIndex === 'number' &&
+          this.initActiveIndex >= 0 &&
+          this.initActiveIndex < this.stateAnswerGroups.length;
+        // Default outcome is not an answer group, so getIndexOfActiveCard()
+        // returns -1. Use the default-outcome slot in that case.
+        this.activeAnswerGroupIndex = isValidAnswerGroupIndex
+          ? this.initActiveIndex
+          : this.stateAnswerGroups.length;
       } else {
         const firstNonEmptyAnswerGroupIndex = this.stateAnswerGroups.findIndex(
           answerGroup => !answerGroup.outcome.feedback.isEmpty()
@@ -288,9 +296,28 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      this.activeCustomizationArgContentIndex = this.initActiveIndex;
+      const customizationArgs =
+        this.interactionCustomizationArgTranslatableContent;
+      const firstNonEmptyCustomizationArgIndex = customizationArgs.findIndex(
+        caContent => !caContent.content.isEmpty()
+      );
+      const fallbackCustomizationArgIndex =
+        firstNonEmptyCustomizationArgIndex === -1
+          ? 0
+          : firstNonEmptyCustomizationArgIndex;
+      if (this.initActiveContentId) {
+        const isValidCustomizationArgIndex =
+          typeof this.initActiveIndex === 'number' &&
+          this.initActiveIndex >= 0 &&
+          this.initActiveIndex < customizationArgs.length;
+        this.activeCustomizationArgContentIndex = isValidCustomizationArgIndex
+          ? this.initActiveIndex
+          : fallbackCustomizationArgIndex;
+      } else {
+        this.activeCustomizationArgContentIndex = fallbackCustomizationArgIndex;
+      }
       const activeContent =
-        this.interactionCustomizationArgTranslatableContent[0].content;
+        customizationArgs[this.activeCustomizationArgContentIndex].content;
       activeContentId = activeContent.contentId;
       if (activeContent instanceof SubtitledUnicode) {
         activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
