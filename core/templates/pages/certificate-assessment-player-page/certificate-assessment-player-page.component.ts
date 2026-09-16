@@ -19,20 +19,17 @@
 import {
   Component,
   EventEmitter,
-  OnChanges,
   Input,
   OnDestroy,
   OnInit,
   Optional,
   Output,
-  SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Router} from '@angular/router';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {SubmitCertificateAssessmentAnswerBackendDict} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
   AssessmentQuestion,
   CertificateAssessmentAttemptData,
@@ -51,12 +48,10 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {
   UnansweredQuestionModalComponent,
   SUBMIT_ANYWAY_RESULT,
 } from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
-import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
@@ -67,25 +62,19 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent
-  implements OnInit, OnChanges, OnDestroy
+  implements OnInit, OnDestroy
 {
   @Input() attempt: CertificateAssessmentAttemptData | null = null;
   @Input() classroomUrlFragment = '';
-  @Input() isTimeExpired = false;
   @Output() assessmentSubmitted = new EventEmitter<
     SubmitCertificateAssessmentAnswerBackendDict[]
   >();
-  @Output() viewResults = new EventEmitter<void>();
-  @Output() assessmentEnded = new EventEmitter<void>();
 
   bannerTitleI18nKey = 'I18N_CERTIFICATE_ASSESSMENT';
   bannerButtonI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
 
   currentQuestionIndex = 0;
   questions: AssessmentQuestion[] = [];
-  isLoadingQuestion = false;
-  loadError = false;
-  private inflightIndexes = new Set<number>();
   answers: {[questionId: string]: InteractionAnswer | null} = {};
   interactions: {[questionId: string]: Interaction} = {};
   interactionHtmls: {[questionId: string]: string} = {};
@@ -94,7 +83,6 @@ export class CertificateAssessmentPlayerPageComponent
   totalQuestionCount = 0;
   progressPercentage = 0;
   isLastQuestion = false;
-  hasHandledTimeExpiry = false;
   private handleSubmitFn: OnSubmitFn;
 
   constructor(
@@ -104,7 +92,6 @@ export class CertificateAssessmentPlayerPageComponent
     private translateService: TranslateService,
     private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
-    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private answerClassificationService: AnswerClassificationService,
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -116,62 +103,25 @@ export class CertificateAssessmentPlayerPageComponent
 
   ngOnInit(): void {
     this.currentInteractionService.setOnSubmitFn(this.handleSubmitFn);
-    this.loadQuestion(0);
+    this.buildQuestions();
     this.refreshComputedFields();
-    if (this.isTimeExpired) {
-      this.handleTimeExpiry();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.isTimeExpired?.currentValue === true &&
-      !changes.isTimeExpired?.previousValue
-    ) {
-      this.handleTimeExpiry();
-    }
   }
 
   ngOnDestroy(): void {
     this.currentInteractionService.clearOnSubmitFn(this.handleSubmitFn);
   }
 
-  private loadQuestion(index: number): void {
-    if (
-      this.attempt === null ||
-      this.questions[index] !== undefined ||
-      this.inflightIndexes.has(index)
-    ) {
+  private buildQuestions(): void {
+    if (this.attempt === null) {
       return;
     }
-    const attemptQuestion = this.attempt.questions[index];
-    if (attemptQuestion === undefined) {
-      return;
-    }
-    this.inflightIndexes.add(index);
-    this.isLoadingQuestion = true;
-    this.loadError = false;
-    this.certificateAssessmentOfferingBackendApiService
-      .getCertificateAssessmentQuestionAsync(
-        this.attempt.attemptId,
-        attemptQuestion.questionId
-      )
-      .then(response => {
-        this.buildQuestionFromStateData(
-          index,
-          response.questionId,
-          response.questionStateData
-        );
-        this.loadError = false;
-        this.refreshComputedFields();
-      })
-      .catch(() => {
-        this.loadError = true;
-      })
-      .finally(() => {
-        this.isLoadingQuestion = false;
-        this.inflightIndexes.delete(index);
-      });
+    this.attempt.questions.forEach((attemptQuestion, index) => {
+      this.buildQuestionFromStateData(
+        index,
+        attemptQuestion.questionId,
+        attemptQuestion.questionStateData
+      );
+    });
   }
 
   private buildQuestionFromStateData(
@@ -203,40 +153,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   private isMobileScreenSize(): boolean {
     return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
-  }
-
-  openTimeExpiredModal(): void {
-    if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(TimeExpiredModalComponent);
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        } else {
-          this.assessmentEnded.emit();
-        }
-      });
-      return;
-    }
-    const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-time-expired-modal',
-    });
-    modalRef.result
-      .then(result => {
-        if (
-          result ===
-          CertificateAssessmentPlayerPageConstants.VIEW_RESULTS_RESULT
-        ) {
-          this.viewResults.emit();
-        }
-      })
-      .catch(() => {
-        this.assessmentEnded.emit();
-      });
   }
 
   openUnansweredQuestionModal(
@@ -281,7 +197,6 @@ export class CertificateAssessmentPlayerPageComponent
       return;
     }
     this.currentQuestionIndex += 1;
-    this.loadQuestion(this.currentQuestionIndex);
     this.refreshComputedFields();
   }
 
@@ -368,15 +283,6 @@ export class CertificateAssessmentPlayerPageComponent
     );
   }
 
-  private handleTimeExpiry(): void {
-    if (this.hasHandledTimeExpiry) {
-      return;
-    }
-    this.hasHandledTimeExpiry = true;
-    this.openTimeExpiredModal();
-    this.assessmentSubmitted.emit(this.collectAnswers());
-  }
-
   handleInteractionSubmit(answer: InteractionAnswer): void {
     const question = this.getCurrentQuestion();
     if (question === null) {
@@ -426,10 +332,6 @@ export class CertificateAssessmentPlayerPageComponent
 
   private getTotalQuestionCount(): number {
     return this.attempt?.questions.length ?? this.questions.length;
-  }
-
-  retryLoadQuestion(): void {
-    this.loadQuestion(this.currentQuestionIndex);
   }
 
   private refreshComputedFields(): void {
