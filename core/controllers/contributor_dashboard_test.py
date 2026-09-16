@@ -2871,6 +2871,8 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi',
                 'certificate_profile_name': self.OWNER_USERNAME,
+                'translated_word_count': 3,
+                'reviewed_word_count': 0,
             },
         )
 
