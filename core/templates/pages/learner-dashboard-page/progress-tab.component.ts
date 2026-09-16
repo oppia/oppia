@@ -63,7 +63,6 @@ export class ProgressTabComponent {
   @Input() completedCollectionsList!: CollectionSummary[];
   @Input() subscriptionsList!: ProfileSummary[];
   @Input() completedToIncompleteCollections!: string[];
-  @Input() learnerDashboardRedesignFeatureFlag!: boolean;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntTopicsList!: LearnerTopicSummary[];
   @Input() currentGoals!: LearnerTopicSummary[];
