@@ -732,7 +732,9 @@ VALID_MODERATOR_ACTIONS: Dict[
 }
 
 # When the site terms were last updated, in UTC.
-TERMS_PAGE_LAST_UPDATED_UTC = datetime.datetime(2020, 10, 19)
+TERMS_PAGE_LAST_UPDATED_UTC = datetime.datetime(
+    2020, 10, 19, tzinfo=datetime.timezone.utc
+)
 
 # Format of string for dashboard statistics logs.
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
@@ -742,7 +744,7 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
 # datetime that a report could be received.
 EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
-    1614556800
+    1614556800, datetime.timezone.utc
 )
 
 # The minimum and maximum package version codes for Oppia Android.

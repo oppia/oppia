@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -1558,7 +1558,7 @@ class ContributorCertificateHandler(
 
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
-        if to_datetime.date() > datetime.datetime.now().date():
+        if to_datetime.date() > utils.get_current_utc_date():
             raise self.InvalidInputException(
                 'To date should not be a future date.'
             )

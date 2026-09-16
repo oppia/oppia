@@ -2228,7 +2228,9 @@ def _create_html_for_reviewable_suggestion_email_info(
     )
     # Calculate how long the suggestion has been waiting for review.
     suggestion_review_wait_time = utils.get_current_utc_datetime() - (
-        reviewable_suggestion_email_info.submission_datetime
+        utils.normalize_datetime_to_utc(
+            reviewable_suggestion_email_info.submission_datetime
+        )
     )
     # Get a string composed of the largest time unit that has a
     # value, followed by that time unit. For example, if the

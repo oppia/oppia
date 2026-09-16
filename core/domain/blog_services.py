@@ -457,7 +457,7 @@ def get_published_blog_post_summaries_by_user_id(
         )
         .filter(
             blog_models.BlogPostSummaryModel.published_on
-            >= datetime.datetime(2000, 1, 1)
+            >= datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
         )
         .order(-blog_models.BlogPostSummaryModel.published_on)
         .fetch(max_limit, offset=offset)
@@ -872,7 +872,7 @@ def get_published_blog_post_summaries(
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.published_on
-            >= datetime.datetime(2000, 1, 1)
+            >= datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
         )
         .order(-blog_models.BlogPostSummaryModel.published_on)
         .fetch(max_limit, offset=offset)

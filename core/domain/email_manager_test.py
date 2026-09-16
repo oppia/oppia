@@ -3869,7 +3869,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     target_id: str = 'exp1'
     skill_id: str = 'skill_123456'
     mocked_review_submission_datetime: datetime.datetime = datetime.datetime(
-        2020, 6, 15, 5
+        2020, 6, 15, 5, tzinfo=datetime.timezone.utc
     )
     AUTHOR_USERNAME: Final = 'author'
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -6061,7 +6061,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     target_id: str = 'exp1'
     skill_id: str = 'skill_123456'
     mocked_review_submission_datetime: datetime.datetime = datetime.datetime(
-        2020, 6, 15, 5
+        2020, 6, 15, 5, tzinfo=datetime.timezone.utc
     )
     AUTHOR_USERNAME: Final = 'author'
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -7150,12 +7150,8 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
     target_id: str = 'exp1'
     skill_id: str = 'skill_123456'
-    timezone = datetime.timezone.utc
     mocked_review_submission_datetime: datetime.datetime = datetime.datetime(
-        2023, 10, 23, 5, tzinfo=timezone
-    )
-    mocked_review_submission_datetime = (
-        mocked_review_submission_datetime.replace(tzinfo=None)
+        2023, 10, 23, 5, tzinfo=datetime.timezone.utc
     )
     AUTHOR_USERNAME: Final = 'author'
     AUTHOR_EMAIL: Final = 'author@example.com'

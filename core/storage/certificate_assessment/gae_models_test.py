@@ -282,7 +282,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_retrieve_lifecycle(self) -> None:
-        started_at = datetime.datetime.utcnow()
+        started_at = utils.get_current_utc_datetime()
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
             certificate_id='cert_abc123',

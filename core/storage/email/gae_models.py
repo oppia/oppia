@@ -89,7 +89,7 @@ class SentEmailModel(base_models.BaseModel):
     # The HTML content of the email body.
     html_body = datastore_services.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
-    sent_datetime = datastore_services.DateTimeProperty(
+    sent_datetime = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # The hash of the recipient id, email subject and message body.

@@ -8061,7 +8061,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         draft_change_list_dict = [
             change.to_dict() for change in draft_change_list
         ]
-        date_time = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+        date_time = datetime.datetime(2016, 2, 16, tzinfo=datetime.timezone.utc)
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.albert_id, self.EXP_0_ID),
             user_id=self.albert_id,
@@ -10222,9 +10222,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     USERNAME: Final = 'user123'
     USER_ID: Final = 'user_id'
     COMMIT_MESSAGE: Final = 'commit message'
-    DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
-    OLDER_DATETIME: Final = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
-    NEWER_DATETIME: Final = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
+    DATETIME: Final = datetime.datetime(
+        2016, 2, 16, tzinfo=datetime.timezone.utc
+    )
+    OLDER_DATETIME: Final = datetime.datetime(
+        2016, 1, 16, tzinfo=datetime.timezone.utc
+    )
+    NEWER_DATETIME: Final = datetime.datetime(
+        2016, 3, 16, tzinfo=datetime.timezone.utc
+    )
     NEW_CHANGELIST: Final = [
         exp_domain.ExplorationChange(
             {
@@ -10617,7 +10623,9 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
     EXP_ID1: Final = 'exp_id1'
     USER_ID: Final = 'user_id'
-    DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    DATETIME: Final = datetime.datetime(
+        2016, 2, 16, tzinfo=datetime.timezone.utc
+    )
 
     def setUp(self) -> None:
         super().setUp()

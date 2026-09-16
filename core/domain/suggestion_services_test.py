@@ -8843,7 +8843,9 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
     REVIEWER_1_EMAIL: str = 'reviewer1@community.org'
     REVIEWER_2_EMAIL: str = 'reviewer2@community.org'
     COMMIT_MESSAGE: str = 'commit message'
-    mocked_current_time: datetime.datetime = datetime.datetime(2020, 6, 15, 5)
+    mocked_current_time: datetime.datetime = datetime.datetime(
+        2020, 6, 15, 5, tzinfo=datetime.timezone.utc
+    )
 
     def _create_translation_suggestion(
         self, content_id: str = 'content_0'
