@@ -1740,7 +1740,12 @@ describe('Translation Modal Component', () => {
       spyOn(
         translateTextBackendApiService,
         'getMachineTranslationAsync'
-      ).and.returnValue(Promise.resolve('<p>hola</p>'));
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text: '<p>hola</p>',
+          translation_provider: 'Google',
+        })
+      );
 
       component.generateTranslation();
 

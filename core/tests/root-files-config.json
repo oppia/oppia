@@ -75,22 +75,23 @@
     "core/templates/pages/contributor-dashboard-page/entity-type-selector/entity-type-selector.component.css"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
-    "extensions/ckeditor_plugins/pre/plugin.js",
-    "core/templates/pages/oppia-root/index.ts",
-    "src/main.ts",
-    "src/vendor-styles.css",
-    "src/index.html",
-    "src/index.prod.html",
-    "src/environments/environment.prod.ts",
-    "src/environments/environment.ts",
-    "extensions/extensions.module.ts",
     "core/templates/domain/feedback/feedback-backend-api.service.ts",
     "core/templates/domain/feedback/feedback-screenshot-staging.service.ts",
     "core/templates/domain/state/state-version-history.model.ts",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
     "core/templates/domain/utilities/classifier-file.model.ts",
-    "extensions/visualizations/visualizationsRequires.ts",
+    "core/templates/pages/oppia-root/index.ts",
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
+    "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/auto-translate-feature.spec.ts",
+    "extensions/ckeditor_plugins/pre/plugin.js",
+    "extensions/extensions.module.ts",
     "extensions/interactions/interactionsQuestionsRequires.ts",
-    "extensions/value_generators/valueGeneratorsRequires.ts"
+    "extensions/value_generators/valueGeneratorsRequires.ts",
+    "extensions/visualizations/visualizationsRequires.ts",
+    "src/environments/environment.prod.ts",
+    "src/environments/environment.ts",
+    "src/index.html",
+    "src/index.prod.html",
+    "src/main.ts",
+    "src/vendor-styles.css"
   ]
 }
