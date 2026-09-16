@@ -37,8 +37,7 @@
         </button>
 
         <span class="oppia-page-selector-label"
-              [translate]="'I18N_CONTRIBUTOR_DASHBOARD_PAGINATION_PAGE_X_OF_Y'"
-              [translateParams]="{totalPages: totalPages}">
+              [translate]="'I18N_CONTRIBUTOR_DASHBOARD_PAGINATION_PAGE'">
         </span>
         <select class="oppia-page-selector e2e-test-page-selector"
                 [ngModel]="activePageNumber"
@@ -46,6 +45,10 @@
                 [disabled]="loadingOpportunityData">
           <option *ngFor="let page of pageNumbers" [ngValue]="page">{{ page }}</option>
         </select>
+        <span class="oppia-page-selector-label"
+              [translate]="'I18N_CONTRIBUTOR_DASHBOARD_PAGINATION_OF_TOTAL_PAGES'"
+              [translateParams]="{totalPages: totalPages}">
+        </span>
 
         <button type="button"
                 class="oppia-pagination-button oppia-pagination-button-icon-only e2e-test-pagination-button-next"
