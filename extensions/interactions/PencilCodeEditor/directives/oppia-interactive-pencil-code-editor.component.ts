@@ -34,10 +34,12 @@ import {
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
 import {Subscription} from 'rxjs';
+import './pencil-code-editor-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-pencil-code-editor',
   templateUrl: './pencil-code-editor-interaction.component.html',
+  styleUrls: ['./pencil-code-editor-interaction.component.css'],
 })
 export class PencilCodeEditor implements OnInit, OnDestroy {
   // `lastAnswer` stores the last submitted code and is always `{code: string} | null`. It is `null` if no previous answer exists.
