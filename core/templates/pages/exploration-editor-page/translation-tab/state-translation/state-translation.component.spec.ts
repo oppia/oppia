@@ -443,7 +443,7 @@ describe('State translation component', () => {
 
             expect(() => {
               component.onTabClick('feedback');
-            }).not.toThrow();
+            }).not.toThrowError();
             expect(component.activeAnswerGroupIndex).toBe(
               component.stateAnswerGroups.length
             );
