@@ -229,9 +229,9 @@ class AwareDateTimePropertyTests(test_utils.GenericTestBase):
 
                 @classmethod
                 def _get_kind(cls) -> str:
-                    return (
+                    return (  # pylint: disable=protected-access
                         AwareDateTimePropertyTestModel._get_kind()
-                    )  # pylint: disable=protected-access
+                    )
 
             LegacyNaiveDateTimePropertyWriterModel(
                 id=legacy_id,
