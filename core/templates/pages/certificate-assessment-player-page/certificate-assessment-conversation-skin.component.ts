@@ -14,8 +14,8 @@
 
 /**
  * @fileoverview Component for the certificate assessment conversation skin,
- * i.e. the question-by-question player screen (progress bar, question card,
- * and navigation actions).
+ * i.e. the question-by-question player screen (question index grid,
+ * question card, and navigation actions).
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
@@ -33,13 +33,26 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
   @Input() currentQuestion!: AssessmentQuestion;
   @Input() currentQuestionIndex = 0;
   @Input() totalQuestions = 0;
-  @Input() progressPercentage = 0;
   @Input() isLastQuestion = false;
   @Input() interactionHtml = '';
+  @Input() questionStatuses: {[index: number]: string} = {};
+  @Input() questionIndexes: number[] = [];
 
   @Output() previousQuestion = new EventEmitter<void>();
   @Output() nextQuestion = new EventEmitter<void>();
+  @Output() navigateToQuestion = new EventEmitter<number>();
   @Output() submitAssessment = new EventEmitter<void>();
+
+  indexNotAttemptedLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_NOT_ATTEMPTED';
+  indexUnansweredLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_UNANSWERED';
+  indexAttemptedLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ATTEMPTED';
+  indexNotVisitedLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_NOT_VISITED';
+  indexAnsweredLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ANSWERED';
 
   OPPIA_AVATAR_IMAGE_URL!: string;
 
@@ -66,6 +79,14 @@ export class CertificateAssessmentConversationSkinComponent implements OnInit {
       this.currentInteractionService.submitAnswer();
     }
     this.nextQuestion.emit();
+  }
+
+  onNavigateToQuestion(index: number): void {
+    this.navigateToQuestion.emit(index);
+  }
+
+  getQuestionStatus(index: number): string {
+    return this.questionStatuses[index] || 'unvisited';
   }
 
   onSubmitAssessment(): void {

@@ -310,13 +310,15 @@ class CertificateAssessmentOfferingByIdHandler(
         'DELETE': {},
     }
 
-    @acl_decorators.can_access_certificate_dashboard
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self, certificate_id: str) -> None:
         """Returns a certificate offering by ID.
 
         Args:
             certificate_id: str. The ID of the certificate offering.
         """
+        if self.user_id is None:
+            raise self.NotLoggedInException
         try:
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id

@@ -35,6 +35,16 @@ export class AssessmentInstructionPanelComponent {
   instructionsHeadingI18nKey = 'I18N_ASSESSMENT_INSTRUCTIONS_HEADING';
   questionCountInstructionI18nKey =
     'I18N_ASSESSMENT_INSTRUCTION_QUESTION_COUNT';
+  indexNavigationInstructionI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_NAVIGATION';
+  indexAttemptedLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ATTEMPTED';
+  indexPreviewDescriptionI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_PREVIEW_DESCRIPTION';
+  indexNotVisitedLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_NOT_VISITED';
+  indexAnsweredLegendI18nKey =
+    'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ANSWERED';
   startAssessmentButtonI18nKey = 'I18N_ASSESSMENT_START_BUTTON';
 
   // Remaining instructions are static text, so no interpolation params

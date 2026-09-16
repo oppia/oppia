@@ -22,8 +22,16 @@
   z-index: 1;
 }
 
-.result-card--failed {
-  --oppia-result-accent: #b3261e;
+.result-card-score {
+  color: var(--oppia-result-accent);
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 4px 0 18px;
+}
+
+.result-card--failed .result-card-score {
+  color: #b3261e;
+  font-weight: 400;
 }
 
 .result-card-heading {
@@ -33,6 +41,10 @@
   font-weight: 800;
   margin-bottom: 20px;
   text-align: center;
+}
+
+.result-card--failed .result-card-heading {
+  font-weight: 400;
 }
 
 .result-card-earned-banner {
@@ -70,13 +82,6 @@
   min-width: 0;
 }
 
-.result-card-score {
-  color: var(--oppia-result-accent);
-  font-size: 4rem;
-  font-weight: 800;
-  margin: 4px 0 18px;
-}
-
 .result-card-time-taken {
   color: #333;
   margin-top: 16px;
@@ -98,13 +103,16 @@
 }
 
 .result-card-retry-btn:hover {
-  background: var(--oppia-teal-pale);
+  background: var(--oppia-teal-dark);
+  border-color: var(--oppia-teal-dark);
+  color: #fff;
 }
 
 @media (max-width: 640px) {
   .result-card {
     margin: -120px 16px 32px;
     padding: 28px 20px 24px;
+    top: 125px;
   }
 
   .result-card-summary {

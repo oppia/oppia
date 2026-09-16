@@ -208,6 +208,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let classificationSpy: jasmine.SpyObj<AnswerClassificationService>;
   let formatterSpy: jasmine.SpyObj<ExplorationHtmlFormatterService>;
   let currentInteractionServiceSpy: jasmine.SpyObj<CurrentInteractionService>;
+  let internetConnectivityServiceSpy: jasmine.SpyObj<InternetConnectivityService>;
 
   const setup = async (
     attempt: CertificateAssessmentAttemptData | null = makeAttempt()
@@ -262,6 +263,11 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       'setOnSubmitFn',
       'clearOnSubmitFn',
     ]);
+    internetConnectivityServiceSpy = jasmine.createSpyObj(
+      'InternetConnectivityService',
+      ['isOnline']
+    );
+    internetConnectivityServiceSpy.isOnline.and.returnValue(true);
 
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
@@ -297,9 +303,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
         },
         {
           provide: InternetConnectivityService,
-          useValue: jasmine.createSpyObj('InternetConnectivityService', [
-            'isOnline',
-          ]),
+          useValue: internetConnectivityServiceSpy,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -366,12 +370,46 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentQuestionIndex).toBe(0);
   });
 
+  it('should navigate directly to a specific question', fakeAsync(() => {
+    load();
+    component.navigateToQuestion(2);
+    expect(component.currentQuestionIndex).toBe(2);
+    expect(component.questionStatuses[2]).toBe('visited');
+  }));
+
+  it('should not navigate to invalid question index', fakeAsync(() => {
+    load();
+    component.navigateToQuestion(-1);
+    expect(component.currentQuestionIndex).toBe(0);
+    component.navigateToQuestion(10);
+    expect(component.currentQuestionIndex).toBe(0);
+  }));
+
+  it('should return correct question indexes', fakeAsync(() => {
+    load();
+    expect(component.getQuestionIndexes()).toEqual([0, 1, 2]);
+  }));
+
+  it('should initialize all question statuses as unvisited', fakeAsync(() => {
+    load();
+    expect(component.questionStatuses[0]).toBe('visited');
+    expect(component.questionStatuses[1]).toBe('unvisited');
+    expect(component.questionStatuses[2]).toBe('unvisited');
+  }));
+
+  it('should mark question as attempted on answer submit', fakeAsync(() => {
+    load();
+    component.currentQuestionIndex = 0;
+    component.handleInteractionSubmit(1);
+    expect(component.questionStatuses[0]).toBe('attempted');
+  }));
+
   it('should recompute derived fields on first load', fakeAsync(() => {
     expect(component.currentQuestion).toBeNull();
     load();
     expect(component.currentQuestion).toEqual(component.questions[0]);
     expect(component.totalQuestionCount).toBe(3);
-    expect(component.progressPercentage).toBe(Math.round((1 / 3) * 100));
+    expect(component.questionStatuses[0]).toBe('visited');
     expect(component.isLastQuestion).toBe(false);
   }));
 
@@ -380,9 +418,11 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.currentQuestionIndex = 0;
     component.nextQuestion();
     expect(component.isLastQuestion).toBe(false);
+    expect(component.questionStatuses[0]).toBe('visited');
+    expect(component.questionStatuses[1]).toBe('visited');
     component.nextQuestion();
     expect(component.isLastQuestion).toBe(true);
-    expect(component.progressPercentage).toBe(100);
+    expect(component.questionStatuses[2]).toBe('visited');
     component.previousQuestion();
     expect(component.isLastQuestion).toBe(false);
   }));
@@ -440,18 +480,15 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.isCurrentQuestionLast()).toBe(true);
   }));
 
-  it('should return 0 when no questions', async () => {
+  it('should return empty indexes when no questions', async () => {
     await setup(null);
     fixture.detectChanges();
-    expect(component.getProgressPercentage()).toBe(0);
+    expect(component.getQuestionIndexes()).toEqual([]);
   });
 
-  it('should compute progress percentage', fakeAsync(() => {
+  it('should return indexes matching question count', fakeAsync(() => {
     load();
-    component.currentQuestionIndex = 0;
-    expect(component.getProgressPercentage()).toBe(Math.round((1 / 3) * 100));
-    component.currentQuestionIndex = 2;
-    expect(component.getProgressPercentage()).toBe(100);
+    expect(component.getQuestionIndexes()).toEqual([0, 1, 2]);
   }));
 
   it('should emit answers directly when all questions are answered', fakeAsync(() => {

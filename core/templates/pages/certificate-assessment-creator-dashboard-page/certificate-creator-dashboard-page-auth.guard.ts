@@ -14,7 +14,8 @@
 
 /**
  * @fileoverview Guard that redirects to 404 when the certificate creator
- * dashboard feature is disabled.
+ * dashboard feature is disabled, and to 401 when the user is not a
+ * curriculum admin.
  */
 
 import {Location} from '@angular/common';
@@ -28,6 +29,7 @@ import {
 
 import {AppConstants} from 'app.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UserService} from 'services/user.service';
 
 interface ErrorResponse {
   status: number;
@@ -43,6 +45,7 @@ class CertificateAssessmentFeatureDisabledError extends Error {
 export class CertificateCreatorDashboardPageAuthGuard implements CanActivate {
   constructor(
     private platformFeatureService: PlatformFeatureService,
+    private userService: UserService,
     private router: Router,
     private location: Location
   ) {}
@@ -53,12 +56,31 @@ export class CertificateCreatorDashboardPageAuthGuard implements CanActivate {
   ): Promise<boolean> {
     try {
       if (
-        this.platformFeatureService.status.EnableCertificateAssessment.isEnabled
+        !this.platformFeatureService.status.EnableCertificateAssessment
+          .isEnabled
       ) {
+        throw new CertificateAssessmentFeatureDisabledError();
+      }
+
+      const userInfo = await this.userService.getUserInfoAsync();
+      if (userInfo.isCurriculumAdmin()) {
         return true;
       }
 
-      throw new CertificateAssessmentFeatureDisabledError();
+      // Store error message in sessionStorage since location.replaceState will
+      // clear router state.
+      window.sessionStorage.setItem(
+        'oppia_401_error_message',
+        'You must be a curriculum admin to access this page.'
+      );
+      this.router
+        .navigate([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+        ])
+        .then(() => {
+          this.location.replaceState(state.url);
+        });
+      return false;
     } catch (err) {
       const errorResponse = err as ErrorResponse;
       await this.router.navigate([

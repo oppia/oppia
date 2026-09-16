@@ -153,4 +153,20 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     expect(() => component.onSubmitAssessment()).toThrowError('submit failed');
     expect(component.submitAssessment.emit).not.toHaveBeenCalled();
   });
+
+  it('should emit navigateToQuestion with correct index', () => {
+    spyOn(component.navigateToQuestion, 'emit');
+
+    component.onNavigateToQuestion(2);
+
+    expect(component.navigateToQuestion.emit).toHaveBeenCalledWith(2);
+  });
+
+  it('should return correct question status', () => {
+    component.questionStatuses = {0: 'visited', 1: 'attempted'};
+
+    expect(component.getQuestionStatus(0)).toBe('visited');
+    expect(component.getQuestionStatus(1)).toBe('attempted');
+    expect(component.getQuestionStatus(2)).toBe('unvisited');
+  });
 });

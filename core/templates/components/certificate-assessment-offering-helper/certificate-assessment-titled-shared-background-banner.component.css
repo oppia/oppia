@@ -59,11 +59,14 @@
 @media (max-width: 600px) {
   .oppia-titled-background-banner-header {
     flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 12px 12px;
   }
 
   .oppia-titled-background-banner-header .col-4 {
-    flex: 0 0 auto;
+    flex: 0 0 100%;
     max-width: none;
+    text-align: right;
   }
 
   .oppia-titled-background-banner-header .col-4:last-child {
@@ -74,9 +77,17 @@
     flex: 1 1 100%;
     margin-bottom: 12px;
     order: -1;
+    padding: 0 8px;
   }
 
   .oppia-titled-background-banner-header h1 {
-    font-size: 1.7rem;
+    font-size: 2.7rem;
+    margin-top: 40px;
+  }
+
+  .oppia-titled-background-banner-button.btn-primary {
+    font-size: 1.6rem;
+    margin-left: 0;
+    width: 120px;
   }
 }

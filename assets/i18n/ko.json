@@ -252,7 +252,6 @@
   "I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE": "카드 내용이 너무 깁니다. 저장하려면 4500자 이내로 작성해 주세요.",
   "I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "이 카드는 너무 길어서 학생들이 흥미를 잃을 수 있습니다. 길이를 줄이거나 두 장으로 나누는 것을 고려해 보세요.",
   "I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_BACK_BUTTON": "뒤로",
-  "I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_CURRENT_PROGRESS": "현재 진행 상황: <[progressPercentage]>%",
   "I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON": "다음",
   "I18N_CHAPTER_COMPLETION": "챕터 완료를 축하합니다!",
   "I18N_CLASSROOM_FOUNDATION_TEXT": "<[classroomName]>에서 시작하기 위한 기초 수업입니다.",

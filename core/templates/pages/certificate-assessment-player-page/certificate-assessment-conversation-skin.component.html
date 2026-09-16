@@ -1,30 +1,41 @@
 <div class="certificate-assessment-conversation-skin">
 
   <div class="oppia-question-player-card certificate-assessment-progress-card">
-    <div class="certificate-assessment-question-player-progress">
-      <div class="certificate-assessment-progress-fill"
-           [ngStyle]="{'width': progressPercentage + '%'}">
-      </div>
+    <div class="certificate-assessment-question-index-grid">
+      <button *ngFor="let i of questionIndexes"
+              type="button"
+              class="certificate-assessment-index-box"
+              [ngClass]="getQuestionStatus(i)"
+              [attr.aria-label]="'Question ' + (i + 1)"
+              (click)="onNavigateToQuestion(i)">
+        {{ i + 1 }}
+      </button>
     </div>
-    <div class="certificate-assessment-progress-meta">
-      <span class="certificate-assessment-current-progress">
-        {{
-          'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_CURRENT_PROGRESS'
-            | translate: {progressPercentage: progressPercentage}
-        }}
-      </span>
+    <div class="certificate-assessment-progress-legend">
+      <div class="certificate-assessment-legend-item">
+        <span class="certificate-assessment-legend-box attempted"></span>
+        <span>{{ indexAttemptedLegendI18nKey | translate }}</span>
+      </div>
+      <div class="certificate-assessment-legend-item">
+        <span class="certificate-assessment-legend-box unvisited"></span>
+        <span>{{ indexNotVisitedLegendI18nKey | translate }}</span>
+      </div>
+      <div class="certificate-assessment-legend-item">
+        <span class="certificate-assessment-legend-box visited"></span>
+        <span>{{ indexAnsweredLegendI18nKey | translate }}</span>
+      </div>
     </div>
   </div>
 
   <div class="oppia-question-player-card certificate-assessment-question-card">
-    <div class="certificate-assessment-question-counter">
+    <div class="certificate-assessment-question-counter e2e-test-question-counter">
       Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}
     </div>
     <div class="certificate-assessment-question-header">
       <div class="certificate-assessment-avatar">
         <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
-      <div class="certificate-assessment-prompt-pill">
+      <div class="certificate-assessment-prompt-pill e2e-test-question-prompt">
         <oppia-rte-output-display [rteString]="currentQuestion.prompt">
         </oppia-rte-output-display>
       </div>
@@ -54,7 +65,7 @@
     <span *ngIf="currentQuestionIndex === 0"></span>
 
     <button *ngIf="!isLastQuestion" type="button"
-            class="certificate-assessment-navigation-link"
+            class="certificate-assessment-navigation-link e2e-test-next-question-button"
             (click)="onNextQuestion()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON'
@@ -63,7 +74,7 @@
       <span class="certificate-assessment-navigation-arrow">&#8594;</span>
     </button>
     <button *ngIf="isLastQuestion" type="submit"
-            class="btn certificate-assessment-primary-button"
+            class="btn certificate-assessment-primary-button e2e-test-submit-assessment-button"
             (click)="onSubmitAssessment()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_SUBMIT_ASSESSMENT_BUTTON'

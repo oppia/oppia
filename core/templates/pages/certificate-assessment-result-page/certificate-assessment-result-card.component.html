@@ -6,7 +6,7 @@
 
   <div class="result-card" [ngClass]="{ 'result-card--failed': !passed }"
        *ngIf="!isLoading && result">
-    <h1 class="result-card-heading">
+    <h1 class="result-card-heading e2e-test-result-heading">
       {{
         passed
           ? ('I18N_CERTIFICATE_ASSESSMENT_RESULT_PASSED_HEADING' | translate)
@@ -40,7 +40,7 @@
       </div>
 
       <div class="result-card-score-block">
-        <h2 class="result-card-score">
+        <h2 class="result-card-score e2e-test-result-score">
           {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL' | translate }}:
           {{ result.scorePercentage | number: '1.0-0' }}%
         </h2>
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <button type="button" class="btn result-card-retry-btn"
+    <button type="button" class="btn result-card-retry-btn e2e-test-result-retry-button"
             (click)="onRetryAssessment()">
       {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_RETRY_BUTTON' | translate }}
     </button>

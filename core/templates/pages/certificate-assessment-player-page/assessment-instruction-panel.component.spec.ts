@@ -80,6 +80,30 @@ describe('AssessmentInstructionPanelComponent', () => {
     ]);
   });
 
+  it('should have the correct i18n key for the index navigation instruction', () => {
+    expect(component.indexNavigationInstructionI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_INDEX_NAVIGATION'
+    );
+  });
+
+  it('should have the correct i18n keys for the index legend', () => {
+    expect(component.indexAttemptedLegendI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ATTEMPTED'
+    );
+    expect(component.indexNotVisitedLegendI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_NOT_VISITED'
+    );
+    expect(component.indexAnsweredLegendI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_INDEX_LEGEND_ANSWERED'
+    );
+  });
+
+  it('should have the correct i18n key for the index preview description', () => {
+    expect(component.indexPreviewDescriptionI18nKey).toBe(
+      'I18N_ASSESSMENT_INSTRUCTION_INDEX_PREVIEW_DESCRIPTION'
+    );
+  });
+
   it('should emit startAssessment when onStartAssessment is called', () => {
     spyOn(component.startAssessment, 'emit');
 

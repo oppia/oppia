@@ -2328,12 +2328,6 @@ oppia-parameter {
   padding: 0 !important;
 }
 
-.oppia-time-expired-modal .modal-content {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
 .oppia-unanswered-question-modal .modal-content {
   background: transparent !important;
   border: none !important;
