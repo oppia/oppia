@@ -596,12 +596,7 @@ class SetupTests(test_utils.GenericTestBase):
             check_function_calls['open_is_called'] = True
             return temp_file
 
-        # The parameter here is named 'filter' (shadowing the builtin) because
-        # it must match TarFile.extractall()'s real keyword argument name, so
-        # the mock can be called the same way as the code under test.
-        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
-            unused_self: str, path: str, filter: str = 'data'
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:
@@ -950,15 +945,7 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        # The parameter here is named 'filter' (shadowing the builtin) because
-        # it must match TarFile.extractall()'s real keyword argument name, so
-        # the mock can be called the same way as the code under test.
-        # The parameter here is named 'filter' (shadowing the builtin) because
-        # it must match TarFile.extractall()'s real keyword argument name, so
-        # the mock can be called the same way as the code under test.
-        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
-            unused_self: str, path: str, filter: str = 'data'
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:
@@ -1060,9 +1047,7 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument, redefined-builtin
-            unused_self: str, path: str, filter: str = 'data'
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:

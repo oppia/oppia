@@ -2037,10 +2037,12 @@ class TestBase(unittest.TestCase):
         """
         super().assertDictEqual(dict_one, dict_two, msg=msg)
 
+    # Here we use type Any because the values in 'subset' and 'dictionary'
+    # can be of any type.
     def assertDictContainsSubset(  # pylint: disable=invalid-name
         self,
-        subset: Mapping[Any, Any],
-        dictionary: Mapping[Any, Any],
+        subset: Mapping[str, Any],
+        dictionary: Mapping[str, Any],
         msg: Optional[str] = None,
     ) -> None:
         """Checks whether the given dictionary contains the given subset of
@@ -2052,13 +2054,13 @@ class TestBase(unittest.TestCase):
         rather than being rewritten to use assertEqual with a dict merge.
 
         Args:
-            subset: Mapping[Any, Any]. The key-value pairs that dictionary is
+            subset: Mapping[str, Any]. The key-value pairs that dictionary is
                 expected to contain.
-            dictionary: Mapping[Any, Any]. The dictionary to check.
+            dictionary: Mapping[str, Any]. The dictionary to check.
             msg: Optional[str]. Message displayed when test fails.
 
         Raises:
-            AssertionError. dictionary does not contain subset.
+            AssertionError. Dictionary does not contain subset.
         """
         missing_keys = []
         mismatched_items = []
