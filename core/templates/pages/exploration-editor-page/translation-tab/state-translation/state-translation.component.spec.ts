@@ -2422,6 +2422,24 @@ describe('State translation component', () => {
         );
         expect(component.getSolutionExplanation(htmlContent)).toBeNull();
       });
+
+      it('should return empty string when subtitled content is not html', () => {
+        const subtitledUnicode = SubtitledUnicode.createDefault(
+          'unicode',
+          'content_0'
+        );
+
+        expect(component.getRequiredHtml(subtitledUnicode)).toBe('');
+      });
+
+      it('should return empty string when subtitled content is not unicode', () => {
+        const subtitledHtml = SubtitledHtml.createDefault(
+          '<p>html</p>',
+          'content_0'
+        );
+
+        expect(component.getRequiredUnicode(subtitledHtml)).toBe('');
+      });
     }
   );
 });
