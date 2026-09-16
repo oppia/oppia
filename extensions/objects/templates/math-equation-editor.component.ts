@@ -35,6 +35,7 @@ import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {TranslateService} from '@ngx-translate/core';
+import './math-equation-editor.component.css';
 
 export interface FocusObj {
   focused: boolean;
@@ -43,7 +44,7 @@ export interface FocusObj {
 @Component({
   selector: 'math-equation-editor',
   templateUrl: './math-equation-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./math-equation-editor.component.css'],
 })
 export class MathEquationEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
