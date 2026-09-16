@@ -26,7 +26,16 @@ const saveButtonSelector = '.e2e-test-save-button';
 
 const totalQuestionReviewersSelector = '.e2e-test-total-question-reviewers';
 
+const openModalWindowSelector = 'ngb-modal-window, .modal-backdrop';
+
 export class QuestionCoordinator extends BaseUser {
+  /**
+   * Waits for the question role editor modal to be visible.
+   */
+  async expectQuestionRoleEditorModalToBeVisible(): Promise<void> {
+    await this.getElementInParent(questionRoleEditorModalSelector);
+  }
+
   /**
    * Clicks on the add reviewer or submitter button.
    * @param {'Submitter' | 'Reviewer'} right - The right to add.
@@ -87,6 +96,18 @@ export class QuestionCoordinator extends BaseUser {
     await saveButton.click();
 
     await this.expectElementToBeVisible(questionRoleEditorModalSelector, false);
+  }
+
+  /**
+   * Waits for all open modals to be closed so they do not block subsequent
+   * clicks and actions.
+   */
+  async expectNoModalsToBeOpen(): Promise<void> {
+    await this.page.waitForFunction(
+      (sel: string) => document.querySelectorAll(sel).length === 0,
+      {},
+      openModalWindowSelector
+    );
   }
 
   /**
