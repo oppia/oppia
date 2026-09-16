@@ -90,10 +90,8 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'},
         )
         self.assertEqual(len(response_dict['results']), 2)
-        self.assertEqual(
-            response_dict['results'][1],
-            response_dict['results'][1]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'username': self.VIEWER_USERNAME,
                 'exploration_id': 'exp_1',
                 'post_commit_status': 'public',
@@ -101,11 +99,10 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'commit_message': 'created first commit',
                 'commit_type': 'create',
             },
+            response_dict['results'][1],
         )
-        self.assertEqual(
-            response_dict['results'][0],
-            response_dict['results'][0]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'username': self.NEW_USER_USERNAME,
                 'exploration_id': 'exp_1',
                 'post_commit_status': 'public',
@@ -113,6 +110,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'commit_message': 'edited commit',
                 'commit_type': 'edit',
             },
+            response_dict['results'][0],
         )
         self.logout()
 

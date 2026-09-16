@@ -344,7 +344,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'topic_name': 'Topic',
             'meta_tag_content': 'story meta content',
         }
-        self.assertEqual(json_response, json_response | expected_dict)
+        self.assertDictContainsSubset(expected_dict, json_response)
 
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):

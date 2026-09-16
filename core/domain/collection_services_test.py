@@ -2125,10 +2125,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertEqual(
-            snapshots_metadata[0],
-            snapshots_metadata[0]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': [
                     {
                         'cmd': 'create_new',
@@ -2143,6 +2141,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 'commit_type': 'create',
                 'version_number': 1,
             },
+            snapshots_metadata[0],
         )
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
@@ -2157,10 +2156,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertEqual(
-            snapshots_metadata[0],
-            snapshots_metadata[0]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': [
                     {
                         'cmd': 'create_new',
@@ -2175,6 +2172,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 'commit_type': 'create',
                 'version_number': 1,
             },
+            snapshots_metadata[0],
         )
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
@@ -2197,10 +2195,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         )
         self.assertEqual(len(snapshots_metadata), 2)
         self.assertIn('created_on_ms', snapshots_metadata[0])
-        self.assertEqual(
-            snapshots_metadata[0],
-            snapshots_metadata[0]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': [
                     {
                         'cmd': 'create_new',
@@ -2215,17 +2211,17 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 'commit_type': 'create',
                 'version_number': 1,
             },
+            snapshots_metadata[0],
         )
-        self.assertEqual(
-            snapshots_metadata[1],
-            snapshots_metadata[1]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': change_list,
                 'committer_id': self.owner_id,
                 'commit_message': 'Changed title.',
                 'commit_type': 'edit',
                 'version_number': 2,
             },
+            snapshots_metadata[1],
         )
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
@@ -2262,10 +2258,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertEqual(
-            snapshots_metadata[0],
-            snapshots_metadata[0]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': [
                     {
                         'cmd': 'create_new',
@@ -2280,28 +2274,27 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 'commit_type': 'create',
                 'version_number': 1,
             },
+            snapshots_metadata[0],
         )
-        self.assertEqual(
-            snapshots_metadata[1],
-            snapshots_metadata[1]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': change_list,
                 'committer_id': self.owner_id,
                 'commit_message': 'Changed title.',
                 'commit_type': 'edit',
                 'version_number': 2,
             },
+            snapshots_metadata[1],
         )
-        self.assertEqual(
-            snapshots_metadata[2],
-            snapshots_metadata[2]
-            | {
+        self.assertDictContainsSubset(
+            {
                 'commit_cmds': new_change_list,
                 'committer_id': second_committer_id,
                 'commit_message': 'Second commit.',
                 'commit_type': 'edit',
                 'version_number': 3,
             },
+            snapshots_metadata[2],
         )
         self.assertLess(
             snapshots_metadata[1]['created_on_ms'],
@@ -2358,12 +2351,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertEqual(
-            snapshots_metadata[2], snapshots_metadata[2] | commit_dict_3
-        )
-        self.assertEqual(
-            snapshots_metadata[1], snapshots_metadata[1] | commit_dict_2
-        )
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
@@ -2397,15 +2386,9 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertEqual(
-            snapshots_metadata[3], snapshots_metadata[3] | commit_dict_4
-        )
-        self.assertEqual(
-            snapshots_metadata[2], snapshots_metadata[2] | commit_dict_3
-        )
-        self.assertEqual(
-            snapshots_metadata[1], snapshots_metadata[1] | commit_dict_2
-        )
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
