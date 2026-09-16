@@ -27,10 +27,12 @@ import {Story} from 'domain/story/story.model';
 import {ValidatorsService} from 'services/validators.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './new-chapter-title-modal.component.css';
 
 @Component({
   selector: 'oppia-new-chapter-title-modal',
   templateUrl: './new-chapter-title-modal.component.html',
+  styleUrls: ['./new-chapter-title-modal.component.css'],
 })
 export class NewChapterTitleModalComponent implements OnInit {
   @Input() nodeTitles!: string | string[];

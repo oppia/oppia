@@ -19,10 +19,12 @@
 import {Component, Input} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import './preview-thumbnail.component.css';
 
 @Component({
   selector: 'oppia-preview-thumbnail',
   templateUrl: './preview-thumbnail.component.html',
+  styleUrls: ['./preview-thumbnail.component.css'],
 })
 export class PreviewThumbnailComponent {
   // These properties are initialized using Angular lifecycle hooks
