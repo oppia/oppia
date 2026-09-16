@@ -1388,10 +1388,16 @@ export class SuperAdmin extends BaseUser {
     return platformParameterContainerElements[index];
   }
 
+  /**
+   * Navigates to the contributor dashboard admin page.
+   */
   async navigateToContributorDashboardAdminPage(): Promise<void> {
-    await this.goto('/contributor-dashboard-admin');
+    await this.goto(testConstants.URLs.ContributorDashboardAdmin);
   }
 
+  /**
+   * Enables automatic translation suggestions in the contributor dashboard admin page.
+   */
   async enableAutoTranslation(): Promise<void> {
     // The Material slide toggle renders its actual checkbox input as
     // cdk-visually-hidden (off-screen), overlapped by the thumb div.
@@ -1409,6 +1415,12 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
+  /**
+   * Adds a new translation provider mapping.
+   *
+   * @param {string} languageCode - The language code for the mapping.
+   * @param {string} providerId - The ID of the translation provider.
+   */
   async addTranslationProviderMapping(
     languageCode: string,
     providerId: string
@@ -1426,11 +1438,21 @@ export class SuperAdmin extends BaseUser {
     await this.clickOnElementWithSelector(addButton);
   }
 
+  /**
+   * Removes an existing translation provider mapping.
+   *
+   * @param {string} languageCode - The language code of the mapping to remove.
+   */
   async removeTranslationProviderMapping(languageCode: string): Promise<void> {
     const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
     await this.clickOnElementWithSelector(removeButton);
   }
 
+  /**
+   * Gets the total number of translation provider mappings.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the number of provider mappings.
+   */
   async getProviderMappingRowCount(): Promise<number> {
     const rows = await this.page.$$('.e2e-test-mapping-row');
     return rows.length;
