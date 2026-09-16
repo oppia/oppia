@@ -112,7 +112,8 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
     # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
     # doesn't yet know about the filter parameter added in 3.12.
-    # TODO(#15913): Remove this ignore pragma and TODO once MyPy is upgraded.
+    # TODO(#15913): Remove this ignore pragma and comment once MyPy is
+    # upgraded.
     tar.extractall(  # type: ignore[call-arg]
         path=common.OPPIA_TOOLS_DIR, filter='data'
     )
@@ -260,7 +261,8 @@ def install_gcloud_sdk() -> None:
         # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
         # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
         # doesn't yet know about the filter parameter added in 3.12.
-        # TODO(#15913): Remove this ignore pragma and TODO once MyPy is upgraded.
+        # TODO(#15913): Remove this ignore pragma and comment once MyPy is
+        # upgraded.
         tar.extractall(  # type: ignore[call-arg]
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'
@@ -369,8 +371,8 @@ def download_and_untar_files(
             # Python 3.12 and its bundled typeshed stub for
             # TarFile.extractall() doesn't yet know about the filter
             # parameter added in 3.12.
-            # TODO(#15913): Remove this ignore pragma and TODO once MyPy is
-            # upgraded.
+            # TODO(#15913): Remove this ignore pragma and comment once MyPy
+            # is upgraded.
             tfile.extractall(  # type: ignore[call-arg]
                 target_parent_dir, filter='data'
             )
