@@ -238,6 +238,7 @@ describe('Contributions and review component', () => {
 
     getUserContributionRightsDataAsyncSpy.and.returnValue(
       Promise.resolve({
+        can_submit_translation_for_language_codes: [],
         can_review_translation_for_language_codes: ['hi'],
         can_review_questions: true,
         can_review_voiceover_for_language_codes: [],
@@ -2218,6 +2219,7 @@ describe('Contributions and review component', () => {
       component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
+          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: ['something', 'cool'],
           can_review_questions: false,
           can_review_voiceover_for_language_codes: ['something', 'cool'],
@@ -2242,6 +2244,7 @@ describe('Contributions and review component', () => {
       component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
+          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: [],
           can_review_questions: false,
           can_review_voiceover_for_language_codes: ['something', 'cool'],
@@ -2267,6 +2270,7 @@ describe('Contributions and review component', () => {
       component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
+          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: [],
           can_review_questions: false,
           can_review_voiceover_for_language_codes: ['something', 'cool'],
