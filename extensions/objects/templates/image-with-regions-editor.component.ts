@@ -39,7 +39,6 @@ import {CustomSchema} from 'services/schema-default-value.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {UtilsService} from 'services/utils.service';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
-import './image-with-regions-editor.component.css';
 
 export interface Region {
   region: {

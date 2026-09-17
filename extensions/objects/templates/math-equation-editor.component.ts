@@ -35,7 +35,6 @@ import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {TranslateService} from '@ngx-translate/core';
-import './math-equation-editor.component.css';
 
 export interface FocusObj {
   focused: boolean;

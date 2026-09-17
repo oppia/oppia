@@ -78,7 +78,6 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
-import './exploration-editor-page.component.css';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
