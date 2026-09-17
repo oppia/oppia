@@ -35,7 +35,6 @@ import {
   LazyCssLoaderService,
   KNOWN_CSS,
 } from 'services/lazy-css-loader.service';
-import './upload-blog-post-thumbnail.component.css';
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',

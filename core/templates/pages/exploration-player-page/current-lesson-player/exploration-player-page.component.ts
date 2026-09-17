@@ -35,7 +35,6 @@ import {
   LazyCssLoaderService,
   KNOWN_CSS,
 } from 'services/lazy-css-loader.service';
-import './exploration-player-page.component.css';
 
 require('interactions/interactionsRequires.ts');
 

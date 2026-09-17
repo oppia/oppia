@@ -33,7 +33,6 @@ import {
   LazyCssLoaderService,
   KNOWN_CSS,
 } from 'services/lazy-css-loader.service';
-import './edit-profile-picture-modal.component.css';
 
 @Component({
   selector: 'oppia-edit-profile-picture-modal',

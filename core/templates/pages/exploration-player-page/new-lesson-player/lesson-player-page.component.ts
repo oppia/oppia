@@ -33,7 +33,6 @@ import {
   LazyCssLoaderService,
   KNOWN_CSS,
 } from 'services/lazy-css-loader.service';
-import './lesson-player-page.component.css';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';

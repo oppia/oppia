@@ -34,7 +34,6 @@ import {
   LazyCssLoaderService,
   KNOWN_CSS,
 } from 'services/lazy-css-loader.service';
-import './image-uploader-modal.component.css';
 
 @Component({
   selector: 'oppia-image-uploader-modal',
