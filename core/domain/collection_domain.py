@@ -1311,7 +1311,7 @@ class Collection:
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title
             )
-        utils.require_valid_name(
+        utils.require_valid_title(
             self.title, 'the collection title', allow_empty=True
         )
 
@@ -1561,7 +1561,7 @@ class CollectionSummary:
             ValidationError. One or more attributes of the CollectionSummary
                 are invalid.
         """
-        utils.require_valid_name(
+        utils.require_valid_title(
             self.title, 'the collection title', allow_empty=True
         )
 

@@ -28,7 +28,6 @@ import {ExplorationRightsService} from '../services/exploration-rights.service';
 import {ExplorationSaveService} from '../services/exploration-save.service';
 import {ExplorationWarningsService} from '../services/exploration-warnings.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
-import './exploration-save-and-publish-buttons.component.css';
 
 @Component({
   selector: 'exploration-save-and-publish-buttons',
