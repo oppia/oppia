@@ -5023,6 +5023,8 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     const row = await this.findFeedbackTableRow(givenDescription);
     await row.click();
+    await this.expectPageURLToContain('/feedback/');
+    await this.expectElementToBeVisible(feedbackDetailPageCard, true);
   }
 
   /**
@@ -5202,6 +5204,16 @@ export class LoggedInUser extends BaseUser {
    */
   async verifyFeedbackDetailScreenshotSection(): Promise<void> {
     await this.expectElementToBeVisible(feedbackDetailScreensshotPreview, true);
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const image = document.querySelector(
+          selector
+        ) as HTMLImageElement | null;
+        return image !== null && image.complete && image.naturalWidth > 0;
+      },
+      {},
+      feedbackDetailScreensshotPreview
+    );
     await this.expectElementToBeClickable(feedbackDetailScreensshotBtn, true);
     await this.expectTextContentToBe(
       feedbackDetailScreensshotBtn,
@@ -5347,6 +5359,8 @@ export class LoggedInUser extends BaseUser {
    */
   async clickFeedbackDetailBackButton(): Promise<void> {
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
+    await this.expectPageURLToContain('#/feedback');
+    await this.expectElementToBeVisible(feedbackFilterBar, true);
   }
 
   /**
