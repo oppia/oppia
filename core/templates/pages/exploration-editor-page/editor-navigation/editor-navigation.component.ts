@@ -86,6 +86,10 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
     return this.explorationRightsService.isPrivate();
   }
 
+  isCloned(): boolean {
+    return this.explorationRightsService.isCloned();
+  }
+
   isExplorationLockedForEditing(): boolean {
     return this.changeListService.isExplorationLockedForEditing();
   }

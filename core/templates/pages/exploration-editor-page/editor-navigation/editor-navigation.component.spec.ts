@@ -305,6 +305,11 @@ describe('Editor Navigation Component', () => {
       expect(component.isPrivate()).toEqual(true);
     });
 
+    it('should return if exploration is cloned', () => {
+      spyOn(explorationRightsService, 'isCloned').and.returnValue(true);
+      expect(component.isCloned()).toEqual(true);
+    });
+
     it('should return if exploration is locked for editing', () => {
       spyOn(changeListService, 'isExplorationLockedForEditing').and.returnValue(
         true
