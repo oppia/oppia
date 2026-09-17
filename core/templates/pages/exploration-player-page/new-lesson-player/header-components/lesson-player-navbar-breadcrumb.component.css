@@ -1,0 +1,25 @@
+.oppia-lesson-player-navbar-breadcrumb {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  font-size: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.oppia-lesson-player-navbar-breadcrumb-separator {
+  margin: 0 8px;
+  opacity: 0.7;
+}
+
+.oppia-lesson-player-navbar-breadcrumb-text {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .oppia-lesson-player-navbar-breadcrumb-text {
+    max-width: 120px;
+  }
+}
