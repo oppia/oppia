@@ -39,7 +39,7 @@ from typing import Final, List, Optional, Tuple
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
 #
-#   https://docs.python.org/3.10/library/sys.html#sys.path
+#   https://docs.python.org/3.12/library/sys.html#sys.path
 #
 # However, when git executes pre_commit_hook.py from its symlink in
 # /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
