@@ -86,8 +86,8 @@
 
         <div class="col-lg-4 col-md-4 col-sm-4 float-end">
           <div class="float-end">
-            <span *ngIf="$any(activeThread).stateName" class="badge text-bg-info">
-              state: {{ $any(activeThread).stateName }}
+            <span *ngIf="getActiveThreadStateName()" class="badge text-bg-info">
+              state: {{ getActiveThreadStateName() }}
             </span>
             <span [ngClass]="getLabelClass(activeThread.status)"
                   class="e2e-test-oppia-feedback-status-name">

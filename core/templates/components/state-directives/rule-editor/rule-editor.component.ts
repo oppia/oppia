@@ -52,7 +52,10 @@ interface SelectItem {
   varName: string;
 }
 
+// The index signature makes a Choice assignable to DictSchemaDefaultValue,
+// which is needed when passing the choices to the object editor.
 interface Choice {
+  [key: string]: SchemaDefaultValue;
   id: string;
   val: string | number | SubtitledHtml;
 }
@@ -236,7 +239,7 @@ export class RuleEditorComponent
         : [];
       this.ruleEditorInitArgs = {
         choices: this.ruleDescriptionChoices || [],
-      } as unknown as SchemaDefaultValue;
+      };
     }, 10);
 
     return ruleDescription;
@@ -259,18 +262,17 @@ export class RuleEditorComponent
     return String(this.rule.inputs[item.varName]);
   }
 
-  // The rule input value can be of any type of the interaction rule inputs,
-  // which is only determined at runtime, so a type assertion is used here to
-  // match the type accepted by the object editor.
+  // The rule input value can be of any interaction rule input type, which is
+  // only determined at runtime, so a type assertion is used here to match the
+  // value type accepted by the object editor.
   getRuleInputValue(item: SelectItem): SchemaDefaultValue {
-    return this.rule.inputs[item.varName] as unknown as SchemaDefaultValue;
+    return this.rule.inputs[item.varName] as SchemaDefaultValue;
   }
 
   // The new value is emitted by the object editor as a schema default value,
   // so a type assertion is used here to match the interaction rule input type.
   setRuleInputValue(newValue: SchemaDefaultValue, item: SelectItem): void {
-    this.rule.inputs[item.varName] =
-      newValue as unknown as InteractionRuleInputs;
+    this.rule.inputs[item.varName] = newValue as InteractionRuleInputs;
   }
 
   onSelectNewRuleType(newRuleType: string): void {

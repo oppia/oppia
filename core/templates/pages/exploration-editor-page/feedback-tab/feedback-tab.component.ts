@@ -315,6 +315,21 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  private isFeedbackThread(
+    thread: SuggestionThread | FeedbackThread | null
+  ): thread is FeedbackThread {
+    return thread !== null && 'stateName' in thread;
+  }
+
+  // The active thread can be a feedback thread or a suggestion thread, and only
+  // feedback threads have a state name associated with them.
+  getActiveThreadStateName(): string | null {
+    if (this.isFeedbackThread(this.activeThread)) {
+      return this.activeThread.stateName;
+    }
+    return null;
+  }
+
   isExplorationEditable(): boolean {
     return this.editabilityService.isEditable();
   }

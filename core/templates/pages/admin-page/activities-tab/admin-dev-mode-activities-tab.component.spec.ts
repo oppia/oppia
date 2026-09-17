@@ -871,6 +871,54 @@ describe('Admin dev mode activities tab', () => {
     );
   });
 
+  describe('.onSkillSelectionChange', () => {
+    it('should set the selected option to the select value', () => {
+      const selectElement = document.createElement('select');
+      const optionElement = document.createElement('option');
+      optionElement.value = '2';
+      selectElement.appendChild(optionElement);
+      selectElement.value = '2';
+      const event = new Event('change');
+      Object.defineProperty(event, 'target', {value: selectElement});
+
+      component.onSkillSelectionChange(event);
+
+      expect(component.selectedOption).toBe('2');
+    });
+  });
+
+  describe('.onTopicSelectionChange', () => {
+    it('should set the selected topic to the select value', () => {
+      const selectElement = document.createElement('select');
+      const optionElement = document.createElement('option');
+      optionElement.value = '3';
+      selectElement.appendChild(optionElement);
+      selectElement.value = '3';
+      const event = new Event('change');
+      Object.defineProperty(event, 'target', {value: selectElement});
+
+      component.onTopicSelectionChange(event);
+
+      expect(component.selectedTopicForStory).toBe('3');
+    });
+  });
+
+  describe('.onStorySelectionChange', () => {
+    it('should set the selected story to the select value', () => {
+      const selectElement = document.createElement('select');
+      const optionElement = document.createElement('option');
+      optionElement.value = '4';
+      selectElement.appendChild(optionElement);
+      selectElement.value = '4';
+      const event = new Event('change');
+      Object.defineProperty(event, 'target', {value: selectElement});
+
+      component.onStorySelectionChange(event);
+
+      expect(component.selectedStoryForChapter).toBe('4');
+    });
+  });
+
   describe('.reloadCollection', () => {
     it('should not reload collection if a task is already running', () => {
       let adminBackendSpy = spyOn(

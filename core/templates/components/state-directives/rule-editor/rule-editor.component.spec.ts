@@ -41,6 +41,7 @@ import {
 } from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Rule, RuleInputs, RuleInputTypes} from 'domain/exploration/rule.model';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe implements PipeTransform {
@@ -731,18 +732,19 @@ describe('Rule Editor Component', () => {
     const item = {
       type: 'html',
       varName: 'x',
-    } as unknown as RuleDescriptionFragment;
-    component.rule = new Rule(
-      'Equals',
-      {x: 'old_val'} as unknown as RuleInputs,
-      {x: 'String'} as unknown as RuleInputTypes
+      text: '',
+    };
+    const initialInput = {x: 'old_val'};
+    component.rule = new Rule('ImageClick', {x: initialInput}, {x: 'String'});
+
+    expect(component.getRuleInputAsString(item)).toBe(String(initialInput));
+    expect(component.getRuleInputValue(item) as InteractionRuleInputs).toBe(
+      initialInput
     );
 
-    expect(component.getRuleInputAsString(item)).toBe('old_val');
-    expect(component.getRuleInputValue(item) as string).toBe('old_val');
-
-    component.setRuleInputValue('new_val', item);
-    expect(component.rule.inputs.x).toBe('new_val');
+    const newInput = {x: 'new_val'};
+    component.setRuleInputValue(newInput, item);
+    expect(component.rule.inputs.x).toBe(newInput);
   });
 
   it('should unsubscribe on destroy', () => {

@@ -211,7 +211,7 @@ export class CustomizeInteractionModalComponent
     let interactionSpec =
       INTERACTION_SPECS[newInteractionId as InteractionSpecsKey];
     this.customizationArgSpecs =
-      interactionSpec.customization_arg_specs as unknown as CustomizationArgSpecsInterface[];
+      interactionSpec.customization_arg_specs as CustomizationArgSpecsInterface[];
     this.stateInteractionIdService.displayed =
       newInteractionId as InteractionSpecsKey;
     this.stateCustomizationArgsService.displayed = {};
@@ -505,7 +505,7 @@ export class CustomizeInteractionModalComponent
       let interactionSpec =
         INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs =
-        interactionSpec.customization_arg_specs as unknown as CustomizationArgSpecsInterface[];
+        interactionSpec.customization_arg_specs as CustomizationArgSpecsInterface[];
 
       this.stateInteractionIdService.displayed = cloneDeep(
         this.stateInteractionIdService.savedMemento
