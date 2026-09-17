@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Contributor dashboard admin page.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   TestBed,

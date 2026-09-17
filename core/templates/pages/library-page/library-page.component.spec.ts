@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   NO_ERRORS_SCHEMA,

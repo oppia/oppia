@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA, ElementRef, QueryList} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {

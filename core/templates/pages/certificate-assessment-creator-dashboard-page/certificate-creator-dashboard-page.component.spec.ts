@@ -37,7 +37,6 @@ interface CertificateSummary {
   certificateId: string;
   title: string;
   topicsLabel: string;
-  timeLabel: string;
   status: string;
 }
 
@@ -55,7 +54,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
     certificateId: id,
     title,
     topicsLabel: '1',
-    timeLabel: '10 min',
     status: 'Available',
   });
 
@@ -141,7 +139,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
           topic_data: {topic_1: 1, topic_2: 1},
           demonstrates: ['Equations'],
           total_questions: 8,
-          time_limit_in_minutes: 40,
           async_status: 'Available',
           version: 1,
         }),
@@ -158,7 +155,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
         certificateId: 'certificate_1',
         title: 'Algebra Certificate',
         topicsLabel: '2',
-        timeLabel: '40 min',
         status: 'Available',
       },
     ]);
@@ -180,7 +176,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
           topic_data: {topic_1: 1},
           demonstrates: [],
           total_questions: 5,
-          time_limit_in_minutes: 20,
           async_status: 'Available',
           version: 1,
         }),
@@ -193,7 +188,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
           topic_data: {topic_1: 1},
           demonstrates: [],
           total_questions: 5,
-          time_limit_in_minutes: 20,
           async_status: 'Available',
           version: 1,
         }),
@@ -268,7 +262,6 @@ describe('CertificateCreatorDashboardPageComponent', () => {
           topic_data: {topic_1: 1},
           demonstrates: ['Equations'],
           total_questions: 8,
-          time_limit_in_minutes: 40,
           async_status: 'not_ready',
           version: 1,
         }),

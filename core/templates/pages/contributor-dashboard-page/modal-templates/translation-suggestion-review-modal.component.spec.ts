@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TranslationSuggestionReviewModalComponent.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,

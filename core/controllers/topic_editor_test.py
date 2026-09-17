@@ -32,6 +32,7 @@ from core.domain import (
     topic_services,
     user_services,
 )
+from core.storage.user import gae_models as user_models
 from core.tests import test_utils
 
 from typing import List
@@ -398,6 +399,131 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             self.assertEqual(
                 additional_story_summary_dict['story_is_published'], False
             )
+
+        self.logout()
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+        ]
+    )
+    def test_handler_returns_completed_node_titles_from_user_progress(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.save_new_valid_exploration(
+            'exp-1', self.admin_id, title='Title 1', end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, 'exp-1')
+        self.save_new_valid_exploration(
+            'exp-2', self.admin_id, title='Title 2', end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, 'exp-2')
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        canonical_story_id = story_services.get_new_story_id()
+
+        story = story_domain.Story.create_default_story(
+            canonical_story_id,
+            'title',
+            'description',
+            topic_id,
+            'url-fragment',
+        )
+        node_1: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-1',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': None,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None,
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-2',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_2',
+            'title': 'Chapter 2',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': None,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None,
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+        ]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_3'
+        story.story_contents.add_arc(
+            story_domain.Arc(
+                'arc_1',
+                'Adventure 1',
+                'First adventure',
+                ['node_1', 'node_2'],
+            )
+        )
+
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='New name',
+            abbreviated_name='topic-completed-test',
+            url_fragment='topic-completed-test',
+            description='New description',
+            canonical_story_ids=[canonical_story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+
+        story_services.save_new_story(self.admin_id, story)
+        topic_services.publish_story(
+            topic_id, canonical_story_id, self.admin_id
+        )
+
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.admin_id, canonical_story_id),
+            user_id=self.admin_id,
+            story_id=canonical_story_id,
+            completed_node_ids=['node_1'],
+        ).put()
+
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id)
+        )
+        canonical_story_summary_dict = response[
+            'canonical_story_summary_dicts'
+        ][0]
+
+        self.assertEqual(
+            canonical_story_summary_dict['completed_node_titles'],
+            ['Chapter 1'],
+        )
 
         self.logout()
 

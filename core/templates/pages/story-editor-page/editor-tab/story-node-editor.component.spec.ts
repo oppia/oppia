@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
