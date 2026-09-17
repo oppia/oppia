@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@
  * QR.CD. Review submitted questions.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
+import {ContributorAdmin} from '../../utilities/user/contributor-admin';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -30,45 +32,55 @@ import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-
 import {QuestionAdmin} from '../../utilities/user/question-admin';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
-const ROLES = testConstants.Roles;
+test.describe.configure({mode: 'serial'});
 
-describe('Practice Question Reviewer', function () {
+test.describe('Practice Question Reviewer', function () {
   let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
   let questionSubmitter: PracticeQuestionSubmitter &
     Contributor &
     ExplorationEditor &
     LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
-  let questionAdmin: QuestionAdmin;
+  let questionAdmin: QuestionAdmin & ContributorAdmin;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
+
     // Create users.
     questionSubmitter = await UserFactory.createNewUser(
       'questionSubmitter',
-      'question_submitter@example.com'
+      'question_submitter@example.com',
+      browser
     );
 
     questionReviewer = await UserFactory.createNewUser(
       'questionReviewer',
-      'question_reviewer@example.com'
+      'question_reviewer@example.com',
+      browser
     );
 
     questionAdmin = await UserFactory.createNewUser(
       'questionAdm',
       'question_admin@example.com',
-      [ROLES.QUESTION_ADMIN]
+      browser,
+      [testConstants.Roles.QUESTION_ADMIN]
     );
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
+      browser,
+      [testConstants.Roles.CURRICULUM_ADMIN]
     );
 
     // Add submit question rights to the question submitter.
     await questionAdmin.navigateToContributorDashboardAdminPage();
-    await questionAdmin.addSubmitQuestionRights('questionSubmitter');
-    await questionAdmin.addReviewQuestionRights('questionReviewer');
+    await questionAdmin.addSubmitQuestionRights(
+      questionSubmitter.username ?? ''
+    );
+    await questionAdmin.addReviewQuestionRights(
+      questionReviewer.username ?? ''
+    );
 
     // Create a topic and add story with a chapter.
     const explorationId1 =
@@ -84,10 +96,6 @@ describe('Practice Question Reviewer', function () {
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
-      'Arithmetic Operations'
-    );
-    await curriculumAdmin.openStoryEditor(
-      'The Broken Calculator',
       'Arithmetic Operations'
     );
     await curriculumAdmin.addChapter(
@@ -133,9 +141,9 @@ describe('Practice Question Reviewer', function () {
       'Arithmetic Operations',
       'What is 231 + 12?'
     );
-  }, 900000);
+  });
 
-  it('should be able to navigate between questions to review', async function () {
+  test('should be able to navigate between questions to review', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
 
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
@@ -143,7 +151,7 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.expectQuestionInReviewModalToBe('12 + 4');
   });
 
-  it('should be able to review the submitted questions', async function () {
+  test('should be able to review the submitted questions', async function () {
     // Reject the question suggestion.
     await questionReviewer.submitReview(
       'reject',
@@ -165,7 +173,7 @@ describe('Practice Question Reviewer', function () {
       'accept',
       'Please make sure to use full sentences.'
     );
-    await questionSubmitter.page.reload();
+    await questionSubmitter.reloadPage();
     await questionSubmitter.expectOpportunityToBePresent(
       'Updated Question',
       'Addition'
@@ -181,14 +189,16 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Checks if questions are visible in question skill editor.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     await curriculumAdmin.openSkillEditor('Addition');
     await curriculumAdmin.navigateToSkillQuestionEditorTab();
     await curriculumAdmin.expectQuestionToBePresent('Updated Question');
     await curriculumAdmin.expectQuestionToBePresent('What is 231 + 12?');
     await curriculumAdmin.expectQuestionToBePresent('What is 2 + 3?', false);
   });
-  afterAll(async function () {
+
+  test.afterAll(async () => {
+    // Close user contexts explicitly so that video recordings are finalized.
     await UserFactory.closeAllBrowsers();
   });
 });
