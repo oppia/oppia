@@ -494,6 +494,96 @@ describe('State translation component', () => {
           }
         );
 
+        it(
+          'should keep a valid initialized customization argument when' +
+            ' opening the customization tab',
+          () => {
+            component.initActiveContentId = 'ca_filled';
+            component.initActiveIndex = 1;
+            component.interactionCustomizationArgTranslatableContent = [
+              {
+                name: 'Empty placeholder',
+                content: SubtitledUnicode.createDefault('', 'ca_empty'),
+              },
+              {
+                name: 'Placeholder',
+                content: SubtitledUnicode.createDefault(
+                  'Type something',
+                  'ca_filled'
+                ),
+              },
+            ];
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('ca');
+
+            expect(component.activeCustomizationArgContentIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('ca_filled', 'unicode');
+          }
+        );
+
+        it(
+          'should fall back to the first non-empty customization argument' +
+            ' when the initialized index is out of range',
+          () => {
+            component.initActiveContentId = 'ca_missing';
+            component.initActiveIndex = -1;
+            component.interactionCustomizationArgTranslatableContent = [
+              {
+                name: 'Empty placeholder',
+                content: SubtitledUnicode.createDefault('', 'ca_empty'),
+              },
+              {
+                name: 'Placeholder',
+                content: SubtitledUnicode.createDefault(
+                  'Type something',
+                  'ca_filled'
+                ),
+              },
+            ];
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('ca');
+
+            expect(component.activeCustomizationArgContentIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('ca_filled', 'unicode');
+          }
+        );
+
+        it(
+          'should fall back to the first non-empty customization argument' +
+            ' when the initialized index is not a number',
+          () => {
+            component.initActiveContentId = 'ca_filled';
+            component.initActiveIndex = undefined as unknown as number;
+            component.interactionCustomizationArgTranslatableContent = [
+              {
+                name: 'Empty placeholder',
+                content: SubtitledUnicode.createDefault('', 'ca_empty'),
+              },
+              {
+                name: 'Placeholder',
+                content: SubtitledUnicode.createDefault(
+                  'Type something',
+                  'ca_filled'
+                ),
+              },
+            ];
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('ca');
+
+            expect(component.activeCustomizationArgContentIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('ca_filled', 'unicode');
+          }
+        );
+
         it('should fall back to the first hint when all hints are empty', () => {
           component.stateHints.forEach(hint => {
             hint.hintContent.html = '';
