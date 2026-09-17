@@ -233,6 +233,8 @@ describe('Lesson Creator', function () {
       'http://localhost:8181/lesson/' + expId,
       'Typo'
     );
+    await lessonCreator.verifyFeedbackDetailScreenshotSection();
+
     await lessonCreator.verifyFeedbackDetailPageLessonContextSection(
       expId,
       '4',
@@ -240,8 +242,6 @@ describe('Lesson Creator', function () {
       '0',
       '1'
     );
-
-    await lessonCreator.verifyFeedbackDetailScreenshotSection();
 
     await lessonCreator.verifyFeedbackDetailPageUserFeedbackSection(
       'There is a typo in the question text.'

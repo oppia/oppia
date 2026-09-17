@@ -102,7 +102,7 @@ export class TechTeamLead extends LoggedInUser {
    * Verifies the default feedback tab filter.
    */
   async verifyDefaultTechnicalFeedbackDashboardFilter(): Promise<void> {
-    // tech-external is the internal enum value mapped to the "LEAP" UI label.
+    // Here tech-external is the internal enum value mapped to the "LEAP" UI label.
     await this.verifyDefaultFeedbackTabFilter(
       'open',
       feedbackFilterTechnicalTeam,
