@@ -23,8 +23,6 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {VisualizationInfo} from 'services/state-interaction-stats.service';
 
-import './state-stats-modal.component.css';
-
 interface PieChartOpitons {
   chartAreaWidth: number;
   colors: string[];

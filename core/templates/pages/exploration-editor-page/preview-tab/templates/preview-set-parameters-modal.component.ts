@@ -21,7 +21,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import './preview-set-parameters-modal.component.css';
 
 @Component({
   selector: 'oppia-preview-set-parameters-modal',

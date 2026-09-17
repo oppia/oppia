@@ -891,6 +891,29 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             self.assert_matches_regexps([], ['1'])
 
+    def test_assert_dict_contains_subset_passes_for_valid_subset(self) -> None:
+        self.assertDictContainsSubset({'a': 1}, {'a': 1, 'b': 2})
+
+    def test_assert_dict_contains_subset_raises_for_missing_key_only(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(AssertionError, 'Missing: \\[\'a\'\\]$'):
+            self.assertDictContainsSubset({'a': 1}, {})
+
+    def test_assert_dict_contains_subset_raises_for_mismatch_only(self) -> None:
+        with self.assertRaisesRegex(AssertionError, '^Mismatched values:'):
+            self.assertDictContainsSubset({'a': 1}, {'a': 2})
+
+    def test_assert_dict_contains_subset_raises_for_missing_and_mismatch(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            AssertionError, 'Missing.*Mismatched values'
+        ):
+            self.assertDictContainsSubset(
+                {'missing_key': 'x', 'b': 1}, {'b': 2}
+            )
+
         with self.assertRaisesRegex(AssertionError, 'extra item \'1\''):
             self.assert_matches_regexps(['1'], [])
 
