@@ -30,7 +30,6 @@ import {Skill} from 'domain/skill/skill.model';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 import {ValidatorsService} from 'services/validators.service';
-import './skill-description-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-description-editor',

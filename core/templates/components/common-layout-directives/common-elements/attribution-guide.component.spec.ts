@@ -92,6 +92,8 @@ describe('Attribution Guide Component', function () {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let windowDimensionsService: WindowDimensionsService;
 
+  const MockNgbTooltip = jasmine.createSpyObj('NgbTooltip', ['open', 'close']);
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AttributionGuideComponent, MockTranslatePipe],
@@ -182,28 +184,71 @@ describe('Attribution Guide Component', function () {
     expect(component.getExplorationTitle()).toEqual('Place Values');
   });
 
-  it('should run the copy command and set and remove title attribute for tooltip', fakeAsync(() => {
+  it('should run the copy command and open and close the tooltip', fakeAsync(() => {
     let dummyDivElement = document.createElement('div');
     let dummyTextNode = document.createTextNode('Text to be copied');
-    dummyDivElement.className = 'class-name';
+    dummyDivElement.className = 'attribution-html-code';
     dummyDivElement.appendChild(dummyTextNode);
     const dummyDocumentFragment = document.createDocumentFragment();
     dummyDocumentFragment.appendChild(dummyDivElement);
 
     spyOn(document, 'getElementsByClassName')
-      .withArgs('class-name')
+      .withArgs('attribution-html-code')
       .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
 
-    component.copyAttribution('class-name');
+    component.copyAttribution('attribution-html-code', MockNgbTooltip);
 
     expect(document.execCommand).toHaveBeenCalled();
-    expect(dummyDivElement.getAttribute('title')).toBe('Copied!');
+    expect(MockNgbTooltip.open).toHaveBeenCalled();
 
     tick(1001);
 
-    expect(dummyDivElement.getAttribute('title')).toBeNull();
+    expect(MockNgbTooltip.close).toHaveBeenCalled();
   }));
+
+  it('should run the print attribution copy command and open and close the tooltip', fakeAsync(() => {
+    let dummyDivElement = document.createElement('div');
+    let dummyTextNode = document.createTextNode('Text to be copied');
+    dummyDivElement.className = 'attribution-print-text';
+    dummyDivElement.appendChild(dummyTextNode);
+    const dummyDocumentFragment = document.createDocumentFragment();
+    dummyDocumentFragment.appendChild(dummyDivElement);
+
+    spyOn(document, 'getElementsByClassName')
+      .withArgs('attribution-print-text')
+      .and.returnValue(dummyDocumentFragment.children);
+    spyOn(document, 'execCommand').withArgs('copy');
+
+    component.copyAttribution('attribution-print-text', MockNgbTooltip);
+
+    expect(document.execCommand).toHaveBeenCalled();
+    expect(MockNgbTooltip.open).toHaveBeenCalled();
+
+    tick(1001);
+
+    expect(MockNgbTooltip.close).toHaveBeenCalled();
+  }));
+
+  it('should run the copy command without showing a tooltip if the tooltip reference is not found', () => {
+    MockNgbTooltip.open.calls.reset();
+    const dummyDivElement = document.createElement('div');
+    const dummyTextNode = document.createTextNode('Text to be copied');
+    dummyDivElement.className = 'attribution-html-code';
+    dummyDivElement.appendChild(dummyTextNode);
+    const dummyDocumentFragment = document.createDocumentFragment();
+    dummyDocumentFragment.appendChild(dummyDivElement);
+
+    spyOn(document, 'getElementsByClassName')
+      .withArgs('attribution-html-code')
+      .and.returnValue(dummyDocumentFragment.children);
+    spyOn(document, 'execCommand').withArgs('copy');
+
+    component.copyAttribution('attribution-html-code', undefined);
+
+    expect(document.execCommand).toHaveBeenCalled();
+    expect(MockNgbTooltip.open).not.toHaveBeenCalled();
+  });
 
   it('should return early if element is not found', () => {
     spyOn(document, 'getElementsByClassName')
@@ -212,7 +257,7 @@ describe('Attribution Guide Component', function () {
 
     const execSpy = spyOn(document, 'execCommand');
 
-    component.copyAttribution('missing-class');
+    component.copyAttribution('missing-class', undefined);
 
     expect(execSpy).not.toHaveBeenCalled();
   });
