@@ -305,7 +305,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 qid,
                 self.editor_id,
                 self._create_valid_question_data(
-                    f'Question {i+1}', content_id_generator
+                    f'Question {i + 1}', content_id_generator
                 ),
                 [skill_id],
                 content_id_generator.next_content_id_index,
@@ -359,7 +359,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 qid,
                 self.editor_id,
                 self._create_valid_question_data(
-                    f'Question {i+1}', content_id_generator
+                    f'Question {i + 1}', content_id_generator
                 ),
                 [skill_id],
                 content_id_generator.next_content_id_index,
