@@ -479,7 +479,6 @@ describe('Translation Suggestion Review Modal Component', function () {
         'getUserContributionRightsDataAsync'
       ).and.returnValue(
         Promise.resolve({
-          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: ['ar'],
           can_review_voiceover_for_language_codes: [],
           can_review_questions: false,
@@ -979,7 +978,6 @@ describe('Translation Suggestion Review Modal Component', function () {
         'getUserContributionRightsDataAsync'
       ).and.returnValue(
         Promise.resolve({
-          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: ['ar'],
           can_review_voiceover_for_language_codes: [],
           can_review_questions: false,

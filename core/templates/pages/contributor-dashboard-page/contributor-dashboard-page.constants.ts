@@ -64,7 +64,7 @@ export const ContributorDashboardConstants = {
         'Translate the lesson text to help non-English speakers ' +
         'follow the lessons.',
       customizationOptions: ['language', 'topic', 'sort'],
-      enabled: false,
+      enabled: true,
     },
   },
 

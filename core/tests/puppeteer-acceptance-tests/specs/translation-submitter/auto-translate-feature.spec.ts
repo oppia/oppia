@@ -27,14 +27,12 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
-import {TranslationAdmin} from \'../../utilities/user/translation-admin\';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
 
 describe('Auto-Translate Feature', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
-  let translationAdmin: TranslationAdmin & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
@@ -43,15 +41,6 @@ describe('Auto-Translate Feature', function () {
       'autotranslator',
       'autotranslator@example.com'
     );
-    translationAdmin = await UserFactory.createNewUser(
-      \'translationAdmin\',
-      \'translationAdmin@example.com\',
-      [ROLES.TRANSLATION_ADMIN]
-    );
-
-    await translationAdmin.navigateToContributorDashboardAdminPage();
-    await translationAdmin.addTranslationSubmitRights(\'autotranslator\', \'hi\');
-
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdmAuto',
       'curriculumAdmAuto@example.com',

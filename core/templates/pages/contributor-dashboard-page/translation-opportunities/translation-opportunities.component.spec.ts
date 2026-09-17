@@ -62,11 +62,9 @@ class MockUserService {
   }
 
   getUserContributionRightsDataAsync(): Promise<{
-    can_submit_translation_for_language_codes: [];
     can_review_translation_for_language_codes: string[];
   }> {
     return Promise.resolve({
-      can_submit_translation_for_language_codes: [],
       can_review_translation_for_language_codes: [],
     });
   }

@@ -1266,7 +1266,6 @@ class UserContributionRights:
         self,
         user_id: str,
         can_review_translation_for_language_codes: List[str],
-        can_submit_translation_for_language_codes: List[str],
         can_review_voiceover_for_language_codes: List[str],
         can_review_questions: bool,
         can_submit_questions: bool,
@@ -1274,9 +1273,6 @@ class UserContributionRights:
         self.id = user_id
         self.can_review_translation_for_language_codes = (
             can_review_translation_for_language_codes
-        )
-        self.can_submit_translation_for_language_codes = (
-            can_submit_translation_for_language_codes
         )
         self.can_review_voiceover_for_language_codes = (
             can_review_voiceover_for_language_codes
@@ -1305,33 +1301,10 @@ class UserContributionRights:
         Returns:
             boolean. Whether user has rights to submit at east one item.
         """
-        return bool(
-            self.can_submit_translation_for_language_codes
-            or self.can_submit_questions
-        )
+        return bool(self.can_submit_questions)
 
     def validate(self) -> None:
         """Validates different attributes of the class."""
-
-        if not isinstance(self.can_submit_translation_for_language_codes, list):
-            raise utils.ValidationError(
-                'Expected can_submit_translation_for_language_codes to be a '
-                'list, found: %s'
-                % type(self.can_submit_translation_for_language_codes)
-            )
-        for language_code in self.can_submit_translation_for_language_codes:
-            if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError(
-                    'Invalid language_code: %s' % (language_code)
-                )
-        if len(self.can_submit_translation_for_language_codes) != len(
-            set(self.can_submit_translation_for_language_codes)
-        ):
-            raise utils.ValidationError(
-                'Expected can_submit_translation_for_language_codes list not '
-                'to have duplicate values, found: %s'
-                % (self.can_submit_translation_for_language_codes)
-            )
         if not isinstance(self.can_review_translation_for_language_codes, list):
             raise utils.ValidationError(
                 'Expected can_review_translation_for_language_codes to be a '

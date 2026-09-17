@@ -23,7 +23,6 @@ from core.domain import (
     feature_flag_services,
     machine_translation_services,
     translation_services,
-    user_services,
 )
 from core.tests import test_utils
 
@@ -61,15 +60,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda: True,
         )
 
-        self.role_swap = self.swap(
-            user_services,
-            'can_submit_translation_suggestions',
-            lambda *args, **kwargs: True,
-        )
-
     def test_post_fails_if_user_is_not_logged_in(self) -> None:
         """Verifies that unauthenticated callers cannot trigger paid API calls."""
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap:
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/generate-translation',
@@ -87,7 +80,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda *args, **kwargs: False,
         )
 
-        with flag_swap, self.admin_toggle_swap, self.role_swap:
+        with flag_swap, self.admin_toggle_swap:
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/generate-translation',
@@ -106,7 +99,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda: False,
         )
 
-        with self.feature_flag_swap, admin_toggle_swap, self.role_swap:
+        with self.feature_flag_swap, admin_toggle_swap:
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
@@ -120,30 +113,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             )
         self.logout()
 
-    def test_post_fails_if_user_lacks_translation_submitter_role(self) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        role_swap = self.swap(
-            user_services,
-            'can_submit_translation_suggestions',
-            lambda *args, **kwargs: False,
-        )
-
-        with self.feature_flag_swap, self.admin_toggle_swap, role_swap:
-            csrf_token = self.get_new_csrf_token()
-            response = self.post_json(
-                '/generate-translation',
-                self.payload,
-                csrf_token=csrf_token,
-                expected_status_int=401,
-            )
-            self.assertEqual(
-                response['error'],
-                'You do not have permission to submit translations '
-                'for this language.'
-            )
-        self.logout()
-
     def test_post_fails_if_no_provider_configured(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -153,7 +122,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda src, tgt, text: None,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
@@ -184,7 +153,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             mock_generate,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
