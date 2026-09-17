@@ -563,6 +563,7 @@
   "I18N_TOPIC_VIEWER_LESSON_PLAY_AGAIN_BUTTON": "Nach eng Kéier spillen",
   "I18N_TOPIC_VIEWER_LIST_AND": " a(n)",
   "I18N_TOPIC_VIEWER_LIST_COMMA_AND": " a(n)",
+  "I18N_TOPIC_VIEWER_MODULE_NUMBER_LABEL": "Modul <[moduleNumber]>",
   "I18N_TOPIC_VIEWER_MODULE_SKIP_CONFIRMATION_TITLE": "Op <[moduleLabel]> sprangen?",
   "I18N_TOPIC_VIEWER_PAGE_TITLE": "<[topicName]> | <[pageTitleFragment]> | Oppia",
   "I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "Beta",
