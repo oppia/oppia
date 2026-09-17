@@ -25,7 +25,6 @@ import {
   ContributorCertificateInfo,
 } from '../services/contribution-and-review-backend-api.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
-import './certificate-download-modal.component.css';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface CertificateContentData {

@@ -57,7 +57,6 @@ import {TranslationLanguageService} from '../services/translation-language.servi
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './state-translation.component.css';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -802,7 +801,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       this.needsUpdateTooltipMessage =
-        'Audio needs update to ' + 'match text. Please record new audio.';
+        'Audio needs update to ' + 'match text. Please add new audio.';
     } else {
       this.needsUpdateTooltipMessage =
         'Translation needs update ' +

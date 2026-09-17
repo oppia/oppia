@@ -268,7 +268,7 @@ jobs:
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Lighthouse checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        run: python -m scripts.run_lighthouse_tests --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }} --shard ${{ matrix.suite.name }}
         timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
