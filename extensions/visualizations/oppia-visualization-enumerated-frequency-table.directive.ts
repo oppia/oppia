@@ -19,8 +19,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 
-import './oppia-visualization-enumerated-frequency-table.directive.css';
-
 @Component({
   selector: 'oppia-visualization-enumerated-frequency-table',
   templateUrl:
