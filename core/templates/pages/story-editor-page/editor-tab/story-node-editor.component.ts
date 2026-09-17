@@ -43,7 +43,6 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-import './story-node-editor.component.css';
 
 interface StoryNodeEditorFormSchema {
   type: 'html';

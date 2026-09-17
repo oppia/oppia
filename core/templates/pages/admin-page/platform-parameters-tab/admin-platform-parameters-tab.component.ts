@@ -36,7 +36,6 @@ import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.mo
 import {PlatformParameterRule} from 'domain/platform-parameter/platform-parameter-rule.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Schema} from 'services/schema-default-value.service';
-import './admin-platform-parameters-tab.component.css';
 
 type PlatformSchema = Schema & {
   ui_config?: {rows: number};

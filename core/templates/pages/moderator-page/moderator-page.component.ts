@@ -26,7 +26,6 @@ import {
   Schema,
   SchemaDefaultValue,
 } from 'services/schema-default-value.service';
-import './moderator-page.component.css';
 import {
   ActivityIdTypeDict,
   CommitMessage,

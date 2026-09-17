@@ -18,7 +18,6 @@
 
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
-import './preferred-language-selector.component.css';
 export interface Language {
   id: string;
   text: string;

@@ -22,7 +22,6 @@ import {Skill} from 'domain/skill/skill.model';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Subscription} from 'rxjs';
 import {GroupedSkillSummaries} from 'components/question-directives/questions-list/questions-list.component';
-import './skill-questions-tab.component.css';
 import {
   CategorizedSkills,
   TopicsAndSkillsDashboardBackendApiService,

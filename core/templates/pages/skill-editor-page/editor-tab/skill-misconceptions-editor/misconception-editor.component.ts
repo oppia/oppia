@@ -31,7 +31,6 @@ import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-ed
 import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-import './misconception-editor.component.css';
 
 interface MisconceptionFormSchema {
   type: 'html';

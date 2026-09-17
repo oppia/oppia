@@ -20,7 +20,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
-import './list-of-sets-of-translatable-html-content-ids-editor.component.css';
 
 interface Choice {
   id: string;

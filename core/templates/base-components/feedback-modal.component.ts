@@ -57,7 +57,6 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import './feedback-modal.component.css';
 
 interface TurnstileApi {
   render: (
