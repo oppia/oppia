@@ -1754,10 +1754,12 @@ describe('Translation Modal Component', () => {
       spyOn(
         translateTextBackendApiService,
         'getMachineTranslationAsync'
-      ).and.returnValue(Promise.resolve({
-        translated_text: '<p>hola</p>',
-        translation_provider: 'Google'
-      }));
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text: '<p>hola</p>',
+          translation_provider: 'Google',
+        })
+      );
 
       component.generateTranslation();
 
@@ -1892,6 +1894,9 @@ describe('Translation Modal Component', () => {
         translationsCount: 20,
         reviewerOnlyContentCount: 0,
       };
+      // This throws "Type 'null' is not assignable to type
+      // 'ExplorationOpportunitySummary'". We need to suppress this error
+      // because we are testing the case where opportunity is null.
       // @ts-ignore
       component.opportunity = null;
 

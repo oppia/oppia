@@ -71,10 +71,10 @@ describe('Auto-Translate Feature', function () {
 
     // Add exploration description with math and hyperlink.
     await curriculumAdm.clickOnElementWithText('Add an interaction');
-    await curriculumAdm.page.keyboard.press('Escape'); // close modal if open
+    // Close the modal if it opened automatically.
+    await curriculumAdm.page.keyboard.press('Escape');
 
-    // We just want to add some basic text with math and link to the state.
-    // wait, we can just use the provided method and add a simple state text
+    // Add some basic text with math and link to the state.
     await curriculumAdm.addExplorationDescriptionContainingBasicRTEComponents();
 
     await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
@@ -101,7 +101,7 @@ describe('Auto-Translate Feature', function () {
     );
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
 
-    // Mock the backend API for generate translation
+    // Mock the backend API for generate translation.
     await translationSubmitter.page.setRequestInterception(true);
     translationSubmitter.page.on('request', request => {
       if (request.url().includes('/generate-translation')) {

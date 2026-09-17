@@ -19,7 +19,6 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslationModalUneditedConfirmationModalComponent} from './translation-modal-unedited-confirmation-modal.component';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('Translation Modal Unedited Confirmation Modal Component', () => {
   let component: TranslationModalUneditedConfirmationModalComponent;
@@ -28,10 +27,7 @@ describe('Translation Modal Unedited Confirmation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TranslationModalUneditedConfirmationModalComponent,
-        MockTranslatePipe,
-      ],
+      declarations: [TranslationModalUneditedConfirmationModalComponent],
       providers: [NgbActiveModal],
     }).compileComponents();
   }));

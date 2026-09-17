@@ -16,7 +16,8 @@
  * @fileoverview Component for the unedited auto-translation confirmation modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -25,7 +26,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
   templateUrl: './translation-modal-unedited-confirmation-modal.component.html',
 })
 export class TranslationModalUneditedConfirmationModalComponent extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() ngbActiveModal: NgbActiveModal,
+    @Optional()
+    bottomSheetRef?: MatBottomSheetRef<TranslationModalUneditedConfirmationModalComponent>
+  ) {
+    super(ngbActiveModal, bottomSheetRef);
   }
 }
