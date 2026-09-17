@@ -39,7 +39,6 @@ import {
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './feedback-detail-page.component.css';
 
 interface BrowserDetails {
   name: string;

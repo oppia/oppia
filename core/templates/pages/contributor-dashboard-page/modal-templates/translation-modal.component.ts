@@ -62,8 +62,6 @@ import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contribu
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
-import './translation-modal.component.css';
-
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
