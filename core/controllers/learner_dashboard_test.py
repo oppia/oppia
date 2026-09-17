@@ -1178,7 +1178,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             exploration = self.save_new_valid_exploration(
                 exp_id,
                 self.owner_id,
-                title=f'Test Exploration {i+1}',
+                title=f'Test Exploration {i + 1}',
                 category='Test',
             )
             exp_services.update_exploration(
