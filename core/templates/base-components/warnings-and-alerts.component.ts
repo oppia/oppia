@@ -22,8 +22,6 @@ import {Subscription} from 'rxjs';
 import {AlertsService, Message, Warning} from 'services/alerts.service';
 import {ErrorModalComponent} from 'components/common-layout-directives/common-elements/error-modal.component';
 
-import './warnings-and-alerts.component.css';
-
 @Component({
   selector: 'oppia-warnings-and-alerts',
   templateUrl: './warnings-and-alerts.component.html',
