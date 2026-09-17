@@ -24,8 +24,6 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
 
-import './card-navigation-control.component.css';
-
 @Component({
   selector: 'oppia-card-navigation-control',
   templateUrl: './card-navigation-control.component.html',

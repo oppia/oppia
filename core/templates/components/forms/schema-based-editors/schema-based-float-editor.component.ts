@@ -164,7 +164,7 @@ export class SchemaBasedFloatEditorComponent
     }
     setTimeout(() => {
       this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
-    }, 0);
+    }, 50);
     // This timeout prevents the red 'invalid input' warning message from
     // flashing at the outset.
     setTimeout(() => {
