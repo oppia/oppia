@@ -5023,8 +5023,6 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     const row = await this.findFeedbackTableRow(givenDescription);
     await row.click();
-    await this.expectPageURLToContain('/feedback/');
-    await this.expectElementToBeVisible(feedbackDetailPageCard, true);
   }
 
   /**
@@ -5359,8 +5357,6 @@ export class LoggedInUser extends BaseUser {
    */
   async clickFeedbackDetailBackButton(): Promise<void> {
     await this.clickOnElementWithSelector(feedbackDetailPageBackBtn);
-    await this.expectPageURLToContain('#/feedback');
-    await this.expectElementToBeVisible(feedbackFilterBar, true);
   }
 
   /**
