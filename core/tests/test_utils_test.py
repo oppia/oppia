@@ -36,9 +36,8 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-import elasticsearch
 import webapp2
-from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
+from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
@@ -951,64 +950,6 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
     def test_jpeg_image_yields_false(self) -> None:
         self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
-
-
-class ElasticSearchStubTests(test_utils.GenericTestBase):
-
-    def test_duplicate_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        stub.mock_create_index('index1')
-        stub.mock_create_index('index2')
-        with self.assertRaisesRegex(
-            elasticsearch.RequestError,
-            r'resource_already_exists_exception: index',
-        ):
-            stub.mock_create_index('index1')
-
-    def test_delete_from_missing_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'index_not_found_exception: no such index \[index1\]',
-        ):
-            stub.mock_delete('index1', 'some_id')
-
-    def test_delete_missing_doc_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        stub.mock_create_index('index1')
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'document not found: \[index1\]\[doc_id\]',
-        ):
-            stub.mock_delete('index1', 'doc_id')
-
-    def test_delete_by_query_with_missing_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'index_not_found_exception: no such index \[index1\]',
-        ):
-            stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
-
-    def test_mock_search_ignores_duplicate_document_ids(self) -> None:
-        """Tests that mock_search correctly skips documents if their ID is
-        already present in the result set, ensuring branch coverage.
-        """
-        stub = test_utils.ElasticSearchStub()
-        stub._DB['index1'] = [  # pylint: disable=protected-access
-            {'id': 'duplicate_id_1', 'data': 'first_doc'},
-            {'id': 'duplicate_id_1', 'data': 'second_doc'},
-        ]
-        body: Dict[
-            str,
-            Dict[str, Dict[str, List[Dict[str, Union[str, int, float, bool]]]]],
-        ] = {'query': {'bool': {'filter': [], 'must': []}}}
-        result = stub.mock_search(body=body, index='index1', size=10, from_=0)
-
-        hits = result['hits']['hits']
-        self.assertEqual(len(hits), 1)
-        self.assertEqual(hits[0]['_id'], 'duplicate_id_1')
-        self.assertEqual(hits[0]['_source']['data'], 'first_doc')
 
 
 class EmailMockTests(test_utils.EmailTestBase):

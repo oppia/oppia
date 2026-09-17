@@ -40,10 +40,8 @@ from core.domain import (
     user_services,
 )
 from core.jobs.batch_jobs import (
-    blog_post_search_indexing_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
-    exp_search_indexing_jobs,
     user_stats_computation_jobs,
     web_feedback_cleanup_jobs,
 )
@@ -1262,40 +1260,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
         with swap_with_checks, self.testapp_swap:
             self.get_html_response('/cron/explorations/recommendations')
-
-    def test_cron_activity_search_rank_handler(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        exp_search_indexing_jobs.IndexExplorationsInSearchJob
-                    ),
-                }
-            ],
-        )
-        with swap_with_checks, self.testapp_swap:
-            self.get_html_response('/cron/explorations/search_rank')
-
-    def test_cron_blog_post_search_rank_handler(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
-                    ),
-                }
-            ],
-        )
-        with swap_with_checks, self.testapp_swap:
-            self.get_html_response('/cron/blog_posts/search_rank')
 
     def test_cron_dashboard_stats_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
