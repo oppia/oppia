@@ -40,6 +40,9 @@ export interface ExplorationDict {
 export interface ActivityIdTypeDict {
   id: string;
   type: string;
+  // Each reference dict only holds string values, so it can safely be
+  // treated as a SchemaDefaultValue by the schema-based editor.
+  [key: string]: string;
 }
 
 export interface RecentCommitResponse {

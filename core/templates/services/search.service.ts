@@ -35,6 +35,7 @@ interface FilterDetails {
   masterList: {
     id: string;
     text: string;
+    ariaLabelInEnglish?: string;
   }[];
   selections: SelectionList;
   numSelections: number;

@@ -252,16 +252,15 @@ describe('Search bar component', () => {
 
   it('should search', () => {
     component.searchButtonIsActive = true;
-    const search = {
-      target: {
-        value: 'search',
-      },
-    };
-    component.searchToBeExec(search);
+    const searchEvent = new Event('input');
+    Object.defineProperty(searchEvent, 'target', {
+      value: {value: 'search'},
+    });
+    component.searchToBeExec(searchEvent);
 
     spyOn(component.searchQueryChanged, 'next');
     component.searchButtonIsActive = false;
-    component.searchToBeExec(search);
+    component.searchToBeExec(searchEvent);
     expect(component.searchQueryChanged.next).toHaveBeenCalled();
   });
 

@@ -19,10 +19,11 @@
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import './preferred-language-selector.component.css';
-interface Language {
+export interface Language {
   id: string;
   text: string;
-  dir: string;
+  // 'direction' is optional because audio languages may not specify it.
+  direction?: string;
 }
 
 @Component({
@@ -44,11 +45,11 @@ export class PreferredSiteLanguageSelectorComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() preferredLanguageCode!: string;
-  @Input() choices!: Language[];
+  @Input() choices!: readonly Language[];
   @Input() e2eTestClass!: string;
   @Input() entity!: string;
 
-  filteredChoices!: Language[];
+  filteredChoices!: readonly Language[];
 
   // Implementing the ControlValueAccessor interface through the following
   // 5 methods to make the component work as a form field.

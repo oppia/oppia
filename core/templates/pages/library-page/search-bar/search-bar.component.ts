@@ -41,6 +41,7 @@ interface SearchDropDownCategories {
 interface LanguageIdAndText {
   id: string;
   text: string;
+  ariaLabelInEnglish?: string;
 }
 
 @Component({
@@ -102,9 +103,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     return this.searchService.isSearchInProgress();
   }
 
-  searchToBeExec(e: {target: {value: string}}): void {
+  searchToBeExec(e: Event): void {
     if (!this.searchButtonIsActive) {
-      this.searchQueryChanged.next(e.target.value);
+      this.searchQueryChanged.next((e.target as HTMLInputElement).value);
     }
   }
 

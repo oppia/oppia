@@ -41,10 +41,12 @@ interface KeyboardEventToCodes {
 }
 
 export interface EventToCodes {
-  [keys: string]: string;
-  enter: string;
-  tab: string;
-  shiftTab: string;
+  [keys: string]: string | undefined;
+  // The keys are optional because callers pass only the subset of keyboard
+  // events (enter/tab/shiftTab) they want to handle.
+  enter?: string;
+  tab?: string;
+  shiftTab?: string;
 }
 
 @Injectable({

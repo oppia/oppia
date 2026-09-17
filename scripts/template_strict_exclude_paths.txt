@@ -63,16 +63,6 @@ core/templates/pages/learner-dashboard-page/home-tab.component.ts
 core/templates/pages/learner-dashboard-page/old-progress-tab.component.ts
 core/templates/pages/learner-dashboard-page/progress-tab.component.ts
 core/templates/pages/learner-group-pages/create-group/add-syllabus-items.component.ts
-core/templates/pages/learner-group-pages/create-group/invite-learners.component.ts
-core/templates/pages/learner-group-pages/edit-group/learner-group-learners-progress.component.ts
-core/templates/pages/library-page/library-page.component.ts
-core/templates/pages/library-page/search-bar/search-bar.component.ts
-core/templates/pages/library-page/search-results/activity-tiles-infinity-grid.component.ts
-core/templates/pages/library-page/search-results/search-results.component.ts
-core/templates/pages/moderator-page/moderator-page.component.ts
-core/templates/pages/practice-session-page/practice-session-page.component.ts
-core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.component.ts
-core/templates/pages/preferences-page/preferences-page.component.ts
 core/templates/pages/profile-page/profile-page.component.ts
 core/templates/pages/review-test-page/review-test-page.component.ts
 core/templates/pages/signup-page/signup-page.component.ts

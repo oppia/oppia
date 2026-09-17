@@ -23,6 +23,7 @@ import {Injectable} from '@angular/core';
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-exploration-summary.model';
 import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
+import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 interface LibraryGroupDataBackendDict {
@@ -37,8 +38,11 @@ export interface ActivityDict {
   community_owned: boolean;
   id: string;
   language_code: string;
+  last_updated_msec?: number;
+  node_count?: number;
   num_views: number;
   objective: string;
+  ratings?: ExplorationRatings;
   status: string;
   tags: [];
   thumbnail_bg_color: string;

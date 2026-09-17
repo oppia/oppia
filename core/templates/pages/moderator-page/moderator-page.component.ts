@@ -22,7 +22,10 @@ import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
-import {Schema} from 'services/schema-default-value.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import './moderator-page.component.css';
 import {
   ActivityIdTypeDict,
@@ -78,11 +81,22 @@ export class ModeratorPageComponent {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  get displayedFeaturedActivityReferencesAsSchemaDefault(): SchemaDefaultValue {
+    // The schema-based editor exposes the value as SchemaDefaultValue, but the
+    // referenced activities are normalized as an array of {type, id} dicts.
+    return this.displayedFeaturedActivityReferences as SchemaDefaultValue;
+  }
+
   updateDisplayedFeaturedActivityReferences(
-    newValue: ActivityIdTypeDict[]
+    newValue: SchemaDefaultValue
   ): void {
-    if (this.displayedFeaturedActivityReferences !== newValue) {
-      this.displayedFeaturedActivityReferences = newValue;
+    // Guard against non-array values emitted by the schema-based editor.
+    if (!Array.isArray(newValue)) {
+      return;
+    }
+    const castedValue = newValue as ActivityIdTypeDict[];
+    if (this.displayedFeaturedActivityReferences !== castedValue) {
+      this.displayedFeaturedActivityReferences = castedValue;
       this.changeDetectorRef.detectChanges();
     }
   }

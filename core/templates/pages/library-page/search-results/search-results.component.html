@@ -6,8 +6,7 @@
                 [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
         <source type="image/png"
                 [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
-        <img *ngIf="!profilePictureDataUrl"
-             [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+        <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
       </picture>
       <p class="text-center">
         <span>{{ 'I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY' | translate }}</span><br><br>
