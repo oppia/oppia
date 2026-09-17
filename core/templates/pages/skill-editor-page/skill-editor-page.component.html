@@ -29,7 +29,7 @@
                 *ngIf="warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
               <li class="oppia-editor-warnings-text"
-                  *ngFor="let issue of skill.getValidationIssues(); trackBy : index">
+                  *ngFor="let issue of skill.getValidationIssues()">
                 <hr class="oppia-editor-warnings-separator">
                 {{issue}}
               </li>

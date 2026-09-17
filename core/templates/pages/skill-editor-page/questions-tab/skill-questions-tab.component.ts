@@ -18,18 +18,16 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Rubric} from 'domain/skill/rubric.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Subscription} from 'rxjs';
+import {GroupedSkillSummaries} from 'components/question-directives/questions-list/questions-list.component';
 import './skill-questions-tab.component.css';
 import {
   CategorizedSkills,
   TopicsAndSkillsDashboardBackendApiService,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import {
-  GroupedSkillSummaries,
-  SkillEditorStateService,
-} from '../services/skill-editor-state.service';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
 @Component({
   selector: 'oppia-questions-tab',
@@ -55,8 +53,11 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   _init(): void {
     this.skill = this.skillEditorStateService.getSkill();
+    // The service returns a structurally narrower 'current' array than the
+    // one expected by the questions list, so the cast is required to bind
+    // the value in the template.
     this.groupedSkillSummaries =
-      this.skillEditorStateService.getGroupedSkillSummaries();
+      this.skillEditorStateService.getGroupedSkillSummaries() as GroupedSkillSummaries;
     this.skillIdToRubricsObject = {};
     this.skillIdToRubricsObject[this.skill.getId()] = this.skill.getRubrics();
     this.topicsAndSkillsDashboardBackendApiService

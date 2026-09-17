@@ -71,7 +71,7 @@ import {RemoveQuestionSkillLinkModalComponent} from '../modal-templates/remove-q
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import './questions-list.component.css';
 
-interface GroupedSkillSummaries {
+export interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];
   others: SkillSummaryBackendDict[];
 }

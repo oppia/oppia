@@ -95,7 +95,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     return misconception.getName();
   }
 
-  openDeleteMisconceptionModal(index: number, evt: string): void {
+  openDeleteMisconceptionModal(index: number, evt: Event): void {
     const modalInstance: NgbModalRef = this.ngbModal.open(
       DeleteMisconceptionModalComponent,
       {

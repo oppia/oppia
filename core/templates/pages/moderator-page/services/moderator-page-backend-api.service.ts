@@ -40,8 +40,8 @@ export interface ExplorationDict {
 export interface ActivityIdTypeDict {
   id: string;
   type: string;
-  // Each reference dict only holds string values, so it can safely be
-  // treated as a SchemaDefaultValue by the schema-based editor.
+  // Every ActivityIdTypeDict is a string-keyed dict, so an array of them is
+  // assignable to SchemaDefaultValue, letting the schema-based editor edit it.
   [key: string]: string;
 }
 

@@ -105,6 +105,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   searchToBeExec(e: Event): void {
     if (!this.searchButtonIsActive) {
+      // The input event is emitted by the search box, so the target is
+      // always an input element.
       this.searchQueryChanged.next((e.target as HTMLInputElement).value);
     }
   }

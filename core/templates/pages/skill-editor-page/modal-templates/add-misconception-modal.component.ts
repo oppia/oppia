@@ -22,7 +22,8 @@ import {AppConstants} from 'app.constants';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {Misconception} from 'domain/skill/misconception.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import './add-misconception-modal.component.css';
 
@@ -98,15 +99,19 @@ export class AddMisconceptionModalComponent
     return this.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA;
   }
 
-  updateLocalForm($event: string): void {
-    if (this.misconceptionNotes !== $event) {
+  updateLocalForm($event: SchemaDefaultValue): void {
+    // The schema type of the notes editor is 'html', so the emitted
+    // value is always a string.
+    if (typeof $event === 'string' && this.misconceptionNotes !== $event) {
       this.misconceptionNotes = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  updateLocalFeedback($event: string): void {
-    if (this.misconceptionFeedback !== $event) {
+  updateLocalFeedback($event: SchemaDefaultValue): void {
+    // The schema type of the feedback editor is 'html', so the emitted
+    // value is always a string.
+    if (typeof $event === 'string' && this.misconceptionFeedback !== $event) {
       this.misconceptionFeedback = $event;
       this.changeDetectorRef.detectChanges();
     }

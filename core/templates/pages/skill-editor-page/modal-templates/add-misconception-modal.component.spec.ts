@@ -176,4 +176,38 @@ describe('Add Misconception Modal Component', function () {
 
     expect(component.misconceptionFeedback).toEqual(feedback);
   });
+
+  it('should not update misconceptionNotes for a non-string value', () => {
+    component.ngOnInit();
+
+    component.updateLocalForm(['non-string value']);
+
+    expect(component.misconceptionNotes).toBe('');
+  });
+
+  it('should not update misconceptionNotes when the value is unchanged', () => {
+    component.ngOnInit();
+
+    component.misconceptionNotes = 'notes';
+    component.updateLocalForm('notes');
+
+    expect(component.misconceptionNotes).toBe('notes');
+  });
+
+  it('should not update misconceptionFeedback for a non-string value', () => {
+    component.ngOnInit();
+
+    component.updateLocalFeedback(['non-string value']);
+
+    expect(component.misconceptionFeedback).toBe('');
+  });
+
+  it('should not update misconceptionFeedback when the value is unchanged', () => {
+    component.ngOnInit();
+
+    component.misconceptionFeedback = 'feedback';
+    component.updateLocalFeedback('feedback');
+
+    expect(component.misconceptionFeedback).toBe('feedback');
+  });
 });
