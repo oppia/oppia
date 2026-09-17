@@ -103,13 +103,15 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private platformFeatureService: PlatformFeatureService
   ) {}
 
-  focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
+  focusSkipButton(eventTarget: EventTarget | null, isLoggedIn: boolean): void {
     if (isLoggedIn || !this.showLoginOverlay) {
       return;
     }
     const target = eventTarget;
+    // The focus event target is the element that the login container
+    // wraps, so it is always an Element.
     if (
-      target.closest('.story-viewer-login-container') !==
+      (target as Element).closest('.story-viewer-login-container') !==
       this.overlay.nativeElement
     ) {
       this.skipButton.nativeElement.focus();
@@ -159,7 +161,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  getExplorationUrl(node: StoryNode): string {
+  getExplorationUrl(node: StoryNode | ReadOnlyStoryNode): string {
     let result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
       result,

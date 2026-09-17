@@ -47,9 +47,11 @@ export class NewChapterTitleModalComponent implements OnInit {
   editableThumbnailBgColor!: string;
   editableThumbnailFilename!: string;
   categoryIsDefault!: boolean;
-  statesWithRestrictedInteractions!: string | string[];
-  statesWithTooFewMultipleChoiceOptions!: string | string[];
-  allowedBgColors = newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
+  statesWithRestrictedInteractions!: string[];
+  statesWithTooFewMultipleChoiceOptions!: string[];
+  allowedBgColors: string[] = [
+    ...newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter,
+  ];
 
   constructor(
     private curatedExplorationValidationService: CuratedExplorationValidationService,
