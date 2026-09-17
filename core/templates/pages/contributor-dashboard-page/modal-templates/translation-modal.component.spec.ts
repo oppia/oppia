@@ -282,6 +282,7 @@ describe('Translation Modal Component', () => {
     getUserContributionRightsDataAsyncSpy.and.returnValue(
       Promise.resolve({
         can_suggest_questions: false,
+        can_submit_translation_for_language_codes: [],
         can_review_translation_for_language_codes: ['ar'],
         can_review_voiceover_for_language_codes: [],
         can_review_questions: false,
@@ -1445,6 +1446,7 @@ describe('Translation Modal Component', () => {
               useValue: {
                 getUserContributionRightsDataAsync: () =>
                   Promise.resolve({
+                    can_submit_translation_for_language_codes: [],
                     can_review_translation_for_language_codes: ['ar'],
                   }),
                 getUserInfoAsync: () =>

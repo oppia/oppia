@@ -212,6 +212,9 @@ export class ContributorDashboardPageComponent implements OnInit {
 
         this.tabsDetails.submitQuestionTab.enabled =
           userContributionRights.can_suggest_questions;
+        
+        this.tabsDetails.translateTextTab.enabled = 
+          userContributionRights.can_submit_translation_for_language_codes.length > 0;
       });
 
     this.userService.getUserInfoAsync().then(userInfo => {

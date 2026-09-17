@@ -2725,6 +2725,9 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_translation_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True)
     )
+    can_submit_translation_for_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )
     can_review_voiceover_for_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
