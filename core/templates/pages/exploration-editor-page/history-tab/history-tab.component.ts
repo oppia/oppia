@@ -42,7 +42,6 @@ import {
   CompareVersionData,
 } from './services/compare-versions.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import './history-tab.component.css';
 
 interface VersionMetadata {
   versionNumber: number;

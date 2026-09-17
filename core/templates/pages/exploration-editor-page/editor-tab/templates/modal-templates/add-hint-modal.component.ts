@@ -27,7 +27,6 @@ import {PageContextService} from 'services/page-context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import './add-hint-modal.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,

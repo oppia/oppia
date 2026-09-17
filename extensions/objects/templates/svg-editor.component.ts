@@ -38,7 +38,6 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Picker from 'vanilla-picker';
 import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
 import {SvgEditorConstants} from './svg-editor.constants';
-import './svg-editor.component.css';
 
 export interface Dimensions {
   height: number;

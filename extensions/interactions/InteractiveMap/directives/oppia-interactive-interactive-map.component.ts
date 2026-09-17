@@ -39,7 +39,6 @@ import {
   TileLayer,
   tileLayer,
 } from 'leaflet';
-import './interactive-map-interaction.component.css';
 
 interface OverlayStyle {
   'background-color': string;

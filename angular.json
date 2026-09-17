@@ -90,9 +90,6 @@
               "node_modules/cropperjs/dist/cropper.min.css",
               "node_modules/codemirror/lib/codemirror.css",
               "node_modules/codemirror/addon/merge/merge.css"
-            ],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
             ]
           },
           "configurations": {
@@ -198,9 +195,6 @@
               "node_modules/cropperjs/dist/cropper.min.css",
               "node_modules/codemirror/lib/codemirror.css",
               "node_modules/codemirror/addon/merge/merge.css"
-            ],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
             ]
           },
           "configurations": {

@@ -47,7 +47,6 @@ import {InteractionData} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import './state-editor.component.css';
 
 @Component({
   selector: 'oppia-state-editor',

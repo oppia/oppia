@@ -45,7 +45,6 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-import './rule-editor.component.css';
 
 interface SelectItem {
   type: string;

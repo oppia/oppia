@@ -31,7 +31,7 @@ import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-import './add-or-update-solution-modal.component.css';
+
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,

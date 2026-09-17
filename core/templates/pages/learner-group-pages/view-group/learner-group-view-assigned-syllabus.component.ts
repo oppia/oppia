@@ -29,8 +29,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 
-import './learner-group-view-assigned-syllabus.component.css';
-
 @Component({
   selector: 'oppia-learner-group-view-assigned-syllabus',
   templateUrl: './learner-group-view-assigned-syllabus.component.html',
