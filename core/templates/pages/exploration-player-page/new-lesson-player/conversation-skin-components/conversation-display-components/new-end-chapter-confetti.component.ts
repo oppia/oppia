@@ -18,7 +18,6 @@
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './new-end-chapter-confetti.component.css';
 
 @Component({
   selector: 'oppia-new-end-chapter-confetti',
