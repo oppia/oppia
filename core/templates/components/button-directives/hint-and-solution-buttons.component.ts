@@ -35,8 +35,6 @@ import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 
-import './hint-and-solution-buttons.component.css';
-
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
   templateUrl: './hint-and-solution-buttons.component.html',
