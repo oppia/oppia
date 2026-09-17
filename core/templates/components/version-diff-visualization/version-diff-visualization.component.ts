@@ -23,7 +23,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {State} from 'domain/state/state.model';
 import {StateDiffModalComponent} from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 import {StateLink} from 'pages/exploration-editor-page/services/exploration-diff.service';
-import './version-diff-visualization.component.css';
 
 interface NodesData {
   [key: string]: {

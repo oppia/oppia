@@ -22,7 +22,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import './item-selection-input-response.component.css';
 
 @Component({
   selector: 'oppia-response-item-selection-input',
