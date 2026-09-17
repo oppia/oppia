@@ -32,8 +32,6 @@ import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './create-learner-group-page.component.css';
-
 @Component({
   selector: 'oppia-create-learner-group-page',
   templateUrl: './create-learner-group-page.component.html',
