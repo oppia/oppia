@@ -159,7 +159,7 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
             )
         else:
             return job_run_result.JobRunResult.as_stderr(
-                '%sERROR: "%s":' % (self.prefix, result_item.value)
+                '%sERROR: "%s":' % (self.prefix, result_item.err_value)
             )
 
     @staticmethod
