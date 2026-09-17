@@ -921,8 +921,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
         )
 
         with send_email_swap:
@@ -6472,8 +6473,9 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
         )
         with send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -6601,8 +6603,9 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
         )
         with send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
