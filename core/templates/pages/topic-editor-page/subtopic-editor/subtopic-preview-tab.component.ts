@@ -29,7 +29,6 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {PageContextService} from 'services/page-context.service';
-import './subtopic-preview-tab.component.css';
 
 @Component({
   selector: 'oppia-subtopic-preview-tab',

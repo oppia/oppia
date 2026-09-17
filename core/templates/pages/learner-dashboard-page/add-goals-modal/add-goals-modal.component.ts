@@ -17,7 +17,6 @@
  */
 import {Component, Inject} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import './add-goals-modal.component.css';
 
 @Component({
   selector: 'oppia-add-goals-modal',

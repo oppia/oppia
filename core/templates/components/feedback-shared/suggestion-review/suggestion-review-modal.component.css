@@ -1,7 +1,3 @@
-/**
- * @fileoverview Styles for suggestion review modal component.
- */
-
 .oppia-suggestion-review-modal-body .oppia-no-current-state {
   color: red;
 }

@@ -32,7 +32,6 @@ import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {ChangeListService} from '../services/change-list.service';
 import {filter, take} from 'rxjs/operators';
-import './exploration-metadata-modal.component.css';
 
 interface CategoryChoices {
   id: string;
