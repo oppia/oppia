@@ -125,7 +125,7 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
     for feature_flag_name_enum in ALL_FEATURE_FLAGS:
         feature_flags_to_fetch_from_storage.append(feature_flag_name_enum.value)
 
-    feature_flags_from_storage = load_feature_flags_from_storage(
+    feature_flags_from_storage = load_web_feature_flags_from_storage(
         feature_flags_to_fetch_from_storage
     )
 
@@ -145,55 +145,59 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
     return feature_flags
 
 
-def load_feature_flags_from_storage(
-    feature_flag_names_list: List[str],
+def load_web_feature_flags_from_storage(
+    web_feature_flag_names_list: List[str],
 ) -> Mapping[str, Optional[feature_flag_domain.FeatureFlag]]:
-    """Loads feature flags from the storage layer.
+    """Loads web feature flags from the storage layer.
 
     Args:
-        feature_flag_names_list: List[str]. The list of feature flag names
+        web_feature_flag_names_list: List[str]. The list of web feature flag names
             that needs to be fetched from the storage layer.
 
     Returns:
-        feature_flag_name_to_feature_flag_dict: Dict[
-        str, FeatureFlag|None]. Dictionary having key as the feature name
-        and value as the feature flag domain model if present in the storage
+        web_feature_flag_name_to_feature_flag_dict: Dict[
+        str, WebFeatureFlag|None]. Dictionary having key as the web feature name
+        and value as the web feature flag domain model if present in the storage
         layer otherwise None.
     """
-    feature_flag_name_to_feature_flag_dict: Dict[
+    web_feature_flag_name_to_feature_flag_dict: Dict[
         str, Optional[feature_flag_domain.FeatureFlag]
     ] = {}
-    feature_flag_config_models = config_models.FeatureFlagConfigModel.get_multi(
-        feature_flag_names_list
+    web_feature_flag_config_models = (
+        config_models.WebFeatureFlagConfigModel.get_multi(
+            web_feature_flag_names_list
+        )
     )
 
-    for feature_flag_config_model in feature_flag_config_models:
-        if feature_flag_config_model:
+    for web_feature_flag_config_model in web_feature_flag_config_models:
+        if web_feature_flag_config_model:
             feature_flag_spec = _get_feature_flag_spec(
-                feature_flag_config_model.id
+                web_feature_flag_config_model.id
             )
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-                feature_flag_config_model.force_enable_for_all_users,
-                feature_flag_config_model.rollout_percentage,
-                feature_flag_config_model.user_group_ids,
-                feature_flag_config_model.last_updated,
+                web_feature_flag_config_model.force_enable_for_all_users,
+                web_feature_flag_config_model.rollout_percentage,
+                web_feature_flag_config_model.user_group_ids,
+                web_feature_flag_config_model.last_updated,
             )
 
-            feature_flag_name_to_feature_flag_dict[
-                feature_flag_config_model.id
+            web_feature_flag_name_to_feature_flag_dict[
+                web_feature_flag_config_model.id
             ] = feature_flag_domain.FeatureFlag(
-                feature_flag_config_model.id,
+                web_feature_flag_config_model.id,
                 feature_flag_spec,
                 feature_flag_config,
             )
 
-        for feature_flag_name in feature_flag_names_list:
-            if feature_flag_name not in (
-                feature_flag_name_to_feature_flag_dict
+        for web_feature_flag_name in web_feature_flag_names_list:
+            if web_feature_flag_name not in (
+                web_feature_flag_name_to_feature_flag_dict
             ):
-                feature_flag_name_to_feature_flag_dict[feature_flag_name] = None
+                web_feature_flag_name_to_feature_flag_dict[
+                    web_feature_flag_name
+                ] = None
 
-    return feature_flag_name_to_feature_flag_dict
+    return web_feature_flag_name_to_feature_flag_dict
 
 
 def is_feature_flag_enabled(
