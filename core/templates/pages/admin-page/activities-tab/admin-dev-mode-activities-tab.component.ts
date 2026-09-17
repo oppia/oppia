@@ -254,6 +254,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.selectedStoryForChapter = (event.target as HTMLSelectElement).value;
   }
 
+  onClassroomSelectionChange(event: Event): void {
+    this.selectedClassroomId = (event.target as HTMLSelectElement).value;
+  }
+
   generateDummySuggestionQuestions(selectedOption: string): void {
     // Generate dummy suggestion question for the selected skill.
     const selectedIndex = Number(selectedOption);
