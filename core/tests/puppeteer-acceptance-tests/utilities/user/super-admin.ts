@@ -1478,13 +1478,13 @@ export class SuperAdmin extends BaseUser {
     const removeButtonSelector = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
     await this.expectElementToBeVisible(removeButtonSelector);
 
-    const rowElement = await this.page.evaluateHandle((selector) => {
+    const rowElement = await this.page.evaluateHandle(selector => {
       const button = document.querySelector(selector);
       return button ? button.closest('tr') : null;
     }, removeButtonSelector);
 
     const isRowPresent = await this.page.evaluate(
-      (el) => el !== null,
+      el => el !== null,
       rowElement
     );
 
@@ -1493,12 +1493,14 @@ export class SuperAdmin extends BaseUser {
     }
 
     const rowText = await this.page.evaluate(
-      (el) => (el as HTMLElement).innerText,
+      el => (el as HTMLElement).innerText,
       rowElement
     );
 
     if (!rowText.includes(providerDisplayText)) {
-      throw new Error(`Provider mapping for "${languageCode}" is missing the provider text "${providerDisplayText}". Found: ${rowText}`);
+      throw new Error(
+        `Provider mapping for "${languageCode}" is missing the provider text "${providerDisplayText}". Found: ${rowText}`
+      );
     }
   }
 
