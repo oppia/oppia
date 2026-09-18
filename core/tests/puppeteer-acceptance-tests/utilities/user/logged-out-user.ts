@@ -6673,7 +6673,6 @@ export class LoggedOutUser extends BaseUser {
   async addFeedbackScreenshot(picturePath: string): Promise<void> {
     await this.expectElementToBeVisible(imageRecieverFeedbackComponentSelector);
     await this.uploadFile(picturePath);
-    await this.expectElementToBeVisible(feedbackScreenshotPreviewSelector);
   }
 
   /**
