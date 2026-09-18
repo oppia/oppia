@@ -1006,6 +1006,54 @@ describe('Contributions and review component', () => {
       });
     });
 
+    describe('isSubmittedTranslationsTab()', () => {
+      it('should return true on Translation Contributions tab', () => {
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS,
+          'translate_content'
+        );
+        expect(component.isSubmittedTranslationsTab()).toBeTrue();
+        expect(component.isReviewTranslationsTab()).toBeFalse();
+      });
+
+      it('should return false on Review Translations tab', () => {
+        component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+        expect(component.isSubmittedTranslationsTab()).toBeFalse();
+      });
+    });
+
+    it('should reload opportunities when the submitted language filter changes', () => {
+      const emitSpy = contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.emit as jasmine.Spy;
+      emitSpy.calls.reset();
+
+      component.onChangeSubmittedLanguage('hi');
+      expect(component.submittedLanguageCode).toBe('hi');
+      expect(emitSpy).toHaveBeenCalled();
+
+      component.onChangeSubmittedLanguage('');
+      expect(component.submittedLanguageCode).toBeNull();
+    });
+
+    it('should pass topic and language filters when fetching submitted translations', () => {
+      spyOn(translationTopicService, 'getActiveTopicName').and.returnValue(
+        'Fractions'
+      );
+      component.submittedLanguageCode = 'hi';
+
+      component.tabNameToOpportunityFetchFunction[
+        component.SUGGESTION_TYPE_TRANSLATE
+      ][component.TAB_TYPE_CONTRIBUTIONS](true);
+
+      expect(getUserCreatedTranslationSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        true,
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        component.activeEntityType,
+        'Fractions',
+        'hi'
+      );
+    });
+
     it('should change the sort key of reviewable questions', () => {
       expect(component.reviewableQuestionsSortKey).toBe('Date');
 
@@ -3459,6 +3507,52 @@ describe('Contributions and review component', () => {
       expect(summaryList[3].labelText).toBe('Obsolete');
     }));
 
+    it('should sort same-status translation contributions by lesson subheading', () => {
+      const suggestionIdToSuggestions = {
+        suggestion_b: {
+          suggestion: {
+            suggestion_id: 'suggestion_b',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content B',
+              translation_html: 'Translation B',
+            },
+            entity_content_html: 'Content B',
+          },
+          details: {
+            topic_name: 'Zoo',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+        suggestion_a: {
+          suggestion: {
+            suggestion_id: 'suggestion_a',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content A',
+              translation_html: 'Translation A',
+            },
+            entity_content_html: 'Content A',
+          },
+          details: {
+            topic_name: 'Algebra',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      const summaryList = component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions
+      );
+
+      expect(summaryList[0].id).toBe('suggestion_a');
+      expect(summaryList[0].subheading).toBe('Algebra / Story / Chapter');
+      expect(summaryList[1].id).toBe('suggestion_b');
+      expect(summaryList[1].subheading).toBe('Zoo / Story / Chapter');
+    });
+
     it('should get translation contributions summary correctly when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         true;
@@ -3529,8 +3623,8 @@ describe('Contributions and review component', () => {
         suggestionIdToSuggestions
       );
 
-      expect(summaryList[0].subheading).toBe('Skill description');
-      expect(summaryList[1].subheading).toBe('');
+      expect(summaryList[0].subheading).toBe('');
+      expect(summaryList[1].subheading).toBe('Skill description');
     }));
 
     it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {

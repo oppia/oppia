@@ -155,11 +155,16 @@ export class ContributorDashboardPageComponent implements OnInit {
       activeTabType === 'reviews' &&
       activeSuggestionType === 'translate_content' &&
       this.activeTabName !== 'submitQuestionTab';
+    const userIsViewingSubmittedTranslations =
+      activeTabType === 'contributions' &&
+      activeSuggestionType === 'translate_content' &&
+      this.activeTabName !== 'submitQuestionTab';
 
     return (
       activeTabDetail.customizationOptions.includes('topic') ||
       userIsReviewingQuestionSuggestions ||
-      userIsReviewingTranslationSuggestions
+      userIsReviewingTranslationSuggestions ||
+      userIsViewingSubmittedTranslations
     );
   }
 

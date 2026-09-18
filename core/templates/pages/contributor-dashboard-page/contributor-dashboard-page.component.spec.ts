@@ -467,5 +467,21 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
     });
+
+    it('should show topic selector for submitted translations', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('translate_content');
+      spyOn(contributionAndReviewService, 'getActiveTabType').and.returnValue(
+        'contributions'
+      );
+
+      component.onTabClick('myContributionTab');
+      expect(component.showTopicSelector()).toBe(true);
+    });
   });
 });

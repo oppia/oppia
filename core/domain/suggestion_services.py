@@ -2000,6 +2000,7 @@ def get_submitted_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     target_type: Optional[str] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionAddQuestion], int]: ...
 
 
@@ -2011,6 +2012,7 @@ def get_submitted_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     target_type: Optional[str] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionTranslateContent], int]: ...
 
 
@@ -2022,6 +2024,7 @@ def get_submitted_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     target_type: Optional[str] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
@@ -2032,6 +2035,7 @@ def get_submitted_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     target_type: Optional[str] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -2044,6 +2048,7 @@ def get_submitted_suggestions_by_offset(
             of all results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
         target_type: str|None. Optional target type to filter suggestions.
+        language_code: str|None. Optional language code to filter suggestions.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -2060,6 +2065,7 @@ def get_submitted_suggestions_by_offset(
             user_id,
             sort_key,
             target_type=target_type,
+            language_code=language_code,
         )
     )
     suggestions = [

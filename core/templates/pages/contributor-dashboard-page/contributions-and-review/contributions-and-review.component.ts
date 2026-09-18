@@ -168,6 +168,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
   languageCode: string;
+  submittedLanguageCode: string | null = null;
   userCreatedQuestionsSortKey: string;
   reviewableQuestionsSortKey: string;
   userCreatedTranslationsSortKey: string;
@@ -321,8 +322,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
 
       const priorityA = getPriority(a.labelText);
       const priorityB = getPriority(b.labelText);
-
-      return priorityA - priorityB;
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+      return a.subheading.localeCompare(b.subheading);
     });
 
     return translationContributionsSummaryList;
@@ -597,6 +600,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&
+      this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE
+    );
+  }
+
+  isSubmittedTranslationsTab(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_CONTRIBUTIONS &&
       this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE
     );
   }
@@ -915,6 +925,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     this.userIsLoggedIn = false;
     this.topicReady = false;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+    this.submittedLanguageCode = null;
     this.activeTabType = '';
     this.activeTabSubtype = '';
     this.dropdownShown = false;
@@ -1058,7 +1069,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
           return this.contributionAndReviewService.getUserCreatedTranslationSuggestionsAsync(
             shouldResetOffset,
             this.userCreatedTranslationsSortKey,
-            this.activeEntityType
+            this.activeEntityType,
+            this.translationTopicService.getActiveTopicName(),
+            this.submittedLanguageCode
           );
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
@@ -1107,6 +1120,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
     this.opportunitiesListRef.onChangeLanguage(languageCode);
+  }
+
+  onChangeSubmittedLanguage(languageCode: string): void {
+    this.submittedLanguageCode = languageCode || null;
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
   ngOnDestroy(): void {
