@@ -41,9 +41,9 @@
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
-            <nav *ngIf="!isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
-                 role="navigation"
-                 headroom>
+            <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
+                 [attr.role]="isNewLessonPlayerEnabled() ? null : 'navigation'"
+                 [attr.headroom]="isNewLessonPlayerEnabled() ? null : ''">
               <div class="navbar-container" [attr.dir]="isRtl ? 'rtl' : 'ltr'">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
@@ -53,29 +53,10 @@
                 </oppia-top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
                   <div [ngClass]="{
-                    'me-auto': !isRtl,
-                    'ms-auto oppia-navbar-breadcrumb-rtl': isRtl
-                  }">
-                    <ng-content select="navbar-breadcrumb"></ng-content>
-                  </div>
-                  <ng-content select="nav-options"></ng-content>
-                </div>
-              </div>
-            </nav>
-
-            <nav *ngIf="isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
-                 role="navigation">
-              <div class="navbar-container" [attr.dir]="isRtl ? 'rtl' : 'ltr'">
-                <div class="oppia-base-content-pre-logo-container">
-                  <ng-content select="navbar-pre-logo-action"></ng-content>
-                </div>
-                <oppia-top-navigation-bar [headerText]="getHeaderText()"
-                                          [subheaderText]="getSubheaderText()">
-                </oppia-top-navigation-bar>
-                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
-                  <div [ngClass]="{
-                    'mr-auto': !isRtl,
-                    'ml-auto oppia-navbar-breadcrumb-rtl': isRtl
+                    'me-auto': !isRtl && !isNewLessonPlayerEnabled(),
+                    'mr-auto': !isRtl && isNewLessonPlayerEnabled(),
+                    'ms-auto oppia-navbar-breadcrumb-rtl': isRtl && !isNewLessonPlayerEnabled(),
+                    'ml-auto oppia-navbar-breadcrumb-rtl': isRtl && isNewLessonPlayerEnabled()
                   }">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
