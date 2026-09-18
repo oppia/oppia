@@ -355,7 +355,7 @@ class StudyGuide:
             section_dict = section.to_dict()
             heading_html = (
                 '<p><strong>'
-                f'{section_dict["heading"]["unicode_str"]}'
+                f'{section_dict['heading']['unicode_str']}'
                 '</strong></p>'
             )
             concatenated_html_parts.append(heading_html)
