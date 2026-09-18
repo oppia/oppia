@@ -45,12 +45,12 @@
 }
 
 .new-post-chapter-recommendation-cards-container {
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 662px;
   margin: 0 auto;
+  max-width: 662px;
+  width: 100%;
 }
 
 .post-chapter-recommendations-btn {
@@ -63,17 +63,17 @@
   font-weight: 400;
   height: 78px;
   margin-bottom: 15px;
+  max-width: 325px;
   padding: 16px;
   width: 100%;
-  max-width: 325px;
 }
 
 .new-post-chapter-recommendation-cards-container a {
-  text-decoration: none;
-  width: 100%;
-  max-width: 325px;
   display: flex;
   justify-content: center;
+  max-width: 325px;
+  text-decoration: none;
+  width: 100%;
 }
 
 .post-chapter-recommendations-btn i {

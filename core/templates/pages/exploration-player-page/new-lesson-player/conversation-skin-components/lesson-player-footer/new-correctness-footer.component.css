@@ -1,4 +1,5 @@
 .inner-container {
+  align-items: center;
   -webkit-animation-delay: 0.5s;
   -ms-animation-delay: 0.5s;
   -webkit-animation-direction: normal;
@@ -15,7 +16,6 @@
   -ms-animation-play-state: running;
   -webkit-animation-timing-function: linear;
   -ms-animation-timing-function: linear;
-  align-items: center;
   background-color: #f0ffd1;
   border-radius: 30px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);

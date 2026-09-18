@@ -3,8 +3,12 @@
      [class.oppia-lesson-player-navbar-breadcrumb-hidden]="!shouldShowBreadcrumb()">
   <span class="oppia-lesson-player-navbar-breadcrumb-separator">&gt;</span>
   <a class="oppia-lesson-player-navbar-breadcrumb-text"
-     [href]="getClassroomUrl()">{{ classroomName }}</a>
+     [href]="getClassroomUrl()">
+    {{ classroomName }}
+  </a>
   <span class="oppia-lesson-player-navbar-breadcrumb-separator">&gt;</span>
   <a class="oppia-lesson-player-navbar-breadcrumb-text"
-     [href]="getTopicUrl()">{{ topicName }}</a>
+     [href]="getTopicUrl()">
+    {{ topicName }}
+  </a>
 </nav>
