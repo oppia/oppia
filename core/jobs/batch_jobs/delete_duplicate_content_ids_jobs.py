@@ -163,18 +163,13 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             | 'Transform to exploration domain objects'
             >> beam.Map(exp_fetchers.get_exploration_from_model)
             | 'Check for duplicate content IDs'
-            >> beam.Map(self._check_and_fix_duplicate_content_ids)
+            >> beam.Map(
+                self._check_and_fix_duplicate_content_ids,
+                self.DATASTORE_UPDATES_ALLOWED,
+            )
             | 'Filter fixed explorations'
             >> beam.Filter(lambda result: result is not None)
         )
-
-        if self.DATASTORE_UPDATES_ALLOWED:
-            unused_put_results = (
-                fixed_explorations
-                | 'Extract fixed models'
-                >> beam.FlatMap(lambda result: result['models_to_put'])
-                | 'Put fixed models' >> ndb_io.PutModels()
-            )
 
         return fixed_explorations | 'Create job run results' >> beam.Map(
             lambda result: job_run_result.JobRunResult.as_stdout(
@@ -187,15 +182,23 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
         exploration: exp_domain.Exploration,
-    ) -> (
-        Dict[str, Union[str, int, List[str], List['base_models.BaseModel']]]
-        | None
-    ):
+        datastore_updates_allowed: bool,
+    ) -> Dict[str, Union[str, int, List[str]]] | None:
         """Check and fix duplicate content IDs in an exploration.
+
+        This method is idempotent: if a previous Beam retry already
+        fixed this exploration (bumping its version), a subsequent
+        call will detect the version mismatch and return None.
+
+        When datastore_updates_allowed is True, all models (exploration
+        snapshot, commit log, and translation models) are written
+        atomically via a single put_multi call.
 
         Args:
             exploration: exp_domain.Exploration. The exploration domain object
                 to check and fix.
+            datastore_updates_allowed: bool. Whether to persist changes to
+                the datastore.
 
         Returns:
             dict|None. Dict containing fix results if duplicates were found and
@@ -256,6 +259,13 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         )
 
         with datastore_services.get_ndb_context():
+            # Idempotency guard: re-fetch the model from the datastore.
+            # If the version has changed since our initial read, a previous
+            # Beam retry already applied this fix — skip.
+            current_model = exp_models.ExplorationModel.get(exploration.id)
+            if current_model.version != exploration.version:
+                return None
+
             # Fetch old translation models to duplicate their contents.
             old_translation_models = translation_models_lib.EntityTranslationsModel.get_all_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION,
@@ -263,16 +273,15 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 exploration.version,
             )
 
-            updated_model = exp_models.ExplorationModel.get(exploration.id)
-            updated_model.states = exploration.to_dict()['states']
-            updated_model.next_content_id_index = (
+            current_model.states = exploration.to_dict()['states']
+            current_model.next_content_id_index = (
                 exploration.next_content_id_index
             )
 
             # Generate snapshot and commit log models using the public API.
             # This safely increments the model's version and creates history.
             models_to_put = list(
-                updated_model.get_models_to_put_values(
+                current_model.get_models_to_put_values(
                     feconf.MIGRATION_BOT_USERNAME,
                     'Fixed duplicate content IDs.',
                     [],
@@ -280,7 +289,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             )
 
             # The exploration model's version is now bumped by 1.
-            new_version = updated_model.version
+            new_version = current_model.version
 
             # Duplicate translation entries for the newly generated content IDs.
             for old_translation_model in old_translation_models:
@@ -305,11 +314,17 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
             base_models.BaseModel.update_timestamps_multi(models_to_put)
 
+            # Atomicity: write all models (exploration, snapshot,
+            # commit log, translations) in a single batch so that a
+            # partial failure cannot leave the exploration in an
+            # inconsistent state.
+            if datastore_updates_allowed:
+                datastore_services.put_multi(models_to_put)
+
             return {
                 'exp_id': exploration.id,
                 'version': new_version,
                 'fixed_content_ids': fixed_content_ids,
-                'models_to_put': models_to_put,
             }
 
 
