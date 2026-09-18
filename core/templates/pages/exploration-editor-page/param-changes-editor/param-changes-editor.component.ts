@@ -114,17 +114,25 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Returns the param changes stored in the given property of the underlying
+   * service. The "displayed" and "savedMemento" properties are typed as a
+   * union of all state property values, but their runtime value is always a
+   * ParamChange[] array. This is the single documented cast point for the
+   * displayedParamChanges and savedParamChanges getters.
+   */
+  private getParamChangesFromService(
+    propertyName: 'displayed' | 'savedMemento'
+  ): ParamChange[] {
+    return this.paramChangesService[propertyName] as ParamChange[];
+  }
+
   get displayedParamChanges(): ParamChange[] {
-    // The "displayed" property of the service is typed as a union of all state
-    // property values, but its runtime value is always a ParamChange[] array.
-    return this.paramChangesService.displayed as ParamChange[];
+    return this.getParamChangesFromService('displayed');
   }
 
   get savedParamChanges(): ParamChange[] {
-    // The "savedMemento" property of the service is typed as a union of all
-    // state property values, but its runtime value is always a ParamChange[]
-    // array.
-    return this.paramChangesService.savedMemento as ParamChange[];
+    return this.getParamChangesFromService('savedMemento');
   }
 
   openParamChangesEditor(): void {

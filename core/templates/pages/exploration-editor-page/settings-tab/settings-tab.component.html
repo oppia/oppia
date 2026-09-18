@@ -431,7 +431,7 @@
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <button (click)="editVoiceArtist(newVoiceArtistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button type="button" (click)="editVoiceArtist(newVoiceArtistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">
@@ -471,7 +471,7 @@
 
         <p *ngIf="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
           <em tabindex="0">Link to share:</em>
-          <input class="form-control" type="text" value="{{getExplorePageUrl()}}" readonly="readonly" onClick="this.select();">
+          <input class="form-control" type="text" value="{{getExplorePageUrl()}}" readonly="readonly" aria-label="Link to share" onClick="this.select();">
         </p>
 
         <br>

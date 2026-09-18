@@ -254,7 +254,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
    * open/close action to be performed (category,language).
    */
   openSubmenu(evt: Event, menuName: string): void {
-    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    this.navigationService.openSubmenu(evt, menuName);
   }
 
   onSearchQueryChangeExec(): void {
