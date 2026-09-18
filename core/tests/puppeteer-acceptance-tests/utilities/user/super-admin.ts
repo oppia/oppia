@@ -133,6 +133,16 @@ const userRolesVisualizationContainerSelector =
 const platformParameterDefaultValueContainerSelector =
   '.e2e-test-platform-param-default-value-container';
 
+// Auto Translation.
+const autoTranslationToggleInputSelector =
+  '.e2e-test-auto-translation-toggle input';
+const autoTranslationToggleLabelSelector =
+  '.e2e-test-auto-translation-toggle label';
+const languageDropdownSelector = '.e2e-test-language-dropdown';
+const providerDropdownSelector = '.e2e-test-provider-dropdown';
+const addMappingButtonSelector = '.e2e-test-add-mapping-btn';
+const mappingRowSelector = '.e2e-test-mapping-row';
+
 export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the Admin Page Activities Tab.
@@ -1410,15 +1420,13 @@ export class SuperAdmin extends BaseUser {
     // cdk-visually-hidden (off-screen), overlapped by the thumb div.
     // Puppeteer's clickability check blocks clicks on the hidden input, so
     // we read the checked state from the input but click the visible label.
-    const inputSelector = '.e2e-test-auto-translation-toggle input';
-    const labelSelector = '.e2e-test-auto-translation-toggle label';
-    await this.page.waitForSelector(inputSelector);
+    await this.page.waitForSelector(autoTranslationToggleInputSelector);
     const isChecked = await this.page.$eval(
-      inputSelector,
+      autoTranslationToggleInputSelector,
       el => (el as HTMLInputElement).checked
     );
     if (!isChecked) {
-      await this.clickOnElementWithSelector(labelSelector);
+      await this.clickOnElementWithSelector(autoTranslationToggleLabelSelector);
     }
   }
 
@@ -1432,17 +1440,13 @@ export class SuperAdmin extends BaseUser {
     languageCode: string,
     providerId: string
   ): Promise<void> {
-    const langDropdown = '.e2e-test-language-dropdown';
-    const providerDropdown = '.e2e-test-provider-dropdown';
-    const addButton = '.e2e-test-add-mapping-btn';
+    await this.page.waitForSelector(languageDropdownSelector);
+    await this.page.select(languageDropdownSelector, languageCode);
 
-    await this.page.waitForSelector(langDropdown);
-    await this.page.select(langDropdown, languageCode);
+    await this.page.waitForSelector(providerDropdownSelector);
+    await this.page.select(providerDropdownSelector, providerId);
 
-    await this.page.waitForSelector(providerDropdown);
-    await this.page.select(providerDropdown, providerId);
-
-    await this.clickOnElementWithSelector(addButton);
+    await this.clickOnElementWithSelector(addMappingButtonSelector);
   }
 
   /**
@@ -1461,7 +1465,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<number>} - A promise that resolves to the number of provider mappings.
    */
   async getProviderMappingRowCount(): Promise<number> {
-    const rows = await this.page.$$('.e2e-test-mapping-row');
+    const rows = await this.page.$$(mappingRowSelector);
     return rows.length;
   }
 
