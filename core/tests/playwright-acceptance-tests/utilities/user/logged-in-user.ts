@@ -2546,6 +2546,7 @@ export class LoggedInUser extends BaseUser {
       throw newError;
     }
   }
+
   /**
    * Navigates to the profile page using the profile dropdown.
    */
@@ -2573,12 +2574,15 @@ export class LoggedInUser extends BaseUser {
       throw new Error('There are no explorations authored by the creator.');
     }
 
-    const explorationTitle = await explorations[0].$eval(
-      '.e2e-test-exp-summary-tile-title span span',
-      element => (element as HTMLElement).textContent
+    const explorationTitleElement = await explorations[0].$(
+      '.e2e-test-exp-summary-tile-title span span'
     );
+    if (!explorationTitleElement) {
+      throw new Error('Exploration title element not found.');
+    }
+    const explorationTitle = await this.getTextContent(explorationTitleElement);
 
-    if (explorationTitle?.trim() === title) {
+    if (explorationTitle === title) {
       showMessage(`Exploration with title ${title} is present.`);
     } else {
       throw new Error(`Exploration with title ${title} is not present.`);

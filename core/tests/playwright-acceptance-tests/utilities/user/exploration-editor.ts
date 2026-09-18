@@ -1738,20 +1738,23 @@ export class ExplorationEditor extends BaseUser {
       );
     }
   }
+
+  /**
+   * Opens the exploration editor for the exploration with the given name from the creator dashboard.
+   * @param {string} explorationName - The name of the exploration.
+   */
   async openExplorationInExplorationEditor(
     explorationName: string
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
-    const title = await this.page.$eval(
-      explorationSummaryTileTitleSelector,
-      el => el.textContent?.trim()
+    const title = await this.getTextContent(
+      explorationSummaryTileTitleSelector
     );
 
     if (title === explorationName) {
-      const explorationTileElement = await this.page.$(
+      await this.clickOnElementWithSelector(
         explorationSummaryTileTitleSelector
       );
-      await explorationTileElement?.click();
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }
@@ -1765,6 +1768,10 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Updates the exploration title in the settings tab.
+   * @param {string} title - The new title of the exploration.
+   */
   async updateTitleTo(title: string): Promise<void> {
     await this.expectElementToBeVisible(addTitleBar);
     await this.clearAllTextFrom(addTitleBar);

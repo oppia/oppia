@@ -20,20 +20,19 @@
 import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const PROFILE_PICTURE = testConstants.data.profilePicture;
+const TEST_EXPLORATION = {
+  title: 'Test Exploration',
+  editedTitle: 'Edited Exploration',
+  category: 'Algebra',
+};
 
 test.describe.configure({mode: 'serial'});
 
 test.describe('Logged-in User', function () {
-  let loggedInUser: LoggedInUser & ExplorationEditor;
-  const TEST_EXPLORATION = {
-    title: 'Test Exploration',
-    editedTitle: 'Edited Exploration',
-    category: 'Algebra',
-  };
+  let loggedInUser: LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
     loggedInUser = await UserFactory.createNewUser(
