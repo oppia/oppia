@@ -109,6 +109,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
+  isTranslationAdmin: boolean = false;
   loadingMessage!: string;
   allTopicNames: string[] = [];
   today!: Date;
@@ -168,6 +169,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.lastDateToFilterUsersActivity = this.getDateNDaysAgo(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+            this.isTranslationAdmin = userInfo.isTranslationAdmin();
 
             if (this.isTranslationCoordinator) {
               this.CONTRIBUTION_TYPES.push(

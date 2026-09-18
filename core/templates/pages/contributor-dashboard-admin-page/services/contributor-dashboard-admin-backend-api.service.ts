@@ -23,6 +23,14 @@ import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {AppConstants} from 'app.constants';
+import {
+  FeaturedTranslationLanguage,
+  FeaturedTranslationLanguageBackendDict,
+} from 'domain/opportunity/featured-translation-language.model';
+
+export interface FeaturedTranslationLanguagesBackendResponse {
+  featured_translation_languages: FeaturedTranslationLanguageBackendDict[];
+}
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
@@ -88,6 +96,47 @@ export class ContributorDashboardAdminBackendApiService {
           }
         );
     });
+  }
+
+  async getFeaturedTranslationLanguagesAsync(): Promise<
+    FeaturedTranslationLanguage[]
+  > {
+    try {
+      const response = await this.http
+        .get<FeaturedTranslationLanguagesBackendResponse>(
+          PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL
+        )
+        .toPromise();
+      return response.featured_translation_languages.map(backendDict =>
+        FeaturedTranslationLanguage.createFromBackendDict(backendDict)
+      );
+    } catch (errorResponse) {
+      const error = errorResponse as {
+        error: {
+          error: string;
+        };
+      };
+      throw error.error.error;
+    }
+  }
+
+  async updateFeaturedTranslationLanguagesAsync(
+    featuredLanguages: FeaturedTranslationLanguageBackendDict[]
+  ): Promise<void> {
+    try {
+      await this.http
+        .put(PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL, {
+          featured_translation_languages: featuredLanguages,
+        })
+        .toPromise();
+    } catch (errorResponse) {
+      const error = errorResponse as {
+        error: {
+          error: string;
+        };
+      };
+      throw error.error.error;
+    }
   }
 
   async viewContributionReviewersAsync(
