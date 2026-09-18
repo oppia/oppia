@@ -107,12 +107,13 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     if (isLoggedIn || !this.showLoginOverlay) {
       return;
     }
-    const target = eventTarget;
-    // The focus event target is the element that the login container
-    // wraps, so it is always an Element.
+    // The focus event target is the element that the login container wraps,
+    // so it is always an Element. Null or non-Element targets are treated as
+    // outside the login container.
     if (
-      (target as Element).closest('.story-viewer-login-container') !==
-      this.overlay.nativeElement
+      !(eventTarget instanceof Element) ||
+      eventTarget.closest('.story-viewer-login-container') !==
+        this.overlay.nativeElement
     ) {
       this.skipButton.nativeElement.focus();
     }

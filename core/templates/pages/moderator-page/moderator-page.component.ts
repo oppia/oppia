@@ -93,6 +93,19 @@ export class ModeratorPageComponent {
     if (!Array.isArray(newValue)) {
       return;
     }
+    // Reject list items that lack string id and type fields so that
+    // isSaveFeaturedActivitiesButtonDisabled() never receives malformed
+    // references from the schema-based editor.
+    for (const item of newValue) {
+      if (
+        typeof item !== 'object' ||
+        item === null ||
+        typeof (item as {id?: unknown}).id !== 'string' ||
+        typeof (item as {type?: unknown}).type !== 'string'
+      ) {
+        return;
+      }
+    }
     const castedValue = newValue as ActivityIdTypeDict[];
     if (this.displayedFeaturedActivityReferences !== castedValue) {
       this.displayedFeaturedActivityReferences = castedValue;

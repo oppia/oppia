@@ -664,6 +664,25 @@ describe('Story Viewer Page component', () => {
 
     expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
   }));
+
+  it('should focus the skip button when the target is null or not an element', fakeAsync(() => {
+    let overlay = new ElementRef(document.createElement('div'));
+    let button = new ElementRef(document.createElement('button'));
+
+    component.skipButton = button;
+    component.overlay = overlay;
+    component.showLoginOverlay = true;
+
+    spyOn(component.skipButton.nativeElement, 'focus');
+
+    component.focusSkipButton(null, false);
+    tick();
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalledTimes(1);
+
+    component.focusSkipButton(document.createTextNode('text'), false);
+    tick();
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalledTimes(2);
+  }));
   it('should check if hacky translation is displayed correctly', () => {
     spyOn(
       i18nLanguageCodeService,

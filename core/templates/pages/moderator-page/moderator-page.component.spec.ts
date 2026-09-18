@@ -280,6 +280,21 @@ describe('Moderator Page Component', () => {
     expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
   });
 
+  it('should reject featured activity references with malformed list items', () => {
+    const newValue = [
+      {
+        id: 'test_id',
+      },
+      {
+        id: 'test_id_2',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
   it('should display error message for nonexistent exploration', () => {
     spyOn(alertsService, 'addWarning');
 

@@ -297,6 +297,38 @@ describe('Search bar component', () => {
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
+  it('should return selected category master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getSelectedCategories()).toEqual([
+      {id: 'id', text: 'category 1'},
+      {id: 'id_2', text: 'category 2'},
+      {id: 'id_3', text: 'category 3'},
+    ]);
+  });
+
+  it('should return deselected category master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    component.selectionDetails.categories.selections = {id: true};
+    expect(component.getDeselectedCategories()).toEqual([
+      {id: 'id_2', text: 'category 2'},
+      {id: 'id_3', text: 'category 3'},
+    ]);
+  });
+
+  it('should return selected language master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getSelectedLanguages()).toEqual([
+      {id: 'en', text: 'English'},
+    ]);
+  });
+
+  it('should return deselected language master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getDeselectedLanguages()).toEqual([
+      {id: 'es', text: 'Spanish'},
+    ]);
+  });
+
   it('should trigger search query only when dropdown is closed', () => {
     spyOn(component, 'onSearchQueryChangeExec');
     component.triggerSearchOnDropdownClose(true);

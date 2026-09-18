@@ -40,8 +40,8 @@
     <ul ngbDropdownMenu
         class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
-      <ng-container *ngFor="let item of selectionDetails.categories.masterList; let first = first; let last = last">
-        <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
+      <ng-container *ngFor="let item of getSelectedCategories(); let first = first; let last = last">
+        <li ngbDropdownItem>
           <a (click)="toggleSelection('categories', item.id)"
              (keydown.enter)="toggleSelection('categories', item.id)"
              [attr.aria-label]="( item.text | translate ) +  ' selected'"
@@ -86,9 +86,8 @@
         </a>
       </li>
       <hr *ngIf="selectionDetails.categories.numSelections > 0" class="oppia-search-bar-hr">
-      <ng-container *ngFor="let item of selectionDetails.categories.masterList; let first = first; let last = last">
-        <li ngbDropdownItem
-            *ngIf="!selectionDetails.categories.selections[item.id]">
+      <ng-container *ngFor="let item of getDeselectedCategories(); let first = first; let last = last">
+        <li ngbDropdownItem>
           <a tabindex="0"
              (keydown.enter)="toggleSelection('categories', item.id)"
              (click)="toggleSelection('categories', item.id)"
@@ -139,9 +138,8 @@
     </button>
     <ul ngbDropdownMenu class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
-      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; let first = first; let last = last">
-        <li ngbDropdownItem
-            *ngIf="selectionDetails.languageCodes.selections[item.id]">
+      <ng-container *ngFor="let item of getSelectedLanguages(); let first = first; let last = last">
+        <li ngbDropdownItem>
           <a tabindex="0"
              [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
@@ -186,9 +184,8 @@
         </a>
       </li>
       <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
-      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; let first = first; let last = last">
-        <li ngbDropdownItem
-            *ngIf="!selectionDetails.languageCodes.selections[item.id]">
+      <ng-container *ngFor="let item of getDeselectedLanguages(); let first = first; let last = last">
+        <li ngbDropdownItem>
           <a (click)="toggleSelection('languageCodes', item.id)"
              [attr.aria-label]="item.ariaLabelInEnglish"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
