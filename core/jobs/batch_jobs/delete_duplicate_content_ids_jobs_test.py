@@ -300,7 +300,8 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id_5']
         )
         # Clear the NDB context cache to avoid reading the model mutated by the job.
-        datastore_services.ndb.get_context().clear_cache()
+        with datastore_services.get_ndb_context() as ndb_context:
+            ndb_context.clear_cache()
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id_5')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
