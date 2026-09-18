@@ -38,7 +38,6 @@
     "core/tests/ci-test-suite-configs/README.md",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
-    "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
     "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
     "core/templates/domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts"
