@@ -84,6 +84,9 @@ const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 
 // Other.
 const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
+const noOfClassroomsToGeneratorField =
+  '#label-target-number-of-classrooms-to-generate';
+const numDummyMathClassroomsToGenerate = '1';
 const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
 
 // Misc Tab selectors.
@@ -765,6 +768,10 @@ export class SuperAdmin extends BaseUser {
   async generateDummyMathClassroom(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
+    await this.page.type(
+      noOfClassroomsToGeneratorField,
+      numDummyMathClassroomsToGenerate
+    );
     await this.clickOnElementWithSelector(loadDummyMathClassRoomButton);
 
     await this.waitForNetworkIdle();
