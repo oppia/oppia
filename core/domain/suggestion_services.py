@@ -18,6 +18,7 @@ suggestions.
 
 from __future__ import annotations
 
+import collections
 import datetime
 import heapq
 import logging
@@ -1683,6 +1684,31 @@ def get_translation_suggestions_in_review_by_entity_ids(
         get_suggestion_from_model(model) if model else None
         for model in suggestion_models_in_review
     ]
+
+
+def get_question_suggestions_in_review_count_by_skill_ids(
+    skill_ids: List[str],
+) -> Dict[str, int]:
+    """Returns the count of in-review question suggestions mapped by skill ID.
+
+    Args:
+        skill_ids: list(str). Skill IDs matching the target ID of the
+            question suggestions.
+
+    Returns:
+        dict(str, int). A dictionary mapping each skill ID to the count of its
+        in-review question suggestions.
+    """
+    if not skill_ids:
+        return {}
+    counts: Dict[str, int] = collections.defaultdict(int)
+    for (
+        model
+    ) in suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
+        skill_ids
+    ):
+        counts[model.target_id] += 1
+    return counts
 
 
 def get_suggestions_with_editable_explorations(
