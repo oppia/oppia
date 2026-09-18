@@ -1047,6 +1047,22 @@ describe('Admin dev mode activities tab', () => {
     });
   });
 
+  describe('.onClassroomSelectionChange', () => {
+    it('should set the selected classroom to the select value', () => {
+      const selectElement = document.createElement('select');
+      const optionElement = document.createElement('option');
+      optionElement.value = '4';
+      selectElement.appendChild(optionElement);
+      selectElement.value = '4';
+      const event = new Event('change');
+      Object.defineProperty(event, 'target', {value: selectElement});
+
+      component.onClassroomSelectionChange(event);
+
+      expect(component.selectedClassroomId).toBe('4');
+    });
+  });
+
   describe('.reloadCollection', () => {
     it('should not reload collection if a task is already running', () => {
       let adminBackendSpy = spyOn(
