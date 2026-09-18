@@ -392,7 +392,7 @@ def check_bad_pattern_in_file(
                 continue
 
             # Check if the current pattern is specifically the TODO check.
-            is_todo_check = 'Please link TODO comments' in pattern['message']
+            is_todo_check = pattern['regexp'].pattern.startswith('TODO')
 
             if is_todo_check:
                 # Remove string literals to avoid false positives for TODOs in strings.
