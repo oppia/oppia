@@ -1457,6 +1457,55 @@ export class SuperAdmin extends BaseUser {
     const rows = await this.page.$$('.e2e-test-mapping-row');
     return rows.length;
   }
+
+  /**
+   * Expects a translation provider mapping to be present.
+   *
+   * @param {string} languageCode - The language code.
+   * @param {string} providerDisplayText - The text of the translation provider displayed.
+   */
+  async expectTranslationProviderMappingToBePresent(
+    languageCode: string,
+    providerDisplayText: string
+  ): Promise<void> {
+    const removeButtonSelector = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.expectElementToBeVisible(removeButtonSelector);
+
+    const rowElement = await this.page.evaluateHandle((selector) => {
+      const button = document.querySelector(selector);
+      return button ? button.closest('tr') : null;
+    }, removeButtonSelector);
+
+    const isRowPresent = await this.page.evaluate(
+      (el) => el !== null,
+      rowElement
+    );
+
+    if (!isRowPresent) {
+      throw new Error(`Mapping row for ${languageCode} not found.`);
+    }
+
+    const rowText = await this.page.evaluate(
+      (el) => (el as HTMLElement).innerText,
+      rowElement
+    );
+
+    if (!rowText.includes(providerDisplayText)) {
+      throw new Error(`Provider mapping for "${languageCode}" is missing the provider text "${providerDisplayText}". Found: ${rowText}`);
+    }
+  }
+
+  /**
+   * Expects a translation provider mapping to be absent.
+   *
+   * @param {string} languageCode - The language code.
+   */
+  async expectTranslationProviderMappingToBeAbsent(
+    languageCode: string
+  ): Promise<void> {
+    const removeButtonSelector = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.expectElementToBeVisible(removeButtonSelector, false);
+  }
 }
 
 export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();
