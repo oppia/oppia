@@ -151,44 +151,30 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
 # PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
 # this list without asking @Hardikgoyal2003.
 LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
-    'ANDROID',
-    'BLOG_ADMIN',
-    'BLOG_HOMEPAGE',
-    'BLOG_POST_PAGE',
+    # These routes correspond to features that have not yet been released.
     'CERTIFICATE_ASSESSMENT_PLAYER',
     'CERTIFICATE_ASSESSMENT_RESULT',
     'CERTIFICATE_CREATOR_DASHBOARD',
     'CERTIFICATE_OFFERING_AVAILABLE',
-    'CLASSROOM_ADMIN_PAGE',
-    'CLASSROOMS',
-    'CONTRIBUTOR_DASHBOARD_ADMIN',
     'CREATE_CERTIFICATE_OFFERING',
-    'DIAGNOSTIC_TEST_PLAYER',
     'EDIT_CERTIFICATE_OFFERING',
     'END_OF_ARC_TEST',
     'FACILITATOR_DASHBOARD',
-    'FEEDBACK_UPDATES',
     'LEARNER_GROUP_CREATOR',
     'LEARNER_GROUP_EDITOR',
     'LEARNER_GROUP_VIEWER',
     'MASTERY_CHALLENGE',
     'NEW_LESSON_PLAYER',
     'NODE_PRACTICE_SESSION',
-    'PARTNERSHIPS',
-    'PENDING_ACCOUNT_DELETION',
-    'PRACTICE_SESSION',
-    'RELEASE_COORDINATOR_PAGE',
-    'SUBTOPIC_VIEWER',
     'TECHNICAL_FEEDBACK_DASHBOARD',
     'TECHNICAL_FEEDBACK_DETAIL',
-    'VOICEOVER_ADMIN',
     # Deprecation needs to be discussed with the prodops team first.
     'BLOG_AUTHOR_PROFILE_PAGE',
     'COLLECTION_EDITOR',
     'COLLECTION_PLAYER',
     # These routes are deprecated or slated for deprecation.
     'BLOG_HOMEPAGE_SEARCH',
-    'LESSON_PLAYER_EMBED',
+    'FEEDBACK_UPDATES',
     'LIBRARY_RECENTLY_PUBLISHED',
     'LIBRARY_SEARCH',
     'LIBRARY_TOP_RATED',
@@ -198,6 +184,7 @@ LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
     'ERROR',
     'EXPLORATION_PLAYER_EMBED',
     'ERROR_IFRAMED',
+    'LESSON_PLAYER_EMBED',
     'LOGIN',
     'LOGOUT',
     'MAINTENANCE',
@@ -469,6 +456,12 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         """Checks that every route in the routing module has a corresponding
         Lighthouse page entry in lighthouse-pages.json, or is explicitly
         listed in the exclusion set.
+
+        The entries in lighthouse-pages.json and lighthouse-shards.json are
+        intentionally ordered to group pages that share the same puppeteer
+        setup under one shard, which keeps each shard's data setup minimal.
+        This check only requires every route to be covered, so re-sorting the
+        files for alphabetical consistency is neither needed nor desired.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the
