@@ -69,7 +69,6 @@ import {
   VersionHistoryBackendApiService,
 } from '../services/version-history-backend-api.service';
 import {MetadataVersionHistoryModalComponent} from '../modal-templates/metadata-version-history-modal.component';
-import './settings-tab.component.css';
 
 @Component({
   selector: 'oppia-settings-tab',

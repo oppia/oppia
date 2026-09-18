@@ -19,7 +19,6 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './skill-preview-modal.component.css';
 
 @Component({
   selector: 'skill-preview-modal',

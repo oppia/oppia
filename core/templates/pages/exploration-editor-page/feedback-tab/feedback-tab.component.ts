@@ -63,7 +63,6 @@ interface CreatorFeedbackListState<TSummary> {
   cursorHistory: (string | null)[];
   moreAvailable: boolean;
 }
-import './feedback-tab.component.css';
 
 @Component({
   selector: 'oppia-feedback-tab',

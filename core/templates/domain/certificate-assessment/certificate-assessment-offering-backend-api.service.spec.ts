@@ -62,7 +62,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       1,
-      1,
       ['Stub demonstration'],
       'Available',
       1
@@ -82,7 +81,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       classroom_id: 'math_classroom_01',
       topics: [{topic_id: 'topic_place_values'}],
       total_questions: 1,
-      time_limit_in_minutes: 1,
       demonstrates: ['Stub demonstration'],
       async_status: 'Available',
     });
@@ -114,7 +112,6 @@ describe('Certificate Assessment Offering backend api service', () => {
           classroom_id: 'sample_classroom',
           topic_ids: ['topic_1', 'topic_2'],
           total_questions: 4,
-          time_limit_in_minutes: 20,
           demonstrates: ['Sample skill'],
           async_status: 'Available',
           version: 1,
@@ -135,7 +132,6 @@ describe('Certificate Assessment Offering backend api service', () => {
           topic_2: 1,
         },
         4,
-        20,
         ['Sample skill'],
         'Available',
         1
@@ -162,6 +158,7 @@ describe('Certificate Assessment Offering backend api service', () => {
           certificate_id: 'mock_certificate_id',
           title: 'Sample Certificate',
           attempt_status: 'Not Attempted',
+          attempt_id: null,
           passed_on_date: null,
           failed_on_date: null,
         },
@@ -252,7 +249,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_2: 1,
       },
       3,
-      15,
       [],
       'Available',
       1
@@ -288,7 +284,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'sample_classroom',
       {topic_1: 1},
       3,
-      15,
       ['Learn math'],
       'Not_Ready',
       1
@@ -399,7 +394,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       1,
-      1,
       ['Stub demonstration'],
       'Available',
       1
@@ -425,7 +419,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       classroom_id: 'math_classroom_01',
       topics: [{topic_id: 'topic_place_values'}],
       total_questions: 1,
-      time_limit_in_minutes: 1,
       demonstrates: ['Stub demonstration'],
       async_status: 'Available',
     });
@@ -450,7 +443,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_2: 1,
       },
       3,
-      15,
       [],
       'Available',
       1
@@ -492,7 +484,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'sample_classroom',
       {topic_1: 1},
       3,
-      15,
       ['Learn math'],
       'Available',
       1
@@ -541,7 +532,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_data: {topic_1: 1},
         demonstrates: ['Fetched Demonstration'],
         total_questions: 4,
-        time_limit_in_minutes: 20,
         async_status: 'Available',
         version: 3,
       },
@@ -558,7 +548,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topicData: {topic_1: 1},
         demonstrates: ['Fetched Demonstration'],
         totalQuestions: 4,
-        timeLimitInMinutes: 20,
         asyncStatus: 'Available',
       })
     );
