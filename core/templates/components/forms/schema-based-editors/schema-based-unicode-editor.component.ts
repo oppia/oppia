@@ -191,7 +191,7 @@ export class SchemaBasedUnicodeEditor
     }
     setTimeout(() => {
       this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
-    }, 0);
+    }, 50);
   }
 
   onKeypress(evt: KeyboardEvent): void {
