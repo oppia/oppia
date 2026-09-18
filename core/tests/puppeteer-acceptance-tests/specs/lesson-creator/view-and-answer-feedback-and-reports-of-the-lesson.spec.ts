@@ -133,6 +133,7 @@ describe('Lesson Creator', function () {
       'There is a typo in the question text.'
     );
     await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedInLearner.expectFeedbackScreenshotPreviewToBePresent(true);
     await loggedInLearner.expectIncludeTechnicalLogToBePresent(false);
     await loggedInLearner.clickButtonInModal('Report an Issue', 'confirm');
     showMessage(
