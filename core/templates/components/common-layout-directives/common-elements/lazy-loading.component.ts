@@ -18,8 +18,6 @@
 
 import {Component} from '@angular/core';
 
-import './lazy-loading.component.css';
-
 @Component({
   selector: 'lazy-loading',
   templateUrl: './lazy-loading.component.html',
