@@ -2,9 +2,15 @@
   align-items: center;
   color: #fff;
   display: flex;
-  font-size: 16px;
+  font-size: 20px;
+  font-family: "Capriola", sans-serif;
+  height: 56px;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.oppia-lesson-player-navbar-breadcrumb-hidden {
+  visibility: hidden;
 }
 
 .oppia-lesson-player-navbar-breadcrumb-separator {
@@ -13,13 +19,22 @@
 }
 
 .oppia-lesson-player-navbar-breadcrumb-text {
+  color: #fff;
   max-width: 220px;
   overflow: hidden;
+  text-decoration: none;
   text-overflow: ellipsis;
 }
 
-@media (max-width: 768px) {
-  .oppia-lesson-player-navbar-breadcrumb-text {
-    max-width: 120px;
+.oppia-lesson-player-navbar-breadcrumb-text:hover,
+.oppia-lesson-player-navbar-breadcrumb-text:focus {
+  color: #fff;
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+@media (max-width: 767px) {
+  .oppia-lesson-player-navbar-breadcrumb {
+    display: none;
   }
 }

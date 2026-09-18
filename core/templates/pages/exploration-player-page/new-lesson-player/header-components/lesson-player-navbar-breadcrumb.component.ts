@@ -91,9 +91,20 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
     return Boolean(this.topicUrlFragment && this.classroomUrlFragment);
   }
 
+  // Returns true once both names have arrived, so the template can avoid
+  // flashing "> > " (or stale "Loading..." text) while fetches are
+  // in flight.
   shouldShowBreadcrumb(): boolean {
     return Boolean(
       this.isLinkedToTopic && this.classroomName && this.topicName
     );
+  }
+
+  getClassroomUrl(): string {
+    return `/learn/${this.classroomUrlFragment}`;
+  }
+
+  getTopicUrl(): string {
+    return `/learn/${this.classroomUrlFragment}/${this.topicUrlFragment}`;
   }
 }
