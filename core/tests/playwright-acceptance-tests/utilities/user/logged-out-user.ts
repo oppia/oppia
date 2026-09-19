@@ -160,6 +160,7 @@ const audioSliderSelector = 'oppia-audio-slider mat-slider';
 const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
+const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 
 // Classroom Page.
 const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
@@ -664,6 +665,15 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(voiceoverDropdown);
     await this.clickOnElementWithSelector(voiceoverDropdown);
     await this.expectElementToBeVisible(voiceoverDropdown, false);
+  }
+
+  /**
+   * Checks if the current voiceover language matches the expected language.
+   * @param language - The expected language.
+   */
+  async expectCurrentVoiceoverLanguageToBe(language: string): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverSelectSelector);
+    await this.expectElementValueToBe(voiceoverSelectSelector, language);
   }
 
   /**
