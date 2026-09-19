@@ -1,0 +1,34 @@
+<div class="card-interaction-controls">
+  <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
+    <button mat-button
+            class="btn btn-secondary  oppia-skip-button"
+            *ngIf="skipButtonIsShown"
+            (click)="skipCurrentQuestion()">
+      I don't know
+    </button>
+    <!-- Special case for the 'Continue' interaction. -->
+    <button mat-button
+            *ngIf="interactionId === 'Continue'"
+            (click)="submit.emit()"
+            class="oppia-learner-confirm-button oppia-autofocus"
+            oppiaFocusOn="continue-btn">
+            {{ continueButtonCustomizationArgs.buttonText.value.unicode }}
+      <i class="fas fa-arrow-right oppia-arrow"></i>
+    </button>
+    <button mat-button
+            *ngIf="doesInteractionHaveNavSubmitButton()"
+            class="oppia-learner-submit-answer-button"
+            (click)="submit.emit()"
+            [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
+      {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+    </button>
+  </div>
+  <oppia-continue-button *ngIf="shouldContinueButtonBeShown()" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="continue-button"
+                          [isLearnAgainButton]="isLearnAgainButton"
+                          (clickContinueButton)="onClickContinueButton()">
+  </oppia-continue-button>
+  <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="continue-button"
+                          [isLearnAgainButton]="isLearnAgainButton"
+                          (clickContinueButton)="clickContinueToReviseButton.emit()">
+  </oppia-continue-button>
+</div>
