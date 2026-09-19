@@ -4337,6 +4337,60 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add an Item Selection solution for a state interaction.
+   * @param {string[]} correctOptions - The options to select as the correct answer.
+   * @param {string} answerExplanation - The explanation for this solution.
+   */
+  async addItemSelectionSolutionToState(
+    correctOptions: string[],
+    answerExplanation: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(addSolutionButton, true, 5000))) {
+        await this.clickOnElementWithSelector(stateSolutionTab);
+      }
+      await this.page.waitForSelector(addSolutionButton);
+    }
+
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    // Wait for the solution modal to appear and render the interaction.
+    const interactionHtmlSelector = '.e2e-test-interaction-html';
+    await this.page.waitForSelector(interactionHtmlSelector, {visible: true});
+
+    // Select the correct checkboxes inside the solution modal.
+    const itemSelector = '.e2e-test-item-selection-input-item';
+    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
+
+    await this.page.waitForSelector(itemSelector, {visible: true});
+    const itemElements = await this.page.$$(itemSelector);
+
+    for (const item of itemElements) {
+      const itemText =
+        (await item.evaluate(el => el.textContent?.trim())) ?? '';
+      const shouldBeChecked = correctOptions.includes(itemText);
+      const checkbox = await item.$(checkboxSelector);
+      if (!checkbox) {
+        continue;
+      }
+      const isChecked = await checkbox.evaluate(el =>
+        el.classList.contains('mat-checkbox-checked')
+      );
+      if (shouldBeChecked && !isChecked) {
+        await checkbox.click();
+      }
+    }
+
+    // Submit the chosen answer.
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitAnswerButton);
+
+    // Type the explanation and save.
+    await this.addSolutionExplanationAndSave(answerExplanation);
+  }
+
+  /**
    * Function to add a solution for a state interaction.
    * @param {string} answer - The solution of the current state card.
    * @param {string} answerExplanation - The explanation for this state card's solution.
@@ -6675,8 +6729,11 @@ export class ExplorationEditor extends BaseUser {
 
       try {
         const selectedDestinationText = await this.page.$eval(
-          `${destinationSelectorDropdown} option:checked`,
-          option => option.textContent?.trim() || ''
+          destinationSelectorDropdown,
+          (select: Element) => {
+            const selectEl = select as HTMLSelectElement;
+            return selectEl.selectedOptions[0]?.textContent?.trim() || '';
+          }
         );
         const currentCardName = await this.page.$eval(
           currentCardNameContainerSelector,

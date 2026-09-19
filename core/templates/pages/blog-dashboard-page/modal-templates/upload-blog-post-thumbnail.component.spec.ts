@@ -181,4 +181,48 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.uploadedImage).toEqual(null);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
+
+  it('should get the invalid SVG issue URL from svg sanitizer service', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    componentInstance.invalidTagsAndAttributes = {
+      tags: ['script'],
+      attrs: ['onclick'],
+    };
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue-url');
+
+    expect(componentInstance.getInvalidSvgIssueUrl()).toBe('issue-url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      componentInstance.invalidTagsAndAttributes
+    );
+  });
+
+  it('should handle SVG file upload and set uploadedImage via trusted url', done => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(componentInstance, 'initializeCropper');
+    spyOn(svgSanitizerService, 'isBase64Svg').and.returnValue(true);
+    spyOn(
+      svgSanitizerService,
+      'getInvalidSvgTagsAndAttrsFromDataUri'
+    ).and.returnValue({tags: [], attrs: []});
+    const trustedUrl = 'trusted-svg-url';
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      trustedUrl
+    );
+
+    const svgContent = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    const file = new File([svgContent], 'test.svg', {type: 'image/svg+xml'});
+
+    componentInstance.onFileChanged(file);
+
+    // Allow the FileReader.onload callback to execute.
+    setTimeout(() => {
+      expect(svgSanitizerService.isBase64Svg).toHaveBeenCalled();
+      expect(
+        svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri
+      ).toHaveBeenCalled();
+      expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalled();
+      expect(componentInstance.uploadedImage).toBe(trustedUrl);
+      done();
+    }, 200);
+  });
 });
