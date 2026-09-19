@@ -30,7 +30,7 @@ import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {VALIDATION_STATUS_INVALID} from 'utility/forms';
 
 interface SanitizedUrlSchema {
-  type: string;
+  type: 'unicode';
   validators: [
     {
       id: string;
