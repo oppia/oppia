@@ -42,7 +42,7 @@ const photoBoxButton = 'div.e2e-test-photo-button';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal';
+const photoUploadModal = 'edit-thumbnail-modal, oppia-image-uploader-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
 
