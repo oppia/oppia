@@ -40,8 +40,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MY_SUGGESTIONS_FILTER_CONFIG} from '../../domain/feedback/feedback.model';
 import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
 
-import './my-suggestions-tab.component.css';
-
 interface LearnerFeedbackStatusDetails {
   label: string;
   className: string;

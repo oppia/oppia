@@ -137,6 +137,8 @@ export default {
     LessonPlayer: 'http://localhost:8181/lesson/',
     SkillEditor: 'http://localhost:8181/skill_editor',
     TopicEditor: 'http://localhost:8181/topic_editor',
+    TechnicalFeedbackDashboard:
+      'http://localhost:8181/technical-feedback-dashboard',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -162,6 +164,7 @@ export default {
     COLLECTION_EDITOR: 'collection editor',
     TRANSLATION_REVIEWER: 'translation reviewer',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
+    TECH_TEAM_LEAD: 'tech team lead',
   } as const,
 
   ViewportWidthBreakpoints: {

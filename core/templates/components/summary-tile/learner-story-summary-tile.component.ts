@@ -27,7 +27,6 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './learner-story-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
