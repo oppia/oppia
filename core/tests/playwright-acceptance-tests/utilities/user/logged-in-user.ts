@@ -96,6 +96,8 @@ const subscribedCreatorSelector = '.e2e-test-subscription-name';
 const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const preferencesContainerSelector = '.e2e-test-preferences-container';
+const contributorDashboardContainerSelector =
+  '.e2e-test-oppia-contributor-home';
 const preferencesMenuLink = '.e2e-test-preferences-link';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
@@ -208,6 +210,8 @@ const closeModalButton = '.e2e-test-close-modal-btn';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
@@ -1226,6 +1230,19 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToContributorAdminDashboardPage(): Promise<void> {
     await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard using the profile dropdown menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
+    await this.clickOnElementWithSelector(contributorDashboardMenuLink);
+
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
