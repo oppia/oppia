@@ -62,7 +62,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/user_services.py',
     'core/domain/suggestion_services.py',
     'core/domain/suggestion_registry.py',
-    'core/domain/opportunity_services.py',
     'core/domain/collection_services.py',
     'core/jobs/batch_jobs/number_with_units_audit_jobs.py',
     'core/domain/app_feedback_report_services.py',
