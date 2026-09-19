@@ -261,6 +261,9 @@ export class OpportunitiesListComponent {
       return;
     }
 
+    this.opportunities = [];
+    this.more = true;
+
     if (this.dropdownPaginationEnabled) {
       if (this.loadOpportunitiesCount) {
         this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {

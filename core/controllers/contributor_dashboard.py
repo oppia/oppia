@@ -1057,6 +1057,7 @@ class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
 
     language_code: Optional[str]
     topic_name: Optional[str]
+    entity_type: Optional[str]
 
 
 class OpportunitiesCountHandler(
@@ -1083,6 +1084,10 @@ class OpportunitiesCountHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'entity_type': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -1105,6 +1110,7 @@ class OpportunitiesCountHandler(
         assert self.normalized_request is not None
         language_code = self.normalized_request.get('language_code')
         topic_name = self.normalized_request.get('topic_name')
+        entity_type = self.normalized_request.get('entity_type')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             count = opportunity_services.get_skill_opportunities_count()
@@ -1117,7 +1123,7 @@ class OpportunitiesCountHandler(
                 self.user_id,
             ):
                 count = opportunity_services.get_translation_opportunities_count_with_new_models(
-                    feconf.ENTITY_TYPE_EXPLORATION, language_code, topic_name
+                    entity_type, language_code, topic_name
                 )
             else:
                 count = (

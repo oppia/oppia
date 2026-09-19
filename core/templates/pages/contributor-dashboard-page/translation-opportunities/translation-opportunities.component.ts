@@ -224,7 +224,8 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   async loadOpportunitiesCountAsync(): Promise<number> {
     return this.contributionOpportunitiesService.getTranslationOpportunitiesCountAsync(
       this.translationLanguageService.getActiveLanguageCode(),
-      this.translationTopicService.getActiveTopicName()
+      this.translationTopicService.getActiveTopicName(),
+      this.activeEntityType
     );
   }
 

@@ -444,7 +444,8 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchOpportunitiesCountAsync(
     opportunityType: string,
     topicName: string,
-    languageCode: string = ''
+    languageCode: string = '',
+    entityType?: string
   ): Promise<number> {
     const queryParams: Record<string, string> = {};
     if (topicName) {
@@ -452,6 +453,9 @@ export class ContributionOpportunitiesBackendApiService {
     }
     if (languageCode) {
       queryParams.language_code = languageCode;
+    }
+    if (this.shouldFilterByEntityType(entityType)) {
+      queryParams.entity_type = entityType as string;
     }
 
     const countUrl = this.urlInterpolationService.interpolateUrl(

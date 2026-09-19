@@ -140,12 +140,14 @@ export class ContributionOpportunitiesService {
 
   async getTranslationOpportunitiesCountAsync(
     languageCode: string,
-    topicName: string
+    topicName: string,
+    entityType?: string
   ): Promise<number> {
     return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
       'translation',
       topicName,
-      languageCode
+      languageCode,
+      entityType
     );
   }
 
@@ -195,17 +197,6 @@ export class ContributionOpportunitiesService {
           more: false,
         };
       });
-  }
-
-  async getReviewableTranslationOpportunitiesCountAsync(
-    topicName: string,
-    languageCode: string
-  ): Promise<number> {
-    return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
-      'reviewable_translation',
-      topicName,
-      languageCode
-    );
   }
 
   async getTranslatableTopicNamesAsync(): Promise<string[]> {
