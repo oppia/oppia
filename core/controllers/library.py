@@ -132,7 +132,7 @@ class OldLibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
 
@@ -159,7 +159,7 @@ class LibraryIndexHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         display_in_language_code = self.normalized_request.get(
@@ -265,7 +265,7 @@ class LibraryGroupIndexHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
         assert self.normalized_request is not None
@@ -372,7 +372,7 @@ class SearchHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(
@@ -424,7 +424,7 @@ class LibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect('/community-library')
 
@@ -464,7 +464,7 @@ class ExplorationSummariesHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         exp_ids = self.normalized_request['stringified_exp_ids']
@@ -529,7 +529,7 @@ class CollectionSummariesHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         collection_ids = self.normalized_request['stringified_collection_ids']

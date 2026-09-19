@@ -117,7 +117,7 @@ class EditableStoryDataHandler(
             )
 
     @acl_decorators.can_edit_story
-    def get(self, story_id: str) -> None:
+    def get(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual story page.
 
         Args:
@@ -155,7 +155,7 @@ class EditableStoryDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, story_id: str) -> None:
+    def put(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given story.
 
         Args:
@@ -191,7 +191,7 @@ class EditableStoryDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, story_id: str) -> None:
+    def delete(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Deletes a story.
 
         Args:
@@ -233,7 +233,7 @@ class StoryPublishHandler(
     }
 
     @acl_decorators.can_edit_story
-    def put(self, story_id: str) -> None:
+    def put(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Publishes/unpublishes a given story.
 
         Args:
@@ -291,7 +291,9 @@ class ValidateExplorationsHandler(
     }
 
     @acl_decorators.can_edit_story
-    def get(self, unused_story_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, unused_story_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a list of exploration IDs, checks whether the
         corresponding explorations are supported on mobile and returns the
         validation error messages (if any).
@@ -323,7 +325,9 @@ class StoryUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, story_url_fragment: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, story_url_fragment: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a story url fragment and checks whether
         a story with the same url fragment exists or not.
 

@@ -101,7 +101,9 @@ class EditableCollectionDataHandler(
     }
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual collection page.
 
         Args:
@@ -117,7 +119,9 @@ class EditableCollectionDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_collection
-    def put(self, collection_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given collection.
 
         Args:
@@ -159,7 +163,9 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Gets the editing rights for the given collection.
 
         Args:
@@ -222,7 +228,9 @@ class CollectionPublishHandler(
     }
 
     @acl_decorators.can_publish_collection
-    def put(self, collection_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Publishes the given collection.
 
         Args:
@@ -288,7 +296,9 @@ class CollectionUnpublishHandler(
     }
 
     @acl_decorators.can_unpublish_collection
-    def put(self, collection_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Unpublishes the given collection.
 
         Args:
@@ -350,7 +360,7 @@ class ExplorationMetadataSearchHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         # The query is encoded into base64 string in the frontend, and b64decode
         # accepts base64 bytes, thus we need to encode the base64 string to
