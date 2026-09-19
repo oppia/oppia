@@ -1753,7 +1753,8 @@ export class ExplorationEditor extends BaseUser {
 
     if (title === explorationName) {
       await this.clickOnElementWithSelector(
-        explorationSummaryTileTitleSelector
+        explorationSummaryTileTitleSelector,
+        {force: true}
       );
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
