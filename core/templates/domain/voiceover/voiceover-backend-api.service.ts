@@ -42,10 +42,15 @@ interface VoiceoverAdminDataBackendDict {
     };
   };
   autogeneratable_language_accent_codes: string[];
+  language_accent_code_to_beam_job_state: LanguageAccentCodeToBeamJobState;
 }
 
 interface EntityVoiceoversBulkBackendDict {
   entity_voiceovers_list: EntityVoiceoversBackendDict[];
+}
+
+interface UpdateLanguageCodesMappingBackendDict {
+  language_accent_code_to_beam_job_state: LanguageAccentCodeToBeamJobState;
 }
 
 interface CloudTaskRunBackendResponseDict {
@@ -58,6 +63,10 @@ export interface LanguageAccentToDescription {
 
 export interface LanguageAccentCodesToSupportsAutogeneration {
   [languageAccentCode: string]: boolean;
+}
+
+export interface LanguageAccentCodeToBeamJobState {
+  [languageAccentCode: string]: string;
 }
 
 export interface LanguageAccentMasterList {
@@ -74,6 +83,7 @@ export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
   autoGeneratableLanguageAccentCodes: string[];
+  languageAccentCodeToBeamJobState: LanguageAccentCodeToBeamJobState;
 }
 
 interface TokensWithDurationBackendType {
@@ -155,6 +165,8 @@ export class VoiceoverBackendApiService {
               languageCodesMapping: response.language_codes_mapping,
               autoGeneratableLanguageAccentCodes:
                 response.autogeneratable_language_accent_codes,
+              languageAccentCodeToBeamJobState:
+                response.language_accent_code_to_beam_job_state,
             });
           },
           errorResponse => {
@@ -166,17 +178,17 @@ export class VoiceoverBackendApiService {
 
   async updateVoiceoverLanguageCodesMappingAsync(
     languageCodesMapping: LanguageCodesMapping
-  ): Promise<void> {
+  ): Promise<LanguageAccentCodeToBeamJobState> {
     return new Promise((resolve, reject) => {
       this.http
-        .put<void>(
+        .put<UpdateLanguageCodesMappingBackendDict>(
           VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
           {language_codes_mapping: languageCodesMapping}
         )
         .toPromise()
         .then(
           response => {
-            resolve(response);
+            resolve(response.language_accent_code_to_beam_job_state);
           },
           errorResopnse => {
             reject(errorResopnse?.error);
