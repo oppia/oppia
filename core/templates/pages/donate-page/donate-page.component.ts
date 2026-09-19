@@ -26,8 +26,6 @@ import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.compo
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-import './donate-page.component.css';
-
 interface ImpactStat {
   imageUrl: string | null;
   stat: string | null;

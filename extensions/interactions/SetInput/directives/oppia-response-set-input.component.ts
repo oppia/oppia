@@ -22,7 +22,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import './set-input-response.component.css';
 
 @Component({
   selector: 'oppia-response-set-input',
