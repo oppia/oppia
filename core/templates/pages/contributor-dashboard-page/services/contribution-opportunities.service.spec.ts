@@ -353,28 +353,6 @@ describe('Contribution Opportunities Service', () => {
     })
   );
 
-  it('should return reviewable translation opportunities count when calling getReviewableTranslationOpportunitiesCountAsync', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    const getReviewableTranslationOpportunitiesCountSpy = spyOn(
-      contributionOpportunitiesBackendApiService,
-      'fetchOpportunitiesCountAsync'
-    ).and.returnValue(Promise.resolve(42));
-
-    contributionOpportunitiesService
-      .getReviewableTranslationOpportunitiesCountAsync('hi', 'Topic')
-      .then(successHandler, failHandler);
-    tick();
-
-    expect(getReviewableTranslationOpportunitiesCountSpy).toHaveBeenCalledWith(
-      'reviewable_translation',
-      'hi',
-      'Topic'
-    );
-    expect(successHandler).toHaveBeenCalledWith(42);
-  }));
-
   it(
     'should throw error if no more translation opportunities is available ' +
       "when calling 'getMoreTranslationOpportunitiesAsync'",

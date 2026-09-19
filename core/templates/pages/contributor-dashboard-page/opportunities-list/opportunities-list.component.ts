@@ -265,7 +265,7 @@ export class OpportunitiesListComponent {
     this.more = true;
 
     if (this.dropdownPaginationEnabled) {
-      if (this.loadOpportunitiesCount) {
+      if (this.loadOpportunitiesCount && !this.searchQuery) {
         this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
           if (!this.more && this.opportunities.length > 0) {
             return;
@@ -275,7 +275,7 @@ export class OpportunitiesListComponent {
             Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE)
           );
         });
-      } else {
+      } else if (!this.loadOpportunitiesCount) {
         this.totalPages = 1;
       }
     }
@@ -384,11 +384,19 @@ export class OpportunitiesListComponent {
   }
 
   private _clampDropdownPages(pageNumber: number): number {
-    if (!this.more && this.dropdownPaginationEnabled) {
-      this.totalPages = Math.max(
-        1,
-        Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
-      );
+    if (this.dropdownPaginationEnabled) {
+      if (this.searchQuery) {
+        const loadedPages = Math.ceil(
+          this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE
+        );
+        this.totalPages = Math.max(1, loadedPages + (this.more ? 1 : 0));
+      } else if (!this.more) {
+        this.totalPages = Math.max(
+          1,
+          Math.ceil(this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE)
+        );
+      }
+
       if (pageNumber > this.totalPages) {
         return this.totalPages;
       }
