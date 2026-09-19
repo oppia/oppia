@@ -574,7 +574,7 @@ describe('Translation opportunities component', () => {
 
     expect(
       contributionOpportunitiesService.getTranslationOpportunitiesCountAsync
-    ).toHaveBeenCalledWith('en', undefined);
+    ).toHaveBeenCalledWith('en', undefined, 'all');
     expect(resolvedCount).toEqual(5);
   }));
 });
