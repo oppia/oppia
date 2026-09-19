@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -37,7 +38,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     pass
 
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models, translation_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.TRANSLATION]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -54,7 +57,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         """Test that the job finds no duplicates when there are none."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_0', title='Test Exploration', category='Test'
         )
         exp_services.save_new_exploration('owner_id', exploration)
 
@@ -65,7 +68,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         duplicate content IDs.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_1', title='Test Exploration', category='Test'
         )
 
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -90,7 +93,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Exploration exp_id (version 1) has duplicate content IDs: '
+                    'Exploration exp_id_1 (version 1) has duplicate content IDs: '
                     '{\'content_2\': [\'Introduction\', \'State2\']}'
                 )
             ]
@@ -110,7 +113,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         """Test that the job does nothing when there are no duplicates."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_2', title='Test Exploration', category='Test'
         )
         exp_services.save_new_exploration('owner_id', exploration)
 
@@ -121,7 +124,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         content IDs.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_3', title='Test Exploration', category='Test'
         )
 
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -145,21 +148,59 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         original_content_id = state1.content.content_id
 
+        # Add a translation for the duplicate content ID in the first version.
+        translation_model = translation_models.EntityTranslationsModel(
+            id=f'{feconf.TranslatableEntityType.EXPLORATION.value}-exp_id_3-1-hi',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+            entity_id='exp_id_3',
+            entity_version=1,
+            language_code='hi',
+            translations={
+                original_content_id: {
+                    'content_value': 'Translation in Hindi',
+                    'needs_update': False,
+                    'content_format': 'html',
+                }
+            },
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    f'Fixed exploration exp_id (version 1) - regenerated content '
+                    f'Fixed exploration exp_id_3 (version 2) - regenerated content '
                     f'IDs: [\'{original_content_id} -> content_3 in State2\']'
                 )
             ]
         )
 
-        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        from core.domain import caching_services
+
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id_3']
+        )
+        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id_3')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
         self.assertEqual(state1_updated.content.content_id, original_content_id)
-        self.assertEqual(state2_updated.content.content_id, 'content_2')
+        self.assertEqual(state2_updated.content.content_id, 'content_3')
+
+        # Assert that the new translation model has been created for version 2
+        # and the translation has been duplicated for the newly generated content ID.
+        new_translation_model = (
+            translation_models.EntityTranslationsModel.get_model(
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id_3', 2, 'hi'
+            )
+        )
+        self.assertIsNotNone(new_translation_model)
+        self.assertIn(original_content_id, new_translation_model.translations)
+        self.assertIn('content_3', new_translation_model.translations)
+        self.assertEqual(
+            new_translation_model.translations[original_content_id],
+            new_translation_model.translations['content_3'],
+        )
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
@@ -175,7 +216,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         """Test that the audit job correctly identifies duplicates."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_4', title='Test Exploration', category='Test'
         )
 
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -200,7 +241,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Exploration exp_id (version 1) has duplicate content IDs: '
+                    'Exploration exp_id_4 (version 1) has duplicate content IDs: '
                     '{\'content_2\': [\'Introduction\', \'State2\']}'
                 )
             ]
@@ -220,7 +261,7 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         """Test that the audit fix job shows what would be fixed."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test'
+            'exp_id_5', title='Test Exploration', category='Test'
         )
 
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -247,13 +288,21 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    f'Fixed exploration exp_id (version 1) - regenerated content '
+                    f'Fixed exploration exp_id_5 (version 2) - regenerated content '
                     f'IDs: [\'{original_content_id} -> content_3 in State2\']'
                 )
             ]
         )
 
-        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        from core.domain import caching_services
+
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id_5']
+        )
+        # Clear the NDB context cache to avoid reading the model mutated by the job.
+        with datastore_services.get_ndb_context() as ndb_context:
+            ndb_context.clear_cache()
+        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id_5')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
