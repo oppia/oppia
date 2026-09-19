@@ -98,3 +98,15 @@
     font-size: 18px;
   }
 }
+
+.oppia-translation-topic-selector-completeness {
+  color: rgb(104, 104, 104);
+  font-size: 0.9em;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.oppia-translation-topic-selector-almost-complete {
+  color: #009688;
+  font-weight: 600;
+}
