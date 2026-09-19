@@ -84,6 +84,9 @@ const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 
 // Other.
 const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
+const noOfClassroomsToGeneratorField =
+  '#label-target-number-of-classrooms-to-generate';
+const numDummyMathClassroomsToGenerate = '1';
 const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
 
 // Misc Tab selectors.
@@ -129,6 +132,16 @@ const userRolesVisualizationContainerSelector =
   'oppia-roles-and-actions-visualizer';
 const platformParameterDefaultValueContainerSelector =
   '.e2e-test-platform-param-default-value-container';
+
+// Auto Translation.
+const autoTranslationToggleInputSelector =
+  '.e2e-test-auto-translation-toggle input';
+const autoTranslationToggleLabelSelector =
+  '.e2e-test-auto-translation-toggle label';
+const languageDropdownSelector = '.e2e-test-language-dropdown';
+const providerDropdownSelector = '.e2e-test-provider-dropdown';
+const addMappingButtonSelector = '.e2e-test-add-mapping-btn';
+const mappingRowSelector = '.e2e-test-mapping-row';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -765,6 +778,10 @@ export class SuperAdmin extends BaseUser {
   async generateDummyMathClassroom(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
+    await this.page.type(
+      noOfClassroomsToGeneratorField,
+      numDummyMathClassroomsToGenerate
+    );
     await this.clickOnElementWithSelector(loadDummyMathClassRoomButton);
 
     await this.waitForNetworkIdle();
@@ -1386,6 +1403,121 @@ export class SuperAdmin extends BaseUser {
     }
 
     return platformParameterContainerElements[index];
+  }
+
+  /**
+   * Navigates to the contributor dashboard admin page.
+   */
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboardAdmin);
+  }
+
+  /**
+   * Enables automatic translation suggestions in the contributor dashboard admin page.
+   */
+  async enableAutoTranslation(): Promise<void> {
+    // The Material slide toggle renders its actual checkbox input as
+    // cdk-visually-hidden (off-screen), overlapped by the thumb div.
+    // Puppeteer's clickability check blocks clicks on the hidden input, so
+    // we read the checked state from the input but click the visible label.
+    await this.page.waitForSelector(autoTranslationToggleInputSelector);
+    const isChecked = await this.page.$eval(
+      autoTranslationToggleInputSelector,
+      el => (el as HTMLInputElement).checked
+    );
+    if (!isChecked) {
+      await this.clickOnElementWithSelector(autoTranslationToggleLabelSelector);
+    }
+  }
+
+  /**
+   * Adds a new translation provider mapping.
+   *
+   * @param {string} languageCode - The language code for the mapping.
+   * @param {string} providerId - The ID of the translation provider.
+   */
+  async addTranslationProviderMapping(
+    languageCode: string,
+    providerId: string
+  ): Promise<void> {
+    await this.page.waitForSelector(languageDropdownSelector);
+    await this.page.select(languageDropdownSelector, languageCode);
+
+    await this.page.waitForSelector(providerDropdownSelector);
+    await this.page.select(providerDropdownSelector, providerId);
+
+    await this.clickOnElementWithSelector(addMappingButtonSelector);
+  }
+
+  /**
+   * Removes an existing translation provider mapping.
+   *
+   * @param {string} languageCode - The language code of the mapping to remove.
+   */
+  async removeTranslationProviderMapping(languageCode: string): Promise<void> {
+    const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.clickOnElementWithSelector(removeButton);
+  }
+
+  /**
+   * Gets the total number of translation provider mappings.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the number of provider mappings.
+   */
+  async getProviderMappingRowCount(): Promise<number> {
+    const rows = await this.page.$$(mappingRowSelector);
+    return rows.length;
+  }
+
+  /**
+   * Expects a translation provider mapping to be present.
+   *
+   * @param {string} languageCode - The language code.
+   * @param {string} providerDisplayText - The text of the translation provider displayed.
+   */
+  async expectTranslationProviderMappingToBePresent(
+    languageCode: string,
+    providerDisplayText: string
+  ): Promise<void> {
+    const removeButtonSelector = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.expectElementToBeVisible(removeButtonSelector);
+
+    const rowElement = await this.page.evaluateHandle(selector => {
+      const button = document.querySelector(selector);
+      return button ? button.closest('tr') : null;
+    }, removeButtonSelector);
+
+    const isRowPresent = await this.page.evaluate(
+      el => el !== null,
+      rowElement
+    );
+
+    if (!isRowPresent) {
+      throw new Error(`Mapping row for ${languageCode} not found.`);
+    }
+
+    const rowText = await this.page.evaluate(
+      el => (el as HTMLElement).innerText,
+      rowElement
+    );
+
+    if (!rowText.includes(providerDisplayText)) {
+      throw new Error(
+        `Provider mapping for "${languageCode}" is missing the provider text "${providerDisplayText}". Found: ${rowText}`
+      );
+    }
+  }
+
+  /**
+   * Expects a translation provider mapping to be absent.
+   *
+   * @param {string} languageCode - The language code.
+   */
+  async expectTranslationProviderMappingToBeAbsent(
+    languageCode: string
+  ): Promise<void> {
+    const removeButtonSelector = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
+    await this.expectElementToBeVisible(removeButtonSelector, false);
   }
 }
 
