@@ -54,6 +54,7 @@ from core.controllers import (
     learner_goals,
     learner_group,
     library,
+    machine_translation,
     moderator,
     oppia_root,
     pages,
@@ -516,6 +517,14 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
         contributor_dashboard.MachineTranslationStateTextsHandler,
+    ),
+    get_redirect_route(
+        r'/generate-translation',
+        machine_translation.MachineTranslationGenerateHandler,
+    ),
+    get_redirect_route(
+        r'/translation-provider-mapping',
+        machine_translation.TranslationProviderMappingHandler,
     ),
     get_redirect_route(
         r'/usercontributionrightsdatahandler',
