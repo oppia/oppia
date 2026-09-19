@@ -272,11 +272,11 @@ def mock_load_template(
     filename: str, template_is_aot_compiled: bool = False
 ) -> str:
     """Mock for load_template function. This mock is required for backend tests
-    since we do not have webpack compilation before backend tests. The folder to
-    search templates is webpack_bundles which is generated after webpack
-    compilation. Since this folder will be missing, load_template function will
-    return an error. So, we use a mock for load_template which returns the html
-    file from the source directory instead.
+    since the compiled output may not be available. The compiled output would
+    normally be served from the build directory. Since this folder will be
+    missing during backend tests, load_template function will return an error.
+    So, we use a mock for load_template which returns the html file from the
+    source directory instead.
 
     Args:
         filename: str. The name of the file for which template is to be
@@ -2037,6 +2037,56 @@ class TestBase(unittest.TestCase):
         """
         super().assertDictEqual(dict_one, dict_two, msg=msg)
 
+    # Here we use type Any because the values in 'subset' and 'dictionary'
+    # can be of any type.
+    def assertDictContainsSubset(  # pylint: disable=invalid-name
+        self,
+        subset: Mapping[str, Any],
+        dictionary: Mapping[str, Any],
+        msg: Optional[str] = None,
+    ) -> None:
+        """Checks whether the given dictionary contains the given subset of
+        key-value pairs.
+
+        This method was removed from unittest.TestCase in Python 3.12. It is
+        reimplemented here (under its original name) so that call sites
+        elsewhere in the codebase can stay as readable as they were before,
+        rather than being rewritten to use assertEqual with a dict merge.
+
+        Args:
+            subset: Mapping[str, Any]. The key-value pairs that dictionary is
+                expected to contain.
+            dictionary: Mapping[str, Any]. The dictionary to check.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. Dictionary does not contain subset.
+        """
+        missing_keys = []
+        mismatched_items = []
+        for key, value in subset.items():
+            if key not in dictionary:
+                missing_keys.append(key)
+            elif value != dictionary[key]:
+                mismatched_items.append(
+                    '%r, expected: %r, actual: %r'
+                    % (key, value, dictionary[key])
+                )
+
+        if not missing_keys and not mismatched_items:
+            return
+
+        standard_msg = ''
+        if missing_keys:
+            standard_msg += 'Missing: %r' % (missing_keys,)
+        if mismatched_items:
+            if standard_msg:
+                standard_msg += '; '
+            standard_msg += 'Mismatched values: %s' % (
+                ', '.join(mismatched_items)
+            )
+        self.fail(self._formatMessage(msg, standard_msg))
+
     # Here we use type Any because the method 'assertItemsEqual' can accept any
     # kind of iterables to compare them against each other, and these iterables
     # can be of type List, Dict, Tuple, etc.
@@ -3036,9 +3086,8 @@ version: 1
         expect_errors = expected_status_int >= 400
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url,
@@ -3154,9 +3203,8 @@ version: 1
         response = None
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
-        # backend tests.
+        # source directory instead of the compiled build output since the build
+        # output is not available during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
 
             if http_method == 'GET':

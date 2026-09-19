@@ -114,6 +114,24 @@ class CommonTests(test_utils.GenericTestBase):
             common.PLAYWRIGHT_NPX_BIN_PATH.endswith(os.path.join('bin', 'npx'))
         )
 
+    def test_lighthouse_node_path_uses_lighthouse_node_version(self) -> None:
+        self.assertIn(
+            common.LIGHTHOUSE_NODE_VERSION,
+            common.LIGHTHOUSE_NODE_PATH,
+        )
+
+    def test_lighthouse_node_bin_path_uses_lighthouse_node_path(self) -> None:
+        self.assertTrue(
+            common.LIGHTHOUSE_NODE_BIN_PATH.startswith(
+                common.LIGHTHOUSE_NODE_PATH
+            )
+        )
+        self.assertTrue(
+            common.LIGHTHOUSE_NODE_BIN_PATH.endswith(
+                os.path.join('bin', 'node')
+            )
+        )
+
     def test_is_mac_os(self) -> None:
         with self.swap(common, 'OS_NAME', 'Darwin'):
             self.assertTrue(common.is_mac_os())

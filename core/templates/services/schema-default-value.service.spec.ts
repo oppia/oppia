@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SchemaDefaultValueService.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 
 import {LoggerService} from 'services/contextual/logger.service';

@@ -18,7 +18,6 @@ assets/hashes.json
 local_compiled_js/*
 local_compiled_js_for_test/*
 core/templates/prod/*
-webpack_bundles/*
 core/tests/.browserstack.env
 core/tests/puppeteer-acceptance-tests/build
 core/tests/puppeteer-acceptance-tests/specs/*/prod-desktop-screenshots/diff-snapshots

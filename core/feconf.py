@@ -415,7 +415,6 @@ DEFAULT_STATE_CONTENT_STR = ''
 EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
 EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
-EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
 
 # Character limit for exploration title translation.
@@ -574,6 +573,7 @@ OPPIA_CONTENT_TAG_DELIMITER = '; '
 # Azure Translator API configuration for automatic translation suggestions.
 AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
 AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+GCP_TRANSLATOR_API_KEY = os.environ.get('GCP_TRANSLATOR_API_KEY')
 
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
@@ -610,6 +610,16 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
+# The email address for the translation technical support group.
+TRANSLATION_TECH_SUPPORT_EMAIL = 'translations-tech-support@oppia.org'
+# Human-readable display names for machine translation providers, keyed by the
+# provider ID used in the language-to-provider mapping (e.g. 'azure', 'gcp').
+# To add a new provider: add an entry here with the provider's display name.
+# To remove a provider: delete its entry here.
+MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES = {
+    'azure': 'Azure Translator',
+    'gcp': 'Google Cloud Translate',
+}
 CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
@@ -1030,6 +1040,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
+LESSON_URL_PREFIX = '/lesson'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
@@ -1181,9 +1192,6 @@ CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
 )
 CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
     '/certificate_assessment_attempts_handler'
-)
-CERTIFICATE_QUESTION_HANDLER = (
-    '/certificate_question_handler/<attempt_id>/<question_id>'
 )
 
 # Event types.

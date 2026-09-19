@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   TestBed,

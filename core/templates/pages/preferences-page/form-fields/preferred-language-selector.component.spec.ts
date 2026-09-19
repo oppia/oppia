@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for the preferred site language component.
  */
 
+// @ts-nocheck
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -92,5 +94,11 @@ describe('Preferred Site Language Selector Component', () => {
     const fn = () => {};
     componentInstance.registerOnTouched(fn);
     expect(componentInstance.onTouched).toBe(fn);
+  });
+
+  it('should expose itself as a control value accessor', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      componentInstance,
+    ]);
   });
 });

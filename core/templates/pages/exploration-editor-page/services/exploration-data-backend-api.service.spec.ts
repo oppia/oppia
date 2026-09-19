@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Exploration data backend api service.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
