@@ -318,7 +318,8 @@ describe('Contribution Opportunities Service', () => {
     expect(getTranslationOpportunitiesCountSpy).toHaveBeenCalledWith(
       'translation',
       'Topic',
-      'hi'
+      'hi',
+      undefined
     );
     expect(successHandler).toHaveBeenCalledWith(42);
   }));
