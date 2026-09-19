@@ -70,6 +70,7 @@ describe('Logged-in Learner', function () {
   let releaseCoordinator: ReleaseCoordinator;
   let voiceoverAdmin: VoiceoverAdmin;
   let loggedInLearner: LoggedInUser & LoggedOutUser;
+  let loggedInLearner2: LoggedInUser & LoggedOutUser;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -210,6 +211,14 @@ describe('Logged-in Learner', function () {
       'learner1',
       'learner_topic_page1@example.com'
     );
+
+    // This second learner keeps an incomplete story so the fourth test can
+    // verify the locked-state helper behavior of the Mastery Challenge, while
+    // the first learner completes the whole story in the earlier tests.
+    loggedInLearner2 = await UserFactory.createNewUser(
+      'learner2',
+      'learner_topic_page2@example.com'
+    );
   }, SPEC_TIMEOUT_MSECS);
 
   it(
@@ -344,8 +353,7 @@ describe('Logged-in Learner', function () {
 
       // Scrolling down the vertical timeline layout reaches the end of the
       // story path, where the CUJ Mastery Challenge Card bullet requires the
-      // challenge card to be displayed; the section below verifies it and its
-      // locked-state helper behavior.
+      // challenge card to be displayed.
       await loggedInLearner.scrollToEndOfTopicPage();
       await loggedInLearner.expectMasteryChallengeCardToBeVisible();
       await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
@@ -362,15 +370,10 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
-      // The CUJ "Locked Challenge Helper" step requires that, if the story is
-      // not yet completed, clicking the "Take the Mastery Challenge" button
-      // shows a helper tooltip (auto-dismissed after ~5s) instead of
-      // navigating to the practice session. The hover check below provides a
-      // deterministic tooltip assertion, and the click check verifies that no
-      // navigation occurs.
-      await loggedInLearner.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
-
-      await loggedInLearner.expectClickingLockedMasteryChallengeButtonToNotNavigate();
+      // The CUJ "Locked Challenge Helper" step (clicking the button shows a
+      // helper tooltip that auto-dismisses after ~5s instead of navigating) is
+      // verified in the fourth test, where a fresh learner who has not
+      // completed the story exercises the locked challenge.
 
       await loggedInLearner.scrollToTopOfTopicPage();
       // The CUJ Timeline & Chapter Layout requires the story card to show
@@ -558,11 +561,10 @@ describe('Logged-in Learner', function () {
       // above, so complete the remaining 11. The Mastery Challenge unlocks
       // only after every published chapter is completed.
       //
-      // The CUJ "Lesson Progression" bullets ("Chapter 13 is marked as
-      // completed" and "Chapter 14 becomes the next active lesson") map to
-      // this fixture's final progression, chapters 11 and 12: each loop
-      // iteration completes a chapter, verifies it is marked as completed with
-      // the ✅ indicator, and verifies the immediately following chapter
+      // The CUJ "Lesson Progression" bullets ("Chapter 11 is marked as
+      // completed" and "Chapter 12 becomes the next active lesson") are
+      // verified by the last loop iteration below: it completes chapter 11,
+      // checks the completed (✅) indicator, and verifies that chapter 12
       // becomes the next active lesson.
       for (let completedCount = 0; completedCount < 10; completedCount++) {
         await loggedInLearner.waitForPageToFullyLoad();
@@ -598,11 +600,22 @@ describe('Logged-in Learner', function () {
   it(
     'should be able to take the Mastery Challenge',
     async function () {
-      // The CUJ Locked Challenge Helper step (clicking the button shows a
-      // helper tooltip that auto-dismisses after ~5s instead of navigating)
-      // is covered in the second test above, where the story is still
-      // incomplete. Here the story is fully completed, so the challenge is
-      // unlocked and clicking it navigates to the practice session.
+      // The CUJ "Locked Challenge Helper" step requires that, if the story is
+      // not yet completed, clicking the "Take the Mastery Challenge" button
+      // shows a helper tooltip (auto-dismissed after ~5s) instead of
+      // navigating to the practice session. The story for loggedInLearner is
+      // fully completed by this point, so a fresh learner who has completed no
+      // lessons is used to verify the locked state: the hover check below
+      // provides a deterministic tooltip assertion, and the click check
+      // verifies that no navigation occurs.
+      await loggedInLearner2.openTopicPage('math', 'fractions');
+      await loggedInLearner2.scrollMasteryChallengeCardIntoView();
+      await loggedInLearner2.hoverOverLockedMasteryChallengeButtonAndExpectHelperTooltip();
+      await loggedInLearner2.expectClickingLockedMasteryChallengeButtonToNotNavigate();
+
+      // With the locked state covered, verify the unlocked flow: the learner
+      // has completed the full story, so the challenge is unlocked and
+      // clicking it navigates to the practice session.
       await loggedInLearner.scrollMasteryChallengeCardIntoView();
       await loggedInLearner.expectMasteryChallengeToBeUnlocked();
       await loggedInLearner.clickMasteryChallengeAndNavigateToPracticeSession();
