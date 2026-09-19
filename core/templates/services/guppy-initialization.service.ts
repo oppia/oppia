@@ -19,6 +19,10 @@
 import {Injectable} from '@angular/core';
 
 import {MathInteractionsService} from 'services/math-interactions.service';
+import {
+  KNOWN_CSS,
+  LazyCssLoaderService,
+} from 'services/lazy-css-loader.service';
 
 export class GuppyObject {
   // These properties are initialized using constructor function
@@ -41,6 +45,8 @@ export class GuppyInitializationService {
   static interactionType: string;
   private static allowedVariables: string[] = [];
 
+  constructor(private lazyCssLoaderService: LazyCssLoaderService) {}
+
   init(
     guppyDivClassName: string,
     placeholderText: string,
@@ -50,6 +56,12 @@ export class GuppyInitializationService {
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
     let mathInteractionsService = new MathInteractionsService();
+    // Guppy editors can be rendered on any page that embeds a math
+    // interaction or editor, such as the question-suggestion flows and the
+    // certificate assessment player. Loading the stylesheet here, before the
+    // Guppy instances are created, keeps those pages styled without having to
+    // load the CSS on every page root. The loader deduplicates repeated calls.
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
     for (let i = 0; i < guppyDivs.length; i++) {
       divId = 'guppy_' + Math.floor(Math.random() * 100000000);
       // Dynamically assigns a unique id to the guppy div.
