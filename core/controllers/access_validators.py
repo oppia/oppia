@@ -32,7 +32,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -310,8 +310,11 @@ class ManageOwnAccountValidationHandler(
         pass
 
 
+# Here we use type Any because the decoded JSON payload contains a list of
+# strings, which BaseHandler's typed dictionary requires 'Any' to represent
+# accurately since other fields are strings.
 class PracticeSessionAccessValidationPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], Dict[str, Any]]
 ):
     """Validates access to practice session page."""
 
