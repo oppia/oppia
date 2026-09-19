@@ -73,6 +73,7 @@ const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const progressBarSelector = '.oppia-progress-bar';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
 const suggestionSection = '.suggested-for-you-section';
+const promoBarTextSelector = '.e2e-test-promo-bar-text';
 
 const errorPageHeading = '.e2e-test-error-page-heading';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
@@ -2195,6 +2196,22 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
+   * Checks if the promo bar is visible and if the promotion content is correct.
+   * @param {boolean} visible - Whether the promo bar should be visible or not.
+   * @param {string} promotionContent - The expected promotion content.
+   */
+  async expectPromoBarToBeVisible(
+    visible: boolean = true,
+    promotionContent?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(promoBarTextSelector, visible);
+
+    if (visible && promotionContent) {
+      await this.expectTextContentToBe(promoBarTextSelector, promotionContent);
+    }
   }
 
   /**

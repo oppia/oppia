@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,23 +19,27 @@
  * RC.PB Enable the promo bar.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-describe('Release Coordinator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'releaseCoordinator@example.com',
+      browser,
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
   });
 
-  it('should be able to enable the promo bar', async function () {
+  test('should be able to enable the promo bar', async function () {
     await releaseCoordinator.navigateToCommunityLibraryPage();
     await releaseCoordinator.expectPromoBarToBeVisible(false);
 
@@ -52,7 +56,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectPromoBarToBeVisible(true, 'testing');
   });
 
-  it('should be able to disable the promo bar', async function () {
+  test('should be able to disable the promo bar', async function () {
     // Disable the promo bar.
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
     await releaseCoordinator.navigateToMiscTab();
@@ -65,7 +69,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectPromoBarToBeVisible(false);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
