@@ -2649,10 +2649,10 @@ def update_translation_suggestion(
         ]
 
         original_summary_text = (
-            f'Components in original text: {", ".join(original_summary)}.'
+            f'Components in original text: {', '.join(original_summary)}.'
         )
         updated_summary_text = (
-            f'Components in translated text: {", ".join(updated_summary)}.'
+            f'Components in translated text: {', '.join(updated_summary)}.'
         )
 
         # Get truncated versions of both original and translated

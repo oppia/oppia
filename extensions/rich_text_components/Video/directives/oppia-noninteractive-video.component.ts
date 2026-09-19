@@ -46,7 +46,6 @@ import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ServicesConstants} from 'services/services.constants';
-import './video.component.css';
 
 /**
  * The "apiLoaded" variable only changes once during the lifetime of

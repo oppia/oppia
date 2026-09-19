@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import './translatable-html-content-id.component.css';
 
 type TranslatableHtmlContentIdEditorChoices = {val: string}[];
 

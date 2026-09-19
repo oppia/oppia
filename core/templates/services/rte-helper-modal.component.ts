@@ -37,7 +37,6 @@ import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
-import './rte-helper-modal.component.css';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
