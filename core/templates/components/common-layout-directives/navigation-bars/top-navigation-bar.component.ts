@@ -47,11 +47,9 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
