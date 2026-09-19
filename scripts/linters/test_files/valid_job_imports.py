@@ -53,6 +53,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     translation_audit_jobs,
     translation_migration_jobs,
     translation_opportunity_backfill_jobs,
+    user_activities_stale_exploration_cleanup_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
