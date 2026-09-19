@@ -21,6 +21,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
@@ -35,10 +36,12 @@ export class TestInteractionPanel implements OnInit {
   @Input() inputTemplate!: string;
   @Input() stateName!: string;
   interactionIsInline!: boolean;
+  userBlueImgUrl: string = '';
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
-    private explorationStatesService: ExplorationStatesService
+    private explorationStatesService: ExplorationStatesService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   isSubmitButtonDisabled(): boolean {
@@ -50,6 +53,9 @@ export class TestInteractionPanel implements OnInit {
   }
 
   ngOnInit(): void {
+    this.userBlueImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+    );
     let _stateName = this.stateName;
     let _state = this.explorationStatesService.getState(_stateName);
     this.interactionIsInline =

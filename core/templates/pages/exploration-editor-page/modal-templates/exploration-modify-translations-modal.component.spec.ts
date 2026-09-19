@@ -194,6 +194,11 @@ describe('Modify Translations Modal Component', function () {
     expect(component.getLanguageName(languageCode)).toBe('English');
   });
 
+  it('should get translation string for rte output display', () => {
+    expect(component.getTranslationString('translation')).toBe('translation');
+    expect(component.getTranslationString(['a', 'b'])).toBe('');
+  });
+
   it('should update translations from response of translation editor modal', fakeAsync(() => {
     const testTranslation = 'New test translation in Hindi';
     spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');

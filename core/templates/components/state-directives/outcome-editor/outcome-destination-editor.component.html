@@ -19,7 +19,7 @@
              name="newStateNameInput"
              [ngModel]="outcomeNewStateName"
              (ngModelChange)="updateChanges($event)"
-             [oppiaFocusOn]="newStateNameInputField"
+             [oppiaFocusOn]="'newStateNameInputField'"
              [attr.maxlength]="maxLen"
              [pattern]="newStateNamePattern"
              tabindex="0"
@@ -47,7 +47,7 @@
            [(ngModel)]="outcome.missingPrerequisiteSkillId"
            tabindex="0"
            [attr.aria-invalid]="false"
-           [ngModelOptions]="{allowInvalid: true}">
+           [ngModelOptions]="{standalone: true}">
     <p class="oppia-prerequisite-explanation-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
           required material and continue with the exploration.

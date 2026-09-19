@@ -42,7 +42,7 @@
         <button *ngIf="userIsLoggedIn"
                 class="btn btn-success float-end oppia-thread-button oppia-autofocus e2e-test-start-new-thread-button"
                 (click)="showCreateThreadModal()"
-                (focus)="newThreadButton">
+                oppiaFocusOn="newThreadButton">
           Start new thread
         </button>
       </div>
@@ -51,7 +51,7 @@
 
       <div class="oppia-clear"></div>
 
-      <div *ngIf="threadData && threadData.feedbackThreads && threadData.feedbackThreads.length === 0" tabindex="0">
+      <div *ngIf="threadData && threadData.length === 0" tabindex="0">
         <em>No feedback has been given for this exploration yet.</em>
       </div>
       <br>
@@ -89,8 +89,8 @@
 
         <div class="col-lg-4 col-md-4 col-sm-4 float-end">
           <div class="float-end">
-            <span *ngIf="activeThread.stateName" class="badge text-bg-info">
-              state: {{ activeThread.stateName }}
+            <span *ngIf="getActiveThreadStateName()" class="badge text-bg-info">
+              state: {{ getActiveThreadStateName() }}
             </span>
             <span [ngClass]="getLabelClass(activeThread.status)"
                   class="e2e-test-oppia-feedback-status-name">

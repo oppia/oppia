@@ -314,6 +314,21 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  private isFeedbackThread(
+    thread: SuggestionThread | FeedbackThread | null
+  ): thread is FeedbackThread {
+    return thread !== null && 'stateName' in thread;
+  }
+
+  // The active thread can be a feedback thread or a suggestion thread, and only
+  // feedback threads have a state name associated with them.
+  getActiveThreadStateName(): string | null {
+    if (this.isFeedbackThread(this.activeThread)) {
+      return this.activeThread.stateName;
+    }
+    return null;
+  }
+
   isExplorationEditable(): boolean {
     return this.editabilityService.isEditable();
   }
@@ -632,6 +647,14 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   onCreatorFeedbackMessageSend(replyText: string): void {
     this.updateLessonFeedbackReply(replyText);
+  }
+
+  onCreatorFeedbackGithubTransfer(githubIssueUrl: string): void {
+    // This mirrors the behavior of the technical feedback dashboard, which
+    // marks the feedback as transferred to GitHub and opens the issue URL in
+    // a new tab.
+    this.onCreatorFeedbackStatusChange(FeedbackStatus.TRANSFERRED_TO_GITHUB);
+    this.windowRef.nativeWindow.open(githubIssueUrl, '_blank', 'noopener');
   }
 
   getDisplayedCreatorFeedbackSummaries():
