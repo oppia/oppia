@@ -557,16 +557,19 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
-      // The story has 12 published chapters. The first chapter was completed
-      // above, so complete the remaining 11. The Mastery Challenge unlocks
-      // only after every published chapter is completed.
+      // The story has 12 published chapters, and the first chapter was
+      // completed in the second test. The skip flow above marks the earlier
+      // published chapters as skipped, so the loop below repeatedly plays the
+      // next playable chapter in story order and stops as soon as no playable
+      // chapter remains, which is when every publishable chapter has been
+      // completed and the Mastery Challenge unlocks.
       //
       // The CUJ "Lesson Progression" bullets ("Chapter 11 is marked as
       // completed" and "Chapter 12 becomes the next active lesson") are
-      // verified by the last loop iteration below: it completes chapter 11,
-      // checks the completed (✅) indicator, and verifies that chapter 12
-      // becomes the next active lesson.
-      for (let completedCount = 0; completedCount < 10; completedCount++) {
+      // verified by the iteration that completes chapter 11: it checks the
+      // completed (✅) indicator and verifies that chapter 12 becomes the next
+      // active lesson.
+      while (await loggedInLearner.hasNextActiveChapterToPlay()) {
         await loggedInLearner.waitForPageToFullyLoad();
         await loggedInLearner.clickOnActiveChapterStartButton();
         await loggedInLearner.clickOnContinueButtonInInteractionCard();
@@ -585,12 +588,6 @@ describe('Logged-in Learner', function () {
       // with the ✅ indicator, collapse into a compact row, and display the
       // "Play Again" quick action.
       await loggedInLearner.waitForPageToFullyLoad();
-      await loggedInLearner.clickOnActiveChapterStartButton();
-      await loggedInLearner.clickOnContinueButtonInInteractionCard();
-      await loggedInLearner.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
-      await loggedInLearner.openTopicPage('math', 'fractions');
       await loggedInLearner.expectCompletedLessonToBeVisible();
       await loggedInLearner.expectCompletedChapterToBeCollapsed();
     },

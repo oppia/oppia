@@ -5899,6 +5899,48 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Returns whether a not-yet-completed chapter is currently playable, i.e.
+   * its lesson card is present in the DOM (its module is not collapsed into a
+   * skipped-module card) and exposes an enabled Start button or a usable
+   * chevron. The completion loop uses this to stop once every chapter that can
+   * be played has been completed, so that it does not try to play a chapter
+   * that is unreachable after the skip flow.
+   */
+  async hasNextActiveChapterToPlay(): Promise<boolean> {
+    await this.page.waitForTimeout(300);
+    return this.page.evaluate(
+      (
+        lessonWrapperSelector: string,
+        lessonCardSelector: string,
+        startButtonSelector: string,
+        chevronButtonSelector: string,
+        completedClass: string
+      ) => {
+        return Array.from(document.querySelectorAll(lessonWrapperSelector))
+          .map(wrapper => wrapper.querySelector(lessonCardSelector))
+          .some(card => {
+            if (!card || card.classList.contains(completedClass)) {
+              return false;
+            }
+            const startButton = card.querySelector(startButtonSelector);
+            if (startButton && !(startButton as HTMLButtonElement).disabled) {
+              return true;
+            }
+            const chevronButton = card.querySelector(chevronButtonSelector);
+            return Boolean(
+              chevronButton && !chevronButton.hasAttribute('disabled')
+            );
+          });
+      },
+      topicLessonCardWrapperIdSelector,
+      topicLessonCardSelector,
+      topicLessonCardStartButtonSelector,
+      topicLessonCardChevronBadgeSelector,
+      completedLessonClassName
+    );
+  }
+
+  /**
    * Verifies that the timeline displays thematic Arc headers.
    */
   async expectArcTitlesToBeVisibleOnTimeline(): Promise<void> {
