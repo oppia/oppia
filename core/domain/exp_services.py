@@ -73,6 +73,7 @@ from extensions import domain
 
 import deepdiff
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -492,7 +493,10 @@ def get_content_updates_from_cmd_edit_state_property_change(
     if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
         return content_id_to_content_value
 
-    if change.new_value is None:
+    # Here we use type Any because BaseChange dynamically assigns values
+    # at runtime that can differ from the statically declared subtype.
+    new_value: Any = change.new_value
+    if new_value is None:
         return content_id_to_content_value
 
     def add_subtitled_html_from_dict(
@@ -882,10 +886,13 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS
                 ):
-                    if not isinstance(change.new_value, bool):
+                    # Here we use type Any because BaseChange dynamically
+                    # assigns values that require runtime validation here.
+                    solicit_answer_details_value: Any = change.new_value
+                    if not isinstance(solicit_answer_details_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a '
-                            + 'bool, received %s' % change.new_value
+                            + 'bool, received %s' % solicit_answer_details_value
                         )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -901,10 +908,13 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT
                 ):
-                    if not isinstance(change.new_value, bool):
+                    # Here we use type Any because BaseChange dynamically
+                    # assigns values that require runtime validation here.
+                    card_is_checkpoint_value: Any = change.new_value
+                    if not isinstance(card_is_checkpoint_value, bool):
                         raise Exception(
                             'Expected card_is_checkpoint to be a '
-                            + 'bool, received %s' % change.new_value
+                            + 'bool, received %s' % card_is_checkpoint_value
                         )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

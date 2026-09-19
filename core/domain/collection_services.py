@@ -418,14 +418,24 @@ def get_collection_and_collection_rights_by_id(
         )
     )
 
+    # Here we use cast because query result has a generic model type.
+    collection_model = cast(
+        Optional[collection_models.CollectionModel],
+        collection_and_rights[0][0],
+    )
     collection = None
-    if collection_and_rights[0][0] is not None:
-        collection = get_collection_from_model(collection_and_rights[0][0])
+    if collection_model is not None:
+        collection = get_collection_from_model(collection_model)
 
+    # Here we use cast because query result has a generic model type.
+    collection_rights_model = cast(
+        Optional[collection_models.CollectionRightsModel],
+        collection_and_rights[1][0],
+    )
     collection_rights = None
-    if collection_and_rights[1][0] is not None:
+    if collection_rights_model is not None:
         collection_rights = rights_manager.get_activity_rights_from_model(
-            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+            collection_rights_model, constants.ACTIVITY_TYPE_COLLECTION
         )
 
     return (collection, collection_rights)
@@ -1469,10 +1479,10 @@ def save_collection_summary(
         ),
     }
 
-    collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id
-        )
+    collection_summary_model: Optional[
+        collection_models.CollectionSummaryModel
+    ] = collection_models.CollectionSummaryModel.get_by_id(
+        collection_summary.id
     )
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
