@@ -8,11 +8,11 @@
                                    [getCollectionId]="activity.id"
                                    [getCollectionTitle]="activity.title"
                                    [getLastUpdatedMsec]="activity.last_updated_msec"
-                                   [getNodeCount]="activity.node_count"
+                                   [getNodeCount]="(activity.node_count || 0).toString()"
                                    [getObjective]="activity.objective"
                                    [getThumbnailIconUrl]="activity.thumbnail_icon_url"
                                    [getThumbnailBgColor]="activity.thumbnail_bg_color"
-                                   [showLearnerDashboardIconsIfPossible]="true"
+                                   showLearnerDashboardIconsIfPossible="true"
                                    [isContainerNarrow]="libraryWindowIsNarrow"
                                    class="e2e-test-collection-summary-tile">
     </oppia-collection-summary-tile>
@@ -28,7 +28,7 @@
                                     [numViews]="activity.num_views"
                                     [contributorsSummary]="activity.human_readable_contributors_summary"
                                     [isCommunityOwned]="activity.community_owned"
-                                    [showLearnerDashboardIconsIfPossible]="true"
+                                    showLearnerDashboardIconsIfPossible="true"
                                     [isContainerNarrow]="libraryWindowIsNarrow"
                                     [translatedMetadataFields]="activity.translated_metadata_fields || []"
                                     class="e2e-test-exp-summary-tile">

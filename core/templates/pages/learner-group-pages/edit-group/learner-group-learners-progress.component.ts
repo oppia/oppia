@@ -145,11 +145,13 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
 
   /**
    * Opens the submenu.
-   * @param {KeyboardEvent} evt
+   * @param {Event} evt - event that triggered the submenu open action.
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
-    this.navigationService.openSubmenu(evt, menuName);
+  openSubmenu(evt: Event, menuName: string): void {
+    // The submenu-open binding is triggered by a keyboard event, so the
+    // target is always a KeyboardEvent.
+    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
   }
 }

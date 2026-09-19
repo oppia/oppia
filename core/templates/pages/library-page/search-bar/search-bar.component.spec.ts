@@ -252,16 +252,15 @@ describe('Search bar component', () => {
 
   it('should search', () => {
     component.searchButtonIsActive = true;
-    const search = {
-      target: {
-        value: 'search',
-      },
-    };
-    component.searchToBeExec(search);
+    const searchEvent = new Event('input');
+    Object.defineProperty(searchEvent, 'target', {
+      value: {value: 'search'},
+    });
+    component.searchToBeExec(searchEvent);
 
     spyOn(component.searchQueryChanged, 'next');
     component.searchButtonIsActive = false;
-    component.searchToBeExec(search);
+    component.searchToBeExec(searchEvent);
     expect(component.searchQueryChanged.next).toHaveBeenCalled();
   });
 
@@ -296,6 +295,38 @@ describe('Search bar component', () => {
     component.toggleSelection('categories', 'id_1');
     expect(component.updateSelectionDetails).toHaveBeenCalled();
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+  });
+
+  it('should return selected category master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getSelectedCategories()).toEqual([
+      {id: 'id', text: 'category 1'},
+      {id: 'id_2', text: 'category 2'},
+      {id: 'id_3', text: 'category 3'},
+    ]);
+  });
+
+  it('should return deselected category master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    component.selectionDetails.categories.selections = {id: true};
+    expect(component.getDeselectedCategories()).toEqual([
+      {id: 'id_2', text: 'category 2'},
+      {id: 'id_3', text: 'category 3'},
+    ]);
+  });
+
+  it('should return selected language master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getSelectedLanguages()).toEqual([
+      {id: 'en', text: 'English'},
+    ]);
+  });
+
+  it('should return deselected language master list items', () => {
+    component.selectionDetails = selectionDetailsStub;
+    expect(component.getDeselectedLanguages()).toEqual([
+      {id: 'es', text: 'Spanish'},
+    ]);
   });
 
   it('should trigger search query only when dropdown is closed', () => {

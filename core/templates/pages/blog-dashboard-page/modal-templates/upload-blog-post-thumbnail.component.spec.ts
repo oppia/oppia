@@ -146,6 +146,22 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
 
+  it('should get invalid SVG issue url', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    const invalidTagsAndAttrs = {
+      tags: ['circel'],
+      attrs: ['data-name'],
+    };
+    const issueUrl = 'www.example.com';
+    componentInstance.invalidTagsAndAttributes = invalidTagsAndAttrs;
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue(issueUrl);
+
+    expect(componentInstance.getInvalidSvgIssueUrl()).toBe(issueUrl);
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
+  });
+
   it('should confirm thumbnail picutre', () => {
     let pictureDataUrl = 'picture_data';
     componentInstance.cropper = {

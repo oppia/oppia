@@ -51,7 +51,9 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
 
   MAX_CHARS_IN_STORY_DESCRIPTION = AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION;
 
-  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+  allowedBgColors: string[] = [
+    ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story,
+  ];
 
   storyUrlFragmentExists = false;
   hostname = this.windowRef.nativeWindow.location.hostname;

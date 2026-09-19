@@ -148,7 +148,7 @@
              {{ 'I18N_LIBRARY_NO_EXPLORATION_GROUPS' | translate }}
         </div>
         <div class="oppia-library-group"
-             dir="auto"
+             [attr.dir]="'auto'"
              *ngFor="let group of libraryGroups; index as idx"
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
@@ -188,12 +188,12 @@
                                                  [getCollectionTitle]="tile.title"
                                                  [getLastUpdatedMsec]="tile.last_updated_msec"
                                                  [getObjective]="tile.objective"
-                                                 [getNodeCount]="tile.node_count"
+                                                 [getNodeCount]="(tile.node_count || 0).toString()"
                                                  [getCategory]="tile.category"
                                                  [getThumbnailIconUrl]="tile.thumbnail_icon_url"
                                                  [getThumbnailBgColor]="tile.thumbnail_bg_color"
                                                  [isOwnedByCurrentUser]="activitiesOwned.collections[tile.id]"
-                                                 [showLearnerDashboardIconsIfPossible]="true">
+                                                 showLearnerDashboardIconsIfPossible="true">
                   </oppia-collection-summary-tile>
                   <oppia-exploration-summary-tile *ngIf="tile.activity_type == 'exploration'"
                                                   [explorationId]="tile.id"
@@ -207,7 +207,7 @@
                                                   [thumbnailBgColor]="tile.thumbnail_bg_color"
                                                   class="e2e-test-exp-summary-tile"
                                                   [isOwnedByCurrentUser]="activitiesOwned.explorations[tile.id]"
-                                                  [showLearnerDashboardIconsIfPossible]="true"
+                                                  showLearnerDashboardIconsIfPossible="true"
                                                   [translatedMetadataFields]="tile.translated_metadata_fields || []">
                   </oppia-exploration-summary-tile>
                 </div>
@@ -235,11 +235,11 @@
                                              [getCollectionTitle]="activity.title"
                                              [getLastUpdatedMsec]="activity.last_updated_msec"
                                              [getObjective]="activity.objective"
-                                             [getNodeCount]="activity.node_count"
+                                             [getNodeCount]="(activity.node_count || 0).toString()"
                                              [getCategory]="activity.category"
                                              [getThumbnailIconUrl]="activity.thumbnail_icon_url"
                                              [getThumbnailBgColor]="activity.thumbnail_bg_color"
-                                             [showLearnerDashboardIconsIfPossible]="true"
+                                             showLearnerDashboardIconsIfPossible="true"
                                              [isContainerNarrow]="true"
                                              [mobileCutoffPx]="537">
               </oppia-collection-summary-tile>
@@ -254,7 +254,7 @@
                                               [thumbnailIconUrl]="activity.thumbnail_icon_url"
                                               [thumbnailBgColor]="activity.thumbnail_bg_color"
                                               class="e2e-test-exp-summary-tile"
-                                              [showLearnerDashboardIconsIfPossible]="true"
+                                              showLearnerDashboardIconsIfPossible="true"
                                               [isContainerNarrow]="true"
                                               [isOwnedByCurrentUser]="activitiesOwned.explorations[activity.id]"
                                               [mobileCutoffPx]="537">

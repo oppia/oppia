@@ -40,6 +40,7 @@ interface SearchDropDownCategories {
 interface LanguageIdAndText {
   id: string;
   text: string;
+  ariaLabelInEnglish?: string;
 }
 
 @Component({
@@ -101,9 +102,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     return this.searchService.isSearchInProgress();
   }
 
-  searchToBeExec(e: {target: {value: string}}): void {
+  searchToBeExec(e: Event): void {
     if (!this.searchButtonIsActive) {
-      this.searchQueryChanged.next(e.target.value);
+      // The input event is emitted by the search box, so the target is
+      // always an input element.
+      this.searchQueryChanged.next((e.target as HTMLInputElement).value);
     }
   }
 
@@ -135,6 +138,33 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ): void {
     this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
+  }
+
+  // Returns the master list items that are currently selected. These filtered
+  // arrays are iterated in the template so that ngFor first/last reflect the
+  // items actually rendered, which the boundary keyboard handlers rely on.
+  getSelectedCategories(): SearchDropDownCategories[] {
+    return this.selectionDetails.categories.masterList.filter(
+      category => this.selectionDetails.categories.selections[category.id]
+    );
+  }
+
+  getDeselectedCategories(): SearchDropDownCategories[] {
+    return this.selectionDetails.categories.masterList.filter(
+      category => !this.selectionDetails.categories.selections[category.id]
+    );
+  }
+
+  getSelectedLanguages(): LanguageIdAndText[] {
+    return this.selectionDetails.languageCodes.masterList.filter(
+      language => this.selectionDetails.languageCodes.selections[language.id]
+    );
+  }
+
+  getDeselectedLanguages(): LanguageIdAndText[] {
+    return this.selectionDetails.languageCodes.masterList.filter(
+      language => !this.selectionDetails.languageCodes.selections[language.id]
+    );
   }
 
   // Update the description, numSelections and summary fields of the

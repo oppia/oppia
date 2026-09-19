@@ -35,7 +35,7 @@
           <div class="story-node-description">
             <label for="storyNodeDescription" class="form-heading">Chapter description*</label>
             <textarea id="storyNodeDescription" type="text" class="form-control e2e-test-add-chapter-description"
-                      [(ngModel)]="editableDescription" [ngModelOptions]="{standalone: true}" (blur)="updateDescription(editableDescription)" [oppiaFocusOn]="storyNodeDesc"
+                      [(ngModel)]="editableDescription" [ngModelOptions]="{standalone: true}" (blur)="updateDescription(editableDescription)" [oppiaFocusOn]="'storyNodeDesc'"
                       placeholder="Enter the description for the chapter." [maxlength]="MAX_CHARS_IN_CHAPTER_DESCRIPTION">
             </textarea>
             <span class="oppia-input-box-subtitle">

@@ -45,7 +45,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   windowIsNarrow: boolean = false;
-  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
   invalidTagsAndAttributes: {tags: string[]; attrs: string[]} = {
     tags: [],
     attrs: [],
@@ -65,6 +65,15 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     private lazyCssLoaderService: LazyCssLoaderService
   ) {
     super(ngbActiveModal);
+  }
+
+  getIssueURL(invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  }): string {
+    // Expose the issue URL builder to the template without making the
+    // sanitizer service public.
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
   }
 
   initializeCropper(): void {
