@@ -59,7 +59,7 @@
              (keydown.enter)="toggleSelection('categories', item.id)"
              [attr.aria-label]="( item.text | translate ) +  ' selected'"
              tabindex="0"
-             *ngIf="first"
+             *ngIf="first && !last"
              (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
@@ -68,7 +68,17 @@
           <a (click)="toggleSelection('categories', item.id)"
              (keydown.enter)="toggleSelection('categories', item.id)"
              [attr.aria-label]="( item.text | translate ) +  ' selected'"
-             *ngIf="last"
+             tabindex="0"
+             *ngIf="first && last"
+             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
+          </a>
+          <a (click)="toggleSelection('categories', item.id)"
+             (keydown.enter)="toggleSelection('categories', item.id)"
+             [attr.aria-label]="( item.text | translate ) +  ' selected'"
+             *ngIf="!first && last"
              tabindex="0"
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
@@ -100,7 +110,12 @@
                class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
-          <a tabindex="0" (keydown.enter)="toggleSelection('categories', item.id)" (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+          <a tabindex="0"
+             (keydown.enter)="toggleSelection('categories', item.id)"
+             (click)="toggleSelection('categories', item.id)"
+             *ngIf="first && !last"
+             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})"
+             class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.categories.selections[item.id]"
                class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
@@ -109,7 +124,18 @@
           <a tabindex="0"
              (keydown.enter)="toggleSelection('categories', item.id)"
              (click)="toggleSelection('categories', item.id)"
-             *ngIf="last"
+             *ngIf="first && last"
+             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]"
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
+            </i>
+          </a>
+          <a tabindex="0"
+             (keydown.enter)="toggleSelection('categories', item.id)"
+             (click)="toggleSelection('categories', item.id)"
+             *ngIf="!first && last"
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
@@ -155,7 +181,7 @@
              [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
-             *ngIf="first"
+             *ngIf="first && !last"
              (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
@@ -167,7 +193,19 @@
              [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
-             *ngIf="last"
+             *ngIf="first && last"
+             (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
+            </i>
+          </a>
+          <a tabindex="0"
+             [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
+             (keydown.enter)="toggleSelection('languageCodes', item.id)"
+             (click)="toggleSelection('languageCodes', item.id)"
+             *ngIf="!first && last"
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
@@ -203,8 +241,22 @@
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
              [attr.aria-label]="item.ariaLabelInEnglish"
-             *ngIf="first"
+             *ngIf="first && !last"
              (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-deselected">
+              {{ item.text | translate }}
+            </span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
+            </i>
+          </a>
+          <a tabindex="0"
+             (keydown.enter)="toggleSelection('languageCodes', item.id)"
+             (click)="toggleSelection('languageCodes', item.id)"
+             [attr.aria-label]="item.ariaLabelInEnglish"
+             *ngIf="first && last"
+             (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">
               {{ item.text | translate }}
@@ -217,7 +269,7 @@
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              [attr.aria-label]="item.ariaLabelInEnglish"
              (click)="toggleSelection('languageCodes', item.id)"
-             *ngIf="last"
+             *ngIf="!first && last"
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
