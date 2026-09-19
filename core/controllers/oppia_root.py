@@ -20,6 +20,7 @@ import urllib
 
 from core import feconf
 from core.controllers import acl_decorators, base
+from core.domain import feature_flag_services
 
 import webapp2
 from typing import Dict
@@ -39,13 +40,32 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
         url = self.request.uri
+
+        # Feature flags are evaluated here so that they arrive with the initial
+        # page load, instead of requiring a separate blocking request to the
+        # feature flags evaluation handler during frontend bootstrap. This
+        # removes an extra network round-trip and a redundant auth/user lookup.
+        feature_flag_dict = (
+            feature_flag_services.evaluate_all_feature_flag_configs(
+                self.user_id
+            )
+        )
+        render_values: Dict[str, Dict[str, bool]] = {
+            'OPPIA_FEATURE_FLAGS': feature_flag_dict
+        }
+
         if 'explore' in url or 'embed' in url:
             self.render_template(
-                'oppia-root.mainpage.html', iframe_restriction=None
+                'oppia-root.mainpage.html',
+                iframe_restriction=None,
+                values=render_values,
             )
             return
 
-        self.render_template('oppia-root.mainpage.html')
+        self.render_template(
+            'oppia-root.mainpage.html',
+            values=render_values,
+        )
 
 
 class OppiaLightweightRootPage(webapp2.RequestHandler):
@@ -96,12 +116,32 @@ class OppiaLightweightRootPage(webapp2.RequestHandler):
             return
 
         url = self.request.uri
+
+        # Feature flags are evaluated and injected into the HTML so that the
+        # frontend always receives JSON instead of the raw template marker. The
+        # lightweight handler skips authentication, so the evaluation cannot be
+        # per-user; flags are evaluated for a logged-out user (no user lookup,
+        # no Datastore reads), which is identical to the values served to
+        # logged-out visitors. Any user-specific flag assignments are resolved
+        # by the API handlers once the Angular app boots.
+        feature_flag_dict = (
+            feature_flag_services.evaluate_all_feature_flag_configs(None)
+        )
+        render_values: Dict[str, Dict[str, bool]] = {
+            'OPPIA_FEATURE_FLAGS': feature_flag_dict
+        }
+
         if 'explore' in url or 'embed' in url:
             base.render_html_response(
                 self.response,
                 'oppia-root.mainpage.html',
                 iframe_restriction=None,
+                values=render_values,
             )
             return
 
-        base.render_html_response(self.response, 'oppia-root.mainpage.html')
+        base.render_html_response(
+            self.response,
+            'oppia-root.mainpage.html',
+            values=render_values,
+        )
