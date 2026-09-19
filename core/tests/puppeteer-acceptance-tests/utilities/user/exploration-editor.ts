@@ -4367,7 +4367,8 @@ export class ExplorationEditor extends BaseUser {
     const itemElements = await this.page.$$(itemSelector);
 
     for (const item of itemElements) {
-      const itemText = (await item.evaluate(el => el.textContent?.trim())) ?? '';
+      const itemText =
+        (await item.evaluate(el => el.textContent?.trim())) ?? '';
       const shouldBeChecked = correctOptions.includes(itemText);
       const checkbox = await item.$(checkboxSelector);
       if (!checkbox) {
