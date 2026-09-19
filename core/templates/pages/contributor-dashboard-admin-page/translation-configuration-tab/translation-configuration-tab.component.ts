@@ -46,6 +46,12 @@ export class TranslationConfigurationTabComponent implements OnInit {
   // Subset of allAvailableProviders relevant for the currently selected language.
   availableProvidersForLanguage: TranslationProviderOption[] = [];
 
+  // Cached list of languages not yet mapped to a provider, used in the
+  // template via property binding (not a method call) to prevent Angular from
+  // replacing all <option> elements on every change-detection cycle, which
+  // would cause the browser to reset the displayed selection to the first item.
+  unmappedLanguageOptions: LanguageOption[] = [];
+
   selectedLanguage: string = '';
   selectedProvider: string = '';
 
@@ -64,6 +70,7 @@ export class TranslationConfigurationTabComponent implements OnInit {
     this.providerMapping = config.providerMapping;
     this.isAutomaticTranslationEnabled = config.automaticTranslationIsEnabled;
     this.allAvailableProviders = config.availableProviders;
+    this.refreshUnmappedLanguageOptions();
   }
 
   getLanguageName(code: string): string {
@@ -75,13 +82,14 @@ export class TranslationConfigurationTabComponent implements OnInit {
     return match ? match.displayName : providerId;
   }
 
-  // Returns available languages that are not yet mapped to a provider.
-  // Derived from all providers' supported language codes.
-  getUnmappedLanguageOptions(): LanguageOption[] {
+  // Recomputes and caches the list of languages not yet mapped to a provider.
+  // Must be called whenever providerMapping changes so the template property
+  // stays in sync without relying on a method call in the template.
+  private refreshUnmappedLanguageOptions(): void {
     const allOppiaLanguages =
       this.languageUtilService.getAllVoiceoverLanguageCodes();
 
-    return allOppiaLanguages
+    this.unmappedLanguageOptions = allOppiaLanguages
       .filter(code => !(code in this.providerMapping))
       .map(code => ({
         code,
@@ -107,6 +115,7 @@ export class TranslationConfigurationTabComponent implements OnInit {
     this.selectedLanguage = '';
     this.selectedProvider = '';
     this.availableProvidersForLanguage = [];
+    this.refreshUnmappedLanguageOptions();
     await this.saveConfiguration();
   }
 
@@ -114,6 +123,7 @@ export class TranslationConfigurationTabComponent implements OnInit {
     const updated = {...this.providerMapping};
     delete updated[languageCode];
     this.providerMapping = updated;
+    this.refreshUnmappedLanguageOptions();
     await this.saveConfiguration();
   }
 
