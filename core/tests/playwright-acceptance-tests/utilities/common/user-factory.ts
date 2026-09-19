@@ -19,7 +19,7 @@
  */
 
 import {Browser} from '@playwright/test';
-import testConstants from './test-constants';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
@@ -36,6 +36,7 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,12 +53,14 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
   ROLES.TRANSLATION_REVIEWER,
   ROLES.VOICEOVER_SUBMITTER,
+  ROLES.BLOG_POST_EDITOR,
 ];
 
 /**
@@ -176,6 +179,13 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.BLOG_POST_EDITOR:
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -288,11 +298,15 @@ export class UserFactory {
       browser
     );
 
-    superAdminInstance = UserFactory.composeUserWithRoles(user, [
+    const superAdmin = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
     ]);
 
+    await superAdmin.assignRoleToUser('superAdm', ROLES.BLOG_ADMIN);
+    await superAdmin.expectUserToHaveRole('superAdm', ROLES.BLOG_ADMIN);
+
+    superAdminInstance = superAdmin;
     showMessage('Super admin created successfully.');
     return superAdminInstance;
   };

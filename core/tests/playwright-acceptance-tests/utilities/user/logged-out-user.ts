@@ -167,6 +167,7 @@ const diagnosticTestPlayerSelector = 'oppia-diagnostic-test-player';
 const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
 const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
 const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
+const classroomNameHeading = '.e2e-test-classroom-name';
 const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
 const startHereButtonSelector = '.e2e-test-start-here-button';
 const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
@@ -2156,6 +2157,22 @@ export class LoggedOutUser extends BaseUser {
     showMessage(
       `Navigated to classroom page: ${classroomsPageUrl}/${urlFragment}`
     );
+  }
+
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.expectElementToBeVisible(classroomNameHeading);
+
+    const headingText = await this.page.$eval(classroomNameHeading, el =>
+      (el as HTMLHeadingElement).innerText.trim()
+    );
+
+    if (headingText !== classroomName) {
+      throw new Error(
+        `Expected classroom "${classroomName}" but found "${headingText}". URL: ${this.page.url()}`
+      );
+    }
+
+    showMessage(`The ${classroomName} classroom name is visible.`);
   }
 
   /**

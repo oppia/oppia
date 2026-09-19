@@ -69,13 +69,13 @@ test.describe('Logged-Out Learner', function () {
     );
     await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
 
-    await curriculumAdmin.openSkillEditor('fractions');
-    await curriculumAdmin.navigateToSkillQuestionEditorTab();
+    await curriculumAdmin.openSkillEditorInCurriculumAdminPage('fractions');
+    await curriculumAdmin.navigateToSkillQuestionEditorTabInCurriculumAdminPage();
 
     await curriculumAdmin.createQuestionsForSkill('fractions', 10);
 
     // Enable the "Show practice tab to learners" in Topic Editor.
-    await curriculumAdmin.openTopicEditor('Fractions');
+    await curriculumAdmin.openTopicEditorInCurriculumAdminPage('Fractions');
     await curriculumAdmin.togglePracticeTabCheckbox();
     await curriculumAdmin.saveTopicDraft('Fractions');
 
