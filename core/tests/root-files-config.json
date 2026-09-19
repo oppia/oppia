@@ -16,6 +16,7 @@
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/README.md",
     "core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.ts",
+    "core/templates/components/common-layout-directives/common-elements/error-modal.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
     "core/templates/css/shepherd-overrides.css",
