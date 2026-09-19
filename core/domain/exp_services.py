@@ -2395,6 +2395,7 @@ def compute_models_to_put_when_saving_new_exp_version(
                 exploration_id,
                 updated_exploration.get_content_count(),
                 translation_counts,
+                new_translation_models=new_translation_models,
             )
         )
     exp_rights = rights_manager.get_exploration_rights(exploration_id)
