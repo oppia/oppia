@@ -62,7 +62,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
-  @Input() parentExplorationIds!: string;
+  @Input() parentExplorationIds!: string[];
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the

@@ -19,12 +19,12 @@
       <img [src]="profilePicturePngDataUrl" class="conversation-skin-user-avatar rounded-circle" alt="User profile picture">
     </picture>
     <div *ngIf="!data.isHint">
-      <div dir="auto" *ngIf="getShortAnswerHtml()">
+      <div [attr.dir]="'auto'" *ngIf="getShortAnswerHtml()">
         <oppia-interaction-display [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()" class="oppia-popover" #popover="ngbPopover" [autoClose]="false"  classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                     [htmlData]="getShortAnswerHtml()">
         </oppia-interaction-display>
       </div>
-      <div dir="auto" *ngIf="!getShortAnswerHtml()">
+      <div [attr.dir]="'auto'" *ngIf="!getShortAnswerHtml()">
         <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                     [htmlData]="getAnswerHtml()">
         </oppia-interaction-display>
@@ -32,7 +32,7 @@
     </div>
     <div *ngIf="data.isHint">
       <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
-        {{ data.learnerInput | translate }}
+        {{ getLearnerInputAsString() | translate }}
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@
 
     <img class="conversation-skin-oppia-avatar rounded-circle" [src]="oppiaAvatarImageUrl" alt="">
 
-    <div dir="auto">
+    <div [attr.dir]="'auto'">
       <oppia-rte-output-display *ngIf="data.oppiaResponse !== null" [rteString]="data.oppiaResponse" [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
         [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%' : 'inherit')}"
         [ngClass]="getFeedbackAudioHighlightClass()">

@@ -20,7 +20,10 @@
 import {Component, Input} from '@angular/core';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {
+  ExplorationRatings,
+  LearnerExplorationSummary,
+} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -196,6 +199,25 @@ export class ProgressTabComponent {
     this.dropdownEnabled = !this.dropdownEnabled;
   }
 
+  toggledSummaryTiles: Set<LearnerExplorationSummary | CollectionSummary> =
+    new Set();
+
+  getSummaryTileToggleState(
+    summaryTile: LearnerExplorationSummary | CollectionSummary
+  ): boolean {
+    return this.toggledSummaryTiles.has(summaryTile);
+  }
+
+  toggleSummaryTile(
+    summaryTile: LearnerExplorationSummary | CollectionSummary
+  ): void {
+    if (this.toggledSummaryTiles.has(summaryTile)) {
+      this.toggledSummaryTiles.delete(summaryTile);
+    } else {
+      this.toggledSummaryTiles.add(summaryTile);
+    }
+  }
+
   changeSection(section: string): void {
     this.dropdownEnabled = !this.dropdownEnabled;
     this.selectedSection = section;
@@ -274,6 +296,35 @@ export class ProgressTabComponent {
       return 'exploration';
     }
     return 'collection';
+  }
+
+  getRatingsForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): ExplorationRatings {
+    if (tile instanceof LearnerExplorationSummary) {
+      return tile.ratings;
+    }
+    return {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+  }
+
+  getNumViewsForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): number {
+    if (tile instanceof LearnerExplorationSummary) {
+      return tile.numViews;
+    }
+    return 0;
+  }
+
+  getNodeCountForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): string {
+    // The summary tiles expect a string value for the getNodeCount input,
+    // since the node count is displayed as text.
+    if (tile instanceof CollectionSummary) {
+      return tile.nodeCount.toString();
+    }
+    return '0';
   }
 
   changePageByOne(direction: string, section: string): void {

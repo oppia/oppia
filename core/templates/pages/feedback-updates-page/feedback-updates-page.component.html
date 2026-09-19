@@ -118,7 +118,7 @@
                 <span class="oppia-exploration-title">{{ explorationTitle }}</span>
               </td>
             </tr>
-            <tr *ngIf="loadingFeedbacks">
+            <tr *ngIf="loadingFeedback">
               <td class="text-center">
                 <span>
                   Loading
@@ -126,7 +126,7 @@
                 </span>
               </td>
             </tr>
-            <ng-container *ngIf="!loadingFeedbacks">
+            <ng-container *ngIf="!loadingFeedback">
               <tr *ngFor="let message of messageSummaries"
                   class="oppia-message-summaries">
                 <td>
@@ -238,7 +238,7 @@
               <span *ngIf="!loadingIndicatorIsShown">Show more</span>
               <span *ngIf="loadingIndicatorIsShown">
                 <mat-progress-spinner [diameter]="25"
-                                      [mode]="indeterminate"
+                                      [mode]="'indeterminate'"
                                       class="oppia-diagram-spinning-button">
                 </mat-progress-spinner>
               </span>

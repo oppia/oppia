@@ -108,10 +108,31 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   drop(event: CdkDragSortEvent<ParamChange[]>): void {
     moveItemInArray(
-      this.paramChangesService.displayed as ParamChange[],
+      this.displayedParamChanges,
       event.previousIndex,
       event.currentIndex
     );
+  }
+
+  /**
+   * Returns the param changes stored in the given property of the underlying
+   * service. The "displayed" and "savedMemento" properties are typed as a
+   * union of all state property values, but their runtime value is always a
+   * ParamChange[] array. This is the single documented cast point for the
+   * displayedParamChanges and savedParamChanges getters.
+   */
+  private getParamChangesFromService(
+    propertyName: 'displayed' | 'savedMemento'
+  ): ParamChange[] {
+    return this.paramChangesService[propertyName] as ParamChange[];
+  }
+
+  get displayedParamChanges(): ParamChange[] {
+    return this.getParamChangesFromService('displayed');
+  }
+
+  get savedParamChanges(): ParamChange[] {
+    return this.getParamChangesFromService('savedMemento');
   }
 
   openParamChangesEditor(): void {
@@ -161,6 +182,32 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   onChangeGeneratorType(paramChange: ParamChange): void {
     paramChange.resetCustomizationArgs();
+  }
+
+  getCustomizationArgs(paramChange: ParamChange): {
+    value: string;
+    list_of_values: string[];
+  } {
+    // This returns the same customizationArgs object that is stored in the
+    // param change so that the value generator editors can update it in place
+    // via their two-way bindings. The cast is safe because the value generator
+    // editor's input type is a required-fields subset of ParamChange's
+    // customization args, and only the generator-matching field is ever read
+    // or written at runtime.
+    return paramChange.customizationArgs as {
+      value: string;
+      list_of_values: string[];
+    };
+  }
+
+  getHumanReadableArgs(paramChange: ParamChange): string {
+    const customizationArgs = this.getCustomizationArgs(paramChange);
+
+    if (paramChange.generatorId === 'Copier') {
+      return this.HUMAN_READABLE_ARGS_RENDERERS.Copier(customizationArgs);
+    }
+
+    return this.HUMAN_READABLE_ARGS_RENDERERS.RandomSelector(customizationArgs);
   }
 
   areDisplayedParamChangesValid(): boolean {

@@ -44,6 +44,7 @@ import {SchemaFormSubmittedService} from '../../../../services/schema-form-submi
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
+import {SubtitledUnicode} from '../../../../domain/exploration/subtitled-unicode.model';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
@@ -251,5 +252,25 @@ describe('Progress nav component', () => {
     componentInstance.onClickContinueButton();
 
     expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
+  });
+
+  it('should return the continue button text from the interaction args', () => {
+    componentInstance.interactionCustomizationArgs = {
+      buttonText: {value: SubtitledUnicode.createDefault('Next', null)},
+    };
+
+    expect(componentInstance.getContinueButtonText()).toBe('Next');
+  });
+
+  it('should return an empty string if the interaction args are not present', () => {
+    componentInstance.interactionCustomizationArgs = null;
+    expect(componentInstance.getContinueButtonText()).toBe('');
+
+    componentInstance.interactionCustomizationArgs = {
+      placeholder: {value: SubtitledUnicode.createDefault('Enter', null)},
+      rows: {value: 1},
+      catchMisspellings: {value: false},
+    };
+    expect(componentInstance.getContinueButtonText()).toBe('');
   });
 });

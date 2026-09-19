@@ -16,9 +16,9 @@
       <strong>Parameters:</strong>
       <table>
         <tr *ngFor="let item of allParams | keyvalue">
-          <td class="oppia-param-column">{{ item.key.paramName }}:</td>
+          <td class="oppia-param-column">{{ item.key }}:</td>
           <td class="oppia-param-column">
-            {{ item.value.paramValue != "" ? item.value.paramValue : "[Not set]" }}
+            {{ item.value != "" ? item.value : "[Not set]" }}
           </td>
         </tr>
       </table>

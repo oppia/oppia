@@ -28,29 +28,6 @@
       </oppia-pie-chart>
     </div>
   </div>
-
-  <div *ngFor="let vizInfo of visualizationsInfo; index as index">
-    <div [ngSwitch]="vizInfo.id">
-      <oppia-visualization-click-hexbins *ngSwitchCase="'ClickHexbins'"
-                                         [data]="vizInfo.data"
-                                         [interactionArgs]="interactionArgs">
-      </oppia-visualization-click-hexbins>
-      <oppia-visualization-enumerated-frequency-table *ngSwitchCase="'EnumeratedFrequencyTable'"
-                                                      [data]="vizInfo.data"
-                                                      [options]="vizInfo.options"
-                                                      [addressedInfoIsSupported]="vizInfo.addressedInfoIsSupported">
-      </oppia-visualization-enumerated-frequency-table>
-      <oppia-visualization-frequency-table *ngSwitchCase="'FrequencyTable'"
-                                           [data]="vizInfo.data"
-                                           [options]="vizInfo.options"
-                                           [addressedInfoIsSupported]="vizInfo.addressedInfoIsSupported">
-      </oppia-visualization-frequency-table>
-      <oppia-visualization-sorted-tiles *ngSwitchCase="'SortedTiles'"
-                                        [data]="vizInfo.data"
-                                        [options]="vizInfo.options">
-      </oppia-visualization-sorted-tiles>
-    </div>
-  </div>
 </div>
 
 <div class="modal-footer">
