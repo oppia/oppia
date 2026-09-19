@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the donate page root component.
  */
 
-// @ts-nocheck
-
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
