@@ -571,46 +571,70 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         """
 
         class FakeContent:
+            """Fake content object."""
+
             def __init__(self, content_id: str) -> None:
                 self.content_id = content_id
 
         class FakeContentWithoutId:
+            """Fake content without ID."""
+
             pass
 
         class FakeCustomizationArg:
+            """Fake customization argument."""
+
+            # Here we use type Any because the value can be of any type.
             def __init__(self, value: Any, content_ids: List[str]) -> None:
                 self.value = value
                 self._content_ids = content_ids
 
             def get_content_ids(self) -> List[str]:
+                """Return a copy of content IDs."""
                 return list(self._content_ids)
 
         class FakeOutcome:
+            """Fake outcome."""
+
+            # Here we use type Any because the feedback can be of any type.
             def __init__(self, feedback: Any = None) -> None:
                 if feedback is not None:
                     self.feedback = feedback
 
         class FakeAnswerGroup:
+            """Fake answer group."""
+
+            # Here we use type Any because the outcome can be of any type.
             def __init__(self, outcome: Any) -> None:
                 self.outcome = outcome
 
         class FakeHint:
+            """Fake hint."""
+
+            # Here we use type Any because the hint_content can be of any type.
             def __init__(self, hint_content: Any = None) -> None:
                 if hint_content is not None:
                     self.hint_content = hint_content
 
         class FakeSolution:
+            """Fake solution."""
+
+            # Here we use type Any because the explanation can be of any type.
             def __init__(self, explanation: Any = None) -> None:
                 if explanation is not None:
                     self.explanation = explanation
 
         class FakeInteraction:
+            """Fake interaction."""
+
             def __init__(
                 self,
                 customization_args: Dict[str, FakeCustomizationArg],
                 answer_groups: List[FakeAnswerGroup],
+                # Here we use type Any because the default outcome can be of any type.
                 default_outcome: Any,
                 hints: List[FakeHint],
+                # Here we use type Any because the solution can be of any type.
                 solution: Any,
             ) -> None:
                 self.customization_args = customization_args
@@ -620,6 +644,8 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
                 self.solution = solution
 
         class FakeState:
+            """Fake state."""
+
             def __init__(
                 self, content: FakeContent, interaction: FakeInteraction
             ) -> None:
@@ -630,29 +656,29 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         new_id = 'new_id'
         different_id = 'different_id'
 
-        # Customization arg whose content_ids do NOT include old_id
+        # Customization arg whose content_ids do NOT include old_id.
         ca_different_id = FakeCustomizationArg(
             FakeContent(different_id), [different_id]
         )
-        # Customization arg with a primitive value (string)
+        # Customization arg with a primitive value (string).
         ca_primitive_val = FakeCustomizationArg('primitive_string', [old_id])
 
-        # Answer groups testing missing feedback, missing content_id, and different content_id
+        # Answer groups testing missing feedback, missing content_id, and different content_id.
         ag_no_feedback = FakeAnswerGroup(FakeOutcome())
         ag_no_content_id = FakeAnswerGroup(FakeOutcome(FakeContentWithoutId()))
         ag_diff_content_id = FakeAnswerGroup(
             FakeOutcome(FakeContent(different_id))
         )
 
-        # Default outcome testing missing feedback, missing content_id, and different content_id
+        # Default outcome testing missing feedback, missing content_id, and different content_id.
         do_diff_content_id = FakeOutcome(FakeContent(different_id))
 
-        # Hints testing missing hint_content, missing content_id, and different content_id
+        # Hints testing missing hint_content, missing content_id, and different content_id.
         hint_no_content = FakeHint()
         hint_no_content_id = FakeHint(FakeContentWithoutId())
         hint_diff_content_id = FakeHint(FakeContent(different_id))
 
-        # Solution testing missing explanation, missing content_id, and different content_id
+        # Solution testing missing explanation, missing content_id, and different content_id.
         sol_diff_content_id = FakeSolution(FakeContent(different_id))
 
         interaction = FakeInteraction(
@@ -665,7 +691,8 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         state = FakeState(FakeContent(different_id), interaction)
 
         # Execution should proceed smoothly without crashing and skip replacements.
-        delete_duplicate_content_ids_jobs._replace_content_id_in_state(
+        # Here we use cast because the helper expects a State object.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
             cast(state_domain.State, state), old_id, new_id
         )
 
@@ -684,12 +711,13 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
             sol_diff_content_id.explanation.content_id, different_id
         )
 
-        # Test the branch where default_outcome is None
+        # Test the branch where default_outcome is None.
         interaction_no_default = FakeInteraction({}, [], None, [], None)
         state_no_default = FakeState(
             FakeContent(different_id), interaction_no_default
         )
-        delete_duplicate_content_ids_jobs._replace_content_id_in_state(
+        # Here we use cast because the helper expects a State object.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
             cast(state_domain.State, state_no_default), old_id, new_id
         )
         self.assertEqual(state_no_default.content.content_id, different_id)
