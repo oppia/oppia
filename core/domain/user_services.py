@@ -1058,12 +1058,16 @@ def convert_to_user_settings_model(
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
-    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+    user_model: Optional[user_models.UserSettingsModel] = (
+        user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+    )
+
     if user_model is not None:
         user_model.populate(**user_settings_dict)
     else:
-        user_settings_dict['id'] = user_settings.user_id
-        user_model = user_models.UserSettingsModel(**user_settings_dict)
+        user_model = user_models.UserSettingsModel(
+            id=user_settings.user_id, **user_settings_dict
+        )
 
     return user_model
 
@@ -1452,8 +1456,8 @@ def _save_user_auth_details(
 
     # If user auth details entry with the given user_id does not exist, create
     # a new one.
-    user_auth_details_model = auth_models.UserAuthDetailsModel.get_by_id(
-        user_auth_details.user_id
+    user_auth_details_model: Optional[auth_models.UserAuthDetailsModel] = (
+        auth_models.UserAuthDetailsModel.get_by_id(user_auth_details.user_id)
     )
     user_auth_details_dict = user_auth_details.to_dict()
     if user_auth_details_model is not None:
@@ -1461,8 +1465,9 @@ def _save_user_auth_details(
         user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
     else:
-        user_auth_details_dict['id'] = user_auth_details.user_id
-        model = auth_models.UserAuthDetailsModel(**user_auth_details_dict)
+        model = auth_models.UserAuthDetailsModel(
+            id=user_auth_details.user_id, **user_auth_details_dict
+        )
         model.update_timestamps()
         model.put()
 
