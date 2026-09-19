@@ -389,6 +389,8 @@
   "I18N_CONTACT_PAGE_VOLUNTEER_HEADING": "Text for heading of volunteer section on contact page.",
   "I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH": "Text for paragraph of voulnteer section on cantact page.",
   "I18N_CONTINUE_REGISTRATION": "Text displayed on a button that, when clicked, allows the user to continue the signup process.",
+  "I18N_CONTRIBUTOR_DASHBOARD_PAGINATION_OF_TOTAL_PAGES": "Text displaying the total number of pages in the contributor dashboard dropdown pagination, where <[totalPages]> is the total number of pages.",
+  "I18N_CONTRIBUTOR_DASHBOARD_PAGINATION_PAGE": "Text displaying the 'Page' label before the dropdown in the contributor dashboard pagination.",
   "I18N_COOKIE_BANNER_ACKNOWLEDGE": "Text displayed on a button at the bottom of the cookie banner. It allows the user to acknowledge and dismiss the banner.",
   "I18N_COOKIE_BANNER_EXPLANATION": "Text shown in the cookie banner at the bottom of the page.",
   "I18N_CORRECT_FEEDBACK": "Text shown in the congratulatory message shown to the learner when they get a correct answer.",
