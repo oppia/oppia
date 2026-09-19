@@ -136,10 +136,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
-    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -152,10 +149,13 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
+    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.STORY_EDITOR_ARCS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -357,9 +357,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value: (
         (
-            'Enables automatic AI-generated translation suggestions in the.'
+            'Enables automatic AI-generated translation suggestions in the '
             'Contributor Dashboard to assist translators.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
@@ -378,7 +378,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
@@ -386,7 +386,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.STORY_EDITOR_ARCS.value: (
