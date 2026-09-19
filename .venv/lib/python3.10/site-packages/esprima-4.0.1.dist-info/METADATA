@@ -1,0 +1,32 @@
+Metadata-Version: 2.4
+Name: esprima
+Version: 4.0.1
+Summary: ECMAScript parsing infrastructure for multipurpose analysis in Python
+Home-page: https://github.com/Kronuz/esprima-python
+Author: German M. Bravo (Kronuz)
+Author-email: german.mb@gmail.com
+License: BSD License
+Keywords: esprima ecmascript javascript parser ast
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Compilers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Text Processing :: General
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: summary
