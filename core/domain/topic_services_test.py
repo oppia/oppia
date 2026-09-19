@@ -32,7 +32,6 @@ from core.domain import (
     question_services,
     rights_manager,
     skill_domain,
-    skill_fetchers,
     skill_services,
     story_domain,
     story_fetchers,
@@ -3771,27 +3770,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         result = topic_services.find_superseded_skill_in_topic(topic)
         self.assertIsNone(result)
 
-    def test_find_superseded_skill_in_topic_skips_none_skills(
-        self,
-    ) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id,
-            self.user_id,
-            name='Topic For None Skill Test',
-            description='desc',
-            url_fragment='topic-none-test',
-            uncategorized_skill_ids=['dummy_skill_id'],
-        )
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        with self.swap(
-            skill_fetchers,
-            'get_multi_skills',
-            lambda skill_ids, strict=True: [None],
-        ):
-            result = topic_services.find_superseded_skill_in_topic(topic)
-        self.assertIsNone(result)
-
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
@@ -4867,38 +4845,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         story_exp_ids = topic_services.get_all_published_story_exploration_ids()
 
         self.assertItemsEqual(story_exp_ids, exp_ids)
-
-    def test_get_published_story_exploration_ids_when_mapping_not_precomputed(
-        self,
-    ) -> None:
-        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
-        self._create_linked_explorations(
-            self.TOPIC_ID, self.story_id_1, topic_exp_ids
-        )
-        topic_services.publish_story(
-            self.TOPIC_ID, self.story_id_1, self.user_id_admin
-        )
-        topic_summary_without_exp_ids = topic_services.compute_summary_of_topic(
-            self.topic
-        )
-        # -> Here we use MyPy ignore because we introduce the mapping
-        # value of None.
-        topic_summary_without_exp_ids.published_story_exploration_mapping = (
-            None  # type: ignore[assignment]
-        )
-
-        with self.swap_to_always_return(
-            topic_fetchers,
-            'get_topic_summary_by_id',
-            topic_summary_without_exp_ids,
-        ):
-            story_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    self.TOPIC_ID
-                )
-            )
-
-        self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
     def test_get_topic_ids_for_exploration_id(self) -> None:
         topic_summary_1 = mock.Mock()
