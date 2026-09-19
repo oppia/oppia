@@ -1798,6 +1798,21 @@ class TranslationCoordinatorStats:
         self.coordinator_ids = coordinator_ids
         self.coordinators_count = coordinators_count
 
+    def validate(self) -> None:
+        """Validates the TranslationCoordinatorStats domain object."""
+        if not isinstance(self.coordinator_ids, list):
+            raise utils.ValidationError(
+                'Expected coordinator_ids to be a list, received %s.'
+                % (self.coordinator_ids)
+            )
+
+        if self.coordinators_count != len(self.coordinator_ids):
+            raise utils.ValidationError(
+                'Expected coordinators_count to match the number of '
+                'coordinator_ids, but got %d and %d respectively.'
+                % (self.coordinators_count, len(self.coordinator_ids))
+            )
+
     def to_dict(self) -> TranslationCoordinatorStatsDict:
         """Returns a dict representaion of TranslationCoordinatorStats.
 
