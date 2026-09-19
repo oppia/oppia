@@ -2036,7 +2036,7 @@ class ContributorCertificateInfoDict(TypedDict):
     from_date: str
     to_date: str
     team_lead: str
-    contribution_hours: str
+    contribution_hours: float
     contribution_word_count: int
     language: Optional[str]
     certificate_profile_name: str
@@ -2052,7 +2052,7 @@ class ContributorCertificateInfo:
         from_date: str,
         to_date: str,
         team_lead: str,
-        contribution_hours: str,
+        contribution_hours: float,
         contribution_word_count: int,
         language: Optional[str],
         certificate_profile_name: str,
