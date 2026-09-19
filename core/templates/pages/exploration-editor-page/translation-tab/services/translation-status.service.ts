@@ -18,6 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -44,6 +45,7 @@ export class TranslationStatusService {
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
+  PLACEHOLDER_STATUS_COLOR: string = '#CCCCCC';
   // These properties are initialized in the constructor and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -57,6 +59,7 @@ export class TranslationStatusService {
   entityTranslation!: EntityTranslation;
 
   constructor(
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private explorationStatesService: ExplorationStatesService,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
@@ -202,12 +205,26 @@ export class TranslationStatusService {
           AppConstants.COMPONENT_NAME_RULE_INPUT,
           allContentIds
         );
-        this.explorationVoiceoverContentRequiredCount +=
-          allContentIds.length - ruleInputContentIds.length;
-        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
-          allContentIds = allContentIds.filter(function (contentId) {
+        let voiceoverableContentIds = allContentIds.filter(
+          function (contentId) {
             return ruleInputContentIds.indexOf(contentId) < 0;
-          });
+          }
+        );
+        // Voiceovers can only be recorded for text that exists in the active
+        // language. Apply this filter only in voiceover mode so translation
+        // progress counts stay unchanged.
+        if (
+          this.translationTabActiveModeService.isVoiceoverModeActive() &&
+          !this._isVoiceoveringOriginalLanguage()
+        ) {
+          voiceoverableContentIds = voiceoverableContentIds.filter(contentId =>
+            this._hasNonemptyWrittenTranslation(contentId)
+          );
+        }
+        this.explorationVoiceoverContentRequiredCount +=
+          voiceoverableContentIds.length;
+        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+          allContentIds = voiceoverableContentIds;
         }
 
         allContentIds.forEach(contentId => {
@@ -354,9 +371,18 @@ export class TranslationStatusService {
 
   _getAvailableContentIds(): string[] {
     let stateName = this.stateEditorService.getActiveStateName();
-    let contentIds = this.explorationStatesService.getAllContentIdsByStateName(
-      stateName as string
-    ) as string[];
+    let contentIds =
+      this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
+        stateName as string
+      ) as string[];
+    if (
+      this.translationTabActiveModeService.isVoiceoverModeActive() &&
+      !this._isVoiceoveringOriginalLanguage()
+    ) {
+      contentIds = contentIds.filter(contentId =>
+        this._hasNonemptyWrittenTranslation(contentId)
+      );
+    }
     return contentIds;
   }
 
@@ -380,6 +406,13 @@ export class TranslationStatusService {
   }
 
   _getActiveStateContentIdStatusColor(contentId: string): string {
+    if (
+      this.translationTabActiveModeService.isVoiceoverModeActive() &&
+      !this._isVoiceoveringOriginalLanguage() &&
+      !this._hasNonemptyWrittenTranslation(contentId)
+    ) {
+      return this.PLACEHOLDER_STATUS_COLOR;
+    }
     let availabilityStatus =
       this._getActiveStateContentAvailabilityStatus(contentId);
     if (availabilityStatus.available) {
@@ -387,6 +420,30 @@ export class TranslationStatusService {
     } else {
       return this.NO_ASSETS_AVAILABLE_COLOR;
     }
+  }
+
+  _isVoiceoveringOriginalLanguage(): boolean {
+    const originalLanguageCode = this.explorationLanguageCodeService.displayed;
+    if (typeof originalLanguageCode !== 'string' || !originalLanguageCode) {
+      return true;
+    }
+    return (
+      this.translationLanguageService.getActiveLanguageCode() ===
+      originalLanguageCode
+    );
+  }
+
+  _hasNonemptyWrittenTranslation(contentId: string): boolean {
+    if (
+      !this.entityTranslation ||
+      !this.entityTranslation.hasWrittenTranslation(contentId)
+    ) {
+      return false;
+    }
+    const translatedContent = this.entityTranslation.getWrittenTranslation(
+      contentId
+    ) as TranslatedContent;
+    return translatedContent.translation !== '';
   }
 
   _getActiveStateContentIdNeedsUpdateStatus(contentId: string): boolean {

@@ -81,48 +81,50 @@
       </oppia-rte-output-display>
       <h3 tabindex="0">Content</h3>
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block mt-0"
-            *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index"
-            [ngClass]="{'active': activeCustomizationArgContentIndex === index}">
-          <a (click)="changeActiveCustomizationArgContentIndex(index)"
-             (keydown.enter)="changeActiveCustomizationArgContentIndex(index)"
-             tabindex="0"
-             class="oppia-rule-tab oppia-translation-preview-list"
-             [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
-             [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
-            <oppia-response-header [index]="index"
-                                   [defaultOutcome]="true"
-                                   [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                                   [shortSummary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                                   [isActive]="index === activeCustomizationArgContentIndex"
-                                   [showWarning]="contentIdNeedUpdates(caContent.content.contentId)">
-            </oppia-response-header>
-          </a>
-          <div *ngIf="activeCustomizationArgContentIndex === index">
-            <div class="oppia-editor-card-section" *ngIf="caContent.content._html">
-              <span *ngIf="!getRequiredHtml(caContent.content)" class="oppia-placeholder" tabindex="0">
-                {{ getEmptyContentMessage() }}
-              </span>
-              <span>
-                <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                          (click)="onContentClick($event)"
-                                          (keydown.enter)="onContentClick($event)"
-                                          tabindex="0"
-                                          class="oppia-rte-editor"
-                                          [rteString]="getRequiredHtml(caContent.content)">
-                </oppia-rte-output-display>
-              </span>
+        <ng-container *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index">
+          <li class="oppia-rule-block mt-0"
+              *ngIf="!caContent.content.isEmpty()"
+              [ngClass]="{'active': activeCustomizationArgContentIndex === index}">
+            <a (click)="changeActiveCustomizationArgContentIndex(index)"
+               (keydown.enter)="changeActiveCustomizationArgContentIndex(index)"
+               tabindex="0"
+               class="oppia-rule-tab oppia-translation-preview-list"
+               [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
+               [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
+              <oppia-response-header [index]="index"
+                                     [defaultOutcome]="true"
+                                     [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                     [shortSummary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                     [isActive]="index === activeCustomizationArgContentIndex"
+                                     [showWarning]="contentIdNeedUpdates(caContent.content.contentId)">
+              </oppia-response-header>
+            </a>
+            <div *ngIf="activeCustomizationArgContentIndex === index">
+              <div class="oppia-editor-card-section" *ngIf="caContent.content._html">
+                <span *ngIf="!getRequiredHtml(caContent.content)" class="oppia-placeholder" tabindex="0">
+                  {{ getEmptyContentMessage() }}
+                </span>
+                <span>
+                  <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                            (click)="onContentClick($event)"
+                                            (keydown.enter)="onContentClick($event)"
+                                            tabindex="0"
+                                            class="oppia-rte-editor"
+                                            [rteString]="getRequiredHtml(caContent.content)">
+                  </oppia-rte-output-display>
+                </span>
+              </div>
+              <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
+                <span *ngIf="!getRequiredUnicode(caContent.content)" class="oppia-placeholder" tabindex="0">
+                  {{ getEmptyContentMessage() }}
+                </span>
+                <span>
+                  <p tabindex="0">{{ getRequiredUnicode(caContent.content) }}</p>
+                </span>
+              </div>
             </div>
-            <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
-              <span *ngIf="!caContent.content._unicode" class="oppia-placeholder" tabindex="0">
-                {{ getEmptyContentMessage() }}
-              </span>
-              <span>
-                <p tabindex="0">{{ getRequiredUnicode(caContent.content) }}</p>
-              </span>
-            </div>
-          </div>
-        </li>
+          </li>
+        </ng-container>
       </ul>
     </div>
     <div *ngIf="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
@@ -155,44 +157,46 @@
     <div *ngIf="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
-              *ngFor="let answerGroup of stateAnswerGroups; index as index"
-              [ngClass]="{'active': activeAnswerGroupIndex === index}">
-            <a class="oppia-rule-tab e2e-test-feedback-{{ index }} oppia-translation-preview-list"
-               tabindex="0"
-               (keydown.enter)="changeActiveAnswerGroupIndex(index)"
-               (click)="changeActiveAnswerGroupIndex(index)"
-               [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}"
-               [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
-              <oppia-response-header [index]="index"
-                                     [summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
-                                     [shortSummary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
-                                     [isActive]="index === activeAnswerGroupIndex"
-                                     [outcome]="answerGroup.outcome"
-                                     [defaultOutcome]="true"
-                                     [numRules]="answerGroup.rules.length"
-                                     [isResponse]="true"
-                                     [showWarning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
-                                     (navigateToState)="navigateToState($event)">
-              </oppia-response-header>
-            </a>
-            <div *ngIf="activeAnswerGroupIndex === index">
-              <div class="oppia-editor-card-section e2e-test-feedback-{{ index }}-text">
-                <div class="oppia-rule-body-container" tabindex="0">
-                  <span *ngIf="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
-                    {{ getEmptyContentMessage() }}
-                  </span>
-                  <span>
-                    <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                              (click)="onContentClick($event)"
-                                              [rteString]="getRequiredHtml(answerGroup.outcome.feedback)"
-                                              class="oppia-rte-editor">
-                    </oppia-rte-output-display>
-                  </span>
+          <ng-container *ngFor="let answerGroup of stateAnswerGroups; index as index">
+            <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
+                *ngIf="!answerGroup.outcome.feedback.isEmpty()"
+                [ngClass]="{'active': activeAnswerGroupIndex === index}">
+              <a class="oppia-rule-tab e2e-test-feedback-{{ index }} oppia-translation-preview-list"
+                 tabindex="0"
+                 (keydown.enter)="changeActiveAnswerGroupIndex(index)"
+                 (click)="changeActiveAnswerGroupIndex(index)"
+                 [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}"
+                 [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
+                <oppia-response-header [index]="index"
+                                       [summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
+                                       [shortSummary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
+                                       [isActive]="index === activeAnswerGroupIndex"
+                                       [outcome]="answerGroup.outcome"
+                                       [defaultOutcome]="true"
+                                       [numRules]="answerGroup.rules.length"
+                                       [isResponse]="true"
+                                       [showWarning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
+                                       (navigateToState)="navigateToState($event)">
+                </oppia-response-header>
+              </a>
+              <div *ngIf="activeAnswerGroupIndex === index">
+                <div class="oppia-editor-card-section e2e-test-feedback-{{ index }}-text">
+                  <div class="oppia-rule-body-container" tabindex="0">
+                    <span *ngIf="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
+                      {{ getEmptyContentMessage() }}
+                    </span>
+                    <span>
+                      <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                                (click)="onContentClick($event)"
+                                                [rteString]="getRequiredHtml(answerGroup.outcome.feedback)"
+                                                class="oppia-rte-editor">
+                      </oppia-rte-output-display>
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
+            </li>
+          </ng-container>
         </ul>
       </div>
 
@@ -236,38 +240,40 @@
     </div>
     <div *ngIf="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block e2e-test-translation-hint mt-0"
-            *ngFor="let hint of stateHints; index as index"
-            [ngClass]="{'active': activeHintIndex === index}">
-          <a (click)="changeActiveHintIndex(index)"
-             (keydown.enter)="changeActiveHintIndex(index)"
-             tabindex="0"
-             class="oppia-rule-tab e2e-test-hint-{{ index }} oppia-translation-preview-list"
-             [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
-             [ngStyle]="contentIdStatusColorStyle(hint.hintContent.contentId)">
-            <oppia-response-header [index]="index"
-                                   [defaultOutcome]="true"
-                                   [summary]="getSubtitledContentSummary(hint.hintContent)"
-                                   [shortSummary]="getSubtitledContentSummary(hint.hintContent)"
-                                   [isActive]="index === activeHintIndex"
-                                   [showWarning]="contentIdNeedUpdates(hint.hintContent.contentId)">
-            </oppia-response-header>
-          </a>
-          <div *ngIf="activeHintIndex === index">
-            <div class="oppia-editor-card-section e2e-test-hint-{{ index }}-text" tabindex="0">
-              <span *ngIf="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
-                {{ getEmptyContentMessage() }}
-              </span>
-              <span>
-                <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                          (click)="onContentClick($event)"
-                                          [rteString]="getRequiredHtml(hint.hintContent)"
-                                          class="oppia-rte-editor">
-                </oppia-rte-output-display>
-              </span>
+        <ng-container *ngFor="let hint of stateHints; index as index">
+          <li class="oppia-rule-block e2e-test-translation-hint mt-0"
+              *ngIf="!hint.hintContent.isEmpty()"
+              [ngClass]="{'active': activeHintIndex === index}">
+            <a (click)="changeActiveHintIndex(index)"
+               (keydown.enter)="changeActiveHintIndex(index)"
+               tabindex="0"
+               class="oppia-rule-tab e2e-test-hint-{{ index }} oppia-translation-preview-list"
+               [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
+               [ngStyle]="contentIdStatusColorStyle(hint.hintContent.contentId)">
+              <oppia-response-header [index]="index"
+                                     [defaultOutcome]="true"
+                                     [summary]="getSubtitledContentSummary(hint.hintContent)"
+                                     [shortSummary]="getSubtitledContentSummary(hint.hintContent)"
+                                     [isActive]="index === activeHintIndex"
+                                     [showWarning]="contentIdNeedUpdates(hint.hintContent.contentId)">
+              </oppia-response-header>
+            </a>
+            <div *ngIf="activeHintIndex === index">
+              <div class="oppia-editor-card-section e2e-test-hint-{{ index }}-text" tabindex="0">
+                <span *ngIf="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
+                  {{ getEmptyContentMessage() }}
+                </span>
+                <span>
+                  <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                            (click)="onContentClick($event)"
+                                            [rteString]="getRequiredHtml(hint.hintContent)"
+                                            class="oppia-rte-editor">
+                  </oppia-rte-output-display>
+                </span>
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
+        </ng-container>
       </ul>
     </div>
 
