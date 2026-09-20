@@ -28,7 +28,6 @@ import type {
   FeedbackFilterConfig,
   FeedbackFilterState,
 } from 'domain/feedback/feedback.model';
-import './feedback-filter-bar.component.css';
 
 @Component({
   selector: 'oppia-feedback-filter-bar',

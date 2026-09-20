@@ -24,8 +24,6 @@ import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {UtilsService} from 'services/utils.service';
 
-import './oppia-visualization-sorted-tiles.component.css';
-
 @Component({
   selector: 'oppia-visualization-sorted-tiles',
   templateUrl: './oppia-visualization-sorted-tiles.component.html',

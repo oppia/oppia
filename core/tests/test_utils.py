@@ -375,19 +375,19 @@ def swap_is_feature_flag_enabled_function(
 
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
+        user_id: Optional[str] = None,  # pylint: disable=unused-argument
         feature_flag: Optional[  # pylint: disable=unused-argument
             feature_flag_domain.FeatureFlag
         ] = None,
-        user_id: Optional[str] = None,  # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
             feature_flag_name: str. The name of the target feature flag.
-            feature_flag: FeatureFlag|None. The feature flag domain model.
             user_id: str|None. The id of the user, if logged-out user
                 then None.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
@@ -2036,6 +2036,56 @@ class TestBase(unittest.TestCase):
             AssertionError. When dictionaries doesn't match.
         """
         super().assertDictEqual(dict_one, dict_two, msg=msg)
+
+    # Here we use type Any because the values in 'subset' and 'dictionary'
+    # can be of any type.
+    def assertDictContainsSubset(  # pylint: disable=invalid-name
+        self,
+        subset: Mapping[str, Any],
+        dictionary: Mapping[str, Any],
+        msg: Optional[str] = None,
+    ) -> None:
+        """Checks whether the given dictionary contains the given subset of
+        key-value pairs.
+
+        This method was removed from unittest.TestCase in Python 3.12. It is
+        reimplemented here (under its original name) so that call sites
+        elsewhere in the codebase can stay as readable as they were before,
+        rather than being rewritten to use assertEqual with a dict merge.
+
+        Args:
+            subset: Mapping[str, Any]. The key-value pairs that dictionary is
+                expected to contain.
+            dictionary: Mapping[str, Any]. The dictionary to check.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. Dictionary does not contain subset.
+        """
+        missing_keys = []
+        mismatched_items = []
+        for key, value in subset.items():
+            if key not in dictionary:
+                missing_keys.append(key)
+            elif value != dictionary[key]:
+                mismatched_items.append(
+                    '%r, expected: %r, actual: %r'
+                    % (key, value, dictionary[key])
+                )
+
+        if not missing_keys and not mismatched_items:
+            return
+
+        standard_msg = ''
+        if missing_keys:
+            standard_msg += 'Missing: %r' % (missing_keys,)
+        if mismatched_items:
+            if standard_msg:
+                standard_msg += '; '
+            standard_msg += 'Mismatched values: %s' % (
+                ', '.join(mismatched_items)
+            )
+        self.fail(self._formatMessage(msg, standard_msg))
 
     # Here we use type Any because the method 'assertItemsEqual' can accept any
     # kind of iterables to compare them against each other, and these iterables
