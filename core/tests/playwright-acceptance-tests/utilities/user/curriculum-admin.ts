@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
 
 const baseURL = testConstants.URLs.BaseURL;
+const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
