@@ -161,6 +161,53 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assertEqual(state1_updated.content.content_id, original_content_id)
         self.assertEqual(state2_updated.content.content_id, 'content_2')
 
+    def test_fix_job_handles_collision_during_regeneration(self) -> None:
+        """Test that the fix job retries generation if the new ID is taken."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='Test Exploration', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2', 'State3'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        # Duplicate ID on Introduction and State2
+        duplicate_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        state1.content.content_id = duplicate_id
+        state2.content.content_id = duplicate_id
+
+        # Collision ID on State3 (which would be generated next)
+        collision_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        state3.content.content_id = collision_id
+
+        # Reset the index to force the generator to generate the duplicate
+        # and then the collision ID before finding a unique one.
+        exploration.next_content_id_index = 0
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_id (version 1) - regenerated content '
+                    f'IDs: [\'{duplicate_id} -> content_2 in State2\']'
+                )
+            ]
+        )
+
+        updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        self.assertEqual(
+            updated_exploration.states['State2'].content.content_id, 'content_2'
+        )
+
     def test_generate_matching_content_id_preserves_solution_prefix(
         self,
     ) -> None:
@@ -184,6 +231,16 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
 
         self.assertEqual(regenerated_content_id, 'ca_choices_7')
+
+    def test_generate_matching_content_id_for_short_customization_arg(
+        self,
+    ) -> None:
+        """Test that short customization arg IDs fallback properly."""
+        content_id_generator = translation_domain.ContentIdGenerator(5)
+        regenerated_content_id = delete_duplicate_content_ids_jobs._generate_matching_content_id(  # pylint: disable=protected-access
+            'ca_2', content_id_generator
+        )
+        self.assertEqual(regenerated_content_id, 'ca_5')
 
     def test_generate_matching_content_id_for_unrecognized_prefix(self) -> None:
         """Test that unknown IDs default to regular content_* IDs."""
@@ -369,14 +426,28 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
                 self.hints = hints
                 self.solution = solution
 
+        class FakeRecordedVoiceovers:
+            def __init__(self, mapping: Dict[str, str]) -> None:
+                self.voiceovers_mapping = mapping
+
+        class FakeWrittenTranslations:
+            def __init__(self, mapping: Dict[str, str]) -> None:
+                self.translations_mapping = mapping
+
         class FakeState:
             """State stub bundling content and interaction."""
 
             def __init__(
-                self, content: FakeContent, interaction: FakeInteraction
+                self,
+                content: FakeContent,
+                interaction: FakeInteraction,
+                recorded_voiceovers: FakeRecordedVoiceovers,
+                written_translations: FakeWrittenTranslations,
             ) -> None:
                 self.content = content
                 self.interaction = interaction
+                self.recorded_voiceovers = recorded_voiceovers
+                self.written_translations = written_translations
 
         duplicate_id = 'duplicate_id'
         replacement_id = 'replacement_id'
@@ -398,7 +469,12 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
             [FakeHint(duplicate_id)],
             FakeSolution(duplicate_id),
         )
-        state = FakeState(FakeContent(duplicate_id), interaction)
+        state = FakeState(
+            FakeContent(duplicate_id),
+            interaction,
+            FakeRecordedVoiceovers({duplicate_id: 'voice'}),
+            FakeWrittenTranslations({duplicate_id: 'translation'}),
+        )
 
         # Here we use cast because FakeState mimics State without inheriting
         # from it; the helper expects a State instance.
@@ -431,6 +507,15 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             interaction.solution.explanation.content_id, replacement_id
+        )
+        self.assertNotIn(duplicate_id, state.recorded_voiceovers.voiceovers_mapping)
+        self.assertEqual(
+            state.recorded_voiceovers.voiceovers_mapping[replacement_id], 'voice'
+        )
+        self.assertNotIn(duplicate_id, state.written_translations.translations_mapping)
+        self.assertEqual(
+            state.written_translations.translations_mapping[replacement_id],
+            'translation',
         )
 
     def test_replace_content_id_in_state_handles_missing_interaction(
@@ -486,11 +571,23 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
 
             pass
 
+        class FakeOutcomeWithNonMatchingFeedback:
+            """Outcome stub with non-matching feedback."""
+
+            def __init__(self) -> None:
+                self.feedback = FakeContent('other_outcome_id')
+
         class FakeAnswerGroup:
             """Answer group stub with outcome lacking feedback."""
 
             def __init__(self) -> None:
                 self.outcome = FakeOutcomeWithoutFeedback()
+
+        class FakeAnswerGroupWithNonMatchingOutcome:
+            """Answer group stub with non-matching outcome."""
+
+            def __init__(self) -> None:
+                self.outcome = FakeOutcomeWithNonMatchingFeedback()
 
         class FakeHintWithoutContent:
             """Hint stub without hint_content field."""
@@ -518,8 +615,10 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
                         {'nested': FakeContent('other')}
                     )
                 }
-                self.answer_groups = [FakeAnswerGroup()]
-                self.default_outcome = None
+                self.answer_groups = [
+                    FakeAnswerGroup(), FakeAnswerGroupWithNonMatchingOutcome()
+                ]
+                self.default_outcome = FakeOutcomeWithNonMatchingFeedback()
                 self.hints = [FakeHintWithoutContent(), FakeHint()]
                 self.solution = FakeSolution()
 
@@ -559,3 +658,10 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(empty_dict, {})
+
+    def test_replace_content_id_in_value_handles_primitives(self) -> None:
+        """Test that helper ignores primitives like strings safely."""
+        delete_duplicate_content_ids_jobs._replace_content_id_in_value(  # pylint: disable=protected-access
+            'some string', 'old', 'new'
+        )
+
