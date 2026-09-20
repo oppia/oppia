@@ -715,6 +715,7 @@ export class TopicManager extends BaseUser {
     if (!isFirstTopic) {
       TopicSelectorElement = await this.expectElementToBeVisible(
         desktopTopicSelector,
+        true,
         this.page,
         10000
       );
