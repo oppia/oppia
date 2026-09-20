@@ -290,6 +290,46 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch opportunities count data with specific entityType', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi', 'skill')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should omit entity_type from opportunities count request when entityType is all', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi', 'all')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should fail to fetch the opportunities count data on error', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
