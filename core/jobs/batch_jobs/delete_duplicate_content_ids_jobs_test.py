@@ -176,14 +176,14 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
 
-        # Duplicate ID on Introduction and State2
+        # Duplicate ID on Introduction and State2.
         duplicate_id = content_id_generator.generate(
             translation_domain.ContentType.CONTENT
         )
         state1.content.content_id = duplicate_id
         state2.content.content_id = duplicate_id
 
-        # Collision ID on State3 (which would be generated next)
+        # Collision ID on State3 (which would be generated next).
         collision_id = content_id_generator.generate(
             translation_domain.ContentType.CONTENT
         )
@@ -427,10 +427,14 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
                 self.solution = solution
 
         class FakeRecordedVoiceovers:
+            """Stub for recorded voiceovers."""
+
             def __init__(self, mapping: Dict[str, str]) -> None:
                 self.voiceovers_mapping = mapping
 
         class FakeWrittenTranslations:
+            """Stub for written translations."""
+
             def __init__(self, mapping: Dict[str, str]) -> None:
                 self.translations_mapping = mapping
 
@@ -664,4 +668,3 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         delete_duplicate_content_ids_jobs._replace_content_id_in_value(  # pylint: disable=protected-access
             'some string', 'old', 'new'
         )
-
