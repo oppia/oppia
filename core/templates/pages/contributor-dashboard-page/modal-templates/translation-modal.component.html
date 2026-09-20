@@ -121,9 +121,7 @@
       </div>
     </div>
     <div class="oppia-translation-error-section">
-      <p *ngIf="hasImageInAutoTranslation && !hasAltTextModalBeenOpened">
-        Please verify that no alt text is required or that the translated alt text is accurate.
-      </p>
+
       <div *ngIf="isFormulaAsText(activeWrittenTranslation)" class="alert alert-warning e2e-test-formula-as-text-warning d-flex justify-content-between"
            [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
         <div *ngIf="!mathWarningIsMinimized">
