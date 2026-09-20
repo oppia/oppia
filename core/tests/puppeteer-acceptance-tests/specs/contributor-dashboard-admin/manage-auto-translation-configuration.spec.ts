@@ -56,11 +56,6 @@ describe('Contributor Dashboard Admin - Translation Configuration', function () 
     // Verify mapping was added.
     let rowCount = await superAdmin.getProviderMappingRowCount();
     expect(rowCount).toBeGreaterThan(0);
-<<<<<<< HEAD
-
-    // 4. Remove the mapping.
-    await superAdmin.removeTranslationProviderMapping('hi');
-=======
     await superAdmin.expectTranslationProviderMappingToBePresent(
       'hi',
       'Google Cloud Translate'
@@ -69,7 +64,6 @@ describe('Contributor Dashboard Admin - Translation Configuration', function () 
     // 4. Remove the mapping.
     await superAdmin.removeTranslationProviderMapping('hi');
     await superAdmin.expectTranslationProviderMappingToBeAbsent('hi');
->>>>>>> upstream/develop
   });
 
   afterAll(async function () {
