@@ -134,7 +134,6 @@ describe('AssessmentIntroductionCardComponent', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       12,
-      60,
       [
         'Understanding of numbers and their relationships',
         'Ability to perform basic arithmetic accurately',
@@ -192,7 +191,7 @@ describe('AssessmentIntroductionCardComponent', () => {
     await fixture.whenStable();
 
     expect(component.recommendedTopicSummaries).toEqual([]);
-    expect(component.isLoadingTopics).toBeFalse();
+    expect(component.isLoadingTopics).toBe(false);
   });
 
   it('should expose the correct i18n key for the demonstrates heading', () => {

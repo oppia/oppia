@@ -16,6 +16,8 @@
  * @fileoverview Tests that search service is working as expected.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

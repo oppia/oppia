@@ -1,8 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
 
 topic-viewer-page .topic-viewer-page-content .oppia-page-card {
   border-radius: 0.25em;
@@ -47,6 +42,7 @@ topic-viewer-page-root .topic-viewer-page-content {
 
 topic-viewer-page-root .oppia-navbar {
   box-shadow: none;
+  top: 0;
 }
 
 topic-viewer-page-root .oppia-topic-viewer-container .background-banner-position {

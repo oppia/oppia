@@ -29,7 +29,7 @@ import types
 
 from core.tests import test_utils
 
-from typing import Final, List, Optional, Tuple, Type
+from typing import Dict, Final, List, Optional, Tuple, Type
 
 from . import (
     clean,
@@ -117,11 +117,22 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False,
         }
         self.print_arr: List[str] = []
+        self.all_cmd_tokens: List[List[str]] = []
+        self.all_envs: List[Optional[Dict[str, str]]] = []
 
         def mock_check_call(
-            unused_cmd_tokens: List[str], **_kwargs: str
+            unused_cmd_tokens: List[str],
+            env: Optional[Dict[str, str]] = None,
+            **_kwargs: str,
         ) -> Ret:
             self.check_function_calls['check_call_is_called'] = True
+            # The mock records every command that install_third_party_libs
+            # runs. Tests that only care about the yarn install command still
+            # receive all other commands here (e.g. the pre-commit hook setup
+            # and git-clang-format), so these records are unused by those
+            # tests and are looked up via self.all_cmd_tokens.index().
+            self.all_cmd_tokens.append(unused_cmd_tokens)
+            self.all_envs.append(env)
             return Ret(0, (b'', b''))
 
         def mock_check_call_error(*args: str) -> None:
@@ -185,7 +196,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_external_script_call() -> None:
             pass
 
-        def mock_mkdir(unused_path: str) -> None:
+        def mock_mkdir(unused_path: str, unused_mode: int = 0o777) -> None:
             pass
 
         def mock_copytree(unused_src: str, unused_dst: str) -> None:
@@ -258,6 +269,24 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                                 install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        yarn_install_command = ['yarn', 'install', '--pure-lockfile']
+        self.assertIn(yarn_install_command, self.all_cmd_tokens)
+        yarn_install_index = self.all_cmd_tokens.index(yarn_install_command)
+        self.assertNotIn(
+            '--ignore-engines', self.all_cmd_tokens[yarn_install_index]
+        )
+        yarn_install_env = self.all_envs[yarn_install_index]
+        self.assertIsNotNone(yarn_install_env)
+        assert yarn_install_env is not None
+        expected_node_20_bin_path = os.path.join(
+            common.LIGHTHOUSE_NODE_PATH, 'bin'
+        )
+        self.assertTrue(
+            yarn_install_env['PATH'].startswith(
+                '%s%s' % (expected_node_20_bin_path, os.pathsep)
+            )
+        )
 
     def test_clean_pyc_files_removes_pyc_files(self) -> None:
         check_file_removals = {'root/file1.js': False, 'root/file2.pyc': False}
@@ -503,12 +532,12 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro']
         )
-        self.version_info_py310_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=10, micro=16)
+        self.version_info_py3_12_13_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=12, micro=13)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py310_swap:
+        with self.version_info_py3_12_13_swap:
             install_third_party_libs.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -567,9 +596,7 @@ class SetupTests(test_utils.GenericTestBase):
             check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:
@@ -918,9 +945,7 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:
@@ -1022,9 +1047,7 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             self.check_function_calls['open_is_called'] = True
             return temp_file
 
-        def mock_extractall(  # pylint: disable=unused-argument
-            unused_self: str, path: str
-        ) -> None:
+        def mock_extractall(*unused_args: str, **unused_kwargs: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         def mock_close(unused_self: str) -> None:

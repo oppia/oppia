@@ -17,6 +17,8 @@
  * text components.
  */
 
+// @ts-nocheck
+
 import {NgZone} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';

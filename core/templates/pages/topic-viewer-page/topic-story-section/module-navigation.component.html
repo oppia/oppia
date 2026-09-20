@@ -1,0 +1,116 @@
+<div class="module-navigation-container"
+     *ngIf="moduleGroups.length > 0"
+     [style.top]="isInTopicEditorPreview ? '126px' : '56px'">
+  <p *ngIf="hasHorizontalOverflow" class="module-navigation-hint">
+    <span class="module-navigation-hint-arrow">&#8592;</span>
+    {{ 'I18N_TOPIC_VIEWER_NAVIGATION_HINT' | translate }}
+    <span class="module-navigation-hint-arrow">&#8594;</span>
+  </p>
+
+  <div class="module-navigation-scroll-area">
+    <button class="module-navigation-arrow module-navigation-arrow--left"
+            *ngIf="showLeftArrow"
+            (click)="scrollLeft()"
+            [attr.aria-label]="'I18N_TOPIC_VIEWER_SCROLL_LEFT' | translate"
+            type="button">
+      <i class="material-icons">chevron_left</i>
+    </button>
+
+    <div class="module-navigation-wrapper"
+         [class.module-navigation-wrapper--centered]="!hasHorizontalOverflow"
+         [class.module-navigation-wrapper--overflow]="hasHorizontalOverflow"
+         #scrollWrapper
+         (scroll)="onScroll()">
+      <div class="module-navigation-group" *ngFor="let moduleGroup of moduleGroups; index as moduleIdx">
+        <div class="module-navigation-group-pill"
+             [ngStyle]="{'border-color': moduleGroup.accentColor, 'grid-column': '1 / ' + (moduleGroup.lessons.length + (moduleGroup.showPractice ? 1 : 0) + 1)}">
+        </div>
+
+        <topic-module-circle-badge *ngFor="let lesson of moduleGroup.lessons; index as i"
+                                   [label]="lesson.lessonNumber.toString()"
+                                   [iconName]="''"
+                                   [size]="'sm'"
+                                   [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? moduleGroup.accentColor : '#fff'"
+                                   [borderColor]="moduleGroup.accentColor"
+                                   [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : moduleGroup.accentColor"
+                                   class="module-navigation-clickable"
+                                   [style.grid-column]="i + 1"
+                                   [style.grid-row]="1"
+                                   (click)="onLessonClick(lesson.lessonNumber, moduleIdx)"
+                                   [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
+                                   [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_LESSON' | translate: {lessonNumber: lesson.lessonNumber}"
+                                   role="button"
+                                   tabindex="0"
+                                   (keydown.enter)="onLessonClick(lesson.lessonNumber, moduleIdx)"
+                                   (keydown.space)="onLessonClick(lesson.lessonNumber, moduleIdx); $event.preventDefault()">
+        </topic-module-circle-badge>
+
+        <topic-module-circle-badge *ngIf="moduleGroup.showPractice"
+                                   [iconName]="getPracticeBadgeIconName()"
+                                   [title]="'I18N_TOPIC_VIEWER_PRACTICE_TEST_BUTTON' | translate"
+                                   [size]="'sm'"
+                                   [backgroundColor]="isActivePractice(moduleGroup.arcId) ? moduleGroup.accentColor : '#fff'"
+                                   [borderColor]="moduleGroup.accentColor"
+                                   [textColor]="isActivePractice(moduleGroup.arcId) ? '#fff' : moduleGroup.accentColor"
+                                   class="module-navigation-clickable"
+                                   [style.grid-column]="moduleGroup.lessons.length + 1"
+                                   [style.grid-row]="1"
+                                   (click)="onPracticeClick(moduleGroup.arcId)"
+                                   [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
+                                   [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
+                                   role="button"
+                                   tabindex="0"
+                                   (keydown.enter)="onPracticeClick(moduleGroup.arcId)"
+                                   (keydown.space)="onPracticeClick(moduleGroup.arcId); $event.preventDefault()">
+        </topic-module-circle-badge>
+
+        <span *ngFor="let lesson of moduleGroup.lessons; index as i"
+              class="module-navigation-progress-dot"
+              [class.module-navigation-progress-dot--completed]="lesson.isCompleted"
+              [class.module-navigation-progress-dot--first]="i === 0"
+              [class.module-navigation-progress-dot--line-completed]="i > 0 && moduleGroup.lessons[i - 1].isCompleted"
+              [style.grid-column]="i + 1"
+              [style.grid-row]="2"
+              [ngStyle]="{'border-color': (lesson.isCompleted || isActiveLesson(lesson.lessonNumber)) ? '#27a844' : '#c9c9c9'}">
+          <i *ngIf="lesson.isCompleted" class="material-icons">check</i>
+        </span>
+
+        <span *ngIf="moduleGroup.showPractice"
+              class="module-navigation-progress-dot"
+              [class.module-navigation-progress-dot--completed]="moduleGroup.isPracticeCompleted"
+              [class.module-navigation-progress-dot--line-completed]="isLastLessonCompleted(moduleGroup)"
+              [style.grid-column]="moduleGroup.lessons.length + 1"
+              [style.grid-row]="2"
+              [ngStyle]="{'border-color': (moduleGroup.isPracticeCompleted || isActivePractice(moduleGroup.arcId)) ? '#27a844' : '#c9c9c9'}">
+          <i *ngIf="moduleGroup.isPracticeCompleted" class="material-icons">check</i>
+        </span>
+      </div>
+
+      <div class="module-navigation-mastery-group">
+        <topic-module-circle-badge class="module-navigation-mastery"
+                                   [iconName]="'emoji_events'"
+                                   [size]="'sm'"
+                                   [backgroundColor]="'#fff7e8'"
+                                   [borderColor]="'#f5a623'"
+                                   [textColor]="'#f5a623'"
+                                   [class.module-navigation-clickable]="true"
+                                   (click)="onMasteryClick()"
+                                   [attr.aria-label]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                   [attr.title]="'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_NAV_ARIA_LABEL' | translate"
+                                   role="button"
+                                   tabindex="0"
+                                   (keydown.enter)="onMasteryClick()"
+                                   (keydown.space)="onMasteryClick(); $event.preventDefault()">
+        </topic-module-circle-badge>
+      </div>
+    </div>
+
+    <button class="module-navigation-arrow module-navigation-arrow--right"
+            *ngIf="showRightArrow"
+            (click)="scrollRight()"
+            [attr.aria-label]="'I18N_TOPIC_VIEWER_SCROLL_RIGHT' | translate"
+            type="button">
+      <i class="material-icons">chevron_right</i>
+    </button>
+  </div>
+</div>
