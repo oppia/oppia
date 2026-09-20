@@ -14,6 +14,8 @@
 
 """Controllers for the cron jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf
@@ -56,7 +58,7 @@ class CronModelsCleanupHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Cron handler that hard-deletes all models that were marked as deleted
         (have deleted field set to True) more than some period of time ago.
         Also, for some types of models (that we shouldn't keep for long time)
@@ -78,7 +80,7 @@ class CronUserDeletionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -99,7 +101,7 @@ class CronFullyCompleteUserDeletionHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -122,7 +124,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Sends each reviewer an email with up to
         suggestion_services.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER
         suggestions that have been waiting the longest for review, based on
@@ -166,7 +168,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Sends each admin up to two emails: an email to alert the admins that
         there are suggestion types that need more reviewers and/or an email
         to alert the admins that specific suggestions have been waiting too long
@@ -232,7 +234,7 @@ class CronMailReviewerNewSuggestionsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
@@ -301,7 +303,7 @@ class CronAppFeedbackReportsScrubberHandlerPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests to scrub reports. This cron handler scrubs all
         app feedback report models that are expiring; expired reports have a
         created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
@@ -322,7 +324,7 @@ class CronDashboardStatsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
@@ -341,7 +343,7 @@ class CronExplorationRecommendationsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
@@ -360,7 +362,7 @@ class CronActivitySearchRankHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob
@@ -377,7 +379,7 @@ class CronBlogPostSearchRankHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
@@ -397,7 +399,7 @@ class CronMailChapterPublicationsNotificationsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Sends each curriculum admin mail to notify them about behind schedule
         and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS days)
         chapter launches.
@@ -432,7 +434,7 @@ class CronMarkStaleCloudTaskRunModelsAsFailedHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedJob
@@ -449,7 +451,7 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:  # pylint: disable=arguments-differ
+    def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
