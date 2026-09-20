@@ -713,15 +713,11 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     let TopicSelectorElement = null;
     if (!isFirstTopic) {
-      try {
-        TopicSelectorElement = await this.expectElementToBeAttachedInDOM(
-          desktopTopicSelector,
-          this.page,
-          10000
-        );
-      } catch {
-        // Element didn't appear in 10 seconds — treat as not present.
-      }
+      TopicSelectorElement = await this.expectElementToBeVisible(
+        desktopTopicSelector,
+        this.page,
+        10000
+      );
     }
 
     if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
