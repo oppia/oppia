@@ -1,0 +1,52 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.result-card-topics-heading {
+  color: #222;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.topic-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.topic-row-name {
+  color: #333;
+  flex: 0 0 auto;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.topic-row-bar {
+  background: var(--oppia-track-gray, #dbe7e5);
+  border-radius: 4px;
+  flex: 1 1 auto;
+  height: 12px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.topic-row-bar-fill {
+  background: var(--oppia-result-accent, var(--oppia-teal-dark, #00645c));
+  border-radius: 4px;
+  height: 100%;
+}
+
+.topic-row-value {
+  color: #333;
+  flex: 0 0 40px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .topic-row {
+    gap: 6px;
+  }
+}

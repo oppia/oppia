@@ -33,6 +33,21 @@
   color: #fff;
 }
 
+.oppia-feedback-chip-submitted {
+  background: #ffc107;
+  color: #212529;
+}
+
+.oppia-feedback-chip-reviewed_by_team {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+.oppia-feedback-chip-lesson_updated {
+  background: rgba(0, 100, 92, 0.14);
+  color: #00645c;
+}
+
 .oppia-feedback-chip-typo {
   background: #e3f2fd;
   color: #1565c0;

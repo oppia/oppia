@@ -1,0 +1,23 @@
+<div class="oppia-feedback-detail-section">
+  <div class="oppia-feedback-detail-section-header"
+       [class.oppia-feedback-detail-section-header-collapsible]="isCollapsible"
+       (click)="toggleCollapse()">
+    <i [ngClass]="['oppia-feedback-detail-section-icon', iconClass]">
+    </i>
+    <span class="oppia-feedback-detail-section-heading">
+      {{ heading }}
+    </span>
+    <i *ngIf="isCollapsible"
+       [ngClass]="[
+        'oppia-feedback-detail-section-toggle',
+        'fas',
+        isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'
+      ]">
+    </i>
+  </div>
+  <div class="oppia-feedback-detail-section-body"
+       *ngIf="!isCollapsed">
+    <ng-content>
+    </ng-content>
+  </div>
+</div>

@@ -21,9 +21,11 @@ import json
 from core import feconf
 from core.domain import (
     skill_domain,
+    skill_fetchers,
     skill_services,
     state_domain,
     translation_domain,
+    translation_services,
     user_services,
 )
 from core.tests import test_utils
@@ -127,6 +129,169 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             '<p>Skill Explanation 1</p>',
             json_response['concept_card_dicts'][1]['explanation']['html'],
         )
+
+    def _add_explanation_translation(
+        self,
+        skill_id: str,
+        language_code: str,
+        translation_html: str,
+        needs_update: bool = False,
+    ) -> None:
+        """Adds a translation of the skill's explanation.
+
+        Args:
+            skill_id: str. The ID of the skill to translate.
+            language_code: str. The language to translate into.
+            translation_html: str. The translated explanation.
+            needs_update: bool. Whether the translation is stale.
+        """
+        skill = skill_fetchers.get_skill_by_id(skill_id)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.SKILL,
+            skill_id,
+            skill.version,
+            language_code,
+            skill.skill_contents.explanation.content_id,
+            translation_domain.TranslatedContent(
+                translation_html,
+                translation_domain.TranslatableContentFormat.HTML,
+                needs_update,
+            ),
+        )
+
+    def test_get_concept_cards_in_a_translated_language(self) -> None:
+        self._add_explanation_translation(
+            self.skill_id, 'es', '<p>Explicación de la habilidad</p>'
+        )
+
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id, self.skill_id_1]),
+            ),
+            params={'language_code': 'es'},
+        )
+
+        self.assertEqual(
+            '<p>Explicación de la habilidad</p>',
+            json_response['concept_card_dicts'][0]['explanation']['html'],
+        )
+        # The second skill has no translation, so it stays in English.
+        self.assertEqual(
+            '<p>Skill Explanation 1</p>',
+            json_response['concept_card_dicts'][1]['explanation']['html'],
+        )
+
+    def test_get_concept_cards_translates_the_skill_description(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.skill_id)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.SKILL,
+            self.skill_id,
+            skill.version,
+            'es',
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            translation_domain.TranslatedContent(
+                'Descripcion de la habilidad',
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                False,
+            ),
+        )
+
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id, self.skill_id_1]),
+            ),
+            params={'language_code': 'es'},
+        )
+
+        self.assertEqual(
+            'Descripcion de la habilidad',
+            json_response['concept_card_dicts'][0]['skill_description'],
+        )
+        # The second skill has no translated description, so it stays in
+        # English.
+        self.assertEqual(
+            skill_fetchers.get_skill_by_id(self.skill_id_1).description,
+            json_response['concept_card_dicts'][1]['skill_description'],
+        )
+
+    def test_get_concept_cards_falls_back_to_english_when_untranslated(
+        self,
+    ) -> None:
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id]),
+            ),
+            params={'language_code': 'es'},
+        )
+
+        self.assertEqual(
+            '<p>Skill Explanation</p>',
+            json_response['concept_card_dicts'][0]['explanation']['html'],
+        )
+
+    def test_get_concept_cards_ignores_a_stale_translation(self) -> None:
+        self._add_explanation_translation(
+            self.skill_id,
+            'es',
+            '<p>Explicación desactualizada</p>',
+            needs_update=True,
+        )
+
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id]),
+            ),
+            params={'language_code': 'es'},
+        )
+
+        # A translation flagged as needing an update is out of date with the
+        # English content, so English is shown instead.
+        self.assertEqual(
+            '<p>Skill Explanation</p>',
+            json_response['concept_card_dicts'][0]['explanation']['html'],
+        )
+
+    def test_get_concept_cards_in_english_returns_original_content(
+        self,
+    ) -> None:
+        self._add_explanation_translation(
+            self.skill_id, 'es', '<p>Explicación de la habilidad</p>'
+        )
+
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id]),
+            ),
+            params={'language_code': 'en'},
+        )
+
+        self.assertEqual(
+            '<p>Skill Explanation</p>',
+            json_response['concept_card_dicts'][0]['explanation']['html'],
+        )
+
+    def test_get_concept_cards_with_invalid_language_code(self) -> None:
+        json_response = self.get_json(
+            '%s/%s'
+            % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id]),
+            ),
+            params={'language_code': 'invalid_language_code'},
+            expected_status_int=400,
+        )
+
+        self.assertIn('language_code', json_response['error'])
 
     def test_get_concept_cards_fails_when_skill_doesnt_exist(self) -> None:
         self.get_json(

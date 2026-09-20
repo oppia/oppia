@@ -31,6 +31,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {States} from 'domain/exploration/states.model';
 import {Exploration} from 'domain/exploration/exploration.model';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 export interface OpportunityDict {
   skill_id: string;
@@ -133,8 +134,9 @@ export class ContributionAndReviewService {
   private async fetchSuggestionsAsync(
     fetcher: SuggestionFetcher,
     shouldResetOffset: boolean,
-    explorationId: string | null,
-    topicName: string | null
+    entityId: string | null,
+    topicName: string | null,
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -153,8 +155,9 @@ export class ContributionAndReviewService {
         AppConstants.OPPORTUNITIES_PAGE_SIZE * 2 - currentCacheSize,
         fetcher.offset,
         fetcher.sortKey,
-        explorationId,
-        topicName
+        entityId,
+        topicName,
+        targetType
       )
       .then(responseBody => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -187,46 +190,53 @@ export class ContributionAndReviewService {
   }
 
   async fetchTranslationSuggestionsAsync(
-    explorationId: string
+    entityId: string,
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
-    const explorationBackendResponse =
-      await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-        explorationId,
-        null
-      );
+    // Suggestions are ordered by the state they belong to, which only an
+    // exploration has, so the exploration is fetched for that entity type
+    // alone. Suggestions of every other entity type keep the order the
+    // backend returned them in.
+    const exploration =
+      targetType === undefined ||
+      targetType === AppConstants.ENTITY_TYPE.EXPLORATION
+        ? Exploration.createFromExplorationBackendResponse(
+            await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
+              entityId,
+              null
+            ),
+            this.loggerService,
+            this.urlInterpolationService
+          )
+        : null;
+
     return this.contributionAndReviewBackendApiService
       .fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS',
         null,
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        explorationId,
-        null
+        entityId,
+        null,
+        targetType
       )
       .then(fetchSuggestionsResponse => {
-        const exploration: Exploration =
-          Exploration.createFromExplorationBackendResponse(
-            explorationBackendResponse,
-            this.loggerService,
-            this.urlInterpolationService
-          );
-        const sortedTranslationSuggestions =
-          this.sortTranslationSuggestionsByState(
-            fetchSuggestionsResponse.suggestions,
-            exploration.getStates(),
-            exploration.initStateName
-          );
+        const suggestions = exploration
+          ? this.sortTranslationSuggestionsByState(
+              fetchSuggestionsResponse.suggestions,
+              exploration.getStates(),
+              exploration.initStateName
+            )
+          : fetchSuggestionsResponse.suggestions;
         const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
-        sortedTranslationSuggestions.forEach(suggestion => {
-          const suggestionDetails = {
+        suggestions.forEach(suggestion => {
+          responseSuggestionIdToDetails[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details:
               fetchSuggestionsResponse.target_id_to_opportunity_dict[
                 suggestion.target_id
               ],
           };
-          responseSuggestionIdToDetails[suggestion.suggestion_id] =
-            suggestionDetails;
         });
         return {
           suggestionIdToDetails: responseSuggestionIdToDetails,
@@ -379,35 +389,50 @@ export class ContributionAndReviewService {
 
   async getUserCreatedTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
-    sortKey: string
+    sortKey: string,
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset,
       null,
-      null
+      null,
+      targetType
     );
   }
 
   async getReviewableTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    explorationId?: string
+    entityId?: string,
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
-    if (explorationId) {
-      return this.fetchTranslationSuggestionsAsync(explorationId);
+    if (entityId) {
+      return this.fetchTranslationSuggestionsAsync(entityId, targetType);
     }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
       null,
-      null
+      null,
+      targetType
     );
   }
 
-  reviewExplorationSuggestion(
+  /**
+   * Reviews a translation suggestion of any entity type. The backend exposes
+   * one suggestion action endpoint per target type, so the endpoint is chosen
+   * from the suggestion's own target type and callers do not branch on it.
+   *
+   * A commit message is only sent for explorations. Accepting an exploration
+   * translation writes it into a new version of the exploration, which needs a
+   * commit message, while accepting a translation of any other entity type
+   * does not create a version.
+   */
+  reviewTranslationSuggestion(
+    targetType: string,
     targetId: string,
     suggestionId: string,
     action: string,
@@ -416,41 +441,57 @@ export class ContributionAndReviewService {
     onSuccess: (suggestionId: string) => void,
     onFailure: (errorMessage: string) => void
   ): Promise<void> {
-    const requestBody = {
-      action: action,
-      review_message: reviewMessage,
-      commit_message: commitMessage,
-    };
+    if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
+      return this.contributionAndReviewBackendApiService
+        .reviewSkillSuggestionAsync(targetId, suggestionId, {
+          action: action,
+          review_message: reviewMessage,
+        })
+        .then(
+          () => {
+            onSuccess(suggestionId);
+          },
+          // The skill endpoint reports failures without a message, so a
+          // generic one is supplied to keep the caller's handling uniform.
+          () => {
+            onFailure(
+              ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+            );
+          }
+        );
+    }
 
     return this.contributionAndReviewBackendApiService
-      .reviewExplorationSuggestionAsync(targetId, suggestionId, requestBody)
+      .reviewExplorationSuggestionAsync(targetId, suggestionId, {
+        action: action,
+        review_message: reviewMessage,
+        commit_message: commitMessage,
+      })
       .then(
         () => {
           onSuccess(suggestionId);
         },
         errorResponse => {
-          onFailure && onFailure(errorResponse.error.error);
+          onFailure(errorResponse.error.error);
         }
       );
   }
 
-  reviewSkillSuggestion(
+  reviewQuestionSuggestion(
     targetId: string,
     suggestionId: string,
     action: string,
     reviewMessage: string,
-    skillDifficulty: string,
+    skillDifficulty: number,
     onSuccess: (suggestionId: string) => void,
     onFailure: () => void
   ): Promise<void> {
-    const requestBody = {
-      action: action,
-      review_message: reviewMessage,
-      skill_difficulty: skillDifficulty,
-    };
-
     return this.contributionAndReviewBackendApiService
-      .reviewSkillSuggestionAsync(targetId, suggestionId, requestBody)
+      .reviewSkillSuggestionAsync(targetId, suggestionId, {
+        action: action,
+        review_message: reviewMessage,
+        skill_difficulty: skillDifficulty,
+      })
       .then(
         () => {
           onSuccess(suggestionId);

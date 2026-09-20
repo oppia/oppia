@@ -1,0 +1,6 @@
+.oppia-feedback-tab-row {
+  cursor: pointer;
+}
+.oppia-feedback-tab-row:hover {
+  background: #eee;
+}

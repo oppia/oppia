@@ -16,6 +16,8 @@
  * @fileoverview Tests for the classroom admin component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {

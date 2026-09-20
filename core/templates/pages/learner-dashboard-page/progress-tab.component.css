@@ -4,7 +4,6 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 .community-lessons-section,
-.playlist-section,
 .subscriptions-section {
   background-color: #fff;
   border-radius: 4px;
@@ -16,19 +15,16 @@
   width: 726px;
 }
 .community-lessons-section .summary-container,
-.playlist-section .summary-container,
 .subscriptions-section .summary-container {
   margin: auto;
   width: 656px;
 }
 .community-lessons-section .oppia-dashboard-intro-button,
-.playlist-section .oppia-dashboard-intro-button,
 .subscriptions-section .oppia-dashboard-intro-button {
   left: 40px;
   position: relative;
 }
-.community-lessons-section .pagination,
-.playlist-section .pagination {
+.community-lessons-section .pagination {
   bottom: 10px;
   display: block;
   list-style: none;
@@ -37,8 +33,7 @@
   text-align: end;
   width: 250px;
 }
-.community-lessons-section .pagination-bottom,
-.playlist-section .pagination-bottom {
+.community-lessons-section .pagination-bottom {
   bottom: 10px;
   display: block;
   list-style: none;
@@ -47,8 +42,7 @@
   right: 41px;
   text-align: end;
 }
-.community-lessons-section .pagination-dot,
-.playlist-section .pagination-dot {
+.community-lessons-section .pagination-dot {
   background-color: rgba(65, 152, 137, 0.15);
   border-radius: 50%;
   bottom: 4px;
@@ -58,8 +52,7 @@
   position: relative;
   width: 25px;
 }
-.community-lessons-section .pagination-number,
-.playlist-section .pagination-number {
+.community-lessons-section .pagination-number {
   color: black;
   font-size: 15px;
   margin: 0 7px;
@@ -67,8 +60,7 @@
   position: relative;
   right: 1px;
 }
-.community-lessons-section .pagination-arrow,
-.playlist-section .pagination-arrow {
+.community-lessons-section .pagination-arrow {
   color: #ccc;
   font-size: 25px;
 }
@@ -126,7 +118,6 @@
   position: relative;
 }
 .community-lessons-section .lessons-title,
-.playlist-section .lessons-title,
 .subscriptions-section .lessons-title {
   color: #00645c;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -137,20 +128,17 @@
   padding: 34px 40px;
   text-align: left;
 }
-.community-lessons-section .oppia-summary-tile-container,
-.playlist-section .oppia-summary-tile-container {
+.community-lessons-section .oppia-summary-tile-container {
   display: inline-block;
   padding: 0 10px 30px 0;
 }
 .community-lessons-section .empty-section,
-.playlist-section .empty-section,
 .subscriptions-section .empty-section {
   font-size: 16px;
   font-weight: inherit;
   padding: 0 113px 0 40px;
 }
-.community-lessons-section .remove-icon,
-.playlist-section .remove-icon {
+.community-lessons-section .remove-icon {
   color: white;
   float: right;
   font-size: 20px;
@@ -172,8 +160,7 @@
   padding: 0;
   width: 191px;
 }
-.community-lessons-section .oppia-learner-dashboard-nonexistent-exploration,
-.playlist-section .oppia-learner-dashboard-nonexistent-exploration {
+.community-lessons-section .oppia-learner-dashboard-nonexistent-exploration {
   display: block;
   padding: 5px 7.5px;
 }
@@ -194,14 +181,12 @@
   margin-bottom: 5px;
 }
 .community-lessons-section .oppia-toggle-button-section,
-.playlist-section .oppia-toggle-button-section,
 .subscriptions-section .oppia-toggle-button-section {
   margin: auto;
   padding: 0 98px;
   width: 50%;
 }
 .community-lessons-section .oppia-toggle-btn,
-.playlist-section .oppia-toggle-btn,
 .subscriptions-section .oppia-toggle-btn {
   color: #00645c;
   font-size: 18px;
@@ -223,7 +208,6 @@
 }
 @media screen and (max-width: 767px) {
   .community-lessons-section,
-  .playlist-section,
   .subscriptions-section {
     margin: auto;
     margin-bottom: 20px;
@@ -233,12 +217,10 @@
     margin-top: 35px;
   }
   .community-lessons-section .summary-container,
-  .playlist-section .summary-container,
   .subscriptions-section .summary-container {
     width: 256px;
   }
-  .community-lessons-section .oppia-summary-tile-container,
-  .playlist-section .oppia-summary-tile-container {
+  .community-lessons-section .oppia-summary-tile-container {
     width: 272px;
   }
   .community-lessons-section .oppia-mobile-summary-tile-container {
@@ -246,12 +228,10 @@
     width: 310px;
   }
   .community-lessons-section .empty-section,
-  .playlist-section .empty-section,
   .subscriptions-section .empty-section {
     padding: 0 40px;
   }
   .community-lessons-section .lessons-title,
-  .playlist-section .lessons-title,
   .subscriptions-section .lessons-title {
     font-size: 17px;
     padding: 34px 24px;
@@ -259,8 +239,7 @@
   .subscriptions-section .oppia-subscriptions-container {
     width: 205px;
   }
-  .community-lessons-section .remove-icon,
-  .playlist-section .remove-icon {
+  .community-lessons-section .remove-icon {
     left: -70px;
     top: 1px;
   }
@@ -271,7 +250,6 @@
 }
 @media screen and (min-width: 768px) and (max-width: 800px) {
   .community-lessons-section,
-  .playlist-section,
   .subscriptions-section {
     right: 117px;
     width: 726px;
@@ -279,7 +257,6 @@
 }
 @media screen and (min-width: 768px) and (max-width: 1200px) {
   .community-lessons-section,
-  .playlist-section,
   .subscriptions-section {
     width: 726px;
   }
@@ -291,15 +268,13 @@
     margin: auto;
     width: 650px;
   }
-  .community-lessons-section .pagination-bottom,
-  .playlist-section .pagination-bottom {
+  .community-lessons-section .pagination-bottom {
     display: none;
   }
   .community-lessons-section .oppia-mobile-summary-tile-container {
     padding: 0 5px;
   }
-  .community-lessons-section .pagination,
-  .playlist-section .pagination {
+  .community-lessons-section .pagination {
     width: 670px;
   }
   .community-lessons-section .dropbtn {

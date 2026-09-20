@@ -28,6 +28,7 @@ from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
+    exp_domain,
     exp_fetchers,
     feature_flag_services,
     feedback_services,
@@ -36,6 +37,7 @@ from core.domain import (
     opportunity_services,
     question_domain,
     rte_component_registry,
+    skill_fetchers,
     skill_services,
     state_domain,
     suggestion_registry,
@@ -82,9 +84,14 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-(feedback_models, suggestion_models, user_models) = (
+feedback_models, opportunity_models, suggestion_models, user_models = (
     models.Registry.import_models(
-        [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
+        [
+            models.Names.FEEDBACK,
+            models.Names.OPPORTUNITY,
+            models.Names.SUGGESTION,
+            models.Names.USER,
+        ]
     )
 )
 
@@ -97,19 +104,21 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 # email.
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
-SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
-    [suggestion_registry.SuggestionTranslateContent], str
-] = lambda suggestion: suggestion.change_cmd.translation_html
 
-SUGGESTION_ADD_QUESTION_HTML: Callable[
-    [suggestion_registry.SuggestionAddQuestion], str
-] = lambda suggestion: suggestion.change_cmd.question_dict[
-    'question_state_data'
-][
-    'content'
-][
-    'html'
-]
+def get_translation_html_from_suggestion(
+    suggestion: suggestion_registry.SuggestionTranslateContent,
+) -> str:
+    """Returns the HTML str from the given SuggestionTranslateContent object."""
+    return suggestion.change_cmd.translation_html
+
+
+def get_question_html_from_suggestion(
+    suggestion: suggestion_registry.SuggestionAddQuestion,
+) -> str:
+    """Returns the HTML str from the given SuggestionAddQuestion object."""
+    data = suggestion.change_cmd.question_dict['question_state_data']
+    return data['content']['html']
+
 
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
@@ -119,8 +128,8 @@ SUGGESTION_ADD_QUESTION_HTML: Callable[
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
 SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: SUGGESTION_TRANSLATE_CONTENT_HTML,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION: SUGGESTION_ADD_QUESTION_HTML,
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: get_translation_html_from_suggestion,
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: get_question_html_from_suggestion,
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
@@ -217,10 +226,11 @@ def create_suggestion(
     )
 
     status = suggestion_models.STATUS_IN_REVIEW
-
+    exploration: Optional[exp_domain.Exploration] = None
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        assert exploration is not None
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -241,15 +251,21 @@ def create_suggestion(
                 score_category,
                 language_code,
                 False,
-                datetime.datetime.utcnow(),
-                datetime.datetime.utcnow(),
+                utils.get_current_utc_datetime(),
+                utils.get_current_utc_datetime(),
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        category = (
+            exploration.category
+            if target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            else target_type
+        )
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
+            category,
         )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
@@ -268,8 +284,12 @@ def create_suggestion(
         # It resolves the generic placeholder state name to the correct exploration
         # state name by matching content IDs.
         if (
-            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
-            or state_name not in exploration.states
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            and (
+                state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+                or state_name not in exploration.states
+            )
         ):
             for s_name, state in exploration.states.items():
                 if (
@@ -282,14 +302,31 @@ def create_suggestion(
                     change_cmd = new_change_cmd
                     break
 
-        content_html = exploration.get_content_html(state_name, content_id)
-        if content_html != change_cmd['content_html']:
-
-            raise Exception(
-                'The Exploration content has changed since this translation '
-                'was submitted.'
-            )
-
+        if (
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+        ):
+            content_html = exploration.get_content_html(state_name, content_id)
+            if content_html != change_cmd['content_html']:
+                raise Exception(
+                    'The Exploration content has changed since this translation '
+                    'was submitted.'
+                )
+        elif target_type == feconf.ENTITY_TYPE_SKILL:
+            skill = skill_fetchers.get_skill_by_id(target_id, strict=False)
+            if skill is not None:
+                translatable_contents = (
+                    skill.get_translatable_contents_collection().content_id_to_translatable_content
+                )
+                if content_id in translatable_contents:
+                    content_value = translatable_contents[
+                        content_id
+                    ].content_value
+                    if content_value != change_cmd['content_html']:
+                        raise Exception(
+                            'The Skill content has changed since this translation '
+                            'was submitted.'
+                        )
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
         existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
@@ -304,19 +341,40 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            target_id,
-            exploration.version,
-            language_code,
-        )
-        if content_id in entity_translation.translations:
-            if not entity_translation.translations[content_id].needs_update:
-                raise Exception(
-                    'The content with content_id %s has already been '
-                    'translated to %s and is up-to-date.'
-                    % (content_id, language_code)
+        translatable_entity_types = [
+            e.value for e in feconf.TranslatableEntityType
+        ]
+        if target_type in translatable_entity_types:
+            # Some translatable entity types (e.g. question, classroom) have no
+            # fetcher in get_entity_by_type_and_id and raise a ValueError. Those
+            # are skipped, but a missing entity must still surface as an error
+            # so that suggestions cannot be created against entities that do
+            # not exist.
+            try:
+                target_entity = opportunity_services.get_entity_by_type_and_id(
+                    target_type, target_id
                 )
+            except ValueError:
+                target_entity = None
+
+            if target_entity is not None:
+                entity_translation = (
+                    translation_fetchers.get_entity_translation(
+                        feconf.TranslatableEntityType(target_type),
+                        target_id,
+                        target_entity.version,
+                        language_code,
+                    )
+                )
+                if content_id in entity_translation.translations:
+                    if not entity_translation.translations[
+                        content_id
+                    ].needs_update:
+                        raise Exception(
+                            'The content with content_id %s has already been '
+                            'translated to %s and is up-to-date.'
+                            % (content_id, language_code)
+                        )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
@@ -329,8 +387,9 @@ def create_suggestion(
             score_category,
             language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
+            target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -363,8 +422,8 @@ def create_suggestion(
             score_category,
             add_question_language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
@@ -421,6 +480,10 @@ def get_suggestion_from_model(
         suggestion_model.edited_by_reviewer,
         suggestion_model.last_updated,
         suggestion_model.created_on,
+        # A translation suggestion can target any translatable entity type, so
+        # the target type comes from the model rather than the default assumed
+        # by the domain class.
+        target_type=suggestion_model.target_type,
     )
 
 
@@ -888,15 +951,17 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated and is up-to-date. We use the current exploration version
+    # translated and is up-to-date. We use the current entity version
     # (not the version at submission) to match the version used when saving
     # the translation in suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            suggestion.target_type, suggestion.target_id
+        )
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            exploration.version,
+            target_entity.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
@@ -944,6 +1009,12 @@ def accept_suggestion(
             suggestion.change_cmd.language_code,
             suggestion.target_type,
         )
+        if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # We import exp_services locally here to avoid a circular dependency
+            # with exp_services, which imports suggestion_services at the top level.
+            from core.domain import exp_services
+
+            exp_services.index_explorations_given_ids([suggestion.target_id])
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this
@@ -1127,6 +1198,36 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
     )
 
 
+def auto_reject_translation_suggestions_for_skill_ids(
+    skill_ids: List[str],
+) -> None:
+    """Rejects all translation suggestions with target IDs matching the
+    supplied skill IDs. These suggestions are being rejected because
+    their corresponding skill was removed or deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
+
+    Args:
+        skill_ids: list(str). The skill IDs corresponding to the target IDs
+            of the translation suggestions.
+    """
+    for skill_id in skill_ids:
+        suggestions = query_suggestions(
+            [
+                ('suggestion_type', feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                ('target_type', feconf.ENTITY_TYPE_SKILL),
+                ('target_id', skill_id),
+                ('status', suggestion_models.STATUS_IN_REVIEW),
+            ]
+        )
+        if suggestions:
+            suggestion_ids = [s.suggestion_id for s in suggestions]
+            reject_suggestions(
+                suggestion_ids,
+                feconf.SUGGESTION_BOT_USER_ID,
+                suggestion_models.DELETED_SKILL_REJECT_MESSAGE,
+            )
+
+
 def auto_reject_translation_suggestions_for_content_ids(
     exp_id: str, content_ids: Set[str]
 ) -> None:
@@ -1239,6 +1340,7 @@ def get_reviewable_translation_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     language: Optional[str] = None,
+    target_type: Optional[str] = None,
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -1252,6 +1354,7 @@ def get_reviewable_translation_suggestions_by_offset(
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
+        target_type: str|None. Optional target type to filter suggestions.
         limit: int|None. The maximum number of results to return. If None,
             all available results are returned.
         sort_key: str|None. The key to sort the suggestions by.
@@ -1287,7 +1390,12 @@ def get_reviewable_translation_suggestions_by_offset(
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit, offset, user_id, sort_key, language_codes
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes,
+                target_type=target_type,
             )
         )
     elif len(opportunity_summary_exp_ids) > 0:
@@ -1299,6 +1407,7 @@ def get_reviewable_translation_suggestions_by_offset(
                 sort_key,
                 language_codes,
                 opportunity_summary_exp_ids,
+                target_type=target_type,
             )
         )
 
@@ -1316,7 +1425,9 @@ def get_reviewable_translation_suggestions_by_offset(
 
 
 def get_reviewable_translation_suggestion_target_ids(
-    user_id: str, language_code: Optional[str] = None
+    user_id: str,
+    language_code: Optional[str] = None,
+    target_type: Optional[str] = None,
 ) -> List[str]:
     """Returns a list of translation suggestions matching the
     passed opportunity IDs which the user can review.
@@ -1325,6 +1436,7 @@ def get_reviewable_translation_suggestion_target_ids(
         user_id: str. The ID of the user.
         language_code: str|None. ISO 639-1 language code for which to filter.
             If it is None, all available languages will be returned.
+        target_type: str|None. Optional entity type to filter suggestions by.
 
     Returns:
         list(str). A list of translation suggestion target ids
@@ -1351,22 +1463,21 @@ def get_reviewable_translation_suggestion_target_ids(
         return []
 
     return suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestion_target_ids(
-        user_id, language_codes
+        user_id, language_codes, target_type=target_type
     )
 
 
-def get_reviewable_translation_suggestions_for_single_exp(
-    user_id: str, opportunity_summary_exp_id: str, language_code: str
+def get_reviewable_translation_suggestions_for_single_entity(
+    user_id: str, entity_id: str, language_code: str
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
-     passed opportunity ID which the user can review.
+     passed entity ID which the user can review. Suggestions are matched on
+     their target ID, so the entity may be of any translatable type.
 
     Args:
         user_id: str. The ID of the user.
-        opportunity_summary_exp_id: str.
-            The exploration ID for which suggestions
-            are fetched. If exp id is empty, no suggestions are
-            fetched.
+        entity_id: str. The ID of the entity for which suggestions are
+            fetched. If the entity ID is empty, no suggestions are fetched.
         language_code: str. The language code to get results for.
 
     Returns:
@@ -1388,7 +1499,7 @@ def get_reviewable_translation_suggestions_for_single_exp(
 
     in_review_translation_suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel.get_reviewable_translation_suggestions(
-            user_id, language_code, opportunity_summary_exp_id
+            user_id, language_code, entity_id
         )
     )
 
@@ -1548,25 +1659,25 @@ def get_translation_suggestions_in_review_by_exploration(
     ]
 
 
-def get_translation_suggestions_in_review_by_exp_ids(
-    exp_ids: List[str], language_code: str
+def get_translation_suggestions_in_review_by_entity_ids(
+    entity_ids: List[str], language_code: str
 ) -> List[Optional[suggestion_registry.BaseSuggestion]]:
-    """Returns translation suggestions in review by exploration ID and language
-    code.
+    """Returns translation suggestions in review by entity ID and language
+    code. The entity IDs may belong to any translatable entity type.
 
     Args:
-        exp_ids: list(str). Exploration IDs matching the target ID of the
+        entity_ids: list(str). Entity IDs matching the target ID of the
             translation suggestions.
         language_code: str. The ISO 639-1 language code of the translation
             suggestions.
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
-        target_id in exp_ids and language_code == language_code, or None if
+        target_id in entity_ids and language_code == language_code, or None if
         suggestion model does not exists.
     """
-    suggestion_models_in_review = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_exp_ids(
-        exp_ids, language_code
+    suggestion_models_in_review = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_entity_ids(
+        entity_ids, language_code
     )
     return [
         get_suggestion_from_model(model) if model else None
@@ -1577,8 +1688,9 @@ def get_translation_suggestions_in_review_by_exp_ids(
 def get_suggestions_with_editable_explorations(
     suggestions: Sequence[suggestion_registry.SuggestionTranslateContent],
 ) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
-    """Filters the supplied suggestions for those suggestions that have
-    explorations that allow edits.
+    """Filters out the supplied suggestions whose target does not allow edits.
+    Only explorations can be locked against edits, so suggestions targeting any
+    other entity type are all kept.
 
     Args:
         suggestions: list(Suggestion). List of translation suggestions to
@@ -1587,18 +1699,26 @@ def get_suggestions_with_editable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
-    suggestion_exp_ids = {suggestion.target_id for suggestion in suggestions}
+    # Only the explorations are fetched, because they are the only targets that
+    # can disallow edits.
+    suggestion_exp_ids = {
+        suggestion.target_id
+        for suggestion in suggestions
+        if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+    }
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids)
     )
-    return list(
-        filter(
-            lambda suggestion: suggestion_exp_id_to_exp[
-                suggestion.target_id
-            ].edits_allowed,
-            suggestions,
+    editable_suggestions = []
+    for suggestion in suggestions:
+        target_allows_edits = (
+            suggestion_exp_id_to_exp[suggestion.target_id].edits_allowed
+            if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+            else True
         )
-    )
+        if target_allows_edits:
+            editable_suggestions.append(suggestion)
+    return editable_suggestions
 
 
 def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
@@ -1879,6 +1999,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionAddQuestion], int]: ...
 
 
@@ -1889,6 +2010,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionTranslateContent], int]: ...
 
 
@@ -1899,6 +2021,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
@@ -1908,6 +2031,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -1919,6 +2043,7 @@ def get_submitted_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning
             of all results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
+        target_type: str|None. Optional target type to filter suggestions.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1929,7 +2054,12 @@ def get_submitted_suggestions_by_offset(
     """
     submitted_suggestion_models, next_offset = (
         suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
-            limit, offset, suggestion_type, user_id, sort_key
+            limit,
+            offset,
+            suggestion_type,
+            user_id,
+            sort_key,
+            target_type=target_type,
         )
     )
     suggestions = [
@@ -3227,6 +3357,54 @@ def _update_question_reviewer_total_stats_models(
     )
 
 
+def _get_topic_id_of_translation_target(
+    suggestion: suggestion_registry.BaseSuggestion,
+) -> str:
+    """Returns the ID of the topic that the target of the given translation
+    suggestion belongs to.
+
+    Args:
+        suggestion: Suggestion. The translation suggestion whose target's topic
+            is required.
+
+    Returns:
+        str. The ID of the topic that the target belongs to, or
+        'uncategorized' if the target is not part of any topic.
+    """
+    # The exploration opportunity summaries are removed once the new
+    # opportunity models are rolled out, so they are only consulted while the
+    # feature flag is off. With the flag on, every entity type resolves its
+    # topic from the new opportunity model.
+    if (
+        suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        and not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        )
+    ):
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+        )
+        # We can confirm that exp_opportunity will not be None since there
+        # should be an assigned opportunity for a given translation. Hence we
+        # can rule out the possibility of None for mypy type checking.
+        assert exp_opportunity is not None
+        return exp_opportunity.topic_id
+
+    opportunity = (
+        opportunity_services.get_translation_opportunities_by_entity_ids(
+            suggestion.target_type, [suggestion.target_id]
+        )[suggestion.target_id]
+    )
+    # An entity such as a skill can be translated before it is assigned to any
+    # topic, in which case the contribution is not attributable to a topic.
+    if opportunity is None or not opportunity.topic_ids:
+        return 'uncategorized'
+    return opportunity.topic_ids[0]
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
 ) -> None:
@@ -3239,16 +3417,7 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3415,16 +3584,7 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3575,16 +3735,7 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
@@ -4454,17 +4605,22 @@ def generate_contributor_certificate_data(
     if user_id is None:
         raise Exception('There is no user for the given username.')
 
+    user_settings = user_services.get_user_settings(user_id)
+    certificate_profile_name = (
+        user_settings.profile_name_for_certificate or username
+    )
+
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         # For the suggestion_type translate_content, there should be a
         # corresponding language_code.
         assert isinstance(language_code, str)
         data = _generate_translation_contributor_certificate_data(
-            language_code, from_date, to_date, user_id
+            language_code, from_date, to_date, user_id, certificate_profile_name
         )
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         data = _generate_question_contributor_certificate_data(
-            from_date, to_date, user_id
+            from_date, to_date, user_id, certificate_profile_name
         )
 
     else:
@@ -4478,6 +4634,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
@@ -4489,6 +4646,7 @@ def _generate_translation_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate translation submitter
@@ -4567,11 +4725,15 @@ def _generate_translation_contributor_certificate_data(
         str(hours_contributed),
         words_count,
         language_description,
+        certificate_profile_name,
     )
 
 
 def _generate_question_contributor_certificate_data(
-    from_date: datetime.datetime, to_date: datetime.datetime, user_id: str
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
@@ -4581,6 +4743,7 @@ def _generate_question_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate question submitter
@@ -4633,4 +4796,5 @@ def _generate_question_contributor_certificate_data(
         str(hours_contributed),
         0,
         None,
+        certificate_profile_name,
     )

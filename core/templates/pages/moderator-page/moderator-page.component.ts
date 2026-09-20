@@ -23,6 +23,7 @@ import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
 import {Schema} from 'services/schema-default-value.service';
+import './moderator-page.component.css';
 import {
   ActivityIdTypeDict,
   CommitMessage,
@@ -33,6 +34,7 @@ import {
 @Component({
   selector: 'oppia-moderator-page',
   templateUrl: './moderator-page.component.html',
+  styleUrls: ['./moderator-page.component.css'],
 })
 export class ModeratorPageComponent {
   allCommits: CommitMessage[] = [];

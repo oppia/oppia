@@ -18,11 +18,10 @@
 
 from __future__ import annotations
 
-import datetime
 import re
 import types
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -346,15 +345,15 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             to the datastore.
             """
             self._last_updated_timestamp_is_fresh = True
-            self.last_updated_by_human = datetime.datetime.utcnow()
+            self.last_updated_by_human = utils.get_current_utc_datetime()
 
             # These if conditions can be removed once the auto_now property
             # is set True to these attributes.
             if self.created_on is None:
-                self.created_on = datetime.datetime.utcnow()
+                self.created_on = utils.get_current_utc_datetime()
 
             if self.last_updated is None:
-                self.last_updated = datetime.datetime.utcnow()
+                self.last_updated = utils.get_current_utc_datetime()
 
             # We are using BaseModel.put() to save the changes to the datastore
             # since the put() method which TestBaseHumanMaintainedModel class
@@ -1168,13 +1167,14 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
     def _create_feedback_model(
         self,
         model_id: str,
+        status: str = feconf.STATUS_CHOICES_OPEN,
     ) -> None:
         """Creates a TestBaseFeedbackModel with the given creation time."""
         model = TestBaseFeedbackModel(
             id=model_id,
             author_id='user_id',
             feedback_text='Feedback text',
-            status=feconf.STATUS_CHOICES_OPEN,
+            status=status,
             exploration_id='exp_id',
             lesson_metadata_schema_version=1,
             lesson_metadata={},
@@ -1290,3 +1290,226 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(final_cursor)
         self.assertFalse(more)
+
+    def test_fetch_page_with_single_status_filter_paginates_by_cursor(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model(
+            'feedback_2', status=feconf.STATUS_CHOICES_FIXED
+        )
+        self._create_feedback_model('feedback_3')
+
+        first_page, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1, status_filter=[feconf.STATUS_CHOICES_OPEN]
+        )
+        assert next_cursor is not None
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in first_page],
+            ['feedback_3'],
+        )
+        self.assertTrue(more)
+
+        final_page, final_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1,
+            status_filter=[feconf.STATUS_CHOICES_OPEN],
+            cursor=next_cursor,
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in final_page],
+            ['feedback_1'],
+        )
+        self.assertIsNone(final_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_with_multiple_status_filters_returns_matches(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model(
+            'feedback_2', status=feconf.STATUS_CHOICES_FIXED
+        )
+        self._create_feedback_model(
+            'feedback_3', status=feconf.STATUS_CHOICES_COMPLIMENT
+        )
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=10,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2', 'feedback_1'],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_with_multiple_status_filters_paginates_by_offset(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
+
+        first_page, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+        )
+        assert next_cursor is not None
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in first_page],
+            ['feedback_3'],
+        )
+        self.assertTrue(more)
+
+        second_page, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+            cursor=next_cursor,
+        )
+        assert next_cursor is not None
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in second_page],
+            ['feedback_2'],
+        )
+        self.assertTrue(more)
+
+        final_page, final_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+            cursor=next_cursor,
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in final_page],
+            ['feedback_1'],
+        )
+        self.assertIsNone(final_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_with_invalid_status_filter_raises_error(self) -> None:
+        self._create_feedback_model('feedback_1')
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Invalid status filter values: \[\'invalid_status\'\]\. '
+            'Expected statuses to be chosen from feconf.STATUS_CHOICES',
+        ):
+            TestBaseFeedbackModel.fetch_page(
+                page_size=10,
+                status_filter=['open', 'invalid_status'],
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Invalid status filter values: \[\'not_a_real_status\'\]\. '
+            'Expected statuses to be chosen from feconf.STATUS_CHOICES',
+        ):
+            TestBaseFeedbackModel.fetch_page(
+                page_size=10,
+                status_filter=['not_a_real_status'],
+            )
+
+    def test_fetch_page_with_multiple_statuses_treats_invalid_cursor_as_zero_offset(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=1,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+            cursor='not-a-number',
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2'],
+        )
+        self.assertTrue(more)
+        self.assertIsNotNone(next_cursor)
+
+    def test_fetch_page_with_multiple_statuses_reports_no_more_on_full_final_page(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+        )
+
+        self.assertEqual(len(feedback_models), 2)
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_with_multiple_statuses_orders_by_last_updated(
+        self,
+    ) -> None:
+        self._create_feedback_model(
+            'feedback_1', status=feconf.STATUS_CHOICES_FIXED
+        )
+        self._create_feedback_model('feedback_2')
+        # Re-saving feedback_1 makes it the most recently updated entry.
+        resaved_model = TestBaseFeedbackModel.get_by_id('feedback_1')
+        assert resaved_model is not None
+        resaved_model.update_timestamps()
+        resaved_model.put()
+
+        feedback_models, _, _ = TestBaseFeedbackModel.fetch_page(
+            page_size=10,
+            status_filter=[
+                feconf.STATUS_CHOICES_OPEN,
+                feconf.STATUS_CHOICES_FIXED,
+            ],
+            order_by_last_updated=True,
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_1', 'feedback_2'],
+        )
+
+    def test_fetch_page_with_single_status_orders_by_last_updated(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        # Re-saving feedback_1 makes it the most recently updated entry.
+        resaved_model = TestBaseFeedbackModel.get_by_id('feedback_1')
+        assert resaved_model is not None
+        resaved_model.update_timestamps()
+        resaved_model.put()
+
+        feedback_models, _, _ = TestBaseFeedbackModel.fetch_page(
+            page_size=10, order_by_last_updated=True
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_1', 'feedback_2'],
+        )

@@ -20,8 +20,6 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {InfiniteScrollModule} from 'ngx-infinite-scroll';
 
-import {LearnerPlaylistModalComponent} from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
-
 import {LibraryFooterComponent} from './library-footer/library-footer.component';
 import {LibraryPageRootComponent} from './library-page-root.component';
 import {LibraryPageComponent} from './library-page.component';
@@ -41,7 +39,6 @@ import {ClassroomCardComponent} from './classroom-card/classroom-card.component'
     NgbModule,
   ],
   declarations: [
-    LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,
     ActivityTilesInfinityGridComponent,
@@ -50,7 +47,6 @@ import {ClassroomCardComponent} from './classroom-card/classroom-card.component'
     ClassroomCardComponent,
   ],
   entryComponents: [
-    LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,
     ActivityTilesInfinityGridComponent,

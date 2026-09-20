@@ -28,7 +28,9 @@ import {
   QuestionSubmitterStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
-} from '../contributor-dashboard-admin-summary.model';
+  TranslationCoordinatorStats,
+  QuestionCoordinatorStats,
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AppConstants} from 'app.constants';
 
 export interface ContributorAttribute {
@@ -54,6 +56,8 @@ export class FormatContributorAttributesService {
   ACCEPTED_QUESTIONS = 'Accepted Questions';
   REVIEWED_QUESTIONS = 'Reviewed Questions';
   REJECTED_QUESTIONS = 'Rejected Questions';
+  TRANSLATORS: string = 'Translators';
+  REVIEWERS: string = 'Reviewers';
 
   private pluralise(num: number, word: string): string {
     return num === 1 ? word : word + 's';
@@ -258,6 +262,30 @@ export class FormatContributorAttributesService {
     return this.getContributorAttributes(
       questionReviewerAttributes as AttributeTable<ContributorStats>,
       questionReviewerStats
+    );
+  }
+
+  getTranslationCoordinatorContributorAttributes(
+    stats: TranslationCoordinatorStats
+  ): ContributorAttribute[] {
+    const attributes: AttributeTable<TranslationCoordinatorStats> = {
+      [this.TRANSLATORS]: (s: TranslationCoordinatorStats) =>
+        s.translatorsCount.toString(),
+      [this.REVIEWERS]: (s: TranslationCoordinatorStats) =>
+        s.reviewersCount.toString(),
+    };
+    return this.getContributorAttributes(
+      attributes as AttributeTable<ContributorStats>,
+      stats
+    );
+  }
+
+  getQuestionCoordinatorContributorAttributes(
+    stats: QuestionCoordinatorStats
+  ): ContributorAttribute[] {
+    return this.getContributorAttributes(
+      {} as AttributeTable<ContributorStats>,
+      stats
     );
   }
 }

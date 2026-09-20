@@ -30,10 +30,12 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import './skill-preview-tab.component.css';
 
 @Component({
   selector: 'oppia-skill-preview-tab',
   templateUrl: './skill-preview-tab.component.html',
+  styleUrls: ['./skill-preview-tab.component.css'],
 })
 export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   constructor(

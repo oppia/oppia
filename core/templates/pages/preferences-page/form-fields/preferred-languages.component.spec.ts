@@ -16,9 +16,16 @@
  * @fileoverview Unit tests for the preferred languages component.
  */
 
+// @ts-nocheck
+
 import {ElementRef} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -183,5 +190,11 @@ describe('Preferred Languages Component', () => {
     const fn = () => {};
     componentInstance.registerOnTouched(fn);
     expect(componentInstance.onTouched).toBe(fn);
+  });
+
+  it('should expose itself as a control value accessor', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      componentInstance,
+    ]);
   });
 });

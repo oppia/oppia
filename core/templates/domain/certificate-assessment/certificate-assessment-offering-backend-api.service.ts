@@ -20,9 +20,13 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {
+  AvailableCertificateAssessmentOfferingBackendDict,
+  AvailableCertificateAssessmentOfferingData,
+  CertificateAssessmentAttemptData,
+  CertificateAssessmentAttemptQuestionBackendDict,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -66,14 +70,20 @@ interface GetCertificateOfferingsBackendResponse {
   certificate_offerings: CertificateAssessmentOfferingBackendDict[];
 }
 
+interface GetAvailableCertificateOfferingsForClassroomBackendResponse {
+  available_certificate_offerings: AvailableCertificateAssessmentOfferingBackendDict[];
+}
 interface CertificateAssessmentTopicScoreBackendDict {
+  topic_name: string;
   total_related_questions: number;
   total_correct_questions: number;
 }
 
 interface GetCertificateAssessmentResultBackendResponse {
+  certificate_id: string;
   title: string;
   total_score: number;
+  time_taken_in_minutes: number | null;
   attempt_data: {[topicId: string]: CertificateAssessmentTopicScoreBackendDict};
   is_submitted: boolean;
 }
@@ -92,6 +102,25 @@ interface GetCertificateAssessmentAttemptsBackendResponse {
   attempts: CertificateAssessmentAttemptSummaryBackendDict[];
 }
 
+// Response for starting a new assessment attempt. Every question's full
+// pinned state data is returned up front, so the client can serve questions
+// from memory without further per-question requests.
+interface StartCertificateAssessmentBackendResponse {
+  attempt_id: string;
+  questions: CertificateAssessmentAttemptQuestionBackendDict[];
+}
+
+export interface SubmitCertificateAssessmentAnswerBackendDict {
+  question_id: string;
+  is_correct: boolean;
+  selected_answer?: string;
+}
+
+interface SubmitCertificateAssessmentBackendResponse {
+  attempt_id: string;
+  is_submitted: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -105,8 +134,24 @@ export class CertificateAssessmentOfferingBackendApiService {
     );
   }
 
+  private getAvailableCertificateOfferingsForClassroomHandlerUrl(
+    classroomId: string
+  ): string {
+    return CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
+      '<classroom_url_fragment>',
+      classroomId
+    );
+  }
+
   private getResultHandlerUrl(attemptId: string): string {
     return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL.replace(
+      '<attempt_id>',
+      attemptId
+    );
+  }
+
+  private getSubmitHandlerUrl(attemptId: string): string {
+    return CertificateAssessmentDomainConstants.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER_URL.replace(
       '<attempt_id>',
       attemptId
     );
@@ -279,6 +324,29 @@ export class CertificateAssessmentOfferingBackendApiService {
       throw errorResponse?.error?.error || errorResponse.message;
     }
   }
+
+  async getAvailableCertificateOfferingsForClassroomAsync(
+    classroomId: string
+  ): Promise<AvailableCertificateAssessmentOfferingData[]> {
+    try {
+      const response = await this.http
+        .get<GetAvailableCertificateOfferingsForClassroomBackendResponse>(
+          this.getAvailableCertificateOfferingsForClassroomHandlerUrl(
+            classroomId
+          )
+        )
+        .toPromise();
+
+      return response.available_certificate_offerings.map(offering =>
+        AvailableCertificateAssessmentOfferingData.createFromBackendDict(
+          offering
+        )
+      );
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
   async getCertificateAssessmentResultAsync(
     attemptId: string
   ): Promise<GetCertificateAssessmentResultBackendResponse> {
@@ -304,6 +372,53 @@ export class CertificateAssessmentOfferingBackendApiService {
         )
         .toPromise();
       return response.attempts;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
+  async attemptCertificateAssessmentAsync(
+    certificateId: string
+  ): Promise<CertificateAssessmentAttemptData> {
+    try {
+      const response = await this.http
+        .post<StartCertificateAssessmentBackendResponse>(
+          CertificateAssessmentDomainConstants.START_CERTIFICATE_ASSESSMENT_HANDLER_URL,
+          {certificate_id: certificateId}
+        )
+        .toPromise();
+      return CertificateAssessmentAttemptData.createFromBackendDict({
+        attempt_id: response.attempt_id,
+        questions: response.questions,
+      });
+    } catch (errorResponse) {
+      // Propagate a structured backend error (with error_type and
+      // remaining_minutes) so the caller can translate it; otherwise fall
+      // back to the usual error string.
+      const backendError = errorResponse?.error;
+      if (
+        backendError &&
+        typeof backendError === 'object' &&
+        (backendError as {error_type?: string}).error_type !== undefined
+      ) {
+        throw backendError;
+      }
+      throw errorResponse?.error?.error || errorResponse?.message;
+    }
+  }
+
+  async submitCertificateAssessmentAttemptAsync(
+    attemptId: string,
+    answers: SubmitCertificateAssessmentAnswerBackendDict[]
+  ): Promise<SubmitCertificateAssessmentBackendResponse> {
+    try {
+      const response = await this.http
+        .post<SubmitCertificateAssessmentBackendResponse>(
+          this.getSubmitHandlerUrl(attemptId),
+          {answers}
+        )
+        .toPromise();
+      return response;
     } catch (errorResponse) {
       throw errorResponse?.error?.error || errorResponse.message;
     }

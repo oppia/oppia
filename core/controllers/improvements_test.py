@@ -523,12 +523,14 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
-    def test_post_can_create_new_resolved_task_in_storage_with_utcnow(
+    def test_post_can_create_new_resolved_task_in_storage_with_current_time(
         self,
     ) -> None:
         login_context = self.login_context(self.OWNER_EMAIL)
-        mock_datetime_utcnow = self.mock_datetime_utcnow(self.MOCK_DATE)
-        with login_context, mock_datetime_utcnow:
+        mock_get_current_utc_datetime = self.swap(
+            utils, 'get_current_utc_datetime', lambda: self.MOCK_DATE
+        )
+        with login_context, mock_get_current_utc_datetime:
             self.post_json(
                 self.get_url(),
                 {

@@ -37,7 +37,7 @@ import '../static/item_selection_input.css';
 @Component({
   selector: 'oppia-interactive-item-selection-input',
   templateUrl: './item-selection-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['../static/item_selection_input.css'],
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -46,6 +46,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   @Input() choicesWithValue!: string;
   @Input() maxAllowableSelectionCountWithValue!: string;
   @Input() minAllowableSelectionCountWithValue!: string;
+  @Input() lastAnswer!: string[] | null;
   choices!: string[];
   choicesValue!: SubtitledHtml[];
   maxAllowableSelectionCount!: number;
@@ -96,8 +97,21 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     for (let i = 0; i < this.choices.length; i++) {
       this.userSelections[this.choices[i]] = false;
     }
+    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
+      for (const selectedContentId of this.lastAnswer) {
+        const selectedChoice = this.choicesValue.find(
+          choice => choice.contentId === selectedContentId
+        );
+        if (selectedChoice !== undefined) {
+          this.userSelections[selectedChoice.html] = true;
+        }
+      }
+    }
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
+    this.selectionCount = Object.keys(this.userSelections).filter(
+      obj => this.userSelections[obj]
+    ).length;
 
     // The following indicates that the number of answers is more than
     // maxAllowableSelectionCount.

@@ -30,6 +30,7 @@ import {Topic} from 'domain/topic/topic-object.model';
 import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
+import './skill-editor-main-tab.component.css';
 import {
   AssignedSkillTopicData,
   SkillEditorStateService,
@@ -38,6 +39,7 @@ import {
 @Component({
   selector: 'oppia-skill-editor-main-tab',
   templateUrl: './skill-editor-main-tab.component.html',
+  styleUrls: ['./skill-editor-main-tab.component.css'],
 })
 export class SkillEditorMainTabComponent
   implements OnInit, AfterContentChecked

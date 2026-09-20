@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based Editor Component
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,

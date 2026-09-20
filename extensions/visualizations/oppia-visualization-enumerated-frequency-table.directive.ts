@@ -25,6 +25,7 @@ import './oppia-visualization-enumerated-frequency-table.directive.css';
   selector: 'oppia-visualization-enumerated-frequency-table',
   templateUrl:
     './oppia-visualization-enumerated-frequency-table.directive.html',
+  styleUrls: ['./oppia-visualization-enumerated-frequency-table.directive.css'],
 })
 export class OppiaVisualizationEnumeratedFrequencyTableComponent
   implements OnInit

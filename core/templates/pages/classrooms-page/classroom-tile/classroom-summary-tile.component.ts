@@ -21,10 +21,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ClassroomSummaryDict} from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
+import './classroom-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-classroom-summary-tile',
   templateUrl: './classroom-summary-tile.component.html',
+  styleUrls: ['./classroom-summary-tile.component.css'],
 })
 export class ClassroomSummaryTileComponent {
   // These properties are initialized using Angular lifecycle hooks

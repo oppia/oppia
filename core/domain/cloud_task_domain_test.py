@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
+from core import utils
 from core.domain import cloud_task_domain
 from core.tests import test_utils
 
@@ -37,8 +38,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.datetime.utcnow()
-        created_on = datetime.datetime.utcnow()
+        last_updated = utils.get_current_utc_datetime()
+        created_on = utils.get_current_utc_datetime()
         task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
             project_id,
             location_id,
@@ -58,6 +59,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             0,
             last_updated,
             created_on,
+            {},
         )
 
         self.assertEqual(cloud_task_run.task_run_id, cloud_task_run_id)
@@ -78,8 +80,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.datetime.utcnow()
-        created_on = datetime.datetime.utcnow()
+        last_updated = utils.get_current_utc_datetime()
+        created_on = utils.get_current_utc_datetime()
         task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
             project_id,
             location_id,
@@ -99,6 +101,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             'current_retry_attempt': 0,
             'last_updated': last_updated.isoformat(),
             'created_on': created_on.isoformat(),
+            'additional_contextual_information': {},
         }
 
         cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(
@@ -120,6 +123,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             current_retry_attempt=0,
             last_updated=datetime.datetime(2026, 1, 2, 3, 4, 5),
             created_on=datetime.datetime(2026, 1, 2, 3, 4, 6),
+            additional_contextual_information={},
         )
 
         cloud_task_run_dict = cloud_task_run.to_dict_with_timezone_info()

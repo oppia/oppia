@@ -30,7 +30,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     learner_goals_services,
-    learner_playlist_services,
     learner_progress_domain,
     skill_services,
     story_domain,
@@ -280,8 +279,7 @@ def _save_last_playthrough_information(
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
-    user. It is also removed from the incomplete list and the learner playlist
-    (if present).
+    user. It is also removed from the incomplete list (if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
@@ -311,12 +309,9 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         exp_id not in subscribed_exploration_ids
         and exp_id not in activities_completed.exploration_ids
     ):
-        # Remove the exploration from the in progress and learner playlist
+        # Remove the exploration from the in progress list
         # (if present) as it is now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
-        learner_playlist_services.remove_exploration_from_learner_playlist(
-            user_id, exp_id
-        )
         activities_completed.add_exploration_id(exp_id)
         _save_completed_activities(activities_completed)
 
@@ -411,8 +406,7 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
 def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
     """Adds the collection id to the list of collections completed by the user
     unless the collection has already been completed or has been created/edited
-    by the user. It is also removed from the incomplete list and the play later
-    list (if present).
+    by the user. It is also removed from the incomplete list (if present).
 
     Args:
         user_id: str. The id of the user who completed the collection.
@@ -442,12 +436,9 @@ def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
         collection_id not in subscribed_collection_ids
         and collection_id not in activities_completed.collection_ids
     ):
-        # Remove the collection from the in progress and learner playlist
+        # Remove the collection from the in progress list
         # (if present) as it is now completed.
         remove_collection_from_incomplete_list(user_id, collection_id)
-        learner_playlist_services.remove_collection_from_learner_playlist(
-            user_id, collection_id
-        )
         activities_completed.add_collection_id(collection_id)
         _save_completed_activities(activities_completed)
 
@@ -458,8 +449,7 @@ def mark_exploration_as_incomplete(
     """Adds the exploration id to the incomplete list of the user unless the
     exploration has been already completed or has been created/edited by the
     user. If the exploration is already present in the incomplete list, just the
-    details associated with it are updated. If the exploration is present in the
-    learner playlist, it is removed.
+    details associated with it are updated.
 
     Args:
         user_id: str. The id of the user who partially completed the
@@ -494,11 +484,6 @@ def mark_exploration_as_incomplete(
     ):
 
         if exploration_id not in incomplete_activities.exploration_ids:
-            # Remove the exploration from the learner playlist (if present) as
-            # it is currently now being completed.
-            learner_playlist_services.remove_exploration_from_learner_playlist(
-                user_id, exploration_id
-            )
             incomplete_activities.add_exploration_id(exploration_id)
 
         last_playthrough_information_model = (
@@ -590,7 +575,6 @@ def mark_collection_as_incomplete(user_id: str, collection_id: str) -> None:
     """Adds the collection id to the list of collections partially completed by
     the user unless the collection has already been completed or has been
     created/edited by the user or is already present in the incomplete list.
-    If the collection is present in the learner playlist, it is removed.
 
     Args:
         user_id: str. The id of the user who partially completed the collection.
@@ -619,11 +603,6 @@ def mark_collection_as_incomplete(user_id: str, collection_id: str) -> None:
         and collection_id not in incomplete_activities.collection_ids
         and collection_id not in collection_ids
     ):
-        # Remove the collection from the learner playlist (if present) as it
-        # is currently now being completed.
-        learner_playlist_services.remove_collection_from_learner_playlist(
-            user_id, collection_id
-        )
         incomplete_activities.add_collection_id(collection_id)
         _save_incomplete_activities(incomplete_activities)
 
@@ -659,147 +638,6 @@ def validate_and_add_topic_to_learn_goal(
         belongs_to_learnt_list = True
 
     return (belongs_to_learnt_list, goals_limit_exceeded)
-
-
-def add_collection_to_learner_playlist(
-    user_id: str,
-    collection_id: str,
-    position_to_be_inserted: Optional[int] = None,
-) -> Tuple[bool, bool, bool]:
-    """This function checks if the collection exists in the completed list or
-    the incomplete list. If it does not exist we call the function in learner
-    playlist services to add the collection to the play later list.
-
-    Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be added to the
-            learner playlist.
-        position_to_be_inserted: int|None. If this is specified the collection
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
-
-    Returns:
-        (bool, bool, bool). The first boolean indicates whether the collection
-        already exists in either of the "completed collections" or "incomplete
-        collections" lists, the second boolean indicates whether the playlist
-        limit of the user has been exceeded, and the third boolean indicates
-        whether the collection belongs to the created or edited collections of
-        the user.
-    """
-    completed_collection_ids = get_all_completed_collection_ids(user_id)
-    incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
-    playlist_limit_exceeded = False
-    belongs_to_subscribed_activities = False
-    belongs_to_completed_or_incomplete_list = False
-
-    if (
-        collection_id not in completed_collection_ids
-        and collection_id not in incomplete_collection_ids
-    ):
-
-        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
-            learner_playlist_services.mark_collection_to_be_played_later(
-                user_id,
-                collection_id,
-                position_to_be_inserted=position_to_be_inserted,
-            )
-        )
-
-        belongs_to_completed_or_incomplete_list = False
-    else:
-        belongs_to_completed_or_incomplete_list = True
-
-    return (
-        belongs_to_completed_or_incomplete_list,
-        playlist_limit_exceeded,
-        belongs_to_subscribed_activities,
-    )
-
-
-def add_exp_to_learner_playlist(
-    user_id: str,
-    exploration_id: str,
-    position_to_be_inserted: Optional[int] = None,
-) -> Tuple[bool, bool, bool]:
-    """This function checks if the exploration exists in the completed list or
-    the incomplete list. If it does not exist we call the function in learner
-    playlist services to add the exploration to the play later list.
-
-    Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be added to the
-            learner playlist.
-        position_to_be_inserted: int|None. If this is specified the exploration
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
-
-    Returns:
-        (bool, bool, bool). The first boolean indicates whether the exploration
-        already exists in either of the "completed explorations" or
-        "incomplete explorations" lists, the second boolean indicates
-        whether the playlist limit of the user has been
-        exceeded, and the third boolean indicates whether the exploration
-        belongs to the created or edited explorations of the user.
-    """
-    completed_exploration_ids = get_all_completed_exp_ids(user_id)
-    incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
-    playlist_limit_exceeded = False
-    belongs_to_subscribed_activities = False
-    belongs_to_completed_or_incomplete_list = False
-
-    if (
-        exploration_id not in completed_exploration_ids
-        and exploration_id not in incomplete_exploration_ids
-    ):
-
-        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
-            learner_playlist_services.mark_exploration_to_be_played_later(
-                user_id,
-                exploration_id,
-                position_to_be_inserted=position_to_be_inserted,
-            )
-        )
-
-        belongs_to_completed_or_incomplete_list = False
-
-    else:
-        belongs_to_completed_or_incomplete_list = True
-
-    return (
-        belongs_to_completed_or_incomplete_list,
-        playlist_limit_exceeded,
-        belongs_to_subscribed_activities,
-    )
-
-
-def _remove_activity_ids_from_playlist(
-    user_id: str, exploration_ids: List[str], collection_ids: List[str]
-) -> None:
-    """Removes the explorations and collections from the playlist of the user.
-
-    Args:
-        user_id: str. The id of the user.
-        exploration_ids: list(str). The ids of the explorations to be removed.
-        collection_ids: list(str). The ids of the collections to be removed.
-    """
-    learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False
-    )
-
-    if learner_playlist_model:
-        learner_playlist = (
-            learner_playlist_services.get_learner_playlist_from_model(
-                learner_playlist_model
-            )
-        )
-
-        for exploration_id in exploration_ids:
-            learner_playlist.remove_exploration_id(exploration_id)
-
-        for collection_id in collection_ids:
-            learner_playlist.remove_collection_id(collection_id)
-
-        learner_playlist_services.save_learner_playlist(learner_playlist)
 
 
 def remove_story_from_completed_list(user_id: str, story_id: str) -> None:
@@ -1639,73 +1477,6 @@ def _get_filtered_topics_to_learn_summaries(
     return filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn
 
 
-def _get_filtered_exp_playlist_summaries(
-    exploration_summaries: List[Optional[exp_domain.ExplorationSummary]],
-    exploration_ids: List[str],
-) -> Tuple[List[exp_domain.ExplorationSummary], List[str]]:
-    """Returns a list of summaries of the explorations in the learner playlist
-    and the ids of explorations that are no longer present.
-
-    Args:
-        exploration_summaries: list(ExplorationSummary|None). The list of
-            exploration summary domain objects to be filtered.
-        exploration_ids: list(str). The ids of the explorations corresponding to
-            the exploration summary domain objects.
-
-    Returns:
-        tuple. A 2-tuple whose elements are as follows:
-        - list(ExplorationSummary). Filtered list of ExplorationSummary domain
-            objects of the explorations in the learner playlist.
-        - list(str). The ids of the explorations that are no longer present.
-    """
-    nonexistent_playlist_exp_ids = []
-    filtered_exp_playlist_summaries = []
-    for index, exploration_summary in enumerate(exploration_summaries):
-        if exploration_summary is None:
-            nonexistent_playlist_exp_ids.append(exploration_ids[index])
-        elif exploration_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
-            nonexistent_playlist_exp_ids.append(exploration_ids[index])
-        else:
-            filtered_exp_playlist_summaries.append(exploration_summary)
-
-    return filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids
-
-
-def _get_filtered_collection_playlist_summaries(
-    collection_summaries: List[Optional[collection_domain.CollectionSummary]],
-    collection_ids: List[str],
-) -> Tuple[List[collection_domain.CollectionSummary], List[str]]:
-    """Returns a list of summaries of the collections in the learner playlist
-    and the ids of collections that are no longer present.
-
-    Args:
-        collection_summaries: list(CollectionSummary|None). The list of
-            collection summary domain objects to be filtered.
-        collection_ids: list(str). The ids of the collections corresponding to
-            the collection summary domain objects.
-
-    Returns:
-        tuple. A 2-tuple whose elements are as follows:
-        - list(CollectionSummary). Filtered list of CollectionSummary domain
-            objects of the collections in the learner playlist.
-        - list(str). The ids of the collections that are no longer present.
-    """
-    nonexistent_playlist_collection_ids = []
-    filtered_collection_playlist_summaries = []
-    for index, collection_summary in enumerate(collection_summaries):
-        if collection_summary is None:
-            nonexistent_playlist_collection_ids.append(collection_ids[index])
-        elif collection_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
-            nonexistent_playlist_collection_ids.append(collection_ids[index])
-        else:
-            filtered_collection_playlist_summaries.append(collection_summary)
-
-    return (
-        filtered_collection_playlist_summaries,
-        nonexistent_playlist_collection_ids,
-    )
-
-
 def get_all_and_untracked_topic_ids_for_user(
     partially_learnt_topic_ids: List[str],
     learnt_topic_ids: List[str],
@@ -2062,8 +1833,8 @@ def get_learner_dashboard_activities(
     user_id: str,
 ) -> learner_progress_domain.ActivityIdsInLearnerDashboard:
     """Returns the ids of each of the activities that are present in the various
-    sections of the learner dashboard, namely the completed section, the
-    incomplete section and the playlist section.
+    sections of the learner dashboard, namely the completed section and the
+    incomplete section.
 
     Args:
         user_id: str. The id of the learner.
@@ -2077,7 +1848,6 @@ def get_learner_dashboard_activities(
             [
                 ('CompletedActivitiesModel', [user_id]),
                 ('IncompleteActivitiesModel', [user_id]),
-                ('LearnerPlaylistModel', [user_id]),
                 ('LearnerGoalsModel', [user_id]),
             ]
         )
@@ -2131,33 +1901,15 @@ def get_learner_dashboard_activities(
         incomplete_collection_ids = []
         partially_learnt_topic_ids = []
 
-    # If learner playlist model is present.
-    if learner_progress_models[2][0]:
-        # Here assert is used to narrow down the type from Model to
-        # LearnerPlaylistModel.
-        assert isinstance(
-            learner_progress_models[2][0], user_models.LearnerPlaylistModel
-        )
-        learner_playlist = (
-            learner_playlist_services.get_learner_playlist_from_model(
-                learner_progress_models[2][0]
-            )
-        )
-        exploration_playlist_ids: List[str] = learner_playlist.exploration_ids
-        collection_playlist_ids: List[str] = learner_playlist.collection_ids
-    else:
-        exploration_playlist_ids = []
-        collection_playlist_ids = []
-
     # If learner goals model is present.
-    if learner_progress_models[3][0]:
+    if learner_progress_models[2][0]:
         # Here assert is used to narrow down the type from Model to
         # LearnerGoalsModel.
         assert isinstance(
-            learner_progress_models[3][0], user_models.LearnerGoalsModel
+            learner_progress_models[2][0], user_models.LearnerGoalsModel
         )
         learner_goals = learner_goals_services.get_learner_goals_from_model(
-            learner_progress_models[3][0]
+            learner_progress_models[2][0]
         )
         topic_ids_to_learn: List[str] = learner_goals.topic_ids_to_learn
     else:
@@ -2180,8 +1932,6 @@ def get_learner_dashboard_activities(
         topic_ids_to_learn,
         all_topic_ids,
         untracked_topic_ids,
-        exploration_playlist_ids,
-        collection_playlist_ids,
     )
 
     return activity_ids
@@ -2430,16 +2180,8 @@ def get_collection_progress(
     incomplete_collection_ids = (
         activity_ids_in_learner_dashboard.incomplete_collection_ids
     )
-    collection_playlist_ids = (
-        activity_ids_in_learner_dashboard.collection_playlist_ids
-    )
-
     unique_collection_ids = list(
-        set(
-            incomplete_collection_ids
-            + completed_collection_ids
-            + collection_playlist_ids
-        )
+        set(incomplete_collection_ids + completed_collection_ids)
     )
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -2472,15 +2214,6 @@ def get_collection_progress(
         )
         for collection_id in completed_collection_ids
     ]
-    collection_playlist_summaries = [
-        (
-            collection_id_to_model_dict[collection_id]
-            if collection_id in collection_id_to_model_dict
-            else None
-        )
-        for collection_id in collection_playlist_ids
-    ]
-
     (
         filtered_completed_collection_summaries,
         nonexistent_completed_collection_ids,
@@ -2504,17 +2237,9 @@ def get_collection_progress(
         incomplete_collection_summaries, incomplete_collection_ids
     )
 
-    (
-        filtered_collection_playlist_summaries,
-        nonexistent_playlist_collection_ids,
-    ) = _get_filtered_collection_playlist_summaries(
-        collection_playlist_summaries, collection_playlist_ids
-    )
-
     number_of_nonexistent_collections = {
         'incomplete_collections': len(nonexistent_incomplete_collection_ids),
         'completed_collections': len(nonexistent_completed_collection_ids),
-        'collection_playlist': len(nonexistent_playlist_collection_ids),
     }
 
     _remove_activity_ids_from_incomplete_list(
@@ -2526,15 +2251,11 @@ def get_collection_progress(
     _remove_activity_ids_from_completed_list(
         user_id, [], nonexistent_completed_collection_ids, [], []
     )
-    _remove_activity_ids_from_playlist(
-        user_id, [], nonexistent_playlist_collection_ids
-    )
 
     learner_progress_in_collection = (
         learner_progress_domain.LearnerProgressInCollections(
             filtered_incomplete_collection_summaries,
             filtered_completed_collection_summaries,
-            filtered_collection_playlist_summaries,
             completed_to_incomplete_collection_titles,
         )
     )
@@ -2573,16 +2294,8 @@ def get_exploration_progress(
     incomplete_exploration_ids = (
         activity_ids_in_learner_dashboard.incomplete_exploration_ids
     )
-    exploration_playlist_ids = (
-        activity_ids_in_learner_dashboard.exploration_playlist_ids
-    )
-
     unique_exploration_ids = list(
-        set(
-            incomplete_exploration_ids
-            + completed_exploration_ids
-            + exploration_playlist_ids
-        )
+        set(incomplete_exploration_ids + completed_exploration_ids)
     )
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -2613,15 +2326,6 @@ def get_exploration_progress(
         )
         for exp_id in completed_exploration_ids
     ]
-    exploration_playlist_summaries = [
-        (
-            exploration_id_to_model_dict[exp_id]
-            if exp_id in exploration_id_to_model_dict
-            else None
-        )
-        for exp_id in exploration_playlist_ids
-    ]
-
     filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
         _get_filtered_incomplete_exp_summaries(
             incomplete_exp_summaries, incomplete_exploration_ids
@@ -2634,16 +2338,9 @@ def get_exploration_progress(
         )
     )
 
-    filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
-        _get_filtered_exp_playlist_summaries(
-            exploration_playlist_summaries, exploration_playlist_ids
-        )
-    )
-
     number_of_nonexistent_explorations = {
         'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
         'completed_explorations': len(nonexistent_completed_exp_ids),
-        'exploration_playlist': len(nonexistent_playlist_exp_ids),
     }
 
     _remove_activity_ids_from_incomplete_list(
@@ -2655,15 +2352,11 @@ def get_exploration_progress(
     _remove_activity_ids_from_completed_list(
         user_id, nonexistent_completed_exp_ids, [], [], []
     )
-    _remove_activity_ids_from_playlist(
-        user_id, nonexistent_playlist_exp_ids, []
-    )
 
     learner_progress_in_explorations = (
         learner_progress_domain.LearnerProgressInExplorations(
             filtered_incomplete_exp_summaries,
             filtered_completed_exp_summaries,
-            filtered_exp_playlist_summaries,
         )
     )
 

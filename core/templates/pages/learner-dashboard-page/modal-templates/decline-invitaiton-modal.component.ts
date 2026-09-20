@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import './decline-invitation-modal.component.css';
 
 @Component({
   selector: 'oppia-decline-invitation-modal',
   templateUrl: './decline-invitation-modal.component.html',
+  styleUrls: ['./decline-invitation-modal.component.css'],
 })
 export class DeclineInvitationModalComponent extends ConfirmOrCancelModal {
   learnerGroupTitle!: string;

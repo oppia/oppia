@@ -20,11 +20,12 @@ import collections
 import itertools
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
+    feature_flag_services,
     html_cleaner,
     opportunity_services,
     role_services,
@@ -36,6 +37,8 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_fetchers,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -55,21 +58,28 @@ from typing import (
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        opportunity_models,
         question_models,
         skill_models,
         topic_models,
+        translation_models,
         user_models,
     )
 
-(skill_models, user_models, question_models, topic_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.SKILL,
-            models.Names.USER,
-            models.Names.QUESTION,
-            models.Names.TOPIC,
-        ]
-    )
+(
+    opportunity_models,
+    skill_models,
+    user_models,
+    question_models,
+    topic_models,
+) = models.Registry.import_models(
+    [
+        models.Names.OPPORTUNITY,
+        models.Names.SKILL,
+        models.Names.USER,
+        models.Names.QUESTION,
+        models.Names.TOPIC,
+    ]
 )
 
 
@@ -1222,6 +1232,33 @@ def update_skill(
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill.id}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        if model is not None:
+            content_count = skill.get_content_count()
+            translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.SKILL, skill
+            )
+            compute_models_fn = (
+                opportunity_services.compute_translation_opportunity_models_with_updated_entity
+            )
+            updated_opp_models = compute_models_fn(
+                feconf.ENTITY_TYPE_SKILL,
+                skill.id,
+                content_count,
+                translation_counts,
+            )
+            if updated_opp_models:
+                opp_model_cls = opportunity_models.TranslationOpportunityModel
+                opp_model_cls.update_timestamps_multi(updated_opp_models)
+                opp_model_cls.put_multi(updated_opp_models)
+
     misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         for change in change_list
@@ -1282,7 +1319,13 @@ def delete_skill(
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_SKILL: [skill_id]}
+    )
     suggestion_services.auto_reject_question_suggestions_for_skill_id(skill_id)
+    suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
+        [skill_id]
+    )
 
 
 def delete_skill_summary(skill_id: str) -> None:
@@ -1732,3 +1775,94 @@ def get_categorized_skill_ids_and_descriptions() -> (
                 )
 
     return categorized_skills
+
+
+class ConceptCardDict(skill_domain.SkillContentsDict):
+    """Dictionary representing a concept card shown to a learner. It carries
+    the skill description alongside the skill contents, because both are
+    displayed on the card and both are translatable.
+    """
+
+    skill_description: str
+
+
+def get_concept_card_dicts(
+    skills: List[skill_domain.Skill],
+    language_code: Optional[str] = None,
+) -> List[ConceptCardDict]:
+    """Returns the concept card dicts for the given skills, with the skill
+    description and explanation translated into the given language where a
+    translation exists.
+
+    Args:
+        skills: list(Skill). The skills whose concept cards are required.
+        language_code: str or None. The language code to display the concept
+            cards in. If None or English, the original content is returned.
+
+    Returns:
+        list(ConceptCardDict). The concept card dicts for the given skills.
+        Any content without an up-to-date translation falls back to English.
+    """
+    concept_card_dicts: List[ConceptCardDict] = []
+    for skill in skills:
+        skill_contents_dict = skill.skill_contents.to_dict()
+        # Every key of SkillContentsDict is listed explicitly because mypy
+        # rejects a ** spread into a TypedDict, so a field added to
+        # SkillContentsDict has to be added here as well.
+        concept_card_dicts.append(
+            {
+                'explanation': skill_contents_dict['explanation'],
+                'recorded_voiceovers': skill_contents_dict[
+                    'recorded_voiceovers'
+                ],
+                'written_translations': skill_contents_dict[
+                    'written_translations'
+                ],
+                'skill_description': skill.description,
+            }
+        )
+
+    if (
+        language_code is None
+        or language_code == constants.DEFAULT_LANGUAGE_CODE
+    ):
+        return concept_card_dicts
+
+    entity_references: List[
+        translation_models.EntityTranslationReferenceDict
+    ] = [
+        {
+            'entity_type': feconf.TranslatableEntityType.SKILL,
+            'entity_id': skill.id,
+            'entity_version': skill.version,
+            'language_code': language_code,
+        }
+        for skill in skills
+    ]
+    entity_translations = translation_fetchers.get_multiple_entity_translations(
+        entity_references
+    )
+
+    for skill, concept_card_dict, entity_translation in zip(
+        skills, concept_card_dicts, entity_translations
+    ):
+        if entity_translation is None:
+            continue
+
+        translated_description = (
+            translation_services.get_up_to_date_translation(
+                entity_translation, feconf.SKILL_DESCRIPTION_CONTENT_ID
+            )
+        )
+        if translated_description is not None:
+            concept_card_dict['skill_description'] = translated_description
+
+        translated_explanation = (
+            translation_services.get_up_to_date_translation(
+                entity_translation, skill.skill_contents.explanation.content_id
+            )
+        )
+        if translated_explanation is not None:
+            concept_card_dict['explanation']['html'] = translated_explanation
+
+    return concept_card_dicts

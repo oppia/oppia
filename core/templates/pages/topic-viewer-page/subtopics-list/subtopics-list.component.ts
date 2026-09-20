@@ -24,6 +24,8 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 
+import './subtopics-list.component.css';
+
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',

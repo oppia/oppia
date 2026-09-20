@@ -21,6 +21,16 @@
       </select>
     </div>
 
+    <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showCreatorFeedbackTypeFilter">
+      <span class="oppia-feedback-filter-bar-stats-label">Feedback Type:</span>
+      <select class="oppia-feedback-filter-bar-select"
+              [(ngModel)]="selectedCreatorFeedbackType">
+        <option *ngFor="let t of creatorFeedbackTypeOptions" [value]="t">
+          {{ creatorFeedbackTypeLabels[t] }}
+        </option>
+      </select>
+    </div>
+
     <div *ngIf="config.showSearchBar" class="oppia-feedback-filter-bar-search">
       <div class="oppia-feedback-filter-bar-stats">
         <span class="oppia-feedback-filter-bar-stats-label">Description Filter:</span>

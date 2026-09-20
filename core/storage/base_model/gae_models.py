@@ -193,10 +193,10 @@ class BaseModel(datastore_services.Model):
         super()._pre_put_hook()
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_utc_datetime()
 
         if self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_utc_datetime()
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
@@ -416,10 +416,10 @@ class BaseModel(datastore_services.Model):
         self._last_updated_timestamp_is_fresh = True
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_utc_datetime()
 
         if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_utc_datetime()
 
     @classmethod
     def update_timestamps_multi(
@@ -614,7 +614,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     def put_for_human(self) -> None:
         """Stores the model instance on behalf of a human."""
-        self.last_updated_by_human = datetime.datetime.utcnow()
+        self.last_updated_by_human = utils.get_current_utc_datetime()
         return super().put()
 
     def put_for_bot(self) -> None:
@@ -640,7 +640,7 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_utc_datetime()
         for instance in instances:
             instance.last_updated_by_human = now
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
@@ -2225,7 +2225,7 @@ class BaseFeedbackModel(BaseModel):
     def _get_filtered_query(
         cls,
         author_id: Optional[str] = None,
-        status_filter: Optional[str] = 'open',
+        status_filter: Optional[List[str]] = None,
         exploration_id: Optional[str] = None,
         date_from: Optional[datetime.datetime] = None,
         date_to: Optional[datetime.datetime] = None,
@@ -2234,7 +2234,8 @@ class BaseFeedbackModel(BaseModel):
 
         Args:
             author_id: Optional[str]. If provided, filters by author ID.
-            status_filter: Optional[str]. If provided, filters by status.
+            status_filter: Optional[List[str]]. If provided, filters by these
+                status values.
             exploration_id: Optional[str]. If provided, filters by
                 exploration ID.
             date_from: Optional[datetime.datetime]. If provided, filters for
@@ -2244,6 +2245,10 @@ class BaseFeedbackModel(BaseModel):
 
         Returns:
             Query. The filtered query object.
+
+        Raises:
+            Exception. Raised when any of the given status filter values is
+                not present in feconf.STATUS_CHOICES.
         """
         query = cls.query()
         # Ignoring deleted threads as they are not relevant for operations.
@@ -2251,8 +2256,19 @@ class BaseFeedbackModel(BaseModel):
 
         if author_id is not None:
             query = query.filter(cls.author_id == author_id)
-        if status_filter and status_filter in feconf.STATUS_CHOICES:
-            query = query.filter(cls.status == status_filter)
+        if status_filter:
+            invalid_statuses = [
+                status
+                for status in status_filter
+                if status not in feconf.STATUS_CHOICES
+            ]
+            if invalid_statuses:
+                raise Exception(
+                    'Invalid status filter values: %s. Expected statuses to '
+                    'be chosen from feconf.STATUS_CHOICES: %s.'
+                    % (invalid_statuses, feconf.STATUS_CHOICES)
+                )
+            query = query.filter(cls.status.IN(status_filter))
         if exploration_id is not None:
             query = query.filter(cls.exploration_id == exploration_id)
         if date_from is not None:
@@ -2263,6 +2279,35 @@ class BaseFeedbackModel(BaseModel):
         return query
 
     @classmethod
+    def get_status_counts(
+        cls,
+        exploration_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Returns the number of non-deleted feedback entries per status.
+
+        Args:
+            exploration_id: Optional[str]. If provided, only entries belonging
+                to this exploration are counted.
+
+        Returns:
+            dict. Maps each status in feconf.STATUS_CHOICES to its count,
+            plus a 'total' key with the overall number of counted entries.
+        """
+        query = cls._get_filtered_query(exploration_id=exploration_id)
+        counts: Dict[str, int] = {status: 0 for status in feconf.STATUS_CHOICES}
+        total = 0
+        # A projection query is used to avoid fetching full entities, since
+        # only the status field is needed for counting.
+        status_models: Sequence[BaseFeedbackModel] = query.fetch(
+            projection=[cls.status]
+        )
+        for model in status_models:
+            counts[model.status] += 1
+            total += 1
+        counts['total'] = total
+        return counts
+
+    @classmethod
     # Here we use type Any because subclasses can extend the filtered query with
     # model-specific keyword filters.
     def fetch_page(
@@ -2270,13 +2315,63 @@ class BaseFeedbackModel(BaseModel):
         page_size: int,
         cursor: Optional[str] = None,
         author_id: Optional[str] = None,
-        status_filter: Optional[str] = None,
+        status_filter: Optional[List[str]] = None,
         exploration_id: Optional[str] = None,
         date_from: Optional[datetime.datetime] = None,
         date_to: Optional[datetime.datetime] = None,
+        order_by_last_updated: bool = False,
         **kwargs: Any,
     ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
-        """Fetches a page of feedback entries sorted by created_on_desc."""
+        """Fetches a page of feedback entries sorted by created_on_desc or
+        last_updated.
+
+        When multiple status filters are provided, uses offset-based pagination
+        with .fetch() instead of .fetch_page() to avoid the IN operator
+        incompatibility with Datastore cursors.
+        """
+        next_cursor_str: Optional[str] = None
+
+        # When multiple statuses are provided, use offset-based pagination
+        # to avoid the IN + fetch_page incompatibility. This follows the
+        # pattern used by suggestion models in this codebase.
+        if status_filter and len(status_filter) > 1:
+            sort_key = (
+                cls.last_updated if order_by_last_updated else cls.created_on
+            )
+            query = cls._get_filtered_query(
+                author_id=author_id,
+                status_filter=status_filter,
+                exploration_id=exploration_id,
+                date_from=date_from,
+                date_to=date_to,
+                **kwargs,
+            ).order(-sort_key)
+
+            # Decode cursor to get offset.
+            offset = 0
+            if cursor:
+                try:
+                    offset = int(cursor)
+                except (ValueError, TypeError):
+                    offset = 0
+
+            results: Sequence[BaseFeedbackModel] = query.fetch(
+                page_size, offset=offset
+            )
+            next_offset = offset + len(results)
+
+            # Check if there are more results. Only one entity is fetched
+            # since the result is used solely to compute the 'more' flag.
+            next_results: Sequence[BaseFeedbackModel] = query.fetch(
+                1, offset=next_offset
+            )
+            more = len(next_results) > 0
+
+            if more:
+                next_cursor_str = str(next_offset)
+
+            return results, next_cursor_str, more
+
         query = cls._get_filtered_query(
             author_id=author_id,
             status_filter=status_filter,
@@ -2284,15 +2379,19 @@ class BaseFeedbackModel(BaseModel):
             date_from=date_from,
             date_to=date_to,
             **kwargs,
-        ).order(-cls.created_on)
+        )
+
+        if order_by_last_updated:
+            query = query.order(-cls.last_updated)
+        else:
+            query = query.order(-cls.created_on)
 
         start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
-        results: Sequence[BaseFeedbackModel]
         results, next_cursor, more = query.fetch_page(
             page_size, start_cursor=start_cursor
         )
 
-        next_cursor_str: Optional[str] = None
+        next_cursor_str = None
         if len(results) < page_size:
             more = False
         elif next_cursor and more:

@@ -52,8 +52,8 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to rate the lesson', async function () {
-    await loggedInUser.playExploration(explorationId);
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.playExplorationAsLoggedInUser(explorationId);
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     // Rate exploration and give feedback.
     await loggedInUser.expectRatingStarsToBeVisible();

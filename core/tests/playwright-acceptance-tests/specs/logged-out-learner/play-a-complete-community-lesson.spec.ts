@@ -53,7 +53,7 @@ test.describe('Logged-Out Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
     await curriculumAdmin.createSkillForTopic(
       'Math',
@@ -150,7 +150,7 @@ test.describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLessonFromSearchResults(
       'What are the place values?'
     );
-    await loggedOutLearner.expectToBeOnPage(
+    await loggedOutLearner.expectToBeOnPageAsLoggedOutUser(
       `http://localhost:8181/explore/${explorationId}`
     );
     await loggedOutLearner.waitForPageToFullyLoad();
@@ -158,7 +158,7 @@ test.describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');
 
     // Continue to next card.
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectGoBackToPreviousCardButton(true);
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
 

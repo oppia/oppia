@@ -1,0 +1,85 @@
+.assessment-modal-card {
+  background: #e9edeb;
+  border-radius: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  max-width: 520px;
+  padding: 28px 28px 24px;
+  width: 100%;
+}
+
+.assessment-modal-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.assessment-modal-header-content {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.assessment-modal-icon {
+  flex: none;
+  height: 60px;
+  width: 60px;
+}
+
+.assessment-modal-title {
+  color: #2d2d2d;
+  font-family: 'Capriola', sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.assessment-modal-message {
+  color: #46545e;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0 0 14px 62px;
+}
+
+.assessment-modal-inline-key {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  color: #334e68;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  height: 22px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0 2px;
+  padding: 0;
+  vertical-align: middle;
+  width: 22px;
+}
+.assessment-modal-inline-key:hover {
+  background: #f4f6f5;
+}
+
+.assessment-modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-left: 62px;
+  margin-top: 18px;
+}
+
+.assessment-modal-action-button {
+  background: #0d6259;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 220px;
+}
+.assessment-modal-action-button:hover {
+  background: #0a4f48;
+}

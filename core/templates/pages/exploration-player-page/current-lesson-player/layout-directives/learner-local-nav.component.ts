@@ -34,10 +34,12 @@ import {PageContextService} from 'services/page-context.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import './learner-local-nav.component.css';
 
 @Component({
   selector: 'oppia-learner-local-nav',
   templateUrl: './learner-local-nav.component.html',
+  styleUrls: ['./learner-local-nav.component.css'],
 })
 export class LearnerLocalNavComponent implements OnInit {
   canEdit: boolean = false;

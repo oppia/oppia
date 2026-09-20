@@ -18,8 +18,12 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
+from core.constants import constants
+
+from google.cloud import resourcemanager_v3
 from typing import Optional
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
@@ -67,3 +71,43 @@ def get_gcs_resource_bucket_name(oppia_project_id: Optional[str] = None) -> str:
     """
     project_id = oppia_project_id or get_application_id()
     return '%s%s' % (project_id, _GCS_RESOURCE_BUCKET_NAME_SUFFIX)
+
+
+def get_compute_engine_default_service_account_email() -> str | None:
+    """Returns the Compute Engine default service account email for the project.
+
+    The Compute Engine default service account email follows the format:
+    `{PROJECT_NUMBER}-compute@developer.gserviceaccount.com`
+
+    `PROJECT_NUMBER` is NOT the same as `PROJECT_ID` (returned by the function:
+    `get_application_id()`), and it is NOT available as an environment variable.
+    Instead, we must query against the Google Cloud SDK to retrieve _all_
+    high-level project info and then extract the number from its "name" field.
+
+    NOTE: The local developer server doesn't correspond to a project, so when
+    running in dev mode we simply return `None`.
+
+    Documentation:
+    https://docs.cloud.google.com/compute/docs/access/service-accounts#default_service_account
+
+    Returns:
+        str | None. The default service account email, or None when running in
+        dev mode or when the request fails for any reason. A warning message
+        will also be logged to help with debugging.
+    """
+    if constants.DEV_MODE:
+        return None
+    try:
+        client = resourcemanager_v3.ProjectsClient()
+        request = resourcemanager_v3.GetProjectRequest(
+            name=f'projects/{get_application_id()}'
+        )
+        response = client.get_project(request=request)
+        project_number = int(response.name.removeprefix('projects/'))
+        return f'{project_number}-compute@developer.gserviceaccount.com'
+    except Exception as err:
+        logging.warning(
+            'Failed to fetch the numeric project id from the '
+            'Google Cloud SDK: %s' % err
+        )
+        return None

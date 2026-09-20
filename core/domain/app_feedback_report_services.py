@@ -751,8 +751,9 @@ def reassign_ticket(
                 )
                 latest_timestamp = report_models[0].submitted_on
                 for index in range(1, len(report_models)):
-                    if report_models[index].submitted_on > (latest_timestamp):
-                        latest_timestamp = report_models[index].submitted_on
+                    latest_timestamp = max(
+                        latest_timestamp, report_models[index].submitted_on
+                    )
                 old_ticket_obj.newest_report_creation_timestamp = (
                     latest_timestamp
                 )

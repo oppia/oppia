@@ -30,7 +30,6 @@ import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-sto
 import {PracticeTabComponent} from './deprecations/practice-tab/practice-tab.component';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
-import {TopicHeaderComponent} from './topic-header/topic-header.component';
 
 @NgModule({
   imports: [
@@ -63,7 +62,6 @@ import {TopicHeaderComponent} from './topic-header/topic-header.component';
   declarations: [
     TopicViewerPageRootComponent,
     TopicViewerPageComponent,
-    TopicHeaderComponent,
     PracticeSessionConfirmationModal,
   ],
   entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],

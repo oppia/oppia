@@ -97,11 +97,12 @@ export class TranslateTextBackendApiService {
     contentHtml: string | string[],
     translationHtml: string | string[],
     imagesData: ImagesData[],
-    dataFormat: string
+    dataFormat: string,
+    entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<void> {
     const postData: Data = {
       suggestion_type: 'translate_content',
-      target_type: 'exploration',
+      target_type: entityType,
       description: 'Adds translation',
       target_id: expId,
       target_version_at_submission: expVersion,

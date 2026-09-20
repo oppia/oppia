@@ -970,3 +970,90 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
                 translation_services.save_machine_translation_provider_mapping(
                     invalid_mapping
                 )
+
+    def test_get_up_to_date_translation_returns_translation_successfully(
+        self,
+    ) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'Valid translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False,
+            )
+        }
+        entity_translation = translation_domain.EntityTranslation(
+            'exp_id',
+            feconf.TranslatableEntityType.EXPLORATION,
+            1,
+            'hi',
+            translation_dict,
+        )
+        self.assertEqual(
+            translation_services.get_up_to_date_translation(
+                entity_translation, 'content_id_1'
+            ),
+            'Valid translation',
+        )
+
+    def test_get_up_to_date_translation_missing_id_returns_none(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'Valid translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False,
+            )
+        }
+        entity_translation = translation_domain.EntityTranslation(
+            'exp_id',
+            feconf.TranslatableEntityType.EXPLORATION,
+            1,
+            'hi',
+            translation_dict,
+        )
+        self.assertIsNone(
+            translation_services.get_up_to_date_translation(
+                entity_translation, 'content_id_2'
+            )
+        )
+
+    def test_get_up_to_date_translation_stale_returns_none(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'Stale translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                True,
+            )
+        }
+        entity_translation = translation_domain.EntityTranslation(
+            'exp_id',
+            feconf.TranslatableEntityType.EXPLORATION,
+            1,
+            'hi',
+            translation_dict,
+        )
+        self.assertIsNone(
+            translation_services.get_up_to_date_translation(
+                entity_translation, 'content_id_1'
+            )
+        )
+
+    def test_get_up_to_date_translation_non_string_returns_none(self) -> None:
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                ['List translation'],
+                translation_domain.TranslatableContentFormat.SET_OF_UNICODE_STRING,
+                False,
+            )
+        }
+        entity_translation = translation_domain.EntityTranslation(
+            'exp_id',
+            feconf.TranslatableEntityType.EXPLORATION,
+            1,
+            'hi',
+            translation_dict,
+        )
+        self.assertIsNone(
+            translation_services.get_up_to_date_translation(
+                entity_translation, 'content_id_1'
+            )
+        )

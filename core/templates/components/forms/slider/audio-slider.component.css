@@ -1,0 +1,27 @@
+.mat-accent /deep/ .mat-slider-track-fill,
+.mat-accent /deep/ .mat-slider-thumb,
+.mat-accent /deep/ .mat-slider-thumb-label {
+  background: #ff4081;
+}
+
+.mat-slider-horizontal {
+  height: 2px;
+  min-width: 120px;
+}
+
+.mat-slider {
+  padding: 0;
+}
+
+/deep/ .mat-slider-wrapper {
+  position: static;
+}
+
+/* ::ng-deep is used here to override Angular Material's own internally-injected
+   .mat-slider-wrapper styles, which set top: 23px and are not reachable through
+   normal Emulated view encapsulation since they live outside this component's
+   template boundary */
+/* stylelint-disable selector-pseudo-element-no-unknown */
+::ng-deep .mat-slider-horizontal .mat-slider-wrapper {
+  top: 0 !important;
+}

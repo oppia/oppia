@@ -100,6 +100,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
+  TAB_NAME_TRANSLATION_COORDINATOR: string = 'Translation Coordinator';
+  TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
@@ -171,7 +173,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (this.isTranslationCoordinator) {
               this.CONTRIBUTION_TYPES.push(
                 this.TAB_NAME_TRANSLATION_SUBMITTER,
-                this.TAB_NAME_TRANSLATION_REVIEWER
+                this.TAB_NAME_TRANSLATION_REVIEWER,
+                this.TAB_NAME_TRANSLATION_COORDINATOR
               );
 
               this.contributorDashboardAdminStatsBackendApiService
@@ -193,7 +196,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (this.isQuestionCoordinator) {
               this.CONTRIBUTION_TYPES.push(
                 this.TAB_NAME_QUESTION_SUBMITTER,
-                this.TAB_NAME_QUESTION_REVIEWER
+                this.TAB_NAME_QUESTION_REVIEWER,
+                this.TAB_NAME_QUESTION_COORDINATOR
               );
             }
 
@@ -233,6 +237,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     return (
       this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
       this.activeTab === this.TAB_NAME_QUESTION_REVIEWER
+    );
+  }
+
+  isCoordinatorTab(): boolean {
+    return (
+      this.activeTab === this.TAB_NAME_TRANSLATION_COORDINATOR ||
+      this.activeTab === this.TAB_NAME_QUESTION_COORDINATOR
     );
   }
 

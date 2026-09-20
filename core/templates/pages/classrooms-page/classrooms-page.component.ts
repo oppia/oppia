@@ -27,10 +27,12 @@ import {LoaderService} from 'services/loader.service';
 import {AppConstants} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import './classrooms-page.component.css';
 
 @Component({
   selector: 'oppia-classrooms-page',
   templateUrl: './classrooms-page.component.html',
+  styleUrls: ['./classrooms-page.component.css'],
 })
 export class ClassroomsPageComponent {
   classroomSummaries: ClassroomSummaryDict[] = [];

@@ -28,10 +28,12 @@ import {GraphData} from 'services/compute-graph.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExplorationGraphModalComponent} from '../templates/modal-templates/exploration-graph-modal.component';
+import './exploration-graph.component.css';
 
 @Component({
   selector: 'oppia-exploration-graph',
   templateUrl: './exploration-graph.component.html',
+  styleUrls: ['./exploration-graph.component.css'],
 })
 export class ExplorationGraphComponent {
   // This property is initialized using Angular lifecycle hooks

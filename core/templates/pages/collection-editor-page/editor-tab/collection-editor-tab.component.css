@@ -1,0 +1,40 @@
+.collection-editor-cards-container {
+  margin: auto;
+  max-width: 898px;
+  position: relative;
+}
+
+.collection-editor-last-node {
+  margin-right: 20px;
+}
+
+.collection-editor-node-list-container {
+  background-color: white;
+  border: 1px solid #bdbdbd;
+  display: block;
+  margin: 30px auto;
+  min-width: 98%;
+  overflow-x: auto;
+  padding: 70px 20px;
+  text-align: center;
+  white-space: nowrap;
+  width: 98%;
+}
+
+.collection-editor-node-container, .collection-editor-node-connector-container {
+  display: inline-block;
+}
+
+.collection-editor-node-connector-container {
+  margin-left: -4px;
+  width: 45px;
+}
+
+.collection-editor-node-connector {
+  height: 30px;
+  width: 50px;
+}
+
+svg {
+  color: #88888a;
+}

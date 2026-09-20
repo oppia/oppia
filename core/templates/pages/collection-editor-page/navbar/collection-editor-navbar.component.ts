@@ -29,10 +29,12 @@ import {CollectionEditorRoutingService} from '../services/collection-editor-rout
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionEditorPrePublishModalComponent} from '../modals/collection-editor-pre-publish-modal.component';
 import {CollectionEditorSaveModalComponent} from '../modals/collection-editor-save-modal.component';
+import './collection-editor-navbar.component.css';
 
 @Component({
   selector: 'collection-editor-navbar',
   templateUrl: './collection-editor-navbar.component.html',
+  styleUrls: ['./collection-editor-navbar.component.css'],
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();

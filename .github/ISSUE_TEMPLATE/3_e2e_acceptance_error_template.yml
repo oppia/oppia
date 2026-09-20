@@ -1,6 +1,6 @@
-name: E2E or Acceptance Test CI Failure Report
+name: Acceptance Test CI Failure Report
 description: Create a report to help us improve
-title: "[E2E/Acceptance CI Failure]: "
+title: "[Acceptance CI Failure]: "
 labels: [triage needed, bug, CI breakage]
 body:
   - type: markdown
@@ -33,7 +33,6 @@ body:
       label: CI Test Type
       description: In which CI test did this failure occur?
       options:
-        - E2E
         - Acceptance
     validations:
       required: true

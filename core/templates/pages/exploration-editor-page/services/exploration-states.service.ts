@@ -623,6 +623,23 @@ export class ExplorationStatesService {
     return allContentIds.filter(contentId => contentId !== undefined);
   }
 
+  getAllNonEmptyContentIdsByStateName(stateName: string): string[] {
+    const state = this._getStates().getState(stateName);
+    const contentIdToHtml = state.getContentIdToContents();
+    const allContentIds = state
+      .getAllContentIds()
+      .filter(contentId => contentId !== undefined);
+    return allContentIds.filter(contentId => {
+      // Content ids present in this map (card content, customization args
+      // like choices, feedback, hints, solution) are dropped when their
+      // HTML is empty, since empty fields don't need a translation. Content
+      // ids not in the map (e.g. rule inputs) are left untouched.
+      return (
+        !(contentId in contentIdToHtml) || contentIdToHtml[contentId] !== ''
+      );
+    });
+  }
+
   getCheckpointCount(): number {
     let count: number = 0;
     if (this._states) {

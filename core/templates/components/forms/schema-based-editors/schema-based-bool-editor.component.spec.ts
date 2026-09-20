@@ -16,8 +16,15 @@
  * @fileoverview Unit tests for Schema Based Bool Editor Component
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {FormControl, FormsModule} from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {
   ComponentFixture,
   fakeAsync,
@@ -92,5 +99,14 @@ describe('Schema Based Bool Editor Component', () => {
     component.updateValue(true);
 
     expect(component.localValue).toBeTrue();
+  });
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
   });
 });

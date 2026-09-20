@@ -1,0 +1,17 @@
+.oppia-add-existing-exploration-form > input {
+  margin-right: 5px;
+  min-width: 430px;
+}
+
+.oppia-new-exploration-form > input {
+  margin-right: 10px;
+  min-width: 160px;
+}
+
+.form-control {
+  width: auto;
+}
+
+.oppia-form-text {
+  font-size: smaller;
+}

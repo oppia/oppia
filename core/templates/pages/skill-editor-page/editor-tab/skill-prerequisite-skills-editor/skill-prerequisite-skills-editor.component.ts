@@ -34,10 +34,12 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Component, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import './skill-prerequisite-skills-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
   templateUrl: './skill-prerequisite-skills-editor.component.html',
+  styleUrls: ['./skill-prerequisite-skills-editor.component.css'],
 })
 export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

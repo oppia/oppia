@@ -59,6 +59,12 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
 
+// Number of times a translate button click is attempted before giving up, and
+// how long each attempt waits for the translation modal to open. The product of
+// the two is kept at the default 30 second selector timeout.
+const translateButtonClickAttempts = 3;
+const translateModalTimeoutMsecs = 10000;
+
 export class TranslationSubmitter extends BaseUser {
   /**
    * Clicks on the given pagination button.
@@ -142,33 +148,67 @@ export class TranslationSubmitter extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
-    const opportunityItem =
-      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
-        chapterName,
-        storyName
-      );
+    // The opportunity list re-renders whenever the language filter changes, so
+    // the opportunity is re-queried and clicked again if the modal does not
+    // open within the timeout.
+    for (let attempt = 1; attempt <= translateButtonClickAttempts; attempt++) {
+      const opportunityItem =
+        await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
+          chapterName,
+          storyName
+        );
 
-    if (!opportunityItem) {
-      throw new Error(
-        `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+      if (!opportunityItem) {
+        throw new Error(
+          `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+        );
+      }
+
+      // Click on translate button in the opportunity item.
+      const translateButton = await opportunityItem.waitForSelector(
+        opportunityTranslateButtonSelector
       );
+      if (!translateButton) {
+        throw new Error(
+          `Translate button for chapter ${chapterName} and story ${storyName} not found.`
+        );
+      }
+      if (this.isViewportAtMobileWidth()) {
+        // Aligning the button with the bottom of the viewport keeps it clear of
+        // the header so that the clickability check below can pass.
+        await translateButton.evaluate(el => el.scrollIntoView({block: 'end'}));
+        await this.waitForElementToStabilize(translateButton);
+        await this.waitForElementToBeClickable(translateButton);
+        // Puppeteer scrolls a target back to the centre of the viewport before
+        // it dispatches a mouse event, which parks the button underneath the
+        // sticky header again and delivers the click to the header instead.
+        // That scroll happens after the check above, so the click is dispatched
+        // on the element itself where it cannot be intercepted.
+        await translateButton.evaluate(el => (el as HTMLElement).click());
+      } else {
+        await this.clickOnElement(translateButton);
+      }
+
+      // Verify that the translation editor is opened.
+      try {
+        await this.page.waitForSelector(
+          translateTextModalHeaderContainerSelector,
+          {visible: true, timeout: translateModalTimeoutMsecs}
+        );
+        showMessage(
+          `Element ${translateTextModalHeaderContainerSelector} is visible.`
+        );
+        return;
+      } catch (error) {
+        if (attempt === translateButtonClickAttempts) {
+          throw error;
+        }
+        showMessage(
+          `Translation modal did not open for chapter ${chapterName} and ` +
+            `story ${storyName} on attempt ${attempt}. Retrying...`
+        );
+      }
     }
-
-    // Click on translate button in the opportunity item.
-    const translateButton = await opportunityItem.waitForSelector(
-      opportunityTranslateButtonSelector
-    );
-    if (!translateButton) {
-      throw new Error(
-        `Translate button for chapter ${chapterName} and story ${storyName} not found.`
-      );
-    }
-    await translateButton.click();
-
-    // Verify that the translation editor is opened.
-    await this.expectElementToBeVisible(
-      translateTextModalHeaderContainerSelector
-    );
   }
 
   /**

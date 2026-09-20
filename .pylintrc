@@ -6,11 +6,11 @@
 init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
+load-plugins=pylint.extensions.docstyle, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
 
-string-quote=single
-triple-quote=double
-docstring-quote=double
+[STRING]
+
+check-quote-consistency=yes
 
 [BASIC]
 
@@ -83,7 +83,7 @@ forbidden-imports=
 
 disallowed-functions-and-replacements-str=
     assertEquals=>self.assertEqual,
-    now=>datetime.datetime.utcnow,
+    utcnow=>utils.get_current_utc_datetime,
     beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=
@@ -124,6 +124,7 @@ disable=abstract-method,
         no-else-return,
         no-member,
         too-many-arguments,
+        too-many-positional-arguments,
         too-many-boolean-expressions,
         too-many-branches,
         too-many-instance-attributes,

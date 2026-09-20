@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
+from core import utils
 from core.domain import blog_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
@@ -136,7 +135,7 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
                 model
             )
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = utils.get_current_utc_datetime()
         if model.published_on:
             if (model.published_on - max_clock_skew_duration) > (
                 current_datetime

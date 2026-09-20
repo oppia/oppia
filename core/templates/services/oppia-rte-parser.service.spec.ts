@@ -15,6 +15,7 @@
 /**
  * @fileoverview Spec for service that parses rich text string.
  */
+// @ts-nocheck
 
 import {DOCUMENT} from '@angular/common';
 import {TestBed} from '@angular/core/testing';
