@@ -70,9 +70,9 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             | 'Create job run results'
             >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f'Exploration {result["exp_id"]} '
-                    f'(version {result["version"]}) '
-                    f'has duplicate content IDs: {result["duplicates"]}'
+                    f'Exploration {result['exp_id']} '
+                    f'(version {result['version']}) '
+                    f'has duplicate content IDs: {result['duplicates']}'
                 )
             )
         )
@@ -164,9 +164,9 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         return fixed_explorations | 'Create job run results' >> beam.Map(
             lambda result: job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration {result["exp_id"]} '
-                f'(version {result["version"]}) - '
-                f'regenerated content IDs: {result["fixed_content_ids"]}'
+                f'Fixed exploration {result['exp_id']} '
+                f'(version {result['version']}) - '
+                f'regenerated content IDs: {result['fixed_content_ids']}'
             )
         )
 

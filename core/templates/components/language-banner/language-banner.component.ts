@@ -21,7 +21,6 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from 'services/user.service';
 import {LanguageBannerService} from './language-banner.service';
 import {Router} from '@angular/router';
-import './language-banner.component.css';
 
 @Component({
   selector: 'language-banner',
