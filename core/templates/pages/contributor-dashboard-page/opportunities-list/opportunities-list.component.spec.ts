@@ -638,6 +638,26 @@ describe('Opportunities List Component', () => {
       expect(component.totalPages).toBe(1);
     }));
 
+    it('should not call loadOpportunitiesCount when searchQuery is set', fakeAsync(() => {
+      const loadOpportunitiesCountSpy = jasmine
+        .createSpy('loadOpportunitiesCount')
+        .and.returnValue(Promise.resolve(20));
+      component.loadOpportunitiesCount = loadOpportunitiesCountSpy;
+      component.dropdownPaginationEnabled = true;
+
+      component.searchQuery = 'activeSearch';
+
+      // Before loadOpportunities resolves, it should be 1.
+      component.fetchAndLoadOpportunities();
+      expect(component.totalPages).toBe(1);
+
+      // After resolving, it evaluates loaded items (16 items -> 2 pages) + 1 for 'more' = 3 pages.
+      tick();
+
+      expect(loadOpportunitiesCountSpy).not.toHaveBeenCalled();
+      expect(component.totalPages).toBe(3);
+    }));
+
     it('should calculate totalPages on init using loadOpportunitiesCount', fakeAsync(() => {
       component.loadOpportunitiesCount = () => Promise.resolve(20); // E.g. 20 total items.
       // 20 items / 16 items per page = 2 pages.

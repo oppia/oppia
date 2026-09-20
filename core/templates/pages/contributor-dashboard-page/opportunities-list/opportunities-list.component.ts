@@ -275,7 +275,7 @@ export class OpportunitiesListComponent {
             Math.ceil(totalCount / this.OPPORTUNITIES_PAGE_SIZE)
           );
         });
-      } else if (!this.loadOpportunitiesCount) {
+      } else if (!this.loadOpportunitiesCount || this.searchQuery) {
         this.totalPages = 1;
       }
     }
