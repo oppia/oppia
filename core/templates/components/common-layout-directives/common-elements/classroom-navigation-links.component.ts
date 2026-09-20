@@ -87,6 +87,13 @@ export class ClassroomNavigationLinksComponent implements OnInit {
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach(classroom => this.classroomSummaries.push(classroom));
           this.isLoading = false;
+        })
+        .catch(() => {
+          // The request can fail for users with a partial login session (a
+          // valid session cookie with no signed-up Oppia account), since the
+          // backend rejects all requests for such sessions until they sign
+          // up. In that case, no classrooms can be shown.
+          this.isLoading = false;
         });
     }
   }

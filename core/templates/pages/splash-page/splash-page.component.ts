@@ -148,10 +148,21 @@ export class SplashPageComponent implements OnInit {
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then(userInfo => {
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.loaderService.hideLoadingScreen();
-    });
+    this.userService
+      .getUserInfoAsync()
+      .then(userInfo => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+        this.loaderService.hideLoadingScreen();
+      })
+      .catch(() => {
+        // A failed user info request can happen when the user has a partial
+        // login session (a valid session cookie with no signed-up Oppia
+        // account). In that case the user is treated as logged out on this
+        // page, and the server clears the session on the next page that is
+        // served by a regular handler.
+        this.userIsLoggedIn = false;
+        this.loaderService.hideLoadingScreen();
+      });
     this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();

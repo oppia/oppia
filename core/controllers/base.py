@@ -112,6 +112,9 @@ def load_template(filename: str, *, template_is_aot_compiled: bool) -> str:
     return html_text
 
 
+# Here we use type Any because the values argument is a dict of template
+# variables whose values can be of any JSON-serializable type (bools,
+# strings, nested containers etc.), which are substituted into the template.
 def render_html_response(
     response: webapp2.Response,
     filename: str,

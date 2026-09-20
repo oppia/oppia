@@ -19,7 +19,7 @@ from __future__ import annotations
 import contextlib
 import json
 
-from core import feconf, feature_flag_list
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import auth_services, user_services
 from core.tests import test_utils
