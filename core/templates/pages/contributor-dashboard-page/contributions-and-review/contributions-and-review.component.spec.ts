@@ -3639,5 +3639,14 @@ describe('Contributions and review component', () => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
     }));
+
+    it(
+      'should return an empty list when the active tab subtype is neither' +
+        'translate nor question',
+      () => {
+        component.activeTabSubtype = '';
+        expect(component.getContributionSummaries({})).toEqual([]);
+      }
+    );
   });
 });
