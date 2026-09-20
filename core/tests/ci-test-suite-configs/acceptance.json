@@ -571,11 +571,6 @@
       "framework": "puppeteer"
     },
     {
-      "name": "community-library-browser/feature-translation-opps-with-new-opps-model/search-for-an-exploration-using-its-translated-title",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/community-library-browser/feature-translation-opps-with-new-opps-model/search-for-an-exploration-using-its-translated-title.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
       "name": "voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts",
       "framework": "puppeteer"
