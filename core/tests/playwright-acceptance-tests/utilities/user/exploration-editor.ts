@@ -1753,8 +1753,7 @@ export class ExplorationEditor extends BaseUser {
 
     if (title === explorationName) {
       await this.clickOnElementWithSelector(
-        explorationSummaryTileTitleSelector,
-        {force: true}
+        '.e2e-test-exploration-dashboard-card'
       );
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
