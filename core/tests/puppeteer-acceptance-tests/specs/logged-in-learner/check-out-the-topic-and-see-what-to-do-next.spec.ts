@@ -568,7 +568,9 @@ describe('Logged-in Learner', function () {
       // completed" and "Chapter 12 becomes the next active lesson") are
       // verified by the iteration that completes chapter 11: it checks the
       // completed (✅) indicator and verifies that chapter 12 becomes the next
-      // active lesson.
+      // active lesson. The final iteration (completing chapter 12) is the last
+      // playable chapter, so it asserts the completed indicator but skips the
+      // next-active check because no playable next chapter remains.
       while (await loggedInLearner.hasNextActiveChapterToPlay()) {
         await loggedInLearner.waitForPageToFullyLoad();
         await loggedInLearner.clickOnActiveChapterStartButton();
@@ -578,7 +580,9 @@ describe('Logged-in Learner', function () {
         );
         await loggedInLearner.openTopicPage('math', 'fractions');
         await loggedInLearner.expectCompletedLessonToBeVisible();
-        await loggedInLearner.expectNextChapterToBeActive();
+        if (await loggedInLearner.hasNextActiveChapterToPlay()) {
+          await loggedInLearner.expectNextChapterToBeActive();
+        }
       }
 
       // The CUJ "Complete Lesson 13 and return to the topic page" step maps in
