@@ -1,7 +1,7 @@
 <div class="card-interaction-controls">
   <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
     <button mat-button
-            class="btn btn-secondary  oppia-skip-button"
+            class="btn btn-secondary oppia-skip-button"
             *ngIf="skipButtonIsShown"
             (click)="skipCurrentQuestion()">
       I don't know
@@ -12,12 +12,12 @@
             (click)="submit.emit()"
             class="oppia-learner-confirm-button oppia-autofocus"
             oppiaFocusOn="continue-btn">
-            {{ continueButtonCustomizationArgs.buttonText.value.unicode }}
+      {{ continueButtonCustomizationArgs.buttonText.value.unicode }}
       <i class="fas fa-arrow-right oppia-arrow"></i>
     </button>
     <button mat-button
             *ngIf="doesInteractionHaveNavSubmitButton()"
-            class="oppia-learner-submit-answer-button"
+            class="oppia-learner-submit-answer-button e2e-test-submit-answer-button"
             (click)="submit.emit()"
             [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
       {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}

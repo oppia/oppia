@@ -233,4 +233,38 @@ describe('Card navigation control component', () => {
     componentInstance.moveBackByOneCard();
     expect(conversationFlowService.moveBackByOneCard).toHaveBeenCalled();
   });
+
+  it('should render the last card without errors', () => {
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/lesson/wZiXFx1iV5bz'
+    );
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      false
+    );
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+    componentInstance.displayedCard = mockDisplayedCard;
+
+    componentInstance.ngOnChanges();
+
+    expect(() => fixture.detectChanges()).not.toThrowError();
+  });
+
+  it('should show the previous button when there is a previous card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+    componentInstance.displayedCard = mockDisplayedCard;
+    componentInstance.navigationThroughCardHistoryIsEnabled = true;
+    componentInstance.helpCardHasContinueButton = false;
+    componentInstance.updateDisplayedCardInfo();
+    fixture.detectChanges();
+
+    const previousButton =
+      fixture.nativeElement.querySelector('.oppia-back-button');
+    const nextButton =
+      fixture.nativeElement.querySelector('.oppia-next-button');
+    expect(previousButton).not.toBeNull();
+    expect(nextButton).not.toBeNull();
+  });
 });
