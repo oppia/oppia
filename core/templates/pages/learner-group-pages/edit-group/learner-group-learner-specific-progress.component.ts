@@ -23,8 +23,6 @@ import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
-import './learner-group-learner-specific-progress.component.css';
-
 @Component({
   selector: 'oppia-learner-group-learner-specific-progress',
   templateUrl: './learner-group-learner-specific-progress.component.html',
