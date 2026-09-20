@@ -212,6 +212,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         )
 
         fixed_content_ids = []
+        all_content_ids_set = set(all_content_ids)
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
@@ -224,9 +225,14 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
-                new_content_id = _generate_matching_content_id(
-                    duplicate_id, content_id_generator
-                )
+                while True:
+                    new_content_id = _generate_matching_content_id(
+                        duplicate_id, content_id_generator
+                    )
+                    if new_content_id not in all_content_ids_set:
+                        break
+
+                all_content_ids_set.add(new_content_id)
 
                 _replace_content_id_in_state(
                     state, duplicate_id, new_content_id
@@ -369,6 +375,21 @@ def _replace_content_id_in_state(
                 state.interaction.solution.explanation.content_id = (
                     new_content_id
                 )
+
+    if (
+        hasattr(state, 'recorded_voiceovers')
+        and old_content_id in state.recorded_voiceovers.voiceovers_mapping
+    ):
+        state.recorded_voiceovers.voiceovers_mapping[new_content_id] = (
+            state.recorded_voiceovers.voiceovers_mapping.pop(old_content_id)
+        )
+    if (
+        hasattr(state, 'written_translations')
+        and old_content_id in state.written_translations.translations_mapping
+    ):
+        state.written_translations.translations_mapping[new_content_id] = (
+            state.written_translations.translations_mapping.pop(old_content_id)
+        )
 
 
 # Here we use type Any because the customization arg value can be of
