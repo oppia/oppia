@@ -14,6 +14,8 @@
 
 """Tests for the topic editor page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import os

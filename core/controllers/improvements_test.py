@@ -16,6 +16,8 @@
 
 """Tests for the improvements controllers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

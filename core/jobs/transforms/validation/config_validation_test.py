@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.transforms.config_validation."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import platform_parameter_domain as parameter_domain

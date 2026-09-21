@@ -23,6 +23,8 @@ TODO(#11475): Add lint checks that ensure all "jobs.*_jobs" modules are imported
 into this file.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs

@@ -16,6 +16,8 @@
 
 """Unit tests for core.jobs.batch_jobs.exploration_voiceover_sync_jobs"""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

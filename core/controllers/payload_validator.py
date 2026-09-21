@@ -18,6 +18,8 @@
 Also contains a list of handler class names which does not contain the schema.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import schema_utils

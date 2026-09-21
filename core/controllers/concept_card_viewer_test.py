@@ -14,6 +14,8 @@
 
 """Tests for the handler that returns concept card for a skill."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import json

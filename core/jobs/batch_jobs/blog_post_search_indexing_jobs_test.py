@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import math

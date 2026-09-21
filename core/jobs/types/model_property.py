@@ -16,6 +16,8 @@
 
 """Domain object for the property of a model."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_utils

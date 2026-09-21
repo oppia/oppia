@@ -16,6 +16,8 @@
 
 """Provides PTransforms for writing job results to the datastore."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import beam_job_services

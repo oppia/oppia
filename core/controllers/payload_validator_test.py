@@ -14,6 +14,8 @@
 
 """Tests for various errors raised by validate method of payload validator."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.controllers import payload_validator

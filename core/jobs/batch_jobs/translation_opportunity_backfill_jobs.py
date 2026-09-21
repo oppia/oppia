@@ -16,6 +16,8 @@
 
 """Jobs that backfill TranslationOpportunityModel from existing ExplorationModels, StoryModels and SkillModels."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

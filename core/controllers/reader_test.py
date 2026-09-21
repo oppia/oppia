@@ -14,6 +14,8 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging

@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.translation_audit_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils

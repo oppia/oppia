@@ -14,6 +14,8 @@
 
 """Tests for various static pages (like the About page)."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

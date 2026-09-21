@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.transforms.subtopic_validation."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils

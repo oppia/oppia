@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.model_validation_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

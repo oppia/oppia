@@ -14,6 +14,8 @@
 
 """Firebase proxy controller."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import json

@@ -16,6 +16,8 @@
 
 """Unit tests for feedback model validator errors."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs.types import (

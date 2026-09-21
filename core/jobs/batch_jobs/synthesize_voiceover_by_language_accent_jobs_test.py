@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import constants, feconf

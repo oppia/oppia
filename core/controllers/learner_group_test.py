@@ -14,6 +14,8 @@
 
 """Tests for the learner groups."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import json

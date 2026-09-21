@@ -16,6 +16,8 @@
 NumericExpressionInput, MathEquationInput.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

@@ -16,6 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of skill models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import skill_domain

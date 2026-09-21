@@ -14,6 +14,8 @@
 
 """Tests for the skill editor page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf, utils

@@ -16,6 +16,8 @@
 
 """Utilities for running Apache Beam tests."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import ast

@@ -16,6 +16,8 @@
 
 """Unit tests for core.jobs.transforms.results_transforms."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils

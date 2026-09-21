@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

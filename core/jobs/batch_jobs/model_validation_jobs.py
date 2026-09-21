@@ -16,6 +16,8 @@
 
 """Audit jobs that validate all of the storage models in the datastore."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

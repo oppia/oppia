@@ -16,6 +16,8 @@
 
 """Decorators to provide authorization across the site."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import functools

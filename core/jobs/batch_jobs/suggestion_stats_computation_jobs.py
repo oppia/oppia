@@ -16,6 +16,8 @@
 
 """Jobs that are run by CRON scheduler."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

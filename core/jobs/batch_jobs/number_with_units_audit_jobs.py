@@ -14,6 +14,8 @@
 
 """Audit job that lists units used in NumberWithUnits rules."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs
