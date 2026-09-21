@@ -176,18 +176,18 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
 
+        # Manually set IDs so we can strictly control the collision.
+        exploration.add_states(['State4'])
+        state4 = exploration.states['State4']
+
+        # Take up the first two indices to force collisions.
+        state4.content.content_id = 'content_0'
+        state3.content.content_id = 'content_1'
+
         # Duplicate ID on Introduction and State2.
-        duplicate_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        )
+        duplicate_id = 'content_5'
         state1.content.content_id = duplicate_id
         state2.content.content_id = duplicate_id
-
-        # Collision ID on State3 (which would be generated next).
-        collision_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        )
-        state3.content.content_id = collision_id
 
         # We must save the exploration first with a valid index to pass domain validation.
         exp_services.save_new_exploration('owner_id', exploration)
@@ -198,13 +198,14 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         with datastore_services.get_ndb_context():
             exp_model = exp_models.ExplorationModel.get('exp_id')
             exp_model.next_content_id_index = 0
-            exp_model.put()
+            exp_model.update_timestamps()
+            datastore_services.put_multi([exp_model])
 
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     f'Fixed exploration exp_id (version 1) - regenerated content '
-                    f'IDs: [\'{duplicate_id} -> content_2 in State2\']'
+                    f'IDs: [\'content_5 -> content_2 in State2\']'
                 )
             ]
         )
