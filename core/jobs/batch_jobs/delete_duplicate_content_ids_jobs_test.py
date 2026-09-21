@@ -189,10 +189,16 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
         state3.content.content_id = collision_id
 
-        # Reset the index to force the generator to generate the duplicate
-        # and then the collision ID before finding a unique one.
-        exploration.next_content_id_index = 0
+        # We must save the exploration first with a valid index to pass domain validation.
         exp_services.save_new_exploration('owner_id', exploration)
+
+        # Now bypass domain validation by saving directly to the datastore
+        # with an invalid next_content_id_index (0) to force the generator
+        # to generate the duplicate and then the collision ID before finding a unique one.
+        with datastore_services.get_ndb_context():
+            exp_model = exp_models.ExplorationModel.get('exp_id')
+            exp_model.next_content_id_index = 0
+            exp_model.put()
 
         self.assert_job_output_is(
             [

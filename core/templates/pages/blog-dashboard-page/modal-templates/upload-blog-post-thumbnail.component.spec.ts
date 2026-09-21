@@ -146,6 +146,37 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
 
+  it('should get invalid SVG issue URL', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('mock_issue_url');
+    componentInstance.invalidTagsAndAttributes = {
+      tags: ['invalid_tag'],
+      attrs: [],
+    };
+
+    expect(componentInstance.getInvalidSvgIssueUrl()).toEqual('mock_issue_url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith({
+      tags: ['invalid_tag'],
+      attrs: [],
+    });
+  });
+
+  it('should catch error when view is destroyed during file load', () => {
+    let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
+    const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
+      c.charCodeAt(0)
+    );
+    let file = new File([arrayBuffer], 'filename.mp3');
+    
+    // Force detectChanges to throw an error
+    const changeDetectorRef = fixture.debugElement.injector.get(ChangeDetectorRef);
+    spyOn(changeDetectorRef, 'detectChanges').and.throwError('ViewDestroyedError');
+
+    expect(() => {
+      componentInstance.onFileChanged(file);
+    }).not.toThrowError();
+  });
+
   it('should confirm thumbnail picutre', () => {
     let pictureDataUrl = 'picture_data';
     componentInstance.cropper = {
