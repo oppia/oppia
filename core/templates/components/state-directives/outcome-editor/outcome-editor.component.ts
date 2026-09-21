@@ -63,7 +63,6 @@ export class OutcomeEditorComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean = false;
-  correctnessLabelEditorIsOpen: boolean = false;
   destinationEditorIsOpen: boolean = false;
   destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
@@ -298,7 +297,6 @@ export class OutcomeEditorComponent implements OnInit {
       this.stateEditorService.isExplorationCurated();
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
-    this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
 
     this.onMobile =

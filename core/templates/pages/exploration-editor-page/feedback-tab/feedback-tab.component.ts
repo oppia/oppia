@@ -93,7 +93,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   };
   readonly creatorFeedbackFilterConfig = CREATOR_DASHBOARD_FILTER_CONFIG;
 
-  activeThread: SuggestionThread | null = null;
+  activeThread: SuggestionThread | FeedbackThread | null = null;
   userIsLoggedIn = false;
   threadIsStale = false;
   threadData: FeedbackThread[] = [];
@@ -185,9 +185,8 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
         if (activeThreadId !== null) {
           // Fetching threads invalidates old thread domain objects, so we
           // need to update our reference to the active thread afterwards.
-          this.activeThread = this.threadDataBackendApiService.getThread(
-            activeThreadId
-          ) as SuggestionThread;
+          this.activeThread =
+            this.threadDataBackendApiService.getThread(activeThreadId);
         }
         this.loaderService.hideLoadingScreen();
       });
@@ -201,11 +200,20 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   }
 
   _isSuggestionHandled(): boolean {
-    return !!(this.activeThread && this.activeThread.isSuggestionHandled());
+    const activeThread = this.activeThread;
+    return !!(
+      activeThread &&
+      !this.isFeedbackThread(activeThread) &&
+      activeThread.isSuggestionHandled()
+    );
   }
 
   _isSuggestionValid(): boolean {
-    const stateName = this.activeThread?.getSuggestionStateName();
+    const activeThread = this.activeThread;
+    const stateName =
+      activeThread && !this.isFeedbackThread(activeThread)
+        ? activeThread.getSuggestionStateName()
+        : null;
 
     return !!(stateName && this.explorationStatesService.hasState(stateName));
   }
@@ -287,15 +295,15 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   }
 
   setActiveThread(threadId: string): void {
-    let thread = this.threadDataBackendApiService.getThread(threadId);
+    const thread = this.threadDataBackendApiService.getThread(threadId);
     if (thread === null) {
       throw new Error('Trying to display a non-existent thread');
     }
 
     this.threadDataBackendApiService.getMessagesAsync(thread).then(() => {
-      this.activeThread = thread as SuggestionThread;
-      this.threadDataBackendApiService.markThreadAsSeenAsync(this.activeThread);
-      this.feedbackMessage.status = this.activeThread.status;
+      this.activeThread = thread;
+      this.threadDataBackendApiService.markThreadAsSeenAsync(thread);
+      this.feedbackMessage.status = thread.status;
       this.focusManagerService.setFocus('feedbackMessage');
     });
   }
