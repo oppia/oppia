@@ -19,7 +19,7 @@
             *ngIf="doesInteractionHaveNavSubmitButton()"
             class="oppia-learner-submit-answer-button"
             (click)="submit.emit()"
-            [disabled]="currentInteractionService.isSubmitButtonDisabled() || displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
+            [disabled]="isSubmitButtonDisabled()">
       {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
     </button>
   </div>

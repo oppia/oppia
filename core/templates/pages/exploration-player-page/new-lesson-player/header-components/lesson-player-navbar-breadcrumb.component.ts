@@ -55,15 +55,15 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
       return;
     }
 
+    if (this.topicUrlFragment === null || this.classroomUrlFragment === null) {
+      throw new Error('Topic or classroom URL fragment is null');
+    }
+
     this.topicViewerBackendApiService
       .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
       .then((readOnlyTopic: ReadOnlyTopic) => {
         this.topicName = readOnlyTopic.getTopicName();
       });
-
-    if (this.classroomUrlFragment === null) {
-      throw new Error('Classroom URL fragment is null');
-    }
 
     this.classroomBackendApiService
       .fetchClassroomDataAsync(this.classroomUrlFragment)

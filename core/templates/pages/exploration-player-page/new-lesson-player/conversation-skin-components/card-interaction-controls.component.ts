@@ -14,10 +14,7 @@
 
 /**
  * @fileoverview Component for the interaction controls (skip, continue,
- * submit buttons) in the new conversation skin. This was split out of
- * CardNavigationControlComponent so that the interaction buttons can be
- * rendered inside the tutor card, while card-to-card navigation and the
- * progress tracker remain in the fixed footer bar.
+ * submit buttons) in the new conversation skin.
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
@@ -192,6 +189,17 @@ export class CardInteractionControlsComponent {
       }
       throw e;
     }
+  }
+
+  // Returns whether the generic submit button should be disabled. This
+  // wraps the private currentInteractionService so the template does not
+  // need direct access to it.
+  isSubmitButtonDisabled(): boolean {
+    return (
+      this.currentInteractionService.isSubmitButtonDisabled() ||
+      this.displayedCard.showNoResponseError() ||
+      this.displayedCard.showInvalidResponseError()
+    );
   }
 
   shouldContinueButtonBeShown(): boolean {

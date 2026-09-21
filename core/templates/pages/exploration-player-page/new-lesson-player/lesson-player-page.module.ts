@@ -32,6 +32,7 @@ import {FatigueDetectionService} from '../services/fatigue-detection.service';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
+import {TranslateModule} from '@ngx-translate/core';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
@@ -45,6 +46,7 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
 import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 import {ConversationFlowService} from '../services/conversation-flow.service';
 import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-player-navbar-breadcrumb.component';
+import {CardInteractionControlsComponent} from './conversation-skin-components/card-interaction-controls.component';
 
 @NgModule({
   imports: [
@@ -60,6 +62,7 @@ import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-
     ToastrModule,
     MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),
+    TranslateModule,
   ],
   declarations: [
     NewLessonPlayerPageComponent,
@@ -72,6 +75,7 @@ import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-
     LessonFeedbackModalComponent,
     NewProgressReminderModalComponent,
     LessonPlayerNavbarBreadcrumbComponent,
+    CardInteractionControlsComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -84,6 +88,7 @@ import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-
     NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewProgressReminderModalComponent,
     LessonPlayerNavbarBreadcrumbComponent,
+    CardInteractionControlsComponent,
   ],
   providers: [
     HintAndSolutionModalService,

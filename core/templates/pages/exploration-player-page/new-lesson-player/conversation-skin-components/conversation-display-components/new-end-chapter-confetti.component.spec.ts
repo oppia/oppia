@@ -80,6 +80,9 @@ describe('End chapter confetti component', function () {
 
   it('should play the confetti video and hide it once it ends', () => {
     fixture.detectChanges();
+    if (!component.confettiVideoRef) {
+      throw new Error('confettiVideoRef is not defined');
+    }
     const videoElement = component.confettiVideoRef.nativeElement;
     spyOn(videoElement, 'play');
     spyOn(component.endChapterCelebratoryAudio, 'play');
@@ -89,7 +92,7 @@ describe('End chapter confetti component', function () {
     expect(videoElement.play).toHaveBeenCalled();
     expect(component.confettiIsShown).toBe(true);
 
-    videoElement.onended(new Event('ended'));
+    videoElement.dispatchEvent(new Event('ended'));
 
     expect(component.confettiIsShown).toBe(false);
   });

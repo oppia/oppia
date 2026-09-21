@@ -33,6 +33,7 @@ import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {
   HelpCardEventResponse,
@@ -41,11 +42,12 @@ import {
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {CardInteractionControlsComponent} from './card-interaction-controls.component';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 
 describe('Card interaction controls component', () => {
   let fixture: ComponentFixture<CardInteractionControlsComponent>;
   let componentInstance: CardInteractionControlsComponent;
+  let currentInteractionService: CurrentInteractionService;
   let playerPositionService: PlayerPositionService;
   let explorationModeService: ExplorationModeService;
   let focusManagerService: FocusManagerService;
@@ -75,6 +77,7 @@ describe('Card interaction controls component', () => {
         UrlService,
         PageContextService,
         ConversationFlowService,
+        CurrentInteractionService,
         SchemaFormSubmittedService,
         ContentTranslationManagerService,
       ],
@@ -85,6 +88,7 @@ describe('Card interaction controls component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CardInteractionControlsComponent);
     componentInstance = fixture.componentInstance;
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -335,5 +339,47 @@ describe('Card interaction controls component', () => {
     componentInstance.interactionCustomizationArgs =
       mockArgs as ContinueCustomizationArgs;
     expect(componentInstance.continueButtonCustomizationArgs).toEqual(mockArgs);
+  });
+
+  it('should disable submit when the interaction service says so', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      true
+    );
+
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(true);
+  });
+
+  it('should disable submit when there is no response error', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      false
+    );
+    spyOn(mockDisplayedCard, 'showNoResponseError').and.returnValue(true);
+    spyOn(mockDisplayedCard, 'showInvalidResponseError').and.returnValue(false);
+
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(true);
+  });
+
+  it('should disable submit when the response is invalid', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      false
+    );
+    spyOn(mockDisplayedCard, 'showNoResponseError').and.returnValue(false);
+    spyOn(mockDisplayedCard, 'showInvalidResponseError').and.returnValue(true);
+
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(true);
+  });
+
+  it('should enable submit when there are no errors', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      false
+    );
+    spyOn(mockDisplayedCard, 'showNoResponseError').and.returnValue(false);
+    spyOn(mockDisplayedCard, 'showInvalidResponseError').and.returnValue(false);
+
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(false);
   });
 });
