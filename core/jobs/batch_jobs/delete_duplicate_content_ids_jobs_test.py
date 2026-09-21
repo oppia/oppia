@@ -167,10 +167,6 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             'exp_id', title='Test Exploration', category='Test'
         )
 
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-
         exploration.add_states(['State2', 'State3'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
@@ -204,8 +200,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    f'Fixed exploration exp_id (version 1) - regenerated content '
-                    f'IDs: [\'content_5 -> content_2 in State2\']'
+                    'Fixed exploration exp_id (version 1) - regenerated content '
+                    'IDs: [\'content_5 -> content_2 in State2\']'
                 )
             ]
         )
