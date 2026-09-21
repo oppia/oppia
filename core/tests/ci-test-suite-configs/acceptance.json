@@ -662,8 +662,8 @@
     },
     {
       "name": "practice-question-reviewer/view-contribution-stats-and-badges-earned",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-reviewer/view-contribution-stats-and-badges-earned.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-reviewer/view-contribution-stats-and-badges-earned.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill",

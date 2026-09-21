@@ -135,6 +135,17 @@ const publishStoryButton = 'button.e2e-test-publish-story-button';
 const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
+const rteSelector = '.e2e-test-rte';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
@@ -931,6 +942,69 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(skillEditorCollapsibleCard);
 
     expect(this.page.url()).toContain('/skill_editor/');
+  }
+
+  /**
+   * Adds an explanation to a skill rubric difficulty level.
+   * @param difficulty - The difficulty level to update.
+   * @param explanation - The explanation to add.
+   */
+  async updateRubric(
+    difficulty: 'Easy' | 'Medium' | 'Hard',
+    explanation: string
+  ): Promise<void> {
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.page.locator(selectRubricDifficultySelector).isVisible())
+    ) {
+      await this.clickOnElementWithSelector(toggleSkillRubricsDropdown);
+    }
+
+    const difficultyValues = {
+      Easy: '0',
+      Medium: '1',
+      Hard: '2',
+    } as const;
+    await this.select(
+      selectRubricDifficultySelector,
+      difficultyValues[difficulty]
+    );
+    await this.clickOnElementWithText(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.typeInInputField(rteSelector, explanation);
+    await this.clickOnElementWithSelector(saveRubricExplanationButton);
+    await this.expectElementToBeVisible(saveRubricExplanationButton, false);
+  }
+
+  /**
+   * Publishes changes made in the skill editor.
+   * @param updateMessage - The commit message for the skill changes.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const navigationIsVisible = await this.isElementVisible(
+        navigationContainerSelector,
+        true,
+        5000
+      );
+      if (!navigationIsVisible) {
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
+      }
+
+      const navigationToggles = await this.page.$$(mobileSkillNavToggle);
+      if (navigationToggles.length < 2) {
+        throw new Error('Skill editor mobile navigation toggle not found.');
+      }
+      await this.clickOnElement(navigationToggles[1]);
+      await this.clickOnElementWithSelector(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.clickOnElementWithSelector(saveOrPublishSkillSelector);
+    }
+
+    await this.expectElementToBeVisible(commitMessageInputSelector);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+    await this.expectToastMessage('Changes Saved.');
+    showMessage('Skill updated successfully.');
   }
 
   /**
