@@ -18,10 +18,7 @@
 
 import {Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
-import testConstants from '../common/test-constants';
 import {Contributor} from './contributor';
-
-const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
@@ -52,67 +49,6 @@ const questionDifficultySelectionModalSelector =
   '.e2e-test-question-opportunity-difficulty';
 
 export class PracticeQuestionSubmitter extends Contributor {
-  /**
-   * Clicks on the view button in the submitted question.
-   * @param {string} question - The question to view.
-   * @param {string} skill - The skill the question belongs to.
-   */
-  async viewSubmittedQuestion(question: string, skill: string): Promise<void> {
-    const questionElement = await this.expectOpportunityToBePresent(
-      question,
-      skill
-    );
-
-    if (!questionElement) {
-      throw new Error(`Opportunity item for question ${question} not found.`);
-    }
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElement(questionElement);
-    } else {
-      const viewButton = await questionElement.$(
-        '.e2e-test-opportunity-list-item-button'
-      );
-      if (!viewButton) {
-        throw new Error('View button not found.');
-      }
-      await this.clickOnElement(viewButton);
-    }
-    await this.expectElementToBeVisible(
-      '.e2e-test-question-suggestion-review-modal-header'
-    );
-  }
-
-  /**
-   * Closes the translation modal.
-   */
-  async closePracticeQuestionModal(): Promise<void> {
-    const closeModalButtonSelector = '.e2e-test-close-modal-button';
-    await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOnElementWithSelector(closeModalButtonSelector);
-    await this.expectElementToBeVisible(closeModalButtonSelector, false);
-  }
-
-  /**
-   * Checks if the interaction name is as expected.
-   * @param name The name of the interaction.
-   */
-  async expectSelectedInteractionNameToBe(name: string): Promise<void> {
-    const selectedInteractionNameSelector =
-      '.e2e-test-selected-interaction-name';
-    await this.expectTextContentToBe(
-      selectedInteractionNameSelector,
-      `Interaction ( ${name} )`
-    );
-  }
-
-  /**
-   * Function for navigating to the contributor dashboard page.
-   */
-  async navigateToContributorDashboard(): Promise<void> {
-    await this.goto(contributorDashboardUrl);
-  }
-
   /**
    * Opens the suggest questions modal and selects a specific skill and topic.
    * @param skillName - The name of the skill to suggest questions for.

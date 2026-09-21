@@ -18,7 +18,6 @@
 
 import {Page} from '@playwright/test';
 import {Contributor} from './contributor';
-import {INTERACTION_TYPES} from './exploration-editor';
 
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
 
@@ -37,9 +36,6 @@ const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
 const stateContentInputField = 'div.e2e-test-rte';
 const saveContentButton = 'button.e2e-test-save-state-content';
-const removeInteractionButtonSelector = '.e2e-test-delete-interaction';
-const confirmDeleteInteractionButtonSelector =
-  '.e2e-test-confirm-delete-interaction';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
@@ -60,37 +56,6 @@ export class PracticeQuestionReviewer extends Contributor {
       );
     }
     await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
-  }
-
-  /**
-   * Removes the interaction from the question being edited.
-   */
-  private async removeInteraction(): Promise<void> {
-    const questionEditorModal = await this.getElementInParent(
-      questionSuggestionEditorModalSelector
-    );
-    const removeInteractionButton = await this.getElementInParent(
-      removeInteractionButtonSelector,
-      questionEditorModal
-    );
-
-    await this.clickOnElement(removeInteractionButton);
-    await this.clickOnElementWithSelector(
-      confirmDeleteInteractionButtonSelector
-    );
-    await this.expectElementToBeVisible(
-      confirmDeleteInteractionButtonSelector,
-      false
-    );
-  }
-
-  /**
-   * Checks that the question in the review modal is the same as the one passed in.
-   * @param question The question to check.
-   */
-  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
-    const rteDisplaySelector = '.e2e-test-state-content-display';
-    await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 
   /**
@@ -145,42 +110,6 @@ export class PracticeQuestionReviewer extends Contributor {
 
     // Update the question.
     await this.editQuestionInQuestionEditorModal(question);
-
-    // Save the question.
-    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
-    await this.expectToastMessage('Updated question.');
-    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
-  }
-
-  /**
-   * Edits the question interaction in the review.
-   */
-  async editQuestionInteractionInReview(): Promise<void> {
-    await this.expectElementToBeVisible(editButtonSelector);
-    await this.openQuestionEditorModal();
-
-    await this.removeInteraction();
-
-    await this.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-
-    // Add responses to the number input interaction.
-    await this.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMBER_INPUT,
-      '100',
-      'Perfect!',
-      undefined,
-      true
-    );
-
-    // Add hint.
-    await this.addHintToState('Test Hint');
-
-    // Add a solution to the state.
-    await this.addSolutionToState(
-      '100',
-      'As said in the question itself.',
-      true
-    );
 
     // Save the question.
     await this.clickOnElementWithSelector(saveQuestionButtonSelector);

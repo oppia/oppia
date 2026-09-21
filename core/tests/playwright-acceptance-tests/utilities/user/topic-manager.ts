@@ -85,7 +85,6 @@ const addDiagnosticTestSkillButton =
 const diagnosticTestSkillSelector =
   'select.e2e-test-diagnostic-test-skill-selector';
 const addQuestionButton = 'button.e2e-test-create-question-button';
-const questionTextSelector = '.e2e-test-question-text';
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
@@ -917,28 +916,6 @@ export class TopicManager extends BaseUser {
       await this.clickAndWaitForNavigation(skillQuestionTab, true);
     }
     await this.expectElementToBeVisible(addQuestionButton);
-  }
-
-  /**
-   * Checks whether a question is present in the skill question list.
-   * @param question - The question to check.
-   * @param contains - Whether the question should be present.
-   */
-  async expectQuestionToBePresent(
-    question: string,
-    contains: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(questionTextSelector);
-    const questionTexts = await this.page.$$eval(
-      questionTextSelector,
-      elements => elements.map(element => element.textContent?.trim())
-    );
-
-    if (contains) {
-      expect(questionTexts).toContain(question);
-    } else {
-      expect(questionTexts).not.toContain(question);
-    }
   }
 
   /**
