@@ -3221,12 +3221,24 @@ export class LoggedInUser extends BaseUser {
         };
 
         if (!href) {
-          await button.click();
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: 'load',
+              timeout: 60000,
+            }),
+            button.click(),
+          ]);
           await waitForExplorationPlayer();
           return;
         }
 
-        await this.page.goto(href);
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: 'load',
+            timeout: 60000,
+          }),
+          this.page.goto(href),
+        ]);
         await waitForExplorationPlayer();
         return;
       }
