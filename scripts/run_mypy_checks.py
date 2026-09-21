@@ -68,8 +68,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/story_services.py',
     'core/domain/skill_services.py',
     'core/domain/question_services.py',
-    'core/domain/opportunity_services.py',
-    'core/domain/learner_progress_services.py',
     'core/controllers/story_viewer.py',
     'core/controllers/reader.py',
     'core/jobs/transforms/validation/base_validation.py',
