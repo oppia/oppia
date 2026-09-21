@@ -24,7 +24,6 @@ import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/fil
 import cloneDeep from 'lodash/cloneDeep';
 import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {UserService} from 'services/user.service';
-import './skill-selector.component.css';
 
 interface SubTopicFilterDict {
   [topicName: string]: {subTopicName: string; checked: boolean}[];

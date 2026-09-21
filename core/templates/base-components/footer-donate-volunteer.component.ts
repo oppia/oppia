@@ -27,8 +27,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
-import './footer-donate-volunteer.component.css';
-
 @Component({
   selector: 'oppia-footer-donate-volunteer',
   templateUrl: './footer-donate-volunteer.component.html',
