@@ -200,7 +200,9 @@ export class ContributionAndReviewBackendApiService {
     if (languageCode) {
       params.language_code = languageCode;
     }
-    return this.http.get<FetchSuggestionsResponse>(url, {params}).toPromise();
+    return this.http
+      .get<FetchSuggestionsResponse>(url, {params} as Object)
+      .toPromise();
   }
 
   async fetchReviewableSuggestionsAsync(
