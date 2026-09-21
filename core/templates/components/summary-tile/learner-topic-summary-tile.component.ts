@@ -23,7 +23,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import './learner-topic-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-learner-topic-summary-tile',

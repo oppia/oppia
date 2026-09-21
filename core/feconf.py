@@ -374,10 +374,6 @@ CURRENT_LESSON_METADATA_SCHEMA_VERSION = 1
 # schema changes.
 CURRENT_RESPONSE_LIST_SCHEMA_VERSION = 1
 
-# The default number of exploration tiles to load at a time in the search
-# results page.
-SEARCH_RESULTS_PAGE_SIZE = 20
-
 # The default number of commits to show on a page in the exploration history
 # tab.
 COMMIT_LIST_PAGE_SIZE = 50
@@ -536,16 +532,6 @@ EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
-ES_HOST = os.environ.get('ES_HOST', 'localhost')
-ES_LOCALHOST_PORT = 9200
-# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
-# auth information during deployment.
-ES_CLOUD_ID = None
-ES_USERNAME = None
-
-ES_DISK_WATERMARK_LOW = 85
-ES_DISK_WATERMARK_HIGH = 95
-
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
@@ -573,6 +559,7 @@ OPPIA_CONTENT_TAG_DELIMITER = '; '
 # Azure Translator API configuration for automatic translation suggestions.
 AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
 AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+GCP_TRANSLATOR_API_KEY = os.environ.get('GCP_TRANSLATOR_API_KEY')
 
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
@@ -609,6 +596,16 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
+# The email address for the translation technical support group.
+TRANSLATION_TECH_SUPPORT_EMAIL = 'translations-tech-support@oppia.org'
+# Human-readable display names for machine translation providers, keyed by the
+# provider ID used in the language-to-provider mapping (e.g. 'azure', 'gcp').
+# To add a new provider: add an entry here with the provider's display name.
+# To remove a provider: delete its entry here.
+MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES = {
+    'azure': 'Azure Translator',
+    'gcp': 'Google Cloud Translate',
+}
 CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
@@ -777,10 +774,6 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
 
-# The maximum number of blog post cards to be visible on each page in blog
-# search results homepage.
-MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
-
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE = 12
@@ -933,7 +926,6 @@ BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
-BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 BLOG_TITLE_HANDLER = '/blogtitlehandler/data'
 BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX = '/blog/author'
 BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX = '/blog/author/data'
@@ -976,7 +968,6 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
     '/learneranswerinfohandler/learner_answer_details'
 )
-EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
@@ -1026,9 +1017,8 @@ LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
-LIBRARY_SEARCH_URL = '/search/find'
-LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
+LESSON_URL_PREFIX = '/lesson'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'

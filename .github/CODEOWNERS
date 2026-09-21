@@ -67,6 +67,8 @@
 /core/templates/services/contextual/logger.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-head.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/lazy-css-loader.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/lazy-css-loader.service.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/services/i18n-language-code.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/question-validation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/request-interceptor.service*.ts @oppia/lace-frontend-reviewers
@@ -247,7 +249,6 @@
 /core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
-/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
@@ -373,6 +374,7 @@
 /extensions/objects/ @oppia/lace-backend-reviewers
 /extensions/objects/templates/*.ts @oppia/lace-frontend-reviewers
 /extensions/objects/templates/*.html @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.css @oppia/lace-frontend-reviewers
 /extensions/value_generators/ @oppia/lace-backend-reviewers
 /extensions/value_generators/templates/*.ts @oppia/lace-frontend-reviewers
 /extensions/value_generators/templates/*.html @oppia/lace-frontend-reviewers
@@ -418,12 +420,12 @@
 # Library page.
 /core/controllers/library*.py @oppia/lace-backend-reviewers
 /core/domain/recommendations*.py @oppia/lace-backend-reviewers
-/core/domain/search_services*.py @oppia/lace-backend-reviewers
 /core/templates/pages/library-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/construct-translation-ids.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
+# Machine Translation project.
+/core/controllers/machine_translation*.py @oppia/lace-backend-reviewers
+/core/domain/machine_translation*.py @oppia/lace-backend-reviewers
 
 # Navigation bar project.
 /core/templates/components/button-directives/create-activity-button.component.ts @oppia/lace-frontend-reviewers
@@ -808,6 +810,7 @@
 /core/controllers/base*.py @oppia/core-reviewers
 /core/controllers/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
+/core/domain/html_translation_services*.py @oppia/contributor-experience-team
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers

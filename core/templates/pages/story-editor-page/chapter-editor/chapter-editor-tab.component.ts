@@ -24,7 +24,6 @@ import {StoryUpdateService} from 'domain/story/story-update.service';
 import {Story} from 'domain/story/story.model';
 import {StoryContents} from 'domain/story/story-contents-object.model';
 import {StoryNode} from 'domain/story/story-node.model';
-import './chapter-editor-tab.component.css';
 
 @Component({
   selector: 'oppia-chapter-editor-tab',
