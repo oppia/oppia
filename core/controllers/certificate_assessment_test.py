@@ -114,7 +114,6 @@ def _create_certificate_offering() -> (
             classroom_id='math_classroom_01',
             topic_ids=['topic_place_values'],
             total_questions=12,
-            time_limit_in_minutes=60,
             demonstrates=['Understanding of whole numbers'],
             async_status='Available',
         )
@@ -141,7 +140,6 @@ class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
                 }
             ],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': ['Understanding of whole numbers'],
             'async_status': 'Available',
         }
@@ -177,7 +175,6 @@ class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
                 }
             ],
             'total_questions': 12,
-            'time_limit_in_minutes': 60,
             'demonstrates': [],
             'async_status': 'Available',
         }
@@ -204,7 +201,6 @@ class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
             classroom_id='physics_classroom_01',
             topic_ids=['topic_motion'],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Basic physics reasoning'],
             async_status='Available',
         )
@@ -220,7 +216,6 @@ class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offering['classroom_id'], 'physics_classroom_01')
         self.assertEqual(offering['topic_ids'], ['topic_motion'])
         self.assertEqual(offering['total_questions'], 5)
-        self.assertEqual(offering['time_limit_in_minutes'], 30)
         self.assertEqual(offering['demonstrates'], ['Basic physics reasoning'])
         self.assertEqual(offering['async_status'], 'Available')
 
@@ -237,7 +232,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -257,7 +251,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
                     'classroom_id': 'science_classroom_01',
                     'topic_ids': ['topic_atoms'],
                     'total_questions': 7,
-                    'time_limit_in_minutes': 35,
                     'demonstrates': ['Scientific reasoning'],
                     'async_status': 'Available',
                     'version': 1,
@@ -282,7 +275,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -304,7 +296,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
                     },
                 ],
                 'total_questions': 9,
-                'time_limit_in_minutes': 40,
                 'demonstrates': ['Scientific reasoning'],
                 'async_status': 'Blocked',
             },
@@ -329,7 +320,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
             updated_offering.topic_ids, ['topic_atoms', 'topic_bonds']
         )
         self.assertEqual(updated_offering.total_questions, 9)
-        self.assertEqual(updated_offering.time_limit_in_minutes, 40)
         self.assertEqual(updated_offering.async_status, 'Blocked')
         self.assertEqual(updated_offering.version, 2)
 
@@ -350,7 +340,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
                     },
                 ],
                 'total_questions': 9,
-                'time_limit_in_minutes': 40,
                 'demonstrates': ['Scientific reasoning'],
                 'async_status': 'Blocked',
             },
@@ -379,7 +368,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
                         },
                     ],
                     'total_questions': 9,
-                    'time_limit_in_minutes': 40,
                     'demonstrates': ['Scientific reasoning'],
                     'async_status': 'Blocked',
                 },
@@ -394,7 +382,6 @@ class CertificateAssessmentOfferingByIdHandlerUnitTests(
             classroom_id='science_classroom_01',
             topic_ids=['topic_atoms'],
             total_questions=7,
-            time_limit_in_minutes=35,
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
@@ -546,7 +533,6 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Sample skill'],
             async_status='Available',
         )
@@ -556,7 +542,7 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         )
         started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
         finished_at = started_at + datetime.timedelta(minutes=5)
-        gae_models.CertificateAssessmentAttemptModel.create(
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             certificate_id=certificate_ids[0]['certificate_id'],
             learner_id=learner_id,
             total_score=90.0,
@@ -604,6 +590,10 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
         )
         self.assertIsNone(
             response['available_certificate_offerings'][0]['failed_on_date']
+        )
+        self.assertEqual(
+            response['available_certificate_offerings'][0]['attempt_id'],
+            attempt_model.id,
         )
 
     def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
@@ -826,7 +816,6 @@ class CertificateAssessmentAttemptsHandlerUnitTests(test_utils.GenericTestBase):
             classroom_id='geography_classroom_01',
             topic_ids=['topic_place_values'],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -1089,7 +1078,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1135,7 +1124,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1198,7 +1187,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
