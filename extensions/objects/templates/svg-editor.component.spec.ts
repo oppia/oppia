@@ -1500,6 +1500,29 @@ describe('SvgEditor with image save destination as local storage', () => {
     expect(lastObj.get('text')).toBe('Goal\nTotal\nText');
   });
 
+  it('should load plain text nodes within a text element correctly', () => {
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    // Create a plain text node without wrapping in tspan
+    const textNode = document.createTextNode('Plain text example');
+    textElement.appendChild(textNode);
+
+    const fabricObj = new fabric.Text('Plain text example', {
+      left: 50,
+      top: 50,
+      width: 100,
+    });
+
+    component.diagramWidth = 450;
+    component.loadTextObject(textElement, fabricObj);
+
+    const lastObj =
+      component.canvas.getObjects()[component.canvas.getObjects().length - 1];
+    expect(lastObj.get('text')).toBe('Plain text example');
+  });
+
   it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
     var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
