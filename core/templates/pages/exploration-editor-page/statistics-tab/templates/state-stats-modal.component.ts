@@ -19,9 +19,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
-import {VisualizationInfo} from 'services/state-interaction-stats.service';
 
 interface PieChartOpitons {
   chartAreaWidth: number;
@@ -48,9 +46,6 @@ export class StateStatsModalComponent
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() visualizationsInfo!: VisualizationInfo[];
-
-  @Input() interactionArgs!: InteractionCustomizationArgs;
   @Input() stateName!: string;
   @Input() stateStats!: {
     usefulFeedbackCount: number;

@@ -41,6 +41,11 @@ interface CopierCustomizationArgs {
   value: string | number | boolean;
 }
 
+interface ParamChangeCustomizationArgs {
+  value: string;
+  list_of_values: string[];
+}
+
 @Component({
   selector: 'param-changes-editor',
   templateUrl: './param-changes-editor.component.html',
@@ -135,6 +140,16 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     return this.getParamChangesFromService('savedMemento');
   }
 
+  /**
+   * Returns the param specs stored by the param specs service. Its "displayed"
+   * property is typed as a union of all state property values, but its runtime
+   * value is always a ParamSpecs object. This is the single documented cast
+   * point for the param specs.
+   */
+  get displayedParamSpecs(): ParamSpecs {
+    return this.explorationParamSpecsService.displayed as ParamSpecs;
+  }
+
   openParamChangesEditor(): void {
     if (!this.editabilityService.isEditable()) {
       return;
@@ -143,7 +158,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     this.isParamChangesEditorOpen = true;
     this.paramNameChoices = this.generateParamNameChoices();
 
-    if ((this.paramChangesService.displayed as ParamChange[]).length === 0) {
+    if (this.displayedParamChanges.length === 0) {
       this.addParamChange();
     }
   }
@@ -154,8 +169,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     let newParamChange = ParamChange.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
-    const paramSpecs = this.explorationParamSpecsService
-      .displayed as ParamSpecs;
+    const paramSpecs = this.displayedParamSpecs;
 
     if (
       paramSpecs.addParamIfNew(
@@ -165,11 +179,11 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     ) {
       this.paramNameChoices = this.generateParamNameChoices();
     }
-    (this.paramChangesService.displayed as ParamChange[]).push(newParamChange);
+    this.displayedParamChanges.push(newParamChange);
   }
 
   generateParamNameChoices(): {id: string; text: string}[] {
-    return (this.explorationParamSpecsService.displayed as ParamSpecs)
+    return this.displayedParamSpecs
       .getParamNames()
       .sort()
       .map(paramName => {
@@ -184,20 +198,14 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     paramChange.resetCustomizationArgs();
   }
 
-  getCustomizationArgs(paramChange: ParamChange): {
-    value: string;
-    list_of_values: string[];
-  } {
+  getCustomizationArgs(paramChange: ParamChange): ParamChangeCustomizationArgs {
     // This returns the same customizationArgs object that is stored in the
     // param change so that the value generator editors can update it in place
     // via their two-way bindings. The cast is safe because the value generator
     // editor's input type is a required-fields subset of ParamChange's
     // customization args, and only the generator-matching field is ever read
     // or written at runtime.
-    return paramChange.customizationArgs as {
-      value: string;
-      list_of_values: string[];
-    };
+    return paramChange.customizationArgs as ParamChangeCustomizationArgs;
   }
 
   getHumanReadableArgs(paramChange: ParamChange): string {
@@ -279,16 +287,13 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
     // Update paramSpecs manually with newly-added param names.
     this.explorationParamSpecsService.restoreFromMemento();
-    (this.paramChangesService.displayed as ParamChange[]).forEach(
-      paramChange => {
-        const paramSpecs = this.explorationParamSpecsService
-          .displayed as ParamSpecs;
+    this.displayedParamChanges.forEach(paramChange => {
+      const paramSpecs = this.displayedParamSpecs;
 
-        const paramSpec = paramSpecs.getParamSpec(paramChange.name);
+      const paramSpec = paramSpecs.getParamSpec(paramChange.name);
 
-        paramSpecs.addParamIfNew(paramChange.name, paramSpec);
-      }
-    );
+      paramSpecs.addParamIfNew(paramChange.name, paramSpec);
+    });
 
     this.explorationParamSpecsService.saveDisplayedValue();
 
@@ -296,7 +301,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     if (!this.currentlyInSettingsTab) {
       this.explorationStatesService.saveStateParamChanges(
         (this.paramChangesService as StateParamChangesService).stateName,
-        cloneDeep(this.paramChangesService.displayed as ParamChange[])
+        cloneDeep(this.displayedParamChanges)
       );
     }
     if (this.postSaveHook) {
@@ -316,16 +321,13 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       );
     }
 
-    (this.paramChangesService.displayed as ParamChange[]).forEach(
-      paramChange => {
-        const paramSpecs = this.explorationParamSpecsService
-          .displayed as ParamSpecs;
+    this.displayedParamChanges.forEach(paramChange => {
+      const paramSpecs = this.displayedParamSpecs;
 
-        const paramSpec = paramSpecs.getParamSpec(paramChange.name);
+      const paramSpec = paramSpecs.getParamSpec(paramChange.name);
 
-        paramSpecs.addParamIfNew(paramChange.name, paramSpec);
-      }
-    );
+      paramSpecs.addParamIfNew(paramChange.name, paramSpec);
+    });
     this.paramNameChoices = this.generateParamNameChoices();
 
     (this.paramChangesService.displayed as []).splice(index, 1);

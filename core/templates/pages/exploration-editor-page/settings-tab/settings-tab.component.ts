@@ -41,7 +41,10 @@ import {ExplorationCategoryService} from '../services/exploration-category.servi
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
-import {ExplorationLanguageCodeService} from '../services/exploration-language-code.service';
+import {
+  ExplorationLanguageCodeService,
+  SupportedContentLanguage,
+} from '../services/exploration-language-code.service';
 import {ExplorationObjectiveService} from '../services/exploration-objective.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
@@ -60,6 +63,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
 import {AppConstants} from 'app.constants';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {
   MetadataDiffData,
   VersionHistoryService,
@@ -146,24 +150,24 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     public editabilityService: EditabilityService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
-    public explorationCategoryService: ExplorationCategoryService,
+    private explorationCategoryService: ExplorationCategoryService,
     private explorationDataService: ExplorationDataService,
     private explorationEditsAllowedBackendApiService: ExplorationEditsAllowedBackendApiService,
     private explorationFeaturesService: ExplorationFeaturesService,
-    public explorationInitStateNameService: ExplorationInitStateNameService,
-    public explorationLanguageCodeService: ExplorationLanguageCodeService,
-    public explorationObjectiveService: ExplorationObjectiveService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
-    public explorationParamSpecsService: ExplorationParamSpecsService,
+    private explorationParamSpecsService: ExplorationParamSpecsService,
     public explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
-    public explorationTitleService: ExplorationTitleService,
+    private explorationTitleService: ExplorationTitleService,
     private explorationWarningsService: ExplorationWarningsService,
     private ngbModal: NgbModal,
     private routerService: RouterService,
     private settingTabBackendApiService: SettingTabBackendApiService,
-    public userEmailPreferencesService: UserEmailPreferencesService,
+    private userEmailPreferencesService: UserEmailPreferencesService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
@@ -905,6 +909,82 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     });
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+  }
+
+  // The following public accessors, getters, and helper methods expose the
+  // values that the template reads from the private metadata services. Exposing
+  // the services directly (by making them public) was rejected in review,
+  // so the services stay private and only the exact members needed by the
+  // template are surfaced here. See:
+  // https://github.com/oppia/oppia/pull/26404.
+
+  get categoryDisplayed(): string {
+    return typeof this.explorationCategoryService.displayed === 'string'
+      ? this.explorationCategoryService.displayed
+      : '';
+  }
+
+  set categoryDisplayed(value: string) {
+    this.explorationCategoryService.displayed = value;
+  }
+
+  get languageCodeDisplayed(): string {
+    return typeof this.explorationLanguageCodeService.displayed === 'string'
+      ? this.explorationLanguageCodeService.displayed
+      : '';
+  }
+
+  set languageCodeDisplayed(value: string) {
+    this.explorationLanguageCodeService.displayed = value;
+  }
+
+  get initStateNameDisplayed(): string {
+    return typeof this.explorationInitStateNameService.displayed === 'string'
+      ? this.explorationInitStateNameService.displayed
+      : '';
+  }
+
+  set initStateNameDisplayed(value: string) {
+    this.explorationInitStateNameService.displayed = value;
+  }
+
+  get explorationTitle(): string {
+    return this.explorationTitleService.displayed;
+  }
+
+  get explorationObjective(): string {
+    return this.explorationObjectiveService.displayed;
+  }
+
+  getSupportedContentLanguages(): SupportedContentLanguage[] {
+    return this.explorationLanguageCodeService.getSupportedContentLanguages();
+  }
+
+  getCurrentLanguageDescription(): string | undefined {
+    return this.explorationLanguageCodeService.getCurrentLanguageDescription();
+  }
+
+  areFeedbackNotificationsMuted(): boolean {
+    return this.userEmailPreferencesService.areFeedbackNotificationsMuted();
+  }
+
+  areSuggestionNotificationsMuted(): boolean {
+    return this.userEmailPreferencesService.areSuggestionNotificationsMuted();
+  }
+
+  hasSavedParamSpecs(): boolean {
+    return !!this.explorationParamSpecsService.savedMemento;
+  }
+
+  hasParamDict(): boolean {
+    return (
+      !!this.explorationParamSpecsService.savedMemento &&
+      !!this.explorationParamSpecsService.savedMemento.getParamDict()
+    );
+  }
+
+  getParamDict(): Record<string, ParamSpec> {
+    return this.explorationParamSpecsService.savedMemento.getParamDict();
   }
 
   ngOnDestroy(): void {
