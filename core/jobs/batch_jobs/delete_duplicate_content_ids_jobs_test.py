@@ -518,11 +518,16 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(
             interaction.solution.explanation.content_id, replacement_id
         )
-        self.assertNotIn(duplicate_id, state.recorded_voiceovers.voiceovers_mapping)
-        self.assertEqual(
-            state.recorded_voiceovers.voiceovers_mapping[replacement_id], 'voice'
+        self.assertNotIn(
+            duplicate_id, state.recorded_voiceovers.voiceovers_mapping
         )
-        self.assertNotIn(duplicate_id, state.written_translations.translations_mapping)
+        self.assertEqual(
+            state.recorded_voiceovers.voiceovers_mapping[replacement_id],
+            'voice',
+        )
+        self.assertNotIn(
+            duplicate_id, state.written_translations.translations_mapping
+        )
         self.assertEqual(
             state.written_translations.translations_mapping[replacement_id],
             'translation',
@@ -626,7 +631,8 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
                     )
                 }
                 self.answer_groups = [
-                    FakeAnswerGroup(), FakeAnswerGroupWithNonMatchingOutcome()
+                    FakeAnswerGroup(),
+                    FakeAnswerGroupWithNonMatchingOutcome(),
                 ]
                 self.default_outcome = FakeOutcomeWithNonMatchingFeedback()
                 self.hints = [FakeHintWithoutContent(), FakeHint()]

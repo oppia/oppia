@@ -167,10 +167,13 @@ describe('Upload Blog Post Thumbnail Component', () => {
       c.charCodeAt(0)
     );
     let file = new File([arrayBuffer], 'filename.mp3');
-    
+
     // Force detectChanges to throw an error
-    const changeDetectorRef = fixture.debugElement.injector.get(ChangeDetectorRef);
-    spyOn(changeDetectorRef, 'detectChanges').and.throwError('ViewDestroyedError');
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    spyOn(changeDetectorRef, 'detectChanges').and.throwError(
+      'ViewDestroyedError'
+    );
 
     expect(() => {
       componentInstance.onFileChanged(file);
