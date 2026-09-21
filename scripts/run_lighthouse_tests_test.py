@@ -103,9 +103,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.swap_redis_server = self.swap(
             servers, 'managed_redis_server', mock_context_manager
         )
-        self.swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server', mock_context_manager
-        )
         self.swap_firebase_auth_emulator = self.swap(
             servers, 'managed_firebase_auth_emulator', mock_context_manager
         )
@@ -906,7 +903,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
 
         with self.print_swap, swap_isdir:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+            with self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
@@ -981,7 +978,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
 
         with self.print_swap, swap_isdir:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+            with self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
@@ -1073,7 +1070,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
         with swap_popen, swap_isdir, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+            with self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
@@ -1173,7 +1170,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
 
         with swap_popen, swap_isdir, swap_build:
-            with self.swap_elasticsearch_dev_server, swap_dev_appserver:
+            with swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
