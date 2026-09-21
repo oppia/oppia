@@ -424,14 +424,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Recomputes the number of classrooms shown in the learn dropdown and the
-   * offset needed to keep the dropdown within the right edge of the page.
-   * This used to run on every change detection cycle via ngAfterViewChecked,
-   * but is now only called when the dropdown is opened or the window is
-   * resized.
+   * Recomputes the offset needed to keep the learn dropdown within the right
+   * edge of the page. This used to run on every change detection cycle via
+   * ngAfterViewChecked, but is now only called when the dropdown is opened, the
+   * window is resized, or the classroom count is loaded.
    */
   updateLearnDropdownOffset(): void {
-    this.setClassroomSummariesLength();
     // The number of classrooms changes the dropdown's width (via the
     // 'two-columns'/'three-columns' classes), so the layout changes must be
     // applied before measuring the space available on the right.
@@ -440,6 +438,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       '.learn-tab',
       '.classroom-enabled'
     );
+  }
+
+  /**
+   * Stores the number of classrooms reported by the classroom navigation links
+   * component and recomputes the learn dropdown offset. This is called when the
+   * async classroom data finishes loading, which may happen after the dropdown
+   * has already been opened and measured at its default width.
+   */
+  onClassroomCountChange(count: number): void {
+    this.classroomSummariesLength = count;
+    this.updateLearnDropdownOffset();
   }
 
   /**
@@ -480,15 +489,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  setClassroomSummariesLength(): void {
-    const classroomGrid = document.querySelector('.classroom-grid');
-    if (classroomGrid) {
-      const countAttr = classroomGrid.getAttribute('data-classroom-count');
-      const parsed = parseInt(countAttr ?? '0', 10);
-      this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
-    }
   }
 
   isTechnicalFeedbackDashboardEnabled(): boolean {

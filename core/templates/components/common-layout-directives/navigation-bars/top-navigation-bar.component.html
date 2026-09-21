@@ -111,7 +111,7 @@
             <li class="nav-item">
               <div class="nav-item-main d-flex">
                 <div class="nav-item-left d-flex flex-column justify-content-between">
-                  <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
+                  <oppia-classroom-navigation-links (classroomCountChange)="onClassroomCountChange($event)"></oppia-classroom-navigation-links>
                 </div>
                 <span class="nav-item-right d-flex flex-column">
                   <a class="nav-content mb-5 e2e-test-topnb-go-to-community-library-link"
