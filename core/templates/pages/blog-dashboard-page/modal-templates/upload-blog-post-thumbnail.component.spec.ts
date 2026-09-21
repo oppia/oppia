@@ -168,7 +168,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
     );
     let file = new File([arrayBuffer], 'filename.mp3');
 
-    // Force detectChanges to throw an error
+    // Force detectChanges to throw an error.
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
     spyOn(changeDetectorRef, 'detectChanges').and.throwError(
