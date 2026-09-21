@@ -29,7 +29,6 @@ import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-bac
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
-import './oppia-footer.component.css';
 import {FeedbackModalComponent} from './feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
