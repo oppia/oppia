@@ -20,7 +20,6 @@ import {Component, OnInit, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {SignupPageBackendApiService} from '../../signup-page/services/signup-page-backend-api.service';
-import './username-input-modal.component.css';
 
 @Component({
   selector: 'oppia-username-input-modal',
