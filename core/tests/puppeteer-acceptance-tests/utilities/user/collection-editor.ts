@@ -48,9 +48,6 @@ const editorShiftLeft = '.e2e-test-editor-shift-left';
 const editorShiftRight = '.e2e-test-editor-shift-right';
 const editorDeleteNode = '.e2e-test-editor-delete-node';
 
-// Library page selectors.
-const searchInput = '.e2e-test-search-input';
-
 const addExplorationInputSelector = '.e2e-test-add-exploration-input';
 const addExplorationButtonSelector = '.e2e-test-add-exploration-button';
 const publishCollectionButtonSelector = '.e2e-test-editor-publish-button';
@@ -546,19 +543,6 @@ export class CollectionEditor extends BaseUser {
       throw new Error(`Could not extract collection ID from URL: ${url}`);
     }
     return match[1];
-  }
-
-  /**
-   * Searches for a collection in the library.
-   * @param {string} searchQuery - The search query.
-   */
-  async searchForCollection(searchQuery: string): Promise<void> {
-    await this.expectElementToBeVisible(searchInput);
-    await this.clearAllTextFrom(searchInput);
-    await this.typeInInputField(searchInput, searchQuery);
-    await this.page.keyboard.press('Enter');
-    await this.waitForPageToFullyLoad();
-    showMessage(`Searched for collection: "${searchQuery}".`);
   }
 
   /**
