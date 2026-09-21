@@ -1331,7 +1331,6 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         [
             'CsrfTokenHandler',
             'Error404Handler',
-            'OppiaLightweightRootPage',
             'SessionBeginHandler',
             'SessionEndHandler',
             'SeedFirebaseHandler',
