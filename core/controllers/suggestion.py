@@ -1165,7 +1165,7 @@ class UserSubmittedSuggestionsHandler(
                         language_code=language_code,
                     )
                 )
-                # Here use cast because this loop only fetches translation
+                # Here we use cast because this loop only fetches translation
                 # suggestions, so the type can be narrowed from
                 # Sequence[BaseSuggestion] to
                 # Sequence[SuggestionTranslateContent].
