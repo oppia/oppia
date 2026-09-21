@@ -16,9 +16,9 @@
 
 """Controllers for the collections editor."""
 
-from __future__ import annotations
+# pylint: disable=arguments-differ
 
-import base64
+from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
@@ -27,7 +27,6 @@ from core.domain import (
     collection_domain,
     collection_services,
     rights_manager,
-    search_services,
     summary_services,
 )
 
@@ -101,9 +100,7 @@ class EditableCollectionDataHandler(
     }
 
     @acl_decorators.can_edit_collection
-    def get(  # pylint: disable=arguments-differ
-        self, collection_id: str
-    ) -> None:  # pylint: disable=arguments-differ
+    def get(self, collection_id: str) -> None:
         """Populates the data on the individual collection page.
 
         Args:
@@ -119,9 +116,7 @@ class EditableCollectionDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_collection
-    def put(  # pylint: disable=arguments-differ
-        self, collection_id: str
-    ) -> None:  # pylint: disable=arguments-differ
+    def put(self, collection_id: str) -> None:
         """Updates properties of the given collection.
 
         Args:
@@ -163,9 +158,7 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
-    def get(  # pylint: disable=arguments-differ
-        self, collection_id: str
-    ) -> None:  # pylint: disable=arguments-differ
+    def get(self, collection_id: str) -> None:
         """Gets the editing rights for the given collection.
 
         Args:
@@ -228,9 +221,7 @@ class CollectionPublishHandler(
     }
 
     @acl_decorators.can_publish_collection
-    def put(  # pylint: disable=arguments-differ
-        self, collection_id: str
-    ) -> None:  # pylint: disable=arguments-differ
+    def put(self, collection_id: str) -> None:
         """Publishes the given collection.
 
         Args:
@@ -249,7 +240,6 @@ class CollectionPublishHandler(
         collection_services.publish_collection_and_update_user_profiles(
             self.user, collection_id
         )
-        collection_services.index_collections_given_ids([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False
@@ -296,9 +286,7 @@ class CollectionUnpublishHandler(
     }
 
     @acl_decorators.can_unpublish_collection
-    def put(  # pylint: disable=arguments-differ
-        self, collection_id: str
-    ) -> None:  # pylint: disable=arguments-differ
+    def put(self, collection_id: str) -> None:
         """Unpublishes the given collection.
 
         Args:
@@ -310,7 +298,6 @@ class CollectionUnpublishHandler(
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
-        search_services.delete_collections_from_search_index([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False
@@ -331,58 +318,4 @@ class CollectionUnpublishHandler(
                 ),
             }
         )
-        self.render_json(self.values)
-
-
-class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of ExplorationMetadataSearchHandler's
-    normalized_payload dictionary.
-    """
-
-    q: str
-    offset: Optional[int]
-
-
-class ExplorationMetadataSearchHandler(
-    base.BaseHandler[
-        Dict[str, str], ExplorationMetadataSearchHandlerNormalizedRequestDict
-    ]
-):
-    """Provides data for exploration search."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'q': {'schema': {'type': 'basestring'}},
-            'offset': {'schema': {'type': 'int'}, 'default_value': None},
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:  # pylint: disable=arguments-differ
-        """Handles GET requests."""
-        # The query is encoded into base64 string in the frontend, and b64decode
-        # accepts base64 bytes, thus we need to encode the base64 string to
-        # base64 bytes, then decode them to just bytes and then decode those
-        # back to string.
-        assert self.normalized_request is not None
-        q = self.normalized_request['q'].encode('utf-8')
-        query_string = base64.b64decode(q).decode('utf-8')
-
-        search_offset = self.normalized_request.get('offset')
-
-        collection_node_metadata_list, new_search_offset = (
-            summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_offset, self.user
-            )
-        )
-
-        self.values.update(
-            {
-                'collection_node_metadata_list': collection_node_metadata_list,
-                'search_cursor': new_search_offset,
-            }
-        )
-
         self.render_json(self.values)
