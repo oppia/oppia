@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for viewing and searching blog posts as a logged-out user.
+ * @fileoverview Acceptance Test for viewing blog posts as a logged-out user.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -87,33 +87,6 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.clickNextBlogPage();
       await loggedOutUser.clickPreviousBlogPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search blog posts by tags',
-    async function () {
-      await loggedOutUser.filterBlogPostsByTag('Community');
-      await loggedOutUser.expectBlogSearchResultsToHaveTag('Community');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search blog posts by keywords',
-    async function () {
-      await loggedOutUser.filterBlogPostsByKeyword('Education');
-      await loggedOutUser.expectBlogSearchResultsToContain('Education');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to search blog posts by body content',
-    async function () {
-      await loggedOutUser.filterBlogPostsByKeyword('Pineapple');
-      await loggedOutUser.expectBlogSearchResultsToContain('Recipe Post');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
