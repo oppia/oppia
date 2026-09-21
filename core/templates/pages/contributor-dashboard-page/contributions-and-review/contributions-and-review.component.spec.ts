@@ -3641,7 +3641,7 @@ describe('Contributions and review component', () => {
     }));
 
     it(
-      'should return an empty list when the active tab subtype is neither' +
+      'should return an empty list when the active tab subtype is neither ' +
         'translate nor question',
       () => {
         component.activeTabSubtype = '';
