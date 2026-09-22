@@ -80,10 +80,11 @@ describe('End chapter confetti component', function () {
 
   it('should play the confetti video and hide it once it ends', () => {
     fixture.detectChanges();
-    if (!component.confettiVideoRef) {
+    const confettiVideoRef = component.confettiVideoRef;
+    if (!confettiVideoRef) {
       throw new Error('confettiVideoRef is not defined');
     }
-    const videoElement = component.confettiVideoRef.nativeElement;
+    const videoElement = confettiVideoRef.nativeElement;
     spyOn(videoElement, 'play');
     spyOn(component.endChapterCelebratoryAudio, 'play');
 
