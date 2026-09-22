@@ -713,9 +713,8 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     let TopicSelectorElement = null;
     if (!isFirstTopic) {
-      TopicSelectorElement = await this.expectElementToBeVisible(
+      TopicSelectorElement = await this.expectElementToBeAttachedInDOM(
         desktopTopicSelector,
-        true,
         this.page,
         10000
       );
