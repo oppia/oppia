@@ -1505,7 +1505,7 @@ describe('SvgEditor with image save destination as local storage', () => {
       'http://www.w3.org/2000/svg',
       'text'
     );
-    // Create a plain text node without wrapping in tspan
+    // Create a plain text node without wrapping in tspan.
     const textNode = document.createTextNode('Plain text example');
     textElement.appendChild(textNode);
 
