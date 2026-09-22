@@ -103,7 +103,9 @@
   color: rgb(104, 104, 104);
   font-size: 0.9em;
   margin-left: auto;
+  min-width: 42px;
   padding-left: 8px;
+  text-align: right;
 }
 
 .oppia-translation-topic-selector-almost-complete {
