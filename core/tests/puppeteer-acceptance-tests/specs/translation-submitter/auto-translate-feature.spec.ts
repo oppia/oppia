@@ -70,8 +70,7 @@ describe('Auto-Translate Feature', function () {
     await curriculumAdm.dismissWelcomeModal();
 
     // Add exploration description with math and hyperlink.
-    // Wait for the Add Interaction button to be present to ensure page is loaded.
-    await curriculumAdm.clickOnElementWithText('Add Interaction');
+    await curriculumAdm.clickOnElementWithText('Add an interaction');
     // Close the modal if it opened automatically.
     await curriculumAdm.page.keyboard.press('Escape');
 

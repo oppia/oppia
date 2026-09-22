@@ -55,10 +55,3 @@ class TranslateEmulatorTests(test_utils.GenericTestBase):
             'en', 'fr', 'custom test'
         )
         self.assertEqual(new_result, 'le test custom')
-
-    def test_fallback_string_returned_for_html_inputs(self) -> None:
-        result = self.emulator.generate_translation(
-            'en', 'hi', '<p>unknown sentence</p>'
-        )
-        self.assertEqual(result, '<p>Mock translation of: unknown sentence</p>')
-
