@@ -46,7 +46,6 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
 import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 import {ConversationFlowService} from '../services/conversation-flow.service';
 import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-player-navbar-breadcrumb.component';
-import {CardInteractionControlsComponent} from './conversation-skin-components/card-interaction-controls.component';
 
 @NgModule({
   imports: [
@@ -75,7 +74,6 @@ import {CardInteractionControlsComponent} from './conversation-skin-components/c
     LessonFeedbackModalComponent,
     NewProgressReminderModalComponent,
     LessonPlayerNavbarBreadcrumbComponent,
-    CardInteractionControlsComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -88,7 +86,6 @@ import {CardInteractionControlsComponent} from './conversation-skin-components/c
     NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewProgressReminderModalComponent,
     LessonPlayerNavbarBreadcrumbComponent,
-    CardInteractionControlsComponent,
   ],
   providers: [
     HintAndSolutionModalService,
