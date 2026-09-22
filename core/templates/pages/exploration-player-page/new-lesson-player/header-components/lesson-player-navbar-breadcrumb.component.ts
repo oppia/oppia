@@ -59,14 +59,17 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
       throw new Error('Topic or classroom URL fragment is null');
     }
 
+    const topicUrlFragment = this.topicUrlFragment;
+    const classroomUrlFragment = this.classroomUrlFragment;
+
     this.topicViewerBackendApiService
-      .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
+      .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
       .then((readOnlyTopic: ReadOnlyTopic) => {
         this.topicName = readOnlyTopic.getTopicName();
       });
 
     this.classroomBackendApiService
-      .fetchClassroomDataAsync(this.classroomUrlFragment)
+      .fetchClassroomDataAsync(classroomUrlFragment)
       .then(classroomData => {
         this.classroomName = this.capitalizePipe.transform(
           classroomData.getName()
