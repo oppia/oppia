@@ -73,8 +73,7 @@
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <div class="oppia-editor-container"
              [class.oppia-container-expanded]="isTranslationExpanded" [class.oppia-container-contracted]="!isTranslationExpanded"
-             #translationContainer
-             style="position: relative;">
+             #translationContainer>
           <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
           <div *ngIf="isAutomaticTranslationSuggestionsEnabled() && activeDataFormat === 'html'" class="oppia-auto-translate-button-container">
             <button class="btn btn-default oppia-auto-translate-button e2e-test-auto-translate-button"
