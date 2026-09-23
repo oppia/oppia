@@ -55,12 +55,8 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
       return;
     }
 
-    if (this.topicUrlFragment === null || this.classroomUrlFragment === null) {
-      throw new Error('Topic or classroom URL fragment is null');
-    }
-
-    const topicUrlFragment = this.topicUrlFragment;
-    const classroomUrlFragment = this.classroomUrlFragment;
+    const topicUrlFragment = this.topicUrlFragment as string;
+    const classroomUrlFragment = this.classroomUrlFragment as string;
 
     this.topicViewerBackendApiService
       .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
@@ -91,7 +87,15 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
       return false;
     }
 
-    return Boolean(this.topicUrlFragment && this.classroomUrlFragment);
+    if (this.topicUrlFragment === null && this.classroomUrlFragment === null) {
+      return false;
+    }
+
+    if (this.topicUrlFragment === null || this.classroomUrlFragment === null) {
+      throw new Error('Classroom URL fragment is null');
+    }
+
+    return true;
   }
 
   // Returns true once both names have arrived, so the template can avoid

@@ -172,7 +172,7 @@ describe('Lesson player navbar breadcrumb component', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should return false when only the topic URL fragment is present', () => {
+    it('should throw when only the topic URL fragment is present', () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
@@ -181,15 +181,15 @@ describe('Lesson player navbar breadcrumb component', () => {
         'getClassroomUrlFragmentFromLearnerUrl'
       ).and.returnValue(null);
 
-      componentInstance.ngOnInit();
-
-      expect(componentInstance.isLinkedToTopic).toBe(false);
+      expect(() => componentInstance.ngOnInit()).toThrowError(
+        'Classroom URL fragment is null'
+      );
       expect(
         topicViewerBackendApiService.fetchTopicDataAsync
       ).not.toHaveBeenCalled();
     });
 
-    it('should return false when only the classroom URL fragment is present', () => {
+    it('should throw when only the classroom URL fragment is present', () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         null
       );
@@ -198,9 +198,9 @@ describe('Lesson player navbar breadcrumb component', () => {
         'getClassroomUrlFragmentFromLearnerUrl'
       ).and.returnValue('classroom1');
 
-      componentInstance.ngOnInit();
-
-      expect(componentInstance.isLinkedToTopic).toBe(false);
+      expect(() => componentInstance.ngOnInit()).toThrowError(
+        'Classroom URL fragment is null'
+      );
       expect(
         topicViewerBackendApiService.fetchTopicDataAsync
       ).not.toHaveBeenCalled();

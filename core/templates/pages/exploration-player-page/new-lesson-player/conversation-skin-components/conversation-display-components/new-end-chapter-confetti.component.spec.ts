@@ -60,6 +60,7 @@ describe('End chapter confetti component', function () {
   });
 
   it('should obtain the confetti video URL upon initialization', () => {
+    component.useVideoConfetti = true;
     expect(component.confettiVideoUrl).toBe('');
 
     component.ngOnInit();
@@ -79,12 +80,12 @@ describe('End chapter confetti component', function () {
   });
 
   it('should play the confetti video and hide it once it ends', () => {
+    component.useVideoConfetti = true;
     fixture.detectChanges();
-    const confettiVideoRef = component.confettiVideoRef;
-    if (!confettiVideoRef) {
+    if (!component.confettiVideoRef) {
       throw new Error('confettiVideoRef is not defined');
     }
-    const videoElement = confettiVideoRef.nativeElement;
+    const videoElement = component.confettiVideoRef.nativeElement;
     spyOn(videoElement, 'play');
     spyOn(component.endChapterCelebratoryAudio, 'play');
 
