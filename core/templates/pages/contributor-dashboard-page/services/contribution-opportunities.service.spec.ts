@@ -56,6 +56,7 @@ describe('Contribution Opportunities Service', () => {
     opportunities: [
       {
         id: 'exp_id',
+        topic_id: 'topic_id',
         topic_name: 'Topic',
         story_title: 'A new story',
         chapter_title: 'Introduction',
@@ -241,7 +242,7 @@ describe('Contribution Opportunities Service', () => {
       );
 
       contributionOpportunitiesService
-        .getTranslationOpportunitiesAsync('en', 'Topic')
+        .getTranslationOpportunitiesAsync('en', 'topic_id')
         .then(successHandler, failHandler);
       tick();
 
@@ -274,7 +275,7 @@ describe('Contribution Opportunities Service', () => {
       );
 
       contributionOpportunitiesService
-        .getMoreTranslationOpportunitiesAsync('en', 'Topic')
+        .getMoreTranslationOpportunitiesAsync('en', 'topic_id')
         .then(successHandler, failHandler);
       tick();
 
@@ -304,7 +305,7 @@ describe('Contribution Opportunities Service', () => {
       );
 
       contributionOpportunitiesService
-        .getReviewableTranslationOpportunitiesAsync('Topic')
+        .getReviewableTranslationOpportunitiesAsync('topic_id')
         .then(successHandler, failHandler);
       tick();
 
@@ -332,7 +333,7 @@ describe('Contribution Opportunities Service', () => {
       );
 
       contributionOpportunitiesService
-        .getMoreTranslationOpportunitiesAsync('en', 'Topic')
+        .getMoreTranslationOpportunitiesAsync('en', 'topic_id')
         .then(successHandler, failHandler);
       tick();
 
@@ -340,7 +341,7 @@ describe('Contribution Opportunities Service', () => {
       expect(successHandler).toHaveBeenCalled();
 
       contributionOpportunitiesService
-        .getMoreTranslationOpportunitiesAsync('en', 'Topic')
+        .getMoreTranslationOpportunitiesAsync('en', 'topic_id')
         .then(successHandler, failHandler);
       tick();
 
@@ -349,26 +350,28 @@ describe('Contribution Opportunities Service', () => {
   );
 
   it(
-    'should return topic names when calling ' +
-      "'getTranslatableTopicNamesAsync'",
+    'should return topics when calling ' + "'getTranslatableTopicsAsync'",
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      let topicNamesDict = ['Topic 1', 'Topic 2'];
+      let topics = [
+        {id: 'topic_id_1', name: 'Topic 1'},
+        {id: 'topic_id_2', name: 'Topic 2'},
+      ];
 
-      let getTranslatableTopicNamesSpy = spyOn(
+      let getTranslatableTopicsSpy = spyOn(
         contributionOpportunitiesBackendApiService,
-        'fetchTranslatableTopicNamesAsync'
-      ).and.returnValue(Promise.resolve(topicNamesDict));
+        'fetchTranslatableTopicsAsync'
+      ).and.returnValue(Promise.resolve(topics));
 
       contributionOpportunitiesService
-        .getTranslatableTopicNamesAsync()
+        .getTranslatableTopicsAsync()
         .then(successHandler, failHandler);
       tick();
 
-      expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+      expect(getTranslatableTopicsSpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(topics);
     })
   );
 
@@ -383,12 +386,26 @@ describe('Contribution Opportunities Service', () => {
         'pinTranslationOpportunity'
       ).and.returnValue(Promise.resolve<void>(undefined));
 
+      const pinnedChangedSpy = spyOn(
+        contributionOpportunitiesService.pinnedOpportunitiesChanged,
+        'emit'
+      );
+
       contributionOpportunitiesService
-        .pinReviewableTranslationOpportunityAsync('Topic 1', 'en', 'exp 1')
+        .pinReviewableTranslationOpportunityAsync('topic_id_1', 'en', 'exp 1')
         .then(successHandler, failHandler);
       tick();
 
-      expect(pinTranslationOpportunitySpy).toHaveBeenCalled();
+      expect(pinTranslationOpportunitySpy).toHaveBeenCalledWith(
+        'en',
+        'topic_id_1',
+        'exp 1'
+      );
+      expect(pinnedChangedSpy).toHaveBeenCalledWith({
+        topicId: 'topic_id_1',
+        languageCode: 'en',
+        explorationId: 'exp 1',
+      });
       expect(successHandler).toHaveBeenCalled();
     })
   );
@@ -405,12 +422,25 @@ describe('Contribution Opportunities Service', () => {
         'unpinTranslationOpportunity'
       ).and.returnValue(Promise.resolve<void>(undefined));
 
+      const unpinnedChangedSpy = spyOn(
+        contributionOpportunitiesService.unpinnedOpportunitiesChanged,
+        'emit'
+      );
+
       contributionOpportunitiesService
-        .unpinReviewableTranslationOpportunityAsync('Topic 1', 'en', '1')
+        .unpinReviewableTranslationOpportunityAsync('topic_id_1', 'en', '1')
         .then(successHandler, failHandler);
       tick();
 
-      expect(unpinTranslationOpportunitySpy).toHaveBeenCalled();
+      expect(unpinTranslationOpportunitySpy).toHaveBeenCalledWith(
+        'en',
+        'topic_id_1'
+      );
+      expect(unpinnedChangedSpy).toHaveBeenCalledWith({
+        topicId: 'topic_id_1',
+        languageCode: 'en',
+        explorationId: '1',
+      });
       expect(successHandler).toHaveBeenCalled();
     })
   );

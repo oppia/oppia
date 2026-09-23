@@ -136,7 +136,7 @@ describe('Contribution and review backend API service', () => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url =
         '/getreviewablesuggestions/skill/add_question' +
-        '?offset=0&sort_key=Date&limit=10&topic_name=specifiedTopic';
+        '?offset=0&sort_key=Date&limit=10&topic_id=specifiedTopicId';
 
       carbas
         .fetchSuggestionsAsync(
@@ -145,7 +145,7 @@ describe('Contribution and review backend API service', () => {
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
           null,
-          'specifiedTopic'
+          'specifiedTopicId'
         )
         .then(successHandler, failureHandler);
       const req = http.expectOne(url);
@@ -160,11 +160,39 @@ describe('Contribution and review backend API service', () => {
         0,
         'Date',
         null,
-        'specifiedTopic'
+        'specifiedTopicId'
       );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
+
+    it(
+      'should not send a topic ID for reviewable question suggestions ' +
+        'from all topics',
+      fakeAsync(() => {
+        const url =
+          '/getreviewablesuggestions/skill/add_question' +
+          '?offset=0&sort_key=Date&limit=10';
+
+        carbas
+          .fetchSuggestionsAsync(
+            'REVIEWABLE_QUESTION_SUGGESTIONS',
+            AppConstants.OPPORTUNITIES_PAGE_SIZE,
+            0,
+            AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+            null,
+            ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+          )
+          .then(successHandler, failureHandler);
+        const req = http.expectOne(url);
+        expect(req.request.params.has('topic_id')).toBeFalse();
+        req.flush(suggestionsBackendObject);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalled();
+        expect(failureHandler).not.toHaveBeenCalled();
+      })
+    );
 
     it('should fetch reviewable suggestions from exp1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();

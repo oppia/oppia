@@ -39,6 +39,7 @@ import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-oppo
 import {OpportunitiesListComponent} from 'pages/contributor-dashboard-page/opportunities-list/opportunities-list.component';
 import {OpportunitiesListItemComponent} from 'pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationOpportunitiesComponent} from './translation-opportunities.component';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -166,6 +167,7 @@ describe('Translation opportunities component', () => {
     opportunitiesArray = [
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '1',
+        topic_id: 'topic_id_1',
         topic_name: 'topic_1',
         story_title: 'Story title 1',
         chapter_title: 'Chapter title 1',
@@ -182,6 +184,7 @@ describe('Translation opportunities component', () => {
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
+        topic_id: 'topic_id_2',
         topic_name: 'topic_2',
         story_title: 'Story title 2',
         chapter_title: 'Chapter title 2',
@@ -219,6 +222,39 @@ describe('Translation opportunities component', () => {
       expect(more).toBe(false);
     });
   });
+
+  it('should fetch opportunities for the active topic ID', fakeAsync(() => {
+    const translationTopicService = TestBed.inject(TranslationTopicService);
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(translationTopicService, 'getActiveTopicId').and.returnValue(
+      'topic_id_1'
+    );
+    const getOpportunitiesSpy = spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesAsync'
+    ).and.resolveTo({opportunities: opportunitiesArray, more: true});
+    const getMoreOpportunitiesSpy = spyOn(
+      contributionOpportunitiesService,
+      'getMoreTranslationOpportunitiesAsync'
+    ).and.resolveTo({opportunities: opportunitiesArray, more: false});
+
+    component.loadOpportunitiesAsync();
+    component.loadMoreOpportunitiesAsync();
+    tick();
+
+    expect(getOpportunitiesSpy).toHaveBeenCalledWith(
+      'en',
+      'topic_id_1',
+      component.activeEntityType
+    );
+    expect(getMoreOpportunitiesSpy).toHaveBeenCalledWith(
+      'en',
+      'topic_id_1',
+      component.activeEntityType
+    );
+  }));
 
   it('should load more translation opportunities', () => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
@@ -390,6 +426,7 @@ describe('Translation opportunities component', () => {
       const opportunitiesWithListContent = [
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
+          topic_id: 'topic_id_1',
           topic_name: 'topic_1',
           story_title: 'Story title 1',
           chapter_title: 'Chapter title 1',
@@ -432,6 +469,7 @@ describe('Translation opportunities component', () => {
       const opportunitiesWithListContent = [
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
+          topic_id: 'topic_id_1',
           topic_name: 'topic_1',
           story_title: 'Story title 1',
           chapter_title: 'Chapter title 1',

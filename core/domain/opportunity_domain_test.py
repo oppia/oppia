@@ -101,6 +101,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             obj.to_dict(),
             {
                 'id': 'exp_1',
+                'topic_id': 'topic_1',
                 'topic_name': 'A topic',
                 'story_title': 'A new story',
                 'chapter_title': 'A new chapter',
