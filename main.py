@@ -430,6 +430,10 @@ URLS = [
         contributor_dashboard_admin.ContributionRightsDataHandler,
     ),
     get_redirect_route(
+        r'/contributordashboardadminfeaturedtranslationlanguages',
+        contributor_dashboard_admin.FeaturedTranslationLanguagesAdminHandler,
+    ),
+    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>'
         % (feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
         contributor_dashboard_admin.ContributorDashboardAdminStatsHandler,
