@@ -25,9 +25,10 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {ContributorDashboardAdminBackendApiService} from './contributor-dashboard-admin-backend-api.service';
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
+import {TranslationAdminConfig} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
-describe('Contributor dashboard admin backend api cdabas', () => {
-  let cdabas: ContributorDashboardAdminBackendApiService;
+describe('Contributor dashboard admin backend api service', () => {
+  let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
@@ -38,7 +39,9 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       imports: [HttpClientTestingModule],
     });
 
-    cdabas = TestBed.inject(ContributorDashboardAdminBackendApiService);
+    contributorDashboardAdminBackendApiService = TestBed.inject(
+      ContributorDashboardAdminBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
@@ -64,7 +67,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .addContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -93,7 +96,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .addContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -122,7 +125,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       let category = 'translation';
       let languageCode = 'en';
       let result = ['validUsername'];
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, languageCode)
         .then(successHandler, failHandler);
 
@@ -139,7 +142,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
 
       category = 'question';
 
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, null)
         .then(successHandler, failHandler);
 
@@ -162,7 +165,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
     fakeAsync(() => {
       let category = 'InvalidCategory';
       let languageCode = 'en';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, languageCode)
         .then(successHandler, failHandler);
 
@@ -196,7 +199,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
         can_review_questions: false,
         can_submit_questions: false,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
@@ -227,7 +230,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       'not exist when calling contributionReviewerRightsAsync',
     fakeAsync(() => {
       let username = 'InvalidUsername';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
@@ -265,7 +268,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -293,7 +296,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -330,7 +333,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, null)
         .then(successHandler, failHandler);
 
@@ -368,7 +371,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
           },
         ],
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewTranslationContributionStatsAsync(username)
         .then(successHandler, failHandler);
 
@@ -392,7 +395,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       ' when calling viewTranslationContributionStatsAsync',
     fakeAsync(() => {
       const username = 'InvalidUsername';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewTranslationContributionStatsAsync(username)
         .then(successHandler, failHandler);
 
@@ -422,7 +425,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, true, false)
         .then(successHandler, failHandler);
 
@@ -445,7 +448,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, false, true, true)
         .then(successHandler, failHandler);
       const query = new URLSearchParams(payload);
@@ -466,7 +469,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, false, true)
         .then(successHandler, failHandler);
 
@@ -489,7 +492,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, false, true, true, true)
         .then(successHandler, failHandler);
       const query = new URLSearchParams(payload);
@@ -609,7 +612,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, false, false)
         .then(successHandler, failHandler);
 
@@ -629,4 +632,105 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+  it('should successfully fetch the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockResponse = {
+      provider_mapping: {hi: 'azure'},
+      automatic_translation_is_enabled: true,
+      available_providers: [{id: 'azure', display_name: 'Azure Translator'}],
+    };
+
+    contributorDashboardAdminBackendApiService
+      .fetchTranslationConfigurationAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(mockResponse);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      TranslationAdminConfig.createFromBackendDict(mockResponse)
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully update the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockMapping = {hi: 'azure'};
+
+    contributorDashboardAdminBackendApiService
+      .updateTranslationConfigurationAsync(mockMapping, true)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({
+      provider_mapping: mockMapping,
+      automatic_translation_is_enabled: true,
+    });
+    const mockResponse = {
+      provider_mapping: mockMapping,
+      automatic_translation_is_enabled: true,
+      available_providers: [{id: 'azure', display_name: 'Azure Translator'}],
+    };
+    req.flush(mockResponse);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      TranslationAdminConfig.createFromBackendDict(mockResponse)
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributorDashboardAdminBackendApiService
+      .fetchTranslationConfigurationAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {error: 'Failed to fetch'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(new Error('Failed to fetch'));
+  }));
+
+  it('should fail to update the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockMapping = {hi: 'azure'};
+
+    contributorDashboardAdminBackendApiService
+      .updateTranslationConfigurationAsync(mockMapping, true)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {error: 'Failed to update'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(new Error('Failed to update'));
+  }));
 });

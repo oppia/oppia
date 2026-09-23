@@ -122,11 +122,14 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'donate',
         'get-started',
         'teach',
+    ],
+    '2': [
         'thanks',
         'volunteer',
         'contributor-dashboard',
+        'learner-dashboard',
+        'email-dashboard',
     ],
-    '2': ['learner-dashboard', 'email-dashboard'],
 }
 
 LIGHTHOUSE_PAGES: List[check_ci_test_suites_to_run.LighthousePageDict] = [
@@ -169,9 +172,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'exploration-player/view-exploration.spec.ts': [
                             'exploration-player/view-exploration.spec.ts'
                         ],
-                        '.lighthouserc-performance.js': [
-                            '.lighthouserc-performance.js'
+                        '.lighthouserc.js': ['.lighthouserc.js'],
+                        '.lighthouserc-desktop.js': [
+                            '.lighthouserc-desktop.js'
                         ],
+                        '.lighthouserc-base.js': ['.lighthouserc-base.js'],
                     }
                 )
             )
@@ -196,6 +201,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         )
         with open(lighthouse_pages_config_file, 'w', encoding='utf-8') as f:
             f.write(json.dumps(LIGHTHOUSE_PAGES_CONFIG))
+        lighthouse_shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards.json'
+        )
+        with open(lighthouse_shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(LIGHTHOUSE_PAGES_FOR_SUITES))
         ci_test_suite_configs_directory = os.path.join(
             self.tempdir.name, 'ci-test-suite-configs'
         )
@@ -308,6 +318,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             'LIGHTHOUSE_PAGES_CONFIG_FILE_PATH',
             lighthouse_pages_config_file,
         )
+        self.lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            lighthouse_shards_config_file,
+        )
         self.ci_test_suite_configs_directory_swap = self.swap(
             check_ci_test_suites_to_run,
             'CI_TEST_SUITE_CONFIGS_DIRECTORY',
@@ -364,35 +379,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     },
                 ],
             },
-            'lighthouse_accessibility': {
+            'lighthouse': {
                 'count': 2,
                 'suites': [
                     {
                         'name': '1',
-                        'module': '.lighthouserc-accessibility.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                     },
                     {
                         'name': '2',
-                        'module': '.lighthouserc-accessibility.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
-                    },
-                ],
-            },
-            'lighthouse_performance': {
-                'count': 2,
-                'suites': [
-                    {
-                        'name': '1',
-                        'module': '.lighthouserc-performance.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
-                    },
-                    {
-                        'name': '2',
-                        'module': '.lighthouserc-performance.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                     },
@@ -551,84 +549,169 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 LIGHTHOUSE_PAGES,
             )
 
-    def test_partition_lighthouse_pages_into_test_suites_one_shard_output(
+    def test_get_lighthouse_test_suites_with_all_pages(self) -> None:
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):
+            lighthouse_page_names = {page['name'] for page in LIGHTHOUSE_PAGES}
+            self.assertEqual(
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', lighthouse_page_names
+                ),
+                [
+                    {
+                        'name': '1',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
+                    },
+                    {
+                        'name': '2',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
+                    },
+                ],
+            )
+
+    def test_get_lighthouse_test_suites_filters_to_affected_pages(self) -> None:
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):
+            self.assertEqual(
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', {'splash', 'learner-dashboard'}
+                ),
+                [
+                    {
+                        'name': '1',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': ['splash'],
+                    },
+                    {
+                        'name': '2',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': ['learner-dashboard'],
+                    },
+                ],
+            )
+
+    def test_get_lighthouse_test_suites_skips_empty_shards(self) -> None:
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):
+            self.assertEqual(
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', {'splash'}
+                ),
+                [
+                    {
+                        'name': '1',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': ['splash'],
+                    },
+                ],
+            )
+
+    def test_get_lighthouse_test_suites_validates_shard_pages(self) -> None:
+        shards_config = {
+            name: list(pages)
+            for name, pages in LIGHTHOUSE_PAGES_FOR_SUITES.items()
+        }
+        shards_config['1'].append('non-existent-page')
+        shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards-invalid.json'
+        )
+        with open(shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(shards_config))
+        lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            shards_config_file,
+        )
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            lighthouse_shards_config_file_path_swap,
+        ):
+            with self.assertRaisesRegex(
+                ValueError,
+                'is listed in lighthouse-shards.json but is not present',
+            ):
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js',
+                    {page['name'] for page in LIGHTHOUSE_PAGES},
+                )
+
+    def test_get_lighthouse_test_suites_validates_no_missing_pages(
         self,
     ) -> None:
-        lighthouse_pages: List[
-            check_ci_test_suites_to_run.LighthousePageDict
-        ] = [
-            {
-                'name': 'splash',
-                'url': 'http://localhost:8181/',
-                'page_module': 'splash-page.module.ts',
-            },
-            {
-                'name': 'about',
-                'url': 'http://localhost:8181/about',
-                'page_module': 'about-page.module.ts',
-            },
-            {
-                'name': 'terms',
-                'url': 'http://localhost:8181/terms',
-                'page_module': 'terms-page.module.ts',
-            },
-            {
-                'name': 'privacy-policy',
-                'url': 'http://localhost:8181/privacy-policy',
-                'page_module': 'privacy-page.module.ts',
-            },
-            {
-                'name': 'exploration-player',
-                'url': 'http://localhost:8181/explore/{{topic_id}}',
-                'page_module': 'exploration-player-page.module.ts',
-            },
-        ]
-
-        self.assertEqual(
-            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', lighthouse_pages
-            ),
-            [
-                {
-                    'name': '1',
-                    'module': 'performance.js',
-                    'environment': 'python',
-                    'pages_to_run': [
-                        'splash',
-                        'about',
-                        'terms',
-                        'privacy-policy',
-                        'exploration-player',
-                    ],
-                }
-            ],
+        shards_config = {
+            name: list(pages)
+            for name, pages in LIGHTHOUSE_PAGES_FOR_SUITES.items()
+        }
+        shards_config['2'].remove('learner-dashboard')
+        shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards-missing.json'
         )
+        with open(shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(shards_config))
+        lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            shards_config_file,
+        )
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            lighthouse_shards_config_file_path_swap,
+        ):
+            with self.assertRaisesRegex(
+                ValueError,
+                'learner-dashboard.*missing from lighthouse-shards.json',
+            ):
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js',
+                    {page['name'] for page in LIGHTHOUSE_PAGES},
+                )
 
-    def test_partition_lighthouse_pages_into_test_suites_multiple_shards_output(
+    def test_get_lighthouse_test_suites_validates_no_duplicate_pages(
         self,
     ) -> None:
-        self.assertEqual(
-            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', LIGHTHOUSE_PAGES
-            ),
-            [
-                {
-                    'name': '1',
-                    'module': 'performance.js',
-                    'environment': 'python',
-                    'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
-                },
-                {
-                    'name': '2',
-                    'module': 'performance.js',
-                    'environment': 'python',
-                    'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
-                },
-            ],
+        shards_config = {
+            name: list(pages)
+            for name, pages in LIGHTHOUSE_PAGES_FOR_SUITES.items()
+        }
+        shards_config['2'].append(shards_config['1'][0])
+        shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards-duplicate.json'
         )
+        with open(shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(shards_config))
+        lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            shards_config_file,
+        )
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            lighthouse_shards_config_file_path_swap,
+        ):
+            with self.assertRaisesRegex(
+                ValueError,
+                'listed in more than one shard in lighthouse-shards.json',
+            ):
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js',
+                    {page['name'] for page in LIGHTHOUSE_PAGES},
+                )
 
     def test_check_ci_test_suites_to_run_with_output_all_suites(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     check_ci_test_suites_to_run.main(
@@ -646,7 +729,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     )
 
     def test_check_ci_test_suites_to_run_with_python_file(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -670,7 +753,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_file_not_in_root_file_mapping(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -694,7 +777,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_no_tests_corresponding_to_changed_files(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -725,11 +808,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -739,7 +818,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_run_all_tests_root_file(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -763,7 +842,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_partial_root_file_changes(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -808,34 +887,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 1,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',  # pylint: disable=line-too-long
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': [
-                                                'about',
-                                                'exploration-player',
                                                 'splash',
-                                                'terms',
-                                            ],
-                                        }
-                                    ],
-                                },
-                                'lighthouse_accessibility': {
-                                    'count': 1,
-                                    'suites': [
-                                        {
-                                            'name': '1',
-                                            'module': '.lighthouserc-accessibility.js',  # pylint: disable=line-too-long
-                                            'environment': 'python',
-                                            'pages_to_run': [
                                                 'about',
-                                                'exploration-player',
-                                                'splash',
                                                 'terms',
+                                                'exploration-player',
                                             ],
                                         }
                                     ],
@@ -846,7 +909,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_test_module(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -887,11 +950,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -901,13 +960,13 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_lighthouse_modules(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
-                        lambda *args: ['.lighthouserc-performance.js'],
+                        lambda *args: ['.lighthouserc.js'],
                     ):
                         check_ci_test_suites_to_run.main(
                             [
@@ -928,16 +987,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 2,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '1'
@@ -945,7 +1000,115 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         },
                                         {
                                             'name': '2',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '2'
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_desktop_module(
+        self,
+    ) -> None:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: ['.lighthouserc-desktop.js'],
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref',
+                                'base',
+                                '--github_head_ref',
+                                'head',
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'lighthouse': {
+                                    'count': 2,
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '1'
+                                            ],
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '2'
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_base_module(
+        self,
+    ) -> None:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: ['.lighthouserc-base.js'],
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref',
+                                'base',
+                                '--github_head_ref',
+                                'head',
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'lighthouse': {
+                                    'count': 2,
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc.js',
+                                            'environment': 'python',
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
+                                                '1'
+                                            ],
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '2'
@@ -975,7 +1138,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         with open(acceptance_config_file_path, 'w+', encoding='utf-8') as f:
             f.write(json.dumps(acceptance_config))
 
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
                 with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
                     with self.swap(
@@ -1008,11 +1171,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },

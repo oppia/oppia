@@ -22,7 +22,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'terms-page',
   templateUrl: './terms-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./terms-page.component.css'],
 })
 export class TermsPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;

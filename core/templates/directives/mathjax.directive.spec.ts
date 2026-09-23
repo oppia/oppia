@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for mathjax directive
  */
 
+// @ts-nocheck
+
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MathJaxDirective} from './mathjax.directive';

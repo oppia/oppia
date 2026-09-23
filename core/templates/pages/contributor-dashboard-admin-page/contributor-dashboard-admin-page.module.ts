@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {MatTableModule} from '@angular/material/table';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
@@ -36,6 +37,7 @@ import {ContributorDashboardAdminPageRootComponent} from './contributor-dashboar
 import {ContributorDashboardAdminAuthGuard} from './contributor-dashboard-admin-auth.guard';
 import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-admin-page.component';
 import {FeaturedTranslationLanguagesEditorComponent} from './featured-translation-languages-editor/featured-translation-languages-editor.component';
+import {TranslationConfigurationTabComponent} from './translation-configuration-tab/translation-configuration-tab.component';
 
 @NgModule({
   imports: [
@@ -43,6 +45,7 @@ import {FeaturedTranslationLanguagesEditorComponent} from './featured-translatio
     FormsModule,
     MatTableModule,
     MatTooltipModule,
+    MatSlideToggleModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
@@ -65,6 +68,7 @@ import {FeaturedTranslationLanguagesEditorComponent} from './featured-translatio
     FeaturedTranslationLanguagesEditorComponent,
     ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent,
+    TranslationConfigurationTabComponent,
   ],
   entryComponents: [
     CdAdminTranslationRoleEditorModal,
@@ -75,6 +79,7 @@ import {FeaturedTranslationLanguagesEditorComponent} from './featured-translatio
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
+    TranslationConfigurationTabComponent,
   ],
 })
 export class ContributorDashboardAdminPageModule {}

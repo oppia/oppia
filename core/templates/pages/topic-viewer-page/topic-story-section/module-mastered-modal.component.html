@@ -1,0 +1,39 @@
+<div class="module-mastered-modal-backdrop"
+     role="presentation">
+  <section class="module-mastered-modal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="module-mastered-title"
+           tabindex="-1">
+    <div class="module-mastered-confetti" aria-hidden="true">
+      <span class="module-mastered-confetti-piece piece-1"></span>
+      <span class="module-mastered-confetti-piece piece-2"></span>
+      <span class="module-mastered-confetti-piece piece-3"></span>
+      <span class="module-mastered-confetti-piece piece-4"></span>
+      <span class="module-mastered-confetti-piece piece-5"></span>
+      <span class="module-mastered-confetti-piece piece-6"></span>
+      <span class="module-mastered-confetti-piece piece-7"></span>
+      <span class="module-mastered-confetti-piece piece-8"></span>
+      <span class="module-mastered-confetti-piece piece-9"></span>
+      <span class="module-mastered-confetti-piece piece-10"></span>
+    </div>
+
+    <img class="module-mastered-trophy"
+         src="/assets/images/icons/mastery-challenge-trophy.svg"
+         alt=""
+         aria-hidden="true">
+
+    <h3 id="module-mastered-title" class="module-mastered-title">
+      {{ title }}
+    </h3>
+    <p class="module-mastered-message">
+      {{ message }}
+    </p>
+
+    <button type="button"
+            class="module-mastered-continue"
+            (click)="confirm()">
+      {{ 'I18N_TOPIC_VIEWER_MODULE_MASTERED_CONTINUE_BUTTON' | translate }}
+    </button>
+  </section>
+</div>

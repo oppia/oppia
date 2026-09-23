@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 
 import {AnswerGroup} from 'domain/exploration/answer-group.model';

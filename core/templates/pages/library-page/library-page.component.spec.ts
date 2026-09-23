@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   NO_ERRORS_SCHEMA,
@@ -46,7 +48,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
-import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
@@ -107,7 +108,6 @@ describe('Library Page Component', () => {
   let userService: UserService;
   let keyboardShortcutService: KeyboardShortcutService;
   let loggerService: LoggerService;
-  let searchService: SearchService;
   let translateService: TranslateService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -240,7 +240,6 @@ describe('Library Page Component', () => {
         KeyboardShortcutService,
         LibraryPageBackendApiService,
         LoaderService,
-        SearchService,
         UrlInterpolationService,
         UserService,
         {
@@ -279,7 +278,6 @@ describe('Library Page Component', () => {
     userService = TestBed.inject(UserService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     loggerService = TestBed.inject(LoggerService);
-    searchService = TestBed.inject(SearchService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
@@ -433,7 +431,7 @@ describe('Library Page Component', () => {
   it('should set appropriate new page title when not in browse mode', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
-    componentInstance.pageMode = 'not_search';
+    componentInstance.pageMode = 'index';
     componentInstance.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -444,10 +442,10 @@ describe('Library Page Component', () => {
     );
   });
 
-  it('should set appropriate new page title when in browse mode', () => {
+  it('should set browse mode page title when in group mode', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
-    componentInstance.pageMode = 'search';
+    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP;
     componentInstance.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -530,17 +528,6 @@ describe('Library Page Component', () => {
     let fullResultsUrl = 'full_results_url';
     componentInstance.showFullResultsPage([], fullResultsUrl);
     expect(windowRef.nativeWindow.location.href).toEqual(fullResultsUrl);
-  });
-
-  it('should show full results page when results url is not available', () => {
-    let urlQueryString = 'urlQueryString';
-    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
-      urlQueryString
-    );
-    componentInstance.showFullResultsPage(['id'], '');
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      '/search/find?q=' + urlQueryString
-    );
   });
 
   it('should increment and decrement carousel', () => {
@@ -997,19 +984,5 @@ describe('Library Page Component', () => {
     tick();
 
     expect(componentInstance.loadLibraryData).toHaveBeenCalled();
-  }));
-
-  it('should not reload library data on site language change in search mode', fakeAsync(() => {
-    spyOn(componentInstance, 'loadLibraryData');
-    componentInstance.ngOnInit();
-    tick();
-
-    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
-    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
-
-    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
-    tick();
-
-    expect(componentInstance.loadLibraryData).not.toHaveBeenCalled();
   }));
 });

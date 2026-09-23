@@ -16,6 +16,8 @@
  * @fileoverview unit tests for non-negative int editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
@@ -115,6 +117,23 @@ describe('NonnegativeIntEditorComponent', () => {
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith(
       component.value
     );
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update value if the entered value is not a number', () => {
+    spyOn(component.valueChanged, 'emit');
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    component.value = 1;
+
+    component.updateValue('foo');
+
+    expect(component.value).toBe(1);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 });

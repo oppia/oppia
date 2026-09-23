@@ -27,6 +27,10 @@ import {
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
+import {
+  TranslationAdminConfig,
+  TranslationAdminConfigBackendDict,
+} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 export interface FeaturedTranslationLanguagesBackendResponse {
   featured_translation_languages: FeaturedTranslationLanguageBackendDict[];
@@ -294,5 +298,43 @@ export class ContributorDashboardAdminBackendApiService {
         );
       }
     }
+  }
+
+  async fetchTranslationConfigurationAsync(): Promise<TranslationAdminConfig> {
+    return this.http
+      .get<TranslationAdminConfigBackendDict>('/translation-provider-mapping')
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
+  }
+
+  async updateTranslationConfigurationAsync(
+    mapping: Record<string, string>,
+    isEnabled: boolean
+  ): Promise<TranslationAdminConfig> {
+    const payload = {
+      provider_mapping: mapping,
+      automatic_translation_is_enabled: isEnabled,
+    };
+    return this.http
+      .put<TranslationAdminConfigBackendDict>(
+        '/translation-provider-mapping',
+        payload
+      )
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }

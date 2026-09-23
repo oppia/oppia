@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import collections
 import json
 import os
 import subprocess
@@ -76,8 +77,7 @@ class TestSuitesByTypeDict(TypedDict):
 
     acceptance: List[GenericTestSuiteDict]
     acceptance_playwright: List[GenericTestSuiteDict]
-    lighthouse_performance: List[LighthouseTestSuiteDict]
-    lighthouse_accessibility: List[LighthouseTestSuiteDict]
+    lighthouse: List[LighthouseTestSuiteDict]
 
 
 class CITestSuitesDict(TypedDict):
@@ -92,8 +92,7 @@ class CITestSuitesToRunDict(TypedDict):
 
     acceptance: CITestSuitesDict
     acceptance_playwright: CITestSuitesDict
-    lighthouse_performance: CITestSuitesDict
-    lighthouse_accessibility: CITestSuitesDict
+    lighthouse: CITestSuitesDict
 
 
 class RootFilesConfigDict(TypedDict):
@@ -111,6 +110,14 @@ ROOT_FILES_CONFIG_FILE_PATH: Final = os.path.join(
 LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
+# Maps each Lighthouse shard to the pages it audits. This explicit mapping
+# keeps every shard's page-to-setup relationship stable: pages are only ever
+# reassigned by editing this file, never by automatic re-partitioning based on
+# page counts, so a page is never silently moved into a shard whose setup it
+# does not require.
+LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH: Final = os.path.join(
+    'core', 'tests', 'lighthouse-shards.json'
+)
 CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'ci-test-suite-configs'
 )
@@ -119,9 +126,14 @@ TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'test-modules-mappings'
 )
 
-LIGHTHOUSE_PAGES_PER_SHARD: Final = 17
-LIGHTHOUSE_ACCESSIBILITY_MODULE: Final = '.lighthouserc-accessibility.js'
-LIGHTHOUSE_PERFORMANCE_MODULE: Final = '.lighthouserc-performance.js'
+LIGHTHOUSE_MODULES: Final = (
+    '.lighthouserc.js',
+    '.lighthouserc-desktop.js',
+    '.lighthouserc-base.js',
+)
+# The primary Lighthouse module is used as the module identifier for the
+# Lighthouse test suites.
+LIGHTHOUSE_MODULE: Final = '.lighthouserc.js'
 
 
 def create_ci_test_suites_dict(
@@ -141,8 +153,7 @@ def create_ci_test_suites_dict(
 def create_ci_test_suites_to_run_dict(
     acceptance: Optional[CITestSuitesDict] = None,
     acceptance_playwright: Optional[CITestSuitesDict] = None,
-    lighthouse_performance: Optional[CITestSuitesDict] = None,
-    lighthouse_accessibility: Optional[CITestSuitesDict] = None,
+    lighthouse: Optional[CITestSuitesDict] = None,
 ) -> CITestSuitesToRunDict:
     """Creates a CITestSuitesToRunDict with the given parameters.
 
@@ -150,10 +161,7 @@ def create_ci_test_suites_to_run_dict(
         acceptance: dict | None. The acceptance test suites to run in the CI.
         acceptance_playwright: dict | None. The Playwright acceptance test
             suites to run in the CI.
-        lighthouse_performance: dict | None. The lighthouse performance test
-            suites to run in the CI.
-        lighthouse_accessibility: dict | None. The lighthouse accessibility
-            test suites to run in the CI.
+        lighthouse: dict | None. The lighthouse test suites to run in the CI.
 
     Returns:
         dict. The CITestSuitesToRunDict with the given parameters.
@@ -162,10 +170,7 @@ def create_ci_test_suites_to_run_dict(
         'acceptance': acceptance or create_ci_test_suites_dict(),
         'acceptance_playwright': acceptance_playwright
         or create_ci_test_suites_dict(),
-        'lighthouse_performance': lighthouse_performance
-        or create_ci_test_suites_dict(),
-        'lighthouse_accessibility': lighthouse_accessibility
-        or create_ci_test_suites_dict(),
+        'lighthouse': lighthouse or create_ci_test_suites_dict(),
     }
 
 
@@ -259,10 +264,7 @@ def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run_output = {
         'acceptance': test_suites_to_run['acceptance'],
         'acceptance_playwright': test_suites_to_run['acceptance_playwright'],
-        'lighthouse_performance': test_suites_to_run['lighthouse_performance'],
-        'lighthouse_accessibility': test_suites_to_run[
-            'lighthouse_accessibility'
-        ],
+        'lighthouse': test_suites_to_run['lighthouse'],
     }
     print(
         'Test Suites to Run: ', json.dumps(test_suites_to_run_output, indent=4)
@@ -310,35 +312,115 @@ def get_lighthouse_pages_from_config() -> List[LighthousePageDict]:
     return lighthouse_pages
 
 
-def partition_lighthouse_pages_into_test_suites(
-    lighthouse_module: str, lighthouse_pages: List[LighthousePageDict]
+def get_lighthouse_shards_config() -> dict[str, List[str]]:
+    """Gets the explicit mapping of Lighthouse shards to their pages.
+
+    Pages are grouped into shards by their data-setup requirements rather
+    than sorted alphabetically: pages that need the same puppeteer setup are
+    kept together so that each shard performs minimal setup. When adding a
+    page, place it in the shard whose setup it needs and keep the existing
+    page order stable.
+
+    Returns:
+        dict(str, list(str)). Maps each shard name to the names of the pages
+        it audits.
+    """
+    with open(LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
+        shards_config = json.load(f)
+        return {name: list(pages) for name, pages in shards_config.items()}
+
+
+def get_lighthouse_test_suites(
+    lighthouse_module: str, pages_to_run: Set[str]
 ) -> List[LighthouseTestSuiteDict]:
-    """Partitions the Lighthouse pages into test suites.
+    """Builds Lighthouse test suites from the explicit shard config.
+
+    The shard boundaries are fixed in ``lighthouse-shards.json`` and are never
+    recomputed from page counts, so a page can only reach a shard by being
+    listed for that shard in the config. This keeps each shard's set of pages
+    aligned with the setup steps its shard function performs.
 
     Args:
         lighthouse_module: str. The Lighthouse module.
-        lighthouse_pages: list(dict). The list of Lighthouse pages.
+        pages_to_run: set(str). The names of the pages that should actually be
+            run. When this is the full set of configured pages, every shard
+            and page is included; otherwise only the shards that list at least
+            one affected page are returned, with each such shard reduced to its
+            affected pages.
 
     Returns:
-        list(dict). The test suites to run.
+        list(dict). The Lighthouse test suites to run.
     """
     lighthouse_test_suites: List[LighthouseTestSuiteDict] = []
-    current_lighthouse_test_suite: LighthouseTestSuiteDict | None = None
-    for i, page in enumerate(lighthouse_pages):
-        if i % LIGHTHOUSE_PAGES_PER_SHARD == 0:
-            if current_lighthouse_test_suite:
-                lighthouse_test_suites.append(current_lighthouse_test_suite)
-            current_lighthouse_test_suite = {
-                'name': '%s' % (str(i // LIGHTHOUSE_PAGES_PER_SHARD + 1)),
+    shards_config = get_lighthouse_shards_config()
+    configured_pages = {
+        page['name'] for page in get_lighthouse_pages_from_config()
+    }
+    _validate_shard_page_membership(shards_config, configured_pages)
+    for shard_name in sorted(shards_config, key=int):
+        pages_in_shard = [
+            page for page in shards_config[shard_name] if page in pages_to_run
+        ]
+        if not pages_in_shard:
+            continue
+        lighthouse_test_suites.append(
+            {
+                'name': shard_name,
                 'module': lighthouse_module,
                 'environment': 'python',
-                'pages_to_run': [],
+                'pages_to_run': pages_in_shard,
             }
-        assert current_lighthouse_test_suite is not None
-        current_lighthouse_test_suite['pages_to_run'].append(page['name'])
-    if current_lighthouse_test_suite:
-        lighthouse_test_suites.append(current_lighthouse_test_suite)
+        )
     return lighthouse_test_suites
+
+
+def _validate_shard_page_membership(
+    shards_config: dict[str, List[str]], configured_pages: Set[str]
+) -> None:
+    """Raises if the shard config does not cover every configured page.
+
+    Every page in ``lighthouse-pages.json`` must be listed in exactly one
+    shard in ``lighthouse-shards.json``. This catches a page that was added to
+    the pages config but forgotten in a shard (leaving it unrun), or a page
+    that was accidentally listed in two shards.
+
+    Args:
+        shards_config: dict(str, list(str)). The explicit shard-to-pages
+            mapping.
+        configured_pages: set(str). The names of all configured Lighthouse
+            pages.
+
+    Raises:
+        ValueError. A configured page is missing from or duplicated across the
+            shard config, or a shard lists an unknown page.
+    """
+    listed_pages: List[str] = []
+    for shard_name in sorted(shards_config, key=int):
+        for page in shards_config[shard_name]:
+            if page not in configured_pages:
+                raise ValueError(
+                    'Page `%s` is listed in lighthouse-shards.json but is not '
+                    'present in lighthouse-pages.json.' % page
+                )
+            listed_pages.append(page)
+
+    missing_pages = sorted(configured_pages - set(listed_pages))
+    if missing_pages:
+        raise ValueError(
+            'Pages %s are present in lighthouse-pages.json but are missing '
+            'from lighthouse-shards.json.' % ', '.join(missing_pages)
+        )
+
+    duplicate_pages = sorted(
+        page
+        for page, count in collections.Counter(listed_pages).items()
+        if count > 1
+    )
+    if duplicate_pages:
+        raise ValueError(
+            'Pages %s are listed in more than one shard in '
+            'lighthouse-shards.json.' % ', '.join(duplicate_pages)
+        )
 
 
 def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
@@ -355,22 +437,15 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_accessibility_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_ACCESSIBILITY_MODULE, get_lighthouse_pages_from_config()
-        )
-    )
-    lighthouse_performance_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_PERFORMANCE_MODULE, get_lighthouse_pages_from_config()
-        )
+    lighthouse_test_suites = get_lighthouse_test_suites(
+        LIGHTHOUSE_MODULE,
+        {page['name'] for page in get_lighthouse_pages_from_config()},
     )
 
     return {
         'acceptance': acceptance_test_suites,
         'acceptance_playwright': acceptance_playwright_suites,
-        'lighthouse_accessibility': lighthouse_accessibility_test_suites,
-        'lighthouse_performance': lighthouse_performance_test_suites,
+        'lighthouse': lighthouse_test_suites,
     }
 
 
@@ -384,11 +459,8 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
         acceptance_playwright=create_ci_test_suites_dict(
             all_test_suites_by_type['acceptance_playwright']
         ),
-        lighthouse_performance=create_ci_test_suites_dict(
-            all_test_suites_by_type['lighthouse_performance']
-        ),
-        lighthouse_accessibility=create_ci_test_suites_dict(
-            all_test_suites_by_type['lighthouse_accessibility']
+        lighthouse=create_ci_test_suites_dict(
+            all_test_suites_by_type['lighthouse']
         ),
     )
     output_test_suites_to_run_to_github_workflow(test_suites_to_run)
@@ -548,21 +620,21 @@ def get_test_suites_affected_by_root_file(
 
 
 def get_affected_lighthouse_pages(
-    modified_root_files: Set[str], lighthouse_module: str
+    modified_root_files: Set[str], lighthouse_modules: Sequence[str]
 ) -> List[LighthousePageDict]:
     """Gets the affected Lighthouse pages by a list of modified root files.
 
     Args:
         modified_root_files: set(str). The set of modified root files.
-        lighthouse_module: str. The Lighthouse module.
+        lighthouse_modules: list(str). The Lighthouse modules.
 
     Returns:
         list(dict). The affected Lighthouse pages sorted by name.
     """
     lighthouse_pages = get_lighthouse_pages_from_config()
-    # If the Lighthouse module is in the modified root files, then all
+    # If any of the Lighthouse modules is in the modified root files, then all
     # Lighthouse pages should be run.
-    if lighthouse_module in modified_root_files:
+    if modified_root_files.intersection(set(lighthouse_modules)):
         return lighthouse_pages
     affected_lighthouse_pages: List[LighthousePageDict] = []
     for modified_root_file in modified_root_files:
@@ -626,22 +698,14 @@ def get_ci_test_suites_to_run(
         s for s in acceptance_test_suites if s.get('framework') == 'playwright'
     ]
 
-    lighthouse_accessibility_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_ACCESSIBILITY_MODULE,
-            get_affected_lighthouse_pages(
-                modified_root_files, LIGHTHOUSE_ACCESSIBILITY_MODULE
-            ),
-        )
-    )
-
-    lighthouse_performance_test_suites = (
-        partition_lighthouse_pages_into_test_suites(
-            LIGHTHOUSE_PERFORMANCE_MODULE,
-            get_affected_lighthouse_pages(
-                modified_root_files, LIGHTHOUSE_PERFORMANCE_MODULE
-            ),
-        )
+    lighthouse_test_suites = get_lighthouse_test_suites(
+        LIGHTHOUSE_MODULE,
+        {
+            page['name']
+            for page in get_affected_lighthouse_pages(
+                modified_root_files, LIGHTHOUSE_MODULES
+            )
+        },
     )
 
     return create_ci_test_suites_to_run_dict(
@@ -649,12 +713,7 @@ def get_ci_test_suites_to_run(
         acceptance_playwright=create_ci_test_suites_dict(
             acceptance_playwright_test_suites
         ),
-        lighthouse_accessibility=create_ci_test_suites_dict(
-            lighthouse_accessibility_test_suites
-        ),
-        lighthouse_performance=create_ci_test_suites_dict(
-            lighthouse_performance_test_suites
-        ),
+        lighthouse=create_ci_test_suites_dict(lighthouse_test_suites),
     )
 
 

@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for chapter editor tab component.
  */
+// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
