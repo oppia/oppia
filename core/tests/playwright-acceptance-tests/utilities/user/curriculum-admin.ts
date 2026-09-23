@@ -110,6 +110,11 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Created ${classroomName} classroom.`);
   }
 
+  /**
+   * Function to create a topic with a linked skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   */
   async createTopicWithSkill(
     topicName: string,
     skillName: string
