@@ -36,6 +36,11 @@ export const ContributorDashboardConstants = {
   // argument, and it never describes an individual opportunity.
   ENTITY_TYPE_SENTINEL_ALL: 'all',
 
+  // Sentinel used by the topic filter to mean "do not filter by topic". It is
+  // never sent to the backend, and it cannot clash with a real topic ID since
+  // those are 12 characters long.
+  TOPIC_SENTINEL_ID_ALL: 'all',
+
   // Shown when a suggestion review fails and the endpoint that rejected it
   // did not report a reason.
   SUGGESTION_REVIEW_FAILURE_MESSAGE: 'Error updating suggestion',
@@ -74,5 +79,4 @@ export const ContributorDashboardConstants = {
     '[The corresponding opportunity ' + 'has been deleted.]',
 
   DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi',
-  DEFAULT_OPPORTUNITY_TOPIC_NAME: 'All',
 } as const;

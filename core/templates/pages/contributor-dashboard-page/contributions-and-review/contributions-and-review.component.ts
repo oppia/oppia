@@ -136,7 +136,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
   styleUrls: ['./contributions-and-review.component.css'],
 })
 export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
-  @Input() activeTopicName: string;
+  @Input() activeTopicId: string;
   @Input() activeEntityType: string =
     ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   @ViewChild('opportunitiesList')
@@ -715,7 +715,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   loadReviewableTranslationOpportunities(): Promise<GetOpportunitiesResponse> {
     return this.contributionOpportunitiesService
       .getReviewableTranslationOpportunitiesAsync(
-        this.translationTopicService.getActiveTopicName(),
+        this.translationTopicService.getActiveTopicId(),
         this.languageCode,
         this.activeEntityType
       )
@@ -728,6 +728,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
+            topicId: opportunity.topicId,
             topicName: opportunity.topicName,
             totalCount: opportunity.getContentCount(),
             translationsCount: opportunity.getTranslationsCount(
@@ -757,23 +758,23 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   }
 
   pinReviewableTranslationOpportunity(dict: Record<string, string>): void {
-    const topicName = dict.topic_name;
+    const topicId = dict.topic_id;
     const explorationId = dict.exploration_id;
     const existingPinnedOpportunity = Object.values(this.opportunities).find(
-      (opportunity: {topicName: string; isPinned: boolean}) =>
-        opportunity.topicName === topicName && opportunity.isPinned
+      (opportunity: {topicId: string; isPinned: boolean}) =>
+        opportunity.topicId === topicId && opportunity.isPinned
     );
 
     if (existingPinnedOpportunity) {
       this.openSnackbarWithAction(
-        topicName,
+        topicId,
         explorationId,
         'A pinned opportunity already exists for this topic and language.',
         'Pin Anyway'
       );
     } else {
       this.contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
-        topicName,
+        topicId,
         this.languageCode,
         explorationId
       );
@@ -782,7 +783,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
 
   unpinReviewableTranslationOpportunity(dict: Record<string, string>): void {
     this.contributionOpportunitiesService.unpinReviewableTranslationOpportunityAsync(
-      dict.topic_name,
+      dict.topic_id,
       this.languageCode,
       dict.exploration_id
     );
@@ -954,7 +955,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     // This flag can be used to conditionally render parts of the UI or
     // enable/disable features that depend on a selected topic.
     this.translationTopicService.onActiveTopicChanged.subscribe(() => {
-      const topic = this.translationTopicService.getActiveTopicName();
+      const topic = this.translationTopicService.getActiveTopicId();
       this.topicReady = !!topic;
     });
 
@@ -1049,7 +1050,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
           return this.contributionAndReviewService.getReviewableQuestionSuggestionsAsync(
             shouldResetOffset,
             this.reviewableQuestionsSortKey,
-            this.translationTopicService.getActiveTopicName()
+            this.translationTopicService.getActiveTopicId()
           );
         },
       },
@@ -1074,7 +1075,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   }
 
   openSnackbarWithAction(
-    topicName: string,
+    topicId: string,
     explorationId: string,
     message: string,
     actionText: string
@@ -1087,17 +1088,17 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       }
     );
 
-    this.handleSnackbarAction(snackBarRef, topicName, explorationId);
+    this.handleSnackbarAction(snackBarRef, topicId, explorationId);
   }
 
   private handleSnackbarAction(
     snackBarRef: CustomMatSnackBarRef,
-    topicName: string,
+    topicId: string,
     explorationId: string
   ): void {
     snackBarRef.onAction().subscribe(() => {
       this.contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
-        topicName,
+        topicId,
         this.languageCode,
         explorationId
       );

@@ -107,7 +107,7 @@ export class ContributionAndReviewBackendApiService {
     offset: number,
     sortKey: string,
     entityId: string | null,
-    topicName: string | null,
+    topicId: string | null,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
@@ -136,7 +136,7 @@ export class ContributionAndReviewBackendApiService {
         offset,
         sortKey,
         null,
-        topicName
+        topicId
       );
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
@@ -192,7 +192,7 @@ export class ContributionAndReviewBackendApiService {
     offset: number,
     sortKey: string,
     entityId: string | null,
-    topicName: string | null
+    topicId: string | null
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL,
@@ -206,7 +206,7 @@ export class ContributionAndReviewBackendApiService {
       offset: string;
       sort_key: string;
       entity_id?: string;
-      topic_name?: string;
+      topic_id?: string;
     } = {
       offset: offset.toString(),
       sort_key: sortKey,
@@ -230,8 +230,13 @@ export class ContributionAndReviewBackendApiService {
     if (entityId) {
       params.entity_id = entityId;
     }
-    if (topicName) {
-      params.topic_name = topicName;
+    // The "all" sentinel means that suggestions from every topic are wanted,
+    // which the handler expresses by the topic_id parameter being omitted.
+    if (
+      topicId &&
+      topicId !== ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+    ) {
+      params.topic_id = topicId;
     }
     return this.http
       .get<FetchSuggestionsResponse>(url, {params} as Object)

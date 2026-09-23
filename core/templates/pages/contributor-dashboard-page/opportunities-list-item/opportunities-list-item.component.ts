@@ -36,6 +36,7 @@ export interface ExplorationOpportunity {
   actionButtonTitle?: string;
   translationWordCount?: number;
   isPinned?: boolean;
+  topicId: string;
   topicName: string;
 }
 
@@ -77,25 +78,25 @@ export class OpportunitiesListItemComponent {
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
   @Output() clickPinButton: EventEmitter<{
-    topic_name: string;
+    topic_id: string;
     exploration_id: string;
   }> = new EventEmitter();
 
   @Output() clickUnpinButton: EventEmitter<{
-    topic_name: string;
+    topic_id: string;
     exploration_id: string;
   }> = new EventEmitter();
 
   pinOpportunity(): void {
     this.clickPinButton.emit({
-      topic_name: this.opportunity.topicName,
+      topic_id: this.opportunity.topicId,
       exploration_id: this.opportunity.id,
     });
   }
 
   unpinOpportunity(): void {
     this.clickUnpinButton.emit({
-      topic_name: this.opportunity.topicName,
+      topic_id: this.opportunity.topicId,
       exploration_id: this.opportunity.id,
     });
   }
