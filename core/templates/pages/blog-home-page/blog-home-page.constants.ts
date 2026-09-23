@@ -20,8 +20,5 @@
 // constants defined in feconf.py..
 export const BlogHomePageConstants = {
   BLOG_HOMEPAGE_DATA_URL_TEMPLATE: '/blogdatahandler/data',
-  BLOG_SEARCH_DATA_URL: '/blog/searchhandler/data',
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE: 10,
-  MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE: 10,
-  DEBOUNCE_TIME: 1500,
 } as const;

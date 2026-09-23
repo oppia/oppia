@@ -28,7 +28,6 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {EditabilityService} from 'services/editability.service';
-import './state-name-editor.component.css';
 
 @Component({
   selector: 'oppia-state-name-editor',
