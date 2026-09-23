@@ -26,7 +26,6 @@
             <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown">
               <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : dropdownMenuIsActive}">
                 <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-bs-toggle="dropdown"
                    (mouseenter)="activateDropdownMenu()"
                    (mouseleave)="deactivateDropdownMenu()">
                   <i class="fa fa-bars oppia-admin-page-dropdown-icon"></i>
@@ -92,7 +91,6 @@
             <ul class="nav oppia-navbar-tabs-admin">
               <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : profileDropdownIsActive}">
                 <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-bs-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
                   <picture *ngIf="profilePicturePngDataUrl">

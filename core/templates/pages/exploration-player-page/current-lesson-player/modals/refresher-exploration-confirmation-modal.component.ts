@@ -23,7 +23,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
-import './refresher-exploration-confirmation-modal.component.css';
 
 @Component({
   selector: 'oppia-refresher-confirmation-modal',

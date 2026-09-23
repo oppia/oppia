@@ -36,7 +36,6 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
 import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SearchService} from 'services/search.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
@@ -217,7 +216,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
-    private searchService: SearchService,
     private windowRef: WindowRef,
     private urlService: UrlService,
     private focusManagerService: FocusManagerService,
@@ -280,14 +278,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // first save a reference to that context in a variable, and then use that
     // variable in place of the 'this' keyword.
     let that = this;
-
-    this.directiveSubscriptions.add(
-      this.searchService.onSearchBarLoaded.subscribe(() => {
-        setTimeout(function () {
-          that.truncateNavbar();
-        }, 100);
-      })
-    );
 
     this.i18nService.updateViewToUserPreferredSiteLanguage();
 
