@@ -30,7 +30,6 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import {TopicIdToPrerequisiteTopicIds} from '../existing-classroom.model';
 import {TopicIdToTopicName} from '../existing-classroom.model';
-import './topic-dependency-graph-viz-modal.component.css';
 
 interface NodeData {
   y0: number;

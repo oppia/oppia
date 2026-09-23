@@ -512,8 +512,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(GeneralSuggestionModel). A list of new suggestions
             matching the criteria.
         """
-        threshold_datetime = utils.get_current_utc_datetime() - (
-            datetime.timedelta(days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION)
+        threshold_datetime = (
+            utils.get_current_utc_datetime()
+            - datetime.timedelta(days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION)
         )
         return (
             cls.get_all()
