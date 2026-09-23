@@ -319,6 +319,167 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
+  describe('translation coordinator / featured languages tab', () => {
+    let translationAdminAndCoordinatorInfo = new UserInfo(
+      ['USER_ROLE', 'TRANSLATION_ADMIN', 'TRANSLATION_COORDINATOR'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+
+    const queryEditor = () =>
+      fixture.debugElement.query(
+        By.css('oppia-featured-translation-languages-editor')
+      );
+    const queryStatsTable = () =>
+      fixture.debugElement.query(By.css('contributor-admin-stats-table'));
+    const queryCoordinatorTab = () =>
+      fixture.debugElement.query(
+        By.css('.e2e-test-translation-coordinators-tab')
+      );
+
+    beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {
+            en: 1,
+            ar: 1,
+            ms: 1,
+            az: 1,
+            'hi-en': 1,
+          },
+          question_reviewers_count: 1,
+        } as CommunityContributionStatsBackendDict)
+      );
+      getUserInfoSpy = spyOn(userService, 'getUserInfoAsync');
+    });
+
+    it('should label the tab as Translation Coordinators / Featured Languages', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+
+      // The label wraps onto two lines with a <br>, so join its text nodes
+      // with a space to get the full label.
+      const tabElement: HTMLElement = queryCoordinatorTab().nativeElement;
+      const label = Array.from(tabElement.childNodes)
+        .map(node => (node.textContent ?? '').trim())
+        .filter(text => text.length > 0)
+        .join(' ');
+      expect(label).toBe('Translation Coordinators / Featured Languages');
+    }));
+
+    it('should map only the translation coordinator key to a custom label', () => {
+      expect(
+        component.getContributionTypeLabel(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        )
+      ).toBe('Translation Coordinators / Featured Languages');
+      expect(
+        component.getContributionTypeLabel(
+          component.TAB_NAME_QUESTION_COORDINATOR
+        )
+      ).toBe(component.TAB_NAME_QUESTION_COORDINATOR);
+      // The internal key must stay unchanged since the stats table matches it.
+      expect(component.TAB_NAME_TRANSLATION_COORDINATOR).toBe(
+        'Translation Coordinator'
+      );
+    });
+
+    it(
+      'should let a pure translation admin reach the tab and see only the ' +
+        'editor',
+      fakeAsync(() => {
+        getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        expect(component.CONTRIBUTION_TYPES).toEqual([
+          component.TAB_NAME_TRANSLATION_COORDINATOR,
+        ]);
+        expect(component.activeTab).toBe(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        );
+        expect(fetchAssignedLanguageIdsSpy).not.toHaveBeenCalled();
+        expect(queryCoordinatorTab()).not.toBeNull();
+        expect(queryEditor()).not.toBeNull();
+        expect(queryStatsTable()).toBeNull();
+      })
+    );
+
+    it(
+      'should show the stats table but not the editor to a pure translation ' +
+        'coordinator',
+      fakeAsync(() => {
+        getUserInfoSpy.and.returnValue(
+          Promise.resolve(translationCoordinatorInfo)
+        );
+        fixture.detectChanges();
+        tick();
+        component.setActiveTab(component.TAB_NAME_TRANSLATION_COORDINATOR);
+        fixture.detectChanges();
+
+        expect(component.isTranslationAdmin).toBeFalse();
+        expect(queryCoordinatorTab()).not.toBeNull();
+        expect(queryEditor()).toBeNull();
+        expect(queryStatsTable()).not.toBeNull();
+      })
+    );
+
+    it('should show both the editor and stats table to an admin coordinator', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationAdminAndCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      component.setActiveTab(component.TAB_NAME_TRANSLATION_COORDINATOR);
+      fixture.detectChanges();
+
+      expect(queryEditor()).not.toBeNull();
+      expect(queryStatsTable()).not.toBeNull();
+    }));
+
+    it('should not show the editor outside the coordinator tab', fakeAsync(() => {
+      getUserInfoSpy.and.returnValue(
+        Promise.resolve(translationAdminAndCoordinatorInfo)
+      );
+      fixture.detectChanges();
+      tick();
+      component.setActiveTab(component.TAB_NAME_TRANSLATION_SUBMITTER);
+      fixture.detectChanges();
+
+      expect(queryEditor()).toBeNull();
+      expect(queryStatsTable()).not.toBeNull();
+    }));
+
+    it('should show the editor in the mobile layout too', fakeAsync(() => {
+      spyOn(component, 'checkMobileView').and.returnValue(true);
+      getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+
+      expect(
+        fixture.debugElement.query(By.css('.dashboard-content-mobile'))
+      ).not.toBeNull();
+      expect(queryEditor()).not.toBeNull();
+      expect(queryStatsTable()).toBeNull();
+    }));
+  });
+
   describe('when user is logged in', () => {
     beforeEach(() => {
       spyOn(
@@ -344,37 +505,6 @@ describe('Contributor dashboard Admin page', () => {
 
       component.ngOnInit();
     });
-
-    it('should show the featured languages editor for a translation admin', fakeAsync(() => {
-      getUserInfoSpy.and.returnValue(Promise.resolve(translationAdminInfo));
-
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
-
-      expect(component.isTranslationAdmin).toBeTrue();
-      expect(
-        fixture.debugElement.query(
-          By.css('oppia-featured-translation-languages-editor')
-        )
-      ).not.toBeNull();
-    }));
-
-    it('should hide the featured languages editor for a non-admin', fakeAsync(() => {
-      // FullAccessUserInfo has coordinator roles but NOT TRANSLATION_ADMIN.
-      getUserInfoSpy.and.returnValue(Promise.resolve(fullAccessUserInfo));
-
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
-
-      expect(component.isTranslationAdmin).toBeFalse();
-      expect(
-        fixture.debugElement.query(
-          By.css('oppia-featured-translation-languages-editor')
-        )
-      ).toBeNull();
-    }));
 
     it(
       'should initialize the contributor admin stats table only' +

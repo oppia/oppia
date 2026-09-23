@@ -29,11 +29,6 @@
       </mat-card>
     </div>
   </div>
-  <div *ngIf="isTranslationAdmin"
-       class="oppia-dashboard-container m-auto e2e-test-featured-translation-languages">
-    <oppia-featured-translation-languages-editor>
-    </oppia-featured-translation-languages-editor>
-  </div>
   <div class="dashboard-content">
     <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
       <div>
@@ -58,9 +53,9 @@
               Question<br>Reviewers
             </a>
           </li>
-          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_COORDINATOR}" *ngIf="isTranslationCoordinator">
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_COORDINATOR}" *ngIf="isTranslationCoordinator || isTranslationAdmin">
             <a class="dashboard-tabs-text e2e-test-translation-coordinators-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_COORDINATOR)">
-              Translation<br>Coordinators
+              Translation Coordinators /<br>Featured Languages
             </a>
           </li>
           <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}" *ngIf="isQuestionCoordinator">
@@ -120,7 +115,11 @@
           </div>
         </div>
       </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <div *ngIf="shouldShowFeaturedLanguagesEditor()" class="mb-3 e2e-test-featured-translation-languages">
+        <oppia-featured-translation-languages-editor>
+        </oppia-featured-translation-languages-editor>
+      </div>
+      <contributor-admin-stats-table *ngIf="shouldShowStatsTable()" [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
     <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
       <div class="dropdown">
@@ -130,7 +129,7 @@
                       (valueChange)="updateSelectedContributionType($event)"
                       class="e2e-test-tab-selection-dropdown">
             <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
-              {{ choice }}
+              {{ getContributionTypeLabel(choice) }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -183,7 +182,11 @@
           </oppia-topic-filter>
         </div>
       </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <div *ngIf="shouldShowFeaturedLanguagesEditor()" class="mb-3 e2e-test-featured-translation-languages">
+        <oppia-featured-translation-languages-editor>
+        </oppia-featured-translation-languages-editor>
+      </div>
+      <contributor-admin-stats-table *ngIf="shouldShowStatsTable()" [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
   </div>
 </div>

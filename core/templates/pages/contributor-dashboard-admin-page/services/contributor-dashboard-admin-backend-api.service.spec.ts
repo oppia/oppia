@@ -515,7 +515,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    cdabas
+    contributorDashboardAdminBackendApiService
       .getFeaturedTranslationLanguagesAsync()
       .then(successHandler, failHandler);
 
@@ -544,7 +544,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const failHandler = jasmine.createSpy('fail');
     const payload = [{language_code: 'hi', explanation: 'For India.'}];
 
-    cdabas
+    contributorDashboardAdminBackendApiService
       .updateFeaturedTranslationLanguagesAsync(payload)
       .then(successHandler, failHandler);
 
@@ -566,7 +566,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    cdabas
+    contributorDashboardAdminBackendApiService
       .getFeaturedTranslationLanguagesAsync()
       .then(successHandler, failHandler);
 
@@ -587,7 +587,7 @@ describe('Contributor dashboard admin backend api service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    cdabas
+    contributorDashboardAdminBackendApiService
       .updateFeaturedTranslationLanguagesAsync([
         {language_code: 'hi', explanation: 'For India.'},
       ])

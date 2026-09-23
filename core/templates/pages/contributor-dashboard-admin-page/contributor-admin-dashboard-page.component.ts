@@ -101,6 +101,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   TAB_NAME_TRANSLATION_COORDINATOR: string = 'Translation Coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
+  // The TAB_NAME_* values above are internal keys that are also matched in
+  // the stats table component, so tabs whose user-facing label differs from
+  // their key are mapped to that label here instead of renaming the key.
+  CONTRIBUTION_TYPE_LABELS: Record<string, string> = {
+    [this.TAB_NAME_TRANSLATION_COORDINATOR]:
+      'Translation Coordinators / Featured Languages',
+  };
   ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
@@ -174,8 +181,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (this.isTranslationCoordinator) {
               this.CONTRIBUTION_TYPES.push(
                 this.TAB_NAME_TRANSLATION_SUBMITTER,
-                this.TAB_NAME_TRANSLATION_REVIEWER,
-                this.TAB_NAME_TRANSLATION_COORDINATOR
+                this.TAB_NAME_TRANSLATION_REVIEWER
               );
 
               this.contributorDashboardAdminStatsBackendApiService
@@ -193,6 +199,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                       this.selectedLanguage.id
                     ];
                 });
+            }
+            // Translation admins need this tab to reach the featured
+            // languages editor, even if they are not translation coordinators.
+            // This is kept outside the block above so that admin-only users do
+            // not trigger the assigned-languages fetch.
+            if (this.isTranslationCoordinator || this.isTranslationAdmin) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_TRANSLATION_COORDINATOR
+              );
             }
             if (this.isQuestionCoordinator) {
               this.CONTRIBUTION_TYPES.push(
@@ -245,6 +260,27 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     return (
       this.activeTab === this.TAB_NAME_TRANSLATION_COORDINATOR ||
       this.activeTab === this.TAB_NAME_QUESTION_COORDINATOR
+    );
+  }
+
+  getContributionTypeLabel(contributionType: string): string {
+    return this.CONTRIBUTION_TYPE_LABELS[contributionType] ?? contributionType;
+  }
+
+  shouldShowFeaturedLanguagesEditor(): boolean {
+    return (
+      this.isTranslationAdmin &&
+      this.activeTab === this.TAB_NAME_TRANSLATION_COORDINATOR
+    );
+  }
+
+  // Translation admins who are not coordinators can open the translation
+  // coordinator tab (for the featured languages editor), but must not see or
+  // fetch the coordinator stats.
+  shouldShowStatsTable(): boolean {
+    return (
+      this.activeTab !== this.TAB_NAME_TRANSLATION_COORDINATOR ||
+      this.isTranslationCoordinator
     );
   }
 
