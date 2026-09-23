@@ -7,7 +7,7 @@
        *ngIf="!isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': !isSidebarShown() }" >
     </i>
-    <i class="fas fa-x-mark oppia-navbar-close-icon"
+    <i class="fas fa-xmark oppia-navbar-close-icon"
        *ngIf="isSidebarShown()"
        [ngClass]="{ 'oppia-stop-scroll': isSidebarShown() }" >
        &#10005;
@@ -426,7 +426,7 @@
              [href]="profilePageUrl"
              class="dropdown-item nav-link e2e-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
-            <strong>
+            <strong class="oppia-navbar-username">
               {{ username }}
             </strong>
           </a>
@@ -517,7 +517,7 @@
         </li>
         <li class="nav-item"
             *ngIf="isTechnicalFeedbackDashboardEnabled() && isTechTeamLead">
-          <a class="dropdown-item nav-link"
+          <a class="dropdown-item nav-link e2e-test-technical-feedback-dashboard-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/technical-feedback-dashboard"
              rel="noopener">

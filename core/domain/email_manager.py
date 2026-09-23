@@ -3644,3 +3644,77 @@ def send_emails_to_voiceover_tech_leads(
     )
 
     _delete_voiceover_error_attachments(filename_to_path)
+
+
+# Central registry of supported machine translation providers.
+# To add a new provider: add one entry here — no other code changes needed.
+# To remove a provider: delete its entry — the function will fall back to
+# generic troubleshooting guidance automatically.
+MACHINE_TRANSLATION_PROVIDERS = {
+    'azure': {
+        'display_name': 'Azure Translator',
+        'documentation_link': (
+            'https://learn.microsoft.com/en-us/azure/ai-services/'
+            'translator/reference/v3-0-reference#errors'
+        ),
+    },
+    'gcp': {
+        'display_name': 'Google Cloud',
+        'documentation_link': (
+            'https://docs.cloud.google.com/translate/troubleshooting'
+        ),
+    },
+}
+
+
+def send_machine_translation_failure_email(
+    provider_id: str, error_message: str
+) -> None:
+    """Sends an email to the translation tech support team when the machine
+    translation API fails (e.g., due to quota exhaustion or timeouts).
+
+    Args:
+        provider_id: str. The ID of the provider that failed (e.g., 'azure').
+        error_message: str. The exception message or error details.
+    """
+    provider_config = MACHINE_TRANSLATION_PROVIDERS.get(provider_id.lower(), {})
+    display_name = provider_config.get('display_name', provider_id.capitalize())
+    documentation_link = provider_config.get('documentation_link')
+
+    email_subject = (
+        '[Action Required]: Automatic Translation Failed: %s' % display_name
+    )
+
+    if documentation_link:
+        documentation_line = (
+            '- Refer to the provider\'s documentation for a full list of '
+            'possible errors: %s\n' % documentation_link
+        )
+    else:
+        documentation_line = (
+            '- No documentation link is available for this provider. '
+            'Please check the provider\'s official documentation for '
+            'troubleshooting guidance.\n'
+        )
+
+    email_body = (
+        'The machine translation API for provider "%s" has failed.\n\n'
+        'How to resolve this:\n'
+        '- Check the cloud console to ensure quotas have not been '
+        'exhausted.\n'
+        '- Verify that the billing account is active and in good '
+        'standing.\n'
+        '%s'
+        '- If the above steps do not resolve the issue, please forward '
+        'this email to the engineering team for technical support.\n\n'
+        'Error Details for Engineering:\n'
+        '%s\n'
+    ) % (display_name, documentation_line, error_message)
+
+    email_services.send_mail(
+        feconf.SYSTEM_EMAIL_ADDRESS,
+        feconf.TRANSLATION_TECH_SUPPORT_EMAIL,
+        email_subject,
+        email_body,
+        email_body.replace('\n', '<br/>'),
+    )

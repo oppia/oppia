@@ -778,8 +778,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency2-5.0.0.egg-info',
                 'dependency3.hyphenated-3.4.0.dist-info',
                 'dependency4.multi_word_suffix-1.1.2.dist-info',
-                'dependency-5-0.5.3-py3.10.egg-info',
-                'dependency_6-0.5.3-py3.10.egg-info',
+                'dependency-5-0.5.3-py3.12.egg-info',
+                'dependency_6-0.5.3-py3.12.egg-info',
             ]
 
         def mock_is_dir(unused_path: str) -> bool:

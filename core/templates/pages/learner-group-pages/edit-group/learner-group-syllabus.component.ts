@@ -28,8 +28,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {SyllabusAdditionSuccessModalComponent} from '../templates/syllabus-addition-success-modal.component';
 import {RemoveItemModalComponent} from '../templates/remove-item-modal.component';
 
-import './learner-group-syllabus.component.css';
-
 @Component({
   selector: 'oppia-learner-group-syllabus',
   templateUrl: './learner-group-syllabus.component.html',
