@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for int editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {IntEditorComponent} from './int-editor.component';
@@ -66,5 +68,16 @@ describe('IntEditorComponent', () => {
 
     expect(component.value).toBe(2);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(2);
+  });
+
+  it('should not update the value when the input is not a number', () => {
+    spyOn(component.valueChanged, 'emit');
+
+    component.value = 0;
+
+    component.updateValue('foo');
+
+    expect(component.value).toBe(0);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
   });
 });

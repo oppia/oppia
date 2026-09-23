@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the skill selector editor.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,

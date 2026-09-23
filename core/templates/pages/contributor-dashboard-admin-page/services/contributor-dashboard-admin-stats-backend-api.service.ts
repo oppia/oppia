@@ -25,7 +25,9 @@ import {
   TranslationReviewerStats,
   QuestionSubmitterStats,
   QuestionReviewerStats,
-} from '../contributor-dashboard-admin-summary.model';
+  TranslationCoordinatorStats,
+  QuestionCoordinatorStats,
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 import {AppConstants} from 'app.constants';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
@@ -148,6 +150,41 @@ export interface QuestionReviewerStatsBackendDict {
   more: boolean;
 }
 
+export interface TranslationCoordinatorBackendDict {
+  language_id: string;
+  translators_count: number;
+  reviewers_count: number;
+  coordinator_activity_list: {
+    translation_coordinator: string;
+    last_activity_days: number;
+  }[];
+}
+
+export interface QuestionCoordinatorBackendDict {
+  question_coordinator: string;
+  last_activity: number;
+}
+
+export interface TranslationCoordinatorStatsBackendDict {
+  stats: TranslationCoordinatorBackendDict[];
+}
+
+export interface QuestionCoordinatorStatsBackendDict {
+  stats: QuestionCoordinatorBackendDict[];
+}
+
+export interface TranslationCoordinatorStatsData {
+  stats: TranslationCoordinatorStats[];
+  nextOffset: number;
+  more: boolean;
+}
+
+export interface QuestionCoordinatorStatsData {
+  stats: QuestionCoordinatorStats[];
+  nextOffset: number;
+  more: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -205,6 +242,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
     | TranslationReviewerStatsData
     | QuestionSubmitterStatsData
     | QuestionReviewerStatsData
+    | TranslationCoordinatorStatsData
+    | QuestionCoordinatorStatsData
   > {
     const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL,
@@ -277,6 +316,36 @@ export class ContributorDashboardAdminStatsBackendApiService {
               }
             );
         });
+      } else if (
+        contributionSubtype ===
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      ) {
+        return new Promise((resolve, reject) => {
+          this.http
+            .get<TranslationCoordinatorStatsBackendDict>(url, {
+              params: this.params,
+            } as Object)
+            .toPromise()
+            .then(
+              response => {
+                const stats: TranslationCoordinatorStats[] = [];
+                response.stats.forEach(languageDict => {
+                  languageDict.coordinator_activity_list.forEach(activity => {
+                    stats.push(
+                      TranslationCoordinatorStats.createFromBackendDict(
+                        languageDict,
+                        activity
+                      )
+                    );
+                  });
+                });
+                resolve({stats, nextOffset: 0, more: false});
+              },
+              errorResponse => {
+                reject(errorResponse.error.error);
+              }
+            );
+        });
       }
     } else if (
       contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION
@@ -323,6 +392,31 @@ export class ContributorDashboardAdminStatsBackendApiService {
                   ),
                   nextOffset: response.next_offset,
                   more: response.more,
+                });
+              },
+              errorResponse => {
+                reject(errorResponse.error.error);
+              }
+            );
+        });
+      } else if (
+        contributionSubtype ===
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      ) {
+        return new Promise((resolve, reject) => {
+          this.http
+            .get<QuestionCoordinatorStatsBackendDict>(url, {
+              params: this.params,
+            } as Object)
+            .toPromise()
+            .then(
+              response => {
+                resolve({
+                  stats: response.stats.map(backendDict =>
+                    QuestionCoordinatorStats.createFromBackendDict(backendDict)
+                  ),
+                  nextOffset: 0,
+                  more: false,
                 });
               },
               errorResponse => {

@@ -18,6 +18,10 @@
 
 import {TestBed} from '@angular/core/testing';
 
+import {
+  KNOWN_CSS,
+  LazyCssLoaderService,
+} from 'services/lazy-css-loader.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
 class MockGuppy {
@@ -45,10 +49,23 @@ class MockGuppy {
 
 describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService;
+  let lazyCssLoaderService: LazyCssLoaderService;
 
   beforeEach(() => {
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    lazyCssLoaderService = TestBed.inject(LazyCssLoaderService);
     window.Guppy = MockGuppy as unknown as Guppy;
+  });
+
+  it('should lazy load guppy css before creating guppy instances', () => {
+    const loadCssSpy = spyOn(lazyCssLoaderService, 'loadCss');
+    let mockDocument = document.createElement('div');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
+
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
+
+    expect(loadCssSpy).toHaveBeenCalledWith(KNOWN_CSS.GUPPY);
   });
 
   it('should assign a random id to the guppy divs', function () {

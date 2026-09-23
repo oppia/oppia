@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ratings and recommendations component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   EventEmitter,

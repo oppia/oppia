@@ -24,7 +24,6 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SignInEventService} from 'services/sign-in-event.service';
-import './save-progress-modal.component.css';
 
 @Component({
   selector: 'oppia-save-progress-modal',

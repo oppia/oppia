@@ -19,7 +19,6 @@
 import {Component, Input, ViewEncapsulation} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-import './partnerships-section.component.css';
 import {AboutPartnerData} from '../data.model';
 
 @Component({

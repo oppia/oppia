@@ -1,0 +1,92 @@
+.module-circle-badge {
+  align-items: center;
+  border: 2px solid #7f8c8d;
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 52px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  height: 52px;
+  justify-content: center;
+  line-height: 1;
+  width: 52px;
+}
+
+.module-circle-badge-label {
+  display: inline-flex;
+  line-height: 1;
+}
+
+.module-circle-badge .material-icons {
+  font-size: 26px;
+}
+
+.module-circle-badge--sm {
+  flex: 0 0 44px;
+  font-size: 22px;
+  height: 44px;
+  min-width: 44px;
+  width: 44px;
+}
+
+.module-circle-badge--sm .material-icons {
+  font-size: 22px;
+}
+
+.module-circle-badge-icon-image {
+  display: block;
+  height: 60%;
+  object-fit: contain;
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  .module-circle-badge {
+    flex-basis: 44px;
+    font-size: 22px;
+    height: 44px;
+    width: 44px;
+  }
+
+  .module-circle-badge .material-icons {
+    font-size: 22px;
+  }
+
+  .module-circle-badge--sm {
+    flex: 0 0 36px;
+    font-size: 20px;
+    height: 36px;
+    min-width: 36px;
+    width: 36px;
+  }
+
+  .module-circle-badge--sm .material-icons {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 450px) {
+  .module-circle-badge {
+    flex-basis: 40px;
+    font-size: 20px;
+    height: 40px;
+    width: 40px;
+  }
+
+  .module-circle-badge .material-icons {
+    font-size: 20px;
+  }
+
+  .module-circle-badge--sm {
+    flex: 0 0 34px;
+    font-size: 18px;
+    height: 34px;
+    min-width: 34px;
+    width: 34px;
+  }
+
+  .module-circle-badge--sm .material-icons {
+    font-size: 18px;
+  }
+}

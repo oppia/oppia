@@ -36,8 +36,8 @@ import {CertificateAssessmentPlayerStateService} from './certificate-assessment-
 @Component({
   selector: 'oppia-certificate-assessment-player-page-root',
   templateUrl: './certificate-assessment-player-page-root.component.html',
-  // The state service is scoped to this component so that its countdown
-  // interval is torn down together with the page it belongs to.
+  // The state service is scoped to this component so that its state is
+  // torn down together with the page it belongs to.
   providers: [CertificateAssessmentPlayerStateService],
 })
 export class CertificateAssessmentPlayerPageRootComponent
@@ -89,19 +89,6 @@ export class CertificateAssessmentPlayerPageRootComponent
     return this.certificateAssessmentPlayerStateService.getAttempt();
   }
 
-  get showAssessmentInterruptCard(): boolean {
-    return this.certificateAssessmentPlayerStateService
-      .showAssessmentInterruptCard;
-  }
-
-  get isTimeExpired(): boolean {
-    return this.certificateAssessmentPlayerStateService.isTimeExpired;
-  }
-
-  get remainingTimeInSeconds(): number {
-    return this.certificateAssessmentPlayerStateService.remainingTimeInSeconds;
-  }
-
   async ngOnInit(): Promise<void> {
     this.certificateId =
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
@@ -119,9 +106,6 @@ export class CertificateAssessmentPlayerPageRootComponent
           this.certificateId
         );
       await this.loadClassroomUrlFragment();
-      this.certificateAssessmentPlayerStateService.configureForOffering(
-        this.certificateOffering.timeLimitInMinutes
-      );
     } catch {
       this.hasError = true;
       await this.redirectToNotFound();
@@ -160,10 +144,8 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Starts a new attempt on the server. The learner only moves to the
-   * questions once the server confirms the attempt; that confirmation is
-   * also what arms a fresh time window for them (see
-   * `beginNewAttempt`), so a failed start leaves any existing timing
-   * state untouched.
+   * questions once the server confirms the attempt, so a failed start
+   * request leaves any existing state untouched.
    */
   async startAssessment(): Promise<void> {
     try {
@@ -209,8 +191,7 @@ export class CertificateAssessmentPlayerPageRootComponent
 
   /**
    * Submits the learner's final answers exactly once and navigates to the
-   * result page, unless the submission raced against the expiry of the
-   * time window (in which case the auto-submit keeps them on the page).
+   * result page.
    */
   async onAssessmentSubmitted(
     answers: SubmitCertificateAssessmentAnswerBackendDict[]
@@ -219,7 +200,6 @@ export class CertificateAssessmentPlayerPageRootComponent
     if (attempt === null || this.isSubmissionInProgress) {
       return;
     }
-    const submittedBeforeExpiry = !this.isTimeExpired;
     const attemptId = attempt.attemptId;
     this.isSubmissionInProgress = true;
     this.pendingSubmission = (async () => {
@@ -228,9 +208,7 @@ export class CertificateAssessmentPlayerPageRootComponent
           attemptId,
           answers
         );
-        if (submittedBeforeExpiry) {
-          await this.navigateToResultPage();
-        }
+        await this.navigateToResultPage();
       } catch {
         this.alertsService.addWarning(
           this.translateService.instant(
@@ -244,33 +222,13 @@ export class CertificateAssessmentPlayerPageRootComponent
     await this.pendingSubmission;
   }
 
-  onRetryAssessment(): void {
-    this.certificateAssessmentPlayerStateService.returnToIntroAfterRetry();
-  }
-
-  onResumeAssessment(): void {
-    this.certificateAssessmentPlayerStateService.resumeQuestionsStage();
-  }
-
   async onViewResults(): Promise<boolean> {
     await this.pendingSubmission;
     return this.navigateToResultPage();
   }
 
-  onAssessmentEnded(): Promise<boolean> {
-    return this.navigateToLearnerDashboard();
-  }
-
   ngOnDestroy(): void {
-    // Stops the countdown before the base class unsubscribes its listeners.
-    this.certificateAssessmentPlayerStateService.ngOnDestroy();
     super.ngOnDestroy();
-  }
-
-  private async navigateToLearnerDashboard(): Promise<boolean> {
-    return this.router.navigate([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
-    ]);
   }
 
   private async navigateToResultPage(): Promise<boolean> {

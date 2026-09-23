@@ -3537,7 +3537,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
         self.assertEqual(response['version'], 1)
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
         content = response['translatable_contents'][0]
         self.assertEqual(content['content_id'], 'content_0')
@@ -3627,7 +3627,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
         # Verify content_0 is in the translatable contents.
         self.assertTrue(
             any(
@@ -3652,7 +3652,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 3)
+        self.assertEqual(len(response['translatable_contents']), 2)
 
     @test_utils.enable_feature_flags(
         [
@@ -3673,7 +3673,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
         # Add translation.
         translated_content = translation_domain.TranslatedContent(
@@ -3695,7 +3695,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 3)
+        self.assertEqual(len(response['translatable_contents']), 2)
 
     @test_utils.enable_feature_flags(
         [

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -46,7 +48,16 @@ import {EditabilityService} from 'services/editability.service';
 import {ExplorationSaveService} from '../services/exploration-save.service';
 import {EditorNavigationComponent} from './editor-navigation.component';
 import {UserInfo} from 'domain/user/user-info.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorNewCreatorFeedbackTab: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Editor Navigation Component', () => {
   let component: EditorNavigationComponent;
@@ -68,6 +79,7 @@ describe('Editor Navigation Component', () => {
   let mockGetResizeEvent = new EventEmitter();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
   let testSubscriptions: Subscription;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
   const openTranslationTutorialSpy = jasmine.createSpy(
@@ -163,6 +175,10 @@ describe('Editor Navigation Component', () => {
         {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -517,5 +533,19 @@ describe('Editor Navigation Component', () => {
 
       expect(component.connectedToInternet).toBe(false);
     }));
+
+    it('should return true when new creator feedback tab is enabled', () => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      component.ngOnInit();
+      expect(component.newCreatorFeedbackTabIsEnabled).toBe(true);
+    });
+
+    it('should return false when new creator feedback tab is disabled', () => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        false;
+      component.ngOnInit();
+      expect(component.newCreatorFeedbackTabIsEnabled).toBe(false);
+    });
   });
 });

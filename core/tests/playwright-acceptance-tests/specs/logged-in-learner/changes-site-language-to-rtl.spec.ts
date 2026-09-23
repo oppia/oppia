@@ -154,8 +154,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     // Check lesson player.
-    await loggedInUser1.searchForLessonInSearchBar('What is a Fraction?');
-    await loggedInUser1.playLessonFromSearchResults('What is a Fraction?');
+    await loggedInUser1.playExplorationAsLoggedInUser(explorationId);
     await loggedInUser1.verifyPageIsRTL();
 
     // Check hints and lesson info are displayed in RTL.

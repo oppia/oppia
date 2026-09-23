@@ -47,7 +47,6 @@ import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/com
 import {ViewBeamJobOutputDialogComponent} from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import './beam-jobs-tab.component.css';
 
 @Component({
   selector: 'oppia-beam-jobs-tab',

@@ -1,0 +1,29 @@
+<div class="mastery-challenge-locked-modal"
+     role="dialog"
+     aria-labelledby="mastery-challenge-locked-modal-title"
+     aria-modal="true">
+  <div class="mastery-challenge-locked-modal-header">
+    <h3 class="mastery-challenge-locked-modal-title" id="mastery-challenge-locked-modal-title">
+        {{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_TITLE' | translate }}
+    </h3>
+  </div>
+
+  <div class="mastery-challenge-locked-modal-body">
+    <p>
+      {{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_TOOLTIP_DESCRIPTION' | translate }}
+    </p>
+  </div>
+
+  <div class="mastery-challenge-locked-modal-footer">
+    <button type="button"
+            class="btn mastery-challenge-locked-modal-cancel-button"
+            (click)="cancel()">
+      {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
+    </button>
+    <button type="button"
+            class="btn mastery-challenge-locked-modal-view-button e2e-test-mastery-challenge-view-button"
+            (click)="confirm()">
+      {{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_MODAL_VIEW_BUTTON' | translate }}
+    </button>
+  </div>
+</div>

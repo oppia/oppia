@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the learner answer info service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';

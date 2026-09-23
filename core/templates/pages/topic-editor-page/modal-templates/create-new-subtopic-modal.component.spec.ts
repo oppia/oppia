@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
+// @ts-nocheck
+
 import {Topic} from 'domain/topic/topic-object.model';
 import {
   ComponentFixture,

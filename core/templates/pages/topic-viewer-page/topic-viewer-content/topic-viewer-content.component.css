@@ -1,25 +1,26 @@
-topic-viewer-content .oppia-redesigned-topic-viewer-container {
+.oppia-redesigned-topic-viewer-container {
   background-color: #fff;
   min-height: 100vh;
   text-align: start;
 }
 
-topic-viewer-content .redesigned-topic-viewer-content {
+.redesigned-topic-viewer-content {
+  background-color: #fff;
   padding: 24px 36px 0;
 }
 
-topic-viewer-content .redesigned-topic-viewer-content topic-header {
+.redesigned-topic-viewer-content topic-header {
   display: block;
   margin: 0 auto;
   max-width: 960px;
   width: 100%;
 }
 
-topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content topic-header {
+.oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content topic-header {
   max-width: 1160px;
 }
 
-topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content {
+.oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content {
   background-color: #f4f6f7;
   background-image: url('/assets/images/background/conversation_skin.svg');
   background-position: top center;
@@ -27,7 +28,7 @@ topic-viewer-content .oppia-redesigned-topic-viewer-container.studyguide-view-ac
   background-size: 1024px auto;
 }
 
-topic-viewer-content .redesigned-stories-section {
+.redesigned-stories-section {
   background-color: #dceaf4;
   background-image: url('/assets/images/background/bannerE.svg');
   background-position: top center;
@@ -37,18 +38,18 @@ topic-viewer-content .redesigned-stories-section {
   padding: 28px 36px 56px;
 }
 
-topic-viewer-content .redesigned-stories-section .oppia-page-card {
+.redesigned-stories-section .oppia-page-card {
   border-radius: 0.25em;
   margin: 0 auto;
   max-width: 1160px;
   width: 100%;
 }
 
-topic-viewer-content .redesigned-secondary-section {
+.redesigned-secondary-section {
   padding-top: 24px;
 }
 
-topic-viewer-content .redesigned-studyguide-section {
+.redesigned-studyguide-section {
   background-color: #f4f6f7;
   background-image: url('/assets/images/background/conversation_skin.svg');
   background-position: top center;
@@ -59,7 +60,7 @@ topic-viewer-content .redesigned-studyguide-section {
   padding: 24px 36px 56px;
 }
 
-topic-viewer-content .redesigned-stories-list {
+.redesigned-stories-list {
   display: flex;
   flex-direction: column;
   gap: 34px;
@@ -68,76 +69,76 @@ topic-viewer-content .redesigned-stories-list {
   width: 100%;
 }
 
-topic-viewer-content .coming-soon-title {
+.coming-soon-title {
   font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 1.5em;
   margin: 1em;
   padding-top: 1em;
 }
 
-topic-viewer-content .coming-soon-text {
+.coming-soon-text {
   font-family: Roboto, Arial, sans-serif;
   font-size: 1.1em;
   margin-left: 1.4em;
 }
 
 @media(max-width: 1024px) {
-  topic-viewer-content .redesigned-topic-viewer-content {
+  .redesigned-topic-viewer-content {
     padding: 24px 28px 0;
   }
 
-  topic-viewer-content .redesigned-studyguide-section {
+  .redesigned-studyguide-section {
     padding: 22px 28px 48px;
   }
 
-  topic-viewer-content .redesigned-stories-section {
+  .redesigned-stories-section {
     padding: 26px 28px 52px;
   }
 
-  topic-viewer-content .redesigned-stories-list {
+  .redesigned-stories-list {
     max-width: 100%;
   }
 }
 
 @media(max-width: 768px) {
-  topic-viewer-content .redesigned-topic-viewer-content {
+  .redesigned-topic-viewer-content {
     padding: 16px 16px 0;
   }
 
-  topic-viewer-content .redesigned-studyguide-section {
+  .redesigned-studyguide-section {
     padding: 16px 16px 36px;
   }
 
-  topic-viewer-content .redesigned-stories-section {
+  .redesigned-stories-section {
     margin-top: 16px;
     padding: 20px 16px 36px;
   }
 
-  topic-viewer-content .redesigned-stories-list {
+  .redesigned-stories-list {
     gap: 22px;
     max-width: 100%;
   }
 
-  topic-viewer-content .redesigned-secondary-section {
+  .redesigned-secondary-section {
     padding-top: 14px;
   }
 }
 
 @media(max-width: 500px) {
-  topic-viewer-content .redesigned-topic-viewer-content {
+  .redesigned-topic-viewer-content {
     padding: 16px 12px 0;
   }
 
-  topic-viewer-content .redesigned-studyguide-section {
+  .redesigned-studyguide-section {
     padding: 16px 12px 34px;
   }
 
-  topic-viewer-content .redesigned-stories-section {
+  .redesigned-stories-section {
     margin-top: 16px;
     padding: 18px 12px 34px;
   }
 
-  topic-viewer-content .redesigned-stories-list {
+  .redesigned-stories-list {
     gap: 22px;
   }
 }

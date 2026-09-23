@@ -26,7 +26,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {LoaderService} from 'services/loader.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './skill-card.component.css';
 @Component({
   selector: 'oppia-skill-card',
   templateUrl: './skill-card.component.html',

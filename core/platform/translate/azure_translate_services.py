@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import http
 import logging
 import time
 
@@ -32,6 +33,10 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
     """Implementation of BaseTranslationService that hooks directly into the
     Azure Cognitive Services Text Translation API REST endpoint.
     """
+
+    # Unique identifier for this provider. Must match the key used in
+    # auto_translation_provider_mapping.json and feconf.py display names.
+    PROVIDER_ID = 'azure'
 
     MAX_RETRIES = 3
     INITIAL_BACKOFF_SEC = 1.0
@@ -79,12 +84,15 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
                     timeout=self.REQUEST_TIMEOUT_SEC,
                 )
 
-                if response.status_code == 200:
+                if response.status_code == http.HTTPStatus.OK:
                     response_json = response.json()
                     return str(response_json[0]['translations'][0]['text'])
 
                 # Transient failure processing (Rate Limits / Server Outage).
-                if response.status_code in [429, 503]:
+                if response.status_code in [
+                    http.HTTPStatus.TOO_MANY_REQUESTS,
+                    http.HTTPStatus.SERVICE_UNAVAILABLE,
+                ]:
                     logging.warning(
                         'Azure API returned status %s. Retrying in %s seconds...',
                         response.status_code,

@@ -26,6 +26,7 @@ import {
   HostListener,
   Input,
 } from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -59,7 +60,6 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -824,17 +824,29 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         this.activeTabType
       ];
 
-    return fetchFunction(shouldResetOffset).then(response => {
-      Object.keys(response.suggestionIdToDetails).forEach(id => {
-        this.contributions[id] = response.suggestionIdToDetails[id];
+    return fetchFunction(shouldResetOffset)
+      .then(response => {
+        Object.keys(response.suggestionIdToDetails).forEach(id => {
+          this.contributions[id] = response.suggestionIdToDetails[id];
+        });
+        return {
+          opportunitiesDicts: this.getContributionSummaries(
+            response.suggestionIdToDetails
+          ),
+          more: response.more,
+        };
+      })
+      .catch((error: HttpErrorResponse) => {
+        // A banned or otherwise non-full-user has no ACTION_SUGGEST_CHANGES
+        // permission, so the suggestion endpoints respond with 401. Handle it
+        // gracefully by showing an empty state instead of letting the
+        // rejection surface as an unhandled promise rejection. Any other
+        // error is rethrown.
+        if (error.status === 401) {
+          return {opportunitiesDicts: [], more: false};
+        }
+        throw error;
       });
-      return {
-        opportunitiesDicts: this.getContributionSummaries(
-          response.suggestionIdToDetails
-        ),
-        more: response.more,
-      };
-    });
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {

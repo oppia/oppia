@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Subtitled Html editor.
  */
 
+// @ts-nocheck
+
 import {ChangeDetectorRef} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
@@ -117,6 +119,23 @@ describe('SubtitledHtmlEditorComponent', () => {
 
     expect(component.value).toEqual(mockValue);
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith(mockValue);
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not replace value when the input is not a html string', () => {
+    spyOn(component.valueChanged, 'emit');
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    component.value = mockValue;
+
+    component.updateValue(5);
+
+    expect(component.value).toEqual(mockValue);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 });

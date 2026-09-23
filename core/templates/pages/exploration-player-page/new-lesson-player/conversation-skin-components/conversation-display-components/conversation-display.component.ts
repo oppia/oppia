@@ -61,7 +61,6 @@ import {ChapterProgressService} from '../../../services/chapter-progress.service
 import {ExplorationModeService} from '../../../services/exploration-mode.service';
 import {QuestionPlayerConfig} from '../../../current-lesson-player/learner-experience/ratings-and-recommendations.component';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
-import './conversation-display.component.css';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
 const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;

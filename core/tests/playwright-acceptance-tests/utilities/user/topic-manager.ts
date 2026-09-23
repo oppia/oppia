@@ -96,7 +96,7 @@ const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
 const storyPhotoBoxButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal';
+const photoUploadModal = 'edit-thumbnail-modal, oppia-image-uploader-modal';
 const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
 const classroomTopicBoxSelector = '.e2e-test-classroom-topic-box';

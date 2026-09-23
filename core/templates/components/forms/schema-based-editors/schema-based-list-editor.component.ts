@@ -36,7 +36,6 @@ import {
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {SchemaUndefinedLastElementService} from 'services/schema-undefined-last-element.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import './schema-based-list-editor.component.css';
 @Component({
   selector: 'schema-based-list-editor',
   templateUrl: './schema-based-list-editor.component.html',

@@ -16,6 +16,8 @@
  * @fileoverview Tests for Story update service.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 

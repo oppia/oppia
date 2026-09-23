@@ -37,7 +37,6 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 
-import './exploration-summary-tile.component.css';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({

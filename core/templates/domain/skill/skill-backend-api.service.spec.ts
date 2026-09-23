@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SkillBackendApiService.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

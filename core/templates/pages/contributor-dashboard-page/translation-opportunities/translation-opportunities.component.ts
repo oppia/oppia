@@ -46,6 +46,7 @@ import {TranslateTextService} from '../services/translate-text.service';
 @Component({
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
+  styleUrls: ['./translation-opportunities.component.css'],
 })
 export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

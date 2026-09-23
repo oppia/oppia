@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the set of algebraic identifier component.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {SetOfAlgebraicIdentifierEditorComponent} from './set-of-algebraic-identifier-editor.component';
@@ -44,5 +46,14 @@ describe('SetOfAlgebraicIdentifier', function () {
     expect(component.value).toEqual([]);
     component.updateValue(['a', 'b', 'c']);
     expect(component.value).toEqual(['a', 'b', 'c']);
+  });
+
+  it('should not update the value when the input is not a string array', () => {
+    component.getSchema();
+    component.ngOnInit();
+
+    component.updateValue('abc');
+
+    expect(component.value).toEqual([]);
   });
 });

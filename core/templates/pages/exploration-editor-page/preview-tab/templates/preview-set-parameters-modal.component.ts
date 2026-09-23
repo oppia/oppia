@@ -20,7 +20,6 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './preview-set-parameters-modal.component.css';
 
 @Component({
   selector: 'oppia-preview-set-parameters-modal',

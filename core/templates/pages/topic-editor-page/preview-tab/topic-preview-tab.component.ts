@@ -31,6 +31,7 @@ import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-
 @Component({
   selector: 'oppia-topic-preview-tab',
   templateUrl: './topic-preview-tab.component.html',
+  styleUrls: ['./topic-preview-tab.component.css'],
 })
 export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';

@@ -28,7 +28,7 @@ import {
 @Component({
   selector: 'filepath-editor',
   templateUrl: './filepath-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./filepath-editor.component.css'],
 })
 export class FilepathEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

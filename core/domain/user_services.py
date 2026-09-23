@@ -48,6 +48,7 @@ from typing import (
     Literal,
     Optional,
     Sequence,
+    Tuple,
     TypedDict,
     overload,
 )
@@ -1018,6 +1019,34 @@ def get_user_actions_info(
     )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
+
+
+def get_user_roles_and_actions(
+    user_id: str,
+) -> Tuple[List[str], List[str], Optional[user_domain.UserSettings]]:
+    """Returns the roles, actions and settings of a user in a single call.
+
+    This fetches the user's settings once and derives both the roles and the
+    actions from it, avoiding the repeated UserSettings reads that calling
+    get_user_roles_from_id and get_user_settings separately would incur.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        tuple(list(str), list(str), UserSettings|None). A tuple containing the
+        roles of the user, the actions the user can perform, and the user's
+        settings. Roles and actions default to guest values and the settings to
+        None if the user does not exist.
+    """
+    user_settings = get_user_settings(user_id, strict=False)
+    roles = (
+        user_settings.roles
+        if user_settings is not None
+        else [feconf.ROLE_ID_GUEST]
+    )
+    actions = role_services.get_all_actions(roles)
+    return roles, actions, user_settings
 
 
 def get_system_user() -> user_domain.UserActionsInfo:

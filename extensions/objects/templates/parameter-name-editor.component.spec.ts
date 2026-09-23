@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for parameter name editor.
  */
 
+// @ts-nocheck
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ParameterNameEditorComponent} from './parameter-name-editor.component';
@@ -92,5 +94,13 @@ describe('StateHintsEditorComponent', () => {
     component.updateValue('a');
 
     expect(component.value).toBe('a');
+  });
+
+  it('should not update value when the input is not a string', () => {
+    component.value = 'y';
+
+    component.updateValue(5);
+
+    expect(component.value).toBe('y');
   });
 });

@@ -16,10 +16,7 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// TODO(#16309): Fix relative imports.
-import '../../../third-party-imports/codemirror.import';
+import 'third-party-imports/codemirror.import';
 import {
   Component,
   EventEmitter,
@@ -42,13 +39,16 @@ import 'components/code-mirror/codemirror.component';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {Subscription} from 'rxjs';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {validate} from 'components/forms/validators/schema-validators';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
-import './schema-based-unicode-editor.component.css';
 
 @Component({
   selector: 'schema-based-unicode-editor',
@@ -81,6 +81,7 @@ export class SchemaBasedUnicodeEditor
         rows: string[];
         placeholder: string;
         coding_mode: string;
+        languageDirection?: string;
       }
     | undefined;
 
@@ -124,6 +125,7 @@ export class SchemaBasedUnicodeEditor
   constructor(
     private deviceInfoService: DeviceInfoService,
     private focusManagerService: FocusManagerService,
+    private lazyCssLoaderService: LazyCssLoaderService,
     private numberConversionService: NumberConversionService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -152,6 +154,7 @@ export class SchemaBasedUnicodeEditor
 
   ngOnInit(): void {
     if (this.uiConfig && this.uiConfig.coding_mode) {
+      this.lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
       // Flag that is flipped each time the codemirror view is
       // shown. (The codemirror instance needs to be refreshed
       // every time it is unhidden.)
@@ -224,6 +227,10 @@ export class SchemaBasedUnicodeEditor
     } else {
       return this.uiConfig.coding_mode;
     }
+  }
+
+  getLanguageDirection(): string {
+    return this.uiConfig?.languageDirection ?? 'auto';
   }
 
   ngOnDestroy(): void {

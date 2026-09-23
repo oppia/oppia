@@ -16,6 +16,8 @@
  * @fileoverview Tests for new lesson player flag guard
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {

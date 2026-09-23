@@ -16,7 +16,14 @@
  * @fileoverview Unit tests for Schema Based Html Editor Component
  */
 
-import {FormControl, FormsModule} from '@angular/forms';
+// @ts-nocheck
+
+import {
+  FormControl,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -75,5 +82,14 @@ describe('Schema Based Html Editor Component', () => {
     component.updateValue('<p> HTML </p>');
 
     expect(component.onChange).toHaveBeenCalledWith('<p> HTML </p>');
+  });
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
   });
 });

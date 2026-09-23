@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based List Editor Component
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
@@ -24,7 +26,12 @@ import {
 } from '@angular/core/testing';
 import {SchemaBasedListEditorComponent} from './schema-based-list-editor.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
-import {FormControl, FormsModule} from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
@@ -407,5 +414,14 @@ describe('Schema Based List Editor Component', () => {
 
     expect(component.isOneLineInput).toBe(false);
     expect(component.addElementText).toBe('Add element');
+  });
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
   });
 });

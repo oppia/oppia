@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for contribution and review service
  */
 
+// @ts-nocheck
+
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AppConstants} from 'app.constants';

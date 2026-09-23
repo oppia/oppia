@@ -3928,12 +3928,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             exploration.get_content_html(
-                'Generic Content', 'exploration_category'
-            ),
-            'Algebra',
-        )
-        self.assertEqual(
-            exploration.get_content_html(
                 'Generic Content', 'exploration_tag_0'
             ),
             'algebra',
@@ -5012,9 +5006,7 @@ title: Title
         self.assertNotIn(
             feconf.EXPLORATION_OBJECTIVE_CONTENT_ID, translatable_contents
         )
-        self.assertNotIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
         self.assertNotIn('exploration_tag_0', translatable_contents)
         self.assertNotIn('exploration_tag_1', translatable_contents)
 
@@ -5081,27 +5073,7 @@ title: Title
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
         )
 
-        self.assertIn(
-            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_value,
-            'Category',
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_type,
-            translation_domain.ContentType.METADATA,
-        )
-        self.assertEqual(
-            translatable_contents[
-                feconf.EXPLORATION_CATEGORY_CONTENT_ID
-            ].content_format,
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
-        )
+        self.assertNotIn('exploration_category', translatable_contents)
 
         self.assertIn('exploration_tag_0', translatable_contents)
         self.assertEqual(
@@ -8949,10 +8921,10 @@ states:
         <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
         start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>   <oppia-noninteractive-collapsible
         content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible
-        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\&amp;quot;\&amp;quot;
-        autoplay-with-value=\&amp;quot;true\&amp;quot; end-with-value=\&amp;quot;0\&amp;quot;
-        ng-version=\&amp;quot;11.2.14\&amp;quot; start-with-value=\&amp;quot;0\&amp;quot;
-        video_id-with-value=\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
+        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot;
+        autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;0\\&amp;quot;
+        ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;0\\&amp;quot;
+        video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
         heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>
         <oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;You
         have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>     <oppia-noninteractive-tabs
@@ -8960,9 +8932,9 @@ states:
         &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},
         {&amp;quot;title&amp;quot;: &amp;quot;Title2&amp;quot;, &amp;quot;content&amp;quot;:
         &amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
-        alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
-        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
-        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
+        alt-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;
+        caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;
+        filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
     inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []

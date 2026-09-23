@@ -24,7 +24,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
-import './add-misconception-modal.component.css';
 
 interface MisconceptionFormSchema {
   type: 'html';

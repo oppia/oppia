@@ -458,7 +458,7 @@ def _get_possible_normalized_metadata_directory_names(
         )
         possible_names.add(
             normalize_directory_name(
-                '%s-%s-py3.10.egg-info' % (name, version_string)
+                '%s-%s-py3.12.egg-info' % (name, version_string)
             )
         )
 

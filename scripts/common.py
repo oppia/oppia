@@ -55,6 +55,16 @@ NODE_VERSION = '16.13.0'
 # isolated from NODE_VERSION so existing frontend tooling remains unchanged.
 PLAYWRIGHT_NODE_VERSION = '20.11.1'
 
+# Dedicated Node version for Lighthouse tests. This is intentionally isolated
+# from NODE_VERSION so existing frontend tooling remains unchanged, because
+# Lighthouse 12+ requires Node 18.20 or newer. It matches
+# PLAYWRIGHT_NODE_VERSION so that the same Node 20 toolchain already installed
+# for the Playwright acceptance tests can be reused. This Node version is also
+# used to run the repo-wide `yarn install` (see install_third_party_libs.py),
+# so that the engines requirement of Lighthouse is satisfied at install time
+# without an --ignore-engines flag.
+LIGHTHOUSE_NODE_VERSION = PLAYWRIGHT_NODE_VERSION
+
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
@@ -74,7 +84,6 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '8.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -95,6 +104,9 @@ GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PLAYWRIGHT_NODE_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'node-%s' % PLAYWRIGHT_NODE_VERSION
+)
+LIGHTHOUSE_NODE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'node-%s' % LIGHTHOUSE_NODE_VERSION
 )
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
@@ -117,16 +129,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = os.path.join(
     CURR_DIR, os.pardir, 'firebase_emulator_cache'
-)
-
-ES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION
-)
-ES_PATH_CONFIG_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config'
-)
-ES_PATH_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data'
 )
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
@@ -191,10 +193,8 @@ ACCEPTANCE_TEST_CONFIG_FILE_PATH = os.path.join(
 )
 
 GAE_PORT_FOR_ACCEPTANCE_TESTING: Final = 8181
-ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_ACCEPTANCE_TESTING: Final = [
     GAE_PORT_FOR_ACCEPTANCE_TESTING,
-    ELASTICSEARCH_SERVER_PORT,
 ]
 
 
@@ -225,6 +225,7 @@ NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 # Binaries for running Playwright with a newer Node runtime only.
 PLAYWRIGHT_NPM_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npm')
 PLAYWRIGHT_NPX_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npx')
+LIGHTHOUSE_NODE_BIN_PATH = os.path.join(LIGHTHOUSE_NODE_PATH, 'bin', 'node')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join(

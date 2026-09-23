@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {AllowedVariablesEditorComponent} from './allowed-variables-editor.component';

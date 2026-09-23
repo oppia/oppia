@@ -28,6 +28,10 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import * as dmpModule from 'diff_match_patch/lib/diff_match_patch';
 
 @Component({
@@ -49,10 +53,12 @@ export class CodemirrorMergeviewComponent
   constructor(
     private elementRef: ElementRef,
     private ngZone: NgZone,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
     // Require CodeMirror.
     if (
       (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined

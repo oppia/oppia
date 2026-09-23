@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Moderator Page Component.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,

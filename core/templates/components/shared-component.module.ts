@@ -94,7 +94,6 @@ import {DisplaySolutionModalComponent} from 'pages/exploration-player-page/curre
 import {DisplaySolutionInterstititalModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-solution-interstitial-modal.component';
 import {DisplayHintModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-hint-modal.component';
 import {HintAndSolutionButtonsComponent} from './button-directives/hint-and-solution-buttons.component';
-import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
 import {FilteredChoicesFieldComponent} from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-field/multi-selection-field.component';
@@ -178,6 +177,7 @@ import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-tem
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -248,7 +248,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
     RichTextComponentsModule,
-    SearchBarModule,
     SharedFormsModule,
     RecommendationsModule,
     StringUtilityPipesModule,
@@ -438,6 +437,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   entryComponents: [
@@ -611,6 +611,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 
   exports: [
@@ -629,7 +630,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
-    SearchBarModule,
     SharedFormsModule,
     StringUtilityPipesModule,
     // Components, directives, and pipes.
@@ -781,6 +781,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    ConfirmFormulaAsTextModalComponent,
   ],
 })
 export class SharedComponentsModule {}

@@ -19,7 +19,6 @@
 
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './new-switch-content-language-refresh-required-modal.component.css';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({

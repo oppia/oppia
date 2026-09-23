@@ -25,8 +25,6 @@ import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-bac
 import {NavigationService} from 'services/navigation.service';
 import {UserService} from 'services/user.service';
 
-import './learner-group-learners-progress.component.css';
-
 @Component({
   selector: 'oppia-learner-group-learners-progress',
   templateUrl: './learner-group-learners-progress.component.html',

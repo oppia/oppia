@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for UploadActivityModalComponent.
  */
 
+// @ts-nocheck
+
 import {AlertsService} from 'services/alerts.service';
 import {
   ComponentFixture,

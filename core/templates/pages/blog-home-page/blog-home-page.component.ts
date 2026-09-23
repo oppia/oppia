@@ -18,25 +18,16 @@
 
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {AlertsService} from 'services/alerts.service';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {
-  UrlSearchQuery,
-  BlogPostSearchService,
-} from 'services/blog-search.service';
-import {
   BlogHomePageData,
   BlogHomePageBackendApiService,
 } from 'domain/blog/blog-homepage-backend-api.service';
-import {SearchResponseData} from 'domain/blog/blog-homepage-backend-api.service';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LoaderService} from 'services/loader.service';
-import {UrlService} from 'services/contextual/url.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
 import {Router, ActivatedRoute} from '@angular/router';
 
@@ -52,40 +43,22 @@ export class BlogHomePageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE!: number;
-  MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH!: number;
-  searchBarPlaceholder!: string;
   lastPostOnPageNum!: number;
   totalBlogPosts!: number;
-  noResultsFound!: boolean;
   oppiaAvatarImgUrl!: string;
-  searchQuery: string = '';
-  activeMenuName: string = '';
-  searchButtonIsActive: boolean = false;
-  pendingTagFilterInput: string = '';
-  searchQueryChanged: Subject<string> = new Subject<string>();
-  listOfDefaultTags: string[] = [];
-  selectedTags: string[] = [];
   showBlogPostCardsLoadingScreen: boolean = false;
   blogPostSummaries: BlogPostSummary[] = [];
   blogPostSummariesToShow: BlogPostSummary[] = [];
-  searchedBlogPostSummaries: BlogPostSummary[] = [];
   page: number = 1;
-  searchPageIsActive: boolean = false;
   directiveSubscriptions = new Subscription();
   firstPostOnPageNum: number = 1;
-  searchOffset: number | null = 0;
-  disableNextPageButton: boolean = false;
-  filterWasUsed: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef,
-    private blogPostSearchService: BlogPostSearchService,
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
-    private urlService: UrlService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -101,9 +74,6 @@ export class BlogHomePageComponent implements OnInit {
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
 
-    this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
-      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
-
     this.route.queryParams.subscribe(params => {
       this.page = params.page ? Number(params.page) : 1;
 
@@ -117,96 +87,30 @@ export class BlogHomePageComponent implements OnInit {
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
 
-      if (params.q || params.tags) {
-        this.searchPageIsActive = true;
-        this.filterWasUsed = true;
-
-        this.searchQuery = params.q || '';
-        this.selectedTags = params.tags
-          ? params.tags.replace(/[()"]/g, '').split(' OR ')
-          : [];
-
-        this.loadPage();
-      } else {
-        this.loadInitialBlogHomePageData();
-      }
+      this.loadInitialBlogHomePageData();
     });
-
-    this.searchQueryChanged
-      .pipe(debounceTime(1000), distinctUntilChanged())
-      .subscribe(model => {
-        this.searchQuery = model;
-        this.onSearchQueryChangeExec();
-      });
-
-    this.blogPostSearchService.onSearchBarLoaded.emit();
-
-    this.directiveSubscriptions.add(
-      this.blogPostSearchService.onInitialSearchResultsLoaded.subscribe(
-        (response: SearchResponseData) => {
-          this.blogPostSummaries = [];
-
-          if (response.blogPostSummariesList.length > 0) {
-            this.noResultsFound = false;
-            this.totalBlogPosts = response.totalMatchingBlogPosts;
-            this.loadSearchResultsPageData(response);
-          } else {
-            this.noResultsFound = true;
-          }
-
-          this.listOfDefaultTags = response.listOfDefaultTags;
-          this.loaderService.hideLoadingScreen();
-        }
-      )
-    );
   }
 
   getStaticCopyrightedImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
-  loadSearchResultsPageData(data: SearchResponseData): void {
-    this.blogPostSummaries = data.blogPostSummariesList;
-    this.searchOffset = data.searchOffset;
-    this.calculateLastPostOnPageNum(
-      this.page,
-      this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
-    );
-    this.selectBlogPostSummariesToShow();
-    this.showBlogPostCardsLoadingScreen = false;
-    this.loaderService.hideLoadingScreen();
-  }
-
   loadInitialBlogHomePageData(): void {
     let offset =
       (this.page - 1) *
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
-    if (this.filterWasUsed) {
-      this.blogPostSearchService.resetSearchState();
-      this.page = 1;
-      this.firstPostOnPageNum = 1;
-      this.blogPostSummaries = [];
-      this.filterWasUsed = false;
-      this.totalBlogPosts = 0;
-      this.showBlogPostCardsLoadingScreen = false;
-    }
+
     this.blogHomePageBackendApiService
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
-          if (data.numOfPublishedBlogPosts) {
-            this.totalBlogPosts = data.numOfPublishedBlogPosts;
-            this.noResultsFound = false;
-            this.blogPostSummaries = data.blogPostSummaryDicts;
-            this.blogPostSummariesToShow = this.blogPostSummaries;
-            this.calculateLastPostOnPageNum(
-              this.page,
-              this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-            );
-          } else {
-            this.noResultsFound = true;
-          }
-          this.listOfDefaultTags = data.listOfDefaultTags;
+          this.totalBlogPosts = data.numOfPublishedBlogPosts;
+          this.blogPostSummaries = data.blogPostSummaryDicts;
+          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.calculateLastPostOnPageNum(
+            this.page,
+            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+          );
           this.loaderService.hideLoadingScreen();
         },
         errorResponse => {
@@ -246,56 +150,8 @@ export class BlogHomePageComponent implements OnInit {
 
   loadPage(): void {
     this.showBlogPostCardsLoadingScreen = true;
-
-    if (!this.searchPageIsActive) {
-      let offset = this.firstPostOnPageNum - 1;
-      this.loadMoreBlogPostSummaries(offset);
-    } else {
-      const pageSize = this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH;
-      const offset = (this.page - 1) * pageSize;
-
-      const params = new URLSearchParams();
-      if (this.searchQuery) {
-        params.set('q', this.searchQuery);
-      }
-      if (this.selectedTags.length > 0) {
-        params.set(
-          'tags',
-          '(' + this.selectedTags.map(tag => `"${tag}"`).join(' OR ') + ')'
-        );
-      }
-      params.set('offset', offset.toString());
-
-      this.blogHomePageBackendApiService
-        .fetchBlogPostSearchResultAsync('?' + params.toString())
-        .then(data => {
-          if (data.blogPostSummariesList.length === 0) {
-            this.disableNextPageButton = true;
-            this.showBlogPostCardsLoadingScreen = false;
-            this.noResultsFound = true;
-            return;
-          }
-
-          this.blogPostSummaries = data.blogPostSummariesList;
-          this.blogPostSummariesToShow = this.blogPostSummaries;
-          this.totalBlogPosts = data.totalMatchingBlogPosts;
-          this.listOfDefaultTags = data.listOfDefaultTags;
-
-          this.calculateLastPostOnPageNum(this.page, pageSize);
-          this.showBlogPostCardsLoadingScreen = false;
-          this.noResultsFound = false;
-        })
-        .catch(error => {
-          if (this.blogPostSummaries.length === 0) {
-            this.alertsService.addWarning(
-              'No more search resutls found. End of search results.'
-            );
-          }
-
-          this.showBlogPostCardsLoadingScreen = false;
-          this.loaderService.hideLoadingScreen();
-        });
-    }
+    let offset = this.firstPostOnPageNum - 1;
+    this.loadMoreBlogPostSummaries(offset);
   }
 
   onPageChange(page = this.page): void {
@@ -305,27 +161,15 @@ export class BlogHomePageComponent implements OnInit {
       queryParams: {page: page},
       queryParamsHandling: 'merge',
     });
-    if (!this.searchPageIsActive) {
-      this.calculateFirstPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-      );
-      this.calculateLastPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-      );
-      this.loadPage();
-    } else {
-      this.calculateFirstPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
-      );
-      this.calculateLastPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
-      );
-      this.loadPage();
-    }
+    this.calculateFirstPostOnPageNum(
+      page,
+      this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    );
+    this.calculateLastPostOnPageNum(
+      page,
+      this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    );
+    this.loadPage();
   }
 
   selectBlogPostSummariesToShow(): void {
@@ -340,106 +184,8 @@ export class BlogHomePageComponent implements OnInit {
     this.lastPostOnPageNum = Math.min(pageNum * pageSize, this.totalBlogPosts);
   }
 
-  isSearchInProgress(): boolean {
-    return false;
-  }
-
-  searchToBeExec(e: {target: {value: string}}): void {
-    if (!this.searchButtonIsActive) {
-      this.searchQueryChanged.next(e.target.value);
-    }
-  }
-
-  onSearchQueryChangeExec(): void {
-    this.loaderService.showLoadingScreen('Loading');
-
-    const hasUnselectedTagInput = this.pendingTagFilterInput.trim().length > 0;
-    if (
-      hasUnselectedTagInput &&
-      this.selectedTags.length === 0 &&
-      this.searchQuery === ''
-    ) {
-      this.alertsService.addWarning(
-        'Please select a tag from the suggestions before searching by tags.'
-      );
-      this.loaderService.hideLoadingScreen();
-      return;
-    }
-
-    let currentParams = this.route.snapshot.queryParams;
-
-    const currentQuery = currentParams.q || '';
-    const currentTags = currentParams.tags ? currentParams.tags.split(',') : [];
-    const currentPage = currentParams.page || '1';
-
-    const isQueryChanged =
-      currentQuery !== this.searchQuery ||
-      currentTags.join(',') !== this.selectedTags.join(',');
-
-    if (this.searchQuery === '' && this.selectedTags.length === 0) {
-      this.searchPageIsActive = false;
-      this.filterWasUsed = false;
-      this.page = 1;
-      this.firstPostOnPageNum = 1;
-      this.blogPostSummaries = [];
-      this.totalBlogPosts = 0;
-
-      this.router.navigate(['/blog']);
-      return;
-    }
-
-    this.searchPageIsActive = true;
-
-    this.blogPostSearchService.executeSearchQuery(
-      this.searchQuery,
-      this.selectedTags,
-      () => {
-        const pageToUse = isQueryChanged ? '1' : currentPage;
-
-        if (isQueryChanged) {
-          this.page = 1;
-          this.firstPostOnPageNum = 1;
-        }
-
-        this.router.navigate(['/blog/search/find'], {
-          queryParams: {
-            q: this.searchQuery,
-            tags:
-              this.selectedTags.length > 0
-                ? '(' +
-                  this.selectedTags.map(tag => `"${tag}"`).join(' OR ') +
-                  ')'
-                : '',
-            page: pageToUse,
-          },
-        });
-      },
-      errorResponse => {
-        this.alertsService.addWarning(
-          `Unable to fetch search results. Error: ${errorResponse}`
-        );
-      }
-    );
-  }
-
   isSmallScreenViewActive(): boolean {
     return this.windowDimensionsService.getWidth() <= 1024;
-  }
-
-  updateSearchFieldsBasedOnUrlQuery(loadPageAfterUpdate = false): void {
-    const newSearchQuery: UrlSearchQuery =
-      this.blogPostSearchService.updateSearchFieldsBasedOnUrlQuery(
-        this.windowRef.nativeWindow.location.search
-      );
-
-    this.searchQuery = newSearchQuery.searchQuery;
-    this.selectedTags = newSearchQuery.selectedTags;
-
-    if (loadPageAfterUpdate) {
-      this.loadPage();
-    } else {
-      this.onSearchQueryChangeExec();
-    }
   }
 
   ngOnDestroy(): void {

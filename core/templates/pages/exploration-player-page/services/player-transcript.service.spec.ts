@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the player transcript service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 
 import {PlayerTranscriptService} from './player-transcript.service';

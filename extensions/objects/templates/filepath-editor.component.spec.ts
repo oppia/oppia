@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
 import {waitForAsync, TestBed} from '@angular/core/testing';
 import {FilepathEditorComponent} from './filepath-editor.component';

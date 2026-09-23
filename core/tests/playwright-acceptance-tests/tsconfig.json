@@ -16,6 +16,7 @@
     "ignoreDeprecations": "6.0"
   },
   "include": [
+    "reporters/**/*.ts",
     "specs/**/*.ts",
     "utilities/**/*.ts",
     "playwright.config.ts"

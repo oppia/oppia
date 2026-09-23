@@ -114,7 +114,7 @@ describe('Topic Manager', function () {
 
       await topicManager.splitIntoAdventure('Chapter 3');
       await topicManager.expectAdventureCount(2);
-      await topicManager.expectAdventureHeaderToBeVisible('Adventure 2');
+      await topicManager.expectAdventureHeaderToBeVisible('Module 2');
 
       await topicManager.scrollToTopOfPage();
 

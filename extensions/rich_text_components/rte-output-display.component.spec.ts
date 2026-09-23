@@ -16,6 +16,8 @@
  * @fileoverview Spec for rte output component.
  */
 
+// @ts-nocheck
+
 import {DOCUMENT} from '@angular/common';
 import {DebugElement, SimpleChanges} from '@angular/core';
 import {

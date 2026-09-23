@@ -26,7 +26,6 @@ import {
 } from '@angular/core';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {PageContextService} from 'services/page-context.service';
-import './outcome-feedback-editor.component.css';
 
 @Component({
   selector: 'oppia-outcome-feedback-editor',

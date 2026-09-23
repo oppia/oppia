@@ -39,7 +39,6 @@ import {
 } from '@angular/animations';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
-import './card-navigation-control.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';

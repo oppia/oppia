@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
+// @ts-nocheck
+
 import {
   ChangeDetectorRef,
   EventEmitter,

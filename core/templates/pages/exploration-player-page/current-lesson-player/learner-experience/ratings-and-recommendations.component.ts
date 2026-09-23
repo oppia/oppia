@@ -39,7 +39,6 @@ import {AppConstants} from 'app.constants';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import './ratings-and-recommendations.component.css';
 
 interface ResultActionButton {
   type: string;

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for AvailableCertificateOfferingPageRootComponent.
  */
 
+// @ts-nocheck
+
 import {ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 

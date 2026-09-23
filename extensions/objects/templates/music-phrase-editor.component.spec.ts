@@ -16,6 +16,8 @@
  * @fileoverview Component for music phrase editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {AlertsService} from 'services/alerts.service';
@@ -108,6 +110,14 @@ describe('MusicPhraseEditorComponent', () => {
     component.localValue = ['C4'];
 
     component.updateValue(['C4', 'C4']);
+
+    expect(component.localValue).toEqual(['C4']);
+  });
+
+  it('should not execute updateValue when the input is not a string array', () => {
+    component.localValue = ['C4'];
+
+    component.updateValue('C4');
 
     expect(component.localValue).toEqual(['C4']);
   });

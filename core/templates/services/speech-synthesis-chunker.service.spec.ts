@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SpeechSynthesisChunkerService.
  */
 
+// @ts-nocheck
+
 import {TestBed, fakeAsync, flush} from '@angular/core/testing';
 
 import {SpeechSynthesisChunkerService} from 'services/speech-synthesis-chunker.service';

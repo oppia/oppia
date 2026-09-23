@@ -40,7 +40,6 @@ import {ExplorationModeService} from 'pages/exploration-player-page/services/exp
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
-import './new-ratings-and-recommendations.component.css';
 import {
   MatBottomSheet,
   MatBottomSheetRef,

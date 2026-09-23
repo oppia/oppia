@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for story preview tab component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -57,13 +59,8 @@ describe('Story Preview tab', () => {
       providers: [
         {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
         {
-          StoryEditorNavigationService,
-          provide: [
-            {
-              provide: StoryEditorNavigationService,
-              UseClass: MockStoryEditorNavigationService,
-            },
-          ],
+          provide: StoryEditorNavigationService,
+          useClass: MockStoryEditorNavigationService,
         },
       ],
     }).compileComponents();

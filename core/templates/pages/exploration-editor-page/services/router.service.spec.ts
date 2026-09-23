@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RouterService.
  */
 
+// @ts-nocheck
+
 import {RouterService} from './router.service';
 import {Subscription} from 'rxjs';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';

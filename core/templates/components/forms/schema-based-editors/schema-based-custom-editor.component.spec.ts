@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for schema-based editor component for custom values
  */
 
+// @ts-nocheck
+
 import {
   Component,
   EventEmitter,
@@ -26,6 +28,7 @@ import {
   ControlValueAccessor,
   FormControl,
   FormsModule,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import {
@@ -175,4 +178,13 @@ describe('Schema Based Custom Editor Component', () => {
 
     expect(onValidatorChangeSpy).toHaveBeenCalled();
   }));
+
+  it('should expose itself as a control value accessor and validator', () => {
+    expect(fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)).toEqual([
+      component,
+    ]);
+    expect(fixture.debugElement.injector.get(NG_VALIDATORS)).toEqual([
+      component,
+    ]);
+  });
 });

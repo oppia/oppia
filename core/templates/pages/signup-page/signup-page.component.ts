@@ -30,7 +30,6 @@ import {LicenseExplanationModalComponent} from './modals/license-explanation-mod
 import {RegistrationSessionExpiredModalComponent} from './modals/registration-session-expired-modal.component';
 import {SignupPageBackendApiService} from './services/signup-page-backend-api.service';
 import analyticsConstants from 'analytics-constants';
-import './signup-page.component.css';
 
 @Component({
   selector: 'oppia-signup-page',

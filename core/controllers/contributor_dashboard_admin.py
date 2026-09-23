@@ -649,7 +649,6 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
-                assert sort_by is not None
                 translation_coordinator_dicts = contribution_stats_services.get_all_translation_coordinator_stats(
                     sort_by
                 )
@@ -777,9 +776,9 @@ def get_translation_coordinator_frontend_dict(
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
         stats_dict['reviewers_count'] = (  # type: ignore[typeddict-item]
-            community_stats.translation_reviewer_counts_by_lang_code[
-                stats_dict['language_id']
-            ]
+            community_stats.translation_reviewer_counts_by_lang_code.get(
+                stats_dict['language_id'], 0
+            )
         )
 
         for coordinator_id in stats_dict['coordinator_ids']:

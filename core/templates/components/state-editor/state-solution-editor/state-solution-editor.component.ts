@@ -38,7 +38,6 @@ import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import './state-solution-editor.component.css';
 
 interface DeleteValue {
   index: number;

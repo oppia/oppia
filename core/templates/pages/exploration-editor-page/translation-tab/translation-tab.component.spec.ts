@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for translationTab.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,

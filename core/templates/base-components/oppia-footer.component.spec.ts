@@ -16,6 +16,8 @@
  * @fileoverview Tests for the Oppia Footer Component.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,

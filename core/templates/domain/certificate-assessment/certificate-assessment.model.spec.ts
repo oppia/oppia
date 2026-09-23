@@ -22,8 +22,6 @@ import {
   CertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   AvailableCertificateAssessmentOfferingBackendDict,
-  CertificateAssessmentQuestionData,
-  CertificateAssessmentQuestionStateBackendDict,
   createAssessmentQuestionFromStateData,
 } from './certificate-assessment.model';
 import {StateBackendDict} from 'domain/state/state.model';
@@ -36,6 +34,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
       certificate_id: 'cert_id_1',
       title: 'Math Assessment',
       attempt_status: 'Not_Attempted',
+      attempt_id: null,
       passed_on_date: null,
       failed_on_date: null,
     };
@@ -46,6 +45,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
       'cert_id_1',
       'Math Assessment',
       'Not_Attempted',
+      'attempt_1',
       1000,
       2000
     );
@@ -53,6 +53,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
     expect(offering.certificateId).toEqual('cert_id_1');
     expect(offering.title).toEqual('Math Assessment');
     expect(offering.attemptStatus).toEqual('Not_Attempted');
+    expect(offering.attemptId).toEqual('attempt_1');
     expect(offering.passedOnDate).toEqual(1000);
     expect(offering.failedOnDate).toEqual(2000);
   });
@@ -64,6 +65,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
       'Not_Attempted'
     );
 
+    expect(offering.attemptId).toBeNull();
     expect(offering.passedOnDate).toBeNull();
     expect(offering.failedOnDate).toBeNull();
   });
@@ -71,6 +73,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
   it('should correctly create an instance from a backend dictionary', () => {
     backendDict.passed_on_date = 1000;
     backendDict.failed_on_date = null;
+    backendDict.attempt_id = 'attempt_2';
     const offering =
       AvailableCertificateAssessmentOfferingData.createFromBackendDict(
         backendDict
@@ -79,6 +82,7 @@ describe('Available Certificate Assessment Offering Data Model', () => {
     expect(offering.certificateId).toEqual('cert_id_1');
     expect(offering.title).toEqual('Math Assessment');
     expect(offering.attemptStatus).toEqual('Not_Attempted');
+    expect(offering.attemptId).toEqual('attempt_2');
     expect(offering.passedOnDate).toEqual(1000);
     expect(offering.failedOnDate).toBeNull();
   });
@@ -100,7 +104,6 @@ describe('Certificate Assessment Offering Data Model', () => {
       },
       demonstrates: ['Learn math'],
       total_questions: 15,
-      time_limit_in_minutes: 60,
       async_status: 'Available',
       version: 1,
     };
@@ -115,7 +118,6 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(emptyOffering.classroomId).toEqual('');
     expect(emptyOffering.topicData).toEqual({});
     expect(emptyOffering.totalQuestions).toEqual(0);
-    expect(emptyOffering.timeLimitInMinutes).toEqual(0);
     expect(emptyOffering.demonstrates).toEqual([]);
     expect(emptyOffering.asyncStatus).toEqual('Not_Ready');
     expect(emptyOffering.version).toEqual(0);
@@ -133,7 +135,6 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.classroomId).toEqual('classroom_id_1');
     expect(offering.topicData).toEqual({topic_1: 5, topic_2: 10});
     expect(offering.totalQuestions).toEqual(15);
-    expect(offering.timeLimitInMinutes).toEqual(60);
     expect(offering.demonstrates).toEqual(['Learn math']);
     expect(offering.asyncStatus).toEqual('Available');
     expect(offering.version).toEqual(1);
@@ -157,7 +158,6 @@ describe('Certificate Assessment Offering Data Model', () => {
     offering.classroomId = 'updated_classroom_id';
     offering.topicData = {topic_3: 20};
     offering.totalQuestions = 20;
-    offering.timeLimitInMinutes = 90;
     offering.demonstrates = ['Learn math'];
 
     expect(offering.title).toEqual('Updated Title');
@@ -165,82 +165,56 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.classroomId).toEqual('updated_classroom_id');
     expect(offering.topicData).toEqual({topic_3: 20});
     expect(offering.totalQuestions).toEqual(20);
-    expect(offering.timeLimitInMinutes).toEqual(90);
     expect(offering.demonstrates).toEqual(['Learn math']);
   });
 });
 
 describe('Certificate Assessment Attempt Data Model', () => {
   it('should correctly create an instance via the constructor', () => {
+    const stateData = {
+      content: {content_id: 'content', html: '<p>Question</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
     const attempt = new CertificateAssessmentAttemptData('attempt_id_1', [
-      {questionId: 'q1', questionVersion: 1},
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData},
     ]);
 
     expect(attempt.attemptId).toEqual('attempt_id_1');
-    expect(attempt.questions).toEqual([{questionId: 'q1', questionVersion: 1}]);
+    expect(attempt.questions).toEqual([
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData},
+    ]);
   });
 
   it('should correctly create an instance from a backend dict', () => {
+    const stateData1 = {
+      content: {content_id: 'content', html: '<p>Question 1</p>'},
+      interaction: {id: 'TextInput'},
+    } as StateBackendDict;
+    const stateData2 = {
+      content: {content_id: 'content', html: '<p>Question 2</p>'},
+      interaction: {id: 'NumericInput'},
+    } as StateBackendDict;
     const attempt = CertificateAssessmentAttemptData.createFromBackendDict({
       attempt_id: 'attempt_id_1',
       questions: [
-        {question_id: 'q1', question_version: 1},
-        {question_id: 'q2', question_version: 2},
+        {
+          question_id: 'q1',
+          question_version: 1,
+          question_state_data: stateData1,
+        },
+        {
+          question_id: 'q2',
+          question_version: 2,
+          question_state_data: stateData2,
+        },
       ],
     });
 
     expect(attempt.attemptId).toEqual('attempt_id_1');
     expect(attempt.questions).toEqual([
-      {questionId: 'q1', questionVersion: 1},
-      {questionId: 'q2', questionVersion: 2},
+      {questionId: 'q1', questionVersion: 1, questionStateData: stateData1},
+      {questionId: 'q2', questionVersion: 2, questionStateData: stateData2},
     ]);
-  });
-});
-
-describe('Certificate Assessment Question Data Model', () => {
-  it('should correctly create an instance via the constructor', () => {
-    const stateData = {
-      content: {content_id: 'content', html: '<p>What is 2+2?</p>'},
-      interaction: {id: 'TextInput'},
-    } as StateBackendDict;
-    const question = new CertificateAssessmentQuestionData('q1', stateData);
-
-    expect(question.questionId).toEqual('q1');
-    expect(question.questionStateData).toBe(stateData);
-  });
-
-  it('should correctly create an instance from a backend dict', () => {
-    const stateData = {
-      content: {content_id: 'content', html: '<p>What is 3+3?</p>'},
-      interaction: {id: 'NumericInput'},
-    } as StateBackendDict;
-    const dict: CertificateAssessmentQuestionStateBackendDict = {
-      question_id: 'q2',
-      question_state_data: stateData,
-    };
-    const question =
-      CertificateAssessmentQuestionData.createFromBackendDict(dict);
-
-    expect(question.questionId).toEqual('q2');
-    expect(question.questionStateData).toBe(stateData);
-  });
-
-  it('should expose questionId via getter', () => {
-    const question = new CertificateAssessmentQuestionData(
-      'q3',
-      {} as StateBackendDict
-    );
-
-    expect(question.questionId).toEqual('q3');
-  });
-
-  it('should expose questionStateData via getter', () => {
-    const stateData = {
-      content: {content_id: 'c', html: ''},
-    } as StateBackendDict;
-    const question = new CertificateAssessmentQuestionData('q4', stateData);
-
-    expect(question.questionStateData).toBe(stateData);
   });
 });
 

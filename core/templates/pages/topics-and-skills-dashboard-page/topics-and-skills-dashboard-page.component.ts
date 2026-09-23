@@ -37,7 +37,6 @@ import {
 } from './topics-and-skills-dashboard-page.constants';
 import {TopicsAndSkillsDashboardPageService} from './topics-and-skills-dashboard-page.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './topics-and-skills-dashboard-page.component.css';
 
 type TopicPublishedOptionsKeys =
   keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS;

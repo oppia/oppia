@@ -37,7 +37,6 @@ import {
 } from 'domain/exploration/written-translation.model';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './exploration-modify-translations-modal.component.css';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;

@@ -42,7 +42,6 @@
             <tr>
               <th scope="col" class="oppia-title-th" >Certificate Title</th>
               <th scope="col">Topics</th>
-              <th scope="col">Time</th>
               <th scope="col">Status</th>
               <th scope="col">Actions</th>
             </tr>
@@ -55,7 +54,6 @@
               <td>
                 <span class="oppia-topics-count">{{ certificateOffering.topicsLabel }}</span>
               </td>
-              <td>{{ certificateOffering.timeLabel }}</td>
               <td class="oppia-status-cell">
                 <span class="badge oppia-status-badge" [ngClass]="{
                     'oppia-status-available': certificateOffering.status.toLowerCase().includes('available'),

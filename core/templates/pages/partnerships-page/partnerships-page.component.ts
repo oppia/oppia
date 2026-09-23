@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'partnerships-page',
   templateUrl: './partnerships-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./partnerships-page.component.css'],
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

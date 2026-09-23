@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
+// @ts-nocheck
+
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,

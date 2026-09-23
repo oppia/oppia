@@ -355,7 +355,7 @@ export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
 
 export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
   showCategory: true,
-  showLesson: true,
+  showLesson: false,
   showResponse: false,
   showLessonMetadata: true,
   showScreenshot: true,

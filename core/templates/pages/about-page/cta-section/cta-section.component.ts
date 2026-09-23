@@ -27,8 +27,6 @@ import {
 import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-import './cta-section.component.css';
-
 interface VolunteerRoleData {
   title: string;
   iconUrl: string;
