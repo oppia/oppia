@@ -181,5 +181,4 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.uploadedImage).toEqual(null);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
-
 });
