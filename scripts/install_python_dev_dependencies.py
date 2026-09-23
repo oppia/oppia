@@ -149,6 +149,7 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
             '--no-emit-index-url',
             '--quiet',
             '--strip-extras',
+            '--allow-unsafe',
             '--generate-hashes',
             requirements_path,
             '--output-file',
