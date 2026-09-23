@@ -836,7 +836,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     offset: int
     sort_key: str
     entity_id: Optional[str]
-    topic_name: Optional[str]
+    topic_id: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -885,7 +885,7 @@ class ReviewableSuggestionsHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
-            'topic_name': {
+            'topic_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -893,21 +893,28 @@ class ReviewableSuggestionsHandler(
     }
 
     def _get_skill_ids_for_topic(
-        self, topic_name: Optional[str]
+        self, topic_id: Optional[str]
     ) -> Optional[List[str]]:
         """Gets all skill ids for the provided topic.
 
-        Returns None to indicate that no filtering is needed.
+        Args:
+            topic_id: str|None. The ID of the topic whose skill IDs should be
+                returned. If None or empty, no topic filtering is needed.
+
+        Returns:
+            list(str)|None. The IDs of all the skills in the topic, or None to
+            indicate that no filtering is needed.
+
+        Raises:
+            InvalidInputException. The supplied topic ID does not correspond
+                to an existing topic.
         """
-        if (
-            topic_name is None
-            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
-        ):
+        if not topic_id:
             return None
-        topic = topic_fetchers.get_topic_by_name(topic_name)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.InvalidInputException(
-                f'The topic \'{topic_name}\' is not valid'
+                f'The topic ID \'{topic_id}\' is not valid'
             )
         return topic.get_all_skill_ids()
 
@@ -982,8 +989,8 @@ class ReviewableSuggestionsHandler(
                 raise self.InvalidInputException(
                     'Limit must be provided for question suggestions.'
                 )
-            topic_name = self.normalized_request.get('topic_name')
-            skill_ids = self._get_skill_ids_for_topic(topic_name)
+            topic_id = self.normalized_request.get('topic_id')
+            skill_ids = self._get_skill_ids_for_topic(topic_id)
 
             suggestions, next_offset = (
                 suggestion_services.get_reviewable_question_suggestions_by_offset(
