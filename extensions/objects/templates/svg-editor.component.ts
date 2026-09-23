@@ -105,6 +105,7 @@ type FabricSvgLoadCallback = (
 @Component({
   selector: 'svg-editor',
   templateUrl: './svg-editor.component.html',
+  styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
   @Input() value: string;

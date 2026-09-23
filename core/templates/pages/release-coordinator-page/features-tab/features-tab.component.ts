@@ -39,7 +39,6 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
-import './features-tab.component.css';
 
 interface IntSchema {
   type: 'int';
