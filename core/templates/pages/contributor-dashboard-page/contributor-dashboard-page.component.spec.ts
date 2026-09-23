@@ -291,6 +291,31 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
     });
 
+    it('should render enabled dashboard tabs as focusable buttons', () => {
+      component.tabsDetails.submitQuestionTab.enabled = true;
+      fixture.detectChanges();
+
+      const tabButtons = fixture.nativeElement.querySelectorAll(
+        '.oppia-opportunities-tabs-text'
+      ) as NodeListOf<HTMLButtonElement>;
+      expect(tabButtons.length).toBe(3);
+
+      tabButtons.forEach(tabButton => {
+        expect(tabButton.tagName).toBe('BUTTON');
+        expect(tabButton.type).toBe('button');
+        expect(tabButton.hasAttribute('href')).toBe(false);
+        expect(tabButton.tabIndex).toBe(0);
+      });
+
+      tabButtons[2].click();
+      fixture.detectChanges();
+
+      expect(component.activeTabName).toBe('translateTextTab');
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-active-tab').classList
+      ).toContain('oppia-active-opportunities-tab');
+    });
+
     it('should change active language when clicking on language selector', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
