@@ -59,7 +59,7 @@ interface ImagePoint {
 @Component({
   selector: 'oppia-interactive-image-click-input',
   templateUrl: './image-click-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./image-click-input-interaction.component.css'],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue!: string;
