@@ -960,6 +960,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       },
     ];
 
+    // Paint submitted-translations filters immediately. Rights loading may
+    // later switch to a review tab; delaying this until that callback is
+    // what caused the contributor-dashboard CLS regression.
+    this.switchToTab(
+      this.TAB_TYPE_CONTRIBUTIONS,
+      this.SUGGESTION_TYPE_TRANSLATE
+    );
+
     // Whenever the active topic changes, update the `topicReady` flag.
     // `topicReady` is true if there is an active topic, false otherwise.
     // This flag can be used to conditionally render parts of the UI or

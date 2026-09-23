@@ -1020,6 +1020,18 @@ describe('Contributions and review component', () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
         expect(component.isSubmittedTranslationsTab()).toBeFalse();
       });
+
+      it('should default to submitted translations before contribution rights load', fakeAsync(() => {
+        getUserContributionRightsDataAsyncSpy.and.returnValue(
+          new Promise(() => {
+            // Never resolve: rights must not override the first-paint default.
+          })
+        );
+        component.ngOnInit();
+
+        expect(component.isSubmittedTranslationsTab()).toBeTrue();
+        expect(component.activeDropdownTabChoice).toBe('Translations');
+      }));
     });
 
     it('should reload opportunities when the submitted language filter changes', () => {

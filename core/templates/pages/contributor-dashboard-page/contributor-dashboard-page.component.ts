@@ -188,6 +188,14 @@ export class ContributorDashboardPageComponent implements OnInit {
     this.userCanReviewQuestions = false;
     this.defaultHeaderVisible = true;
 
+    // Default My Contributions to submitted translations so the topic
+    // selector is present on first paint (avoids CLS when the child later
+    // confirms this tab after contribution rights load).
+    this.contributionAndReviewService.setActiveTabType('contributions');
+    this.contributionAndReviewService.setActiveSuggestionType(
+      'translate_content'
+    );
+
     const prevSelectedTopicName =
       this.localStorageService.getLastSelectedTranslationTopicName();
 

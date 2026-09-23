@@ -483,5 +483,15 @@ describe('Contributor dashboard page', () => {
       component.onTabClick('myContributionTab');
       expect(component.showTopicSelector()).toBe(true);
     });
+
+    it('should default to submitted translations so topic selector is on first paint', () => {
+      expect(contributionAndReviewService.getActiveTabType()).toBe(
+        'contributions'
+      );
+      expect(contributionAndReviewService.getActiveSuggestionType()).toBe(
+        'translate_content'
+      );
+      expect(component.showTopicSelector()).toBe(true);
+    });
   });
 });
