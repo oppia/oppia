@@ -25,7 +25,6 @@ import {
   NgZone,
 } from '@angular/core';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import './card-display.component.css';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
