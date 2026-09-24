@@ -372,7 +372,7 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should open submenu when user hovers over the menu button', () => {
-    let mouseoverEvent = new KeyboardEvent('mouseover');
+    let mouseoverEvent = new MouseEvent('mouseover');
     spyOn(navigationService, 'openSubmenu');
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
 
@@ -388,7 +388,7 @@ describe('TopNavigationBarComponent', () => {
     'should close submenu when user moves the mouse away' +
       ' from the menu button',
     () => {
-      let mouseleaveEvent = new KeyboardEvent('mouseleave');
+      let mouseleaveEvent = new MouseEvent('mouseleave');
       spyOn(navigationService, 'closeSubmenu');
       spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
 
@@ -404,7 +404,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(navigationService, 'closeSubmenu');
 
-    component.closeSubmenuIfNotMobile(new KeyboardEvent('mouseleave'));
+    component.closeSubmenuIfNotMobile(new MouseEvent('mouseleave'));
 
     expect(navigationService.closeSubmenu).not.toHaveBeenCalled();
   });

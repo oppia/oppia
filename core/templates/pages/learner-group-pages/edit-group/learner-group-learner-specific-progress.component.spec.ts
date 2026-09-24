@@ -40,7 +40,7 @@ class MockTruncatePipe implements PipeTransform {
 }
 
 class MockNavigationService {
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {}
+  openSubmenu(evt: Event, menuName: string): void {}
 }
 
 describe('LearnerGroupLearnerSpecificProgressComponent', () => {

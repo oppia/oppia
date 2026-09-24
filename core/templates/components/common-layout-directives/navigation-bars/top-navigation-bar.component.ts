@@ -508,12 +508,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * open/close action to be performed (aboutMenu,profileMenu).
    */
   openSubmenu(evt: Event, menuName: string): void {
-    // Focus on the current target before opening its submenu.
-    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    // The navigation service only needs the event to set the active menu
+    // name, so the generic Event type is sufficient.
+    this.navigationService.openSubmenu(evt, menuName);
   }
 
   closeSubmenu(evt: Event): void {
-    this.navigationService.closeSubmenu(evt as KeyboardEvent);
+    this.navigationService.closeSubmenu(evt);
   }
 
   closeSubmenuIfNotMobile(evt: Event): void {
