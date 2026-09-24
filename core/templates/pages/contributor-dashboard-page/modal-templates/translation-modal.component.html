@@ -80,7 +80,7 @@
                     (click)="generateTranslation()"
                     [disabled]="isGeneratingTranslation">
               <i class="material-icons oppia-translate-icon" *ngIf="!isGeneratingTranslation">translate</i>
-              <i class="fa fa-spinner fa-spin" *ngIf="isGeneratingTranslation"></i>
+              <i class="fa fa-spinner fa-spin oppia-auto-translate-spinner" *ngIf="isGeneratingTranslation"></i>
               <span class="oppia-auto-translate-text">Auto-translate</span>
             </button>
           </div>

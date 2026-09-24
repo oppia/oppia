@@ -1,9 +1,7 @@
 <div class="modal-body">
-  <p>
-    Are you sure this auto-generated translation needs no edits?
-  </p>
+  <p [innerHTML]="'I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BODY' | translate"></p>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-secondary e2e-test-cancel-unedited-save-button" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-confirm-unedited-save-button" (click)="confirm()">Yes, save</button>
+  <button class="btn btn-secondary e2e-test-cancel-unedited-save-button" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+  <button class="btn btn-success e2e-test-confirm-unedited-save-button" (click)="confirm()" [innerHTML]="'I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BUTTON' | translate"></button>
 </div>

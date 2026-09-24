@@ -1160,6 +1160,8 @@
   "I18N_MODAL_CANCEL_BUTTON": "Cancel",
   "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_1": "It looks like your translation contains a math formula written as plain text. In Right-to-Left (RTL) languages, plain-text formulas can break and render out of order.",
   "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_2": "Are you sure you want to save anyway, or would you like to continue editing and use the <strong>Math Formula component</strong> instead?",
+  "I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BODY": "Are you sure this auto-generated translation needs no edits?",
+  "I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BUTTON": "Yes, save",
   "I18N_MODAL_CONTINUE_BUTTON": "Continue",
   "I18N_MODAL_REMOVE_BUTTON": "Remove",
   "I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "Step into Oppia Classrooms and explore educational materials curated by our team with your learning journey in mind!",
