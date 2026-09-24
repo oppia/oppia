@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -38,6 +40,8 @@ if MYPY:  # pragma: no cover
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
+
+GENERATE_CONTENT_ID_TIME_LIMIT = datetime.timedelta(seconds=2)
 
 
 class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
@@ -186,6 +190,10 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         Returns:
             dict|None. Dict containing fix results if duplicates were found and
             fixed, None otherwise.
+
+        Raises:
+            Exception. If a unique content ID cannot be generated within the
+                time limit.
         """
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
@@ -225,12 +233,20 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
-                while True:
+                timeout = (
+                    datetime.datetime.now() + GENERATE_CONTENT_ID_TIME_LIMIT
+                )
+                while datetime.datetime.now() < timeout:
                     new_content_id = _generate_matching_content_id(
                         duplicate_id, content_id_generator
                     )
                     if new_content_id not in all_content_ids_set:
                         break
+                else:
+                    raise Exception(
+                        'Timeout generating unique content ID for '
+                        f'exploration {exploration.id}.'
+                    )
 
                 all_content_ids_set.add(new_content_id)
 
