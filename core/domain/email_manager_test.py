@@ -9825,6 +9825,73 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
 
+    def test_send_machine_translation_failure_email(self) -> None:
+        """Tests the send_machine_translation_failure_email function."""
+        email_messages: List[Tuple[str, str]] = []
+
+        def mock_send_mail(
+            unused_sender: str,
+            unused_recipient: str,
+            subject: str,
+            body: str,
+            unused_html_body: str,
+        ) -> None:
+            email_messages.append((subject, body))
+
+        swap_send_mail = self.swap(email_services, 'send_mail', mock_send_mail)
+
+        with swap_send_mail:
+            email_manager.send_machine_translation_failure_email(
+                'azure', 'Timeout Exception 504'
+            )
+
+        self.assertEqual(len(email_messages), 1)
+
+        subject, body = email_messages[0]
+
+        self.assertEqual(
+            subject,
+            '[Action Required]: Automatic Translation Failed: Azure Translator',
+        )
+        self.assertIn('provider "Azure Translator" has failed.', body)
+        self.assertIn('Timeout Exception 504', body)
+
+    def test_send_machine_translation_failure_email_without_documentation_link(
+        self,
+    ) -> None:
+        """Tests send_machine_translation_failure_email for an unknown provider
+        that has no documentation link, covering the else branch.
+        """
+        email_messages: List[Tuple[str, str]] = []
+
+        def mock_send_mail(
+            unused_sender: str,
+            unused_recipient: str,
+            subject: str,
+            body: str,
+            unused_html_body: str,
+        ) -> None:
+            email_messages.append((subject, body))
+
+        swap_send_mail = self.swap(email_services, 'send_mail', mock_send_mail)
+
+        with swap_send_mail:
+            # Use an unknown provider ID so documentation_link is None,
+            # which exercises the else branch at line 3180 of email_manager.py.
+            email_manager.send_machine_translation_failure_email(
+                'unknown_provider', 'Some error'
+            )
+
+        self.assertEqual(len(email_messages), 1)
+
+        subject, body = email_messages[0]
+
+        self.assertIn('Automatic Translation Failed', subject)
+        self.assertIn(
+            'No documentation link is available for this provider.', body
+        )
+        self.assertIn('Some error', body)
+
     def test_failed_send_mail_does_not_create_sent_email_model(self) -> None:
         """Test that a failed send does not create a SentEmailModel record."""
 
