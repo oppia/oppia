@@ -21,7 +21,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './certificate-assessment-titled-shared-background-banner.component.css';
 
 @Component({
   selector: 'oppia-titled-background-banner',

@@ -376,14 +376,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/library-page/library-page.module').then(
-        m => m.LibraryPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
       .ROUTE,
     pathMatch: 'full',
@@ -511,15 +503,6 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/blog-home-page/blog-home-page.module').then(
-        m => m.BlogHomePageModule
-      ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH
-      .ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import('pages/blog-home-page/blog-home-page.module').then(
