@@ -83,6 +83,7 @@ export class OpportunitiesListComponent {
   languageCode: string = '';
   dropdownPaginationEnabled: boolean = false;
   totalPages: number = 0;
+  private activeLoadOpportunitiesCountPromise?: Promise<number>;
 
   get pageNumbers(): number[] {
     return Array.from({length: this.totalPages}, (_, i) => i + 1);
@@ -266,7 +267,12 @@ export class OpportunitiesListComponent {
 
     if (this.dropdownPaginationEnabled) {
       if (this.loadOpportunitiesCount && !this.searchQuery) {
-        this.loadOpportunitiesCount(this.searchQuery).then(totalCount => {
+        const countPromise = this.loadOpportunitiesCount(this.searchQuery);
+        this.activeLoadOpportunitiesCountPromise = countPromise;
+        countPromise.then(totalCount => {
+          if (this.activeLoadOpportunitiesCountPromise !== countPromise) {
+            return;
+          }
           if (!this.more && this.opportunities.length > 0) {
             return;
           }
