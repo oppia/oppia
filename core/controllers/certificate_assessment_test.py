@@ -1076,7 +1076,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1122,7 +1122,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1185,7 +1185,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data=version_data,
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )

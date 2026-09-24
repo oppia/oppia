@@ -18,7 +18,6 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './donation-box-modal.component.css';
 
 @Component({
   selector: 'donation-box-modal',

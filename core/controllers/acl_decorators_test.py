@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import android_validation_constants, feature_flag_list, feconf
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base, incoming_app_feedback_report
 from core.domain import (
@@ -234,7 +234,7 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
                 'question_versions': question_versions,
                 'question_topic_links': question_topic_links,
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=is_submitted,
         )

@@ -31,7 +31,6 @@ import {
   ClassroomSummaryDict,
 } from 'domain/classroom/classroom-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
-import './certificate-offering-details.component.css';
 
 interface CertificateOfferingDetailsFormData {
   title: string;
