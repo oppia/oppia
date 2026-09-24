@@ -60,7 +60,6 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -673,6 +672,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     } else if (this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION) {
       return this.getQuestionContributionsSummary(suggestionIdToSuggestions);
     }
+    return [];
   }
 
   getActiveDropdownTabText(tabType: string, subType: string): string {
@@ -820,6 +820,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         resolve({opportunitiesDicts: [], more: false});
       });
     }
+    const requestedTabType = this.activeTabType;
+    const requestedTabSubtype = this.activeTabSubtype;
     const fetchFunction =
       this.tabNameToOpportunityFetchFunction[this.activeTabSubtype][
         this.activeTabType
@@ -827,6 +829,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
 
     return fetchFunction(shouldResetOffset)
       .then(response => {
+        if (
+          this.activeTabType !== requestedTabType ||
+          this.activeTabSubtype !== requestedTabSubtype
+        ) {
+          // The active tab changed while this request was in flight, so this
+          // is a stale response. Ignore it to avoid processing data for a tab
+          // the user has already navigated away from.
+          return {opportunitiesDicts: [], more: false};
+        }
         Object.keys(response.suggestionIdToDetails).forEach(id => {
           this.contributions[id] = response.suggestionIdToDetails[id];
         });

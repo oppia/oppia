@@ -28,7 +28,6 @@ import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {FocusObj} from './math-equation-editor.component';
-import './numeric-expression-editor.component.css';
 
 @Component({
   selector: 'numeric-expression-editor',

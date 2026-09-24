@@ -20,7 +20,6 @@ import {Ratio} from 'domain/objects/ratio.model';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
-import './ratio-expression-editor.component.css';
 
 @Component({
   selector: 'ratio-expression-editor',

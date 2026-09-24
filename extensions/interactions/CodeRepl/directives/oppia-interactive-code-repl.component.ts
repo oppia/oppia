@@ -35,6 +35,10 @@ import {Subscription} from 'rxjs';
 
 import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {CodeReplRulesService} from './code-repl-rules.service';
@@ -91,10 +95,12 @@ export class InteractiveCodeReplComponent
     private currentInteractionService: CurrentInteractionService,
     private codeReplRulesService: CodeReplRulesService,
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
-    private playerPositionService: PlayerPositionService
+    private playerPositionService: PlayerPositionService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CODEMIRROR);
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(
         () => (this.interactionIsActive = false)
