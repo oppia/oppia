@@ -23,10 +23,9 @@ import {
   AvailableCertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentAttemptData,
+  CertificateAssessmentAttemptQuestionBackendDict,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
-  CertificateAssessmentQuestionStateBackendDict,
-  CertificateAssessmentQuestionData,
 } from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
@@ -61,7 +60,6 @@ interface GetCertificateOfferingBackendResponse {
     };
     demonstrates: string[];
     total_questions: number;
-    time_limit_in_minutes: number;
     async_status: string;
     version: number;
   };
@@ -103,17 +101,12 @@ interface GetCertificateAssessmentAttemptsBackendResponse {
   attempts: CertificateAssessmentAttemptSummaryBackendDict[];
 }
 
-interface CertificateAssessmentQuestionBackendDict {
-  question_id: string;
-  question_version: number;
-}
-
-// Response for starting a new assessment attempt. The question list is
-// represented by CertificateAssessmentQuestionBackendDict entries; the full
-// question state is fetched separately via the question handler.
+// Response for starting a new assessment attempt. Every question's full
+// pinned state data is returned up front, so the client can serve questions
+// from memory without further per-question requests.
 interface StartCertificateAssessmentBackendResponse {
   attempt_id: string;
-  questions: CertificateAssessmentQuestionBackendDict[];
+  questions: CertificateAssessmentAttemptQuestionBackendDict[];
 }
 
 export interface SubmitCertificateAssessmentAnswerBackendDict {
@@ -163,16 +156,6 @@ export class CertificateAssessmentOfferingBackendApiService {
     );
   }
 
-  private getCertificateQuestionHandlerUrl(
-    attemptId: string,
-    questionId: string
-  ): string {
-    return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
-      '<attempt_id>',
-      attemptId
-    ).replace('<question_id>', questionId);
-  }
-
   async getCertificateAssessmentOfferingsAsync(): Promise<
     CertificateAssessmentOfferingData[]
   > {
@@ -205,8 +188,6 @@ export class CertificateAssessmentOfferingBackendApiService {
                       demonstrates: certificateOfferingBackendDict.demonstrates,
                       total_questions:
                         certificateOfferingBackendDict.total_questions,
-                      time_limit_in_minutes:
-                        certificateOfferingBackendDict.time_limit_in_minutes,
                       async_status: certificateOfferingBackendDict.async_status,
                       version: certificateOfferingBackendDict.version,
                     }
@@ -240,8 +221,6 @@ export class CertificateAssessmentOfferingBackendApiService {
         topic_data: response.certificate_offering.topic_data,
         demonstrates: response.certificate_offering.demonstrates,
         total_questions: response.certificate_offering.total_questions,
-        time_limit_in_minutes:
-          response.certificate_offering.time_limit_in_minutes,
         async_status: response.certificate_offering.async_status,
         version: response.certificate_offering.version,
       });
@@ -266,8 +245,6 @@ export class CertificateAssessmentOfferingBackendApiService {
               topic_id: topicId,
             })),
             total_questions: certificateAssessmentOffering.totalQuestions,
-            time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes,
             demonstrates: certificateAssessmentOffering.demonstrates,
             async_status: certificateAssessmentOffering.asyncStatus,
           }
@@ -296,8 +273,6 @@ export class CertificateAssessmentOfferingBackendApiService {
               topic_id: topicId,
             })),
             total_questions: certificateAssessmentOffering.totalQuestions,
-            time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes,
             demonstrates: certificateAssessmentOffering.demonstrates,
             async_status: certificateAssessmentOffering.asyncStatus,
           }
@@ -435,22 +410,6 @@ export class CertificateAssessmentOfferingBackendApiService {
         )
         .toPromise();
       return response;
-    } catch (errorResponse) {
-      throw errorResponse?.error?.error || errorResponse.message;
-    }
-  }
-
-  async getCertificateAssessmentQuestionAsync(
-    attemptId: string,
-    questionId: string
-  ): Promise<CertificateAssessmentQuestionData> {
-    try {
-      const response = await this.http
-        .get<CertificateAssessmentQuestionStateBackendDict>(
-          this.getCertificateQuestionHandlerUrl(attemptId, questionId)
-        )
-        .toPromise();
-      return CertificateAssessmentQuestionData.createFromBackendDict(response);
     } catch (errorResponse) {
       throw errorResponse?.error?.error || errorResponse.message;
     }

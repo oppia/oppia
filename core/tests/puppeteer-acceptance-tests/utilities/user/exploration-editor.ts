@@ -267,11 +267,11 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
-
+const explorationFeedbackTabTitleSelector =
+  '.e2e-test-exploration-feedback-title';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
-const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const languageDropdownValueSelector =
   'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
@@ -552,6 +552,7 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Truncates a card name the same way the frontend graph visualization does.
@@ -2914,6 +2915,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expects new exploration feedback tab to be visible.
+   */
+  async expectNewExplorationFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+    await this.expectTextContentToBe(
+      explorationFeedbackTabTitleSelector,
+      'Exploration Feedback'
+    );
+  }
+
+  /**
    * Fetches the exploration ID from the current URL of the exploration editor page.
    * The exploration ID is the string after '/create/' in the URL.
    */
@@ -3700,7 +3712,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -3733,7 +3744,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -6268,10 +6278,12 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (title === explorationName) {
-      const explorationTileElement = await this.page.$(
-        explorationSummaryTileTitleSelector
-      );
-      await explorationTileElement?.click();
+      await this.page.evaluate(selector => {
+        const titleElement = document.querySelector(selector);
+        if (titleElement) {
+          titleElement.parentElement.click();
+        }
+      }, explorationSummaryTileTitleSelector);
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }

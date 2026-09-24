@@ -99,6 +99,12 @@ describe('Admin Data Service', () => {
     ],
     skill_list: [],
     story_list: [],
+    classroom_list: [
+      {
+        classroom_id: 'classroomId1',
+        name: 'math',
+      },
+    ],
   };
   let adminDataResponse: AdminPageData;
 
@@ -129,6 +135,10 @@ describe('Admin Data Service', () => {
       storyList: sampleAdminData.story_list.map(dict =>
         Story.createFromBackendDict(dict)
       ),
+      classroomList: sampleAdminData.classroom_list.map(dict => ({
+        classroomId: dict.classroom_id,
+        name: dict.name,
+      })),
     };
   });
 
