@@ -79,7 +79,7 @@ class AudioUploadHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': r'[^\s]+(\.(?i)(mp3))$',
+                            'regex_pattern': r'(?i)[^\s]+(\.(mp3))$',
                         }
                     ],
                 }
