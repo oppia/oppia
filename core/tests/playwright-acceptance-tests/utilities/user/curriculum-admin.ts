@@ -16,7 +16,7 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-import {Page} from '@playwright/test';
+import {Page, expect} from '@playwright/test';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
@@ -191,6 +191,21 @@ const confirmDeleteClassroomButton = '.e2e-test-confirm-delete-classroom';
 const topicPrerequisitesContainerSelector =
   '.e2e-test-topic-prerquisites-container';
 const movableClassroomTileSelector = '.e2e-test-movable-classroom-tile';
+const richTextAreaField = 'div.e2e-test-rte';
+const skillEditorCollapsibleCard = '.e2e-test-skill-editor-collapsible-card';
+const modalDiv = 'div.modal-content';
+const closeSaveModalButton = '.e2e-test-close-save-modal-button';
+const addQuestionButton = 'button.e2e-test-create-question-button';
+const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
+const classroomTileSelector = '.e2e-test-classroom-tile';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
+const editWorkedExampleModalQuestionRte =
+  '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
+const editWorkedExampleModalAnswerRte =
+  '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
+const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
 
 export class CurriculumAdmin extends TopicManager {
   /**
