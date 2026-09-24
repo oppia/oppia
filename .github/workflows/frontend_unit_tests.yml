@@ -78,6 +78,8 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
+      - name: Install Chrome
+        uses: ./.github/actions/install-chrome
       - name: Describe filesystem
         run: |
           pwd
