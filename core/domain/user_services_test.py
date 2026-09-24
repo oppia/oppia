@@ -34,6 +34,7 @@ from core.domain import (
     exp_services,
     platform_parameter_list,
     rights_manager,
+    role_services,
     state_domain,
     suggestion_services,
     user_domain,
@@ -2483,6 +2484,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.add_user_role(user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.assertTrue(user_services.is_topic_manager(user_id))
+
+    def test_get_user_roles_and_actions(self) -> None:
+        auth_id = 'someUser'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+
+        roles, actions, user_settings = (
+            user_services.get_user_roles_and_actions(user_id)
+        )
+        expected_actions = role_services.get_all_actions(
+            [feconf.ROLE_ID_FULL_USER]
+        )
+        self.assertEqual(roles, [feconf.ROLE_ID_FULL_USER])
+        self.assertEqual(actions, expected_actions)
+        assert user_settings is not None
+        self.assertEqual(user_settings.user_id, user_id)
+
+        user_services.add_user_role(user_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        roles, actions, _ = user_services.get_user_roles_and_actions(user_id)
+        expected_roles = [
+            feconf.ROLE_ID_FULL_USER,
+            feconf.ROLE_ID_CURRICULUM_ADMIN,
+        ]
+        expected_actions = role_services.get_all_actions(expected_roles)
+        self.assertEqual(roles, expected_roles)
+        self.assertEqual(actions, expected_actions)
+
+    def test_get_user_roles_and_actions_for_non_existent_user(self) -> None:
+        roles, actions, user_settings = (
+            user_services.get_user_roles_and_actions('nonExistentUser')
+        )
+        self.assertEqual(roles, [feconf.ROLE_ID_GUEST])
+        self.assertEqual(
+            actions,
+            role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
+        )
+        self.assertIsNone(user_settings)
 
     def test_create_login_url(self) -> None:
         return_url = 'sample_url'

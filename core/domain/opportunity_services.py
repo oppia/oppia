@@ -1159,7 +1159,7 @@ def update_translation_opportunity_with_accepted_suggestion(
             return
 
         exp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
-            entity_id
+            entity_id, strict=False
         )
         if exp_model is None:
             return
@@ -1978,8 +1978,8 @@ def create_skill_opportunity(skill_id: str, skill_description: str) -> None:
         Exception. If a SkillOpportunityModel corresponding to the supplied
             skill_id already exists.
     """
-    skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
+    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get(
+        skill_id, strict=False
     )
     if skill_opportunity_model is not None:
         raise Exception(
@@ -2055,8 +2055,8 @@ def _get_skill_opportunity(
         SkillOpportunity with the supplied skill_id, or None if it does not
         exist.
     """
-    skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
+    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get(
+        skill_id, strict=False
     )
     if skill_opportunity_model is not None:
         return get_skill_opportunity_from_model(skill_opportunity_model)
@@ -2070,8 +2070,8 @@ def delete_skill_opportunity(skill_id: str) -> None:
         skill_id: str. The skill_id corresponding to the to-be-deleted
             SkillOpportunityModel.
     """
-    skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
+    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get(
+        skill_id, strict=False
     )
     if skill_opportunity_model is not None:
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
