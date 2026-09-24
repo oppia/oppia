@@ -46,6 +46,20 @@ interface ParamChangeCustomizationArgs {
   list_of_values: string[];
 }
 
+// The shared service properties that hold the current and saved param changes.
+const PARAM_CHANGES_PROPERTY_NAMES = {
+  displayed: 'displayed',
+  savedMemento: 'savedMemento',
+} as const;
+
+type ParamChangesPropertyName = keyof typeof PARAM_CHANGES_PROPERTY_NAMES;
+
+// The value generator ids supported by the param changes editor.
+const PARAM_GENERATOR_IDS = {
+  Copier: 'Copier',
+  RandomSelector: 'RandomSelector',
+} as const;
+
 @Component({
   selector: 'param-changes-editor',
   templateUrl: './param-changes-editor.component.html',
@@ -127,17 +141,23 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
    * displayedParamChanges and savedParamChanges getters.
    */
   private getParamChangesFromService(
-    propertyName: 'displayed' | 'savedMemento'
+    propertyName: ParamChangesPropertyName
   ): ParamChange[] {
-    return this.paramChangesService[propertyName] as ParamChange[];
+    return this.paramChangesService[
+      PARAM_CHANGES_PROPERTY_NAMES[propertyName]
+    ] as ParamChange[];
   }
 
   get displayedParamChanges(): ParamChange[] {
-    return this.getParamChangesFromService('displayed');
+    return this.getParamChangesFromService(
+      PARAM_CHANGES_PROPERTY_NAMES.displayed
+    );
   }
 
   get savedParamChanges(): ParamChange[] {
-    return this.getParamChangesFromService('savedMemento');
+    return this.getParamChangesFromService(
+      PARAM_CHANGES_PROPERTY_NAMES.savedMemento
+    );
   }
 
   /**
@@ -211,7 +231,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   getHumanReadableArgs(paramChange: ParamChange): string {
     const customizationArgs = this.getCustomizationArgs(paramChange);
 
-    if (paramChange.generatorId === 'Copier') {
+    if (paramChange.generatorId === PARAM_GENERATOR_IDS.Copier) {
       return this.HUMAN_READABLE_ARGS_RENDERERS.Copier(customizationArgs);
     }
 
@@ -263,7 +283,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       }
 
       if (
-        generatorId === 'RandomSelector' &&
+        generatorId === PARAM_GENERATOR_IDS.RandomSelector &&
         customizationArgs?.list_of_values?.length === 0
       ) {
         this.warningText =

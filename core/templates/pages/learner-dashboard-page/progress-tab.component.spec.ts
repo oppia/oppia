@@ -732,13 +732,7 @@ describe('Progress Tab Component', () => {
       4: 4,
       5: 5,
     });
-    expect(component.getRatingsForSummaryTile(collectionSummary)).toEqual({
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-    });
+    expect(component.getRatingsForSummaryTile(collectionSummary)).toBeNull();
   });
 
   it('should get the number of views for a summary tile based on its type', () => {

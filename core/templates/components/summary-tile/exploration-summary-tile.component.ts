@@ -55,7 +55,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() numViews!: number;
   @Input() objective!: string;
   @Input() category!: string;
-  @Input() ratings!: ExplorationRatings;
+  @Input() ratings!: ExplorationRatings | null;
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;

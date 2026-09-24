@@ -298,24 +298,15 @@ export class ProgressTabComponent {
     return 'collection';
   }
 
-  // Collections have no ratings, so return a stable reference instead of a
-  // fresh object on every call to avoid triggering change detection each time
-  // the template evaluates this getter.
-  private readonly emptyRatings: ExplorationRatings = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-  };
-
   getRatingsForSummaryTile(
     tile: LearnerExplorationSummary | CollectionSummary
-  ): ExplorationRatings {
+  ): ExplorationRatings | null {
     if (tile instanceof LearnerExplorationSummary) {
       return tile.ratings;
     }
-    return this.emptyRatings;
+    // Collections have no ratings, so return null and let the summary tile
+    // render its "no rating" (N/A) state instead of fabricating a ratings map.
+    return null;
   }
 
   getNumViewsForSummaryTile(
