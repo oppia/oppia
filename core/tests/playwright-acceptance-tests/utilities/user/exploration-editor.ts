@@ -169,6 +169,7 @@ const totalPlaysCardSelector = '.total-plays';
 const openFeedbackCardSelector = '.total-open-feedback';
 const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationDashboardCardSelector = '.e2e-test-exploration-dashboard-card';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
@@ -1752,9 +1753,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (title === explorationName) {
-      await this.clickOnElementWithSelector(
-        explorationSummaryTileTitleSelector
-      );
+      await this.clickOnElementWithSelector(explorationDashboardCardSelector);
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }

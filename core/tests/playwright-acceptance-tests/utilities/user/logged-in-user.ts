@@ -216,6 +216,8 @@ const explorationSuccessfullyFlaggedMessage =
   '.e2e-test-exploration-flagged-success-message';
 
 const explorationCard = '.e2e-test-exploration-dashboard-card';
+const explorationSummaryTileTitleSpanSelector =
+  '.e2e-test-exp-summary-tile-title span span';
 const profileMenuLink = '.e2e-test-profile-link';
 const profileContainerSelector = '.e2e-test-profile-container';
 
@@ -2575,7 +2577,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     const explorationTitleElement = await explorations[0].$(
-      '.e2e-test-exp-summary-tile-title span span'
+      explorationSummaryTileTitleSpanSelector
     );
     if (!explorationTitleElement) {
       throw new Error('Exploration title element not found.');
