@@ -598,6 +598,45 @@ describe('Opportunities List Component', () => {
       expect(component.activePageNumber).toBe(2);
     }));
 
+    it(
+      'should stop loading when the initial loadOpportunities ' +
+        'request rejects',
+      fakeAsync(() => {
+        component.loadOpportunities = () =>
+          Promise.reject(
+            new Error('No more translation opportunities available.')
+          );
+
+        component.init();
+        component.onChangeLanguage('en');
+        tick();
+
+        expect(component.loadingOpportunityData).toBe(false);
+        expect(component.more).toBe(false);
+      })
+    );
+
+    it(
+      'should stop loading when the loadMoreOpportunities ' + 'request rejects',
+      fakeAsync(() => {
+        component.init();
+        component.onChangeLanguage('en');
+        tick();
+        mockReloadOpportunitiesEventEmitter.emit();
+        tick();
+        component.loadMoreOpportunities = () =>
+          Promise.reject(
+            new Error('No more translation opportunities available.')
+          );
+
+        component.gotoPage(2);
+        tick();
+
+        expect(component.loadingOpportunityData).toBe(false);
+        expect(component.more).toBe(false);
+      })
+    );
+
     it('should debounce search query changes and reload opportunities', fakeAsync(() => {
       component.init();
       component.ngOnInit();
