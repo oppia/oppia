@@ -497,9 +497,9 @@ def main() -> None:
     )
     install_python_prod_dependencies.main()
 
-    # pip install --target inside install_python_prod_dependencies uninstalls
-    # global setuptools due to pip upgrading behavior. We must restore it
-    # so that the subsequent `python setup.py` commands do not fail.
+    # The pip install --target command inside install_python_prod_dependencies
+    # uninstalls global setuptools due to pip upgrading behavior. We must restore
+    # it so that the subsequent `python setup.py` commands do not fail.
     # Note: 80.9.0 is the setuptools version installed by dev_dependencies.
     subprocess.check_call(
         [sys.executable, '-m', 'pip', 'install', 'setuptools==80.9.0']
