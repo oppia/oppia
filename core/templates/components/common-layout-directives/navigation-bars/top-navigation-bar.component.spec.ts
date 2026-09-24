@@ -885,12 +885,81 @@ describe('TopNavigationBarComponent', () => {
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
 
-    component.ngAfterViewChecked();
+    component.updateLearnDropdownOffset();
+    component.updateGetInvolvedMenuOffset();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
   }));
+
+  it('should recompute the learn dropdown offset when the learn menu is opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'learnMenu');
+
+    expect(component.updateLearnDropdownOffset).toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).not.toHaveBeenCalled();
+  });
+
+  it('should recompute the get involved dropdown offset when the menu is opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'getInvolvedMenu');
+
+    expect(component.updateLearnDropdownOffset).not.toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).toHaveBeenCalled();
+  });
+
+  it('should not recompute dropdown offsets when other menus are opened', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+
+    component.openSubmenu(new Event('mouseover'), 'aboutMenu');
+
+    expect(component.updateLearnDropdownOffset).not.toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).not.toHaveBeenCalled();
+  });
+
+  it('should recompute the dropdown offsets when the window is resized', () => {
+    spyOn(component, 'updateLearnDropdownOffset').and.stub();
+    spyOn(component, 'updateGetInvolvedMenuOffset').and.stub();
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    component.ngOnInit();
+    mockResizeEmitter.emit();
+
+    expect(component.updateLearnDropdownOffset).toHaveBeenCalled();
+    expect(component.updateGetInvolvedMenuOffset).toHaveBeenCalled();
+  });
+
+  it('should store the classroom count and recompute the learn dropdown offset when it is emitted', () => {
+    spyOn(component, 'getDropdownOffset').and.returnValue(-10);
+
+    expect(component.classroomSummariesLength).toBe(0);
+
+    component.onClassroomCountChange(3);
+
+    expect(component.classroomSummariesLength).toBe(3);
+    expect(component.getDropdownOffset).toHaveBeenCalledWith(
+      '.learn-tab',
+      '.classroom-enabled'
+    );
+    expect(component.learnDropdownOffset).toBe(-10);
+  });
+
+  it('should reset the classroom count but not recompute the offset when it is re-emitted', () => {
+    spyOn(component, 'getDropdownOffset').and.returnValue(0);
+    component.classroomSummariesLength = 5;
+    component.learnDropdownOffset = -10;
+
+    component.onClassroomCountChange(2);
+
+    expect(component.classroomSummariesLength).toBe(2);
+    expect(component.learnDropdownOffset).toBe(0);
+  });
 
   it('should handle non-numeric minWidth gracefully', () => {
     const dummyLearnTab = document.createElement('div');
@@ -1029,42 +1098,6 @@ describe('TopNavigationBarComponent', () => {
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
     expect(component.menuIconIsShown).toBe(true);
-  });
-
-  it('should set classroomSummariesLength from DOM data attribute', () => {
-    const mockCount = '5';
-    const mockElement = document.createElement('div');
-    mockElement.classList.add('classroom-grid');
-    mockElement.setAttribute('data-classroom-count', mockCount);
-    document.body.appendChild(mockElement);
-
-    component.setClassroomSummariesLength();
-
-    expect(component.classroomSummariesLength).toBe(parseInt(mockCount, 10));
-    document.body.removeChild(mockElement);
-  });
-
-  it('should default classroomSummariesLength to 0 if attribute is missing', () => {
-    const mockElement = document.createElement('div');
-    mockElement.classList.add('classroom-grid');
-    document.body.appendChild(mockElement);
-
-    component.setClassroomSummariesLength();
-
-    expect(component.classroomSummariesLength).toBe(0);
-    document.body.removeChild(mockElement);
-  });
-
-  it('should default classroomSummariesLength to 0 if count is NaN', () => {
-    const mockElement = document.createElement('div');
-    mockElement.classList.add('classroom-grid');
-    mockElement.setAttribute('data-classroom-count', 'invalid');
-    document.body.appendChild(mockElement);
-
-    component.setClassroomSummariesLength();
-
-    expect(component.classroomSummariesLength).toBe(0);
-    document.body.removeChild(mockElement);
   });
 
   it('should not show Sign In button while auth status is not resolved', () => {
