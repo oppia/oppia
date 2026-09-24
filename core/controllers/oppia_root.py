@@ -42,7 +42,7 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # feature flags evaluation handler during frontend bootstrap. This
         # removes an extra network round-trip and a redundant auth/user lookup.
         feature_flag_dict = (
-            web_feature_flag_services.evaluate_all_feature_flag_configs(
+            web_feature_flag_services.evaluate_all_web_feature_flag_configs(
                 self.user_id
             )
         )

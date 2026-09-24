@@ -807,10 +807,8 @@ class BaseHandler(
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
-                feature_flags = (
-                    web_feature_flag_services.evaluate_all_feature_flag_configs(
-                        self.user_id
-                    )
+                feature_flags = web_feature_flag_services.evaluate_all_web_feature_flag_configs(
+                    self.user_id
                 )
                 self.render_template(
                     'oppia-root.mainpage.html',

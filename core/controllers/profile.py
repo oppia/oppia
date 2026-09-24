@@ -518,7 +518,7 @@ class SignupPage(
             'oppia-root.mainpage.html',
             values={
                 'OPPIA_FEATURE_FLAGS': (
-                    web_feature_flag_services.evaluate_all_feature_flag_configs(
+                    web_feature_flag_services.evaluate_all_web_feature_flag_configs(
                         self.user_id
                     )
                 ),
