@@ -16,7 +16,7 @@
  * @fileoverview Acceptance Test for topic manager to edit a topic.
  */
 
-import {test} from '@playwright/test';
+import {test, expect} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {TopicManager} from '../../utilities/user/topic-manager';
@@ -152,22 +152,23 @@ test.describe('Topic Manager', () => {
     await topicManager.saveTopicDraft('AO 101');
     await topicManager.verifyTopicManagerToastMessage('Changes Saved.');
 
+    await topicManager.navigateToTopicPreviewTab();
+
     if (process.env.MOBILE !== 'true') {
-      await topicManager.navigateToTopicPreviewTab();
+      // These text elements and sub-tabs are hidden or altered on mobile viewports.
       await topicManager.expectTopicPreviewToHaveTitleAndDescription(
         'AO 101',
         'Arithmetic Operations (New): This is the new topic description.'
       );
-
-      // Navigate to the practice tab.
       await topicManager.navigateToTabInPreview('Practice');
+    }
 
-      // Take the screenshot while the Practice tab is visible and save it directly.
-      await topicManager.page.screenshot({
-        path: 'core/tests/playwright-acceptance-tests/prod-desktop-screenshots/arithmeticOperationsWithPracticeTab.png',
-        fullPage: true,
-      });
+    // This command executes on BOTH platforms, automatically generating.
+    await expect(topicManager.page).toHaveScreenshot(
+      'arithmeticOperationsWithPracticeTab.png'
+    );
 
+    if (process.env.MOBILE !== 'true') {
       await topicManager.verifyTopicManagerTabTitle('Master Skills for AO 101');
       await topicManager.navigateToTabInPreview('Study');
       await topicManager.verifyTopicManagerTabTitle('Study Skills for AO 101');
