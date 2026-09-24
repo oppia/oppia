@@ -658,6 +658,46 @@ describe('Opportunities List Component', () => {
       expect(component.totalPages).toBe(3);
     }));
 
+    it('should ignore stale loadOpportunitiesCount responses if a new request is made', fakeAsync(() => {
+      let resolveFirstCount: (value: number) => void = () => {};
+      let resolveSecondCount: (value: number) => void = () => {};
+
+      const loadOpportunitiesCountSpy = jasmine
+        .createSpy('loadOpportunitiesCount')
+        .and.returnValues(
+          new Promise(resolve => {
+            resolveFirstCount = resolve;
+          }),
+          new Promise(resolve => {
+            resolveSecondCount = resolve;
+          })
+        );
+
+      component.loadOpportunitiesCount = loadOpportunitiesCountSpy;
+      component.dropdownPaginationEnabled = true;
+      component.searchQuery = '';
+
+      // Fire first request.
+      component.fetchAndLoadOpportunities();
+
+      // Fire second request before first count resolves.
+      component.fetchAndLoadOpportunities();
+
+      // Resolve first count with a fake number (e.g., 100).
+      resolveFirstCount(100);
+      tick();
+
+      // Total pages should not be updated from the first count because it is stale.
+      // (It will remain 1 because it's still waiting for the second count, though loadOpportunities also updates it eventually)
+
+      // Resolve second count with the real number.
+      resolveSecondCount(20);
+      tick();
+
+      // Expect 2 pages (20 items / 10 page size)
+      expect(component.totalPages).toBe(2);
+    }));
+
     it('should calculate totalPages on init using loadOpportunitiesCount', fakeAsync(() => {
       component.loadOpportunitiesCount = () => Promise.resolve(20); // E.g. 20 total items.
       // 20 items / 16 items per page = 2 pages.
