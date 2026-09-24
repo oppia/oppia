@@ -2896,6 +2896,25 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0].language_code, 'en')
         self.assertEqual(suggestions[0].target_id, self.target_id_1)
 
+    def test_get_question_suggestions_in_review_count_by_skill_ids(
+        self,
+    ) -> None:
+        counts = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            ['skill_1', 'skill_2']
+        )
+        self.assertEqual(counts, {})
+        self.assertEqual(
+            suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+                []
+            ),
+            {},
+        )
+        self._create_question_suggestion_with_skill_id('skill_1')
+        counts = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            ['skill_1', 'skill_2']
+        )
+        self.assertEqual(counts, {'skill_1': 1})
+
     def test_get_by_target_id(self) -> None:
         queries = [
             ('target_type', feconf.ENTITY_TYPE_EXPLORATION),

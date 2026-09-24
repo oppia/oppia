@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     opportunity_domain,
     opportunity_services,
+    question_domain,
     skill_fetchers,
     state_domain,
     story_domain,
@@ -47,7 +48,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, cast
+from typing import Dict, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -132,18 +133,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_1 = {
             'id': self.skill_id_1,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_2 = {
             'id': self.skill_id_2,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic1',
+            'questions_in_review_count': 0,
         }
 
         # The content_count is 2 for the expected dicts below since each
@@ -190,6 +194,60 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'],
             [
                 self.expected_skill_opportunity_dict_0,
+                self.expected_skill_opportunity_dict_1,
+            ],
+        )
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
+
+    def test_get_skill_opportunity_data_with_in_review_suggestions(
+        self,
+    ) -> None:
+        # Here we use cast because we need to bypass TypedDict checks for the
+        # empty question state data dict in the test context.
+        change_cmd: Dict[
+            str, Union[str, question_domain.QuestionDict, float]
+        ] = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': cast(state_domain.StateDict, {}),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ),
+                'linked_skill_ids': [self.skill_id_0],
+                'inapplicable_skill_misconception_ids': [],
+                'next_content_id_index': 0,
+            },
+            'skill_id': self.skill_id_0,
+            'skill_difficulty': 0.3,
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            self.skill_id_0,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.owner_id,
+            self.OWNER_USERNAME,
+            change_cmd,
+            'score_category',
+            'suggestion_id_1',
+            constants.DEFAULT_LANGUAGE_CODE,
+        )
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
+        )
+        self.assertEqual(len(response['opportunities']), 2)
+        expected_dict = self.expected_skill_opportunity_dict_0.copy()
+        expected_dict['questions_in_review_count'] = 1
+        self.assertEqual(
+            response['opportunities'],
+            [
+                expected_dict,
                 self.expected_skill_opportunity_dict_1,
             ],
         )
@@ -373,18 +431,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_4,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_5,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                 ],
             )
