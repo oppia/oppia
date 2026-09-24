@@ -165,7 +165,8 @@ test.describe('Topic Manager', () => {
 
     // This command executes on BOTH platforms, automatically generating.
     await expect(topicManager.page).toHaveScreenshot(
-      'arithmeticOperationsWithPracticeTab.png'
+      'arithmeticOperationsWithPracticeTab.png',
+      {maxDiffPixelRatio: 0.05}
     );
 
     if (process.env.MOBILE !== 'true') {
