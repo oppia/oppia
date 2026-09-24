@@ -18,6 +18,9 @@
 
 from __future__ import annotations
 
+import datetime
+from unittest import mock
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -210,6 +213,41 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assertEqual(
             updated_exploration.states['State2'].content.content_id, 'content_2'
         )
+
+    def test_fix_job_raises_exception_on_timeout_during_regeneration(
+        self,
+    ) -> None:
+        """Test that the fix job raises an exception if ID generation times out."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='Test Exploration', category='Test'
+        )
+
+        exploration.add_states(['State2'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        duplicate_id = 'content_1'
+        state1.content.content_id = duplicate_id
+        state2.content.content_id = duplicate_id
+
+        # Save to bypass domain validation manually later
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        with datastore_services.get_ndb_context():
+            exp_model = exp_models.ExplorationModel.get('exp_id')
+            exp_model.next_content_id_index = 0
+            exp_model.update_timestamps()
+            datastore_services.put_multi([exp_model])
+
+        with mock.patch.object(
+            delete_duplicate_content_ids_jobs,
+            'GENERATE_CONTENT_ID_TIME_LIMIT',
+            datetime.timedelta(seconds=0),
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'Timeout generating unique content ID'
+            ):
+                self.assert_job_output_is([])
 
     def test_generate_matching_content_id_preserves_solution_prefix(
         self,
