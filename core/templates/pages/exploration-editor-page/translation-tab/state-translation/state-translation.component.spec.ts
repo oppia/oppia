@@ -584,6 +584,35 @@ describe('State translation component', () => {
           }
         );
 
+        it('should highlight the active customization argument tab', () => {
+          component.initActiveContentId = null;
+          component.activeHintIndex = 0;
+          component.interactionCustomizationArgTranslatableContent = [
+            {
+              name: 'Empty placeholder',
+              content: SubtitledUnicode.createDefault('', 'ca_empty'),
+            },
+            {
+              name: 'Placeholder',
+              content: SubtitledUnicode.createDefault(
+                'Type something',
+                'ca_filled'
+              ),
+            },
+          ];
+
+          component.onTabClick('ca');
+          fixture.detectChanges();
+
+          const visibleTabs =
+            fixture.nativeElement.querySelectorAll('.oppia-rule-tab');
+          expect(visibleTabs.length).toBe(1);
+          expect(
+            visibleTabs[0].classList.contains('oppia-rule-tab-active')
+          ).toBe(true);
+          expect(fixture.nativeElement.textContent).toContain('Type something');
+        });
+
         it('should fall back to the first hint when all hints are empty', () => {
           component.stateHints.forEach(hint => {
             hint.hintContent.html = '';

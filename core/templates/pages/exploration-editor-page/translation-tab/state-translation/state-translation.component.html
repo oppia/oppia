@@ -81,6 +81,7 @@
       </oppia-rte-output-display>
       <h3 tabindex="0">Content</h3>
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
+        <!-- Iterate the original array so `index` stays aligned with changeActiveCustomizationArgContentIndex(). Hide empty cards with *ngIf. -->
         <ng-container *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index">
           <li class="oppia-rule-block mt-0"
               *ngIf="!caContent.content.isEmpty()"
@@ -89,7 +90,7 @@
                (keydown.enter)="changeActiveCustomizationArgContentIndex(index)"
                tabindex="0"
                class="oppia-rule-tab oppia-translation-preview-list"
-               [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
+               [ngClass]="{'oppia-rule-tab-active': activeCustomizationArgContentIndex === index}"
                [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
               <oppia-response-header [index]="index"
                                      [defaultOutcome]="true"
@@ -100,7 +101,7 @@
               </oppia-response-header>
             </a>
             <div *ngIf="activeCustomizationArgContentIndex === index">
-              <div class="oppia-editor-card-section" *ngIf="caContent.content._html">
+              <div class="oppia-editor-card-section" *ngIf="caContent.content.html">
                 <span *ngIf="!getRequiredHtml(caContent.content)" class="oppia-placeholder" tabindex="0">
                   {{ getEmptyContentMessage() }}
                 </span>
@@ -114,7 +115,7 @@
                   </oppia-rte-output-display>
                 </span>
               </div>
-              <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
+              <div class="oppia-editor-card-section" *ngIf="caContent.content.unicode">
                 <span *ngIf="!getRequiredUnicode(caContent.content)" class="oppia-placeholder" tabindex="0">
                   {{ getEmptyContentMessage() }}
                 </span>
@@ -157,6 +158,7 @@
     <div *ngIf="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
+          <!-- Iterate the original array so `index` stays aligned with changeActiveAnswerGroupIndex() and the numbered e2e-test-feedback classes. Hide empty cards with *ngIf. -->
           <ng-container *ngFor="let answerGroup of stateAnswerGroups; index as index">
             <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
                 *ngIf="!answerGroup.outcome.feedback.isEmpty()"
@@ -240,6 +242,7 @@
     </div>
     <div *ngIf="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
+        <!-- Iterate the original array so `index` stays aligned with changeActiveHintIndex() and the numbered e2e-test-hint classes. Hide empty cards with *ngIf. -->
         <ng-container *ngFor="let hint of stateHints; index as index">
           <li class="oppia-rule-block e2e-test-translation-hint mt-0"
               *ngIf="!hint.hintContent.isEmpty()"
