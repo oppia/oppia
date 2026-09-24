@@ -22,12 +22,11 @@ import collections
 import copy
 import logging
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
-    web_feature_flag_services,
     opportunity_domain,
     question_fetchers,
     skill_domain,
@@ -41,6 +40,7 @@ from core.domain import (
     translation_domain,
     translation_fetchers,
     translation_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 

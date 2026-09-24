@@ -30,17 +30,17 @@ import json
 import re
 import string
 
-from core import web_feature_flag_list, feconf, schema_utils, utils
+from core import feconf, schema_utils, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
-    web_feature_flag_services,
     html_validation_service,
     interaction_registry,
     param_domain,
     state_domain,
     translation_domain,
+    web_feature_flag_services,
 )
 from core.platform import models  # pylint: disable=invalid-import-from
 from extensions.objects.models import objects

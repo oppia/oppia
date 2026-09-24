@@ -24,9 +24,9 @@ import re
 
 from core import (
     android_validation_constants,
-    web_feature_flag_list,
     feconf,
     utils,
+    web_feature_flag_list,
 )
 from core.constants import constants
 from core.controllers import base
@@ -36,7 +36,6 @@ from core.domain import (
     certificate_assessment_services,
     classroom_config_services,
     email_manager,
-    web_feature_flag_services,
     feedback_services,
     platform_parameter_list,
     platform_parameter_services,
@@ -54,6 +53,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar

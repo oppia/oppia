@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     exp_domain,

@@ -37,9 +37,9 @@ import zipfile
 
 from core import (
     android_validation_constants,
-    web_feature_flag_list,
     feconf,
     utils,
+    web_feature_flag_list,
 )
 from core.constants import constants
 from core.domain import (
@@ -52,7 +52,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_rights_domain,
-    web_feature_flag_services,
     feedback_services,
     fs_services,
     html_cleaner,
@@ -71,6 +70,7 @@ from core.domain import (
     user_domain,
     user_services,
     voiceover_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 from extensions import domain

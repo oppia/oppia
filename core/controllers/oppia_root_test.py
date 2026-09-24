@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.constants import constants
 from core.tests import test_utils
 
@@ -72,12 +72,12 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
 
         feature_flags = json.loads(feature_flags_json)
         self.assertIn(
-            feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             feature_flags,
         )
         self.assertEqual(
             feature_flags[
-                feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+                web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
             ],
             False,
         )

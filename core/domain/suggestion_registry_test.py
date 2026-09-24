@@ -26,7 +26,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    web_feature_flag_services,
     fs_services,
     html_validation_service,
     opportunity_services,
@@ -41,6 +40,7 @@ from core.domain import (
     translation_domain,
     translation_fetchers,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 from core.tests import test_utils

@@ -37,7 +37,7 @@ import string
 import unittest
 
 import main
-from core import web_feature_flag_list, feconf, schema_utils, utils
+from core import feconf, schema_utils, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import base
 from core.domain import (
@@ -50,8 +50,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    web_feature_flag_domain,
-    web_feature_flag_services,
     interaction_registry,
     object_registry,
     param_domain,
@@ -75,6 +73,8 @@ from core.domain import (
     topic_services,
     translation_domain,
     user_services,
+    web_feature_flag_domain,
+    web_feature_flag_services,
 )
 from core.platform import models
 from core.platform.taskqueue import cloud_tasks_emulator

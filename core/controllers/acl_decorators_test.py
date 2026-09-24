@@ -23,9 +23,9 @@ import json
 
 from core import (
     android_validation_constants,
-    web_feature_flag_list,
     feconf,
     utils,
+    web_feature_flag_list,
 )
 from core.constants import constants
 from core.controllers import acl_decorators, base, incoming_app_feedback_report

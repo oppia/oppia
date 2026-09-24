@@ -23,14 +23,13 @@ import heapq
 import logging
 import re
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
     exp_domain,
     exp_fetchers,
-    web_feature_flag_services,
     feedback_services,
     html_cleaner,
     html_validation_service,
@@ -46,6 +45,7 @@ from core.domain import (
     translation_fetchers,
     user_domain,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 

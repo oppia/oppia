@@ -22,12 +22,11 @@ import collections
 import itertools
 import logging
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     caching_services,
     change_domain,
-    web_feature_flag_services,
     feedback_services,
     fs_services,
     opportunity_services,
@@ -49,6 +48,7 @@ from core.domain import (
     topic_fetchers,
     user_domain,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 

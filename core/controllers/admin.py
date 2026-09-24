@@ -22,7 +22,7 @@ import operator
 import random
 import string
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
@@ -36,7 +36,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    web_feature_flag_services,
     fs_services,
     opportunity_services,
 )
@@ -69,6 +68,7 @@ from core.domain import (
     translation_domain,
     user_services,
     voiceover_services,
+    web_feature_flag_services,
     wipeout_service,
 )
 

@@ -34,8 +34,8 @@ from core.controllers import payload_validator
 from core.domain import (
     auth_domain,
     auth_services,
-    feature_flag_services,
     user_services,
+    web_feature_flag_services,
 )
 
 import webapp2
@@ -808,7 +808,7 @@ class BaseHandler(
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
                 feature_flags = (
-                    feature_flag_services.evaluate_all_feature_flag_configs(
+                    web_feature_flag_services.evaluate_all_feature_flag_configs(
                         self.user_id
                     )
                 )

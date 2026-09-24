@@ -27,11 +27,11 @@ from core import web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     auth_domain,
-    web_feature_flag_services,
     param_domain,
     platform_parameter_list,
     platform_parameter_services,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 from core.tests import test_utils
