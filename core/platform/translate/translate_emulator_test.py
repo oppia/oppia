@@ -61,4 +61,3 @@ class TranslateEmulatorTests(test_utils.GenericTestBase):
             'en', 'hi', '<p>unknown sentence</p>'
         )
         self.assertEqual(result, '<p>Mock translation of: unknown sentence</p>')
-

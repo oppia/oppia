@@ -178,7 +178,6 @@ describe('TranslateTextBackendApiService', () => {
 
   describe('getMachineTranslationAsync', () => {
     let successHandler: jasmine.Spy<jasmine.Func>;
-
     let failHandler: jasmine.Spy<jasmine.Func>;
 
     beforeEach(() => {
