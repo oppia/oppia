@@ -26,7 +26,6 @@ import {
   CertificateOfferingAsyncStatus,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
-import './certificate-offering-confirmation-modal.component.css';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',
