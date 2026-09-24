@@ -230,7 +230,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1.content.content_id = duplicate_id
         state2.content.content_id = duplicate_id
 
-        # Save to bypass domain validation manually later
+        # Save to bypass domain validation manually later.
         exp_services.save_new_exploration('owner_id', exploration)
 
         with datastore_services.get_ndb_context():
