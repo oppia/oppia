@@ -77,8 +77,7 @@ const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
-const teacherStoryTaggedBlogsLink =
-  testConstants.URLs.TeacherStoryTaggedBlogsLink;
+const blogPageLink = testConstants.URLs.BlogPage;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 const testimonialCarouselNamesInTeachPage =
@@ -315,12 +314,6 @@ const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
-const searchInputSelector = '.e2e-test-search-input';
-const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
-const unselectedFilterOptionsSelector = '.e2e-test-deselected';
-const selectedFilterOptionsSelector = '.e2e-test-selected';
-const languageFilterDropdownToggler =
-  '.oppia-search-bar-dropdown-toggle-button';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationObjectiveSelector = '.e2e-test-exp-summary-tile-objective';
@@ -413,13 +406,8 @@ const watchAVideoButtonInThanksForSubscribe =
 const readOurBlogButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
-const noBlogPostsFoundSelector = '.e2e-no-blog-posts-found';
 const blogTagContainerSelector = '.e2e-test-blog-tag-container';
 const blogPostTagSelector = '.e2e-test-blog-post-tag';
-const blogSearchInputSelector = '.e2e-test-search-input';
-const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
-const blogTagFilterSelector = '.e2e-test-tag-filter-component';
-const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const blogPaginationSelector = '.e2e-test-pagination';
 const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
 const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
@@ -429,7 +417,6 @@ const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
-const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
 const blogPostListSelector = '.e2e-test-blog-post-list';
 const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
 const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
@@ -647,6 +634,36 @@ const metaDescriptionSelector =
   'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
+// New lesson player page.
+const lessonPlayerSideBarToggleButton = '.e2e-test-player-sidebar-toggle';
+const mobileOpenOptionsButton = '.e2e-test-mobile-open-options-button';
+const lessonFeedbackButtonSelector = '.e2e-test-lesson-feedback-button';
+const desktopLessonReportButtonSelector =
+  '.e2e-test-lesson-desktop-report-button';
+const mobileLessonReportButtonSelector =
+  '.e2e-test-lesson-mobile-report-button';
+const feedbackModaltextarea = '.e2e-test-feedback-modal-textarea';
+const feedbackCharacterCount = '.e2e-test-feedback-text-count';
+const lessonSpecificCategoryChips = '.e2e-test-flag-category-chips';
+const screenshotDropZoneSelector = '.e2e-test-screenshot-dropzone-text';
+const reportIssueTypoChipSelector = '.e2e-test-report-issue-typo-chip';
+const photoUploadErrorMessage = '.e2e-test-upload-error';
+const reportIssueConfusingOrIncorrectChipSelector =
+  '.e2e-test-report-issue-confusing-or-incorrect-chip';
+const reportIssueBrokenLayoutChipSelector =
+  '.e2e-test-report-issue-broken-layout-chip';
+const reportIssueOtherChipSelector = '.e2e-test-report-issue-other-chip';
+const technicalLogsSelector = '.e2e-test-technical-logs';
+const technicalLogsLabelSelector = '.e2e-test-technical-logs-label';
+const imageRecieverFeedbackComponentSelector = '.e2e-test-photo-upload-input';
+const reportWebsiteIssueLink = '.e2e-test-report-website-issue-link';
+const feedbackCaptchaContainer = '.e2e-test-feedback-captcha-container';
+const cancelFeedbackUploadButtonSelector =
+  '.e2e-test-cancel-feedback-upload-button';
+const feedbackScreenshotPreviewSelector =
+  '.e2e-test-feedback-screenshot-preview';
+const feedbackModalSubHeader = '.e2e-test-modal-subHeader';
+const feedbackModalMicrocopy = '.e2e-test-lesson-feedback-microcopy';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -1049,27 +1066,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check whether any blog posts are found.
-   * @returns {Promise<boolean>} A promise that resolves to a boolean
-   * indicating whether any blog posts are found.
-   */
-  async checkIfBlogPostsAreFound(): Promise<boolean> {
-    const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
-    if (noPostsElement) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Function to verify that the each blog post has a tag
    * associated with it
    */
   async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
     const allPostsHaveTags = await this.page.$$eval(
       blogTagContainerSelector,
       (posts, tagSelector) =>
@@ -1090,106 +1090,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to filter blog posts by a keyword
-   */
-  async filterBlogPostsByKeyword(keyword: string): Promise<void> {
-    await this.page.waitForSelector(blogSearchInputSelector, {
-      visible: true,
-    });
-    await this.typeInInputField(blogSearchInputSelector, keyword);
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
-
-    const url = new URL(this.page.url());
-    const queryParam = url.searchParams.get('q');
-
-    if (queryParam !== keyword) {
-      throw new Error(
-        `Query Parameter doesn't match. Expected ${keyword}, but found ${queryParam}`
-      );
-    }
-  }
-
-  /**
-   * Function to verify that the filtered blog posts contain the keyword
-   */
-  async expectBlogSearchResultsToContain(text: string): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
-    await this.expectElementToBeVisible(blogPostContentSelector);
-    const contentFound = await this.page.$$eval(
-      `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
-      (elements, searchText) =>
-        elements.some(el =>
-          el.textContent
-            ?.toLowerCase()
-            .includes((searchText as string).toLowerCase())
-        ),
-      text
-    );
-
-    if (!contentFound) {
-      throw new Error(`No results found containing "${text}"`);
-    }
-  }
-
-  /**
-   * Function to filter blog posts by a tag
-   */
-  async filterBlogPostsByTag(tagName: string): Promise<void> {
-    await this.page.waitForSelector(blogTagFilterSelector, {
-      visible: true,
-    });
-    await this.typeInInputField(
-      '.e2e-test-tag-filter-selection-input',
-      tagName
-    );
-    await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
-    await this.page.waitForSelector(blogTagFilterDropdownSelector, {
-      hidden: true,
-    });
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
-
-    const url = new URL(this.page.url());
-    const queryParam = url.searchParams.get('tags');
-
-    if (queryParam !== `("${tagName}")`) {
-      throw new Error(
-        `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
-      );
-    }
-  }
-
-  /**
-   * Function to verify that the filtered blog posts contain the tag
-   */
-  async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
-    await this.expectElementToBeVisible(blogPostTagSelector);
-    const tagFound = await this.page.$$eval(
-      blogPostTagSelector,
-      (elements, expectedTag) =>
-        elements.some(el => el.textContent?.trim() === expectedTag),
-      tagName
-    );
-
-    if (!tagFound) {
-      throw new Error(`No results found with tag "${tagName}"`);
-    }
-  }
-
-  /**
    * Function to check whether the pagination controls are visible
    */
   async expectBlogPaginationControlsVisible(): Promise<void> {
-    let blogPostsFound = await this.checkIfBlogPostsAreFound();
-    if (!blogPostsFound) {
-      return;
-    }
     try {
       await this.page.waitForSelector(blogPaginationSelector, {
         visible: true,
@@ -2305,10 +2208,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Teacher Story tagged blogs link
    */
   async clickAndVerifyBlogButtonInTeachPage(): Promise<void> {
-    await this.openExternalLink(
-      blogButtonInTeachPage,
-      teacherStoryTaggedBlogsLink
-    );
+    await this.openExternalLink(blogButtonInTeachPage, blogPageLink);
   }
 
   /**
@@ -4128,149 +4028,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.page.waitForSelector(searchInputSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
-  }
-
-  /**
-   * Filters lessons by multiple categories.
-   * @param {string[]} categoryNames - The names of the categories to filter by.
-   */
-  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
-    await this.page.waitForSelector(categoryFilterDropdownToggler, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
-    await this.waitForStaticAssetsToLoad();
-
-    await this.page.waitForSelector(unselectedFilterOptionsSelector);
-    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
-    let foundMatch = false;
-
-    for (const option of filterOptions) {
-      const optionText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        option
-      );
-
-      if (categoryNames.includes(optionText.trim())) {
-        foundMatch = true;
-        await this.waitForElementToBeClickable(option);
-        await option.click();
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for categories: ${categoryNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    await this.page.waitForFunction(
-      (categoryNames: string[]) => {
-        // Check if URL contains all the categories. Added %22 to remove false positives.
-        return categoryNames.every(category =>
-          window.location.href.includes(`%22${category}%22`)
-        );
-      },
-      {},
-      categoryNames
-    );
-  }
-
-  /**
-   * Filters lessons by multiple languages and deselect the already selected English language.
-   * @param {string[]} languageNames - The names of the languages to filter by.
-   * @param {string} languageToDeselect - The name of the language to deselect.
-   */
-  async filterLessonsByLanguage(
-    languageNames: string[],
-    languageToDeselect: string = 'English'
-  ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.waitForPageToFullyLoad();
-    }
-    await this.page.waitForSelector(languageFilterDropdownToggler);
-    const languageFilterDropdownTogglerElement = await this.page.$(
-      languageFilterDropdownToggler
-    );
-    await languageFilterDropdownTogglerElement?.click();
-    await this.waitForStaticAssetsToLoad();
-
-    await this.page.waitForSelector(selectedFilterOptionsSelector);
-    const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
-    for (const element of selectedElements) {
-      const elementText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        element
-      );
-      // Deselecting the selected language before choosing new filters.
-      if (elementText === languageToDeselect) {
-        await element.click();
-      }
-    }
-
-    await this.page.waitForSelector(unselectedFilterOptionsSelector);
-    const deselectedLanguages = await this.page.$$(
-      unselectedFilterOptionsSelector
-    );
-    let foundMatch = false;
-    let englishMatchCount = 0;
-
-    for (const language of deselectedLanguages) {
-      const languageText = await this.page.evaluate(
-        el => el.textContent,
-        language
-      );
-      const trimmedLanguageText = languageText.trim();
-
-      if (trimmedLanguageText === 'English') {
-        englishMatchCount += 1;
-        if (englishMatchCount < 2) {
-          continue;
-        }
-      }
-
-      if (languageNames.includes(trimmedLanguageText)) {
-        foundMatch = true;
-        await this.waitForElementToBeClickable(language);
-        await language.click();
-      }
-    }
-
-    if (!foundMatch) {
-      throw new Error(
-        `No match found for languages: ${languageNames.join(', ')}`
-      );
-    }
-
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.page.keyboard.press('Enter');
-
-    const buttonTextContent =
-      languageNames.length === 1
-        ? languageNames[0]
-        : `${languageNames.length} Languages`;
-    await this.expectTextContentToBe(
-      languageFilterDropdownToggler,
-      buttonTextContent
-    );
-  }
-
-  /**
    * Checks if the search results contain a specific result.
    * @param {string[]} searchResultsExpected - The search result to check for.
    * @param {boolean} present - Whether the search results should be present or not.
@@ -4634,10 +4391,12 @@ export class LoggedOutUser extends BaseUser {
    * Selects and opens a chapter within a story to learn.
    * @param {string} storyName - The name of the story containing the chapter.
    * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {boolean} isNewLessonPlayer - Whether it will be used for new lesson player.
    */
   async selectChapterWithinStoryToLearn(
     storyName: string,
-    chapterName: string
+    chapterName: string,
+    isNewLessonPlayer: boolean = false
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -4670,9 +4429,10 @@ export class LoggedOutUser extends BaseUser {
               await this.waitForElementToBeClickable(chapter);
               await chapter.click();
 
-              await this.expectPageURLToContain(
-                testConstants.URLs.ExplorationPlayer
-              );
+              const urlPrefix = isNewLessonPlayer
+                ? testConstants.URLs.LessonPlayer
+                : testConstants.URLs.ExplorationPlayer;
+              await this.expectPageURLToContain(urlPrefix);
               showMessage(`Chapter ${chapterName} is opened successfully.`);
               return;
             }
@@ -5008,9 +4768,17 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+    const lessonCardTitleSelectorAccordingToViewport =
+      this.isViewportAtMobileWidth()
+        ? explorationTitleSelector
+        : lessonCardTitleSelector;
     try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      await this.page.waitForSelector(
+        lessonCardTitleSelectorAccordingToViewport
+      );
+      const searchResultsElements = await this.page.$$(
+        lessonCardTitleSelectorAccordingToViewport
+      );
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
           this.page.evaluate(el => el.textContent.trim(), result)
@@ -5030,7 +4798,10 @@ export class LoggedOutUser extends BaseUser {
       await searchResultsElements[lessonIndex].click();
       await this.waitForStaticAssetsToLoad();
 
-      await this.page.waitForSelector(lessonCardTitleSelector, {hidden: true});
+      await this.page.waitForSelector(
+        lessonCardTitleSelectorAccordingToViewport,
+        {hidden: true}
+      );
       showMessage(`Lesson "${lessonTitle}" opened from search results.`);
     } catch (error) {
       const newError = new Error(
@@ -6098,16 +5869,8 @@ export class LoggedOutUser extends BaseUser {
     // Determine the expected element to be focused.
     let expectedFocusedElement: puppeteer.ElementHandle | null = null;
     switch (shortcut) {
-      case '/':
-        expectedFocusedElement = await this.page.$(searchInputSelector);
-        break;
       case 's':
         expectedFocusedElement = await this.page.$(mainContentSelector);
-        break;
-      case 'c':
-        expectedFocusedElement = await this.page.$(
-          categoryFilterDropdownToggler
-        );
         break;
       case 'j':
         expectedFocusedElement = await this.page.$(
@@ -6368,6 +6131,394 @@ export class LoggedOutUser extends BaseUser {
    */
   async playExploration(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  }
+
+  /**
+   * Navigates to and plays an lesson by exploration ID.
+   * @param {string | null} explorationId - The ID of the exploration to play.
+   */
+  async playLesson(explorationId: string | null): Promise<void> {
+    await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
+  }
+
+  /**
+   * Selects a report issue chip in feedback Modal.
+   * @param {string} chipName - The name of the chip to select.
+   */
+  async selectReportIssueChip(chipName: string): Promise<void> {
+    switch (chipName) {
+      case 'typo':
+        await this.clickOnElementWithSelector(reportIssueTypoChipSelector);
+        break;
+      case 'confusing or incorrect answer':
+        await this.clickOnElementWithSelector(
+          reportIssueConfusingOrIncorrectChipSelector
+        );
+        break;
+      case 'broken layout':
+        await this.clickOnElementWithSelector(
+          reportIssueBrokenLayoutChipSelector
+        );
+        break;
+      case 'other':
+        await this.clickOnElementWithSelector(reportIssueOtherChipSelector);
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+  }
+
+  /**
+   * Checks if a report issue chip is selected in feedback Modal.
+   * @param {string} chipName - The name of the chip to check.
+   * @param {boolean} shouldBeSelected - Whether the chip should be selected or not.
+   */
+  async expectReportIssueChipToBeSelected(
+    chipName: string,
+    shouldBeSelected: boolean
+  ): Promise<void> {
+    let chipSelector: string;
+
+    switch (chipName) {
+      case 'typo':
+        chipSelector = reportIssueTypoChipSelector;
+        break;
+      case 'confusing or incorrect answer':
+        chipSelector = reportIssueConfusingOrIncorrectChipSelector;
+        break;
+      case 'broken layout':
+        chipSelector = reportIssueBrokenLayoutChipSelector;
+        break;
+      case 'other':
+        chipSelector = reportIssueOtherChipSelector;
+        break;
+      default:
+        throw new Error('Invalid chip name: ' + chipName);
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, expected: boolean) => {
+        const element = document.querySelector(selector);
+        return element?.classList.contains('selected') === expected;
+      },
+      {},
+      chipSelector,
+      shouldBeSelected
+    );
+  }
+
+  /**
+   * Expect the technical log to be present in the feedback modal.
+   */
+  async expectIncludeTechnicalLogToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(technicalLogsSelector, shouldBePresent);
+    if (shouldBePresent) {
+      await this.expectTextContentInElementWithSelectorToBe(
+        technicalLogsLabelSelector,
+        'Include technical error logs to help the team fix this faster (highly recommended).'
+      );
+    }
+  }
+
+  /**
+   * Clicks on the include technical log checkbox.
+   */
+  async clickOnIncludetechnicalLogCheckbox(): Promise<void> {
+    await this.expectElementToBeClickable(technicalLogsSelector, true);
+    await this.clickOnElementWithSelector(technicalLogsSelector);
+  }
+
+  /**
+   * Waits for the Cloudflare Turnstile iframe to finish loading.
+   * This avoids interacting with the captcha before the third-party
+   * iframe has been fully initialized.
+   */
+  private async waitForTurnstileFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const turnstileFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('challenges.cloudflare.com'));
+
+      if (turnstileFrame) {
+        return;
+      }
+
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The Cloudflare Turnstile iframe did not finish loading within the expected time.'
+    );
+  }
+
+  /**
+   * Function to check if the Cloudflare Turnstile captcha is visible in the
+   * feedback modal. Here we don't test the functionality of the captcha, just
+   * its visibility because Turnstile is a third-party service.
+   */
+  async isTurnstileCaptchaVisible(): Promise<void> {
+    const turnstileCaptcha = await this.page.waitForSelector(
+      feedbackCaptchaContainer
+    );
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return false;
+        }
+
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      },
+      {},
+      feedbackCaptchaContainer
+    );
+
+    await this.waitForTurnstileFrameToLoad();
+
+    if (!turnstileCaptcha) {
+      throw new Error(
+        'The Cloudflare Turnstile captcha is not visible in the feedback modal.'
+      );
+    } else {
+      showMessage(
+        'The Cloudflare Turnstile captcha is visible in the feedback modal.'
+      );
+    }
+  }
+
+  /**
+   * Scrolls to the captcha container.
+   */
+  async scrollToCaptchaContainer(): Promise<void> {
+    await this.isTurnstileCaptchaVisible();
+
+    await this.page.evaluate((selector: string) => {
+      const element = document.querySelector(selector);
+      element?.scrollIntoView({block: 'center'});
+    }, feedbackCaptchaContainer);
+    showMessage('Scrolled to captcha container.');
+  }
+
+  /**
+   * Waits until Turnstile has produced a response token. The iframe can be
+   * visible before the token callback runs, especially on mobile headless.
+   */
+  async waitForTurnstileTokenIfPresent(): Promise<void> {
+    const captchaContainerIsPresent = await this.page.evaluate(
+      (selector: string) => document.querySelector(selector) !== null,
+      feedbackCaptchaContainer
+    );
+
+    if (!captchaContainerIsPresent) {
+      return;
+    }
+
+    await this.page.waitForFunction(
+      () => {
+        const responseInput = document.querySelector(
+          '[name="cf-turnstile-response"]'
+        ) as HTMLInputElement | HTMLTextAreaElement | null;
+
+        return Boolean(responseInput?.value);
+      },
+      {timeout: 60000}
+    );
+  }
+
+  /**
+   * Open 'Open Options' in new lesson player page.
+   */
+  async toggleOptionsSidebar(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    if (isMobileViewport) {
+      await this.clickOnElementWithSelector(mobileOpenOptionsButton);
+      return;
+    }
+    await this.clickOnElementWithSelector(lessonPlayerSideBarToggleButton);
+  }
+
+  /**
+   * Open the Send a Lesson feedback modal of new lesson player.
+   * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
+   */
+  async clickLessonFeedbackButton(isUserLoggedIn: boolean): Promise<void> {
+    await this.clickOnElementWithSelector(lessonFeedbackButtonSelector);
+    isUserLoggedIn
+      ? await this.expectModalTitleToBe('Send Feedback to the Lessons Team')
+      : await this.expectModalTitleToBe('Want to chat with our Lessons Team?');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    if (isUserLoggedIn) {
+      await this.expectElementToBeVisible(feedbackModaltextarea);
+    }
+  }
+
+  /**
+   * Open the Report an Issue feedback modal of new lesson player.
+   * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
+   */
+  async clickReportLessonButton(isUserLoggedIn: boolean): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+
+    const selector = isMobileViewport
+      ? mobileLessonReportButtonSelector
+      : desktopLessonReportButtonSelector;
+    await this.clickOnElementWithSelector(selector);
+    await this.expectModalTitleToBe('Report an Issue');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectElementToBeVisible(feedbackModaltextarea);
+    if (!isUserLoggedIn) {
+      await this.scrollToCaptchaContainer();
+      await this.expectElementToBeVisible(feedbackCaptchaContainer);
+      await this.waitForTurnstileFrameToLoad();
+    }
+  }
+
+  /**
+   * Clears the feedback text area.
+   */
+  async clearFeedbackTextArea(): Promise<void> {
+    return await this.clearAllTextFrom(feedbackModaltextarea);
+  }
+
+  /**
+   * Submits the feedback in the text area.
+   * @param feedback - The feedback to submit.
+   */
+  async submitFeedbackInTextArea(feedback: string): Promise<void> {
+    await this.clickOnElementWithSelector(feedbackModaltextarea);
+    await this.typeInInputField(feedbackModaltextarea, feedback);
+  }
+
+  /**
+   * Adds a screenshot to the feedback form.
+   * @param {string} picturePath - The path to the screenshot to add.
+   */
+  async addFeedbackScreenshot(picturePath: string): Promise<void> {
+    await this.expectElementToBeVisible(imageRecieverFeedbackComponentSelector);
+    await this.uploadFile(picturePath);
+  }
+
+  /**
+   * Opens the report a site issue modal from the global footer.
+   */
+  async openReportASiteIssueModalFromGlobalFooter(
+    isUserLoggedIn: boolean
+  ): Promise<void> {
+    await this.scrollToBottomOfPage();
+    await this.expectElementToBeVisible(reportWebsiteIssueLink, true);
+    await this.clickOnElementWithSelector(reportWebsiteIssueLink);
+    await this.expectModalTitleToBe('Report a Website Issue');
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectElementToBeVisible(feedbackModaltextarea);
+    if (!isUserLoggedIn) {
+      await this.expectElementToBeVisible(feedbackCaptchaContainer);
+      await this.waitForTurnstileFrameToLoad();
+    }
+  }
+
+  /**
+   * Checks if the photo upload error message is visible.
+   * @param expectedText - The expected text of the error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
+    await this.expectTextContentToContain(
+      photoUploadErrorMessage,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the sub-header of the feedback modal matches the expected text.
+   * @param expectedText - The expected text of the sub-header.
+   */
+  async expectFeedbackModalSubHeaderToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackModalSubHeader);
+    await this.expectTextContentToContain(feedbackModalSubHeader, expectedText);
+  }
+
+  /**
+   * Checks if the microcopy of the lesson feedback modal matches the expected text.
+   * @param expectedText - The expected text of the microcopy.
+   */
+  async expectLessonFeedbackModalmicrocopyToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackModalMicrocopy);
+    await this.expectTextContentToContain(feedbackModalMicrocopy, expectedText);
+  }
+
+  /**
+   * Checks if the feedback textarea placeholder matches the expected text.
+   *
+   * @param expectedPlaceholder - Expected placeholder text of the textarea.
+   */
+  async expectFeedbackTextareaPlaceholderToBe(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      feedbackModaltextarea,
+      expectedPlaceholder
+    );
+
+    await this.expectTextContentToContain(feedbackCharacterCount, '0 / 2500');
+  }
+
+  /**
+   * Checks if the lesson specific category chips are present.
+   * @param shouldBePresent - Whether the lesson specific category chips should be present.
+   */
+  async expectLessonSpecificCategoryChipsToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      lessonSpecificCategoryChips,
+      shouldBePresent
+    );
+  }
+
+  /**
+   * Checks if the screenshot drop zone text matches the expected text.
+   * @param expectedText - The expected text.
+   */
+  async expectScreenshotDropZoneTextToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(screenshotDropZoneSelector);
+    await this.expectTextContentToContain(
+      screenshotDropZoneSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the feedback screenshot preview is present.
+   * @param shouldBePresent - Whether the feedback screenshot preview should be present.
+   */
+  async expectFeedbackScreenshotPreviewToBePresent(
+    shouldBePresent: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      feedbackScreenshotPreviewSelector,
+      shouldBePresent
+    );
+    if (shouldBePresent) {
+      await this.expectElementToBeVisible(
+        cancelFeedbackUploadButtonSelector,
+        shouldBePresent
+      );
+    }
   }
 
   /**
@@ -7775,18 +7926,6 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementContentToBe(
       blogWelcomeHeadingSelector,
-      expectedText
-    );
-  }
-
-  /**
-   * Expects the "no blog posts" message to be visible.
-   */
-  async expectNoBlogPostsMessageToBeVisible(
-    expectedText: string
-  ): Promise<void> {
-    await this.expectElementContentToBe(
-      blogNoResultsFoundSelector,
       expectedText
     );
   }

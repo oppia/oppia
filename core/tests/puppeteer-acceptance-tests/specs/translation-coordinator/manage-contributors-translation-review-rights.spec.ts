@@ -33,6 +33,11 @@ import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 
 const ROLES = testConstants.Roles;
 
+const LANGUAGE_SELECTOR_SELECTED = '.e2e-test-language-selector-selected';
+// This selector represents the empty stats table card. Waiting for it ensures
+// the background layout is fully rendered before taking the modal screenshot.
+const NO_DATA_MESSAGE_SELECTOR = '.e2e-test-no-data-message';
+
 describe('Translation Coordinator', function () {
   let translationCoordinator: TranslationCoordinator & ContributorAdmin;
   let translationSubmitter: ExplorationEditor &
@@ -158,11 +163,24 @@ describe('Translation Coordinator', function () {
       'Translation Reviewers'
     );
 
+    // Wait for the background Language row to settle (async fetch to complete)
+    // before opening the modal and taking a screenshot.
+    await translationCoordinator.expectTextContentToContain(
+      LANGUAGE_SELECTOR_SELECTED,
+      'English'
+    );
+
+    await translationCoordinator.expectElementToBeVisible(
+      NO_DATA_MESSAGE_SELECTOR
+    );
+
     // Add translation rights.
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
       'translationReviewer1'
     );
+
+    await translationCoordinator.scrollToTopOfPage();
     await translationCoordinator.expectScreenshotToMatch(
       'addTranslationRightsModal',
       __dirname
@@ -195,10 +213,13 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
+
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
       'translationReviewer1'
     );
+
+    await translationCoordinator.scrollToTopOfPage();
     await translationCoordinator.expectScreenshotToMatch(
       'translationRightsModalWithHindiSelected',
       __dirname

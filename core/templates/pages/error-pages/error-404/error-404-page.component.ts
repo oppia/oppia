@@ -26,7 +26,7 @@ import {PageTitleService} from 'services/page-title.service';
 @Component({
   selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./error-404-page.component.css'],
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
