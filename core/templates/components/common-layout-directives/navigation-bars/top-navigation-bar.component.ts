@@ -531,6 +531,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // The navigation service only needs the event to set the active menu
     // name, so the generic Event type is sufficient.
     this.navigationService.openSubmenu(evt, menuName);
+    if (menuName === 'learnMenu') {
+      this.updateLearnDropdownOffset();
+    } else if (menuName === 'getInvolvedMenu') {
+      this.updateGetInvolvedMenuOffset();
+    }
   }
 
   closeSubmenu(evt: Event): void {
