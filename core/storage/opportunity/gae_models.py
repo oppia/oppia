@@ -106,7 +106,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         page_size: int,
         urlsafe_start_cursor: Optional[str],
         language_code: str,
-        topic_name: Optional[str],
+        topic_id: Optional[str],
     ) -> Tuple[
         Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
@@ -121,8 +121,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 of the full list of entities.
             language_code: str. The language for which translation opportunities
                 are to be fetched.
-            topic_name: str or None. The topic for which translation
-                opportunities should be fetched. If topic_name is None or empty,
+            topic_id: str or None. The ID of the topic for which translation
+                opportunities should be fetched. If topic_id is None or empty,
                 fetch translation opportunities from all topics.
 
         Returns:
@@ -147,10 +147,17 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         language_query = cls.query(
             cls.incomplete_translation_language_codes == language_code
-        ).order(cls.topic_name)
+        )
 
-        if topic_name:
-            language_query = language_query.filter(cls.topic_name == topic_name)
+        if topic_id:
+            # All results share a single topic here, so ordering by topic_name
+            # would be a no-op. Leaving the ordering out also means that this
+            # query can be served by the built-in single-property indexes,
+            # whereas combining the topic_id filter with an ORDER BY on
+            # topic_name would require an additional composite index.
+            language_query = language_query.filter(cls.topic_id == topic_id)
+        else:
+            language_query = language_query.order(cls.topic_name)
 
         fetch_result: Tuple[
             Sequence[ExplorationOpportunitySummaryModel],

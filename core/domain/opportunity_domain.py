@@ -30,6 +30,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     """
 
     id: str
+    topic_id: str
     topic_name: str
     story_title: str
     chapter_title: str
@@ -49,7 +50,6 @@ class ExplorationOpportunitySummaryDict(
     It gets the required fields from PartialExplorationOpportunitySummaryDict.
     """
 
-    topic_id: str
     story_id: str
     incomplete_translation_language_codes: List[str]
     language_codes_needing_voice_artists: List[str]
@@ -201,6 +201,7 @@ class ExplorationOpportunitySummary:
         """
         return {
             'id': self.id,
+            'topic_id': self.topic_id,
             'topic_name': self.topic_name,
             'story_title': self.story_title,
             'chapter_title': self.chapter_title,
