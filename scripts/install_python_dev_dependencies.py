@@ -123,6 +123,10 @@ def uninstall_dev_dependencies() -> None:
         check=True,
         encoding='utf-8',
     )
+    # The --allow-unsafe flag causes setuptools to be included in the
+    # requirements file, which means it gets uninstalled. We must reinstall
+    # it so that setup.py and other scripts can run.
+    install_installation_tools()
 
 
 def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
