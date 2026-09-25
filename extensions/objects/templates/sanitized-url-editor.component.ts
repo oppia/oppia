@@ -30,7 +30,7 @@ import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {VALIDATION_STATUS_INVALID} from 'utility/forms';
 
 interface SanitizedUrlSchema {
-  type: string;
+  type: 'unicode';
   validators: [
     {
       id: string;
@@ -41,6 +41,11 @@ interface SanitizedUrlSchema {
     },
   ];
   ui_config: {
+    // 'languageDirection' is optional because a sanitized-url schema does not
+    // set it, but it is declared so that this schema stays assignable to the
+    // 'UnicodeSchema' union member's 'ui_config' type in strict template
+    // checks, which requires at least one common property.
+    languageDirection?: string;
     placeholder: string;
   };
 }

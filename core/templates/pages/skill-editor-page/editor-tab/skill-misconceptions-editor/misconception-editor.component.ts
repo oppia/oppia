@@ -30,7 +30,6 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {Misconception} from 'domain/skill/misconception.model';
-import './misconception-editor.component.css';
 
 interface MisconceptionFormSchema {
   type: 'html';
