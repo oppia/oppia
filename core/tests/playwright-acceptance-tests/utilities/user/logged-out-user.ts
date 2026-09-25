@@ -192,10 +192,9 @@ const communityLibraryHeading = '.e2e-test-library-main-header';
 const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 
 // Home Page Selectors.
-const homePageHeadingSelector =
-  '.e2e-test-splash-page .e2e-test-home-page-title';
+const homePageHeadingSelector = '.oppia-splash-page .e2e-test-home-page-title';
 const browseLessonButtonSelector =
-  '.e2e-test-splash-page .e2e-test-explore-lessons-btn';
+  '.oppia-splash-page .e2e-test-explore-lessons-btn';
 
 // Topic page.
 const lessonsTabButtonSelector = '.e2e-test-lesson-tab-link';

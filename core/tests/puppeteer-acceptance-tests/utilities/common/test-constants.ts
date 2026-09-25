@@ -140,7 +140,7 @@ export default {
       'http://localhost:8181/technical-feedback-dashboard',
   },
   Dashboard: {
-    MainDashboard: '.e2e-test-splash-page',
+    MainDashboard: '.oppia-splash-page',
     LearnerDashboard: '.oppia-learner-dashboard-main-content',
   },
 
