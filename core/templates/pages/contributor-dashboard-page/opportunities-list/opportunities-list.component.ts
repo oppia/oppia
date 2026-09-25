@@ -273,10 +273,8 @@ export class OpportunitiesListComponent {
         // If the request rejects (e.g. the service throws
         // 'No more ... opportunities available.'), recover gracefully so
         // the spinner clears instead of leaving the tab frozen.
-        this.zone.run(() => {
-          this.more = false;
-          this.loadingOpportunityData = false;
-        });
+        this.more = false;
+        this.loadingOpportunityData = false;
       }
     );
   }
