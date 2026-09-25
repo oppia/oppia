@@ -27,9 +27,11 @@ import {
   ElementRef,
 } from '@angular/core';
 
-import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {
+  ALL_TOPICS_OPTION,
   ContributionOpportunitiesBackendApiService,
+  TranslatableTopic,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 
@@ -42,13 +44,17 @@ export class TranslationTopicSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() activeTopicName!: string;
-  @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
+  @Input() activeTopicId!: string;
+  @Output() setActiveTopicId: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
 
-  options!: string[];
   dropdownShown = false;
-  topicsPerClassroomMap: Record<string, string[]> = {};
+  topicsPerClassroomMap: Record<string, TranslatableTopic[]> = {};
+  // Maps topic IDs to topic names, so that the name of the active topic can
+  // be displayed while only its ID is tracked.
+  private topicIdToName: Record<string, string> = {
+    [ALL_TOPICS_OPTION.id]: ALL_TOPICS_OPTION.name,
+  };
 
   constructor(
     private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService
@@ -56,24 +62,31 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .fetchTranslatableTopicsPerClassroomAsync()
       .then(topicsPerClassroom => {
         topicsPerClassroom.forEach(({classroom, topics}) => {
           this.topicsPerClassroomMap[classroom] = topics;
+          topics.forEach(topic => {
+            this.topicIdToName[topic.id] = topic.name;
+          });
         });
       });
 
-    // Set initial value for activeTopicName to "ALL".
-    this.activeTopicName = AppConstants.TOPIC_SENTINEL_NAME_ALL;
-    this.setActiveTopicName.emit(this.activeTopicName);
+    // Set the initial active topic to "All".
+    this.activeTopicId = ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL;
+    this.setActiveTopicId.emit(this.activeTopicId);
+  }
+
+  getActiveTopicName(): string {
+    return this.topicIdToName[this.activeTopicId] ?? '';
   }
 
   toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  selectOption(activeTopicName: string): void {
-    this.setActiveTopicName.emit(activeTopicName);
+  selectOption(activeTopicId: string): void {
+    this.setActiveTopicId.emit(activeTopicId);
     this.dropdownShown = false;
   }
 
