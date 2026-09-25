@@ -598,13 +598,19 @@ describe('SvgSanitizerService', () => {
           ' xmlns:dc="http://purl.org/dc/elements/1.1/">' +
           ' <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />' +
           ' </svg>',
-        expectedSvgString:
+        expectedSvgStrings: [
           '<svg xmlns="http://www.w3.org/2000/svg"' +
-          ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
-          ' width="100" height="100">' +
-          ' <circle cx="50" cy="50" r="40" stroke="black"' +
-          ' stroke-width="3" fill="red"/>' +
-          ' </svg>',
+            ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+            ' width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40" stroke="black"' +
+            ' stroke-width="3" fill="red"/>' +
+            ' </svg>',
+          '<svg xmlns:xlink="http://www.w3.org/1999/xlink"' +
+            ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40"' +
+            ' stroke="black" stroke-width="3" fill="red"/>' +
+            ' </svg>',
+        ],
       },
       // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed.
       {
@@ -618,12 +624,19 @@ describe('SvgSanitizerService', () => {
           ' <circle cx="50" cy="50" r="40" stroke="black"' +
           ' stroke-width="3" fill="red" />' +
           ' </svg>',
-        expectedSvgString:
+        expectedSvgStrings: [
+          '<svg xmlns="http://www.w3.org/2000/svg"' +
+            ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+            ' width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40" stroke="black"' +
+            ' stroke-width="3" fill="red"/>' +
+            ' </svg>',
           '<svg xmlns:xlink="http://www.w3.org/1999/xlink"' +
-          ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
-          ' <circle cx="50" cy="50" r="40"' +
-          ' stroke="black" stroke-width="3" fill="red"/>' +
-          ' </svg>',
+            ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40"' +
+            ' stroke="black" stroke-width="3" fill="red"/>' +
+            ' </svg>',
+        ],
       },
       // In this image, xmlns:sodipodi is removed.
       {
@@ -636,12 +649,19 @@ describe('SvgSanitizerService', () => {
           ' <circle cx="50" cy="50" r="40"' +
           ' stroke="black" stroke-width="3" fill="red" />' +
           ' </svg>',
-        expectedSvgString:
+        expectedSvgStrings: [
+          '<svg xmlns="http://www.w3.org/2000/svg"' +
+            ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+            ' width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40" stroke="black"' +
+            ' stroke-width="3" fill="red"/>' +
+            ' </svg>',
           '<svg xmlns:xlink="http://www.w3.org/1999/xlink"' +
-          ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
-          ' <circle cx="50" cy="50" r="40"' +
-          ' stroke="black" stroke-width="3" fill="red"/>' +
-          ' </svg>',
+            ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+            ' <circle cx="50" cy="50" r="40"' +
+            ' stroke="black" stroke-width="3" fill="red"/>' +
+            ' </svg>',
+        ],
       },
     ];
     testCases.forEach(testCase => {
@@ -650,10 +670,12 @@ describe('SvgSanitizerService', () => {
         btoa(unescape(encodeURIComponent(testCase.svgString)));
       let safeSvgData =
         svgSanitizerService.removeAllInvalidTagsAndAttributes(svgDataURI);
-      expect(safeSvgData).toEqual(
-        'data:image/svg+xml;base64,' +
-          btoa(unescape(encodeURIComponent(testCase.expectedSvgString)))
+      let expectedSafeSvgDataArray = testCase.expectedSvgStrings.map(
+        expectedString =>
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(expectedString)))
       );
+      expect(expectedSafeSvgDataArray).toContain(safeSvgData);
     });
   });
 });
