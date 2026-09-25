@@ -1043,8 +1043,8 @@ export class BaseUser {
     if (inputUploadHandle === null) {
       throw new Error('No file input found while attempting to upload a file.');
     }
-    let fileToUpload = filePath;
-    inputUploadHandle.uploadFile(fileToUpload);
+    const fileToUpload = filePath;
+    await inputUploadHandle.uploadFile(fileToUpload);
   }
 
   /**
