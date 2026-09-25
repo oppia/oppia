@@ -31,6 +31,7 @@ import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learne
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {UrlService} from 'services/contextual/url.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -82,8 +83,13 @@ export class HomeTabComponent {
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private urlService: UrlService
   ) {}
+
+  get openInNewWindow(): boolean {
+    return this.urlService.isIframed();
+  }
 
   isSerialChapterFeatureLearnerFlagEnabled(): boolean {
     return this.platformFeatureService.status.SerialChapterLaunchLearnerView

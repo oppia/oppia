@@ -25,6 +25,16 @@ import {PageContextService} from 'services/page-context.service';
 
 import {AppConstants} from 'app.constants';
 
+/**
+ * Represents a content language that an exploration can be created in.
+ */
+export interface SupportedContentLanguage {
+  code: string;
+  description: string;
+  direction?: string;
+  ariaLabelInEnglish?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -39,16 +49,18 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     super(alertsService, changeListService, loggerService);
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getSupportedContentLanguages() {
+  getSupportedContentLanguages(): SupportedContentLanguage[] {
     if (this.pageContextService.isExplorationLinkedToStory()) {
-      return AppConstants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
+      // Return a copy so that the shared constant array is not exposed to
+      // mutation by callers.
+      return AppConstants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID.slice();
     }
-    return AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+    // Return a copy so that the shared constant array is not exposed to
+    // mutation by callers.
+    return AppConstants.SUPPORTED_CONTENT_LANGUAGES.slice();
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getCurrentLanguageDescription() {
+  getCurrentLanguageDescription(): string | undefined {
     for (var i = 0; i < AppConstants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
       if (AppConstants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
         return AppConstants.SUPPORTED_CONTENT_LANGUAGES[i].description;
@@ -56,8 +68,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value: string) {
+  _isValid(value: string): boolean {
     return AppConstants.SUPPORTED_CONTENT_LANGUAGES.some(elt => {
       return elt.code === value;
     });

@@ -39,6 +39,7 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -48,6 +49,7 @@ describe('Home tab Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
   let siteAnalyticsService: SiteAnalyticsService;
+  let urlService: UrlService;
   class MockPlatformFeatureService {
     status = {
       SerialChapterLaunchLearnerView: {
@@ -72,6 +74,7 @@ describe('Home tab Component', () => {
           },
         },
         {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        UrlService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -83,6 +86,7 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlService = TestBed.inject(UrlService);
 
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
@@ -734,6 +738,18 @@ describe('Home tab Component', () => {
     expect(
       component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes_2')
     ).toBe(true);
+  });
+
+  it('should return true for openInNewWindow when the page is iframed', () => {
+    spyOn(urlService, 'isIframed').and.returnValue(true);
+
+    expect(component.openInNewWindow).toBe(true);
+  });
+
+  it('should return false for openInNewWindow when the page is not iframed', () => {
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+
+    expect(component.openInNewWindow).toBe(false);
   });
 });
 

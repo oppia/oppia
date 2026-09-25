@@ -152,6 +152,16 @@ export class CardNavigationControlComponent {
     );
   }
 
+  getContinueButtonText(): string {
+    if (
+      !this.interactionCustomizationArgs ||
+      !('buttonText' in this.interactionCustomizationArgs)
+    ) {
+      return '';
+    }
+    return this.interactionCustomizationArgs.buttonText.value.unicode;
+  }
+
   skipCurrentQuestion(): void {
     this.skipQuestion.emit();
   }

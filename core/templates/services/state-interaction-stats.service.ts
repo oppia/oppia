@@ -38,7 +38,7 @@ interface AnswerData {
   isAddressed: boolean;
 }
 
-interface VisualizationInfo {
+export interface VisualizationInfo {
   addressedInfoIsSupported: boolean;
   data: AnswerData[];
   id: string;

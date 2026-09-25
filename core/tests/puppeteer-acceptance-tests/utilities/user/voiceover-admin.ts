@@ -25,7 +25,7 @@ const baseURL = testConstants.URLs.BaseURL;
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
-const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
+const voiceArtistUsernameInputBox = 'input#newVoiceArtistUsername';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
 

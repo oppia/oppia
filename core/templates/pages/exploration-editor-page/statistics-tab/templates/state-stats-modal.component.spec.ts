@@ -47,15 +47,6 @@ describe('State Stats Modal Component', () => {
     totalHitCount: 13,
     numCompletions: 8,
   };
-  let visualizationsInfo = [
-    {
-      data: 'Hola',
-      options: 'Options',
-      id: '1',
-      addressed_info_is_supported: true,
-    },
-  ];
-  let interactionArgs = {};
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -81,8 +72,6 @@ describe('State Stats Modal Component', () => {
     spyOn(ngbActiveModal, 'close').and.stub();
 
     component.stateStats = stateStats;
-    component.visualizationsInfo = visualizationsInfo;
-    component.interactionArgs = interactionArgs;
     component.stateName = stateName;
 
     component.ngOnInit();
@@ -95,8 +84,6 @@ describe('State Stats Modal Component', () => {
     expect(component.numQuits).toEqual(
       stateStats.totalHitCount - stateStats.numCompletions
     );
-    expect(component.interactionArgs).toBe(interactionArgs);
-    expect(component.visualizationsInfo).toEqual(visualizationsInfo);
   });
 
   it('should navigate to state editor', () => {

@@ -52,7 +52,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {EndChapterCheckMarkComponent} from './end-chapter-check-mark.component';
@@ -122,7 +122,7 @@ export class TutorCardComponent {
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
-  @Input() collectionSummary!: CollectionSummary;
+  @Input() collectionSummary!: CollectionSummaryBackendDict | string | null;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
   @Input() nextLessonLink!: string;
 

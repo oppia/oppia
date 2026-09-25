@@ -35,6 +35,7 @@ import {
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {Solution} from 'domain/exploration/solution.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Rule} from 'domain/exploration/rule.model';
@@ -2384,6 +2385,60 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).not.toHaveBeenCalled();
+      });
+
+      it('should return the html content when subtitled content is html', () => {
+        const htmlContent = new SubtitledHtml('<p>html</p>', 'content_0');
+        const unicodeContent = SubtitledUnicode.createDefault(
+          'unicode',
+          'content_1'
+        );
+
+        expect(component.getHtmlOrNull(htmlContent)).toBe('<p>html</p>');
+        expect(component.getHtmlOrNull(unicodeContent)).toBeNull();
+      });
+
+      it('should return the unicode content when subtitled content is unicode', () => {
+        const htmlContent = new SubtitledHtml('<p>html</p>', 'content_0');
+        const unicodeContent = SubtitledUnicode.createDefault(
+          'unicode',
+          'content_1'
+        );
+
+        expect(component.getUnicodeOrNull(unicodeContent)).toBe('unicode');
+        expect(component.getUnicodeOrNull(htmlContent)).toBeNull();
+      });
+
+      it('should return the solution explanation only for a Solution instance', () => {
+        const solution = new Solution(
+          true,
+          [],
+          new SubtitledHtml('<p>explanation</p>', 'content_0')
+        );
+        const htmlContent = new SubtitledHtml('<p>html</p>', 'content_0');
+
+        expect(component.getSolutionExplanation(solution)).toEqual(
+          solution.explanation
+        );
+        expect(component.getSolutionExplanation(htmlContent)).toBeNull();
+      });
+
+      it('should return empty string when subtitled content is not html', () => {
+        const subtitledUnicode = SubtitledUnicode.createDefault(
+          'unicode',
+          'content_0'
+        );
+
+        expect(component.getRequiredHtml(subtitledUnicode)).toBe('');
+      });
+
+      it('should return empty string when subtitled content is not unicode', () => {
+        const subtitledHtml = SubtitledHtml.createDefault(
+          '<p>html</p>',
+          'content_0'
+        );
+
+        expect(component.getRequiredUnicode(subtitledHtml)).toBe('');
       });
     }
   );
