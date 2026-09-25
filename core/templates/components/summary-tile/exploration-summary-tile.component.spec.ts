@@ -230,7 +230,6 @@ describe('Exploration Summary Tile Component', () => {
     component.isCollectionPreviewTile = true;
     component.isPlaylistTile = true;
     component.parentExplorationIds = '123';
-    component.showLearnerDashboardIconsIfPossible = 'true';
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
     fixture.detectChanges();

@@ -39,7 +39,7 @@ export interface ActivityDict {
   id: string;
   language_code: string;
   last_updated_msec?: number;
-  node_count?: number;
+  node_count: number;
   num_views: number;
   objective: string;
   ratings?: ExplorationRatings;
