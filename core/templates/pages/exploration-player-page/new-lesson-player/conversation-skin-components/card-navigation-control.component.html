@@ -41,7 +41,7 @@
         </button>
         <button mat-button
                 *ngIf="doesInteractionHaveNavSubmitButton()"
-                class="oppia-learner-submit-answer-button"
+                class="oppia-learner-submit-answer-button e2e-test-submit-answer-button"
                 (click)="submit.emit()"
                 [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
           {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}

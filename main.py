@@ -54,6 +54,7 @@ from core.controllers import (
     learner_goals,
     learner_group,
     library,
+    machine_translation,
     moderator,
     oppia_root,
     pages,
@@ -518,6 +519,14 @@ URLS = [
         contributor_dashboard.MachineTranslationStateTextsHandler,
     ),
     get_redirect_route(
+        r'/generate-translation',
+        machine_translation.MachineTranslationGenerateHandler,
+    ),
+    get_redirect_route(
+        r'/translation-provider-mapping',
+        machine_translation.TranslationProviderMappingHandler,
+    ),
+    get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler,
     ),
@@ -775,9 +784,6 @@ URLS = [
         blog_homepage.BlogHomepageDataHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.BLOG_SEARCH_DATA_URL, blog_homepage.BlogPostSearchHandler
-    ),
-    get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio|thumbnail)>/<encoded_filename>',
         resources.AssetDevHandler,
@@ -793,9 +799,6 @@ URLS = [
     ),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_GROUP_DATA_URL, library.LibraryGroupIndexHandler
-    ),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler
     ),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
@@ -1278,10 +1281,6 @@ URLS = [
         story_editor.ValidateExplorationsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
-        collection_editor.ExplorationMetadataSearchHandler,
-    ),
-    get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler
     ),
     get_redirect_route(
@@ -1655,13 +1654,6 @@ URLS.extend(
         get_redirect_route(
             r'/cron/explorations/recommendations',
             cron.CronExplorationRecommendationsHandler,
-        ),
-        get_redirect_route(
-            r'/cron/explorations/search_rank',
-            cron.CronActivitySearchRankHandler,
-        ),
-        get_redirect_route(
-            r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler
         ),
         get_redirect_route(
             r'/cron/cloud_task/mark_stale_cloud_task_run_as_failed',
