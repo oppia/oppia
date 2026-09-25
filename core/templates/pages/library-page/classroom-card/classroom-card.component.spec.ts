@@ -77,7 +77,7 @@ describe('ClassroomCardComponent', () => {
 
   it('should show translated classroom name if translation key is present', () => {
     component.classroomSummary = dummyClassroomData;
-    component.classroomSummary.name = null;
+    component.classroomSummary.name = '';
     expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
 
     component.classroomSummary.name = 'math';
