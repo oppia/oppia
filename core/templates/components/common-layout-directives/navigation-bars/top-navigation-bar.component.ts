@@ -36,7 +36,6 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
 import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SearchService} from 'services/search.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
@@ -216,7 +215,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
-    private searchService: SearchService,
     private windowRef: WindowRef,
     private urlService: UrlService,
     private focusManagerService: FocusManagerService,
@@ -273,14 +271,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // first save a reference to that context in a variable, and then use that
     // variable in place of the 'this' keyword.
     let that = this;
-
-    this.directiveSubscriptions.add(
-      this.searchService.onSearchBarLoaded.subscribe(() => {
-        setTimeout(function () {
-          that.truncateNavbar();
-        }, 100);
-      })
-    );
 
     this.i18nService.updateViewToUserPreferredSiteLanguage();
 
@@ -372,6 +362,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
         this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+        // The available space on the right of the dropdowns changes when the
+        // window is resized, so recompute the offsets explicitly.
+        this.updateGetInvolvedMenuOffset();
+        this.updateLearnDropdownOffset();
         debounce(this.truncateNavbar, 500);
       })
     );
@@ -412,20 +406,45 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  ngAfterViewChecked(): void {
-    this.getInvolvedMenuOffset = this.getDropdownOffset(
-      '.get-involved',
-      '.get-involved-dropdown'
-    );
-    // The '.donate-tab' no longer has a dropdown, so
-    // offset calculation has been removed.
+  /**
+   * Recomputes the offset needed to keep the learn dropdown within the right
+   * edge of the page. This used to run on every change detection cycle via
+   * ngAfterViewChecked, but is now only called when the dropdown is opened, the
+   * window is resized, or the classroom count is loaded.
+   */
+  updateLearnDropdownOffset(): void {
+    // The number of classrooms changes the dropdown's width (via the
+    // 'two-columns'/'three-columns' classes), so the layout changes must be
+    // applied before measuring the space available on the right.
+    this.changeDetectorRef.detectChanges();
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab',
       '.classroom-enabled'
     );
-    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
-    this.changeDetectorRef.detectChanges();
-    this.setClassroomSummariesLength();
+  }
+
+  /**
+   * Stores the number of classrooms reported by the classroom navigation links
+   * component and recomputes the learn dropdown offset. This is called when the
+   * async classroom data finishes loading, which may happen after the dropdown
+   * has already been opened and measured at its default width.
+   */
+  onClassroomCountChange(count: number): void {
+    this.classroomSummariesLength = count;
+    this.updateLearnDropdownOffset();
+  }
+
+  /**
+   * Recomputes the offset needed to keep the 'Get Involved' dropdown within
+   * the right edge of the page. This used to run on every change detection
+   * cycle via ngAfterViewChecked, but is now only called when the dropdown is
+   * opened or the window is resized.
+   */
+  updateGetInvolvedMenuOffset(): void {
+    this.getInvolvedMenuOffset = this.getDropdownOffset(
+      '.get-involved',
+      '.get-involved-dropdown'
+    );
   }
 
   // This function is required to shift the dropdown towards left if
@@ -453,15 +472,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  setClassroomSummariesLength(): void {
-    const classroomGrid = document.querySelector('.classroom-grid');
-    if (classroomGrid) {
-      const countAttr = classroomGrid.getAttribute('data-classroom-count');
-      const parsed = parseInt(countAttr ?? '0', 10);
-      this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
-    }
   }
 
   isTechnicalFeedbackDashboardEnabled(): boolean {
@@ -513,6 +523,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    if (menuName === 'learnMenu') {
+      this.updateLearnDropdownOffset();
+    } else if (menuName === 'getInvolvedMenu') {
+      this.updateGetInvolvedMenuOffset();
+    }
   }
 
   closeSubmenu(evt: Event): void {

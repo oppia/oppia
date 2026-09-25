@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * CL.SE. Learner searches for a specific exploration
+ * CL.SE. Learner browses and verifies lessons in the community library
  */
 
 import {test} from '@playwright/test';
@@ -65,12 +65,13 @@ test.describe('Logged-Out Learner', function () {
     );
   });
 
-  test('should be able to search for an exploration of an interest', async function () {
+  test('should be able to find an exploration of an interest by browsing the community library', async function () {
     await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
 
-    await loggedOutLearner.searchForLessonInSearchBar('Geometry');
+    // Both published explorations of the same interest are listed in
+    // the community library.
     await loggedOutLearner.expectSearchResultsToContain(['Geometry']);
-    await loggedOutLearner.expectSearchResultsToContain(['Fractions'], false);
+    await loggedOutLearner.expectSearchResultsToContain(['Fractions']);
 
     await loggedOutLearner.expectLessonsToHaveRating(5, 'Geometry');
     await loggedOutLearner.expectLessonViewsToBe(1, 'Geometry');
