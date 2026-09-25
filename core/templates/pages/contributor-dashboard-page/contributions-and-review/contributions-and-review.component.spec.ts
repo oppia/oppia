@@ -1522,6 +1522,30 @@ describe('Contributions and review component', () => {
           expect(more).toEqual(false);
         });
       });
+      it(
+        'should ignore a stale response when the active tab changes ' +
+          'while the request is in flight',
+        fakeAsync(() => {
+          // Set the tab state that the request starts with.
+          component.activeTabType = component.TAB_TYPE_REVIEWS;
+          component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
+
+          const loadPromise = component.loadContributions(null);
+
+          // Simulate the user switching tabs before the response resolves.
+          component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
+
+          let result: GetOpportunitiesResponse;
+          loadPromise.then(response => {
+            result = response;
+          });
+          tick();
+
+          // The stale response should be ignored and an empty result returned.
+          expect(result.opportunitiesDicts).toEqual([]);
+          expect(result.more).toBeFalse();
+        })
+      );
 
       it('should load translation contributions', () => {
         getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
@@ -3642,5 +3666,14 @@ describe('Contributions and review component', () => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
     }));
+
+    it(
+      'should return an empty list when the active tab subtype is neither ' +
+        'translate nor question',
+      () => {
+        component.activeTabSubtype = '';
+        expect(component.getContributionSummaries({})).toEqual([]);
+      }
+    );
   });
 });

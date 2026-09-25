@@ -81,4 +81,21 @@ describe('SubtitledUnicodeEditorComponent', () => {
     });
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
+
+  it('should not update value when the input is not a string', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    spyOn(component.valueChanged, 'emit');
+    component.value = new SubtitledUnicode('value', null);
+
+    component.updateValue(5);
+
+    expect(component.value.unicode).toBe('value');
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
 });
