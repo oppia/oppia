@@ -62,8 +62,8 @@
     },
     {
       "name": "interested-donor/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-donor/make-a-donation",
