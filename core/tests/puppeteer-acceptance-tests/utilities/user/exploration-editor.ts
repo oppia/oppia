@@ -272,7 +272,6 @@ const explorationFeedbackTabTitleSelector =
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
-const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const languageDropdownValueSelector =
   'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
@@ -3713,7 +3712,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -3746,7 +3744,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);

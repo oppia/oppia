@@ -311,8 +311,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-out-user/view-and-search-blog-posts",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-and-search-blog-posts.spec.ts",
+      "name": "logged-out-user/view-blog-posts",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-blog-posts.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -401,8 +401,8 @@
       "framework": "playwright"
     },
     {
-      "name": "logged-out-learner/search-for-a-specific-exploration",
-      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
+      "name": "logged-out-learner/browse-and-verify-lessons-in-the-community-library",
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/browse-and-verify-lessons-in-the-community-library.spec.ts",
       "framework": "playwright"
     },
     {
