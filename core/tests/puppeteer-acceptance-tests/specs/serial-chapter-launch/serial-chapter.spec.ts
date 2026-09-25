@@ -107,11 +107,12 @@ describe('Logged-In Learner', function () {
       'Jaya at the Market',
     ];
 
-    for (const chapter of placeValueChapters) {
+    for (const [index, chapter] of placeValueChapters.entries()) {
       const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
         chapter,
         'Algebra',
-        1
+        1,
+        index === 0
       );
       chapterIds.push(expId ?? '');
     }
