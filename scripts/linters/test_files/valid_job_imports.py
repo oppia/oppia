@@ -101,6 +101,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     recover_orphaned_translations_jobs,
 )
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    remove_auto_tts_enabled_from_exp_models_jobs,
+)
 
 
 class FakeClass:
