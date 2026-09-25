@@ -236,6 +236,64 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(migrated_draft_change_list_1_v57 is None)
 
+    def test_convert_states_v57_dict_to_v58_dict_without_state_changes(
+        self,
+    ) -> None:
+        draft_change_list_1_v57 = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New Title',
+                }
+            )
+        ]
+
+        self.create_and_migrate_new_exploration('57', '58')
+        migrated_draft_change_list_1_v58 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v57, 1, 2, self.EXP_ID
+            )
+        )
+
+        self.assertFalse(migrated_draft_change_list_1_v58 is None)
+
+    def test_convert_states_v57_dict_to_v58_dict_with_state_changes(
+        self,
+    ) -> None:
+        draft_change_list_1_v57 = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                    ),
+                    'new_value': {
+                        'requireNonnegativeInput': {'value': False},
+                    },
+                }
+            )
+        ]
+
+        self.create_and_migrate_new_exploration('57', '58')
+        migrated_draft_change_list_1_v58 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v57, 1, 2, self.EXP_ID
+            )
+        )
+
+        # Ruling out possibility of None for MyPy.
+        assert migrated_draft_change_list_1_v58 is not None
+        migrated_change = migrated_draft_change_list_1_v58[0]
+        self.assertEqual(
+            migrated_change.new_value,
+            {
+                'requireNonnegativeInput': {'value': False},
+                'allowExponentialNotation': {'value': True},
+            },
+        )
+
     def test_convert_states_v56_dict_to_v57_dict_with_state_changes(
         self,
     ) -> None:

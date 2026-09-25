@@ -2839,6 +2839,56 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             )
 
+    def test_update_customization_args_backfills_missing_args(self) -> None:
+        """Test that missing customization args are backfilled."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('NumericInput')
+
+        init_state.update_interaction_customization_args(
+            {'requireNonnegativeInput': {'value': True}}
+        )
+
+        self.assertDictEqual(
+            init_state.interaction.customization_args[
+                'requireNonnegativeInput'
+            ].to_customization_arg_dict(),
+            {'value': True},
+        )
+        self.assertDictEqual(
+            init_state.interaction.customization_args[
+                'allowExponentialNotation'
+            ].to_customization_arg_dict(),
+            {'value': False},
+        )
+
+    def test_update_customization_args_preserves_existing_value_when_omitted(
+        self,
+    ) -> None:
+        """Test that an existing customization arg value is preserved (not
+        reset to default) when omitted from a later update call.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('NumericInput')
+        init_state.update_interaction_customization_args(
+            {
+                'requireNonnegativeInput': {'value': True},
+                'allowExponentialNotation': {'value': True},
+            }
+        )
+
+        init_state.update_interaction_customization_args(
+            {'requireNonnegativeInput': {'value': False}}
+        )
+
+        self.assertDictEqual(
+            init_state.interaction.customization_args[
+                'allowExponentialNotation'
+            ].to_customization_arg_dict(),
+            {'value': True},
+        )
+
     def test_solution_validation(self) -> None:
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
