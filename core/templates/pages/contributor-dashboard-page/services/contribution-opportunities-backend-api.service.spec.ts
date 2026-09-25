@@ -24,9 +24,12 @@ import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 
 import {AppConstants} from 'app.constants';
 import {
+  ALL_TOPICS_OPTION,
   ContributionOpportunitiesBackendApiService,
+  TranslatableTopic,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -73,6 +76,7 @@ describe('Contribution Opportunities backend API service', function () {
   const translationOpportunities: ExplorationOpportunitySummaryBackendDict[] = [
     {
       id: 'exp_id_1',
+      topic_id: 'topic_id_1',
       topic_name: 'Topic 1',
       story_title: 'A new story',
       chapter_title: 'Introduction',
@@ -89,6 +93,7 @@ describe('Contribution Opportunities backend API service', function () {
     },
     {
       id: 'exp_id_2',
+      topic_id: 'topic_id_2',
       topic_name: 'Topic 2',
       story_title: 'Another story',
       chapter_title: 'Another chapter',
@@ -181,10 +186,16 @@ describe('Contribution Opportunities backend API service', function () {
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
   const sampleTopicsPerClassroomBackendDict = {
-    topic_names_per_classroom: [
-      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-      {classroom: 'Class 2', topics: ['Topic 3']},
-      {classroom: '', topics: ['Topic 4']},
+    topics_per_classroom: [
+      {
+        classroom: 'Class 1',
+        topics: [
+          {id: 'topic_id_1', name: 'Topic 1'},
+          {id: 'topic_id_2', name: 'Topic 2'},
+        ],
+      },
+      {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
+      {classroom: '', topics: [{id: 'topic_id_4', name: 'Topic 4'}]},
     ],
   };
 
@@ -323,15 +334,16 @@ describe('Contribution Opportunities backend API service', function () {
     contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
         'hi',
-        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
         ''
       )
       .then(successHandler, failHandler);
+    // The "all topics" sentinel is never sent, so topic_id is left off.
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
         '/opportunitiessummaryhandler/<opportunityType>',
         {opportunityType: 'translation'}
-      ) + '?language_code=hi&topic_name=&cursor='
+      ) + '?language_code=hi&cursor='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(translationOpportunityResponse);
@@ -359,12 +371,12 @@ describe('Contribution Opportunities backend API service', function () {
     contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
         'hi',
-        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
         ''
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
+      '/opportunitieshandlerv2?language_code=hi&cursor='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(translationOpportunityResponseV2);
@@ -404,12 +416,12 @@ describe('Contribution Opportunities backend API service', function () {
       contributionOpportunitiesBackendApiService
         .fetchTranslationOpportunitiesAsync(
           'hi',
-          AppConstants.TOPIC_SENTINEL_NAME_ALL,
+          ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
           ''
         )
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
+        '/opportunitieshandlerv2?language_code=hi&cursor='
       );
 
       expect(req.request.method).toEqual('GET');
@@ -442,13 +454,13 @@ describe('Contribution Opportunities backend API service', function () {
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync('hi', 'Topic 1', '', 'all')
+      .fetchTranslationOpportunitiesAsync('hi', 'topic_id_1', '', 'all')
       .then(successHandler, failHandler);
 
     // "all" means "do not filter by entity type", so the parameter is left
     // off the request entirely rather than being sent as a literal value.
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor='
+      '/opportunitieshandlerv2?language_code=hi&cursor=&topic_id=topic_id_1'
     );
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.has('entity_type')).toBeFalse();
@@ -471,14 +483,14 @@ describe('Contribution Opportunities backend API service', function () {
     contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
         'hi',
-        'Topic 1',
+        'topic_id_1',
         '',
         AppConstants.ENTITY_TYPE.SKILL
       )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor=' +
+      '/opportunitieshandlerv2?language_code=hi&cursor=&topic_id=topic_id_1' +
         '&entity_type=skill'
     );
     expect(req.request.method).toEqual('GET');
@@ -493,14 +505,14 @@ describe('Contribution Opportunities backend API service', function () {
       'given invalid language code ' +
       "when calling 'fetchTranslationOpportunitiesAsync'",
     fakeAsync(() => {
-      const topicName = translationOpportunities[0].topic_name;
+      const topicId = translationOpportunities[0].topic_id;
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
         .fetchTranslationOpportunitiesAsync(
           'invlaidCode',
-          topicName,
+          topicId,
           invalidCursor
         )
         .then(successHandler, failHandler);
@@ -508,8 +520,8 @@ describe('Contribution Opportunities backend API service', function () {
         urlInterpolationService.interpolateUrl(
           '/opportunitiessummaryhandler/<opportunityType>' +
             '?language_code=invlaidCode' +
-            '&topic_name=<topicName>&cursor=<invalidCursor>',
-          {opportunityType: 'translation', topicName, invalidCursor}
+            '&cursor=<invalidCursor>&topic_id=<topicId>',
+          {opportunityType: 'translation', topicId, invalidCursor}
         )
       );
 
@@ -533,16 +545,21 @@ describe('Contribution Opportunities backend API service', function () {
   );
 
   it('should successfully pin reviewable pinned translation opportunities', fakeAsync(() => {
-    const topicName = translationOpportunities[0].topic_name;
+    const topicId = translationOpportunities[0].topic_id;
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .pinTranslationOpportunity('en', topicName, 'exp 1')
+      .pinTranslationOpportunity('en', topicId, 'exp 1')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/pinned-opportunities');
     expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({
+      language_code: 'en',
+      topic_id: 'topic_id_1',
+      opportunity_id: 'exp 1',
+    });
 
     req.flush({});
     flushMicrotasks();
@@ -552,16 +569,20 @@ describe('Contribution Opportunities backend API service', function () {
   }));
 
   it('should successfully unpin reviewable pinned translation opportunities', fakeAsync(() => {
-    const topicName = translationOpportunities[0].topic_name;
+    const topicId = translationOpportunities[0].topic_id;
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .unpinTranslationOpportunity('en', topicName)
+      .unpinTranslationOpportunity('en', topicId)
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/pinned-opportunities');
     expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({
+      language_code: 'en',
+      topic_id: 'topic_id_1',
+    });
 
     req.flush({});
     flushMicrotasks();
@@ -576,7 +597,7 @@ describe('Contribution Opportunities backend API service', function () {
 
     contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
-        AppConstants.TOPIC_SENTINEL_NAME_ALL
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
@@ -596,6 +617,24 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should not send a topic ID when it is empty', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync('')
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      '/getreviewableopportunitieshandler'
+    );
+    expect(req.request.params.has('topic_id')).toBeFalse();
+
+    req.flush({opportunities: []});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({opportunities: []});
+  }));
+
   it('should fetch V2 reviewable translation opportunities when feature flag is enabled', fakeAsync(() => {
     spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
       EnableTranslationOppsWithNewOppModels: {
@@ -608,7 +647,7 @@ describe('Contribution Opportunities backend API service', function () {
 
     contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
-        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
         'hi'
       )
       .then(successHandler, failHandler);
@@ -648,7 +687,7 @@ describe('Contribution Opportunities backend API service', function () {
 
     contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
-        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
         'hi',
         AppConstants.ENTITY_TYPE.SKILL
       )
@@ -678,15 +717,15 @@ describe('Contribution Opportunities backend API service', function () {
       },
     } as unknown as FeatureStatusChecker);
 
-    const topicName = translationOpportunitiesV2[1].topic_name;
+    const topicId = translationOpportunitiesV2[1].topic_ids[0];
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(topicName, 'hi')
+      .fetchReviewableTranslationOpportunitiesAsync(topicId, 'hi')
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?topic_name=Topic%202&language_code=hi'
+      '/getreviewableopportunitieshandlerv2?topic_id=topic_id_2&language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -722,7 +761,7 @@ describe('Contribution Opportunities backend API service', function () {
 
       contributionOpportunitiesBackendApiService
         .fetchReviewableTranslationOpportunitiesAsync(
-          AppConstants.TOPIC_SENTINEL_NAME_ALL,
+          ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
           'hi'
         )
         .then(successHandler, failHandler);
@@ -751,31 +790,31 @@ describe('Contribution Opportunities backend API service', function () {
   );
 
   it('should fetch reviewable translation opportunities from a topic', fakeAsync(() => {
-    const topicName = translationOpportunities[1].topic_name;
+    const topicId = translationOpportunities[1].topic_id;
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(topicName)
+      .fetchReviewableTranslationOpportunitiesAsync(topicId)
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
-        '/getreviewableopportunitieshandler?topic_name=<topicName>',
-        {topicName}
+        '/getreviewableopportunitieshandler?topic_id=<topicId>',
+        {topicId}
       )
     );
     expect(req.request.method).toEqual('GET');
 
     req.flush({
       opportunities: translationOpportunities.filter(
-        opportunity => opportunity.topic_name === topicName
+        opportunity => opportunity.topic_id === topicId
       ),
     });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
       opportunities: sampleTranslationOpportunitiesResponse.filter(
-        opportunity => opportunity.topicName === topicName
+        opportunity => opportunity.topicId === topicId
       ),
     });
     expect(failHandler).not.toHaveBeenCalled();
@@ -788,7 +827,7 @@ describe('Contribution Opportunities backend API service', function () {
 
     contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
-        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
         languageCode
       )
       .then(successHandler, failHandler);
@@ -818,21 +857,21 @@ describe('Contribution Opportunities backend API service', function () {
 
   it(
     'should fail to fetch reviewable translation opportunities ' +
-      'given invalid topic name when calling ' +
+      'given invalid topic ID when calling ' +
       'fetchReviewableTranslationOpportunitiesAsync',
     fakeAsync(() => {
-      const invalidTopicName = 'invalid';
+      const invalidTopicId = 'invalid';
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
-        .fetchReviewableTranslationOpportunitiesAsync(invalidTopicName)
+        .fetchReviewableTranslationOpportunitiesAsync(invalidTopicId)
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
-          '/getreviewableopportunitieshandler?topic_name=<invalidTopicName>',
-          {invalidTopicName}
+          '/getreviewableopportunitieshandler?topic_id=<invalidTopicId>',
+          {invalidTopicId}
         )
       );
       expect(req.request.method).toEqual('GET');
@@ -917,24 +956,30 @@ describe('Contribution Opportunities backend API service', function () {
     })
   );
 
-  it('should successfully fetch translatable topic names', fakeAsync(() => {
-    const topicNames = ['Topic 1', 'Topic 2'];
+  it('should successfully fetch translatable topics', fakeAsync(() => {
+    const topics = [
+      {id: 'topic_id_1', name: 'Topic 1'},
+      {id: 'topic_id_2', name: 'Topic 2'},
+    ];
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesAsync()
+      .fetchTranslatableTopicsAsync()
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/gettranslatabletopicnames');
     expect(req.request.method).toEqual('GET');
 
-    req.flush({topic_names: topicNames});
+    req.flush({topics: topics});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith([
-      AppConstants.TOPIC_SENTINEL_NAME_ALL,
-      ...topicNames,
+      {
+        id: ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
+        name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
+      },
+      ...topics,
     ]);
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -942,10 +987,10 @@ describe('Contribution Opportunities backend API service', function () {
   it("should return empty response if 'gettranslatabletopicnames' call fails", fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const emptyResponse: string[] = [];
+    const emptyResponse: TranslatableTopic[] = [];
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesAsync()
+      .fetchTranslatableTopicsAsync()
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/gettranslatabletopicnames');
@@ -1122,12 +1167,12 @@ describe('Contribution Opportunities backend API service', function () {
     })
   );
 
-  it('should successfully fetch translatable topic names per classroom', fakeAsync(() => {
+  it('should successfully fetch translatable topics per classroom', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .fetchTranslatableTopicsPerClassroomAsync()
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -1138,12 +1183,20 @@ describe('Contribution Opportunities backend API service', function () {
     req.flush(sampleTopicsPerClassroomBackendDict);
     flushMicrotasks();
 
+    // The "all topics" option is only added to the group of topics that do
+    // not belong to any classroom.
     const expectedResponse = [
-      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-      {classroom: 'Class 2', topics: ['Topic 3']},
+      {
+        classroom: 'Class 1',
+        topics: [
+          {id: 'topic_id_1', name: 'Topic 1'},
+          {id: 'topic_id_2', name: 'Topic 2'},
+        ],
+      },
+      {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
       {
         classroom: '',
-        topics: [AppConstants.TOPIC_SENTINEL_NAME_ALL, 'Topic 4'],
+        topics: [ALL_TOPICS_OPTION, {id: 'topic_id_4', name: 'Topic 4'}],
       },
     ];
 
@@ -1156,7 +1209,7 @@ describe('Contribution Opportunities backend API service', function () {
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .fetchTranslatableTopicsPerClassroomAsync()
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
