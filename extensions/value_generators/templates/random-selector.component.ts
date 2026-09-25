@@ -18,6 +18,12 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
+interface RandomSelectorSchema {
+  type: 'list';
+  items: {type: 'unicode'};
+  ui_config: {add_element_text: string};
+}
+
 @Component({
   selector: 'random-selector',
   templateUrl: './RandomSelector.component.html',
@@ -34,7 +40,7 @@ export class RandomSelectorComponent implements OnInit {
     list_of_values: string[];
   };
 
-  SCHEMA = {
+  SCHEMA: RandomSelectorSchema = {
     type: 'list',
     items: {
       type: 'unicode',
