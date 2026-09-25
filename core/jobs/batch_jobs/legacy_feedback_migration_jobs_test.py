@@ -398,6 +398,36 @@ class MigrateLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
             '',
         )
 
+    def test_job_ignores_messages_without_thread(self) -> None:
+        thread = self.create_legacy_feedback_thread(self.THREAD_ID)
+        message = self.create_legacy_feedback_message(
+            self.THREAD_ID, 0, 'Original learner feedback.'
+        )
+        orphan_message = self.create_legacy_feedback_message(
+            'exploration.exp_id.deleted_thread_id', 0, 'Orphan feedback.'
+        )
+        self.put_multi([thread, message, orphan_message])
+
+        feedback_id = self.get_expected_migrated_feedback_id(self.THREAD_ID)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Migrated legacy feedback thread into lesson feedback: '
+                        f'feedback_id={feedback_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'migrated_legacy_feedback_thread_count: 1'
+                ),
+            ]
+        )
+
+        self.assertIsNotNone(
+            general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
+        )
+
 
 class AuditLegacyFeedbackJobTests(LegacyFeedbackMigrationJobTestBase):
     """Tests for AuditLegacyFeedbackJob."""

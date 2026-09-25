@@ -318,12 +318,14 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
             str,
             Dict[str, List[GroupedMigrationValue]],
         ],
-    ) -> Tuple[
-        str,
+    ) -> List[
         Tuple[
-            feedback_models.GeneralFeedbackThreadModel,
-            List[feedback_models.GeneralFeedbackMessageModel],
-        ],
+            str,
+            Tuple[
+                feedback_models.GeneralFeedbackThreadModel,
+                List[feedback_models.GeneralFeedbackMessageModel],
+            ],
+        ]
     ]:
         """Extracts legacy threads with their messages.
 
@@ -332,8 +334,9 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
                 legacy thread / messages values.
 
         Returns:
-            tuple. The deterministic feedback ID and the legacy thread and
-            messages.
+            list(tuple). A single-item list containing the deterministic
+            feedback ID and the legacy thread and messages, or an empty list
+            if the messages belong to a thread that no longer exists.
         """
         unused_thread_id, grouped_values = grouped_item
         # Here we use cast because CoGroupByKey stores all grouped PCollection
@@ -350,15 +353,21 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
             List[feedback_models.GeneralFeedbackMessageModel],
             grouped_values['messages'],
         )
+        # Messages can outlive their thread (see #14971). There is nothing to
+        # migrate them into, so they are skipped.
+        if not threads:
+            return []
         thread = threads[0]
         messages = sorted(
             messages,
             key=lambda message: int(message.message_id),
         )
-        return (
-            self._get_migrated_feedback_id(thread.id),
-            (thread, messages),
-        )
+        return [
+            (
+                self._get_migrated_feedback_id(thread.id),
+                (thread, messages),
+            )
+        ]
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the migration.
@@ -418,7 +427,7 @@ class MigrateLegacyFeedbackJob(base_jobs.JobBase):
         legacy_thread_id_pairs = (
             threads_with_messages
             | 'Key legacy threads with messages by feedback ID'
-            >> beam.Map(self._extract_thread_with_messages)
+            >> beam.FlatMap(self._extract_thread_with_messages)
         )
 
         threads_with_migration_status = (
