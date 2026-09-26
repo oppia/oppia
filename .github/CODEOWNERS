@@ -292,6 +292,9 @@
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.css @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/error-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/error-modal.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/error-modal.component.css @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.css @oppia/lace-frontend-reviewers
@@ -328,6 +331,7 @@
 /core/templates/services/chapter-label-visibility.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/frontend-error-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/html-escaper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/id-generation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/keyboard-shortcut.service*.ts @oppia/lace-frontend-reviewers
