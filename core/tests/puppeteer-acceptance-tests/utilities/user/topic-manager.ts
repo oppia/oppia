@@ -5565,6 +5565,7 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(mobileReadyToPublishButton);
     } else {
       await this.page.waitForSelector(markAsReadyToPublishButton);
+
       await this.clickOnElementWithSelector(markAsReadyToPublishButton);
 
       await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
