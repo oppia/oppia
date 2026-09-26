@@ -8,12 +8,11 @@
             [attr.aria-label]="item.value.ariaLabel">
           <div *ngIf="item.value.enabled"
                class="oppia-tabs-container">
-            <a role="button"
-               (click)="onTabClick(item.key)"
-               href="javascript:void(0);"
-               class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
+            <button type="button"
+                    (click)="onTabClick(item.key)"
+                    class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
               {{item.value.tabName}}
-            </a>
+            </button>
             <div class="oppia-active-tab-highlighter"></div>
           </div>
         </li>

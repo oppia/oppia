@@ -135,9 +135,13 @@
 
 .navbar-icons .nav-list-item > .nav-link {
   align-items: center;
+  background: transparent;
+  border: 0;
   display: flex;
+  font: inherit;
   inset: 0;
   justify-content: center;
+  margin: 0;
   position: absolute;
 }
 
