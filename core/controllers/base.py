@@ -89,24 +89,16 @@ class ResponseValueDict(TypedDict):
 
 
 @functools.lru_cache(maxsize=128)
-def load_template(filename: str, *, template_is_aot_compiled: bool) -> str:
+def load_template(filename: str) -> str:
     """Return the HTML file contents at filepath.
 
     Args:
         filename: str. Name of the requested HTML file.
-        template_is_aot_compiled: bool. Used to determine which bundle to use.
 
     Returns:
         str. The HTML file content.
     """
-    filepath = os.path.join(
-        (
-            feconf.FRONTEND_AOT_DIR
-            if template_is_aot_compiled
-            else feconf.FRONTEND_TEMPLATES_DIR
-        ),
-        filename,
-    )
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
     with open(filepath, 'r', encoding='utf-8') as f:
         html_text = f.read()
     return html_text
@@ -120,16 +112,10 @@ def render_html_response(
     filename: str,
     iframe_restriction: Optional[str] = 'DENY',
     *,
-    template_is_aot_compiled: bool = False,
     values: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Writes the HTML file contents to the response with the Oppia security
     and caching headers.
-
-    This helper is shared by BaseHandler.render_template and lightweight
-    handlers which bypass the BaseHandler auth pipeline (e.g. the oppia root
-    page), so that the response headers stay identical regardless of the
-    handler type.
 
     Template variable substitution is supported via the ``values``
     argument. Each key in ``values`` is substituted for the corresponding
@@ -149,8 +135,6 @@ def render_html_response(
             DENY: Strictly prevents the template to load in an iframe.
             SAMEORIGIN: The template can only be displayed in a frame
                 on the same origin as the page itself.
-        template_is_aot_compiled: bool. False by default. Use
-            True when the template is compiled by angular AoT compiler.
         values: dict|None. A dict of template variables to substitute into
             the template. Keys are matched against ``___KEY___`` markers.
             Defaults to None (no substitution).
@@ -184,9 +168,7 @@ def render_html_response(
 
     response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
     response.pragma = 'no-cache'
-    html = load_template(
-        filename, template_is_aot_compiled=template_is_aot_compiled
-    )
+    html = load_template(filename)
     if values:
         for key, value in values.items():
             rendered_value = (
@@ -805,7 +787,6 @@ class BaseHandler(
         filepath: str,
         iframe_restriction: Optional[str] = 'DENY',
         *,
-        template_is_aot_compiled: bool = False,
         values: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Prepares an HTML response to be sent to the client.
@@ -827,8 +808,6 @@ class BaseHandler(
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
-            template_is_aot_compiled: bool. False by default. Use
-                True when the template is compiled by angular AoT compiler.
             values: dict|None. A dict of template variables to substitute into
                 the template. Keys are matched against ``___KEY___`` markers.
                 Defaults to None (no substitution).
@@ -841,7 +820,6 @@ class BaseHandler(
             self.response,
             filepath,
             iframe_restriction,
-            template_is_aot_compiled=template_is_aot_compiled,
             values=values,
         )
 

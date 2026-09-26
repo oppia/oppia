@@ -72,9 +72,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
                 '"Loading | Oppia"',
-                base.load_template(
-                    'oppia-root.mainpage.html', template_is_aot_compiled=False
-                ),
+                base.load_template('oppia-root.mainpage.html'),
             )
 
 

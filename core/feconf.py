@@ -110,12 +110,6 @@ FRONTEND_TEMPLATES_DIR = (
     if constants.DEV_MODE
     else os.path.join('build')
 )
-# To know more about AOT visit https://angular.io/guide/glossary#aot
-FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular')
-    if constants.DEV_MODE
-    else os.path.join('build')
-)
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
 )
