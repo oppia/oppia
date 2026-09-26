@@ -48,6 +48,7 @@ export interface TranslatableContentBackendDictV2 {
   content_format: string;
   content_value: string | string[];
   grouping_key?: string | null;
+  status: string;
 }
 
 export interface TranslatableTextsBackendDictV2 {
@@ -98,7 +99,8 @@ export class TranslatableTexts {
           content.content_format,
           content.content_type,
           null,
-          null
+          null,
+          content.status
         );
     }
     const orderedStateNamesToContentIdMapping: StateNamesToContentIdMapping =

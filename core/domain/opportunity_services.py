@@ -44,14 +44,16 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models, user_models
+    from mypy_imports import opportunity_models, translation_models, user_models
 
-opportunity_models, user_models = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.USER]
+opportunity_models, translation_models, user_models = (
+    models.Registry.import_models(
+        [models.Names.OPPORTUNITY, models.Names.TRANSLATION, models.Names.USER]
+    )
 )
 
 # NOTE TO DEVELOPERS: The functions:
@@ -128,6 +130,7 @@ def get_exploration_opportunity_summary_from_model(
         # gets its own independent copy of these mutable collections. This prevents
         # accidental modifications to the underlying datastore model properties.
         copy.deepcopy(model.translation_counts),
+        copy.deepcopy(model.translation_missing_reasons),
         list(model.language_codes_needing_voice_artists),
         list(model.language_codes_with_assigned_voice_artists),
         {},
@@ -170,6 +173,9 @@ def _construct_new_opportunity_summary_models(
                 opportunity_summary.incomplete_translation_language_codes
             ),
             translation_counts=opportunity_summary.translation_counts,
+            translation_missing_reasons=(
+                opportunity_summary.translation_missing_reasons
+            ),
             language_codes_needing_voice_artists=(
                 opportunity_summary.language_codes_needing_voice_artists
             ),
@@ -260,6 +266,9 @@ def create_exp_opportunity_summary(
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION, exploration
     )
+    translation_missing_reasons = (
+        translation_services.get_translation_missing_reasons(exploration)
+    )
 
     story_node = story.story_contents.get_node_with_corresponding_exp_id(
         exploration.id
@@ -280,6 +289,7 @@ def create_exp_opportunity_summary(
             content_count,
             incomplete_translation_language_codes,
             translation_counts,
+            translation_missing_reasons,
             list(language_codes_needing_voice_artists),
             [],
             {},
@@ -388,6 +398,9 @@ def get_translation_opportunity_summary_from_model(
         # to the underlying datastore model properties when the domain object
         # is mutated.
         translation_counts=copy.deepcopy(model.translation_counts),
+        translation_missing_reasons=copy.deepcopy(
+            model.translation_missing_reasons
+        ),
     )
 
 
@@ -427,6 +440,9 @@ def compute_translation_opportunity_models_with_updated_entity(
     entity_id: str,
     content_count: int,
     translation_counts: Dict[str, int],
+    new_translation_models: Optional[
+        List[translation_models.EntityTranslationsModel]
+    ] = None,
 ) -> List[opportunity_models.TranslationOpportunityModel]:
     """Returns translation opportunity domain objects for the given entity
     with updated content and translation counts.
@@ -437,6 +453,8 @@ def compute_translation_opportunity_models_with_updated_entity(
         content_count: int. Total number of translatable content strings.
         translation_counts: Dict[str, int]. Map of language code to
             number of translated content strings.
+        new_translation_models: list(EntityTranslationsModel)|None. Optional list of
+            new translation models that haven't been saved to the datastore yet.
 
     Returns:
         list(TranslationOpportunityModel). A list with one
@@ -490,6 +508,16 @@ def compute_translation_opportunity_models_with_updated_entity(
     translation_opportunity.incomplete_translation_language_codes = (
         incomplete_translation_language_codes
     )
+
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        # Here we use cast because mypy cannot infer that the entity is an
+        # Exploration after the entity_type check.
+        translation_opportunity.translation_missing_reasons = (
+            translation_services.get_translation_missing_reasons(
+                cast(exp_domain.Exploration, entity),
+                new_translation_models=new_translation_models,
+            )
+        )
 
     translation_opportunity.validate()
 
@@ -588,6 +616,10 @@ def _build_opportunity_for_non_exploration_entity(
         content_count=content_count,
         incomplete_translation_language_codes=incomplete_langs,
         translation_counts=translation_counts,
+        # This helper only handles non-exploration entities (explorations
+        # are processed separately in `create_translation_opportunity`), so
+        # `translation_missing_reasons` is always empty here.
+        translation_missing_reasons={},
         entity_type=entity_type,
     )
 
@@ -640,12 +672,18 @@ def create_translation_opportunity(
                         feconf.TranslatableEntityType.EXPLORATION, exploration
                     )
                 )
+                translation_missing_reasons = (
+                    translation_services.get_translation_missing_reasons(
+                        exploration
+                    )
+                )
                 opportunity = opportunity_domain.TranslationOpportunity(
                     topic_ids=entity_to_topics.get(exploration_id, []),
                     entity_id=exploration_id,
                     content_count=exploration.get_content_count(),
                     incomplete_translation_language_codes=incomplete_langs,
                     translation_counts=translation_counts,
+                    translation_missing_reasons=translation_missing_reasons,
                     entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 )
                 opportunities_list.append(opportunity)
@@ -699,6 +737,8 @@ def _save_multi_translation_opportunities(
                     existing_model.content_count != model.content_count
                     or existing_model.translation_counts
                     != model.translation_counts
+                    or existing_model.translation_missing_reasons
+                    != model.translation_missing_reasons
                     or set(existing_model.incomplete_translation_language_codes)
                     != set(model.incomplete_translation_language_codes)
                     or existing_model.topic_ids != merged_topic_ids
@@ -741,6 +781,9 @@ def _construct_new_translation_opportunity_models(
                 opportunity.incomplete_translation_language_codes
             ),
             translation_counts=opportunity.translation_counts,
+            translation_missing_reasons=(
+                opportunity.translation_missing_reasons
+            ),
         )
         translation_opportunity_model_list.append(model)
 
@@ -940,7 +983,12 @@ def remove_topic_from_translation_opportunities(
 
 
 def compute_opportunity_models_with_updated_exploration(
-    exp_id: str, content_count: int, translation_counts: Dict[str, int]
+    exp_id: str,
+    content_count: int,
+    translation_counts: Dict[str, int],
+    new_translation_models: Optional[
+        List[translation_models.EntityTranslationsModel]
+    ] = None,
 ) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
     """Updates the opportunities models with the changes made in the
     exploration.
@@ -951,6 +999,8 @@ def compute_opportunity_models_with_updated_exploration(
         content_count: int. The number of contents available in the exploration.
         translation_counts: dict(str, int). The number of translations available
             for the exploration in different languages.
+        new_translation_models: list(EntityTranslationsModel)|None. Optional list of
+            new translation models that haven't been saved to the datastore yet.
 
     Returns:
         list(ExplorationOpportunitySummaryModel). A list of opportunity models
@@ -969,6 +1019,11 @@ def compute_opportunity_models_with_updated_exploration(
     )
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
+    exploration_opportunity_summary.translation_missing_reasons = (
+        translation_services.get_translation_missing_reasons(
+            updated_exploration, new_translation_models=new_translation_models
+        )
+    )
     exploration_opportunity_summary.reviewer_only_content_count = (
         updated_exploration.get_reviewer_only_content_count()
     )
@@ -1066,6 +1121,13 @@ def update_translation_opportunity_with_accepted_suggestion(
             exp_opportunity_summary.translation_counts[language_code] = (
                 new_count
             )
+            # Here we use cast because mypy cannot infer that the entity is an
+            # Exploration after the entity_type check.
+            exp_opportunity_summary.translation_missing_reasons = (
+                translation_services.get_translation_missing_reasons(
+                    cast(exp_domain.Exploration, entity)
+                )
+            )
 
             if (
                 exp_opportunity_summary.content_count
@@ -1126,6 +1188,14 @@ def update_translation_opportunity_with_accepted_suggestion(
             if isinstance(entity, translation_domain.BaseTranslatableObject)
             else 0
         )
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # Here we use cast because mypy cannot infer that the entity is an
+            # Exploration after the entity_type check.
+            translation_opportunity.translation_missing_reasons = (
+                translation_services.get_translation_missing_reasons(
+                    cast(exp_domain.Exploration, entity)
+                )
+            )
         translation_opportunity.update_translation_count(
             language_code, new_count
         )
@@ -1188,6 +1258,10 @@ def update_translation_opportunity_with_accepted_suggestion(
             )
         else:
             exp_opportunity_summary.translation_counts[language_code] = 0
+
+        exp_opportunity_summary.translation_missing_reasons = (
+            translation_services.get_translation_missing_reasons(exploration)
+        )
 
         if (
             exp_opportunity_summary.content_count
@@ -1620,6 +1694,7 @@ def _get_translation_opportunity_cards_from_models(
             content_count=model.content_count,
             incomplete_translation_language_codes=model.incomplete_translation_language_codes,
             translation_counts=model.translation_counts,
+            translation_missing_reasons=model.translation_missing_reasons,
             entity_type=model_entity_type,
             topic_name=topic_name_val,
             entity_description=entity_description,
