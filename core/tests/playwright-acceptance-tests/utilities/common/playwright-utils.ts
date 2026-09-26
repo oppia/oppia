@@ -27,6 +27,10 @@ const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
+const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -602,6 +606,53 @@ export class BaseUser {
       );
       throw newError;
     }
+  }
+
+  /**
+   * Clicks the requested action button in a confirmation modal.
+   * @param title - The expected title of the modal.
+   * @param action - The modal action to click.
+   */
+  async clickButtonInModal(
+    title: string,
+    action: 'confirm' | 'cancel'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, title);
+
+    const actionButtonSelector =
+      action === 'confirm'
+        ? commonModalConfirmBtnSelector
+        : commonModalCancelBtnSelector;
+    await this.expectElementToBeVisible(actionButtonSelector);
+    await this.clickOnElementWithSelector(actionButtonSelector);
+    await this.expectElementToBeVisible(actionButtonSelector, false);
+  }
+
+  /**
+   * Verifies the title of a visible modal.
+   * @param expectedTitle - The expected modal title.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      expectedTitle
+    );
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage - The expected upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
+    );
   }
 
   /**

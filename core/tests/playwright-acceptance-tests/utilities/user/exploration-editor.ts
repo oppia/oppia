@@ -56,6 +56,8 @@ const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
+const interactionDiv = '.e2e-test-interaction';
+const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -75,6 +77,7 @@ const explorationStateGraphModalSelector =
   '.e2e-test-exploration-state-graph-modal';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
+const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateResponsesSelector = '.e2e-test-default-response-tab';
@@ -118,6 +121,9 @@ const addAnotherResponseButton = 'button.e2e-test-add-another-response';
 
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
+const previewTabButton = '.e2e-test-preview-tab';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
@@ -525,6 +531,19 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.expectElementToBeVisible(addInteractionModalSelector, false);
     showMessage('Text input interaction has been added successfully.');
+  }
+
+  /**
+   * Update the optional text input interaction content.
+   * @param content - The text input interaction content.
+   */
+  async updateTextInputInteraction(content: string): Promise<void> {
+    await this.expectElementToBeVisible(interactionDiv);
+    await this.clickOnElementWithSelector(interactionDiv);
+    await this.clickOnElementWithSelector(textInputField);
+    await this.typeInInputField(textInputField, content);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
   }
 
   /**
@@ -1081,6 +1100,24 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expects the node warning sign to be visible or hidden.
+   * @param visible - Whether the node warning sign should be visible.
+   */
+  async expectNodeWariningSignToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    // Nodes are not rendered in the mobile viewport.
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping node warning sign check on mobile viewport because nodes are not visible.'
+      );
+      return;
+    }
+
+    await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
    * Function to navigate to the editor tab.
    */
   async navigateToEditorTab(): Promise<void> {
@@ -1133,6 +1170,48 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+  }
+
+  /**
+   * Navigate to the preview tab.
+   */
+  async navigateToPreviewTab(): Promise<void> {
+    const previewUrl = (url: URL): boolean => url.href.includes('#/preview/');
+    let previewTabReached = previewUrl(new URL(this.page.url()));
+
+    // Under load, the fixed mobile navigation bar can accept the click without
+    // switching tabs. Retry the navigation with a bounded wait so that a
+    // transient click race does not consume the complete test timeout.
+    for (let attempt = 0; attempt < 3 && !previewTabReached; attempt++) {
+      if (this.isViewportAtMobileWidth()) {
+        await this.waitForPageToFullyLoad();
+        if (!(await this.isElementVisible(mobileNavbarOptions))) {
+          await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        }
+
+        if (!(await this.isElementVisible(`${mobileNavbarPane}.show`))) {
+          await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+            force: true,
+          });
+        }
+        await this.expectElementToBeVisible(`${mobileNavbarPane}.show`);
+        await this.clickOnElementWithSelector(mobilePreviewTabButton);
+      } else {
+        await this.clickOnElementWithSelector(previewTabButton);
+      }
+
+      try {
+        await this.page.waitForURL(previewUrl, {timeout: 30000});
+        previewTabReached = true;
+      } catch (error) {
+        if (attempt === 2) {
+          throw error;
+        }
+      }
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(previewTabContainer);
   }
 
   /**
