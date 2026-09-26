@@ -5577,11 +5577,15 @@ export class TopicManager extends BaseUser {
    * @param chapterName - The name of the chapter to be marked as ready to publish.
    * @param storyName - The name of the story containing the chapter.
    * @param topicName - The name of the topic under which the story exists.
+   * @param skillName - The name of the skill to add as an acquired skill. This
+   *   must be a skill that exists in the topic. Defaults to the skill used by
+   *   the Place Values acceptance-test topic.
    */
   async readyToPublish(
     chapterName: string,
     storyName: string,
-    topicName: string
+    topicName: string,
+    skillName: string = 'Place Values skills'
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
     await this.waitForPageToFullyLoad();
@@ -5633,7 +5637,7 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(outlineEditorInput, 'This is an outline.');
     await this.clickOnElementWithSelector(saveOutlineButton);
     await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
-    await this.addAcquiredSkill('Place Values skills');
+    await this.addAcquiredSkill(skillName);
 
     await this.saveStoryDraft();
     await this.clickReadyToPublishButton();
