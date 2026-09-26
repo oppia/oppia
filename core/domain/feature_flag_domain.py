@@ -395,8 +395,10 @@ class FeatureFlagConfig:
             object.
         """
         last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                feature_flag_config_dict['last_updated']
+            utils.normalize_datetime_to_utc(
+                utils.convert_string_to_naive_datetime_object(
+                    feature_flag_config_dict['last_updated']
+                )
             )
             if isinstance(feature_flag_config_dict['last_updated'], str)
             else None

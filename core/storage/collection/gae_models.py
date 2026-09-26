@@ -853,13 +853,13 @@ class CollectionSummaryModel(base_models.BaseModel):
     # Time when the collection model was last updated (not to be
     # confused with last_updated, which is the time when the
     # collection *summary* model was last updated).
-    collection_model_last_updated = datastore_services.DateTimeProperty(
+    collection_model_last_updated = datastore_services.AwareDateTimeProperty(
         indexed=True
     )
     # Time when the collection model was created (not to be confused
     # with created_on, which is the time when the collection *summary*
     # model was created).
-    collection_model_created_on = datastore_services.DateTimeProperty(
+    collection_model_created_on = datastore_services.AwareDateTimeProperty(
         indexed=True
     )
 

@@ -1798,8 +1798,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     """Tests for the ExplorationUserDataModel class."""
 
     NONEXISTENT_USER_ID: Final = 'id_x'
-    DATETIME_OBJECT: Final = datetime.datetime.strptime(
-        '2016-02-16', '%Y-%m-%d'
+    DATETIME_OBJECT: Final = datetime.datetime(
+        2016, 2, 16, tzinfo=datetime.timezone.utc
     )
     DATETIME_EPOCH: Final = utils.get_time_in_millisecs(DATETIME_OBJECT)
     USER_1_ID: Final = 'id_1'

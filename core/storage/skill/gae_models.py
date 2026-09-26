@@ -322,13 +322,13 @@ class SkillSummaryModel(base_models.BaseModel):
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).
-    skill_model_last_updated = datastore_services.DateTimeProperty(
+    skill_model_last_updated = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # Time when the skill model was created (not to be confused
     # with created_on, which is the time when the skill *summary*
     # model was created).
-    skill_model_created_on = datastore_services.DateTimeProperty(
+    skill_model_created_on = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     version = datastore_services.IntegerProperty(required=True)

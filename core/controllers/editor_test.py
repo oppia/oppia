@@ -3514,7 +3514,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         utils.get_current_utc_datetime() + datetime.timedelta(30)
     )
     # A date in the past.
-    OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
+    OLDER_DATETIME: Final = datetime.datetime(
+        2015, 3, 16, tzinfo=datetime.timezone.utc
+    )
     DRAFT_CHANGELIST: Final = [
         {
             'cmd': 'edit_exploration_property',

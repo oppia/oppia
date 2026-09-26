@@ -2421,8 +2421,10 @@ def update_exploration_summary(
         # TODO(#15895): Revisit this after we have validations for the model to
         # see whether exploration_model_last_updated and
         # ExplorationModel.last_updated are in sync or not.
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            get_last_updated_by_human_ms(exploration.id) / 1000.0
+        exploration_model_last_updated = (
+            utils.convert_millisecs_time_to_datetime_object(
+                get_last_updated_by_human_ms(exploration.id)
+            )
         )
 
     contributor_ids = list(exp_summary.contributors_summary.keys())
@@ -2477,8 +2479,10 @@ def generate_new_exploration_summary(
     """
     ratings = feconf.get_empty_ratings()
     scaled_average_rating = get_scaled_average_rating(ratings)
-    exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0
+    exploration_model_last_updated = (
+        utils.convert_millisecs_time_to_datetime_object(
+            get_last_updated_by_human_ms(exploration.id)
+        )
     )
 
     if exploration.created_on is None:
@@ -3332,7 +3336,7 @@ def create_or_update_draft(
             'Voice artist does not have permission to make some '
             'changes in the change list.'
         )
-
+    current_datetime = utils.normalize_datetime_to_utc(current_datetime)
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (
         exp_user_data

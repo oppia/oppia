@@ -279,13 +279,13 @@ class StorySummaryModel(base_models.BaseModel):
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
-    story_model_last_updated = datastore_services.DateTimeProperty(
+    story_model_last_updated = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # Time when the story model was created (not to be confused
     # with created_on, which is the time when the story *summary*
     # model was created).
-    story_model_created_on = datastore_services.DateTimeProperty(
+    story_model_created_on = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # The titles of the nodes in the story, in the same order as present there.

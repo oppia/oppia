@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import utils
 from core.jobs import job_options, job_utils
 from core.platform import models
@@ -252,9 +250,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 3.14,
-                'created_on': current_time.replace(
-                    tzinfo=datetime.timezone.utc
-                ),
+                'created_on': current_time,
                 'last_updated': None,
                 'deleted': False,
             }
@@ -289,8 +285,12 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 123,
-                'created_on': utils.get_current_utc_datetime(),
-                'last_updated': utils.get_current_utc_datetime(),
+                'created_on': utils.get_current_utc_datetime().replace(
+                    tzinfo=None
+                ),
+                'last_updated': utils.get_current_utc_datetime().replace(
+                    tzinfo=None
+                ),
                 'deleted': False,
             }
         )

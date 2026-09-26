@@ -391,7 +391,7 @@ def get_cloud_task_run_by_given_params(
         for model in cloud_task_run_models
         if (
             start_datetime
-            <= model.last_updated.replace(tzinfo=datetime.timezone.utc)
+            <= utils.normalize_datetime_to_utc(model.last_updated)
             <= end_datetime
         )
         and (

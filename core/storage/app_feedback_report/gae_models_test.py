@@ -42,21 +42,21 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     PLATFORM_WEB: Final = 'web'
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP_1: Final = datetime.datetime.fromtimestamp(
-        1615151836
+        1615151836, datetime.timezone.utc
     )
     REPORT_SUBMITTED_TIMESTAMP_1_MSEC: Final = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP_1
     )
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
     REPORT_SUBMITTED_TIMESTAMP_2: Final = datetime.datetime.fromtimestamp(
-        1615519337
+        1615519337, datetime.timezone.utc
     )
     REPORT_SUBMITTED_TIMESTAMP_2_MSEC: Final = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP_2
     )
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
-        1616173836
+        1616173836, datetime.timezone.utc
     )
     TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
@@ -566,16 +566,18 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
-        1615151836
+        1615151836, datetime.timezone.utc
     )
     REPORT_SUBMITTED_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP
     )
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
-    NEWEST_REPORT_TIMESTAMP: Final = datetime.datetime.fromtimestamp(1615151836)
+    NEWEST_REPORT_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
+        1615151836, datetime.timezone.utc
+    )
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
-        1616173836
+        1616173836, datetime.timezone.utc
     )
     TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
@@ -691,7 +693,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
-        1616173836
+        1616173836, datetime.timezone.utc
     )
     TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
