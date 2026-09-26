@@ -152,6 +152,10 @@ describe('Topic Manager', function () {
       'Wrong Answer. Please try again'
     );
     await topicManager.addHintToState('Select any of the correct option.');
+    await topicManager.addItemSelectionSolutionToState(
+      ['Correct Option 1', 'Correct Option 2'],
+      'As given in the question.'
+    );
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible(
       'Select any one correct option.'

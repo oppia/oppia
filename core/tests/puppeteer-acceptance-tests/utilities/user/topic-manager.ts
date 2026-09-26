@@ -5662,6 +5662,18 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOnElementWithSelector(publishUptoChaptersDropdownSelector);
     await this.select(publishUptoChaptersDropdownSelector, dropdownValue);
+    // Explicitly dispatch a 'change' event to guarantee Angular's
+    // ngModelChange fires even when the dropdown value was already set to
+    // dropdownValue (e.g. '-1' is the default on page load, so selecting
+    // '-1' again does not trigger a native change event, leaving
+    // _newChapterPublicationIsDisabled at its initial 'true' value and
+    // keeping the Publish/Unpublish button permanently disabled).
+    await this.page.evaluate(selector => {
+      const el = document.querySelector(selector) as HTMLSelectElement | null;
+      if (el) {
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+    }, publishUptoChaptersDropdownSelector);
   }
 
   /**

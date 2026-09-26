@@ -270,6 +270,58 @@ export class PracticeQuestionSubmitter extends Contributor {
   }
 
   /**
+   * Function to add a solution for an ItemSelectionInput interaction.
+   * Selects the provided options (via checkboxes) in the solution modal.
+   * @param {string[]} correctOptions - The options to select as the correct answer.
+   * @param {string} answerExplanation - The explanation for this solution.
+   */
+  async addItemSelectionSolutionToState(
+    correctOptions: string[],
+    answerExplanation: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    // Wait for the solution modal to appear and render the interaction.
+    const interactionHtmlSelector = '.e2e-test-interaction-html';
+    await this.page.waitForSelector(interactionHtmlSelector, {visible: true});
+
+    // Select the correct checkboxes inside the solution modal.
+    const itemSelector = '.e2e-test-item-selection-input-item';
+    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
+
+    await this.page.waitForSelector(itemSelector, {visible: true});
+    const itemElements = await this.page.$$(itemSelector);
+
+    for (const item of itemElements) {
+      const itemText =
+        (await item.evaluate(el => el.textContent?.trim())) ?? '';
+      const shouldBeChecked = correctOptions.includes(itemText);
+      const checkbox = await item.$(checkboxSelector);
+      if (!checkbox) {
+        continue;
+      }
+      const isChecked = await checkbox.evaluate(el =>
+        el.classList.contains('mat-checkbox-checked')
+      );
+      if (shouldBeChecked && !isChecked) {
+        await checkbox.click();
+      }
+    }
+
+    // Submit the chosen answer.
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitAnswerButton);
+
+    // Type the explanation and save.
+    await this.typeInInputField(stateContentInputField, answerExplanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitSolutionButton);
+
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
    * Function to submit the question suggestion.
    */
   async submitQuestionSuggestion(): Promise<void> {
