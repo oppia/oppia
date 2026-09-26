@@ -20,22 +20,28 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackUpdatesPageComponent} from './feedback-updates-page.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.component';
 import {CommonModule} from '@angular/common';
 import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    NgbModalModule,
     NgbPopoverModule,
     RouterModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    FeedbackSharedModule,
     FeedbackUpdatesPageRoutingModule,
     Error404PageModule,
+    MatBottomSheetModule,
   ],
   declarations: [
     FeedbackUpdatesPageComponent,

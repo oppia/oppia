@@ -166,19 +166,58 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
             )
-            if not isinstance(
+            suggestion_summary: SuggestionSummaryDict
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+            if isinstance(
                 suggestion, suggestion_registry.SuggestionEditStateContent
             ):
+                try:
+                    current_content_html = exploration.states[
+                        suggestion.change_cmd.state_name
+                    ].content.html
+                except KeyError:
+                    # The suggestion's target state may have been renamed or
+                    # deleted since the suggestion was created, so leave the
+                    # current content empty and still return the thread.
+                    current_content_html = ''
+                suggestion_html = suggestion.change_cmd.new_value['html']
+            elif isinstance(
+                suggestion, suggestion_registry.SuggestionTranslateContent
+            ):
+                try:
+                    translate_current_content_html = (
+                        exploration.get_content_html(
+                            suggestion.change_cmd.state_name,
+                            suggestion.change_cmd.content_id,
+                        )
+                    )
+                except ValueError:
+                    # The suggestion's target state or content may no longer
+                    # exist, so leave the current content empty and still
+                    # return the thread.
+                    translate_current_content_html = ''
+                # translate_current_content_html can be str or List[str],
+                # but SuggestionSummaryDict expects str. Convert to str if needed.
+                if isinstance(translate_current_content_html, list):
+                    current_content_html = ' '.join(
+                        translate_current_content_html
+                    )
+                else:
+                    current_content_html = translate_current_content_html
+                suggestion_html = (
+                    suggestion_services.get_translation_html_from_suggestion(
+                        suggestion
+                    )
+                )
+
+            else:
                 raise Exception(
-                    'No edit state content suggestion found for the given '
+                    'Unrecognized suggestion type for the given '
                     'thread_id: %s' % thread_id
                 )
-            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-            current_content_html = exploration.states[
-                suggestion.change_cmd.state_name
-            ].content.html
-            suggestion_summary: SuggestionSummaryDict = {
-                'suggestion_html': suggestion.change_cmd.new_value['html'],
+
+            suggestion_summary = {
+                'suggestion_html': suggestion_html,
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
@@ -191,7 +230,6 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
-
             if author_settings is None:
                 author_username = None
             else:

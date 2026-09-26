@@ -19,7 +19,7 @@
 import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {LearnerDashboardSuggestionModalComponent} from './learner-dashboard-suggestion-modal.component';
+import {SuggestionReviewModalComponent} from 'components/feedback-shared/suggestion-review/suggestion-review-modal.component';
 interface ExtraParams {
   newContent: string;
   oldContent: string;
@@ -37,10 +37,9 @@ export class SuggestionModalForLearnerDashboardService {
     oldContent: string,
     description: string
   ): void {
-    const modelRef = this.ngbModal.open(
-      LearnerDashboardSuggestionModalComponent,
-      {backdrop: true}
-    );
+    const modelRef = this.ngbModal.open(SuggestionReviewModalComponent, {
+      backdrop: true,
+    });
     modelRef.componentInstance.newContent = newContent;
     modelRef.componentInstance.oldContent = oldContent;
     modelRef.componentInstance.description = description;
