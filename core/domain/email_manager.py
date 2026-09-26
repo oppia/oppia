@@ -521,6 +521,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_VOICEOVER_REGENERATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
+    feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID
+    ),
 }
 
 
@@ -599,6 +602,47 @@ def get_rendered_email_footer() -> str:
     )
 
 
+def _validate_and_clean_email(
+    sender_id: str, intent: str, email_html_body: str
+) -> Optional[Tuple[str, str]]:
+    """Validates the sender and cleans the email HTML body.
+
+    This centralizes the safety checks shared by _send_email() and
+    send_bulk_email_to_recipients(): sender validation, HTML cleaning, and
+    plaintext body derivation.
+
+    Args:
+        sender_id: str. The user ID of the sender.
+        intent: str. The intent string for the email, i.e. the purpose/type.
+        email_html_body: str. The body (message) of the email.
+
+    Returns:
+        tuple(str, str)|None. A tuple containing the cleaned HTML body and the
+        cleaned plaintext body, or None if the sender_id is invalid or the
+        HTML body differs from the cleaned version.
+    """
+    require_sender_id_is_valid(intent, sender_id)
+
+    cleaned_html_body = html_cleaner.clean(email_html_body)
+    if cleaned_html_body != email_html_body:
+        logging.error(
+            'Original email HTML body does not match cleaned HTML body:\n'
+            'Original:\n%s\n\nCleaned:\n%s\n'
+            % (email_html_body, cleaned_html_body)
+        )
+        return None
+
+    raw_plaintext_body = (
+        cleaned_html_body.replace('<br/>', '\n')
+        .replace('<br>', '\n')
+        .replace('<li>', '<li>- ')
+        .replace('</p><p>', '</p>\n<p>')
+    )
+    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+
+    return cleaned_html_body, cleaned_plaintext_body
+
+
 def _send_email(
     recipient_id: str,
     sender_id: str,
@@ -651,8 +695,6 @@ def _send_email(
         assert isinstance(email_sender_name, str)
         sender_name = email_sender_name
 
-    require_sender_id_is_valid(intent, sender_id)
-
     if recipient_email is None:
         recipient_email_address = user_services.get_email_from_user_id(
             recipient_id
@@ -660,22 +702,12 @@ def _send_email(
     else:
         recipient_email_address = recipient_email
 
-    cleaned_html_body = html_cleaner.clean(email_html_body)
-    if cleaned_html_body != email_html_body:
-        logging.error(
-            'Original email HTML body does not match cleaned HTML body:\n'
-            'Original:\n%s\n\nCleaned:\n%s\n'
-            % (email_html_body, cleaned_html_body)
-        )
-        return
-
-    raw_plaintext_body = (
-        cleaned_html_body.replace('<br/>', '\n')
-        .replace('<br>', '\n')
-        .replace('<li>', '<li>- ')
-        .replace('</p><p>', '</p>\n<p>')
+    cleaned_email = _validate_and_clean_email(
+        sender_id, intent, email_html_body
     )
-    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
+    if cleaned_email is None:
+        return
+    cleaned_html_body, cleaned_plaintext_body = cleaned_email
 
     if email_models.SentEmailModel.check_duplicate_message(
         recipient_id, email_subject, cleaned_plaintext_body
@@ -735,6 +767,125 @@ def _send_email(
         )
 
     _send_email_transactional()
+
+
+def send_bulk_email_to_recipients(
+    recipient_ids: Sequence[str],
+    sender_id: str,
+    intent: str,
+    email_subject: str,
+    email_html_body: str,
+    sender_email: str,
+    sender_name: Optional[str] = None,
+) -> None:
+    """Sends an email to a batch of recipients in a single call to the email
+    service.
+
+    This function is the batch counterpart of _send_email(). It reuses the
+    shared sender validation and HTML cleaning helper, applies the same
+    per-recipient safety checks (duplicate-message detection, retry
+    enqueueing, and SentEmailModel audit records), and sends all recipients
+    in one batch, leaving the underlying email service to chunk the
+    recipients into provider-sized messages (for example, 1,000 recipients
+    per Mailgun request).
+
+    Args:
+        recipient_ids: list(str). The user IDs of the recipients.
+        sender_id: str. The user ID of the sender.
+        intent: str. The intent string for the email, i.e. the purpose/type.
+            Valid intent strings are defined in feconf.py.
+        email_subject: str. The subject of the email.
+        email_html_body: str. The body (message) of the email.
+        sender_email: str. The sender's email address.
+        sender_name: str or None. The name to be shown in the "sender" field
+            of the email.
+
+    Raises:
+        Exception. The sender_id is not appropriate for the given intent.
+    """
+    if sender_name is None:
+        email_sender_name = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+            )
+        )
+        assert isinstance(email_sender_name, str)
+        sender_name = email_sender_name
+
+    cleaned_email = _validate_and_clean_email(
+        sender_id, intent, email_html_body
+    )
+    if cleaned_email is None:
+        return
+    cleaned_html_body, cleaned_plaintext_body = cleaned_email
+
+    recipients_with_emails: List[Tuple[str, str]] = []
+    for recipient_id in recipient_ids:
+        recipient_email_address = user_services.get_email_from_user_id(
+            recipient_id
+        )
+        if not recipient_email_address:
+            logging.error(
+                'No email on file for user with id %s. Skipping.', recipient_id
+            )
+            continue
+        if email_models.SentEmailModel.check_duplicate_message(
+            recipient_id, email_subject, cleaned_plaintext_body
+        ):
+            logging.error(
+                'Duplicate email:\n'
+                'Details:\n%s %s\n%s\n\n'
+                % (recipient_id, email_subject, cleaned_plaintext_body)
+            )
+            continue
+        recipients_with_emails.append((recipient_id, recipient_email_address))
+
+    if not recipients_with_emails:
+        return
+
+    recipient_emails = [
+        recipient_email_address
+        for _, recipient_email_address in recipients_with_emails
+    ]
+    sender_name_email = '%s <%s>' % (sender_name, sender_email)
+
+    try:
+        email_services.send_mail_to_recipients(
+            sender_name_email,
+            recipient_emails,
+            email_subject,
+            cleaned_plaintext_body,
+            cleaned_html_body,
+        )
+    except Exception as e:
+        logging.error(
+            'Email to %d recipients failed to send: %s. '
+            'Enqueuing for retry.',
+            len(recipient_emails),
+            e,
+        )
+        for _, recipient_email_address in recipients_with_emails:
+            payload = {
+                'sender_email': sender_name_email,
+                'recipient_id': recipient_email_address,
+                'subject': email_subject,
+                'html_body': cleaned_html_body,
+                'text_body': cleaned_plaintext_body,
+            }
+            taskqueue_services.enqueue_task(
+                feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
+            )
+        return
+
+    email_models.SentEmailModel.create_multi(
+        recipients_with_emails,
+        sender_id,
+        sender_name_email,
+        intent,
+        email_subject,
+        cleaned_html_body,
+        utils.get_current_utc_datetime(),
+    )
 
 
 def send_dummy_mail_to_admin(username: str) -> None:

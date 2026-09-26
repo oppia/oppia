@@ -299,6 +299,44 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 )
             )
 
+    def test_create_multi_creates_models_for_all_recipients(self) -> None:
+        email_models.SentEmailModel.create_multi(
+            [
+                ('recipient_id_1', 'recipient_1@email.com'),
+                ('recipient_id_2', 'recipient_2@email.com'),
+            ],
+            self.SENDER_ID,
+            'sender@email.com',
+            feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject',
+            'Email Body',
+            utils.get_current_utc_datetime(),
+        )
+
+        all_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(all_models), 3)
+
+        new_models = [
+            model
+            for model in all_models
+            if model.recipient_id in ['recipient_id_1', 'recipient_id_2']
+        ]
+        self.assertEqual(len(new_models), 2)
+        self.assertNotEqual(new_models[0].id, new_models[1].id)
+        for model in new_models:
+            self.assertEqual(model.sender_id, self.SENDER_ID)
+            self.assertEqual(model.sender_email, 'sender@email.com')
+            self.assertEqual(model.intent, feconf.EMAIL_INTENT_SIGNUP)
+            self.assertEqual(model.subject, 'Email Subject')
+            self.assertEqual(model.html_body, 'Email Body')
+            self.assertTrue(
+                email_models.SentEmailModel.check_duplicate_message(
+                    model.recipient_id, 'Email Subject', 'Email Body'
+                )
+            )
+
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
         with self.assertRaisesRegex(

@@ -23,7 +23,7 @@ import datetime
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -81,6 +81,7 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
             feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
+            feconf.EMAIL_INTENT_COMMUNITY_LIBRARY_DEPRECATION,
             (feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),
         ],
     )
@@ -240,6 +241,49 @@ class SentEmailModel(base_models.BaseModel):
 
         email_model_instance.update_timestamps()
         email_model_instance.put()
+
+    @classmethod
+    def create_multi(
+        cls,
+        recipient_ids_and_emails: List[Tuple[str, str]],
+        sender_id: str,
+        sender_email: str,
+        intent: str,
+        subject: str,
+        html_body: str,
+        sent_datetime: datetime.datetime,
+    ) -> None:
+        """Creates new SentEmailModel entries for multiple recipients.
+
+        Args:
+            recipient_ids_and_emails: list(tuple(str, str)). Each tuple
+                contains the recipient user ID and their email address.
+            sender_id: str. The user ID of the email sender.
+            sender_email: str. The email address used to send the notification.
+            intent: str. The intent string, i.e. the purpose of the email.
+            subject: str. The subject line of the email.
+            html_body: str. The HTML content of the email body.
+            sent_datetime: datetime.datetime. The datetime the email was sent,
+                in UTC.
+        """
+        email_model_instances = []
+        for recipient_id, recipient_email in recipient_ids_and_emails:
+            instance_id = cls._generate_id(intent)
+            email_model_instance = cls(
+                id=instance_id,
+                recipient_id=recipient_id,
+                recipient_email=recipient_email,
+                sender_id=sender_id,
+                sender_email=sender_email,
+                intent=intent,
+                subject=subject,
+                html_body=html_body,
+                sent_datetime=sent_datetime,
+            )
+            email_model_instances.append(email_model_instance)
+
+        cls.update_timestamps_multi(email_model_instances)
+        cls.put_multi(email_model_instances)
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
