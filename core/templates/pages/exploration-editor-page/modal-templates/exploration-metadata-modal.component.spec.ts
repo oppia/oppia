@@ -364,6 +364,26 @@ describe('Exploration Metadata Modal Component', () => {
       });
     }));
 
+    it('should expose the category and language values through getters and setters', () => {
+      explorationCategoryService.displayed = 'Generic category';
+      explorationLanguageCodeService.displayed = 'en';
+
+      expect(component.selectedExplorationCategory).toBe('Generic category');
+      expect(component.selectedExplorationLanguageCode).toBe('en');
+
+      component.selectedExplorationCategory = 'New category';
+      component.selectedExplorationLanguageCode = 'es';
+
+      expect(explorationCategoryService.displayed).toBe('New category');
+      expect(explorationLanguageCodeService.displayed).toBe('es');
+    });
+
+    it('should return the supported content languages', () => {
+      expect(component.getSupportedContentLanguages()).toEqual(
+        explorationLanguageCodeService.getSupportedContentLanguages()
+      );
+    });
+
     it(
       'should save all exploration metadata values when it contains title,' +
         ' category and objective',
