@@ -136,7 +136,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
