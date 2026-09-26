@@ -1,11 +1,10 @@
 <div class="topic-lesson-card"
-     [attr.aria-label]="lessonTitle || 'Lesson card'"
+     [attr.aria-label]="lessonTitle || ('I18N_TOPIC_VIEWER_LESSON_CARD_ARIA_LABEL' | translate)"
      [class.collapsed]="!isExpanded"
      [class.completed-lesson]="isCompletedLesson"
      [class.completed-collapsed]="isCompletedLesson && !isExpanded"
      [class.coming-soon-section-card]="isComingSoonSectionCard">
-  <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded"
-       [ngStyle]="{'background-color': adventureAccentColor}">
+  <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded">
     <img class="topic-lesson-card-image"
          [src]="resolvedThumbnailUrl"
          alt="{{ getThumbnailAltText() }}">
@@ -13,38 +12,38 @@
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
       <div class="topic-lesson-card-title-row" [class.collapsed]="!isExpanded">
-        <topic-adventure-circle-badge *ngIf="!isExpanded && isCompletedLesson"
-                                      [label]="lessonNumber.toString()"
-                                      [iconName]="'check'"
-                                      [size]="'sm'"
-                                      [backgroundColor]="'#fff'"
-                                      [borderColor]="'#40a84f'"
-                                      [textColor]="'#40a84f'">
-        </topic-adventure-circle-badge>
-        <topic-adventure-circle-badge *ngIf="isExpanded || !isCompletedLesson"
-                                      [label]="lessonNumber.toString()"
-                                      [size]="'sm'"
-                                      [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
-                                      [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
-                                      [textColor]="isExpanded ? '#fff' : '#6b7280'">
-        </topic-adventure-circle-badge>
+        <topic-module-circle-badge *ngIf="!isExpanded && isCompletedLesson"
+                                   [label]="lessonNumber.toString()"
+                                   [iconName]="'check'"
+                                   [size]="'sm'"
+                                   [backgroundColor]="'#fff'"
+                                   [borderColor]="'#40a84f'"
+                                   [textColor]="'#40a84f'">
+        </topic-module-circle-badge>
+        <topic-module-circle-badge *ngIf="isExpanded || !isCompletedLesson"
+                                   [label]="lessonNumber.toString()"
+                                   [size]="'sm'"
+                                   [backgroundColor]="isExpanded ? moduleAccentColor : '#fff'"
+                                   [borderColor]="isExpanded ? moduleAccentColor : '#d1d5db'"
+                                   [textColor]="isExpanded ? '#fff' : '#6b7280'">
+        </topic-module-circle-badge>
         <div class="topic-lesson-card-header">
           <div class="topic-lesson-card-title-with-labels">
             <h3 class="topic-lesson-card-title"
                 [class.topic-lesson-card-title-completed-collapsed]="!isExpanded && isCompletedLesson">
               {{ lessonTitle }}
             </h3>
-            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">
-              {{ 'I18N_TOPIC_VIEWER_LESSON_NEW_LABEL' | translate }}
-            </span>
-            <span class="topic-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
-              {{ 'I18N_TOPIC_VIEWER_LESSON_COMING_SOON_LABEL' | translate }}
-            </span>
             <span class="topic-lesson-card-completed-label"
                   [class.topic-lesson-card-completed-label-compact]="!isExpanded && isCompletedLesson"
                   *ngIf="isCompletedLesson">
               <i class="material-icons" aria-hidden="true">check_circle</i>
               {{ 'I18N_TOPIC_VIEWER_LESSON_COMPLETED_LABEL' | translate }}
+            </span>
+            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">
+              {{ 'I18N_TOPIC_VIEWER_LESSON_NEW_LABEL' | translate }}
+            </span>
+            <span class="topic-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
+              {{ 'I18N_TOPIC_VIEWER_LESSON_COMING_SOON_LABEL' | translate }}
             </span>
           </div>
           <p class="topic-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
@@ -74,13 +73,6 @@
     <div class="topic-lesson-card-footer"
          [class.collapsed]="!isExpanded"
          [class.coming-soon-footer]="isComingSoonSectionCard">
-      <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
-        <oppia-checkpoint-bar
-          [totalCheckpointsCount]="totalCheckpointsCount"
-          [visitedCheckpointsCount]="visitedCheckpointsCount"
-          [isReadOnly]="true">
-        </oppia-checkpoint-bar>
-      </div>
       <div class="topic-lesson-card-actions">
         <div class="topic-lesson-card-actions-left">
           <span
@@ -103,13 +95,21 @@
         </div>
         <div class="topic-lesson-card-actions-right">
           <div class="topic-lesson-card-secondary-buttons">
-            <button class="topic-lesson-card-secondary-button"
-                    type="button"
-                    [disabled]="isComingSoonLesson || (!practiceUrl && !startUrl)"
-                    (click)="onPracticeButtonClick()">
-              <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">edit</i>
-              {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
-            </button>
+            <span class="topic-lesson-card-practice-button-wrapper"
+                  [matTooltip]="'I18N_TOPIC_VIEWER_PRACTICE_BADGE_TOOLTIP' | translate"
+                  [matTooltipDisabled]="hasPracticeQuestions"
+                  [attr.tabindex]="hasPracticeQuestions ? undefined : 0">
+              <button class="topic-lesson-card-secondary-button topic-lesson-card-practice-button"
+                      type="button"
+                      [disabled]="!hasPracticeQuestions"
+                      (click)="onPracticeButtonClick()">
+                <img class="topic-lesson-card-btn-icon"
+                     [src]="getStaticImageUrl('/icons/practice-pencil-icon.svg')"
+                     alt=""
+                     aria-hidden="true">
+                {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
+              </button>
+            </span>
             <button class="topic-lesson-card-secondary-button"
                     type="button"
                     [disabled]="isComingSoonLesson || (!studyUrl && !startUrl)"
