@@ -30,6 +30,8 @@ NDB I/O transforms, making the jobs scalable and safe to execute over
 large datasets.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

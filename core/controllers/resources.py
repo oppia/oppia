@@ -14,6 +14,8 @@
 
 """Controllers for Oppia resources (templates, images)."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import io

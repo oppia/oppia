@@ -16,6 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of collection models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import collection_domain, rights_domain

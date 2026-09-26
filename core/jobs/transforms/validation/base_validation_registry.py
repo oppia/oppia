@@ -25,6 +25,8 @@ TODO(#11475): Add lint checks that ensure all "jobs.transforms.*_audits" modules
 are imported into this file.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs.decorators import validation_decorators

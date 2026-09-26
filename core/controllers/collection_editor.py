@@ -16,8 +16,9 @@
 
 """Controllers for the collections editor."""
 
-from __future__ import annotations
+# pylint: disable=arguments-differ
 
+from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base

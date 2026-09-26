@@ -80,7 +80,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             self.oppia_project_id,
         )
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         combined_models: Tuple[
             str,

@@ -14,6 +14,8 @@
 
 """Tests for the library page and associated handlers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import json

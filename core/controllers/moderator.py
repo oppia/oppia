@@ -61,7 +61,7 @@ class FeaturedActivitiesHandler(
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.render_json(
             {
@@ -73,7 +73,7 @@ class FeaturedActivitiesHandler(
         )
 
     @acl_decorators.can_access_moderator_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         featured_activity_references = self.normalized_payload[
@@ -174,7 +174,7 @@ class EmailDraftHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_send_moderator_emails
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.render_json(
             {

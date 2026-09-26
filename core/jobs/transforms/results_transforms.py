@@ -16,6 +16,8 @@
 
 """Provides a transform to drain PCollection in case of an error."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import apache_beam as beam

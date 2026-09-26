@@ -57,7 +57,9 @@ class ConceptCardDataHandler(
     }
 
     @acl_decorators.can_view_skills
-    def get(self, selected_skill_ids: List[str]) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, selected_skill_ids: List[str]
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:

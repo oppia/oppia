@@ -239,7 +239,9 @@ class ThreadListHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
 
         feedback_thread_dicts = [
             thread.to_dict()
@@ -259,7 +261,9 @@ class ThreadListHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_payload is not None
         subject = self.normalized_payload['subject']
         text = self.normalized_payload['text']
@@ -296,7 +300,7 @@ class ThreadListHandlerForTopicsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_topic
-    def get(self, topic_id: str) -> None:
+    def get(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
 
         suggestion_thread_dicts = [
             thread.to_dict()
@@ -361,7 +365,7 @@ class ThreadHandler(
     }
 
     @acl_decorators.can_view_feedback_thread
-    def get(self, thread_id: str) -> None:
+    def get(self, thread_id: str) -> None:  # pylint: disable=arguments-differ
         suggestion_id = thread_id
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_id, strict=False
@@ -386,7 +390,7 @@ class ThreadHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id: str) -> None:
+    def post(self, thread_id: str) -> None:  # pylint: disable=arguments-differ
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -446,7 +450,7 @@ class RecentFeedbackMessagesHandler(
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
@@ -490,7 +494,9 @@ class FeedbackStatsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         feedback_thread_analytics = feedback_services.get_thread_analytics(
             exploration_id
         )
@@ -531,7 +537,7 @@ class FeedbackThreadViewEventHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id: str) -> None:
+    def post(self, thread_id: str) -> None:  # pylint: disable=arguments-differ
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         feedback_services.clear_feedback_message_references_transactional(
             self.user_id, exploration_id, thread_id

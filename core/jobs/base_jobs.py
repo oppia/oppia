@@ -54,6 +54,8 @@ Oppia, we use DataflowRunner() to have our Pipelines run on the Google Cloud
 Dataflow service: https://cloud.google.com/dataflow.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs.types import job_run_result

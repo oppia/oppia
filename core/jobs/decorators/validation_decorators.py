@@ -16,6 +16,8 @@
 
 """Decorators for assigning DoFn types to specific storage models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

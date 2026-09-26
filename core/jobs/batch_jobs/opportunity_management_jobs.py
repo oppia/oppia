@@ -16,6 +16,8 @@
 
 """Jobs that manage Exploration Opportunity models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import itertools

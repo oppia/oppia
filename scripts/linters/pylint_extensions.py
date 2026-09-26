@@ -1915,6 +1915,12 @@ class SingleLinePragmaChecker(checkers.BaseTokenChecker):
                 if re.search(r'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
                         continue
+                    # Allow file-level disable for arguments-differ rule.
+                    if (
+                        re.search(r'disable=arguments-differ', line)
+                        and 'enable' not in line
+                    ):
+                        continue
                     self.add_message('single-line-pragma', line=line_num)
 
 

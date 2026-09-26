@@ -14,6 +14,8 @@
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import os

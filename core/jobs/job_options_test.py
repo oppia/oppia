@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.job_options."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_options

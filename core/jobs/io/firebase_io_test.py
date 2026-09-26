@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.io.firebase_io."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from unittest import mock

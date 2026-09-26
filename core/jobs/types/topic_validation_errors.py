@@ -16,6 +16,8 @@
 
 """Error classes for topic model audits."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs.types import base_validation_errors

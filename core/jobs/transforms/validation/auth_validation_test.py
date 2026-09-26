@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.transforms.auth_validation."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

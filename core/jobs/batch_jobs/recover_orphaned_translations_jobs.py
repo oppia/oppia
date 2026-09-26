@@ -24,6 +24,8 @@ stuck on old versions, and forward-propagates them to the latest
 version so they become visible again on the contributor dashboard.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

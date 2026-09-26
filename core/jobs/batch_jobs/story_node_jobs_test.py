@@ -16,6 +16,8 @@
 
 """Jobs used for populating story node."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime
