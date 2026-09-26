@@ -284,11 +284,18 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       const firstNonEmptyHintIndex = this.stateHints.findIndex(
         hint => !hint.hintContent.isEmpty()
       );
+      const fallbackHintIndex =
+        firstNonEmptyHintIndex === -1 ? 0 : firstNonEmptyHintIndex;
       if (this.initActiveContentId) {
-        this.activeHintIndex = this.initActiveIndex;
+        const isValidHintIndex =
+          typeof this.initActiveIndex === 'number' &&
+          this.initActiveIndex >= 0 &&
+          this.initActiveIndex < this.stateHints.length;
+        this.activeHintIndex = isValidHintIndex
+          ? this.initActiveIndex
+          : fallbackHintIndex;
       } else {
-        this.activeHintIndex =
-          firstNonEmptyHintIndex === -1 ? 0 : firstNonEmptyHintIndex;
+        this.activeHintIndex = fallbackHintIndex;
       }
       activeContentId =
         this.stateHints[this.activeHintIndex as number].hintContent.contentId;
@@ -492,17 +499,16 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     ) {
       return true;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
-      if (!this.stateDefaultOutcome) {
-        return true;
-      } else {
-        return false;
-      }
+      // Disable the tab when no feedback card would be visible.
+      return (
+        !this.stateDefaultOutcome ||
+        (this.stateDefaultOutcome.feedback.isEmpty() &&
+          !this.stateAnswerGroups.some(
+            answerGroup => !answerGroup.outcome.feedback.isEmpty()
+          ))
+      );
     } else if (tabId === this.TAB_ID_HINTS) {
-      if (this.stateHints.length <= 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return !this.stateHints.some(hint => !hint.hintContent.isEmpty());
     } else if (tabId === this.TAB_ID_SOLUTION) {
       if (!this.stateSolution) {
         return true;
@@ -510,7 +516,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         return false;
       }
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      return this.interactionCustomizationArgTranslatableContent.length === 0;
+      return !this.interactionCustomizationArgTranslatableContent.some(
+        caContent => !caContent.content.isEmpty()
+      );
     } else if (tabId === this.TAB_ID_RULE_INPUTS) {
       return this.interactionRuleTranslatableContents.length === 0;
     }

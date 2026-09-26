@@ -133,7 +133,7 @@ describe('State translation component', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder',
-              unicode_str: '',
+              unicode_str: 'Type something',
             },
           },
           rows: {
@@ -466,6 +466,42 @@ describe('State translation component', () => {
         });
 
         it(
+          'should fall back to the first non-empty hint when the initialized' +
+            ' index is out of range',
+          () => {
+            component.initActiveContentId = 'hint_missing';
+            component.initActiveIndex = -1;
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            expect(() => {
+              component.onTabClick('hint');
+            }).not.toThrowError();
+            expect(component.activeHintIndex).toBe(0);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('hint_1', 'html');
+          }
+        );
+
+        it(
+          'should fall back to the first non-empty hint when the initialized' +
+            ' index is not a number',
+          () => {
+            component.initActiveContentId = 'hint_2';
+            component.initActiveIndex = undefined as unknown as number;
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            expect(() => {
+              component.onTabClick('hint');
+            }).not.toThrowError();
+            expect(component.activeHintIndex).toBe(0);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('hint_1', 'html');
+          }
+        );
+
+        it(
           'should select the first non-empty customization argument when' +
             ' opening the customization tab',
           () => {
@@ -613,18 +649,67 @@ describe('State translation component', () => {
           expect(fixture.nativeElement.textContent).toContain('Type something');
         });
 
-        it('should fall back to the first hint when all hints are empty', () => {
+        it('should disable the hint tab when all hints are empty', () => {
           component.stateHints.forEach(hint => {
             hint.hintContent.html = '';
           });
           spyOn(translationTabActiveContentIdService, 'setActiveContent');
 
+          expect(component.isDisabled('hint')).toBe(true);
           component.onTabClick('hint');
 
           expect(
             translationTabActiveContentIdService.setActiveContent
-          ).toHaveBeenCalledWith('hint_1', 'html');
+          ).not.toHaveBeenCalled();
         });
+
+        it('should disable the feedback tab when every feedback card is empty', () => {
+          component.stateDefaultOutcome.feedback.html = '';
+          component.stateAnswerGroups.forEach(answerGroup => {
+            answerGroup.outcome.feedback.html = '';
+          });
+          spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+          expect(component.isDisabled('feedback')).toBe(true);
+          component.onTabClick('feedback');
+
+          expect(
+            translationTabActiveContentIdService.setActiveContent
+          ).not.toHaveBeenCalled();
+        });
+
+        it(
+          'should keep the feedback tab enabled when an answer group has' +
+            ' nonempty feedback',
+          () => {
+            component.stateDefaultOutcome.feedback.html = '';
+            component.stateAnswerGroups[0].outcome.feedback.html =
+              'Answer group feedback';
+
+            expect(component.isDisabled('feedback')).toBe(false);
+          }
+        );
+
+        it(
+          'should disable the customization argument tab when every' +
+            ' customization argument is empty',
+          () => {
+            component.interactionCustomizationArgTranslatableContent = [
+              {
+                name: 'Empty placeholder',
+                content: SubtitledUnicode.createDefault('', 'ca_empty'),
+              },
+            ];
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            expect(component.isDisabled('ca')).toBe(true);
+            component.onTabClick('ca');
+
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).not.toHaveBeenCalled();
+          }
+        );
       });
 
       it('should broadcast copy to ck editor when clicking on content', () => {
@@ -675,7 +760,7 @@ describe('State translation component', () => {
             translationTabActiveContentIdService.setActiveContent
           ).toHaveBeenCalledWith('ca_placeholder', 'unicode');
           expect(component.tabStatusColorStyle('ca')).toEqual({
-            'border-top-color': '#16A765',
+            'border-top-color': '#D14836',
           });
           expect(component.tabNeedUpdatesStatus('ca')).toBe(false);
           expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
@@ -1001,7 +1086,7 @@ describe('State translation component', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder',
-              unicode_str: '',
+              unicode_str: 'Type something',
             },
           },
           rows: {
@@ -1418,7 +1503,7 @@ describe('State translation component', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder',
-              unicode_str: '',
+              unicode_str: 'Type something',
             },
           },
           rows: {
@@ -1537,7 +1622,7 @@ describe('State translation component', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder',
-              unicode_str: '',
+              unicode_str: 'Type something',
             },
           },
           rows: {
@@ -2261,7 +2346,7 @@ describe('State translation component', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder',
-              unicode_str: '',
+              unicode_str: 'Type something',
             },
           },
           rows: {
