@@ -268,6 +268,13 @@ export class OpportunitiesListComponent {
           );
           this.loadingOpportunityData = false;
         });
+      },
+      () => {
+        // If the request rejects (e.g. the service throws
+        // 'No more ... opportunities available.'), recover gracefully so
+        // the spinner clears instead of leaving the tab frozen.
+        this.more = false;
+        this.loadingOpportunityData = false;
       }
     );
   }
@@ -295,6 +302,13 @@ export class OpportunitiesListComponent {
             pageNumber,
             this.more
           );
+        },
+        () => {
+          // The service throws 'No more ... opportunities available.' when
+          // its internal availability flag disagrees with this.more. Clear
+          // the spinner and stop paging instead of leaving the tab frozen.
+          this.more = false;
+          this.loadingOpportunityData = false;
         }
       );
     } else {
