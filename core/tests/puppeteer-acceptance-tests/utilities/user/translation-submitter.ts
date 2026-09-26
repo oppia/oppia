@@ -375,7 +375,9 @@ export class TranslationSubmitter extends BaseUser {
     let subjectOption: ElementHandle<Element> | null = null;
     await this.expectElementToBeVisible(topicOptionSelector);
     for (const option of await this.page.$$(topicOptionSelector)) {
-      const optionText = await option.evaluate(el => el.textContent?.trim());
+      const optionText = await option.evaluate(el =>
+        el.querySelector('.e2e-test-topic-name')?.textContent?.trim()
+      );
       if (optionText?.includes(subject)) {
         subjectOption = option;
         break;
