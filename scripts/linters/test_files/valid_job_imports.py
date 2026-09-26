@@ -23,6 +23,7 @@ from __future__ import annotations
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     blog_author_details_migration_jobs,
     blog_validation_jobs,
+    certificate_assessment_attempt_cleanup_jobs,
     classroom_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
