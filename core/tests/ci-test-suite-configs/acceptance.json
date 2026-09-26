@@ -557,13 +557,13 @@
     },
     {
       "name": "translation-reviewer/review-the-translations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-reviewer/filter-the-translations",
