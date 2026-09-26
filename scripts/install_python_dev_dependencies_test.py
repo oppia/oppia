@@ -233,6 +233,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 (
                     [
                         'pip-compile',
+                        '--allow-unsafe',
                         '--no-emit-index-url',
                         '--quiet',
                         '--strip-extras',
@@ -290,6 +291,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 (
                     [
                         'pip-compile',
+                        '--allow-unsafe',
                         '--no-emit-index-url',
                         '--quiet',
                         '--strip-extras',

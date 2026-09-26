@@ -302,6 +302,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile',
+                    '--allow-unsafe',
                     '--no-emit-index-url',
                     '--quiet',
                     '--strip-extras',
@@ -373,6 +374,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list[0],
             [
                 'pip-compile',
+                '--allow-unsafe',
                 '--no-emit-index-url',
                 '--quiet',
                 '--strip-extras',
@@ -487,6 +489,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile',
+                    '--allow-unsafe',
                     '--no-emit-index-url',
                     '--quiet',
                     '--strip-extras',
@@ -590,6 +593,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile',
+                    '--allow-unsafe',
                     '--no-emit-index-url',
                     '--quiet',
                     '--strip-extras',
@@ -681,6 +685,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile',
+                    '--allow-unsafe',
                     '--no-emit-index-url',
                     '--quiet',
                     '--strip-extras',

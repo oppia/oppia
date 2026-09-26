@@ -146,6 +146,7 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     subprocess.run(
         [
             'pip-compile',
+            '--allow-unsafe',
             '--no-emit-index-url',
             '--quiet',
             '--strip-extras',
