@@ -189,6 +189,7 @@ export class SchemaBasedUnicodeEditor
         )
       );
     }
+    this.focusManagerService.setFocus(this.labelForFocusTarget);
   }
 
   onKeypress(evt: KeyboardEvent): void {
