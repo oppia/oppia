@@ -138,7 +138,7 @@
              {{ 'I18N_LIBRARY_NO_EXPLORATION_GROUPS' | translate }}
         </div>
         <div class="oppia-library-group"
-             dir="auto"
+             [attr.dir]="'auto'"
              *ngFor="let group of libraryGroups; index as idx"
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
@@ -182,8 +182,7 @@
                                                  [getCategory]="tile.category"
                                                  [getThumbnailIconUrl]="tile.thumbnail_icon_url"
                                                  [getThumbnailBgColor]="tile.thumbnail_bg_color"
-                                                 [isOwnedByCurrentUser]="activitiesOwned.collections[tile.id]"
-                                                 [showLearnerDashboardIconsIfPossible]="true">
+                                                 [isOwnedByCurrentUser]="activitiesOwned.collections[tile.id]">
                   </oppia-collection-summary-tile>
                   <oppia-exploration-summary-tile *ngIf="tile.activity_type == 'exploration'"
                                                   [explorationId]="tile.id"
@@ -197,7 +196,6 @@
                                                   [thumbnailBgColor]="tile.thumbnail_bg_color"
                                                   class="e2e-test-exp-summary-tile"
                                                   [isOwnedByCurrentUser]="activitiesOwned.explorations[tile.id]"
-                                                  [showLearnerDashboardIconsIfPossible]="true"
                                                   [translatedMetadataFields]="tile.translated_metadata_fields || []">
                   </oppia-exploration-summary-tile>
                 </div>
@@ -229,7 +227,6 @@
                                              [getCategory]="activity.category"
                                              [getThumbnailIconUrl]="activity.thumbnail_icon_url"
                                              [getThumbnailBgColor]="activity.thumbnail_bg_color"
-                                             [showLearnerDashboardIconsIfPossible]="true"
                                              [isContainerNarrow]="true"
                                              [mobileCutoffPx]="537">
               </oppia-collection-summary-tile>
@@ -244,7 +241,6 @@
                                               [thumbnailIconUrl]="activity.thumbnail_icon_url"
                                               [thumbnailBgColor]="activity.thumbnail_bg_color"
                                               class="e2e-test-exp-summary-tile"
-                                              [showLearnerDashboardIconsIfPossible]="true"
                                               [isContainerNarrow]="true"
                                               [isOwnedByCurrentUser]="activitiesOwned.explorations[activity.id]"
                                               [mobileCutoffPx]="537">

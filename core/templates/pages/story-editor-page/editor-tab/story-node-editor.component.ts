@@ -42,6 +42,12 @@ import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+
+interface StoryNodeEditorFormSchema {
+  type: 'html';
+  ui_config: object;
+}
 
 @Component({
   selector: 'oppia-story-node-editor',
@@ -81,7 +87,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   storyNodeIds!: string[];
   nodeIdToTitleMap!: Record<string, string>;
   skillInfoHasLoaded = false;
-  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
+  allowedBgColors: string[] = [
+    ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter,
+  ];
   isStoryPublished!: () => boolean;
   currentTitle!: string;
   editableTitle!: string;
@@ -99,7 +107,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   editablePlannedPublicationDate!: Date | null;
   plannedPublicationDateIsInPast: boolean = false;
 
-  OUTLINE_SCHEMA = {
+  OUTLINE_SCHEMA: StoryNodeEditorFormSchema = {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'ALL_COMPONENTS',
@@ -253,7 +261,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  updatePlannedPublicationDate(dateString: string | null): void {
+  updatePlannedPublicationDate(dateString: Date | string | null): void {
     let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
 
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
@@ -587,8 +595,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       !this.explorationInputButtonsAreShown;
   }
 
-  updateLocalEditableOutline($event: string): void {
-    if (this.editableOutline !== $event) {
+  updateLocalEditableOutline($event: SchemaDefaultValue): void {
+    // The schema type of the outline editor is 'html', so the emitted
+    // value is always a string.
+    if (typeof $event === 'string' && this.editableOutline !== $event) {
       this.editableOutline = $event;
       if (!this.chapterOutlineButtonsAreShown && $event) {
         this.toggleChapterOutlineButtons();

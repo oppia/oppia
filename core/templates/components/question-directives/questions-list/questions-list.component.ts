@@ -70,7 +70,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {RemoveQuestionSkillLinkModalComponent} from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-interface GroupedSkillSummaries {
+export interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];
   others: SkillSummaryBackendDict[];
 }

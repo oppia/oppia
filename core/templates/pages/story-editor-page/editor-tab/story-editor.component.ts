@@ -44,6 +44,10 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import constants from 'assets/constants';
 import {StoryDomainConstants} from 'domain/story/story-domain.constants';
+interface StoryEditorFormSchema {
+  type: 'html';
+  ui_config: object;
+}
 @Component({
   selector: 'oppia-story-editor',
   templateUrl: './story-editor.component.html',
@@ -55,7 +59,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   disconnectedNodes!: string[];
   linearNodesList!: StoryNode[];
   nodes!: StoryNode[];
-  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+  allowedBgColors: string[] = [
+    ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story,
+  ];
 
   initialNodeId!: string;
   notesEditorIsShown!: boolean;
@@ -79,7 +85,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   chapterIsPublishable!: boolean[];
   selectedChapterIndexInPublishUptoDropdown!: number;
   publishedChaptersDropErrorIsShown: boolean = false;
-  NOTES_SCHEMA = {
+  NOTES_SCHEMA: StoryEditorFormSchema = {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'ALL_COMPONENTS',
@@ -162,7 +168,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     );
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  drop(event: CdkDragDrop<StoryNode[]>): void {
     if (this.linearNodesList[event.currentIndex].getStatus() === 'Published') {
       this.publishedChaptersDropErrorIsShown = true;
       setTimeout(() => {
@@ -171,6 +177,14 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       return;
     }
     this.rearrangeNodeInList(event.previousIndex, event.currentIndex);
+  }
+
+  getLocaleDateTimeHourString(millisSinceEpoch: number): string {
+    // Expose date formatting to the template without making the
+    // date-time-format service public.
+    return this.dateTimeFormatService.getLocaleDateTimeHourString(
+      millisSinceEpoch
+    );
   }
 
   private ensureArcMembershipForNodes(): void {

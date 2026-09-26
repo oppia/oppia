@@ -41,10 +41,12 @@ interface KeyboardEventToCodes {
 }
 
 export interface EventToCodes {
-  [keys: string]: string;
-  enter: string;
-  tab: string;
-  shiftTab: string;
+  [keys: string]: string | undefined;
+  // The keys are optional because callers pass only the subset of keyboard
+  // events (enter/tab/shiftTab) they want to handle.
+  enter?: string;
+  tab?: string;
+  shiftTab?: string;
 }
 
 @Injectable({
@@ -80,12 +82,12 @@ export class NavigationService {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.activeMenuName = menuName;
   }
 
-  closeSubmenu(evt: KeyboardEvent): void {
+  closeSubmenu(evt: Event): void {
     this.activeMenuName = '';
   }
 

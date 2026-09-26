@@ -55,7 +55,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() numViews!: number;
   @Input() objective!: string;
   @Input() category!: string;
-  @Input() ratings!: ExplorationRatings;
+  // 'ratings' is optional because some summary tiles (e.g. collections) do
+  // not carry ratings for the exploration.
+  @Input() ratings: ExplorationRatings | undefined = undefined;
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;
@@ -73,7 +75,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // will be displayed.
   @Input() isCollectionPreviewTile: boolean = false;
   @Input() isPlaylistTile: boolean = false;
-  @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
   @Input() tags: string[] = [];

@@ -89,8 +89,10 @@ export class SignupPageComponent {
     );
   }
 
-  showLicenseExplanationModal(evt: {target: {innerText: string}}): void {
-    if (evt.target.innerText !== 'here') {
+  showLicenseExplanationModal(evt: Event): void {
+    // The click event always originates from a text element, so its target
+    // is assumed to be an HTMLElement.
+    if ((evt.target as HTMLElement).innerText !== 'here') {
       return;
     }
     let modalRef = this.ngbModal.open(LicenseExplanationModalComponent, {
