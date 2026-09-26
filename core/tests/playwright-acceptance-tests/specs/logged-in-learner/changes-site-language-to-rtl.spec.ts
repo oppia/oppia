@@ -105,7 +105,8 @@ test.describe('Logged-In Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
       'Basics Of Fractions',
-      'fractions'
+      'fractions',
+      true
     );
 
     await curriculumAdmin.createAndPublishClassroom(

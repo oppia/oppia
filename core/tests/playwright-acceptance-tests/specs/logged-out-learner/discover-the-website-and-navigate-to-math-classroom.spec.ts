@@ -65,7 +65,8 @@ test.describe('Logged-Out Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
       'Algebra',
-      'fractions'
+      'fractions',
+      true
     );
     await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
 

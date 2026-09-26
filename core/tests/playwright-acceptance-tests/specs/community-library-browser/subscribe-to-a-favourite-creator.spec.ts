@@ -59,7 +59,8 @@ test.describe('Community Library Browser', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
       'Basics of Fractions',
-      'fractions'
+      'fractions',
+      true
     );
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Story 1',

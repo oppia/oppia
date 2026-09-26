@@ -594,11 +594,13 @@ export class TopicManager extends BaseUser {
   async createAndPublishTopic(
     topicName: string,
     subtopicName: string,
-    skillName: string
+    skillName: string,
+    isFirstTopic: boolean = false
   ): Promise<void> {
     await this.createTopic(
       topicName,
-      topicName.toLowerCase().replace(/ /g, '-')
+      topicName.toLowerCase().replace(/ /g, '-'),
+      isFirstTopic
     );
     await this.createSubtopicForTopic(
       subtopicName,
@@ -703,17 +705,19 @@ export class TopicManager extends BaseUser {
    * @param {string} urlFragment - The URL fragment for the topic.
    * @returns {Promise<string>} - A promise that resolves to the ID of the created topic.
    */
-  async createTopic(name: string, urlFragment: string): Promise<string> {
+  async createTopic(
+    name: string,
+    urlFragment: string,
+    isFirstTopic: boolean = false
+  ): Promise<string> {
     await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     let TopicSelectorElement = null;
-    try {
+    if (!isFirstTopic) {
       TopicSelectorElement = await this.expectElementToBeAttachedInDOM(
         desktopTopicSelector,
         this.page,
         10000
       );
-    } catch {
-      // Element didn't appear in 10 seconds — treat as not present.
     }
 
     if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
