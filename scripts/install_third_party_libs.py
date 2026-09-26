@@ -497,6 +497,14 @@ def main() -> None:
     )
     install_python_prod_dependencies.main()
 
+    # The pip install --target command inside install_python_prod_dependencies
+    # uninstalls global setuptools due to pip upgrading behavior. We must restore
+    # it so that the subsequent `python setup.py` commands do not fail.
+    # Note: 80.9.0 is the setuptools version installed by dev_dependencies.
+    subprocess.check_call(
+        [sys.executable, '-m', 'pip', 'install', 'setuptools==80.9.0']
+    )
+
     # The install_gcloud_sdk() function needs the Python third-party libs
     # "google" folder to exist first, so we only do the installation here after
     # the Python dependencies are installed.
