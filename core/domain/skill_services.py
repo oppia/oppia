@@ -20,12 +20,12 @@ import collections
 import itertools
 import logging
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
-    feature_flag_services,
+    web_feature_flag_services,
     html_cleaner,
     opportunity_services,
     role_services,
@@ -1232,8 +1232,8 @@ def update_skill(
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill.id}'

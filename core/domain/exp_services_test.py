@@ -24,7 +24,7 @@ import os
 import re
 import zipfile
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -7633,7 +7633,9 @@ title: Old Title
             )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_update_exploration_linked_to_story(self) -> None:
         story_id = story_services.get_new_story_id()
@@ -10500,7 +10502,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_version_history_on_only_translation_commits(self) -> None:
@@ -12535,7 +12537,7 @@ class ComputeVoiceoversModelFromExplorationChangeTest(
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:

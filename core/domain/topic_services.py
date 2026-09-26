@@ -22,12 +22,11 @@ import collections
 import itertools
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     caching_services,
     change_domain,
-    feature_flag_services,
     feedback_services,
     fs_services,
     opportunity_services,
@@ -49,6 +48,7 @@ from core.domain import (
     topic_fetchers,
     user_domain,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 
@@ -880,8 +880,8 @@ def apply_change_list(
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
         committer_id,
     ):
         modified_study_guides_list = (
@@ -1177,8 +1177,8 @@ def apply_change_list(
                 update_subtopic_property_cmd.subtopic_id,
                 update_subtopic_property_cmd.new_value,
             )
-            if not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            if not web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 committer_id,
             ):
                 # Here we use cast because we are narrowing down the
@@ -1480,8 +1480,8 @@ def update_topic_and_subtopic_pages(
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
-            if not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            if not web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 committer_id,
             ):
                 subtopic_page_services.delete_subtopic_page(
@@ -1556,8 +1556,8 @@ def delete_uncategorized_skill(
         change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         opportunity_services.remove_topic_from_translation_opportunities(
@@ -1590,8 +1590,8 @@ def add_uncategorized_skill(
         change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         opportunity_services.create_translation_opportunity(
@@ -1683,8 +1683,8 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])
 
-    serial_chapter_curriculum_admin_view_feature_is_enabled = feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+    serial_chapter_curriculum_admin_view_feature_is_enabled = web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
         committer_id,
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -1782,8 +1782,8 @@ def unpublish_story(
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
 
-    serial_chapter_curriculum_admin_view_feature_is_enabled = feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+    serial_chapter_curriculum_admin_view_feature_is_enabled = web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
         committer_id,
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -2002,8 +2002,8 @@ def delete_topic(
             topic_id
         )
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         if topic is not None:
@@ -2114,8 +2114,8 @@ def compute_summary_of_topic(
         if story.id in published_canonical_story_ids:
             total_published_node_count += (
                 story.story_contents.get_published_node_count()
-                if feature_flag_services.is_feature_flag_enabled(
-                    feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                if web_feature_flag_services.is_feature_flag_enabled(
+                    web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
                     None,
                 )
                 else len(story.story_contents.nodes)
@@ -2171,8 +2171,8 @@ def _compute_story_exploration_mapping(
     for story in stories:
         mapping[story.id] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+            if web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
                 None,
             )
             else story.story_contents.get_all_linked_exp_ids()

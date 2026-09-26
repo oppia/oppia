@@ -35,7 +35,12 @@ import pprint
 import re
 import zipfile
 
-from core import android_validation_constants, feature_flag_list, feconf, utils
+from core import (
+    android_validation_constants,
+    feconf,
+    utils,
+    web_feature_flag_list,
+)
 from core.constants import constants
 from core.domain import (
     activity_services,
@@ -47,7 +52,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_rights_domain,
-    feature_flag_services,
     feedback_services,
     fs_services,
     html_cleaner,
@@ -66,6 +70,7 @@ from core.domain import (
     user_domain,
     user_services,
     voiceover_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 from extensions import domain
@@ -4264,8 +4269,8 @@ def does_exploration_support_voiceovers(
     if get_story_id_linked_to_exploration(exploration_id):
         return True
     else:
-        return feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
+        return web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
             committer_id,
         )
 

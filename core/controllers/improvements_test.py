@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import improvements
 from core.domain import (
@@ -853,7 +853,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED]
+        [web_feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED]
     )
     def test_improvements_tab_enabled(self) -> None:
         with self.login_context(self.OWNER_EMAIL):

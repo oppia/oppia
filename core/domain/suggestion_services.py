@@ -23,14 +23,13 @@ import heapq
 import logging
 import re
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
     exp_domain,
     exp_fetchers,
-    feature_flag_services,
     feedback_services,
     html_cleaner,
     html_validation_service,
@@ -46,6 +45,7 @@ from core.domain import (
     translation_fetchers,
     user_domain,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 
@@ -1057,8 +1057,8 @@ def accept_suggestion(
 
     # Generates voiceovers for approved translation suggestions.
     if (
-        feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+        web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         )
         and suggestion.change_cmd.cmd == 'add_written_translation'
@@ -3371,8 +3371,8 @@ def _get_topic_id_of_translation_target(
     # topic from the new opportunity model.
     if (
         suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
-        and not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        and not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             None,
         )
     ):

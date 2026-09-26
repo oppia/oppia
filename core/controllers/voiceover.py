@@ -18,13 +18,13 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     beam_job_services,
     exp_fetchers,
-    feature_flag_services,
+    web_feature_flag_services,
     opportunity_services,
     taskqueue_services,
     translation_fetchers,
@@ -127,8 +127,8 @@ class VoiceoverLanguageCodesMappingHandler(
             and voiceover_services.is_accent_code_valid_for_autogeneration(
                 new_accent_code
             )
-            and feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            and web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
                 None,
             )
         ):
@@ -325,8 +325,8 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         # curated exploration content changes.
         if opportunity_services.is_exploration_available_for_contribution(
             exploration_id
-        ) and feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+        ) and web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         ):
             taskqueue_services.defer(
@@ -487,8 +487,8 @@ class RegenerateVoiceoversForExplorationHandler(
 
         if opportunity_services.is_exploration_available_for_contribution(
             exploration_id
-        ) and feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+        ) and web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         ):
             taskqueue_services.defer(

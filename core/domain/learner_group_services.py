@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
+from core import web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
-    feature_flag_services,
+    web_feature_flag_services,
     learner_group_domain,
     learner_group_fetchers,
     story_domain,
@@ -60,8 +60,8 @@ def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
         bool. Whether the learner group feature is enabled.
     """
     return bool(
-        feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
+        web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
             user_id,
         )
     )

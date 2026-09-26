@@ -19,7 +19,7 @@ from __future__ import annotations
 import enum
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import admin
 from core.domain import (
@@ -780,7 +780,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_load_new_structures_data_with_study_guides(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -1413,7 +1413,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_regenerate_topic_related_opportunities_action(self) -> None:

@@ -22,7 +22,7 @@ import operator
 import random
 import string
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
@@ -36,7 +36,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    feature_flag_services,
     fs_services,
     opportunity_services,
 )
@@ -69,6 +68,7 @@ from core.domain import (
     translation_domain,
     user_services,
     voiceover_services,
+    web_feature_flag_services,
     wipeout_service,
 )
 
@@ -1152,8 +1152,8 @@ class AdminHandler(
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            if web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 self.user_id,
             ):
                 study_guide = study_guide_domain.StudyGuide.create_study_guide(
@@ -1276,8 +1276,8 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            if web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 self.user_id,
             ):
                 study_guide_services.save_study_guide(

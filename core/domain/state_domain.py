@@ -26,7 +26,7 @@ import re
 
 from core import (
     android_validation_constants,
-    feature_flag_list,
+    web_feature_flag_list,
     feconf,
     schema_utils,
     utils,
@@ -36,7 +36,7 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import rules_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     customization_args_util,
-    feature_flag_services,
+    web_feature_flag_services,
     interaction_registry,
     param_domain,
     translation_domain,
@@ -264,8 +264,8 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         if (
             self.tagged_skill_misconception_id is not None
             and not tagged_skill_misconception_id_required
-            and not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+            and not web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
                 None,
             )
         ):

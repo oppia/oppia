@@ -16,11 +16,11 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
-    feature_flag_services,
+    web_feature_flag_services,
     skill_fetchers,
     study_guide_services,
     subtopic_page_domain,
@@ -125,8 +125,8 @@ class SubtopicPageDataHandler(
             except Exception as e:
                 raise self.NotFoundException(e)
 
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+        if web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
             self.user_id,
         ):
             study_guide_sections = (

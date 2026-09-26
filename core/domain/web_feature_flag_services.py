@@ -1,0 +1,305 @@
+# coding: utf-8
+#
+# Copyright 2023 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""The services file for the web feature flags."""
+
+from __future__ import annotations
+
+import hashlib
+
+from core import web_feature_flag_list
+from core.domain import web_feature_flag_domain
+from core.domain import web_feature_flag_registry as registry
+from core.platform import models
+
+from typing import Dict, List, Mapping, Optional, Set
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import config_models, user_models
+
+(config_models, user_models) = models.Registry.import_models(
+    [models.Names.CONFIG, models.Names.USER]
+)
+
+
+ALL_WEB_FEATURE_FLAGS: List[web_feature_flag_list.FeatureNames] = (
+    web_feature_flag_list.DEV_FEATURES_LIST
+    + web_feature_flag_list.TEST_FEATURES_LIST
+    + web_feature_flag_list.PROD_FEATURES_LIST
+)
+
+ALL_WEB_FEATURES_NAMES_SET: Set[str] = set(
+    feature.value for feature in ALL_WEB_FEATURE_FLAGS
+)
+
+WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    web_feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+)
+
+
+class WebFeatureFlagNotFoundException(Exception):
+    """Exception thrown when an unknown feature flag is requested."""
+
+    pass
+
+
+def update_web_feature_flag(
+    web_feature_flag_name: str,
+    force_enable_for_all_users: bool,
+    rollout_percentage: int,
+    user_group_ids: List[str],
+) -> None:
+    """Updates the web feature flag.
+
+    Args:
+        web_feature_flag_name: str. The name of the web feature flag to update.
+        force_enable_for_all_users: bool. Whether the feature flag is
+            force-enabled for all the users.
+        rollout_percentage: int. The percentage of logged-in users for which
+            the feature will be enabled. This value is ignored if the
+            force_enable_for_all_users property is set to True.
+        user_group_ids: List[str]. The list of ids of UserGroupModel.
+
+    Raises:
+        WebFeatureFlagNotFoundException. Feature flag trying to update does
+            not exist.
+    """
+    if web_feature_flag_name not in ALL_WEB_FEATURES_NAMES_SET:
+        raise WebFeatureFlagNotFoundException(
+            'Unknown feature flag: %s.' % web_feature_flag_name
+        )
+
+    registry.Registry.update_web_feature_flag(
+        web_feature_flag_name,
+        force_enable_for_all_users,
+        rollout_percentage,
+        user_group_ids,
+    )
+
+
+def _get_web_feature_flag_spec(
+    name: str,
+) -> web_feature_flag_domain.WebFeatureFlagSpec:
+    """Returns WebFeatureFlagSpec domain object.
+
+    name: str. The name of the web feature flag.
+
+    Returns:
+        WebFeatureFlagSpec. The WebFeatureFlagSpec domain object.
+
+    Raises:
+        Exception. Feature flag does not exists.
+    """
+    if name not in WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
+        raise Exception('Web Feature flag not found: %s.' % name)
+
+    return web_feature_flag_domain.WebFeatureFlagSpec(
+        WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
+        WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
+    )
+
+
+def get_all_web_feature_flags() -> List[web_feature_flag_domain.FeatureFlag]:
+    """Returns all feature flags. This method is used for providing detailed
+    feature flags information to the release coordinator page.
+
+    Returns:
+        feature_flags: list(FeatureFlag). A list containing the dict mappings
+        of all fields of the feature flags.
+    """
+    feature_flags: List[web_feature_flag_domain.FeatureFlag] = []
+    feature_flags_to_fetch_from_storage = []
+
+    for feature_flag_name_enum in ALL_WEB_FEATURE_FLAGS:
+        feature_flags_to_fetch_from_storage.append(feature_flag_name_enum.value)
+
+    feature_flags_from_storage = load_web_feature_flags_from_storage(
+        feature_flags_to_fetch_from_storage
+    )
+
+    for feature_flag_name, feature_flag in feature_flags_from_storage.items():
+        if feature_flag is not None:
+            feature_flags.append(feature_flag)
+        else:
+            web_feature_flag_spec = _get_web_feature_flag_spec(
+                feature_flag_name
+            )
+            web_feature_flag_config = (
+                web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None)
+            )
+            feature_flag = web_feature_flag_domain.FeatureFlag(
+                feature_flag_name,
+                web_feature_flag_spec,
+                web_feature_flag_config,
+            )
+            feature_flags.append(feature_flag)
+
+    return feature_flags
+
+
+def load_web_feature_flags_from_storage(
+    web_feature_flag_names_list: List[str],
+) -> Mapping[str, Optional[web_feature_flag_domain.FeatureFlag]]:
+    """Loads web feature flags from the storage layer.
+
+    Args:
+        web_feature_flag_names_list: List[str]. The list of web feature flag names
+            that needs to be fetched from the storage layer.
+
+    Returns:
+        web_feature_flag_name_to_feature_flag_dict: Dict[
+        str, WebFeatureFlag|None]. Dictionary having key as the web feature name
+        and value as the web feature flag domain model if present in the storage
+        layer otherwise None.
+    """
+    web_feature_flag_name_to_feature_flag_dict: Dict[
+        str, Optional[web_feature_flag_domain.FeatureFlag]
+    ] = {}
+    web_feature_flag_config_models = (
+        config_models.WebFeatureFlagConfigModel.get_multi(
+            web_feature_flag_names_list
+        )
+    )
+
+    for web_feature_flag_config_model in web_feature_flag_config_models:
+        if web_feature_flag_config_model:
+            web_feature_flag_spec = _get_web_feature_flag_spec(
+                web_feature_flag_config_model.id
+            )
+            web_feature_flag_config = (
+                web_feature_flag_domain.WebFeatureFlagConfig(
+                    web_feature_flag_config_model.force_enable_for_all_users,
+                    web_feature_flag_config_model.rollout_percentage,
+                    web_feature_flag_config_model.user_group_ids,
+                    web_feature_flag_config_model.last_updated,
+                )
+            )
+
+            web_feature_flag_name_to_feature_flag_dict[
+                web_feature_flag_config_model.id
+            ] = web_feature_flag_domain.FeatureFlag(
+                web_feature_flag_config_model.id,
+                web_feature_flag_spec,
+                web_feature_flag_config,
+            )
+
+        for web_feature_flag_name in web_feature_flag_names_list:
+            if web_feature_flag_name not in (
+                web_feature_flag_name_to_feature_flag_dict
+            ):
+                web_feature_flag_name_to_feature_flag_dict[
+                    web_feature_flag_name
+                ] = None
+
+    return web_feature_flag_name_to_feature_flag_dict
+
+
+def is_feature_flag_enabled(
+    feature_flag_name: str,
+    user_id: Optional[str],
+    feature_flag: Optional[web_feature_flag_domain.FeatureFlag] = None,
+) -> bool:
+    """Returns True if feature is enabled for the given user else False.
+
+    Args:
+        feature_flag_name: str. The name of the feature flag that needs to
+            be evaluated.
+        user_id: str|None. The id of the user, if logged-out user then None.
+        feature_flag: FeatureFlag|None. The feature flag domain object.
+            If None, then this function is responsible for fetching the
+            feature flag.
+
+    Returns:
+        bool. True if the feature is enabled for the given user else False.
+    """
+    if feature_flag is None:
+        feature_flag = registry.Registry.get_feature_flag(feature_flag_name)
+
+    current_server = web_feature_flag_domain.get_server_mode()
+
+    if (
+        current_server == web_feature_flag_domain.ServerMode.TEST
+        and feature_flag.web_feature_flag_spec.feature_stage
+        == web_feature_flag_domain.ServerMode.DEV
+    ):
+        return False
+
+    if (
+        current_server == web_feature_flag_domain.ServerMode.PROD
+        and feature_flag.web_feature_flag_spec.feature_stage
+        in (
+            web_feature_flag_domain.ServerMode.DEV,
+            web_feature_flag_domain.ServerMode.TEST,
+        )
+    ):
+        return False
+
+    if feature_flag.web_feature_flag_config.force_enable_for_all_users:
+        return True
+
+    if user_id is not None:
+        user_group_models: List[user_models.UserGroupModel] = list(
+            user_models.UserGroupModel.query(
+                user_models.UserGroupModel.user_ids == user_id
+            ).fetch()
+        )
+
+        user_group_models_ids: Set[str] = set(
+            user_group_model.id for user_group_model in user_group_models
+        )
+
+        for (
+            user_group_id
+        ) in feature_flag.web_feature_flag_config.user_group_ids:
+            if user_group_id in user_group_models_ids:
+                return True
+
+        salt = feature_flag_name.encode('utf-8')
+        hashed_user_id = hashlib.sha256(
+            user_id.encode('utf-8') + salt
+        ).hexdigest()
+        hash_value = int(hashed_user_id, 16)
+        mod_result = hash_value % 1000
+        threshold = (
+            feature_flag.web_feature_flag_config.rollout_percentage / 100
+        ) * 1000
+        return bool(mod_result < threshold)
+    return False
+
+
+def evaluate_all_web_feature_flag_configs(
+    user_id: Optional[str],
+) -> Dict[str, bool]:
+    """Evaluates and returns the value of feature flags.
+
+    Args:
+        user_id: str|None. The id of the user, if logged-out user then None.
+
+    Returns:
+        dict. The keys are the feature flag names and the values are boolean
+        results of corresponding flags.
+    """
+    result_dict = {}
+    feature_flags = get_all_web_feature_flags()
+    for feature_flag in feature_flags:
+        feature_flag_status = is_feature_flag_enabled(
+            feature_flag.name, user_id, feature_flag=feature_flag
+        )
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(feature_flag_status, bool)
+        result_dict[feature_flag.name] = feature_flag_status
+    return result_dict

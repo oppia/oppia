@@ -24,7 +24,7 @@ import logging
 import os
 import zipfile
 
-from core import feature_flag_list, feconf, utils
+from core import web_feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import (
@@ -4488,7 +4488,7 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS
+            web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS
         ]
     )
     def test_fetching_entity_translations_in_bulk(self) -> None:

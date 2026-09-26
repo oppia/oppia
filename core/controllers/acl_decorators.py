@@ -22,7 +22,12 @@ import functools
 import logging
 import re
 
-from core import android_validation_constants, feature_flag_list, feconf, utils
+from core import (
+    android_validation_constants,
+    feconf,
+    utils,
+    web_feature_flag_list,
+)
 from core.constants import constants
 from core.controllers import base
 from core.domain import (
@@ -31,7 +36,6 @@ from core.domain import (
     certificate_assessment_services,
     classroom_config_services,
     email_manager,
-    feature_flag_services,
     feedback_services,
     platform_parameter_list,
     platform_parameter_services,
@@ -49,6 +53,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
@@ -1229,8 +1234,8 @@ def can_access_contributor_dashboard_admin_page(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+        new_dashboard_enabled = web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
             self.user_id,
         )
 
@@ -4492,8 +4497,8 @@ def can_access_subtopic_viewer_page(
             )
             return None
 
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+        if web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
             self.user_id,
         ):
             study_guide = study_guide_services.get_study_guide_by_id(

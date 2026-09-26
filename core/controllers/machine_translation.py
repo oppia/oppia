@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.controllers import acl_decorators, base
 from core.domain import (
-    feature_flag_services,
     machine_translation_services,
     translation_services,
+    web_feature_flag_services,
 )
 
 from typing import Any, Dict
@@ -52,8 +52,8 @@ class MachineTranslationGenerateHandler(
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
 
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()
@@ -145,8 +145,8 @@ class TranslationProviderMappingHandler(
     def get(self) -> None:
         """Handles GET requests to fetch the current language-to-provider mapping."""
 
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()
@@ -177,8 +177,8 @@ class TranslationProviderMappingHandler(
     def put(self) -> None:
         """Handles PUT requests to update the language-to-provider mapping."""
 
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()

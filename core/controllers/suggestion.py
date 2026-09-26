@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import base64
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
     exp_fetchers,
-    feature_flag_services,
+    web_feature_flag_services,
     fs_services,
     html_cleaner,
     image_validation_services,
@@ -1336,8 +1336,8 @@ def _get_target_id_to_exploration_opportunity_dict(
         ],
     ] = {}
 
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+    if web_feature_flag_services.is_feature_flag_enabled(
+        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         language_code = (

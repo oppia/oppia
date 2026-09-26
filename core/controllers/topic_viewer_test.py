@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import web_feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
@@ -1034,7 +1034,7 @@ class TopicPageDataHandlerTests(
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.STORY_EDITOR_ARCS]
+        [web_feature_flag_list.FeatureNames.STORY_EDITOR_ARCS]
     )
     def test_get_with_are_story_arcs_enabled(self) -> None:
         self.login(self.NEW_USER_EMAIL)
