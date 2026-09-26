@@ -86,11 +86,18 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
-        <review-translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
+      <div *ngIf="activeExplorationId === null && (isReviewTranslationsTab() || isSubmittedTranslationsTab()) && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
+        <review-translation-language-selector *ngIf="isReviewTranslationsTab()"
+                                              class="oppia-language-selector e2e-test-language-dropdown"
                                               [activeLanguageCode]="languageCode"
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
+        <translation-language-selector *ngIf="isSubmittedTranslationsTab()"
+                                       class="oppia-language-selector e2e-test-submitted-language-dropdown"
+                                       [includeAllOption]="true"
+                                       [activeLanguageCode]="submittedLanguageCode"
+                                       (setActiveLanguageCode)="onChangeSubmittedLanguage($event)">
+        </translation-language-selector>
       </div>
       <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container" [hidden]="!isReviewQuestionsTab()">
         <span class="sort-questions-select float-end"

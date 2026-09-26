@@ -52,7 +52,7 @@
            (click)="selectOption(option.id)"
            (keydown.enter)="selectOption(option.id)"
            tabindex="0"
-           [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
+           [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === (activeLanguageCode || '')}">
         {{option.description}}
       </div>
     </div>
