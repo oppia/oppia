@@ -68,15 +68,9 @@ export class PracticeQuestionSubmitter extends Contributor {
     }
 
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElement(questionElement);
+      await questionElement.click();
     } else {
-      const viewButton = await questionElement.$(
-        '.e2e-test-opportunity-list-item-button'
-      );
-      if (!viewButton) {
-        throw new Error('View button not found.');
-      }
-      await this.clickOnElement(viewButton);
+      await questionElement.locator(suggestQuestionButton).click();
     }
     await this.expectElementToBeVisible(
       '.e2e-test-question-suggestion-review-modal-header'
@@ -136,11 +130,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       );
     }
 
-    const button = await questionElement.$(suggestQuestionButton);
-    if (!button) {
-      throw new Error('Suggest Question button not found.');
-    }
-    await this.clickOnElement(button);
+    await questionElement.locator(suggestQuestionButton).click();
 
     await this.expectElementToBeVisible(
       questionDifficultySelectionModalSelector
@@ -196,9 +186,11 @@ export class PracticeQuestionSubmitter extends Contributor {
       await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
-    const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(options[i]);
+      const responseOption = this.page.locator(stateContentInputField).nth(i);
+      // CKEditor needs a key event to sync the filled text to its model.
+      await responseOption.fill(options[i].slice(0, -1));
+      await responseOption.pressSequentially(options[i].slice(-1));
     }
 
     await this.clickOnElementWithSelector(saveInteractionButton);

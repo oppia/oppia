@@ -43,22 +43,17 @@ const confirmDeleteInteractionButtonSelector =
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
-   * Opens the question editor and waits for the review modal to be removed.
+   * Opens the question editor and waits for the review modal to be hidden.
    */
   private async openQuestionEditorModal(): Promise<void> {
-    const reviewModal = await this.page.$(reviewModalWindowSelector);
-
     await this.clickOnElementWithSelector(editButtonSelector);
 
     // The review and editor modals contain several identical controls. Wait
-    // for the dismissed review modal to detach so that subsequent selectors
+    // for the dismissed review modal to hide so that subsequent selectors
     // cannot resolve to one of its controls during the closing animation.
-    if (reviewModal) {
-      await this.page.waitForFunction(
-        element => !element.isConnected,
-        reviewModal
-      );
-    }
+    await this.page
+      .locator(reviewModalWindowSelector)
+      .waitFor({state: 'hidden'});
     await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
   }
 
@@ -122,7 +117,7 @@ export class PracticeQuestionReviewer extends Contributor {
       stateContentInputField,
       questionEditorModal
     );
-    await contentInput.press('Control+A');
+    await contentInput.press('ControlOrMeta+A');
     await contentInput.press('Backspace');
     await this.typeInInputField(contentInput, question);
 
@@ -204,16 +199,9 @@ export class PracticeQuestionReviewer extends Contributor {
     }
 
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElement(questionElement);
+      await questionElement.click();
     } else {
-      const reviewButton = await questionElement.waitForSelector(
-        opportunityButtonSelector
-      );
-      if (!reviewButton) {
-        throw new Error('Review button not found.');
-      }
-
-      await this.clickOnElement(reviewButton);
+      await questionElement.locator(opportunityButtonSelector).click();
     }
     await this.expectModalTitleToBe(skill);
   }

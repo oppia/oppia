@@ -107,11 +107,6 @@ export class ContributorAdmin extends BaseUser {
    */
   async addUsernameInUsernameInputModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalContainerSelector);
-    const modalContainer = await this.page.$(commonModalContainerSelector);
-    if (!modalContainer) {
-      throw new Error('Modal container not found.');
-    }
-
     const usernameInputSelector = `${commonModalContainerSelector} input`;
     await this.typeInInputField(usernameInputSelector, username);
 
@@ -154,22 +149,7 @@ export class ContributorAdmin extends BaseUser {
    * @param number - The expected number of stats rows.
    */
   async expectNumberOfStatsRowsToBe(number: number): Promise<void> {
-    await this.page.waitForFunction(
-      ({
-        selector,
-        expectedCount,
-      }: {
-        selector: string;
-        expectedCount: number;
-      }) => {
-        const rows = document.querySelectorAll(selector);
-        return rows.length === expectedCount;
-      },
-      {
-        selector: statsListItemSelector,
-        expectedCount: number,
-      }
-    );
+    await expect(this.page.locator(statsListItemSelector)).toHaveCount(number);
   }
 
   /**

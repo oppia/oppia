@@ -929,10 +929,9 @@ export class TopicManager extends BaseUser {
     contains: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(questionTextSelector);
-    const questionTexts = await this.page.$$eval(
-      questionTextSelector,
-      elements => elements.map(element => element.textContent?.trim())
-    );
+    const questionTexts = (
+      await this.page.locator(questionTextSelector).allTextContents()
+    ).map(text => text.trim());
 
     if (contains) {
       expect(questionTexts).toContain(question);
@@ -1004,20 +1003,15 @@ export class TopicManager extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const navigationIsVisible = await this.isElementVisible(
-        navigationContainerSelector,
-        true,
-        5000
-      );
-      if (!navigationIsVisible) {
+      const navigation = this.page.locator(navigationContainerSelector);
+      if (!(await navigation.isVisible())) {
         await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
+      await navigation.waitFor({state: 'visible'});
 
-      const navigationToggles = await this.page.$$(mobileSkillNavToggle);
-      if (navigationToggles.length < 2) {
-        throw new Error('Skill editor mobile navigation toggle not found.');
-      }
-      await this.clickOnElement(navigationToggles[1]);
+      const navigationToggle = this.page.locator(mobileSkillNavToggle).nth(1);
+      await expect(navigationToggle).toBeVisible();
+      await navigationToggle.click();
       await this.clickOnElementWithSelector(mobileSaveOrPublishSkillSelector);
     } else {
       await this.clickOnElementWithSelector(saveOrPublishSkillSelector);

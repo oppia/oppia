@@ -32,6 +32,8 @@ import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-
 import {QuestionAdmin} from '../../utilities/user/question-admin';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
+const NEXT_BUTTON_TEXT = 'Next';
+
 test.describe.configure({mode: 'serial'});
 
 test.describe('Practice Question Reviewer', function () {
@@ -147,7 +149,7 @@ test.describe('Practice Question Reviewer', function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
 
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
-    await questionReviewer.clickOnElementWithText('Next');
+    await questionReviewer.clickOnElementWithText(NEXT_BUTTON_TEXT);
     await questionReviewer.expectQuestionInReviewModalToBe('12 + 4');
   });
 

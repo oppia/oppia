@@ -210,7 +210,7 @@ const closeModalButton = '.e2e-test-close-modal-btn';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
-const contributorDashboardMenuLink =
+const contributorDashboardMenuLinkSelector =
   '.e2e-test-contributor-dashboard-menu-link';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
@@ -1239,8 +1239,8 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
-    await this.expectElementToBeVisible(contributorDashboardMenuLink);
-    await this.clickOnElementWithSelector(contributorDashboardMenuLink);
+    await this.expectElementToBeVisible(contributorDashboardMenuLinkSelector);
+    await this.clickOnElementWithSelector(contributorDashboardMenuLinkSelector);
 
     await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
