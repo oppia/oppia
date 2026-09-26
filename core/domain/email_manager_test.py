@@ -16,8 +16,11 @@
 
 from __future__ import annotations
 
+import base64
 import datetime
 import logging
+import pathlib
+import tempfile
 import types
 from unittest import mock
 
@@ -9793,14 +9796,24 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         self.signup(self.USER_A_EMAIL, 'userA')
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
-    def test_failed_send_mail_enqueues_retry_task(self) -> None:
+    def _send_email_that_fails(
+        self,
+        cc_emails: Optional[List[str]] = None,
+        attachments: Optional[List[Dict[str, str]]] = None,
+    ) -> email_manager.FailedEmailPayloadDict:
+        """Sends an email whose first attempt fails, and returns the payload
+        of the retry task that gets enqueued.
+        """
+
         def mock_send_mail(*_args: str, **_kwargs: str) -> None:
             raise Exception('Simulated email failure')
 
-        enqueued_tasks = []
+        enqueued_tasks: List[
+            Tuple[str, email_manager.FailedEmailPayloadDict]
+        ] = []
 
         def mock_enqueue_task(
-            url: str, payload: dict[str, str], _delay: int
+            url: str, payload: email_manager.FailedEmailPayloadDict, _delay: int
         ) -> None:
             enqueued_tasks.append((url, payload))
 
@@ -9817,13 +9830,137 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
                 'Subject',
                 'Body',
                 'sender@example.com',
+                bcc_admin=True,
+                cc_emails=cc_emails,
+                attachments=attachments,
             )
 
         self.assertEqual(len(enqueued_tasks), 1)
+        url, payload = enqueued_tasks[0]
+        self.assertEqual(url, feconf.TASK_URL_RETRY_FAILED_EMAIL)
+        return payload
+
+    def test_failed_send_mail_enqueues_retry_task(self) -> None:
+        payload = self._send_email_that_fails(cc_emails=['cc@example.com'])
+
+        self.assertEqual(payload['recipient_id'], self.user_a_id)
+        self.assertEqual(payload['recipient_email'], self.USER_A_EMAIL)
+        self.assertEqual(payload['sender_id'], feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(payload['intent'], feconf.EMAIL_INTENT_SIGNUP)
+        self.assertEqual(payload['subject'], 'Subject')
+        self.assertEqual(payload['cc_emails'], ['cc@example.com'])
+        self.assertTrue(payload['bcc_admin'])
+        self.assertEqual(payload['attachments'], [])
+
+    def test_retry_task_carries_attachment_contents(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = pathlib.Path(temp_dir) / 'errors.txt'
+            path.write_bytes(b'Voiceover generation failed.')
+            payload = self._send_email_that_fails(
+                attachments=[{'filename': 'errors.txt', 'path': str(path)}]
+            )
+
         self.assertEqual(
-            enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
+            payload['attachments'],
+            [
+                {
+                    'filename': 'errors.txt',
+                    'content': base64.b64encode(
+                        b'Voiceover generation failed.'
+                    ).decode('utf-8'),
+                }
+            ],
         )
-        self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+
+    def test_resend_failed_email_sends_original_email_and_records_it(
+        self,
+    ) -> None:
+        # Here we use object because each recorded email mixes strings, a
+        # list, a bool and a dict of file contents.
+        sent_emails: List[Dict[str, object]] = []
+        attachment_paths: List[pathlib.Path] = []
+
+        def mock_send_mail(
+            sender_email: str,
+            recipient_email: str,
+            subject: str,
+            unused_plaintext_body: str,
+            unused_html_body: str,
+            cc_emails: Optional[List[str]] = None,
+            bcc_admin: bool = False,
+            attachments: Optional[List[Dict[str, str]]] = None,
+        ) -> None:
+            assert attachments is not None
+            attachment_paths.extend(
+                pathlib.Path(attachment['path']) for attachment in attachments
+            )
+            sent_emails.append(
+                {
+                    'sender_email': sender_email,
+                    'recipient_email': recipient_email,
+                    'subject': subject,
+                    'cc_emails': cc_emails,
+                    'bcc_admin': bcc_admin,
+                    'attachments': {
+                        attachment['filename']: pathlib.Path(
+                            attachment['path']
+                        ).read_bytes()
+                        for attachment in attachments
+                    },
+                }
+            )
+
+        payload: email_manager.FailedEmailPayloadDict = {
+            'recipient_id': self.user_a_id,
+            'recipient_email': self.USER_A_EMAIL,
+            'sender_id': feconf.SYSTEM_COMMITTER_ID,
+            'sender_email': 'Site Admin <sender@example.com>',
+            'intent': feconf.EMAIL_INTENT_SIGNUP,
+            'subject': 'Subject',
+            'html_body': 'Body',
+            'text_body': 'Body',
+            'cc_emails': ['cc@example.com'],
+            'bcc_admin': True,
+            'attachments': [
+                {
+                    'filename': 'errors.txt',
+                    'content': base64.b64encode(b'Voiceover failed.').decode(
+                        'utf-8'
+                    ),
+                }
+            ],
+        }
+
+        with self.swap(email_services, 'send_mail', mock_send_mail):
+            email_manager.resend_failed_email(payload)
+
+        self.assertEqual(
+            sent_emails,
+            [
+                {
+                    'sender_email': 'Site Admin <sender@example.com>',
+                    'recipient_email': self.USER_A_EMAIL,
+                    'subject': 'Subject',
+                    'cc_emails': ['cc@example.com'],
+                    'bcc_admin': True,
+                    'attachments': {'errors.txt': b'Voiceover failed.'},
+                }
+            ],
+        )
+        # The attachment files only exist while the email is being sent.
+        self.assertFalse(any(path.exists() for path in attachment_paths))
+
+        sent_email_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(sent_email_models), 1)
+        self.assertEqual(sent_email_models[0].recipient_id, self.user_a_id)
+        self.assertEqual(
+            sent_email_models[0].sender_id, feconf.SYSTEM_COMMITTER_ID
+        )
+        self.assertEqual(
+            sent_email_models[0].intent, feconf.EMAIL_INTENT_SIGNUP
+        )
 
     def test_send_machine_translation_failure_email(self) -> None:
         """Tests the send_machine_translation_failure_email function."""

@@ -279,11 +279,23 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
+            'recipient_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'recipient_email': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'sender_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
             'sender_email': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
-            'recipient_id': {
+            'intent': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -299,6 +311,36 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'cc_emails': {
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'basestring'},
+                },
+                'default_value': None,
+            },
+            'bcc_admin': {
+                'schema': {'type': 'bool'},
+                'default_value': False,
+            },
+            'attachments': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'filename',
+                                'schema': {'type': 'basestring'},
+                            },
+                            {
+                                'name': 'content',
+                                'schema': {'type': 'basestring'},
+                            },
+                        ],
+                    },
+                },
+                'default_value': [],
+            },
         }
     }
 
@@ -308,13 +350,10 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
         """
-        payload = json.loads(self.request.body)
-
-        sender_email = payload.get('sender_email')
-        recipient_id = payload.get('recipient_id')
-        subject = payload.get('subject')
-        html_body = payload.get('html_body')
-        text_body = payload.get('text_body')
+        payload: email_manager.FailedEmailPayloadDict = json.loads(
+            self.request.body
+        )
+        recipient_email = payload['recipient_email']
 
         num_of_attempts_of_retry_made = int(
             self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
@@ -342,20 +381,18 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             return
 
         try:
-            email_services.send_mail(
-                sender_email, recipient_id, subject, text_body, html_body
-            )
+            email_manager.resend_failed_email(payload)
         except email_services.PermanentEmailSendingError as e:
             logging.error(
                 'Retry dropped due to permanent 4xx error for recipient %s: %s',
-                recipient_id,
+                recipient_email,
                 e,
             )
             self.render_json({})
             return
         except Exception as e:
             logging.error(
-                'Email retry failed for recipient %s: %s', recipient_id, e
+                'Email retry failed for recipient %s: %s', recipient_email, e
             )
             raise Exception('Failed to resend email: %s' % e) from e
 

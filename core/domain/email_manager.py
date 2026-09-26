@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import base64
 import logging
 import pathlib
 import tempfile
@@ -599,6 +600,58 @@ def get_rendered_email_footer() -> str:
     )
 
 
+class FailedEmailAttachmentDict(TypedDict):
+    """Dict representation of an attachment carried by a retried email."""
+
+    filename: str
+    # The base64-encoded contents of the file.
+    content: str
+
+
+class FailedEmailPayloadDict(TypedDict):
+    """Dict representation of the task payload used to retry a failed email."""
+
+    recipient_id: str
+    recipient_email: str
+    sender_id: str
+    sender_email: str
+    intent: str
+    subject: str
+    html_body: str
+    text_body: str
+    cc_emails: Optional[List[str]]
+    bcc_admin: bool
+    attachments: List[FailedEmailAttachmentDict]
+
+
+def _encode_attachments_for_retry(
+    attachments: Optional[List[Dict[str, str]]],
+) -> List[FailedEmailAttachmentDict]:
+    """Reads the given attachment files so that they can be sent with a retry.
+
+    Attachments are usually temporary files that are deleted as soon as
+    _send_email() returns, and the retry task may run on a different instance,
+    so the file contents have to travel with the task instead of their paths.
+
+    Args:
+        attachments: list(dict)|None. A list of dictionaries, where each
+            dictionary includes the keys `filename` and `path`.
+
+    Returns:
+        list(FailedEmailAttachmentDict). The attachments with their contents
+        base64-encoded.
+    """
+    return [
+        {
+            'filename': attachment['filename'],
+            'content': base64.b64encode(
+                pathlib.Path(attachment['path']).read_bytes()
+            ).decode('utf-8'),
+        }
+        for attachment in attachments or []
+    ]
+
+
 def _send_email(
     recipient_id: str,
     sender_id: str,
@@ -710,16 +763,22 @@ def _send_email(
                 e,
             )
 
-            payload = {
+            payload: FailedEmailPayloadDict = {
+                'recipient_id': recipient_id,
+                'recipient_email': recipient_email_address,
+                'sender_id': sender_id,
                 'sender_email': sender_name_email,
-                'recipient_id': recipient_email_address,
+                'intent': intent,
                 'subject': email_subject,
                 'html_body': cleaned_html_body,
                 'text_body': cleaned_plaintext_body,
+                'cc_emails': cc_emails,
+                'bcc_admin': bcc_admin,
+                'attachments': _encode_attachments_for_retry(attachments),
             }
 
             taskqueue_services.enqueue_task(
-                feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
+                feconf.TASK_URL_RETRY_FAILED_EMAIL, dict(payload), 0
             )
             return
 
@@ -735,6 +794,50 @@ def _send_email(
         )
 
     _send_email_transactional()
+
+
+def resend_failed_email(payload: FailedEmailPayloadDict) -> None:
+    """Resends an email whose first attempt failed, and records it as sent.
+
+    Args:
+        payload: FailedEmailPayloadDict. The payload that _send_email()
+            enqueued when the first attempt failed.
+
+    Raises:
+        Exception. The email could not be sent. Errors from
+            email_services.send_mail() are propagated so that the caller can
+            decide whether the task should be retried.
+    """
+    with tempfile.TemporaryDirectory() as attachment_dir:
+        attachments = []
+        for attachment in payload['attachments']:
+            path = pathlib.Path(attachment_dir) / attachment['filename']
+            path.write_bytes(base64.b64decode(attachment['content']))
+            attachments.append(
+                {'filename': attachment['filename'], 'path': str(path)}
+            )
+
+        email_services.send_mail(
+            payload['sender_email'],
+            payload['recipient_email'],
+            payload['subject'],
+            payload['text_body'],
+            payload['html_body'],
+            cc_emails=payload['cc_emails'],
+            bcc_admin=payload['bcc_admin'],
+            attachments=attachments or None,
+        )
+
+    email_models.SentEmailModel.create(
+        payload['recipient_id'],
+        payload['recipient_email'],
+        payload['sender_id'],
+        payload['sender_email'],
+        payload['intent'],
+        payload['subject'],
+        payload['html_body'],
+        utils.get_current_utc_datetime(),
+    )
 
 
 def send_dummy_mail_to_admin(username: str) -> None:

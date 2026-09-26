@@ -39,13 +39,15 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Tuple
+from typing import Dict, Final, List, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import feedback_models
+    from mypy_imports import email_models, feedback_models
 
-(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
+(email_models, feedback_models) = models.Registry.import_models(
+    [models.Names.EMAIL, models.Names.FEEDBACK]
+)
 
 
 class TasksTests(test_utils.EmailTestBase):
@@ -1311,11 +1313,17 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.payload = {
+            'recipient_id': 'recipient_id',
+            'recipient_email': 'recipient@example.com',
+            'sender_id': feconf.SYSTEM_COMMITTER_ID,
             'sender_email': 'sender@example.com',
-            'recipient_id': 'recipient@example.com',
+            'intent': feconf.EMAIL_INTENT_SIGNUP,
             'subject': 'Test Subject',
             'html_body': '<html>Test Body</html>',
             'text_body': 'Test Body',
+            'cc_emails': ['cc@example.com'],
+            'bcc_admin': True,
+            'attachments': [],
         }
         self.url = feconf.TASK_URL_RETRY_FAILED_EMAIL
         self.csrf_token = self.get_new_csrf_token()
@@ -1326,9 +1334,13 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
         }
 
-    def test_successful_retry_returns_200(self) -> None:
-        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
-            pass
+    def test_successful_retry_keeps_cc_and_bcc_and_records_email(
+        self,
+    ) -> None:
+        send_mail_kwargs = []
+
+        def mock_send_mail(*_args: str, **kwargs: str) -> None:
+            send_mail_kwargs.append(kwargs)
 
         send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
 
@@ -1341,6 +1353,22 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
                 expect_errors=False,
                 expected_status_int=200,
             )
+
+        self.assertEqual(
+            send_mail_kwargs,
+            [
+                {
+                    'cc_emails': ['cc@example.com'],
+                    'bcc_admin': True,
+                    'attachments': None,
+                }
+            ],
+        )
+        sent_email_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(sent_email_models), 1)
+        self.assertEqual(sent_email_models[0].recipient_id, 'recipient_id')
 
     def test_failed_retry_raises_exception_to_trigger_cloud_task_retry(
         self,
