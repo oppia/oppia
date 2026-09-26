@@ -1059,6 +1059,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Waits for the page to fully load by checking the document's ready state and waiting for the respective
    * HTML to load completely.
    *

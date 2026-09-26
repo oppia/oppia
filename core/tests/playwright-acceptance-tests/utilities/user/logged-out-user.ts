@@ -211,6 +211,95 @@ const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
+const blogUrl = testConstants.URLs.Blog;
+const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
+const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
+const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
+
+// About page selectors.
+const aboutUsHeadingSelector = '.e2e-test-about-us-title';
+const aboutUsSubheadingSelector = '.e2e-test-about-page-title-new';
+const aboutPageSectionGoalTitleSelector =
+  '.oppia-about-foundation-section-goal-title';
+const exploreLessonsButtonInAboutUsPageSelector =
+  '.e2e-test-about-page-explore-lessons-button';
+const androidAppButtonInAboutUsPageSelector =
+  '.e2e-test-about-page-android-button';
+const partnershipStoryBoardDesktopSelector =
+  '.oppia-about-partnerships-cards-container-desktop .oppia-about-partnerships-card';
+const partnershipStoryBoardMobileSelector =
+  '.oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card';
+const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
+const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
+const impactReportButtonInAboutPage =
+  '.e2e-test-about-page-impact-report-button';
+const featuresSectionInAboutPage = '.e2e-test-about-page-features-section';
+const featuresAccordionExpandButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel-title-desktop';
+const featuresAccordionExpandButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-title-mobile';
+const featuresAccordionCloseButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel button';
+const featuresAccordionCloseButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-close-button';
+const featuresAccordionPanelContentDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel .panel-content';
+const featuresAccordionPanelContentMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-content';
+const volunteerCarouselSelectorDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-desktop';
+const volunteerCarouselSelectorMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-mobile';
+const volunteerCarouselSlideHeadingDesktopInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-desktop';
+const volunteerCarouselSlideHeadingMobileInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-mobile';
+const volunteerCarouselNextButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-desktop';
+const volunteerCarouselNextButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-mobile';
+const volunteerCarouselPrevButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-desktop';
+const volunteerCarouselPrevButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-mobile';
+const volunteerCarouselSlideHeadingsInAboutPage =
+  testConstants.AboutPageVolunteerCarouselHeadings;
+
+// Navbar, sidebar and footer selectors for the About menu.
+const navbarAboutTabImpactReportButton =
+  'a.e2e-test-navbar-impact-report-button';
+const mobileSidebarImpactReportButton =
+  'a.e2e-mobile-test-sidebar-impact-report-button';
+const mobileSidebarExpandImpactReportSubMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-impactreport-submenu';
+const footerBlogLink = 'a.e2e-test-footer-blog-link';
+
+// Donate page selectors and URLs.
+const donateUrl = testConstants.URLs.Donate;
+const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const donorBoxIframe = '.e2e-test-donate-page-iframe';
+const donatePage = '.donate-content-container';
+const donationHeadingSelector = '.e2e-test-donate-heading';
+const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
+const ourImpactSectionSelector = '.e2e-test-dp-our-impact-section';
+const ourLearnersSectionSelector = '.e2e-test-donate-our-learners';
+const donationHighlightsSelector = '.e2e-test-donate-highlights';
+const ourNetworkHeadingSelector = '.e2e-test-dp-our-network-heading';
+const ourNetworkSectionSelector = '.e2e-test-dp-our-network-section';
+const thanksForDonatingDismissButton =
+  'i.e2e-test-thanks-for-donating-page-dismiss-button';
+const thanksForDonatingModalOpen = '.modal-open';
+
+// Navbar and sidebar selectors for Donate.
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabDonateButton =
+  'a.e2e-test-navbar-get-involved-menu-donate-button';
+const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
+const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuDonateButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2923,6 +3012,505 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Closes the mobile sidebar and waits for it to disappear.
+   *
+   * @throws Error if sidebar is already closed (indicates a test logic error).
+   */
+  private async closeMobileSidebar(): Promise<void> {
+    const sidebarOpen = await this.page.$(mobileSidebarOpenSelector);
+    if (!sidebarOpen) {
+      throw new Error(
+        'closeMobileSidebar() called but sidebar is already closed. ' +
+          'This indicates a test logic error.'
+      );
+    }
+
+    await this.waitForAngularStability();
+    await this.page
+      .locator(mobileNavbarOpenSidebarButton)
+      .dispatchEvent('click');
+    await this.expectElementToBeVisible(mobileSidebarOpenSelector, false);
+  }
+
+  /**
+   * Checks that the link with the given text (among the elements matching
+   * the selector) points to the expected URL. The link is not opened, since
+   * it leads to an external site.
+   * @param {string} selector - The selector of the links.
+   * @param {string} linkText - The exact (trimmed) text of the link.
+   * @param {string} expectedUrl - The expected href of the link.
+   */
+  async openExternalLinkBySelectorAndText(
+    selector: string,
+    linkText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    const link = this.page
+      .locator(selector)
+      .filter({hasText: new RegExp(`^\\s*${linkText}\\s*$`)})
+      .first();
+    await expect(
+      link,
+      `Link with text "${linkText}" not found.`
+    ).toBeAttached();
+    await expect(link).toHaveAttribute('href', expectedUrl);
+  }
+
+  /**
+   * Checks if the text content of any element with the given selector
+   * matches the given value exactly.
+   * @param {string} selector - The CSS selector to find the elements.
+   * @param {string} value - The expected text content value.
+   */
+  async expectAnyElementWithSelectorToHaveTextContent(
+    selector: string,
+    value: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const values = await this.page.locator(selector).allTextContents();
+
+    if (!values.includes(value)) {
+      throw new Error(
+        `Expected text content to contain ${value}, but found ${values.join(',')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if heading in about us page matches the expected heading.
+   * @param {string} heading - The expected heading.
+   */
+  async expectAboutUsPageHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      aboutUsHeadingSelector,
+      heading
+    );
+  }
+
+  /**
+   * Checks if given subheading is available in about page. Curly quotes and
+   * extra whitespace are normalized before comparing.
+   * @param {string} subheading - The expected subheading.
+   */
+  async expectSubheadingInAboutUsPageToContain(
+    subheading: string
+  ): Promise<void> {
+    const normalizeSubheadingText = (text: string | null | undefined): string =>
+      (text ?? '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    await this.expectElementToBeVisible(aboutUsSubheadingSelector);
+    const subheadings = await this.page
+      .locator(aboutUsSubheadingSelector)
+      .allTextContents();
+
+    const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
+    const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
+
+    if (normalizedSubheadings.includes(normalizedExpectedSubheading)) {
+      showMessage(`Subheading ${subheading} is present.`);
+    } else {
+      throw new Error(
+        `Subheading "${subheading}" is not present. Subheading present: ${subheadings.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if given goal is listed in any section of about page.
+   * @param {string} sectionGoal - The expected section goal.
+   */
+  async expectSectionGoalsInAboutPageToContain(
+    sectionGoal: string
+  ): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      aboutPageSectionGoalTitleSelector,
+      sectionGoal
+    );
+  }
+
+  /**
+   * Checks if explore lessons button is visible in about page.
+   */
+  async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(
+      exploreLessonsButtonInAboutUsPageSelector
+    );
+  }
+
+  /**
+   * Checks if android app button is visible in about page.
+   */
+  async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(androidAppButtonInAboutUsPageSelector);
+  }
+
+  /**
+   * Verifies that the expand button of the Features accordion in the About
+   * page opens the panel content and the close button closes it.
+   */
+  async expectFeaturesAccordionToBeFunctionalInAboutPage(): Promise<void> {
+    await this.expectElementToBeVisible(featuresSectionInAboutPage);
+
+    const isMobile = this.isViewportAtMobileWidth();
+    const panelContentSelector = isMobile
+      ? featuresAccordionPanelContentMobileInAboutPage
+      : featuresAccordionPanelContentDesktopInAboutPage;
+    const expandButtonSelector = isMobile
+      ? featuresAccordionExpandButtonMobileInAboutPage
+      : featuresAccordionExpandButtonDesktopInAboutPage;
+    const closeButtonSelector = isMobile
+      ? featuresAccordionCloseButtonMobileInAboutPage
+      : featuresAccordionCloseButtonDesktopInAboutPage;
+
+    await this.clickOnElementWithSelector(expandButtonSelector);
+    await this.expectElementToBeVisible(panelContentSelector);
+
+    await this.page.locator(closeButtonSelector).first().dispatchEvent('click');
+
+    // The panel is closed when it is removed or loses the "show" class.
+    await this.page.waitForFunction((selector: string) => {
+      const panel = document.querySelector(selector);
+      return !panel || !panel.classList.contains('show');
+    }, panelContentSelector);
+  }
+
+  /**
+   * Verifies that the Volunteer carousel in the About page shows the first
+   * slide, moves to the next slide, and moves back to the first slide.
+   */
+  async expectVolunteerCarouselToBeFunctionalInAboutPage(): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const carouselSelector = isMobile
+      ? volunteerCarouselSelectorMobileInAboutPage
+      : volunteerCarouselSelectorDesktopInAboutPage;
+    const slideHeadingSelector = isMobile
+      ? volunteerCarouselSlideHeadingMobileInAboutPage
+      : volunteerCarouselSlideHeadingDesktopInAboutPage;
+    const nextButtonSelector = isMobile
+      ? volunteerCarouselNextButtonMobileInAboutPage
+      : volunteerCarouselNextButtonDesktopInAboutPage;
+    const prevButtonSelector = isMobile
+      ? volunteerCarouselPrevButtonMobileInAboutPage
+      : volunteerCarouselPrevButtonDesktopInAboutPage;
+    const firstSlideHeading = volunteerCarouselSlideHeadingsInAboutPage[0];
+    // Desktop shows two slides at a time, so "next" jumps two headings.
+    const secondSlideHeading = isMobile
+      ? volunteerCarouselSlideHeadingsInAboutPage[1]
+      : volunteerCarouselSlideHeadingsInAboutPage[2];
+
+    await this.expectElementToBeVisible(carouselSelector);
+    const slideHeading = this.page.locator(slideHeadingSelector).first();
+
+    // toContainText retries until the slide transition finishes.
+    await expect(
+      slideHeading,
+      `Expected first volunteer slide heading to contain "${firstSlideHeading}"`
+    ).toContainText(firstSlideHeading);
+
+    await this.clickOnElementWithSelector(nextButtonSelector);
+    await expect(
+      slideHeading,
+      `Expected second volunteer slide heading to contain "${secondSlideHeading}"`
+    ).toContainText(secondSlideHeading);
+
+    await this.clickOnElementWithSelector(prevButtonSelector);
+    await expect(
+      slideHeading,
+      `Expected first volunteer slide heading to contain "${firstSlideHeading}" again`
+    ).toContainText(firstSlideHeading);
+  }
+
+  /**
+   * Checks the number of partnership story boards in the About page.
+   * @param {number} n - The expected number of story boards.
+   */
+  async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? partnershipStoryBoardMobileSelector
+      : partnershipStoryBoardDesktopSelector;
+    await expect(
+      this.page.locator(selector),
+      `Expected ${n} story boards in the About page.`
+    ).toHaveCount(n);
+  }
+
+  /**
+   * Checks the number of impact stats listed in the About page.
+   * @param {number} n - The expected number of impact stats.
+   */
+  async expectImpactStatsTitlesToBe(n: number): Promise<void> {
+    await expect(
+      this.page.locator(impactStatsTitleSelector),
+      `Expected ${n} impact stats in the About page.`
+    ).toHaveCount(n);
+  }
+
+  /**
+   * Checks the number of impact charts shown in the About page.
+   * @param {number} n - The expected number of charts.
+   */
+  async expectImpactChartsToBe(n: number): Promise<void> {
+    await expect(
+      this.page.locator(impactChartContainerSelector),
+      `Expected ${n} impact charts in the About page.`
+    ).toHaveCount(n);
+  }
+
+  /**
+   * Checks that the "View Report" button on the About page is visible.
+   */
+  async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(impactReportButtonInAboutPage);
+  }
+
+  /**
+   * Opens the Impact Report submenu in the About menu of the navbar (or the
+   * mobile sidebar) and checks that the 2024, 2023 and 2022 report links
+   * point to the right URLs.
+   */
+  async verifyImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.waitForAngularStability();
+
+      await this.page
+        .locator(mobileSidebarExpandAboutMenuButton)
+        .dispatchEvent('click');
+      await this.expectElementToBeVisible(
+        mobileSidebarExpandImpactReportSubMenuButton
+      );
+      await this.page
+        .locator(mobileSidebarExpandImpactReportSubMenuButton)
+        .dispatchEvent('click');
+
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2022',
+        impactReport2022Url
+      );
+
+      // Collapse the About menu and close the sidebar, so the next test can
+      // open it again.
+      await this.page
+        .locator(mobileSidebarExpandAboutMenuButton)
+        .dispatchEvent('click');
+      await this.closeMobileSidebar();
+    } else {
+      await this.expectElementToBeVisible(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2022',
+        impactReport2022Url
+      );
+
+      // Close the About dropdown, so the next step can open it again.
+      await this.page.keyboard.press('Escape');
+      await this.page.mouse.move(0, 0);
+      await this.expectElementToBeVisible(navbarAboutTabAboutButton, false);
+    }
+  }
+
+  /**
+   * Navigates to the Blog page using the Oppia website footer.
+   */
+  async clickOnBlogLinkInFooter(): Promise<void> {
+    await this.expectElementToBeVisible(footerBlogLink);
+    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
+  }
+
+  /**
+   * Clicks the element with the given selector and waits until the Donate
+   * page has loaded.
+   *
+   * Note: The Donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot wait for 'networkidle' (as
+   * clickAndWaitForNavigation does). Instead, we wait only for the 'load'
+   * event.
+   * @param {string} selector - The selector of the element to click.
+   */
+  private async clickAndWaitForDonatePage(selector: string): Promise<void> {
+    const navigation = this.page.waitForURL(
+      (url: URL) => url.href.startsWith(donateUrl),
+      {waitUntil: 'load', timeout: 60000}
+    );
+    await this.clickOnElementWithSelector(selector);
+    await navigation;
+  }
+
+  /**
+   * Clicks the Donate button in the Get Involved menu on the navbar (or the
+   * mobile sidebar) and checks that it opens the Donate page.
+   */
+  async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
+      await this.clickAndWaitForDonatePage(
+        mobileSidebarGetInvolvedMenuDonateButton
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.clickAndWaitForDonatePage(navbarGetInvolvedTabDonateButton);
+    }
+    await this.expectPageURLToContain(donateUrl);
+  }
+
+  /**
+   * Clicks the Donate button on the navbar (in the sidebar on mobile) and
+   * checks that it opens the Donate page.
+   */
+  async clickDonateButtonOnNavbar(): Promise<void> {
+    const navbarDonateButton = this.isViewportAtMobileWidth()
+      ? navbarDonateMobileButton
+      : navbarDonateDesktopButton;
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+    }
+    await this.expectElementToBeVisible(navbarDonateButton);
+    await this.clickAndWaitForDonatePage(navbarDonateButton);
+    await this.expectPageURLToContain(donateUrl);
+  }
+
+  /**
+   * Checks that the DonorBox iframe is visible on the Donate page.
+   * Only its visibility is tested, since the DonorBox is a third-party
+   * service.
+   */
+  async isDonorBoxVisbleOnDonatePage(): Promise<void> {
+    const donorBox = this.page.locator(donorBoxIframe);
+    await expect(
+      donorBox,
+      'The donor box is not present on the donate page.'
+    ).toBeAttached();
+
+    if (!this.isViewportAtMobileWidth()) {
+      await expect(
+        donorBox,
+        'The donor box is not visible on the donate page.'
+      ).toBeVisible();
+      // Wait for the DonorBox frame itself to start loading.
+      await expect
+        .poll(
+          () =>
+            this.page
+              .frames()
+              .some(frame => frame.url().includes('donorbox.org')),
+          {
+            message:
+              'The DonorBox iframe did not finish loading within the expected time.',
+            timeout: 20000,
+          }
+        )
+        .toBe(true);
+    }
+    showMessage('The donor box is visible on the donate page.');
+  }
+
+  /**
+   * Checks that the Donate page heading matches the given heading.
+   * @param {string} heading - The expected heading.
+   */
+  async expectDonationPageHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      donationHeadingSelector,
+      heading
+    );
+  }
+
+  /**
+   * Checks that the "Our Impact" section is visible on the Donate page.
+   */
+  async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourImpactSectionSelector);
+  }
+
+  /**
+   * Checks that the "Our Network" section is visible on the Donate page.
+   */
+  async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourNetworkHeadingSelector);
+    await this.expectTextContentInElementWithSelectorToBe(
+      ourNetworkHeadingSelector,
+      'Our Network'
+    );
+    await this.expectElementToBeVisible(ourNetworkSectionSelector);
+    await this.expectElementToBeVisible(donationHighlightsSelector);
+  }
+
+  /**
+   * Checks that the "Our Learners" section is visible on the Donate page.
+   */
+  async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourLearnersSectionSelector);
+  }
+
+  /**
+   * Checks that the "Ready to make an impact?" text is present on the page.
+   */
+  async expectReadyToMakeAnImpactToBePresent(): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      readyToMakeDonationSelector,
+      ' Ready to make an impact? '
+    );
+  }
+
+  /**
+   * Navigates to the "Thanks for donating" modal on the Donate page.
+   * Waits only for the 'load' event, for the same DonorBox reason as
+   * clickAndWaitForDonatePage.
+   */
+  async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.page.goto(donatePageThanksModalURL, {waitUntil: 'load'});
+    await this.expectElementToBeVisible(thanksForDonatingDismissButton);
+  }
+
+  /**
+   * Clicks the dismiss button in the "Thanks for donating" modal on the
+   * Donate page, and checks that the modal closes and the Donate page is
+   * shown.
+   */
+  async dismissDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.expectElementToBeVisible(thanksForDonatingDismissButton);
+    await this.clickOnElementWithSelector(thanksForDonatingDismissButton);
+    await this.expectElementToBeVisible(thanksForDonatingModalOpen, false);
+    await this.expectElementToBeVisible(donatePage);
+    showMessage(
+      'The dismiss button closes the Donation thanks modal on Donate page ' +
+        'and shows the Donate page.'
+    );
   }
 }
 
