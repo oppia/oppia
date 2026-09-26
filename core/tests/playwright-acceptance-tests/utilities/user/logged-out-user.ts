@@ -274,6 +274,33 @@ const mobileSidebarExpandImpactReportSubMenuButton =
   'div.e2e-mobile-test-sidebar-expand-impactreport-submenu';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 
+// Donate page selectors and URLs.
+const donateUrl = testConstants.URLs.Donate;
+const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const donorBoxIframe = '.e2e-test-donate-page-iframe';
+const donatePage = '.donate-content-container';
+const donationHeadingSelector = '.e2e-test-donate-heading';
+const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
+const ourImpactSectionSelector = '.e2e-test-dp-our-impact-section';
+const ourLearnersSectionSelector = '.e2e-test-donate-our-learners';
+const donationHighlightsSelector = '.e2e-test-donate-highlights';
+const ourNetworkHeadingSelector = '.e2e-test-dp-our-network-heading';
+const ourNetworkSectionSelector = '.e2e-test-dp-our-network-section';
+const thanksForDonatingDismissButton =
+  'i.e2e-test-thanks-for-donating-page-dismiss-button';
+const thanksForDonatingModalOpen = '.modal-open';
+
+// Navbar and sidebar selectors for Donate.
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabDonateButton =
+  'a.e2e-test-navbar-get-involved-menu-donate-button';
+const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
+const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuDonateButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -3317,6 +3344,173 @@ export class LoggedOutUser extends BaseUser {
   async clickOnBlogLinkInFooter(): Promise<void> {
     await this.expectElementToBeVisible(footerBlogLink);
     await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
+  }
+
+  /**
+   * Clicks the element with the given selector and waits until the Donate
+   * page has loaded.
+   *
+   * Note: The Donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot wait for 'networkidle' (as
+   * clickAndWaitForNavigation does). Instead, we wait only for the 'load'
+   * event.
+   * @param {string} selector - The selector of the element to click.
+   */
+  private async clickAndWaitForDonatePage(selector: string): Promise<void> {
+    const navigation = this.page.waitForURL(
+      (url: URL) => url.href.startsWith(donateUrl),
+      {waitUntil: 'load', timeout: 60000}
+    );
+    await this.clickOnElementWithSelector(selector);
+    await navigation;
+  }
+
+  /**
+   * Clicks the Donate button in the Get Involved menu on the navbar (or the
+   * mobile sidebar) and checks that it opens the Donate page.
+   */
+  async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
+      await this.clickAndWaitForDonatePage(
+        mobileSidebarGetInvolvedMenuDonateButton
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.clickAndWaitForDonatePage(navbarGetInvolvedTabDonateButton);
+    }
+    await this.expectPageURLToContain(donateUrl);
+  }
+
+  /**
+   * Clicks the Donate button on the navbar (in the sidebar on mobile) and
+   * checks that it opens the Donate page.
+   */
+  async clickDonateButtonOnNavbar(): Promise<void> {
+    const navbarDonateButton = this.isViewportAtMobileWidth()
+      ? navbarDonateMobileButton
+      : navbarDonateDesktopButton;
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+    }
+    await this.expectElementToBeVisible(navbarDonateButton);
+    await this.clickAndWaitForDonatePage(navbarDonateButton);
+    await this.expectPageURLToContain(donateUrl);
+  }
+
+  /**
+   * Checks that the DonorBox iframe is visible on the Donate page.
+   * Only its visibility is tested, since the DonorBox is a third-party
+   * service.
+   */
+  async isDonorBoxVisbleOnDonatePage(): Promise<void> {
+    const donorBox = this.page.locator(donorBoxIframe);
+    await expect(
+      donorBox,
+      'The donor box is not present on the donate page.'
+    ).toBeAttached();
+
+    if (!this.isViewportAtMobileWidth()) {
+      await expect(
+        donorBox,
+        'The donor box is not visible on the donate page.'
+      ).toBeVisible();
+      // Wait for the DonorBox frame itself to start loading.
+      await expect
+        .poll(
+          () =>
+            this.page
+              .frames()
+              .some(frame => frame.url().includes('donorbox.org')),
+          {
+            message:
+              'The DonorBox iframe did not finish loading within the expected time.',
+            timeout: 20000,
+          }
+        )
+        .toBe(true);
+    }
+    showMessage('The donor box is visible on the donate page.');
+  }
+
+  /**
+   * Checks that the Donate page heading matches the given heading.
+   * @param {string} heading - The expected heading.
+   */
+  async expectDonationPageHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      donationHeadingSelector,
+      heading
+    );
+  }
+
+  /**
+   * Checks that the "Our Impact" section is visible on the Donate page.
+   */
+  async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourImpactSectionSelector);
+  }
+
+  /**
+   * Checks that the "Our Network" section is visible on the Donate page.
+   */
+  async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourNetworkHeadingSelector);
+    await this.expectTextContentInElementWithSelectorToBe(
+      ourNetworkHeadingSelector,
+      'Our Network'
+    );
+    await this.expectElementToBeVisible(ourNetworkSectionSelector);
+    await this.expectElementToBeVisible(donationHighlightsSelector);
+  }
+
+  /**
+   * Checks that the "Our Learners" section is visible on the Donate page.
+   */
+  async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(ourLearnersSectionSelector);
+  }
+
+  /**
+   * Checks that the "Ready to make an impact?" text is present on the page.
+   */
+  async expectReadyToMakeAnImpactToBePresent(): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      readyToMakeDonationSelector,
+      ' Ready to make an impact? '
+    );
+  }
+
+  /**
+   * Navigates to the "Thanks for donating" modal on the Donate page.
+   * Waits only for the 'load' event, for the same DonorBox reason as
+   * clickAndWaitForDonatePage.
+   */
+  async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.page.goto(donatePageThanksModalURL, {waitUntil: 'load'});
+    await this.expectElementToBeVisible(thanksForDonatingDismissButton);
+  }
+
+  /**
+   * Clicks the dismiss button in the "Thanks for donating" modal on the
+   * Donate page, and checks that the modal closes and the Donate page is
+   * shown.
+   */
+  async dismissDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.expectElementToBeVisible(thanksForDonatingDismissButton);
+    await this.clickOnElementWithSelector(thanksForDonatingDismissButton);
+    await this.expectElementToBeVisible(thanksForDonatingModalOpen, false);
+    await this.expectElementToBeVisible(donatePage);
+    showMessage(
+      'The dismiss button closes the Donation thanks modal on Donate page ' +
+        'and shows the Donate page.'
+    );
   }
 }
 
