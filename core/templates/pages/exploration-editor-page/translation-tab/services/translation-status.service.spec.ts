@@ -18,6 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationStatusService} from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
@@ -71,6 +72,7 @@ describe('Translation status service', () => {
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
+  let PLACEHOLDER_STATUS_COLOR = '#CCCCCC';
   let statesWithAudioDict: StateObjectsBackendDict = {};
 
   beforeEach(() => {
@@ -111,6 +113,7 @@ describe('Translation status service', () => {
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    TestBed.inject(ExplorationLanguageCodeService).init('en');
     let currentIndex = 9;
     generateContentIdService.init(
       () => currentIndex++,
@@ -830,6 +833,111 @@ describe('Translation status service', () => {
       true
     );
   });
+
+  it(
+    'should only count translated content as requiring voiceovers in a' +
+      ' non-original language',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(1);
+    }
+  );
+
+  it(
+    'should use a gray status color for untranslated content in' +
+      ' voiceover mode',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      tss.refresh();
+
+      expect(tss.getActiveStateContentIdStatusColor('content_0')).toBe(
+        PLACEHOLDER_STATUS_COLOR
+      );
+    }
+  );
+
+  it(
+    'should ignore untranslated content when coloring active state' +
+      ' components in voiceover mode',
+    () => {
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      stateEditorService.setActiveStateName('First');
+      tss.refresh();
+
+      // Untranslated content ids are dropped, so the content component
+      // has nothing left to color.
+      expect(tss.getActiveStateComponentStatusColor('content')).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+      // Only feedback_3 has a Hindi translation. The fixture still uses
+      // English en-US voiceovers, so that remaining feedback item is
+      // treated as fully voiced.
+      expect(tss.getActiveStateComponentStatusColor('feedback')).toBe(
+        ALL_ASSETS_AVAILABLE_COLOR
+      );
+      expect(tss.getActiveStateComponentNeedsUpdateStatus('feedback')).toBe(
+        false
+      );
+    }
+  );
+
+  it(
+    'should treat an unset exploration language as the original language' +
+      ' for voiceover counts',
+    () => {
+      TestBed.inject(ExplorationLanguageCodeService).displayed = null;
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(5);
+    }
+  );
+
+  it(
+    'should treat an empty exploration language as the original language' +
+      ' for voiceover counts',
+    () => {
+      TestBed.inject(ExplorationLanguageCodeService).displayed = '';
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(5);
+    }
+  );
+
+  it(
+    'should exclude empty written translations from the voiceover required' +
+      ' count',
+    () => {
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
+        EntityTranslation.createFromBackendDict({
+          entity_id: 'exp_id',
+          entity_type: 'exploration',
+          entity_version: 5,
+          language_code: 'hi',
+          translations: {
+            feedback_3: {
+              content_format: 'html',
+              content_value: '',
+              needs_update: false,
+            },
+          },
+        });
+      ttams.activateVoiceoverMode();
+      tls.setActiveLanguageCode('hi');
+      tss.refresh();
+
+      expect(tss.getExplorationContentRequiredCount()).toBe(0);
+    }
+  );
 });
 
 describe('Translation status service - initialization', () => {
