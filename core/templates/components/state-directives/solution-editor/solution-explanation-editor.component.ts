@@ -38,7 +38,7 @@ import {
   SchemaDefaultValue,
 } from 'services/schema-default-value.service';
 
-interface ExplanationFormSchema {
+export interface ExplanationFormSchema {
   type: 'html';
   ui_config: object;
 }

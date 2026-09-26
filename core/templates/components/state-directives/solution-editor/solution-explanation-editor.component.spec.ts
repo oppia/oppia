@@ -26,7 +26,10 @@ import {
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {EditabilityService} from 'services/editability.service';
 import {PageContextService} from 'services/page-context.service';
-import {SolutionExplanationEditor} from './solution-explanation-editor.component';
+import {
+  ExplanationFormSchema,
+  SolutionExplanationEditor,
+} from './solution-explanation-editor.component';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
@@ -105,8 +108,8 @@ describe('Solution explanation editor', () => {
   });
 
   it('should intitalize with default values', () => {
-    const schema = {
-      type: 'html' as const,
+    const schema: ExplanationFormSchema = {
+      type: 'html',
       ui_config: {
         rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
@@ -127,8 +130,8 @@ describe('Solution explanation editor', () => {
   });
 
   it('should open shema based editor on user click', () => {
-    const schema = {
-      type: 'html' as const,
+    const schema: ExplanationFormSchema = {
+      type: 'html',
       ui_config: {
         rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
