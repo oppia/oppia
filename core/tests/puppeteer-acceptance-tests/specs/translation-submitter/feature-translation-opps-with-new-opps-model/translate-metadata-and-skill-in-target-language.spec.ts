@@ -22,7 +22,7 @@
  * TS.2 Translate a skill.
  * TS.2 View the translation I submitted.
  *
- * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -42,8 +42,6 @@ import {TopicManager} from '../../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
-
-Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
 

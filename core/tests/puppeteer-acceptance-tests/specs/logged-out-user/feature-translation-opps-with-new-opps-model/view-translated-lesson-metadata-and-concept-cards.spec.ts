@@ -22,7 +22,7 @@
  * LO.4 Refer to a concept card.
  * LO.4 View translated lesson metadata and concept cards in the player.
  *
- * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -44,8 +44,6 @@ import {TranslationReviewer} from '../../../utilities/user/translation-reviewer'
 import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
-
-Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
 const HINDI_SITE_LANGUAGE_CODE = 'hi';
@@ -233,7 +231,7 @@ describe('Logged-out User', function () {
     await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
   }, 2100000);
 
-  it('should cover LO.4: view information about the lesson', async function () {
+  it('should view information about the lesson', async function () {
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
     );
@@ -243,13 +241,13 @@ describe('Logged-out User', function () {
     await loggedOutUser.closeLessonInfoModal();
   });
 
-  it('should cover LO.4: refer to a concept card', async function () {
+  it('should refer to a concept card', async function () {
     await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
       HINDI_SKILL_EXPLANATION
     );
   });
 
-  it('should cover LO.4: view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
+  it('should view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
     await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`

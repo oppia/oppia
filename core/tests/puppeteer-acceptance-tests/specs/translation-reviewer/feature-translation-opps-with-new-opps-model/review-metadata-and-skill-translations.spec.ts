@@ -21,7 +21,7 @@
  * TR.2 Accept a translation.
  * TR.2 Reject a translation.
  *
- * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit
+ * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
 
 import testConstants from '../../../utilities/common/test-constants';
@@ -42,8 +42,6 @@ import {TranslationReviewer} from '../../../utilities/user/translation-reviewer'
 import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
-
-Error.stackTraceLimit = 20;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
 
