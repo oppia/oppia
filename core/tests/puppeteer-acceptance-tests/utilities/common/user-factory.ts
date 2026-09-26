@@ -318,8 +318,8 @@ export class UserFactory {
     user.email = email;
 
     await user.openBrowser();
-    await user.signUpNewUser(username, email);
     activeUsers.push(user);
+    await user.signUpNewUser(username, email);
 
     return (await UserFactory.assignRolesToUser(
       user,
