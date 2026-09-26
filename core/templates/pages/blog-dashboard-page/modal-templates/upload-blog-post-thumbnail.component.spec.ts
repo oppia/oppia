@@ -103,6 +103,21 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.cropppedImageDataUrl).toEqual('');
   });
 
+  it('should get the invalid SVG issue URL', () => {
+    const invalidTagsAndAttributes = {
+      tags: ['script'],
+      attrs: ['onerror'],
+    };
+    componentInstance.invalidTagsAndAttributes = invalidTagsAndAttributes;
+    const getIssueURLSpy = spyOn(
+      TestBed.inject(SvgSanitizerService),
+      'getIssueURL'
+    ).and.returnValue('issue-url');
+
+    expect(componentInstance.getInvalidSvgIssueUrl()).toEqual('issue-url');
+    expect(getIssueURLSpy).toHaveBeenCalledWith(invalidTagsAndAttributes);
+  });
+
   it('should handle image', () => {
     spyOn(componentInstance, 'initializeCropper');
     // This is just a mock base 64 in order to test the FileReader event.
