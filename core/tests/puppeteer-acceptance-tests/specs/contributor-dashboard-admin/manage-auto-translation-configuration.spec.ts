@@ -25,7 +25,7 @@ import testConstants from '../../utilities/common/test-constants';
 const autoTranslationFeatureFlagName =
   'enable_automatic_translation_suggestions';
 
-describe('Contributor Dashboard Admin', function () {
+describe('Contributor Dashboard Admin - Translation Configuration', function () {
   let superAdmin: SuperAdmin;
   let releaseCoordinator: ReleaseCoordinator;
 
@@ -43,7 +43,7 @@ describe('Contributor Dashboard Admin', function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
   });
 
-  it('should be able to enable auto-translation and map providers', async function () {
+  it('should allow the admin to enable auto-translation and map providers', async function () {
     // 1. Log in as super admin and navigate to CD admin page.
     await superAdmin.navigateToContributorDashboardAdminPage();
 
