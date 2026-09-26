@@ -241,6 +241,19 @@ describe('Splash Page', () => {
     expect(component.userIsLoggedIn).toBe(false);
   }));
 
+  it('should treat the user as logged out when fetching user info fails', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.reject(
+        new Error('You must complete signup before accessing this resource.')
+      )
+    );
+    spyOn(loaderService, 'hideLoadingScreen');
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(false);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
   it('should check if loader screen is working', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen').and.callThrough();
     component.ngOnInit();

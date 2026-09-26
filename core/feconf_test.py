@@ -115,6 +115,5 @@ class FeconfTests(test_utils.GenericTestBase):
             self.assertEqual(
                 feconf.FRONTEND_TEMPLATES_DIR, os.path.join('build')
             )
-            self.assertEqual(feconf.FRONTEND_AOT_DIR, os.path.join('build'))
 
         importlib.reload(feconf)

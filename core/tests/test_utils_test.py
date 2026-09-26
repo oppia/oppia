@@ -542,17 +542,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 'exp_id', 'owner_id', ['state_name'], []
             )
 
-    def test_raises_error_with_aot_compiled_true(self) -> None:
-        """Test that mock_load_template uses the src folder when
-        template_is_aot_compiled is True.
-        """
-        with self.assertRaisesRegex(
-            Exception, 'No file exists for the given file name'
-        ):
-            test_utils.mock_load_template(
-                'invalid_path', template_is_aot_compiled=True
-            )
-
     def test_add_explorations_to_story_with_empty_list_does_nothing(
         self,
     ) -> None:

@@ -1448,10 +1448,6 @@ URLS = [
         learner_group.LearnerStoriesChaptersProgressHandler,
     ),
     get_redirect_route(
-        '/learner_groups_feature_status_handler',
-        learner_group.LearnerGroupsFeatureStatusHandler,
-    ),
-    get_redirect_route(
         r'/android_platform_parameters',
         android.AndroidPlatformParametersHandler,
     ),
