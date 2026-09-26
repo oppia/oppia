@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 import {NavigationUtils} from '../common/navigation-utils';
 
 const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
+const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 
@@ -67,6 +68,10 @@ const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const topicsTab = 'a.e2e-test-topics-tab';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
+const storyTitleSelector = '.e2e-test-story-title';
+const storyEditorContainerSelector = '.e2e-test-story-editor';
+const mobileCollapsibleCardHeaderSelector =
+  '.oppia-mobile-collapsible-card-header';
 const mobileSaveTopicDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
 const mobilePublishTopicButton =
@@ -164,6 +169,16 @@ const editWorkedExampleModalAnswerRte =
 const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
 
 export class TopicManager extends BaseUser {
+  /**
+   * Navigates to the topics and skills dashboard.
+   */
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+    await this.expectElementToBeVisible(
+      '.e2e-test-topics-and-skills-dashboard'
+    );
+  }
+
   /**
    * Create a basic algebra question in the skill editor page.
    * @param {string} skillName The name of the skill to which the question will be added.
@@ -951,6 +966,46 @@ export class TopicManager extends BaseUser {
     ]);
 
     expect(this.page.url()).toContain('/topic_editor/');
+  }
+
+  /**
+   * Opens a story editor from its topic editor story list.
+   *
+   * @param storyName - The story to edit.
+   * @param topicName - The topic containing the story.
+   */
+  async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+
+    // Topic editor data is loaded asynchronously after the route navigation,
+    // particularly on mobile where the story section is rendered lazily.
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      const storyTitles = this.page.locator(storyTitleSelector);
+      if (
+        !(await storyTitles
+          .first()
+          .isVisible()
+          .catch(() => false))
+      ) {
+        const cards = this.page.locator(mobileCollapsibleCardHeaderSelector);
+        // Story summaries can arrive a few seconds after the topic editor
+        // route has loaded, so wait for all collapsible sections to render.
+        await expect(cards).toHaveCount(4, {timeout: 60000});
+        await cards.nth(3).click();
+      }
+    }
+
+    const story = this.page
+      .locator(storyTitleSelector)
+      .filter({hasText: storyName})
+      .first();
+    await expect(story).toBeVisible({timeout: 60000});
+    await Promise.all([this.page.waitForURL(/story_editor/), story.click()]);
+    await this.expectElementToBeVisible(storyEditorContainerSelector);
   }
 
   /**
