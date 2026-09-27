@@ -3210,7 +3210,7 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(carouselSelector);
     const slideHeading = this.page.locator(slideHeadingSelector).first();
 
-    // toContainText retries until the slide transition finishes.
+    // The toContainText assertion retries until the slide transition finishes.
     await expect(
       slideHeading,
       `Expected first volunteer slide heading to contain "${firstSlideHeading}"`
