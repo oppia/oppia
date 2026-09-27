@@ -182,6 +182,9 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
     await this.typeInInputField(usernameInputSelector, username);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
     await this.clickOnElementWithSelector(agreeToTermsCheckboxSelector);
     await this.expectElementToBeVisible(registerButtonSelector);
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
