@@ -4488,7 +4488,7 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS
+            web_feature_flag_list.WebFeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS
         ]
     )
     def test_fetching_entity_translations_in_bulk(self) -> None:

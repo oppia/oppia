@@ -57,7 +57,7 @@ class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
         dummy_feature_flag_for_e2e_tests = (
-            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+            web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
         )
         self.render_json(
             {

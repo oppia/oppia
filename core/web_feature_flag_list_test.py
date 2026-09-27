@@ -38,7 +38,7 @@ FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
 )
 
 ENUM_BODY_REGEXP: Final = re.compile(
-    r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL
+    r'enum WebFeatureNames \{(.+?)\}', flags=re.DOTALL
 )
 ENUM_MEMBER_REGEXP: Final = re.compile(
     r'([a-zA-Z0-9_]+?)\s+=\s+\'([a-zA-Z0-9_]+?)\''
@@ -202,7 +202,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_names = []
-        for feature_flag_enum in web_feature_flag_list.FeatureNames:
+        for feature_flag_enum in web_feature_flag_list.WebFeatureNames:
             feature_flag_names.append(feature_flag_enum.name)
         for platform_param_enum in platform_parameter_list.ParamName:
             self.assertFalse(platform_param_enum.name in feature_flag_names)

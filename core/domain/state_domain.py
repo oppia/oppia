@@ -265,7 +265,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             self.tagged_skill_misconception_id is not None
             and not tagged_skill_misconception_id_required
             and not web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+                web_feature_flag_list.WebFeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
                 None,
             )
         ):

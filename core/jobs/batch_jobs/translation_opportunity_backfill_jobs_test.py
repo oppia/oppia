@@ -426,7 +426,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_creates_translation_opportunity_model_with_new_opp_models_flag_enabled(

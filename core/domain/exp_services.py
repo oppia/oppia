@@ -4270,7 +4270,7 @@ def does_exploration_support_voiceovers(
         return True
     else:
         return web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
+            web_feature_flag_list.WebFeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
             committer_id,
         )
 

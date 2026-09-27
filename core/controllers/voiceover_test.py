@@ -82,7 +82,7 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
         ]
     )
     def test_put_language_accent_codes_mapping_correctly(self) -> None:
@@ -390,7 +390,7 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
         ]
     )
     def test_should_be_able_to_regenerate_voiceovers(self) -> None:
@@ -717,8 +717,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_exploration_added_to_topic(self) -> None:
@@ -841,8 +841,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_exploration_update(self) -> None:
@@ -1039,8 +1039,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_translation_addition(self) -> None:
@@ -1257,8 +1257,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_regenerate_voiceovers_on_translation_suggestion_acceptance(
@@ -1381,8 +1381,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-            web_feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            web_feature_flag_list.WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
     def test_should_not_regenerate_voiceovers_on_translation_suggestion_rejection(
@@ -1739,7 +1739,7 @@ class RegenerateVoiceoversForExplorationHandlerTests(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
         ]
     )
     def test_regenerate_voiceovers_for_exploration(self) -> None:

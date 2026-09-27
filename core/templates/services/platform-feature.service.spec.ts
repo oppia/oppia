@@ -24,7 +24,7 @@ import {
   PlatformFeatureService,
   platformFeatureInitFactory,
 } from 'services/platform-feature.service';
-import {FeatureNames} from 'domain/feature-flag/feature-status-summary.model';
+import {WebFeatureNames} from 'domain/feature-flag/feature-status-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 
 describe('PlatformFeatureService', () => {
@@ -120,7 +120,7 @@ describe('PlatformFeatureService', () => {
     };
 
     mockFeatureFlagsInHtml({
-      [FeatureNames.DummyFeatureFlagForE2ETests]: true,
+      [WebFeatureNames.DummyFeatureFlagForE2ETests]: true,
     });
   });
 

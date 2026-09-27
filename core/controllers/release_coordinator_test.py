@@ -30,7 +30,7 @@ from core.domain import (
 from core.tests import test_utils
 
 
-class FeatureNames(enum.Enum):
+class WebFeatureNames(enum.Enum):
     """Enum for feature names."""
 
     TEST_FEATURE_1 = 'test_feature_1'
@@ -40,8 +40,8 @@ class FeatureNames(enum.Enum):
 FeatureStages = web_feature_flag_domain.FeatureStages
 
 
-class MemoryCacheHandlerTest(test_utils.GenericTestBase):
-    """Tests MemoryCacheHandler."""
+class WebMemoryCacheHandlerTest(test_utils.GenericTestBase):
+    """Tests WebMemoryCacheHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -261,8 +261,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
             )
 
 
-class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
-    """Tests FeatureFlagsHandler."""
+class WebFeatureFlagsHandlerTest(test_utils.GenericTestBase):
+    """Tests WebFeatureFlagsHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -317,7 +317,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             web_feature_flag_services,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
@@ -326,12 +326,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature_list_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_1],
+            [WebFeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_1.value]),
+            set([WebFeatureNames.TEST_FEATURE_1.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -341,7 +341,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     response_dict['feature_flags'],
                     [
                         {
-                            'name': FeatureNames.TEST_FEATURE_1.value,
+                            'name': WebFeatureNames.TEST_FEATURE_1.value,
                             'description': 'a feature in dev stage',
                             'feature_stage': FeatureStages.DEV.value,
                             'force_enable_for_all_users': False,
@@ -361,7 +361,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
@@ -370,12 +370,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature_list_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_1],
+            [WebFeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_1.value]),
+            set([WebFeatureNames.TEST_FEATURE_1.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -384,7 +384,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     feconf.FEATURE_FLAGS_URL,
                     {
                         'action': 'update_web_feature_flag',
-                        'feature_flag_name': FeatureNames.TEST_FEATURE_1.value,
+                        'feature_flag_name': WebFeatureNames.TEST_FEATURE_1.value,
                         'force_enable_for_all_users': False,
                         'rollout_percentage': 50,
                         'user_group_ids': [],
@@ -394,7 +394,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
                 updated_feature_flag = (
                     web_feature_flag_registry.Registry.get_feature_flag(
-                        FeatureNames.TEST_FEATURE_1.value
+                        WebFeatureNames.TEST_FEATURE_1.value
                     )
                 )
                 self.assertEqual(
@@ -428,7 +428,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
@@ -463,7 +463,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             web_feature_flag_registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_2.value: (
+                WebFeatureNames.TEST_FEATURE_2.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
@@ -472,12 +472,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature_list_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_2],
+            [WebFeatureNames.TEST_FEATURE_2],
         )
         feature_set_ctx = self.swap(
             web_feature_flag_services,
             'ALL_WEB_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_2.value]),
+            set([WebFeatureNames.TEST_FEATURE_2.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -486,7 +486,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     feconf.FEATURE_FLAGS_URL,
                     {
                         'action': 'update_web_feature_flag',
-                        'feature_flag_name': FeatureNames.TEST_FEATURE_2.value,
+                        'feature_flag_name': WebFeatureNames.TEST_FEATURE_2.value,
                         'force_enable_for_all_users': False,
                         'rollout_percentage': 200,
                         'user_group_ids': [],

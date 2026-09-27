@@ -46,7 +46,7 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
     """Tests for testing test_utils.enable_feature_flags."""
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+        [web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
     )
     def test_enable_feature_flags_decorator(self) -> None:
         """Tests if single feature-flag is enabled."""
@@ -58,8 +58,8 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-            web_feature_flag_list.FeatureNames.BLOG_PAGES,
+            web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+            web_feature_flag_list.WebFeatureNames.BLOG_PAGES,
         ]
     )
     def test_enable_multiple_feature_flags_decorator(self) -> None:

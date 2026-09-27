@@ -36,7 +36,7 @@ if MYPY:  # pragma: no cover
 )
 
 
-ALL_WEB_FEATURE_FLAGS: List[web_feature_flag_list.FeatureNames] = (
+ALL_WEB_FEATURE_FLAGS: List[web_feature_flag_list.WebFeatureNames] = (
     web_feature_flag_list.DEV_FEATURES_LIST
     + web_feature_flag_list.TEST_FEATURES_LIST
     + web_feature_flag_list.PROD_FEATURES_LIST

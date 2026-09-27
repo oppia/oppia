@@ -170,7 +170,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_is_learner_group_feature_enabled(self) -> None:
         self.assertTrue(

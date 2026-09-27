@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
-FeatureNames = web_feature_flag_list.FeatureNames
+WebFeatureNames = web_feature_flag_list.WebFeatureNames
 WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
     web_feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )

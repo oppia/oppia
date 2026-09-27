@@ -27,7 +27,7 @@ from core.tests import test_utils
 FeatureStages = web_feature_flag_domain.FeatureStages
 
 
-class FeatureNames(enum.Enum):
+class WebFeatureNames(enum.Enum):
     """Enum for features names."""
 
     FEATURE_A = 'feature_a'
@@ -48,14 +48,17 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         )
 
         feature_names = ['feature_a', 'feature_b']
-        feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
+        feature_name_enums = [
+            WebFeatureNames.FEATURE_A,
+            WebFeatureNames.FEATURE_B,
+        ]
 
         self.swapped_value = {
-            FeatureNames.FEATURE_A.value: (
+            WebFeatureNames.FEATURE_A.value: (
                 'a feature in dev stage',
                 FeatureStages.DEV,
             ),
-            FeatureNames.FEATURE_B.value: (
+            WebFeatureNames.FEATURE_B.value: (
                 'a feature in prod stage',
                 FeatureStages.PROD,
             ),
@@ -67,14 +70,14 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         )
 
         self.dev_feature_flag = web_feature_flag_domain.FeatureFlag(
-            FeatureNames.FEATURE_A.value,
+            WebFeatureNames.FEATURE_A.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
             web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
-            FeatureNames.FEATURE_B.value,
+            WebFeatureNames.FEATURE_B.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
@@ -86,8 +89,8 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             )
 
         # Here we use MyPy ignore because the expected type of ALL_WEB_FEATURE_FLAGS
-        # is a list of 'web_feature_flag_list.FeatureNames' Enum, but here for
-        # testing purposes we are providing a list of custom 'FeatureNames'
+        # is a list of 'web_feature_flag_list.WebFeatureNames' Enum, but here for
+        # testing purposes we are providing a list of custom 'WebFeatureNames'
         # enums for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
@@ -130,7 +133,7 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagDummyHandler."""
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+        [web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
     )
     def test_get_with_dummy_feature_flag_enabled_returns_true(self) -> None:
         result = self.get_json(

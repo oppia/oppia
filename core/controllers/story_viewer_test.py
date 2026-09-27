@@ -685,7 +685,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertFalse(json_response['ready_for_review_test'])
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_READY_FOR_REVIEW_TEST]
     )
     def test_post_returns_ready_for_review_when_acquired_skills_exist_and_enable_ready_for_review_test_is_enabled(
         self,

@@ -301,7 +301,7 @@ def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
     # and other available translations when the exploration is linked to a
     # story.
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
         None,
     ):
         taskqueue_services.defer(
@@ -895,7 +895,7 @@ def _create_exploration_opportunities(
     )
 
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         create_translation_opportunity(
@@ -1088,7 +1088,7 @@ def update_translation_opportunity_with_accepted_suggestion(
             )
 
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{entity_type}.{entity_id}'
@@ -2192,7 +2192,7 @@ def regenerate_opportunities_related_to_topic(
         # support safe fallback. Thus, we delete the V2 models here alongside the
         # V1 summary models when topic opportunities are being regenerated.
         if web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             None,
         ):
             translation_opportunity_models = (
@@ -2248,7 +2248,7 @@ def regenerate_opportunities_related_to_topic(
     # TranslationOpportunityModel records when creating exploration opportunities,
     # ensuring data consistency across both V1 and V2 models.
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         create_translation_opportunity(

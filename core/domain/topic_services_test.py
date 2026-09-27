@@ -242,7 +242,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_compute_summary_when_serial_chapter_launch_enabled(self) -> None:
@@ -512,7 +512,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_generate_topic_summary_when_unpublishing_story_chapter(
@@ -581,7 +581,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_generate_topic_summary_when_deleting_published_story_chapter(
@@ -646,7 +646,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_generate_topic_summary_when_changing_exp_id_linked_to_published_story_chapter(  # pylint: disable=line-too-long
@@ -2164,7 +2164,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(subtopic_page)
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_update_topic_and_study_guide(self) -> None:
         changelist: List[
@@ -2702,7 +2702,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_add_and_delete_uncategorized_skill_with_new_models(self) -> None:
@@ -2734,7 +2734,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_delete_uncategorized_skill_when_skill_in_another_topic_with_new_models(
@@ -2916,7 +2916,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_delete_topic_with_new_models(self) -> None:
@@ -4798,7 +4798,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_get_published_story_exploration_ids_from_published_chapters_when_serial_chapter_feature_enabled(  # pylint: disable=line-too-long
@@ -4822,7 +4822,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+            web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
         ]
     )
     def test_get_published_story_exploration_ids_in_all_topics_when_topic_id_not_given(  # pylint: disable=line-too-long

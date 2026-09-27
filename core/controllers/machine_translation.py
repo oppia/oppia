@@ -53,7 +53,7 @@ class MachineTranslationGenerateHandler(
         """Handles POST requests to generate a machine translation."""
 
         if not web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()
@@ -146,7 +146,7 @@ class TranslationProviderMappingHandler(
         """Handles GET requests to fetch the current language-to-provider mapping."""
 
         if not web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()
@@ -178,7 +178,7 @@ class TranslationProviderMappingHandler(
         """Handles PUT requests to update the language-to-provider mapping."""
 
         if not web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
             raise self.NotFoundException()

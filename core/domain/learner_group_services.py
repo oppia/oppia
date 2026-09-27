@@ -61,7 +61,7 @@ def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
     """
     return bool(
         web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
+            web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
             user_id,
         )
     )

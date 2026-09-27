@@ -1034,7 +1034,7 @@ class TopicPageDataHandlerTests(
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.STORY_EDITOR_ARCS]
+        [web_feature_flag_list.WebFeatureNames.STORY_EDITOR_ARCS]
     )
     def test_get_with_are_story_arcs_enabled(self) -> None:
         self.login(self.NEW_USER_EMAIL)

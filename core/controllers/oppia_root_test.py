@@ -72,12 +72,12 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
 
         feature_flags = json.loads(feature_flags_json)
         self.assertIn(
-            web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             feature_flags,
         )
         self.assertEqual(
             feature_flags[
-                web_feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+                web_feature_flag_list.WebFeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
             ],
             False,
         )

@@ -27,8 +27,8 @@ from core.domain import user_services
 from typing import Dict, List, TypedDict
 
 
-class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Handler for memory cache profile."""
+class WebMemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler for the web memory cache profile."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -129,8 +129,8 @@ class UserGroupHandler(
         self.render_json(self.values)
 
 
-class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of FeatureFlag's normalized_payload
+class WebFeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of WebFeatureFlagsHandler's normalized_payload
     dictionary.
     """
 
@@ -141,10 +141,12 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     user_group_ids: List[str]
 
 
-class FeatureFlagsHandler(
-    base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
+class WebFeatureFlagsHandler(
+    base.BaseHandler[
+        WebFeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
 ):
-    """Handler for feature-flags."""
+    """Handler for web feature-flags."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

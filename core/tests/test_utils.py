@@ -296,14 +296,14 @@ def generate_random_hexa_str() -> str:
 
 @contextlib.contextmanager
 def swap_is_feature_flag_enabled_function(
-    feature_flag_names: List[web_feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.WebFeatureNames],
 ) -> Iterator[None]:
     """Mocks is_feature_flag_enabled function within the context of a
     'with' statement. is_feature_flag_enabled will return True for all
     the features present in feature_flag_names.
 
     Args:
-        feature_flag_names: List[FeatureNames]. The name of the feature
+        feature_flag_names: List[WebFeatureNames]. The name of the feature
             flags for which the value should be returned as True.
 
     Yields:
@@ -354,7 +354,7 @@ def swap_is_feature_flag_enabled_function(
 
 
 def enable_feature_flags(
-    feature_flag_names: List[web_feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.WebFeatureNames],
 ) -> Callable[
     [Callable[..., _GenericHandlerFunctionReturnType]],
     Callable[..., _GenericHandlerFunctionReturnType],
@@ -363,7 +363,7 @@ def enable_feature_flags(
     scope of the test.
 
     Args:
-        feature_flag_names: List[web_feature_flag_list.FeatureNames]. The list
+        feature_flag_names: List[web_feature_flag_list.WebFeatureNames]. The list
             of the names of the feature flags that will be enabled.
 
     Returns:

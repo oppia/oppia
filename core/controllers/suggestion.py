@@ -1337,7 +1337,7 @@ def _get_target_id_to_exploration_opportunity_dict(
     ] = {}
 
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         language_code = (

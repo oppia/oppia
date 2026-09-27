@@ -1235,7 +1235,7 @@ def can_access_contributor_dashboard_admin_page(
             raise self.NotLoggedInException
 
         new_dashboard_enabled = web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            web_feature_flag_list.WebFeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
             self.user_id,
         )
 
@@ -4498,7 +4498,7 @@ def can_access_subtopic_viewer_page(
             return None
 
         if web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
             self.user_id,
         ):
             study_guide = study_guide_services.get_study_guide_by_id(

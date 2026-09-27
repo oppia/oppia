@@ -7634,7 +7634,7 @@ title: Old Title
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
         ]
     )
     def test_update_exploration_linked_to_story(self) -> None:
@@ -10502,7 +10502,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.WebFeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_version_history_on_only_translation_commits(self) -> None:
@@ -12537,7 +12537,7 @@ class ComputeVoiceoversModelFromExplorationChangeTest(
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.WebFeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:

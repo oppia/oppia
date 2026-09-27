@@ -128,7 +128,7 @@ class VoiceoverLanguageCodesMappingHandler(
                 new_accent_code
             )
             and web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+                web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
                 None,
             )
         ):
@@ -326,7 +326,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         if opportunity_services.is_exploration_available_for_contribution(
             exploration_id
         ) and web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         ):
             taskqueue_services.defer(
@@ -488,7 +488,7 @@ class RegenerateVoiceoversForExplorationHandler(
         if opportunity_services.is_exploration_available_for_contribution(
             exploration_id
         ) and web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         ):
             taskqueue_services.defer(

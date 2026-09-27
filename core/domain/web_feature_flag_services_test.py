@@ -38,7 +38,7 @@ if MYPY:  # pragma: no cover
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
-class FeatureNames(enum.Enum):
+class WebFeatureNames(enum.Enum):
     """Enum for parameter names."""
 
     FEATURE_A = 'feature_a'
@@ -66,15 +66,15 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             registry,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.FEATURE_A.value: (
+                WebFeatureNames.FEATURE_A.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 ),
-                FeatureNames.FEATURE_B.value: (
+                WebFeatureNames.FEATURE_B.value: (
                     'a feature in test stage',
                     FeatureStages.TEST,
                 ),
-                FeatureNames.FEATURE_C.value: (
+                WebFeatureNames.FEATURE_C.value: (
                     'a feature in prod stage',
                     FeatureStages.PROD,
                 ),
@@ -111,9 +111,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         # Feature names that might be used in following tests.
         self.feature_names = ['feature_a', 'feature_b', 'feature_c']
         self.feature_name_enums = [
-            FeatureNames.FEATURE_A,
-            FeatureNames.FEATURE_B,
-            FeatureNames.FEATURE_C,
+            WebFeatureNames.FEATURE_A,
+            WebFeatureNames.FEATURE_B,
+            WebFeatureNames.FEATURE_C,
         ]
 
         self.swap_all_feature_names_set = self.swap(
@@ -123,15 +123,15 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
 
         swapped_value = {
-            FeatureNames.FEATURE_A.value: (
+            WebFeatureNames.FEATURE_A.value: (
                 'a feature in dev stage',
                 FeatureStages.DEV,
             ),
-            FeatureNames.FEATURE_B.value: (
+            WebFeatureNames.FEATURE_B.value: (
                 'a feature in test stage',
                 FeatureStages.TEST,
             ),
-            FeatureNames.FEATURE_C.value: (
+            WebFeatureNames.FEATURE_C.value: (
                 'a feature in prod stage',
                 FeatureStages.PROD,
             ),
@@ -150,21 +150,21 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
 
         self.dev_feature_flag = web_feature_flag_domain.FeatureFlag(
-            FeatureNames.FEATURE_A.value,
+            WebFeatureNames.FEATURE_A.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in dev stage', FeatureStages.DEV
             ),
             web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.test_feature_flag = web_feature_flag_domain.FeatureFlag(
-            FeatureNames.FEATURE_B.value,
+            WebFeatureNames.FEATURE_B.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in test stage', FeatureStages.TEST
             ),
             web_feature_flag_domain.WebFeatureFlagConfig(False, 0, [], None),
         )
         self.prod_feature_flag = web_feature_flag_domain.FeatureFlag(
-            FeatureNames.FEATURE_C.value,
+            WebFeatureNames.FEATURE_C.value,
             web_feature_flag_domain.WebFeatureFlagSpec(
                 'a feature in prod stage', FeatureStages.PROD
             ),
@@ -219,7 +219,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ) -> None:
         expected_feature_flags_dict = [
             {
-                'name': FeatureNames.FEATURE_ONE.value,
+                'name': WebFeatureNames.FEATURE_ONE.value,
                 'description': 'feature flag one',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
@@ -228,7 +228,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'last_updated': None,
             },
             {
-                'name': FeatureNames.FEATURE_TWO.value,
+                'name': WebFeatureNames.FEATURE_TWO.value,
                 'description': 'feature flag two',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
@@ -237,7 +237,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'last_updated': None,
             },
             {
-                'name': FeatureNames.FEATURE_THREE.value,
+                'name': WebFeatureNames.FEATURE_THREE.value,
                 'description': 'feature flag three',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
@@ -247,9 +247,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             },
         ]
         feature_flag_name_enums = [
-            FeatureNames.FEATURE_ONE,
-            FeatureNames.FEATURE_TWO,
-            FeatureNames.FEATURE_THREE,
+            WebFeatureNames.FEATURE_ONE,
+            WebFeatureNames.FEATURE_TWO,
+            WebFeatureNames.FEATURE_THREE,
         ]
         feature_flag_names = ['feature_one', 'feature_two', 'feature_three']
         swap_all_feature_flags = self.swap(
@@ -264,15 +264,15 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             feature_services,
             'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.FEATURE_ONE.value: (
+                WebFeatureNames.FEATURE_ONE.value: (
                     'feature flag one',
                     FeatureStages.DEV,
                 ),
-                FeatureNames.FEATURE_TWO.value: (
+                WebFeatureNames.FEATURE_TWO.value: (
                     'feature flag two',
                     FeatureStages.DEV,
                 ),
-                FeatureNames.FEATURE_THREE.value: (
+                WebFeatureNames.FEATURE_THREE.value: (
                     'feature flag three',
                     FeatureStages.DEV,
                 ),
@@ -296,10 +296,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             feature_services,
             'ALL_WEB_FEATURE_FLAGS',
             [
-                FeatureNames.FEATURE_A,
-                FeatureNames.FEATURE_B,
-                FeatureNames.FEATURE_C,
-                FeatureNames.FEATURE_D,
+                WebFeatureNames.FEATURE_A,
+                WebFeatureNames.FEATURE_B,
+                WebFeatureNames.FEATURE_C,
+                WebFeatureNames.FEATURE_D,
             ],
         )
         with swap_all_feature_flags:

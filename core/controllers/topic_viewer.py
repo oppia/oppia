@@ -107,7 +107,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         are_story_arcs_enabled = (
             web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
+                web_feature_flag_list.WebFeatureNames.STORY_EDITOR_ARCS.value,
                 None,
             )
         )

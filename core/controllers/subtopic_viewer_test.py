@@ -508,7 +508,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         self.assertEqual(json_response['skill_ids'], ['skill_id_one'])
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_get_with_valid_skill_ids_and_study_guides_feature_flag(
         self,
@@ -562,7 +562,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         self.assertDictContainsSubset(expected_dict, json_response)
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_get_for_first_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
@@ -602,7 +602,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         self.assertDictContainsSubset(expected_dict, json_response)
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+        [web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
     def test_get_for_last_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(

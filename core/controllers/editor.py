@@ -371,7 +371,7 @@ class EntityTranslationsBulkHandler(
         entity_version: int,
     ) -> None:
         exploration_editor_can_modify_translations = web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
+            web_feature_flag_list.WebFeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
             self.user_id,
         )
 

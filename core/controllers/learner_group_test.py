@@ -1546,7 +1546,7 @@ class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.LEARNER_GROUPS_ARE_ENABLED]
     )
     def test_get_request_returns_true_when_learner_groups_featuer_flag_enabled(
         self,

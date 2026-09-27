@@ -853,7 +853,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
     @test_utils.enable_feature_flags(
-        [web_feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED]
+        [web_feature_flag_list.WebFeatureNames.IS_IMPROVEMENTS_TAB_ENABLED]
     )
     def test_improvements_tab_enabled(self) -> None:
         with self.login_context(self.OWNER_EMAIL):

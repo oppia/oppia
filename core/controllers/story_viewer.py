@@ -341,7 +341,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         # Gated Review Test redirection.
         if web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
             self.user_id,
         ) and (
             questions_available

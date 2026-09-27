@@ -1153,7 +1153,7 @@ class AdminHandler(
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
             if web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 self.user_id,
             ):
                 study_guide = study_guide_domain.StudyGuide.create_study_guide(
@@ -1277,7 +1277,7 @@ class AdminHandler(
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
             if web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 self.user_id,
             ):
                 study_guide_services.save_study_guide(

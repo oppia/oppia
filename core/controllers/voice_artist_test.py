@@ -229,7 +229,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.WebFeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_draft_updated_version_valid(self) -> None:
@@ -282,7 +282,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     @test_utils.enable_feature_flags(
         [
-            web_feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+            web_feature_flag_list.WebFeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
         ]
     )
     def test_draft_updated_version_invalid(self) -> None:

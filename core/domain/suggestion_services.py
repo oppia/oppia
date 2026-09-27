@@ -1058,7 +1058,7 @@ def accept_suggestion(
     # Generates voiceovers for approved translation suggestions.
     if (
         web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
             None,
         )
         and suggestion.change_cmd.cmd == 'add_written_translation'
@@ -3372,7 +3372,7 @@ def _get_topic_id_of_translation_target(
     if (
         suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
         and not web_feature_flag_services.is_feature_flag_enabled(
-            web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             None,
         )
     ):

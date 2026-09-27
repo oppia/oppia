@@ -1233,7 +1233,7 @@ def update_skill(
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill.id}'

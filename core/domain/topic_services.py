@@ -881,7 +881,7 @@ def apply_change_list(
         assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+        web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
         committer_id,
     ):
         modified_study_guides_list = (
@@ -1178,7 +1178,7 @@ def apply_change_list(
                 update_subtopic_property_cmd.new_value,
             )
             if not web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 committer_id,
             ):
                 # Here we use cast because we are narrowing down the
@@ -1481,7 +1481,7 @@ def update_topic_and_subtopic_pages(
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
             if not web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                web_feature_flag_list.WebFeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
                 committer_id,
             ):
                 subtopic_page_services.delete_subtopic_page(
@@ -1557,7 +1557,7 @@ def delete_uncategorized_skill(
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         opportunity_services.remove_topic_from_translation_opportunities(
@@ -1591,7 +1591,7 @@ def add_uncategorized_skill(
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
     )
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         opportunity_services.create_translation_opportunity(
@@ -1684,7 +1684,7 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
             _are_nodes_valid_for_publishing([node])
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+        web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
         committer_id,
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -1783,7 +1783,7 @@ def unpublish_story(
         raise Exception('A story with the given ID doesn\'t exist')
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+        web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
         committer_id,
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -2003,7 +2003,7 @@ def delete_topic(
         )
     )
     if web_feature_flag_services.is_feature_flag_enabled(
-        web_feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         if topic is not None:
@@ -2115,7 +2115,7 @@ def compute_summary_of_topic(
             total_published_node_count += (
                 story.story_contents.get_published_node_count()
                 if web_feature_flag_services.is_feature_flag_enabled(
-                    web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                    web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
                     None,
                 )
                 else len(story.story_contents.nodes)
@@ -2172,7 +2172,7 @@ def _compute_story_exploration_mapping(
         mapping[story.id] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
             if web_feature_flag_services.is_feature_flag_enabled(
-                web_feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                web_feature_flag_list.WebFeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
                 None,
             )
             else story.story_contents.get_all_linked_exp_ids()
