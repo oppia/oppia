@@ -497,11 +497,6 @@ def main() -> None:
     )
     install_python_prod_dependencies.main()
 
-    # The pip install --target command inside install_python_prod_dependencies
-    # uninstalls global setuptools due to pip upgrading behavior. We must
-    # restore it so that the subsequent `python setup.py` commands do not fail.
-    install_python_dev_dependencies.install_installation_tools()
-
     # The install_gcloud_sdk() function needs the Python third-party libs
     # "google" folder to exist first, so we only do the installation here after
     # the Python dependencies are installed.
