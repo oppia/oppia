@@ -16,7 +16,7 @@
  * @fileoverview Component for classroom navigation links.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {
   ClassroomBackendApiService,
@@ -33,6 +33,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   styleUrls: ['./classroom-navigation-links.component.css'],
 })
 export class ClassroomNavigationLinksComponent implements OnInit {
+  @Output() classroomCountChange = new EventEmitter<number>();
   classroomSummaries: ClassroomSummaryDict[] = [];
   isLoading: boolean = true;
   currentUrl!: string;
@@ -87,6 +88,7 @@ export class ClassroomNavigationLinksComponent implements OnInit {
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach(classroom => this.classroomSummaries.push(classroom));
           this.isLoading = false;
+          this.classroomCountChange.emit(this.getClassroomCount());
         });
     }
   }
