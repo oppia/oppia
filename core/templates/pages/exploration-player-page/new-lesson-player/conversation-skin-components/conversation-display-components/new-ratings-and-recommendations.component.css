@@ -152,7 +152,7 @@ a:hover {
 @media (max-width: 480px) {
   .community-library-btn {
     font-size: 13px;
-    width: 240px;
+    width: 200px;
   }
 
   .community-library-btn i {

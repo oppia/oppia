@@ -17,6 +17,17 @@
                         [explorationIsInPreviewMode]="isInPreviewMode"
                         [recommendedExplorationSummaries]="this.getRecommendationExplorationSummaries()"
                         [nextLessonLink]="getExplorationLink()">
+
+        <div *ngIf="!getCanAskLearnerForAnswerInfo()">
+          <oppia-card-interaction-controls (submit)="submitAnswerFromProgressNav()"
+                              [isLearnAgainButton]="isLearnAgainButton()"
+                              [displayedCard]="getDisplayedCard()"
+                              [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
+                              [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
+                              (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
+                              (skipQuestion)="skipCurrentQuestion()">
+          </oppia-card-interaction-controls>
+        </div>
       </oppia-conversation-display>
 
       <!-- Ask more information about answer -->
@@ -57,14 +68,9 @@
     </div>
   </div>
 
-  <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
-    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded(),'question-player-footer': !isInLessonPlayer()}" (submit)="submitAnswerFromProgressNav()"
-                        [isLearnAgainButton]="isLearnAgainButton()"
+  <div class="new-progress-nav-bar-container">
+    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded(),'question-player-footer': !isInLessonPlayer()}"
                         [displayedCard]="getDisplayedCard()"
-                        [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
-                        [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
-                        (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                        (skipQuestion)="skipCurrentQuestion()"
                         [userIsLoggedIn]="isLoggedIn">
     </oppia-card-navigation-control>
   </div>
