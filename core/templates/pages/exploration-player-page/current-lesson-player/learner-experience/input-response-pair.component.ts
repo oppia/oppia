@@ -34,7 +34,6 @@ import {NumberConversionService} from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 
-import './input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 
 @Component({

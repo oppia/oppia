@@ -35,8 +35,6 @@ import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-explo
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 
-import './collection-player-page.component.css';
-
 export interface IconParametersArray {
   thumbnailIconUrl: string;
   left: string;

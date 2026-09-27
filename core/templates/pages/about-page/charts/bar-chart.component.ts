@@ -23,7 +23,6 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import './bar-chart.component.css';
 
 interface DataPoint {
   country: string;

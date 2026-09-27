@@ -36,7 +36,6 @@ import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './state-hints-editor.component.css';
 
 interface DeleteValueResponse {
   index: number;

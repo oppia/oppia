@@ -23,7 +23,6 @@ import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopi
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
-import './subtopic-viewer-navbar-breadcrumb.component.css';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,

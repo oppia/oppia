@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import './new-correctness-footer.component.css';
 
 @Component({
   selector: 'oppia-new-correctness-footer',

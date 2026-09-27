@@ -26,6 +26,7 @@ import {
   HostListener,
   Input,
 } from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -63,7 +64,6 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -898,16 +898,27 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         resolve({opportunitiesDicts: [], more: false});
       });
     }
+    const requestedTabType = this.activeTabType;
+    const requestedTabSubtype = this.activeTabSubtype;
     const fetchFunction =
       this.tabNameToOpportunityFetchFunction[this.activeTabSubtype][
         this.activeTabType
       ];
 
-    return fetchFunction(shouldResetOffset).then(
-      (response: {
+    return fetchFunction(shouldResetOffset)
+      .then((response: {
         suggestionIdToDetails: Record<string, SuggestionDetails>;
         more: boolean;
       }) => {
+        if (
+          this.activeTabType !== requestedTabType ||
+          this.activeTabSubtype !== requestedTabSubtype
+        ) {
+          // The active tab changed while this request was in flight, so this
+          // is a stale response. Ignore it to avoid processing data for a tab
+          // the user has already navigated away from.
+          return {opportunitiesDicts: [], more: false};
+        }
         Object.keys(response.suggestionIdToDetails).forEach((id: string) => {
           this.contributions[id] = response.suggestionIdToDetails[id];
         });
@@ -917,8 +928,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
           ),
           more: response.more,
         };
-      }
-    );
+      })
+      .catch((error: HttpErrorResponse) => {
+        // A banned or otherwise non-full-user has no ACTION_SUGGEST_CHANGES
+        // permission, so the suggestion endpoints respond with 401. Handle it
+        // gracefully by showing an empty state instead of letting the
+        // rejection surface as an unhandled promise rejection. Any other
+        // error is rethrown.
+        if (error.status === 401) {
+          return {opportunitiesDicts: [], more: false};
+        }
+        throw error;
+      });
+
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {

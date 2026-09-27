@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './assessment-instruction-panel.component.css';
 
 @Component({
   selector: 'oppia-assessment-instruction-panel',
