@@ -1,7 +1,7 @@
 <div class="card-interaction-controls">
   <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
     <button mat-button
-            class="btn btn-secondary  oppia-skip-button"
+            class="btn btn-secondary oppia-skip-button"
             *ngIf="skipButtonIsShown"
             (click)="skipCurrentQuestion()">
       I don't know
