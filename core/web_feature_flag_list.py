@@ -135,7 +135,6 @@ class WebFeatureNames(enum.Enum):
 DEV_FEATURES_LIST = [
     WebFeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     WebFeatureNames.SHOW_TRANSLATION_SIZE,
-    WebFeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     WebFeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     WebFeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
 ]
@@ -154,6 +153,7 @@ TEST_FEATURES_LIST: List[WebFeatureNames] = [
     WebFeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     WebFeatureNames.STORY_EDITOR_ARCS,
+    WebFeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     WebFeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     WebFeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
@@ -286,7 +286,7 @@ WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            web_feature_flag_domain.ServerMode.DEV,
+            web_feature_flag_domain.ServerMode.TEST,
         )
     ),
     WebFeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
