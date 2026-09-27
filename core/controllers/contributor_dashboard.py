@@ -19,14 +19,13 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     exp_domain,
     exp_fetchers,
-    web_feature_flag_services,
     opportunity_domain,
     opportunity_services,
     skill_domain,
@@ -39,6 +38,7 @@ from core.domain import (
     translation_fetchers,
     translation_services,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import (

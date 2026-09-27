@@ -26,20 +26,20 @@ import re
 
 from core import (
     android_validation_constants,
-    web_feature_flag_list,
     feconf,
     schema_utils,
     utils,
+    web_feature_flag_list,
 )
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import rules_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     customization_args_util,
-    web_feature_flag_services,
     interaction_registry,
     param_domain,
     translation_domain,
+    web_feature_flag_services,
 )
 from extensions import domain
 from extensions.objects.models import objects

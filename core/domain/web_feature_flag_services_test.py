@@ -53,7 +53,7 @@ class WebFeatureNames(enum.Enum):
 FeatureStages = web_feature_flag_domain.FeatureStages
 
 
-class FeatureFlagServiceTest(test_utils.GenericTestBase):
+class WebFeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
     LOGGED_OUT_USER_ID = None

@@ -21,11 +21,11 @@ import enum
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    platform_parameter_list,
+    user_services,
     web_feature_flag_domain,
     web_feature_flag_registry,
     web_feature_flag_services,
-    platform_parameter_list,
-    user_services,
 )
 from core.tests import test_utils
 

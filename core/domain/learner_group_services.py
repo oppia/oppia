@@ -22,7 +22,6 @@ from core import web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
-    web_feature_flag_services,
     learner_group_domain,
     learner_group_fetchers,
     story_domain,
@@ -30,6 +29,7 @@ from core.domain import (
     subtopic_page_domain,
     topic_domain,
     topic_fetchers,
+    web_feature_flag_services,
 )
 from core.platform import models
 

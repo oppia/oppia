@@ -18,14 +18,13 @@ from __future__ import annotations
 
 import logging
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
     exp_fetchers,
-    web_feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
@@ -35,6 +34,7 @@ from core.domain import (
     topic_services,
     translation_services,
     voiceover_services,
+    web_feature_flag_services,
 )
 
 from typing import Dict, List, Optional, Sequence, TypedDict, cast

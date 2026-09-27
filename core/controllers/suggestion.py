@@ -20,13 +20,12 @@ from __future__ import annotations
 
 import base64
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
     exp_fetchers,
-    web_feature_flag_services,
     fs_services,
     html_cleaner,
     image_validation_services,
@@ -40,6 +39,7 @@ from core.domain import (
     topic_fetchers,
     translation_domain,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import (

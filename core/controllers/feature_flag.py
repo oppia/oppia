@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.controllers import acl_decorators, base
 from core.domain import web_feature_flag_services
 

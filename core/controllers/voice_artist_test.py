@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.domain import (
     rights_domain,
     rights_manager,

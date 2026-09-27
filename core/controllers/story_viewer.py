@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import logging
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
-    web_feature_flag_services,
     learner_progress_services,
     question_services,
     skill_fetchers,
@@ -31,6 +30,7 @@ from core.domain import (
     story_services,
     summary_services,
     topic_fetchers,
+    web_feature_flag_services,
 )
 
 from typing import Dict, List, Optional, Tuple

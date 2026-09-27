@@ -20,12 +20,11 @@ import collections
 import itertools
 import logging
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
-    web_feature_flag_services,
     html_cleaner,
     opportunity_services,
     role_services,
@@ -40,6 +39,7 @@ from core.domain import (
     translation_fetchers,
     translation_services,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 

@@ -18,19 +18,19 @@ from __future__ import annotations
 
 import datetime
 
-from core import web_feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     beam_job_services,
     exp_fetchers,
-    web_feature_flag_services,
     opportunity_services,
     taskqueue_services,
     translation_fetchers,
     voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
+    web_feature_flag_services,
 )
 from core.jobs.batch_jobs import synthesize_voiceover_by_language_accent_jobs
 

@@ -24,7 +24,7 @@ import logging
 import os
 import zipfile
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import (

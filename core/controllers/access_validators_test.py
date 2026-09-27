@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     caching_services,

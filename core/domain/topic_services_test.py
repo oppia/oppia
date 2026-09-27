@@ -22,11 +22,10 @@ import logging
 import os
 from unittest import mock
 
-from core import web_feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     exp_services,
-    web_feature_flag_services,
     fs_services,
     question_domain,
     question_services,
@@ -47,6 +46,7 @@ from core.domain import (
     topic_services,
     translation_domain,
     user_services,
+    web_feature_flag_services,
 )
 from core.platform import models
 from core.tests import test_utils

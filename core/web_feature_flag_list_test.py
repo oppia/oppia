@@ -23,9 +23,9 @@ import re
 
 from core import web_feature_flag_list
 from core.domain import (
+    platform_parameter_list,
     web_feature_flag_domain,
     web_feature_flag_registry,
-    platform_parameter_list,
 )
 from core.tests import test_utils
 

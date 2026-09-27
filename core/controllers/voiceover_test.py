@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from core import constants, web_feature_flag_list, feconf
+from core import constants, feconf, web_feature_flag_list
 from core.domain import (
     cloud_task_domain,
     exp_domain,
