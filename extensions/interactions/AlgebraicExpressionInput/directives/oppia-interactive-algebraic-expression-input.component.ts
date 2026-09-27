@@ -139,6 +139,8 @@ export class AlgebraicExpressionInputInteractionComponent
       this.savedSolution !== undefined ? (this.savedSolution as string) : ''
     );
 
+    this.guppyInitializationService.activate();
+
     Guppy.event('change', this.onAnswerChange.bind(this));
 
     Guppy.event('done', this.submitAnswer.bind(this));
