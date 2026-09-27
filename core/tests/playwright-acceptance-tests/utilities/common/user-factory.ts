@@ -36,6 +36,16 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  PracticeQuestionSubmitter,
+  PracticeQuestionSubmitterFactory,
+} from '../user/practice-question-submitter';
+import {
+  PracticeQuestionReviewer,
+  PracticeQuestionReviewerFactory,
+} from '../user/practice-question-reviewer';
+import {QuestionAdminFactory} from '../user/question-admin';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,6 +62,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -81,7 +92,10 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
+  TopicManager &
+  Contributor &
+  PracticeQuestionSubmitter &
+  PracticeQuestionReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -225,6 +239,9 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      ContributorFactory(page),
+      PracticeQuestionSubmitterFactory(page),
+      PracticeQuestionReviewerFactory(page),
     ]);
 
     user.username = username;

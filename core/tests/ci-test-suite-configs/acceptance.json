@@ -317,8 +317,8 @@
     },
     {
       "name": "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "super-admin/load-dummy-data-in-dev-mode",
@@ -647,13 +647,13 @@
     },
     {
       "name": "practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-reviewer/review-submitted-questions",

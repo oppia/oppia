@@ -172,6 +172,15 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
+// Question editor selectors.
+const multipleChoiceInteractionButton =
+  'div.e2e-test-interaction-tile-MultipleChoiceInput';
+const currentSolutionSummarySelector =
+  '.e2e-test-oppia-solution-tab .e2e-test-response-summary';
+const ruleEditorInResponseModalSelector = 'oppia-rule-editor';
+const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
+const solutionModalSelector = 'oppia-add-or-update-solution-modal';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -1735,6 +1744,373 @@ export class ExplorationEditor extends BaseUser {
           `but found ${totalUsers} instead.`
       );
     }
+  }
+
+  /**
+   * Customizes the drag and drop sort interaction.
+   * @param {string[]} options - The options to be added.
+   */
+  async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].click({clickCount: 3});
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage(
+      'Drag and Drop Sort interaction has been customized successfully.'
+    );
+  }
+
+  /**
+   * Customizes the item selection interaction.
+   * @param {string[]} options - The options to be added.
+   * @param {number} minimumNumberOfSelections - The minimum number of selections.
+   * @param {number} maximumNumberOfSelections - The maximum number of selections.
+   */
+  async customizeItemSelectionInteraction(
+    options: string[],
+    minimumNumberOfSelections?: number,
+    maximumNumberOfSelections?: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+
+    const inputSelector = `${customizeInteractionBodySelector} input`;
+    await this.expectElementToBeVisible(inputSelector);
+    const inputElements = await this.page.$$(inputSelector);
+
+    // Update minimum and maximum number of selections.
+    const selectionLimits = [
+      minimumNumberOfSelections,
+      maximumNumberOfSelections,
+    ];
+    for (let i = 0; i < selectionLimits.length; i++) {
+      const limit = selectionLimits[i];
+      if (!limit) {
+        continue;
+      }
+      const inputElement = inputElements[i];
+      await inputElement.click();
+      await this.page.keyboard.press('Backspace');
+      await inputElement.type(String(limit));
+      await this.expectElementValueToBe(inputElement, String(limit));
+    }
+
+    // Add options.
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Item Selection interaction has been customized successfully.');
+  }
+
+  /**
+   * Returns the rule editor in the response modal.
+   */
+  async getRuleEditorModal(): Promise<ElementHandle<Element>> {
+    const responseBox = await this.expectElementToBeVisible(
+      responseModalBodySelector
+    );
+    const ruleEditor = await responseBox?.$(ruleEditorInResponseModalSelector);
+    if (!ruleEditor) {
+      throw new Error('Rule editor not found in the response modal.');
+    }
+    return ruleEditor;
+  }
+
+  /**
+   * Updates the rule in the response modal.
+   * @param {string} rule - The rule to update the response modal to.
+   */
+  async updateRuleInResponseModalTo(rule: string): Promise<void> {
+    const responseBox = await this.expectElementToBeVisible(
+      responseModalBodySelector
+    );
+    const selectInput = await responseBox?.$('mat-select');
+    if (!selectInput) {
+      throw new Error('Rule dropdown not found in the response modal.');
+    }
+    await this.clickOnElement(selectInput);
+
+    await this.expectElementToBeVisible('mat-option');
+    const ruleOptions = await this.page.$$('mat-option');
+    for (const ruleOption of ruleOptions) {
+      const optionText = await ruleOption.evaluate(el => el.textContent);
+      if (optionText?.includes(rule)) {
+        await ruleOption.click();
+        break;
+      }
+    }
+
+    await this.page.waitForFunction(
+      ({element, value}: {element: Element; value: string}) =>
+        element.textContent?.trim().includes(value),
+      {element: selectInput, value: rule}
+    );
+  }
+
+  /**
+   * Updates rule and options in response modal for Drag and Drop Sort interaction.
+   * @param {string} rule - Rule to update.
+   * @param {number[]} optionsSelections - Positions to select for each item.
+   */
+  async updateDragAndDropSortLearnersAnswerInResponseModal(
+    rule: string,
+    optionsSelections: string[] | number[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const ruleBox = await this.expectElementToBeVisible(
+      ruleEditorInResponseModalSelector
+    );
+    if (!ruleBox) {
+      throw new Error('Response modal is not visible.');
+    }
+
+    if (typeof optionsSelections[0] !== 'number') {
+      throw new Error('Rule currently not supported');
+    }
+
+    const selectBoxes = await ruleBox.$$('select');
+    if (selectBoxes.length !== optionsSelections.length) {
+      throw new Error(
+        `Expected ${optionsSelections.length} select boxes, but found ${selectBoxes.length}.`
+      );
+    }
+
+    for (let i = 0; i < selectBoxes.length; i++) {
+      await selectBoxes[i].selectOption(optionsSelections[i].toString());
+    }
+  }
+
+  /**
+   * Updates the answer in the response modal for a multiple choice rule.
+   * @param {string} rule - The rule to update.
+   * @param {string} answer - The answer to update.
+   */
+  async updateMultipleChoiceLearnersAnswerInResponseModal(
+    rule: 'is equal to',
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const ruleEditor = await this.getRuleEditorModal();
+    const multipleChoiceDropdown = await this.getElementInParent(
+      multipleChoiceResponseDropdown,
+      ruleEditor
+    );
+
+    await this.clickOnElement(multipleChoiceDropdown);
+    await this.selectMatOption(answer);
+
+    // Check if the value has been updated.
+    await this.expectTextContentToBe(multipleChoiceResponseDropdown, answer);
+  }
+
+  /**
+   * Updates the item selection learner's answer in the response modal.
+   * @param {string} rule - The rule to update.
+   * @param {string[]} optionsSelections - The options to select.
+   */
+  async updateItemSelectionLearnersAnswerInResponseModal(
+    rule:
+      | 'is equal to'
+      | 'is proper subset of'
+      | 'contains at least one of'
+      | 'omits atleast on of',
+    optionsSelections: string[]
+  ): Promise<void> {
+    const responseBox = await this.expectElementToBeVisible(
+      responseModalBodySelector
+    );
+    if (!responseBox) {
+      throw new Error('Response modal is not visible.');
+    }
+
+    await this.updateRuleInResponseModalTo(rule);
+
+    // Select given options.
+    const options = await responseBox.$$('mat-checkbox');
+    for (const option of options) {
+      const optionText =
+        (await option.evaluate(el => el.textContent?.trim())) ?? '';
+      if (!optionsSelections.includes(optionText)) {
+        continue;
+      }
+      const inputElementContainer = await option.$(
+        '.mat-checkbox-inner-container'
+      );
+      const inputElement = await option.$('input');
+      if (!inputElementContainer || !inputElement) {
+        throw new Error(`Option ${optionText} not found.`);
+      }
+      await inputElementContainer.click();
+      await this.page.waitForFunction(
+        (element: HTMLInputElement) => element.checked,
+        inputElement
+      );
+    }
+  }
+
+  /**
+   * Function to add a multiple choice interaction to the exploration.
+   * Any number of options can be added to the multiple choice interaction
+   * using the options array.
+   * @param {string[]} options - Array of multiple choice options.
+   */
+  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+
+    await this.expectModalTitleToBe('Choose Interaction');
+    await this.expectElementToBeVisible(multipleChoiceInteractionButton);
+    await this.clickOnElementWithSelector(multipleChoiceInteractionButton);
+
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Multiple Choice)'
+    );
+
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Multiple Choice interaction has been added successfully.');
+  }
+
+  /**
+   * Drags an item from the start coordinates and drops it at the end
+   * coordinates.
+   * @param {number} startX - The starting x coordinate of the item.
+   * @param {number} startY - The starting y coordinate of the item.
+   * @param {number} endX - The ending x coordinate of the item.
+   * @param {number} endY - The ending y coordinate of the item.
+   */
+  async dragAndDropItem(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number
+  ): Promise<void> {
+    await this.page.mouse.move(startX, startY);
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.down();
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.move(endX, endY, {steps: 10});
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.up();
+    await this.page.waitForTimeout(1000);
+  }
+
+  /**
+   * Function to add a drag and drop sort solution.
+   * @param {string[]} sortedOptions - The options in the sorted order.
+   * @param {string} explanation - The explanation of the solution.
+   */
+  async addDragAndDropSortSolution(
+    sortedOptions: string[],
+    explanation: string
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    await this.expectElementToBeVisible(dragAndDropItemSelector);
+    const solutionModal = await this.expectElementToBeVisible(
+      solutionModalSelector
+    );
+    if (!solutionModal) {
+      throw new Error('Solution modal not found.');
+    }
+
+    for (let i = 0; i < sortedOptions.length - 1; i++) {
+      const option = sortedOptions[i];
+
+      const optionElements = await solutionModal.$$(dragAndDropItemSelector);
+      const destinationElement = optionElements[i];
+
+      let sourceElement: ElementHandle<Element> | null = null;
+      for (let j = i; j < optionElements.length; j++) {
+        const optionText = await optionElements[j].evaluate(el =>
+          el.textContent?.trim()
+        );
+        if (optionText === option) {
+          sourceElement = optionElements[j];
+          break;
+        }
+      }
+
+      if (!sourceElement) {
+        throw new Error(`Option "${option}" not found.`);
+      }
+
+      if (sourceElement === destinationElement) {
+        continue;
+      }
+
+      // Ensure that elements have stopped animating before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
+      const sourceBox = await sourceElement.boundingBox();
+      const destBox = await destinationElement.boundingBox();
+
+      if (!sourceBox || !destBox) {
+        throw new Error(
+          'Could not get bounding box for drag-and-drop operation.'
+        );
+      }
+
+      await this.dragAndDropItem(
+        sourceBox.x + sourceBox.width / 2,
+        sourceBox.y + sourceBox.height / 2,
+        destBox.x + destBox.width / 2,
+        destBox.y + destBox.height / 2
+      );
+    }
+
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.addSolutionExplanationAndSave(explanation);
+  }
+
+  /**
+   * Verifies that the expected solution is in the current solutions.
+   * @param {string} expectedSolution - The expected solution.
+   */
+  async expectSolutionsToContain(expectedSolution: string): Promise<void> {
+    await this.expectElementToBeVisible(currentSolutionSummarySelector);
+
+    const solutions = await this.page.$$eval(
+      currentSolutionSummarySelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    if (!solutions.includes(expectedSolution)) {
+      throw new Error(
+        `Expected solutions to contain "${expectedSolution}", but found: ${JSON.stringify(solutions)}.`
+      );
+    }
+    showMessage(`Solutions contain "${expectedSolution}".`);
   }
 }
 

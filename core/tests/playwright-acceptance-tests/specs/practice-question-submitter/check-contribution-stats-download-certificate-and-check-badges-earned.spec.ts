@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * QS.CD Check for contribution stats, download certificate, and badges earned.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
@@ -32,7 +33,9 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Practice Question Submitter', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Practice Question Submitter', function () {
   let questionSubmitter: PracticeQuestionSubmitter &
     Contributor &
     ExplorationEditor &
@@ -41,36 +44,42 @@ describe('Practice Question Submitter', function () {
   let questionAdmin: QuestionAdmin;
   let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000); // Setup takes longer than the default timeout.
     // Create users.
     questionSubmitter = await UserFactory.createNewUser(
       'questionSubmitter',
-      'question_submitter@example.com'
+      'question_submitter@example.com',
+      browser
     );
 
     questionReviewer = await UserFactory.createNewUser(
       'questionReviewer',
-      'question_reviewer@example.com'
+      'question_reviewer@example.com',
+      browser
     );
 
     questionAdmin = await UserFactory.createNewUser(
       'questionAdm',
       'question_admin@example.com',
+      browser,
       [ROLES.QUESTION_ADMIN]
     );
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Add submit question rights to the question submitter.
+    // Add submit question rights to the question submitter and review
+    // question rights to the question reviewer.
     await questionAdmin.navigateToContributorDashboardAdminPage();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
     await questionAdmin.addReviewQuestionRights('questionReviewer');
 
-    // Create a topic and add story with a chapter.
+    // Create a topic and add a story with a chapter.
     const explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Test Exploration 1'
@@ -81,13 +90,10 @@ describe('Practice Question Submitter', function () {
       'Addition and Subtraction',
       'Addition'
     );
+    // The story editor is opened after the story is created.
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
-      'Arithmetic Operations'
-    );
-    await curriculumAdmin.openStoryEditor(
-      'The Broken Calculator',
       'Arithmetic Operations'
     );
     await curriculumAdmin.addChapter(
@@ -106,15 +112,16 @@ describe('Practice Question Submitter', function () {
     await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
     await curriculumAdmin.publishUpdatedSkill('Added rubrics to skill');
 
-    // Add topic the Math classroom.
+    // Add the topic to the Math classroom.
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math-classroom',
       'Arithmetic Operations'
     );
-  }, 750000);
+  });
 
-  it('should be able to check contribution stats', async function () {
+  test('should be able to check contribution stats', async function () {
+    test.setTimeout(600000);
     // Submit question suggestions.
     await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await questionSubmitter.switchToTabInContributionDashboard(
@@ -138,6 +145,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
+
     // Submit reviews.
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await questionReviewer.startQuestionReview('What is 10 - 11?', 'Addition');
@@ -155,7 +163,7 @@ describe('Practice Question Submitter', function () {
     await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Check question status.
-    await questionSubmitter.page.reload();
+    await questionSubmitter.reloadPage();
     await questionSubmitter.navigateToTabInMyContributions(
       'Contribution Stats'
     );
@@ -170,18 +178,18 @@ describe('Practice Question Submitter', function () {
     ]);
   });
 
-  it('should be able to download contribution certificate', async function () {
+  test('should be able to download contribution certificate', async function () {
     // TODO(#22743): Currently, the download certificate functionality is not working
     // when "To" date is of today and only contribution is made today.
   });
 
-  it('should be able to check for badges earned', async function () {
+  test('should be able to check for badges earned', async function () {
     await questionSubmitter.navigateToTabInMyContributions('Badges');
     await questionSubmitter.selectBadgeTypeInMobileView('Question');
     await questionSubmitter.expectBadgesToContain('1', 'Submission');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
