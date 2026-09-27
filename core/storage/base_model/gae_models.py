@@ -2412,10 +2412,17 @@ class BasePlatformParameterConfigModel(VersionedModel):
     This model defines the common storage structure for platform parameters
     across Web and Android. It must not be instantiated directly.
 
+    Subclasses MUST implement:
+        get_deletion_policy()
+        get_model_association_to_user()
+
     The id field represents the unique platform parameter name.
 
     Fields:
         id: str. Unique name of the platform parameter.
+        created_on: datetime. Timestamp of creation (set by BaseModel).
+        last_updated: datetime. Timestamp of last update (set by BaseModel).
+        deleted: bool. Soft-delete flag (set by BaseModel).
     """
 
     @staticmethod
@@ -2451,10 +2458,17 @@ class BaseFeatureFlagConfigModel(BaseModel):
     This model defines the common structure for all feature flags across
     Web and Android. It must not be instantiated directly.
 
+    Subclasses MUST implement:
+        get_deletion_policy()
+        get_model_association_to_user()
+
     The id field represents the globally unique feature flag name.
 
     Fields:
         id: str. Unique name of the feature flag.
+        created_on: datetime. Timestamp of creation (set by BaseModel).
+        last_updated: datetime. Timestamp of last update (set by BaseModel).
+        deleted: bool. Soft-delete flag (set by BaseModel).
     """
 
     @staticmethod
