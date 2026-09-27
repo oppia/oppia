@@ -212,6 +212,18 @@ const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
 
+// Newsletter selectors and URLs.
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
+const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
+const newsletterSubscriptionThanksMessage =
+  '.e2e-test-thanks-subscribe-message';
+const watchAVideoButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-watch-video-btn';
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
+const watchAVideoUrl = 'https://youtu.be/OConyxG7HaM';
+const readBlogUrl = testConstants.URLs.ReadBlogLink;
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -2923,6 +2935,69 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Types the given email into the newsletter input field (in the footer),
+   * clicks the Subscribe button, and waits for the thanks message.
+   * @param {string} email - The email to subscribe with.
+   */
+  async submitEmailForNewsletter(email: string): Promise<void> {
+    await this.waitForElementToBeClickable(newsletterEmailInputField);
+    await this.typeInInputField(newsletterEmailInputField, email);
+    await this.clickOnElementWithSelector(newsletterSubscribeButton);
+    await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
+  }
+
+  /**
+   * Checks that the "Thanks for subscribing!" message is shown after
+   * subscribing to the newsletter.
+   */
+  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
+    await expect(
+      this.page.locator(newsletterSubscriptionThanksMessage),
+      'Thank you message does not exist or incorrect'
+    ).toContainText('Thanks for subscribing!');
+    showMessage('Subscribed to newsletter successfully');
+  }
+
+  /**
+   * Checks that the element with the given selector links to the expected
+   * external URL. The link is not opened, since it leads to an external site.
+   * @param {string} selector - The selector of the link.
+   * @param {string} expectedUrl - The expected href of the link.
+   */
+  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
+    const link = this.page.locator(selector).first();
+    await expect(link).toBeVisible();
+    await expect(
+      link,
+      `The ${selector} does not link to ${expectedUrl}.`
+    ).toHaveAttribute('href', expectedUrl);
+  }
+
+  /**
+   * Checks that the "Watch a video" button shown after subscribing to the
+   * newsletter has the correct link.
+   */
+  async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
+      watchAVideoButtonInThanksForSubscribe,
+      watchAVideoUrl
+    );
+    showMessage('The Watch a Video button has the right link.');
+  }
+
+  /**
+   * Checks that the "Read our blog" button shown after subscribing to the
+   * newsletter has the correct link.
+   */
+  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
+      readOurBlogButtonInThanksForSubscribe,
+      readBlogUrl
+    );
+    showMessage('The Read our blog button has the right link.');
   }
 }
 
