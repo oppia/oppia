@@ -69,12 +69,6 @@ describe('Auto-Translate Feature', function () {
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissWelcomeModal();
 
-    // Add exploration description with math and hyperlink.
-    // Wait for the Add Interaction button to be present to ensure page is loaded.
-    await curriculumAdm.clickOnElementWithText('Add Interaction');
-    // Close the modal if it opened automatically.
-    await curriculumAdm.page.keyboard.press('Escape');
-
     // Add some basic text with math and link to the state.
     await curriculumAdm.addExplorationDescriptionContainingBasicRTEComponents();
 
@@ -129,6 +123,17 @@ describe('Auto-Translate Feature', function () {
     await translationSubmitter.page.waitForTimeout(1000);
 
     await translationSubmitter.clickOnElementWithText('Save and close');
+
+    // The unedited confirmation modal appears because the auto-generated
+    // translation was not edited. Click the confirm button to proceed.
+    await translationSubmitter.page.waitForSelector(
+      '.e2e-test-confirm-unedited-save-button',
+      {visible: true}
+    );
+    await translationSubmitter.page.click(
+      '.e2e-test-confirm-unedited-save-button'
+    );
+
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
