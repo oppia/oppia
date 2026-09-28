@@ -35,30 +35,6 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class FeatureFlagConfigModel(base_model_module.BaseFeatureFlagConfigModel):
-    """Legacy datastore model before it was renamed to WebFeatureFlagConfigModel."""
-
-    force_enable_for_all_users = datastore_services.BooleanProperty(
-        default=False, indexed=True
-    )
-    rollout_percentage = datastore_services.IntegerProperty(
-        default=0, indexed=True
-    )
-    user_group_ids = datastore_services.StringProperty(repeated=True)
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Legacy model does not correspond to a user."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Legacy model does not correspond to a user."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-
 class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
     """Migrates FeatureFlagConfigModel rows to WebFeatureFlagConfigModel."""
 
@@ -66,7 +42,7 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
 
     def _migrate_legacy_model(
         self,
-        legacy_model: FeatureFlagConfigModel,
+        legacy_model: config_models.FeatureFlagConfigModel,
     ) -> config_models.WebFeatureFlagConfigModel:
         """Creates the new web feature flag config model from a legacy one."""
         migrated_config = config_models.WebFeatureFlagConfigModel(
@@ -84,7 +60,9 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
             self.pipeline
             | 'Get legacy FeatureFlagConfigModels'
             >> ndb_io.GetModels(
-                FeatureFlagConfigModel.get_all(include_deleted=False)
+                config_models.FeatureFlagConfigModel.get_all(
+                    include_deleted=False
+                )
             )
         )
 
@@ -100,8 +78,13 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                 | 'Put migrated WebFeatureFlagConfigModels'
                 >> ndb_io.PutModels()
             )
-            _ = (
+            legacy_model_keys = (
                 legacy_models
+                | 'Get legacy FeatureFlagConfigModel keys'
+                >> beam.Map(lambda model: model.key)
+            )
+            _ = (
+                legacy_model_keys
                 | 'Delete legacy FeatureFlagConfigModels'
                 >> ndb_io.DeleteModels()
             )

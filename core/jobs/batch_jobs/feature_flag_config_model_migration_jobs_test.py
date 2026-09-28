@@ -47,13 +47,11 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
 
     def test_migrates_legacy_feature_flag_config_model(self) -> None:
         """Legacy datastore entries should be migrated to the web config model."""
-        legacy_model = (
-            feature_flag_config_model_migration_jobs.FeatureFlagConfigModel(
-                id='feature_flag_a',
-                force_enable_for_all_users=True,
-                rollout_percentage=25,
-                user_group_ids=['group_1', 'group_2'],
-            )
+        legacy_model = config_models.FeatureFlagConfigModel(
+            id='feature_flag_a',
+            force_enable_for_all_users=True,
+            rollout_percentage=25,
+            user_group_ids=['group_1', 'group_2'],
         )
         legacy_model.update_timestamps()
         legacy_model.put()
@@ -81,20 +79,16 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         )
 
         self.assertIsNone(
-            feature_flag_config_model_migration_jobs.FeatureFlagConfigModel.get(
-                'feature_flag_a'
-            )
+            config_models.FeatureFlagConfigModel.get('feature_flag_a')
         )
 
     def test_audit_job_does_not_write_new_models(self) -> None:
         """The audit job should report the legacy items without mutating storage."""
-        legacy_model = (
-            feature_flag_config_model_migration_jobs.FeatureFlagConfigModel(
-                id='feature_flag_b',
-                force_enable_for_all_users=False,
-                rollout_percentage=40,
-                user_group_ids=['group_3'],
-            )
+        legacy_model = config_models.FeatureFlagConfigModel(
+            id='feature_flag_b',
+            force_enable_for_all_users=False,
+            rollout_percentage=40,
+            user_group_ids=['group_3'],
         )
         legacy_model.update_timestamps()
         legacy_model.put()
@@ -114,9 +108,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         )
 
         self.assertIsNotNone(
-            feature_flag_config_model_migration_jobs.FeatureFlagConfigModel.get(
-                'feature_flag_b'
-            )
+            config_models.FeatureFlagConfigModel.get('feature_flag_b')
         )
         self.assertIsNone(
             config_models.WebFeatureFlagConfigModel.get('feature_flag_b')

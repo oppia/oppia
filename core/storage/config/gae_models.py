@@ -134,6 +134,63 @@ class PlatformParameterModel(base_models.VersionedModel):
         )
 
 
+class FeatureFlagConfigModel(base_models.BaseModel):
+    """A class that represents named dynamic feature-flag.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the feature-flag.
+    """
+
+    # Whether the feature flag is force enabled for all the users.
+    force_enable_for_all_users = datastore_services.BooleanProperty(
+        default=False, indexed=True
+    )
+    # The percentage of logged-in users for which the feature flag will
+    # be enabled. The value of this field should be between 0 and 100.
+    rollout_percentage = datastore_services.IntegerProperty(
+        default=0, indexed=True
+    )
+    # A list of IDs of user groups for which the feature flag will be enabled.
+    user_group_ids = datastore_services.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """FeatureFlagConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    @classmethod
+    def create(
+        cls,
+        feature_flag_name: str,
+        force_enable_for_all_users: bool,
+        rollout_percentage: int,
+        user_group_ids: List[str],
+    ) -> FeatureFlagConfigModel:
+        """Creates FeatureFlagConfigModel instance.
+
+        Args:
+            feature_flag_name: str. The name of the feature-flag.
+            force_enable_for_all_users: bool. Whether to force-enable the
+                feature-flag for all the users.
+            rollout_percentage: int. The defined percentage of logged-in
+                users for which the feature should be enabled.
+            user_group_ids: List[str]. The list of ids of UserGroup objects.
+
+        Returns:
+            FeatureFlagConfigModel. The created FeatureFlagConfigModel instance.
+        """
+        feature_flag_entity = cls(
+            id=feature_flag_name,
+            force_enable_for_all_users=force_enable_for_all_users,
+            rollout_percentage=rollout_percentage,
+            user_group_ids=user_group_ids,
+        )
+        feature_flag_entity.update_timestamps()
+        feature_flag_entity.put()
+        return feature_flag_entity
+
+
 class WebFeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
     """A class that represents named dynamic web-feature-flag.
     This model only stores fields that can be updated in run time.
