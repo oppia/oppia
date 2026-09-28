@@ -4494,6 +4494,12 @@ def increment_question_reviewer_total_stats(
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
+    if question_reviewer_total_stat.reviewed_questions_count == 0:
+        # The stats row may have been created with zero counts when review
+        # rights were granted, so the first review sets the real first date.
+        question_reviewer_total_stat.first_contribution_date = (
+            last_contribution_date.date()
+        )
     question_reviewer_total_stat.reviewed_questions_count += 1
     if suggestion_is_accepted:
         question_reviewer_total_stat.accepted_questions_count += 1
