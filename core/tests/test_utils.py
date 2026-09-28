@@ -164,6 +164,9 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES: Final = (
     'BaseSnapshotContentModel',
     'BaseSnapshotMetadataModel',
     'VersionedModel',
+    'BaseFeedbackModel',
+    'BaseFeatureFlagConfigModel',
+    'BasePlatformParameterConfigModel',
 )
 
 _GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
