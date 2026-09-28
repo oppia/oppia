@@ -36,14 +36,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
     )
 
     def test_empty_storage(self) -> None:
-        """The job should emit a zero-count result when no legacy models exist."""
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED FEATURE FLAG CONFIG MODEL COUNT: 0.'
-                )
-            ]
-        )
+        self.assert_job_output_is_empty()
 
     def test_migrates_legacy_feature_flag_config_model(self) -> None:
         """Legacy datastore entries should be migrated to the web config model."""

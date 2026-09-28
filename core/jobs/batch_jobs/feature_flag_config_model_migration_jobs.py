@@ -45,14 +45,15 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
         legacy_model: config_models.FeatureFlagConfigModel,
     ) -> config_models.WebFeatureFlagConfigModel:
         """Creates the new web feature flag config model from a legacy one."""
-        migrated_config = config_models.WebFeatureFlagConfigModel(
-            id=legacy_model.id,
-            force_enable_for_all_users=legacy_model.force_enable_for_all_users,
-            rollout_percentage=legacy_model.rollout_percentage,
-            user_group_ids=legacy_model.user_group_ids,
-        )
-        migrated_config.update_timestamps()
-        return migrated_config
+        with datastore_services.get_ndb_context():
+            migrated_config = config_models.WebFeatureFlagConfigModel(
+                id=legacy_model.id,
+                force_enable_for_all_users=legacy_model.force_enable_for_all_users,
+                rollout_percentage=legacy_model.rollout_percentage,
+                user_group_ids=legacy_model.user_group_ids,
+            )
+            migrated_config.update_timestamps()
+            return migrated_config
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the migration from old to new feature flag config models."""
