@@ -20,7 +20,6 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 export interface SignupPageBackendDict {
-  server_can_send_emails: boolean;
   has_agreed_to_latest_terms: boolean;
   has_ever_registered: boolean;
   username: string;

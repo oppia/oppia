@@ -460,17 +460,6 @@ class _Gae(Platform):
             return cloud_taskqueue_services
 
     @classmethod
-    def import_search_services(cls) -> ModuleType:
-        """Imports and returns gae_search_services module.
-
-        Returns:
-            module. The gae_search_services module.
-        """
-        from core.platform.search import elastic_search_services
-
-        return elastic_search_services
-
-    @classmethod
     def import_translate_services(cls) -> ModuleType:
         """Imports and returns cloud_translate_services module.
 
@@ -696,15 +685,6 @@ class Registry:
             module. The cloud_translate_services module.
         """
         return cls._get().import_translate_services()
-
-    @classmethod
-    def import_search_services(cls) -> ModuleType:
-        """Imports and returns search_services module.
-
-        Returns:
-            module. The search_services module.
-        """
-        return cls._get().import_search_services()
 
     @classmethod
     def import_storage_services(cls) -> ModuleType:
