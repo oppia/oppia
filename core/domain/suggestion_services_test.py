@@ -24,6 +24,7 @@ from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
+    contribution_stats_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -6488,6 +6489,71 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(filtered_translatable_suggestions), 0)
+
+    def test_first_review_sets_first_contribution_date_of_empty_stats(
+        self,
+    ) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id='uid_new_reviewer',
+            topic_ids_with_question_reviews=[],
+            reviewed_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_with_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=datetime.date(2026, 1, 1),
+            last_contribution_date=datetime.date(2026, 1, 1),
+        )
+        stats_model = model_class.get_by_id('uid_new_reviewer')
+        assert stats_model is not None
+        stats = contribution_stats_services.get_question_reviewer_total_stats_from_model(  # pylint: disable=line-too-long
+            stats_model
+        )
+        review_datetime = datetime.datetime(2026, 2, 15, 10, 0, 0)
+
+        suggestion_services.increment_question_reviewer_total_stats(
+            stats, review_datetime, True, False
+        )
+
+        expected_date = datetime.date(2026, 2, 15)
+        self.assertEqual(stats.first_contribution_date, expected_date)
+        self.assertEqual(stats.last_contribution_date, expected_date)
+        self.assertEqual(stats.reviewed_questions_count, 1)
+
+    def test_later_review_keeps_first_contribution_date(self) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id='uid_active_reviewer',
+            topic_ids_with_question_reviews=['topic_1'],
+            reviewed_questions_count=2,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=0,
+            rejected_questions_count=1,
+            first_contribution_date=datetime.date(2026, 1, 1),
+            last_contribution_date=datetime.date(2026, 1, 10),
+        )
+        stats_model = model_class.get_by_id('uid_active_reviewer')
+        assert stats_model is not None
+        stats = contribution_stats_services.get_question_reviewer_total_stats_from_model(  # pylint: disable=line-too-long
+            stats_model
+        )
+        review_datetime = datetime.datetime(2026, 2, 15, 10, 0, 0)
+
+        suggestion_services.increment_question_reviewer_total_stats(
+            stats, review_datetime, True, False
+        )
+
+        self.assertEqual(
+            stats.first_contribution_date, datetime.date(2026, 1, 1)
+        )
+        self.assertEqual(
+            stats.last_contribution_date, datetime.date(2026, 2, 15)
+        )
+        self.assertEqual(stats.reviewed_questions_count, 3)
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
