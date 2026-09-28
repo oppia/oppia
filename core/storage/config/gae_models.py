@@ -158,7 +158,6 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         """FeatureFlagConfigModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
     @classmethod
     def create(
         cls,

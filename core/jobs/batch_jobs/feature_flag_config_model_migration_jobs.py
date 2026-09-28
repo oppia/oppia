@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import core.storage.base_model.gae_models as base_model_module
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -29,9 +28,8 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 datastore_services = models.Registry.import_datastore_services()
 
 
