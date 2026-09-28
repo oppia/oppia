@@ -19,8 +19,6 @@
 import {Component} from '@angular/core';
 import {AlertsService, Message, Warning} from 'services/alerts.service';
 
-import './warnings-and-alerts.component.css';
-
 @Component({
   selector: 'oppia-warnings-and-alerts',
   templateUrl: './warnings-and-alerts.component.html',

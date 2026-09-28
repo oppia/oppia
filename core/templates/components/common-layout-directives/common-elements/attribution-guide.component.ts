@@ -16,7 +16,8 @@
  * @fileoverview Component for the attribution guide.
  */
 
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {AttributionService} from 'services/attribution.service';
@@ -24,8 +25,6 @@ import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-
-import './attribution-guide.component.css';
 
 @Component({
   selector: 'attribution-guide',
@@ -39,6 +38,10 @@ export class AttributionGuideComponent implements OnInit {
   generateAttibutionIsAllowed: boolean = false;
   maskIsShown: boolean = false;
   printAttributionLink: string = '';
+  @ViewChild('htmlAttributionTooltip', {static: false})
+  htmlAttributionTooltip!: NgbTooltip;
+  @ViewChild('printAttributionTooltip', {static: false})
+  printAttributionTooltip!: NgbTooltip;
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
@@ -98,7 +101,7 @@ export class AttributionGuideComponent implements OnInit {
     return this.pageContextService.getExplorationId();
   }
 
-  copyAttribution(className: string): void {
+  copyAttribution(className: string, tooltip: NgbTooltip | undefined): void {
     const codeDiv = document.getElementsByClassName(
       className
     )[0] as HTMLElement;
@@ -115,8 +118,14 @@ export class AttributionGuideComponent implements OnInit {
     selection?.addRange(range);
     document.execCommand('copy');
     selection?.removeAllRanges();
-    codeDiv.setAttribute('title', 'Copied!');
-    codeDiv.dispatchEvent(new Event('mouseenter'));
-    setTimeout(() => codeDiv.removeAttribute('title'), 1000);
+    this.showCopiedTooltip(tooltip);
+  }
+
+  private showCopiedTooltip(tooltip: NgbTooltip | undefined): void {
+    if (!tooltip) {
+      return;
+    }
+    tooltip.open();
+    setTimeout(() => tooltip.close(), 1000);
   }
 }

@@ -32,7 +32,6 @@ import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import './hint-editor.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,

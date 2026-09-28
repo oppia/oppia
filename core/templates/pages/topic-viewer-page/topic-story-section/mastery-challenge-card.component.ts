@@ -19,8 +19,6 @@
 import {Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './mastery-challenge-card.component.css';
-
 @Component({
   selector: 'topic-mastery-challenge-card',
   templateUrl: './mastery-challenge-card.component.html',

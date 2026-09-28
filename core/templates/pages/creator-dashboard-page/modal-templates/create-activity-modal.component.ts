@@ -22,7 +22,6 @@ import {UserService} from 'services/user.service';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
 import {CollectionCreationService} from 'components/entity-creation-services/collection-creation.service';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './create-activity-modal.component.css';
 
 @Component({
   selector: 'create-activity-modal',

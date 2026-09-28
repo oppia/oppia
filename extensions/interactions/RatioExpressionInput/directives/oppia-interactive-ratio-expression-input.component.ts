@@ -33,7 +33,7 @@ import {RatioInputAnswer, InteractionAnswer} from 'interactions/answer-defs';
 @Component({
   selector: 'oppia-interactive-ratio-expression-input',
   templateUrl: './ratio-expression-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./ratio-expression-input-interaction.component.css'],
 })
 export class InteractiveRatioExpressionInputComponent
   implements OnInit, OnDestroy

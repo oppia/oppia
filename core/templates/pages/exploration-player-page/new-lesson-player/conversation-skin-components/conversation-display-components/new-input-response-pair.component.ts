@@ -34,7 +34,6 @@ import {NumberConversionService} from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 
-import './new-input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {animate, style, transition, trigger} from '@angular/animations';
