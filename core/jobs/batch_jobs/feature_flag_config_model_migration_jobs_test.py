@@ -72,8 +72,23 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         )
 
         self.assertIsNone(
-            config_models.FeatureFlagConfigModel.get('feature_flag_a')
+            config_models.FeatureFlagConfigModel.get(
+                'feature_flag_a', strict=False
+            )
         )
+
+
+class AuditFeatureFlagConfigModelsMigrationJobTests(job_test_utils.JobTestBase):
+    """Tests for AuditFeatureFlagConfigModelsMigrationJob."""
+
+    JOB_CLASS: Type[
+        feature_flag_config_model_migration_jobs.AuditFeatureFlagConfigModelsMigrationJob
+    ] = (
+        feature_flag_config_model_migration_jobs.AuditFeatureFlagConfigModelsMigrationJob
+    )
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_audit_job_does_not_write_new_models(self) -> None:
         """The audit job should report the legacy items without mutating storage."""
@@ -86,9 +101,6 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         legacy_model.update_timestamps()
         legacy_model.put()
 
-        audit_job = feature_flag_config_model_migration_jobs.AuditFeatureFlagConfigModelsMigrationJob(
-            self.pipeline
-        )
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -104,5 +116,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
             config_models.FeatureFlagConfigModel.get('feature_flag_b')
         )
         self.assertIsNone(
-            config_models.WebFeatureFlagConfigModel.get('feature_flag_b')
+            config_models.WebFeatureFlagConfigModel.get(
+                'feature_flag_b', strict=False
+            )
         )
