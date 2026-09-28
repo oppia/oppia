@@ -478,8 +478,8 @@ describe('Classroom Page Component', () => {
   }));
 
   it('should hide private classroom banner when user info fetch fails', fakeAsync(() => {
-    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
-      Promise.reject(new Error('User info error'))
+    (userService.getUserInfoAsync as jasmine.Spy).and.rejectWith(
+      new Error('User info error')
     );
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
       'classroomUrlFragment'
