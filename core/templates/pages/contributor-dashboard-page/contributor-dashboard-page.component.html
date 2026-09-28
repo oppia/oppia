@@ -10,8 +10,8 @@
                class="oppia-tabs-container">
             <button type="button"
                     (click)="onTabClick(item.key)"
-                    class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
-              {{item.value.tabName}}
+                    class="oppia-opportunities-tabs-button e2e-test-{{item.key}}">
+              <span class="oppia-opportunities-tabs-text">{{item.value.tabName}}</span>
             </button>
             <div class="oppia-active-tab-highlighter"></div>
           </div>

@@ -291,12 +291,13 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
     });
 
-    it('should render enabled dashboard tabs as focusable buttons', () => {
+    it('should render enabled dashboard tabs as focusable buttons', fakeAsync(() => {
       component.tabsDetails.submitQuestionTab.enabled = true;
+      spyOn(focusManagerService, 'setFocusWithoutScroll');
       fixture.detectChanges();
 
       const tabButtons = fixture.nativeElement.querySelectorAll(
-        '.oppia-opportunities-tabs-text'
+        '.oppia-opportunities-tabs-button'
       ) as NodeListOf<HTMLButtonElement>;
       expect(tabButtons.length).toBe(3);
 
@@ -307,14 +308,55 @@ describe('Contributor dashboard page', () => {
         expect(tabButton.tabIndex).toBe(0);
       });
 
-      tabButtons[2].click();
+      const tabNames = [
+        'myContributionTab',
+        'submitQuestionTab',
+        'translateTextTab',
+      ];
+      const initialHash = window.location.hash;
+
+      tabButtons.forEach((tabButton, index) => {
+        tabButton.click();
+        fixture.detectChanges();
+
+        expect(component.activeTabName).toBe(tabNames[index]);
+        expect(
+          fixture.nativeElement
+            .querySelector('.e2e-test-active-tab')
+            .contains(tabButton)
+        ).toBe(true);
+        expect(window.location.hash).toBe(initialHash);
+      });
+      flush();
+    }));
+
+    it('should hide question submission without contribution rights', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve({
+          ...userContributionRights,
+          can_suggest_questions: false,
+        })
+      );
+
+      component.ngOnInit();
+      flush();
       fixture.detectChanges();
 
-      expect(component.activeTabName).toBe('translateTextTab');
       expect(
-        fixture.nativeElement.querySelector('.e2e-test-active-tab').classList
-      ).toContain('oppia-active-opportunities-tab');
-    });
+        fixture.nativeElement.querySelector('.e2e-test-submitQuestionTab')
+      ).toBeNull();
+      expect(
+        fixture.nativeElement.querySelectorAll(
+          '.oppia-opportunities-tabs-button'
+        ).length
+      ).toBe(2);
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-myContributionTab')
+      ).not.toBeNull();
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-translateTextTab')
+      ).not.toBeNull();
+    }));
 
     it('should change active language when clicking on language selector', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
