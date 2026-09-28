@@ -18,13 +18,11 @@
  */
 
 import {StoryNode, StoryNodeBackendDict} from './story-node.model';
-
-export interface ArcBackendDict {
-  id: string;
-  title: string;
-  description: string;
-  node_ids: string[];
-}
+// ModuleBackendDict is declared in story-contents-object.model.ts, since
+// the story editor is the owner of the module domain object. It is re-used
+// here rather than declared a second time, so that the two representations
+// of a module can never drift apart.
+import {ModuleBackendDict} from './story-contents-object.model';
 
 export interface StorySummaryBackendDict {
   id: string;
@@ -37,7 +35,7 @@ export interface StorySummaryBackendDict {
   completed_node_titles: string[];
   url_fragment: string;
   all_node_dicts: StoryNodeBackendDict[];
-  arcs?: ArcBackendDict[];
+  modules?: ModuleBackendDict[];
   published_chapters_count?: number;
   total_chapters_count?: number;
   upcoming_chapters_count?: number;
@@ -74,19 +72,20 @@ export class StorySummary {
     private _upcomingChaptersExpectedDays: number[] | undefined,
     private _overdueChaptersCount: number | undefined,
     private _visitedChapterTitles: string[] | undefined,
-    private _arcs: ArcBackendDict[] | undefined
+    private _modules: ModuleBackendDict[] | undefined
   ) {}
 
-  getArcs(): ArcBackendDict[] {
-    if (!this._arcs) {
+  getModules(): ModuleBackendDict[] {
+    if (!this._modules) {
       return [];
     }
-    // Return deep copies of arc objects so callers cannot mutate internal state.
-    return this._arcs.map(a => ({
-      id: a.id,
-      title: a.title,
-      description: a.description,
-      node_ids: a.node_ids ? a.node_ids.slice() : [],
+    // Return deep copies of module objects so callers cannot mutate internal
+    // state.
+    return this._modules.map(m => ({
+      id: m.id,
+      title: m.title,
+      description: m.description,
+      node_ids: m.node_ids ? m.node_ids.slice() : [],
     }));
   }
 
@@ -201,7 +200,7 @@ export class StorySummary {
       storySummaryBackendDict.upcoming_chapters_expected_days,
       storySummaryBackendDict.overdue_chapters_count,
       storySummaryBackendDict.visited_chapter_titles,
-      storySummaryBackendDict.arcs
+      storySummaryBackendDict.modules
     );
   }
 }

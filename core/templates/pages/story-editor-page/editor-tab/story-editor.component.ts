@@ -29,7 +29,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StoryNode} from 'domain/story/story-node.model';
 import {
-  ArcModel,
+  ModuleModel,
   StoryContents,
 } from 'domain/story/story-contents-object.model';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
@@ -37,7 +37,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-title-modal.component';
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
-import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
+import {EditModuleModalComponent} from '../modal-templates/edit-module-modal.component';
 import {Story} from 'domain/story/story.model';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -173,9 +173,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.rearrangeNodeInList(event.previousIndex, event.currentIndex);
   }
 
-  private ensureArcMembershipForNodes(): void {
+  private ensureModuleMembershipForNodes(): void {
     if (
-      !this.isStoryEditorArcsFeatureFlagEnabled() ||
+      !this.isStoryEditorModulesFeatureFlagEnabled() ||
       !this.storyContents ||
       this.storyContents.getNodes().length === 0
     ) {
@@ -183,13 +183,13 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     }
 
     const nodeIds = this.storyContents.getNodes().map(node => node.getId());
-    const arcs = this.storyContents.getArcs();
+    const modules = this.storyContents.getModules();
 
-    // Backfill a default arc for stories that predate arc data.
-    if (arcs.length === 0) {
-      this.storyContents.addArc(
-        ArcModel.createNew(
-          'arc_' + Date.now().toString(),
+    // Backfill a default module for stories that predate module data.
+    if (modules.length === 0) {
+      this.storyContents.addModule(
+        ModuleModel.createNew(
+          'module_' + Date.now().toString(),
           'All Chapters',
           '',
           nodeIds
@@ -201,19 +201,19 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     const validNodeIdSet = new Set(nodeIds);
     const coveredNodeIds = new Set<string>();
 
-    arcs.forEach(arc => {
+    modules.forEach(module => {
       // Remove stale node references that are no longer in story contents.
-      const normalizedNodeIds = arc
+      const normalizedNodeIds = module
         .getNodeIds()
         .filter(id => validNodeIdSet.has(id));
-      arc.setNodeIds(normalizedNodeIds);
+      module.setNodeIds(normalizedNodeIds);
       normalizedNodeIds.forEach(id => coveredNodeIds.add(id));
     });
 
     const missingNodeIds = nodeIds.filter(id => !coveredNodeIds.has(id));
     if (missingNodeIds.length > 0) {
-      const firstArcNodeIds = arcs[0].getNodeIds();
-      arcs[0].setNodeIds([...firstArcNodeIds, ...missingNodeIds]);
+      const firstModuleNodeIds = modules[0].getNodeIds();
+      modules[0].setNodeIds([...firstModuleNodeIds, ...missingNodeIds]);
     }
   }
 
@@ -232,136 +232,151 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
-  isStoryEditorArcsFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status.StoryEditorArcs.isEnabled;
+  isStoryEditorModulesFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.StoryEditorModules.isEnabled;
   }
 
-  getArcIdForNode(nodeId: string): string {
-    for (const arc of this.storyContents.getArcs()) {
-      if (arc.getNodeIds().indexOf(nodeId) !== -1) {
-        return arc.getId();
+  getModuleIdForNode(nodeId: string): string {
+    for (const module of this.storyContents.getModules()) {
+      if (module.getNodeIds().indexOf(nodeId) !== -1) {
+        return module.getId();
       }
     }
-    throw new Error('Node ' + nodeId + ' does not belong to any arc.');
+    throw new Error('Node ' + nodeId + ' does not belong to any module.');
   }
 
-  getArcForNode(nodeId: string): ArcModel {
-    const arcId = this.getArcIdForNode(nodeId);
-    const arcIndex = this.storyContents.getArcIndex(arcId);
-    if (arcIndex === -1) {
-      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+  getModuleForNode(nodeId: string): ModuleModel {
+    const moduleId = this.getModuleIdForNode(nodeId);
+    const moduleIndex = this.storyContents.getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
+      throw new Error(
+        'Module ' + moduleId + ' not found for node ' + nodeId + '.'
+      );
     }
-    return this.storyContents.getArcs()[arcIndex];
+    return this.storyContents.getModules()[moduleIndex];
   }
 
-  getArcSequenceNumber(nodeId: string): number {
-    const arcId = this.getArcIdForNode(nodeId);
-    const arcIndex = this.storyContents.getArcIndex(arcId);
-    if (arcIndex === -1) {
-      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+  getModuleSequenceNumber(nodeId: string): number {
+    const moduleId = this.getModuleIdForNode(nodeId);
+    const moduleIndex = this.storyContents.getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
+      throw new Error(
+        'Module ' + moduleId + ' not found for node ' + nodeId + '.'
+      );
     }
-    return arcIndex + 1;
+    return moduleIndex + 1;
   }
 
-  getArcColorForNode(
+  getModuleColorForNode(
     nodeId: string
-  ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] {
-    const arcId = this.getArcIdForNode(nodeId);
-    const arcIndex = this.storyContents.getArcIndex(arcId);
-    if (arcIndex === -1) {
-      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+  ): (typeof StoryDomainConstants.MODULE_COLOR_PALETTE)[number] {
+    const moduleId = this.getModuleIdForNode(nodeId);
+    const moduleIndex = this.storyContents.getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
+      throw new Error(
+        'Module ' + moduleId + ' not found for node ' + nodeId + '.'
+      );
     }
-    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
-    return palette[arcIndex % palette.length];
+    const palette = StoryDomainConstants.MODULE_COLOR_PALETTE;
+    return palette[moduleIndex % palette.length];
   }
 
-  isSameArc(nodeIndex: number): boolean {
+  isSameModule(nodeIndex: number): boolean {
     if (nodeIndex <= 0) {
       return true;
     }
     const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
     const currNodeId = this.linearNodesList[nodeIndex].getId();
     return (
-      this.getArcIdForNode(prevNodeId) === this.getArcIdForNode(currNodeId)
+      this.getModuleIdForNode(prevNodeId) ===
+      this.getModuleIdForNode(currNodeId)
     );
   }
 
-  splitIntoArc(nodeIndex: number): void {
+  splitIntoModule(nodeIndex: number): void {
     const nodeId = this.linearNodesList[nodeIndex].getId();
-    const sourceArcId = this.getArcIdForNode(nodeId);
-    const sourceArcIndex = this.storyContents.getArcIndex(sourceArcId);
-    const sourceArc = this.storyContents.getArcs()[sourceArcIndex];
-    const sourceArcNodeIds = [...sourceArc.getNodeIds()];
-    const splitIdx = sourceArcNodeIds.indexOf(nodeId);
+    const sourceModuleId = this.getModuleIdForNode(nodeId);
+    const sourceModuleIndex = this.storyContents.getModuleIndex(sourceModuleId);
+    const sourceModule = this.storyContents.getModules()[sourceModuleIndex];
+    const sourceModuleNodeIds = [...sourceModule.getNodeIds()];
+    const splitIdx = sourceModuleNodeIds.indexOf(nodeId);
     if (splitIdx <= 0) {
       return;
     }
-    const nodesToMove = sourceArcNodeIds.slice(splitIdx);
+    const nodesToMove = sourceModuleNodeIds.slice(splitIdx);
 
-    const previousArcIdsOrder = this.storyContents
-      .getArcs()
-      .map(arc => arc.getId());
-    let arcId = 'arc_' + Date.now().toString();
-    const existingArcIds = new Set(
-      this.storyContents.getArcs().map(arc => arc.getId())
+    const previousModuleIdsOrder = this.storyContents
+      .getModules()
+      .map(module => module.getId());
+    let moduleId = 'module_' + Date.now().toString();
+    const existingModuleIds = new Set(
+      this.storyContents.getModules().map(module => module.getId())
     );
-    while (existingArcIds.has(arcId)) {
-      arcId = 'arc_' + Date.now().toString();
+    while (existingModuleIds.has(moduleId)) {
+      moduleId = 'module_' + Date.now().toString();
     }
-    this.storyUpdateService.createArc(
+    this.storyUpdateService.createModule(
       this.story,
-      arcId,
-      'Module ' + (this.storyContents.getArcs().length + 1),
+      moduleId,
+      'Module ' + (this.storyContents.getModules().length + 1),
       '',
       [nodesToMove[0]]
     );
 
-    this.storyUpdateService.moveNodeToArc(this.story, nodesToMove[0], arcId);
+    this.storyUpdateService.moveNodeToModule(
+      this.story,
+      nodesToMove[0],
+      moduleId
+    );
 
     nodesToMove.slice(1).forEach(nodeIdToMove => {
-      this.storyUpdateService.moveNodeToArc(this.story, nodeIdToMove, arcId);
+      this.storyUpdateService.moveNodeToModule(
+        this.story,
+        nodeIdToMove,
+        moduleId
+      );
     });
 
-    const newArcOrder = [...previousArcIdsOrder];
-    newArcOrder.splice(sourceArcIndex + 1, 0, arcId);
-    this.storyUpdateService.rearrangeArcs(this.story, newArcOrder);
+    const newModuleOrder = [...previousModuleIdsOrder];
+    newModuleOrder.splice(sourceModuleIndex + 1, 0, moduleId);
+    this.storyUpdateService.rearrangeModules(this.story, newModuleOrder);
 
     this._initEditor();
   }
 
-  onEditArcClick(nodeId: string): void {
-    this.editArc(this.getArcIdForNode(nodeId));
+  onEditModuleClick(nodeId: string): void {
+    this.editModule(this.getModuleIdForNode(nodeId));
   }
 
-  editArc(arcId: string): void {
-    const arcIndex = this.storyContents.getArcIndex(arcId);
-    if (arcIndex === -1) {
+  editModule(moduleId: string): void {
+    const moduleIndex = this.storyContents.getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
       return;
     }
-    const arc = this.storyContents.getArcs()[arcIndex];
-    const modalRef = this.ngbModal.open(EditArcModalComponent, {
+    const module = this.storyContents.getModules()[moduleIndex];
+    const modalRef = this.ngbModal.open(EditModuleModalComponent, {
       backdrop: 'static',
-      windowClass: 'oppia-edit-arc-modal',
+      windowClass: 'oppia-edit-module-modal',
     });
-    modalRef.componentInstance.arcTitle = arc.getTitle();
-    modalRef.componentInstance.arcDescription = arc.getDescription();
+    modalRef.componentInstance.moduleTitle = module.getTitle();
+    modalRef.componentInstance.moduleDescription = module.getDescription();
     modalRef.result.then(
       (result: {title: string; description: string}) => {
-        if (result.title !== arc.getTitle()) {
-          this.storyUpdateService.updateArcProperty(
+        if (result.title !== module.getTitle()) {
+          this.storyUpdateService.updateModuleProperty(
             this.story,
-            arcId,
-            StoryDomainConstants.ARC_PROPERTY_TITLE,
-            arc.getTitle(),
+            moduleId,
+            StoryDomainConstants.MODULE_PROPERTY_TITLE,
+            module.getTitle(),
             result.title
           );
         }
-        if (result.description !== arc.getDescription()) {
-          this.storyUpdateService.updateArcProperty(
+        if (result.description !== module.getDescription()) {
+          this.storyUpdateService.updateModuleProperty(
             this.story,
-            arcId,
-            StoryDomainConstants.ARC_PROPERTY_DESCRIPTION,
-            arc.getDescription(),
+            moduleId,
+            StoryDomainConstants.MODULE_PROPERTY_DESCRIPTION,
+            module.getDescription(),
             result.description
           );
         }
@@ -371,44 +386,46 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     );
   }
 
-  onRemoveArcClick(nodeId: string): void {
-    this.removeArcBoundary(this.getArcIdForNode(nodeId));
+  onRemoveModuleClick(nodeId: string): void {
+    this.removeModuleBoundary(this.getModuleIdForNode(nodeId));
   }
 
-  isFirstArc(nodeId: string): boolean {
-    const arcId = this.getArcIdForNode(nodeId);
-    return this.storyContents.getArcIndex(arcId) === 0;
+  isFirstModule(nodeId: string): boolean {
+    const moduleId = this.getModuleIdForNode(nodeId);
+    return this.storyContents.getModuleIndex(moduleId) === 0;
   }
 
-  removeArcBoundary(arcId: string): void {
-    const arcIndex = this.storyContents.getArcIndex(arcId);
-    if (arcIndex === -1) {
+  removeModuleBoundary(moduleId: string): void {
+    const moduleIndex = this.storyContents.getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
       return;
     }
 
-    let sourceArcIndex = arcIndex;
-    let destinationArcId: string;
-    if (arcIndex === 0) {
-      if (this.storyContents.getArcs().length < 2) {
+    let sourceModuleIndex = moduleIndex;
+    let destinationModuleId: string;
+    if (moduleIndex === 0) {
+      if (this.storyContents.getModules().length < 2) {
         return;
       }
-      sourceArcIndex = 1;
-      destinationArcId = arcId;
+      sourceModuleIndex = 1;
+      destinationModuleId = moduleId;
     } else {
-      destinationArcId = this.storyContents.getArcs()[arcIndex - 1].getId();
+      destinationModuleId = this.storyContents
+        .getModules()
+        [moduleIndex - 1].getId();
     }
 
-    const currentArc = this.storyContents.getArcs()[sourceArcIndex];
-    const nodeIdsToMove = [...currentArc.getNodeIds()];
+    const currentModule = this.storyContents.getModules()[sourceModuleIndex];
+    const nodeIdsToMove = [...currentModule.getNodeIds()];
 
     nodeIdsToMove.forEach(nodeId => {
-      this.storyUpdateService.moveNodeToArc(
+      this.storyUpdateService.moveNodeToModule(
         this.story,
         nodeId,
-        destinationArcId
+        destinationModuleId
       );
     });
-    this.storyUpdateService.deleteArc(this.story, currentArc.getId());
+    this.storyUpdateService.deleteModule(this.story, currentModule.getId());
     this._initEditor();
   }
 
@@ -417,7 +434,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.story = this.storyEditorStateService.getStory();
     if (this.story) {
       this.storyContents = this.story.getStoryContents();
-      this.ensureArcMembershipForNodes();
+      this.ensureModuleMembershipForNodes();
       this.disconnectedNodes = [];
       this.linearNodesList = [];
       this.nodes = [];

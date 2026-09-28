@@ -428,7 +428,7 @@ const masteryChallengeLockedModalCancelButtonSelector =
   '.mastery-challenge-locked-modal-cancel-button';
 const topicStudySkillsCtaSelector = '.e2e-test-study-skills-cta';
 const adventureGroupSelector = '.module-group';
-const adventureTitleSelector = '.module-title';
+const moduleTitleSelector = '.module-title';
 const adventureHeaderSelector = '.module-header';
 const adventureEndTestCardSelector = '.module-end-test-card';
 const adventureEndTestTitleSelector = '.module-end-test-card-title';
@@ -436,9 +436,9 @@ const adventureEndTestPracticeButtonSelector =
   '.module-end-test-card-practice-button';
 const topicPracticeSessionContainerSelector =
   '.e2e-test-practice-session-container';
-const arcSkipModalSelector = '.module-skip-confirmation-modal';
-const arcSkipProceedButtonSelector = '.module-skip-confirmation-proceed';
-const arcSkipCancelButtonSelector = '.module-skip-confirmation-cancel';
+const moduleSkipModalSelector = '.module-skip-confirmation-modal';
+const moduleSkipProceedButtonSelector = '.module-skip-confirmation-proceed';
+const moduleSkipCancelButtonSelector = '.module-skip-confirmation-cancel';
 const skippedAdventureCardSelector = '.skipped-module-card';
 const skippedAdventureBadgeSelector = '.skipped-module-badge';
 const skippedAdventureMessageSelector = '.skipped-module-message';
@@ -4971,7 +4971,7 @@ export class LoggedInUser extends BaseUser {
    * Verifies that adventure titles are visible on the timeline.
    */
   async expectAdventureTitlesToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(adventureTitleSelector);
+    await this.expectElementToBeVisible(moduleTitleSelector);
   }
 
   /**
@@ -5443,7 +5443,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies that the adventure end-of-arc practice test card and its Practice
+   * Verifies that the adventure end-of-module practice test card and its
    * Test button are visible.
    */
   async expectPracticeTestCardToBeVisible(): Promise<void> {
@@ -5514,13 +5514,13 @@ export class LoggedInUser extends BaseUser {
    * Clicks the dock badge at the given index and then the Start button of the
    * selected lesson. Starting a lesson of a later, incomplete adventure
    * triggers the skip confirmation modal.
-   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
-   *   badge for the later arc.
+   * @param {number} moduleNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later module.
    */
-  async clickDockBadge(arcNodeIndex: number): Promise<void> {
+  async clickDockBadge(moduleNodeIndex: number): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
-      const targetBadge = circleBadges[arcNodeIndex];
+      const targetBadge = circleBadges[moduleNodeIndex];
       const targetLessonNumber =
         await this.getLessonNumberFromDockBadge(targetBadge);
 
@@ -5540,9 +5540,9 @@ export class LoggedInUser extends BaseUser {
    * to be visible.
    */
   async expectSkipConfirmationModalToShow(): Promise<void> {
-    await this.expectElementToBeVisible(arcSkipModalSelector);
-    await this.expectElementToBeVisible(arcSkipCancelButtonSelector);
-    await this.expectElementToBeVisible(arcSkipProceedButtonSelector);
+    await this.expectElementToBeVisible(moduleSkipModalSelector);
+    await this.expectElementToBeVisible(moduleSkipCancelButtonSelector);
+    await this.expectElementToBeVisible(moduleSkipProceedButtonSelector);
   }
 
   /**
@@ -5550,25 +5550,25 @@ export class LoggedInUser extends BaseUser {
    * the modal closes.
    */
   async cancelSkipConfirmationModal(): Promise<void> {
-    await this.clickOnElementWithSelector(arcSkipCancelButtonSelector);
-    await this.expectElementToBeVisible(arcSkipModalSelector, false);
+    await this.clickOnElementWithSelector(moduleSkipCancelButtonSelector);
+    await this.expectElementToBeVisible(moduleSkipModalSelector, false);
   }
 
   /**
-   * Selects the later arc's lesson from the navigation dock, clicks its Start
+   * Selects the later module's lesson from the navigation dock, clicks its
    * button, confirms the skip, and verifies that the earlier adventures are
    * shown as skipped cards with the SKIPPED badge, message, and Start CTA.
    * Confirming the skip starts the selected lesson, so the test returns to
    * the topic page to verify that the skip state was persisted.
-   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
-   *   badge for the later arc.
+   * @param {number} moduleNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later module.
    */
-  async skipToLaterArcAndExpectSkippedAdventureCards(
-    arcNodeIndex: number
+  async skipToLaterModuleAndExpectSkippedAdventureCards(
+    moduleNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
-      const targetBadge = circleBadges[arcNodeIndex];
+      const targetBadge = circleBadges[moduleNodeIndex];
       const targetLessonNumber =
         await this.getLessonNumberFromDockBadge(targetBadge);
 
@@ -5578,8 +5578,8 @@ export class LoggedInUser extends BaseUser {
       const topicPageUrl = this.page.url();
       const startButtonSelector = `#lesson-${targetLessonNumber} .e2e-test-lesson-card-start-button`;
       await this.clickOnElementWithSelector(startButtonSelector);
-      await this.expectElementToBeVisible(arcSkipModalSelector);
-      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
+      await this.expectElementToBeVisible(moduleSkipModalSelector);
+      await this.clickOnElementWithSelector(moduleSkipProceedButtonSelector);
 
       // Confirming the skip starts the selected lesson, which navigates away
       // from the topic page. Wait for the lesson player to load and then
@@ -5608,18 +5608,18 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the dock badge for the later arc at the given index and verifies
+   * Clicks the dock badge for the later module at the given index and checks
    * that the page smooth-scrolls to the selected milestone without reloading.
-   * @param {number} arcNodeIndex - The zero-based index of the dock lesson
-   *   badge for the later arc.
+   * @param {number} moduleNodeIndex - The zero-based index of the dock lesson
+   *   badge for the later module.
    */
-  async navigateToLaterArcMilestoneAndExpectNoPageReload(
-    arcNodeIndex: number
+  async navigateToLaterModuleMilestoneAndExpectNoPageReload(
+    moduleNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
     if (circleBadges.length >= 3) {
       const lessonNumber = await this.getLessonNumberFromDockBadge(
-        circleBadges[arcNodeIndex]
+        circleBadges[moduleNodeIndex]
       );
 
       // Start from the top of the page and record the browser's navigation
@@ -5640,7 +5640,7 @@ export class LoggedInUser extends BaseUser {
       // Use the stabilized click helper instead of a raw Puppeteer click:
       // on mobile the navigation dock can scroll while the page is
       // smooth-scrolling, so a raw click's coordinates can land off-target.
-      await this.clickOnElement(circleBadges[arcNodeIndex]);
+      await this.clickOnElement(circleBadges[moduleNodeIndex]);
 
       // The dock scrolls to the selected milestone with a 300 ms delay before
       // a smooth scroll, so give the smooth scroll time to finish.
@@ -5687,7 +5687,8 @@ export class LoggedInUser extends BaseUser {
     const skippedCardsBefore = await this.page.$$(skippedAdventureCardSelector);
     // Use the stabilized click helper instead of a raw Puppeteer click:
     // the page is still smooth-scrolling toward the previously selected
-    // arc, and a raw click's coordinates can land off-target mid-scroll.
+    // module, and a raw click's coordinates can land off-target
+    // mid-scroll.
     await this.clickOnElement(startCtas[0]);
     await this.page.waitForTimeout(1000);
 
@@ -5873,8 +5874,8 @@ export class LoggedInUser extends BaseUser {
     // Clicking strictly in story order prevents the module-skip confirmation
     // modal from appearing, but confirm it as a safety net if it shows so the
     // learner still proceeds into the exploration.
-    if (await this.isElementVisible(arcSkipModalSelector, true, 3000)) {
-      await this.clickOnElementWithSelector(arcSkipProceedButtonSelector);
+    if (await this.isElementVisible(moduleSkipModalSelector, true, 3000)) {
+      await this.clickOnElementWithSelector(moduleSkipProceedButtonSelector);
     }
 
     await this.waitForPageToFullyLoad();
@@ -5953,14 +5954,14 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies that the timeline displays thematic Arc headers.
+   * Verifies that the timeline displays thematic module headers.
    */
-  async expectArcTitlesToBeVisibleOnTimeline(): Promise<void> {
-    await this.expectElementToBeVisible(adventureTitleSelector);
-    const arcTitles = await this.page.$$eval(adventureTitleSelector, elements =>
+  async expectModuleTitlesToBeVisibleOnTimeline(): Promise<void> {
+    await this.expectElementToBeVisible(moduleTitleSelector);
+    const moduleTitles = await this.page.$$eval(moduleTitleSelector, elements =>
       elements.map(el => (el as HTMLElement).textContent?.trim())
     );
-    expect(arcTitles.length).toBeGreaterThan(0);
+    expect(moduleTitles.length).toBeGreaterThan(0);
   }
 
   /**

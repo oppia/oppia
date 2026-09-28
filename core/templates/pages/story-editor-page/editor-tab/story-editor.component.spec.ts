@@ -43,10 +43,10 @@ import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {
-  ArcModel,
+  ModuleModel,
   StoryContents,
 } from 'domain/story/story-contents-object.model';
-import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
+import {EditModuleModalComponent} from '../modal-templates/edit-module-modal.component';
 import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -63,7 +63,7 @@ class MockPlatformFeatureService {
     SerialChapterLaunchCurriculumAdminView: {
       isEnabled: false,
     },
-    StoryEditorArcs: {
+    StoryEditorModules: {
       isEnabled: false,
     },
   };
@@ -90,7 +90,7 @@ describe('Story Editor Component having three story nodes', () => {
         StoryEditorComponent,
         NewChapterTitleModalComponent,
         DeleteChapterModalComponent,
-        EditArcModalComponent,
+        EditModuleModalComponent,
         MockTranslatePipe,
         UrlFragmentEditorComponent,
       ],
@@ -210,7 +210,7 @@ describe('Story Editor Component having three story nodes', () => {
       'fractions'
     );
     spyOn(storyEditorStateService, 'getTopicName').and.returnValue('addition');
-    mockPlatformFeatureService.status.StoryEditorArcs = {
+    mockPlatformFeatureService.status.StoryEditorModules = {
       isEnabled: false,
     };
     component.ngOnInit();
@@ -842,260 +842,273 @@ describe('Story Editor Component having three story nodes', () => {
     );
   });
 
-  it('should open edit arc modal and update title and description', fakeAsync(() => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', 'Old description', [
+  it('should open edit module modal and update title and description', fakeAsync(() => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', 'Old description', [
         'node_2',
         'node_3',
       ])
     );
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
-        arcTitle: '',
-        arcDescription: '',
+        moduleTitle: '',
+        moduleDescription: '',
       },
       result: Promise.resolve({
         title: 'Module 1 updated',
         description: 'New description',
       }),
     } as NgbModalRef);
-    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+    const updateModulePropertySpy = spyOn(
+      storyUpdateService,
+      'updateModuleProperty'
+    );
 
-    component.editArc('arc_1');
+    component.editModule('module_1');
     tick();
 
-    expect(modalSpy).toHaveBeenCalledWith(EditArcModalComponent, {
+    expect(modalSpy).toHaveBeenCalledWith(EditModuleModalComponent, {
       backdrop: 'static',
-      windowClass: 'oppia-edit-arc-modal',
+      windowClass: 'oppia-edit-module-modal',
     });
-    expect(updateArcPropertySpy).toHaveBeenCalledTimes(2);
+    expect(updateModulePropertySpy).toHaveBeenCalledTimes(2);
   }));
 
-  it('should throw error when onEditArcClick is called for a node with no arc', () => {
+  it('should throw error when onEditModuleClick is called for a node with no module', () => {
     const modalSpy = spyOn(ngbModal, 'open');
 
-    expect(() => component.onEditArcClick('node_without_arc')).toThrowError();
+    expect(() =>
+      component.onEditModuleClick('node_without_module')
+    ).toThrowError();
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
-  it('should return early from editArc when arc index is invalid', () => {
+  it('should return early from editModule when module index is invalid', () => {
     const modalSpy = spyOn(ngbModal, 'open');
 
-    component.editArc('non_existent_arc');
+    component.editModule('non_existent_module');
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
-  it('should merge current arc into previous arc on removeArcBoundary', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
+  it('should merge current module into previous module on removeModuleBoundary', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_3'])
     );
-    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
-    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+    const moveNodeToModuleSpy = spyOn(storyUpdateService, 'moveNodeToModule');
+    const deleteModuleSpy = spyOn(storyUpdateService, 'deleteModule');
 
-    component.removeArcBoundary('arc_2');
+    component.removeModuleBoundary('module_2');
 
-    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+    expect(moveNodeToModuleSpy).toHaveBeenCalledWith(
       component.story,
       'node_3',
-      'arc_1'
+      'module_1'
     );
-    expect(deleteArcSpy).toHaveBeenCalledWith(component.story, 'arc_2');
+    expect(deleteModuleSpy).toHaveBeenCalledWith(component.story, 'module_2');
   });
 
-  it('should merge second arc into first when removing boundary from first arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
+  it('should merge second module into first when removing boundary from first module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_3'])
     );
-    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
-    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+    const moveNodeToModuleSpy = spyOn(storyUpdateService, 'moveNodeToModule');
+    const deleteModuleSpy = spyOn(storyUpdateService, 'deleteModule');
 
-    component.removeArcBoundary('arc_1');
+    component.removeModuleBoundary('module_1');
 
-    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+    expect(moveNodeToModuleSpy).toHaveBeenCalledWith(
       component.story,
       'node_3',
-      'arc_1'
+      'module_1'
     );
-    expect(deleteArcSpy).toHaveBeenCalledWith(component.story, 'arc_2');
+    expect(deleteModuleSpy).toHaveBeenCalledWith(component.story, 'module_2');
   });
 
-  it('should place split chapter in new arc only', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', [
+  it('should place split chapter in new module only', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
       ])
     );
 
-    component.splitIntoArc(2);
+    component.splitIntoModule(2);
 
-    expect(component.storyContents.getArcs().length).toBe(2);
-    expect(component.getArcIdForNode('node_3')).not.toBe('arc_1');
+    expect(component.storyContents.getModules().length).toBe(2);
+    expect(component.getModuleIdForNode('node_3')).not.toBe('module_1');
   });
 
-  it('should generate a unique arc ID when the timestamp-based ID collides', () => {
+  it('should generate a unique module ID when the timestamp-based ID collides', () => {
     const dateNowSpy = spyOn(Date, 'now');
     dateNowSpy.and.returnValues(1234567890, 1234567890, 1234567891);
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1234567890', 'Module 1', '', [
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1234567890', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
       ])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
-    const createArcSpy = spyOn(
+    const createModuleSpy = spyOn(
       storyUpdateService,
-      'createArc'
+      'createModule'
     ).and.callThrough();
 
-    component.splitIntoArc(2);
+    component.splitIntoModule(2);
 
-    expect(createArcSpy).toHaveBeenCalledWith(
+    expect(createModuleSpy).toHaveBeenCalledWith(
       component.story,
-      'arc_1234567891',
+      'module_1234567891',
       jasmine.any(String),
       '',
       ['node_3']
     );
   });
 
-  it('should move multiple nodes to a new arc when splitting at a middle index', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', [
+  it('should move multiple nodes to a new module when splitting at a middle index', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
       ])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
-    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
+    const moveNodeToModuleSpy = spyOn(storyUpdateService, 'moveNodeToModule');
 
-    component.splitIntoArc(1);
+    component.splitIntoModule(1);
 
-    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+    expect(moveNodeToModuleSpy).toHaveBeenCalledWith(
       component.story,
       'node_2',
       jasmine.any(String)
     );
-    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+    expect(moveNodeToModuleSpy).toHaveBeenCalledWith(
       component.story,
       'node_3',
       jasmine.any(String)
     );
   });
 
-  it('should throw error for arc helpers when node has no arc', () => {
-    expect(() => component.getArcForNode('node_1')).toThrowError();
-    expect(() => component.getArcSequenceNumber('node_1')).toThrowError();
+  it('should throw error for module helpers when node has no module', () => {
+    expect(() => component.getModuleForNode('node_1')).toThrowError();
+    expect(() => component.getModuleSequenceNumber('node_1')).toThrowError();
   });
 
-  it('should not update arc when edit arc modal is dismissed', fakeAsync(() => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', 'Old description', ['node_2'])
+  it('should not update module when edit module modal is dismissed', fakeAsync(() => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', 'Old description', [
+        'node_2',
+      ])
     );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
-        arcTitle: '',
-        arcDescription: '',
+        moduleTitle: '',
+        moduleDescription: '',
       },
       result: Promise.reject(),
     } as NgbModalRef);
-    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+    const updateModulePropertySpy = spyOn(
+      storyUpdateService,
+      'updateModuleProperty'
+    );
 
-    component.editArc('arc_1');
+    component.editModule('module_1');
     tick();
 
-    expect(updateArcPropertySpy).not.toHaveBeenCalled();
+    expect(updateModulePropertySpy).not.toHaveBeenCalled();
   }));
 
-  it('should check if story editor arcs feature flag is enabled', () => {
-    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(false);
+  it('should check if story editor modules feature flag is enabled', () => {
+    expect(component.isStoryEditorModulesFeatureFlagEnabled()).toBe(false);
 
-    mockPlatformFeatureService.status.StoryEditorArcs = {
+    mockPlatformFeatureService.status.StoryEditorModules = {
       isEnabled: true,
     };
-    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(true);
+    expect(component.isStoryEditorModulesFeatureFlagEnabled()).toBe(true);
   });
 
-  it('should backfill a default arc when arc data is missing', () => {
-    mockPlatformFeatureService.status.StoryEditorArcs = {
+  it('should backfill a default module when module data is missing', () => {
+    mockPlatformFeatureService.status.StoryEditorModules = {
       isEnabled: true,
     };
 
     component.storyContents = story.getStoryContents();
-    expect(component.storyContents.getArcs().length).toBe(0);
+    expect(component.storyContents.getModules().length).toBe(0);
 
     component._initEditor();
 
-    expect(component.storyContents.getArcs().length).toBe(1);
-    expect(component.storyContents.getArcs()[0].getTitle()).toBe(
+    expect(component.storyContents.getModules().length).toBe(1);
+    expect(component.storyContents.getModules()[0].getTitle()).toBe(
       'All Chapters'
     );
-    expect(component.storyContents.getArcs()[0].getNodeIds()).toEqual([
+    expect(component.storyContents.getModules()[0].getNodeIds()).toEqual([
       'node_1',
       'node_2',
       'node_3',
     ]);
   });
 
-  it('should normalize stale arc node ids and include missing nodes', () => {
-    mockPlatformFeatureService.status.StoryEditorArcs = {
+  it('should normalize stale module node ids and include missing nodes', () => {
+    mockPlatformFeatureService.status.StoryEditorModules = {
       isEnabled: true,
     };
 
     component.storyContents = story.getStoryContents();
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2', 'ghost_node'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', [
+        'node_2',
+        'ghost_node',
+      ])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_3'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_3'])
     );
 
     component._initEditor();
 
-    expect(component.storyContents.getArcs()[0].getNodeIds()).toEqual([
+    expect(component.storyContents.getModules()[0].getNodeIds()).toEqual([
       'node_2',
       'node_1',
     ]);
-    expect(component.storyContents.getArcs()[1].getNodeIds()).toEqual([
+    expect(component.storyContents.getModules()[1].getNodeIds()).toEqual([
       'node_3',
     ]);
   });
 
-  it('should return true when node index is zero for isSameArc', () => {
-    expect(component.isSameArc(0)).toBe(true);
+  it('should return true when node index is zero for isSameModule', () => {
+    expect(component.isSameModule(0)).toBe(true);
   });
 
-  it('should return true when previous and current nodes are in the same arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
+  it('should return true when previous and current nodes are in the same module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Module 2', '', ['node_3'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_3'])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
-    expect(component.isSameArc(1)).toBe(true);
+    expect(component.isSameModule(1)).toBe(true);
   });
 
-  it('should return false when previous and current nodes are in different arcs', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1'])
+  it('should return false when previous and current nodes are in different modules', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1'])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Module 2', '', ['node_2', 'node_3'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_2', 'node_3'])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
-    expect(component.isSameArc(1)).toBe(false);
+    expect(component.isSameModule(1)).toBe(false);
   });
 
   it('should call StoryUpdate to update story description when changed', () => {
@@ -1160,60 +1173,60 @@ describe('Story Editor Component having three story nodes', () => {
     expect(storyUpdateSpy).not.toHaveBeenCalled();
   });
 
-  it('should throw error from getArcForNode when arc index is invalid', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should throw error from getModuleForNode when module index is invalid', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
-    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+    spyOn(component.storyContents, 'getModuleIndex').and.returnValue(-1);
 
-    expect(() => component.getArcForNode('node_2')).toThrowError();
+    expect(() => component.getModuleForNode('node_2')).toThrowError();
   });
 
-  it('should return the arc for a valid node from getArcForNode', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should return the module for a valid node from getModuleForNode', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
 
-    const result = component.getArcForNode('node_2');
+    const result = component.getModuleForNode('node_2');
 
-    expect(result.getId()).toBe('arc_1');
+    expect(result.getId()).toBe('module_1');
     expect(result.getTitle()).toBe('Module 1');
   });
 
-  it('should throw error from getArcSequenceNumber when arc index is invalid', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should throw error from getModuleSequenceNumber when module index is invalid', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
-    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+    spyOn(component.storyContents, 'getModuleIndex').and.returnValue(-1);
 
-    expect(() => component.getArcSequenceNumber('node_2')).toThrowError();
+    expect(() => component.getModuleSequenceNumber('node_2')).toThrowError();
   });
 
-  it('should return early from splitIntoArc when conditions are not met', () => {
-    const createArcSpy = spyOn(storyUpdateService, 'createArc');
+  it('should return early from splitIntoModule when conditions are not met', () => {
+    const createModuleSpy = spyOn(storyUpdateService, 'createModule');
 
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', [
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
       ])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
-    component.splitIntoArc(0);
-    expect(createArcSpy).not.toHaveBeenCalled();
+    component.splitIntoModule(0);
+    expect(createModuleSpy).not.toHaveBeenCalled();
   });
 
-  it('should return early from removeArcBoundary when conditions are not met', () => {
-    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+  it('should return early from removeModuleBoundary when conditions are not met', () => {
+    const deleteModuleSpy = spyOn(storyUpdateService, 'deleteModule');
 
     component.storyContents = story.getStoryContents();
-    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
-    component.removeArcBoundary('arc_1');
-    expect(deleteArcSpy).not.toHaveBeenCalled();
+    spyOn(component.storyContents, 'getModuleIndex').and.returnValue(-1);
+    component.removeModuleBoundary('module_1');
+    expect(deleteModuleSpy).not.toHaveBeenCalled();
   });
 
-  it('should return early when removing boundary from the only arc', () => {
+  it('should return early when removing boundary from the only module', () => {
     component.storyContents = StoryContents.createFromBackendDict({
       initial_node_id: 'node_1',
       nodes: [
@@ -1237,9 +1250,9 @@ describe('Story Editor Component having three story nodes', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
+      modules: [
         {
-          id: 'arc_only',
+          id: 'module_only',
           title: 'Only Module',
           description: '',
           node_ids: ['node_1'],
@@ -1247,35 +1260,41 @@ describe('Story Editor Component having three story nodes', () => {
       ],
     });
     component.linearNodesList = component.storyContents.getLinearNodesList();
-    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+    const deleteModuleSpy = spyOn(storyUpdateService, 'deleteModule');
 
-    component.removeArcBoundary('arc_only');
+    component.removeModuleBoundary('module_only');
 
-    expect(deleteArcSpy).not.toHaveBeenCalled();
+    expect(deleteModuleSpy).not.toHaveBeenCalled();
   });
 
-  it('should edit arc with only title change', fakeAsync(() => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Original Title', 'Original description', [
-        'node_2',
-      ])
+  it('should edit module with only title change', fakeAsync(() => {
+    component.storyContents.addModule(
+      ModuleModel.createNew(
+        'module_1',
+        'Original Title',
+        'Original description',
+        ['node_2']
+      )
     );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
-        arcTitle: '',
-        arcDescription: '',
+        moduleTitle: '',
+        moduleDescription: '',
       },
       result: Promise.resolve({
         title: 'Updated Title',
         description: 'Original description',
       }),
     } as NgbModalRef);
-    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+    const updateModulePropertySpy = spyOn(
+      storyUpdateService,
+      'updateModuleProperty'
+    );
 
-    component.editArc('arc_1');
+    component.editModule('module_1');
     tick();
 
-    expect(updateArcPropertySpy).toHaveBeenCalledTimes(1);
+    expect(updateModulePropertySpy).toHaveBeenCalledTimes(1);
   }));
 
   it('should set the node to edit with the given id', () => {
@@ -1284,13 +1303,13 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.idOfNodeToEdit).toBe('node_1');
   });
 
-  it('should return the arc id for a node', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should return the module id for a node', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
 
-    expect(component.getArcIdForNode('node_2')).toBe('arc_1');
-    expect(() => component.getArcIdForNode('node_1')).toThrowError();
+    expect(component.getModuleIdForNode('node_2')).toBe('module_1');
+    expect(() => component.getModuleIdForNode('node_1')).toThrowError();
   });
 
   it('should call setInitialNodeId when rearranging from index 0', () => {
@@ -1322,52 +1341,58 @@ describe('Story Editor Component having three story nodes', () => {
     expect(setInitialNodeIdSpy).not.toHaveBeenCalled();
   });
 
-  it('should get sequence number for a node in an arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should get sequence number for a node in a module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
 
-    expect(component.getArcSequenceNumber('node_2')).toBe(1);
+    expect(component.getModuleSequenceNumber('node_2')).toBe(1);
   });
 
-  it('should update arc description but not title in edit arc modal', fakeAsync(() => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module title', 'Original description', [
-        'node_2',
-      ])
+  it('should update module description but not title in edit module modal', fakeAsync(() => {
+    component.storyContents.addModule(
+      ModuleModel.createNew(
+        'module_1',
+        'Module title',
+        'Original description',
+        ['node_2']
+      )
     );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
-        arcTitle: '',
-        arcDescription: '',
+        moduleTitle: '',
+        moduleDescription: '',
       },
       result: Promise.resolve({
         title: 'Module title',
         description: 'Updated description',
       }),
     } as NgbModalRef);
-    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+    const updateModulePropertySpy = spyOn(
+      storyUpdateService,
+      'updateModuleProperty'
+    );
 
-    component.editArc('arc_1');
+    component.editModule('module_1');
     tick();
 
-    expect(updateArcPropertySpy).toHaveBeenCalledTimes(1);
+    expect(updateModulePropertySpy).toHaveBeenCalledTimes(1);
   }));
 
-  it('should return early from splitIntoArc when split index is first node in arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', [
+  it('should return early from splitIntoModule when split index is first node in module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', [
         'node_1',
         'node_2',
         'node_3',
       ])
     );
     component.linearNodesList = story.getStoryContents().getNodes();
-    const createArcSpy = spyOn(storyUpdateService, 'createArc');
+    const createModuleSpy = spyOn(storyUpdateService, 'createModule');
 
-    component.splitIntoArc(0);
+    component.splitIntoModule(0);
 
-    expect(createArcSpy).not.toHaveBeenCalled();
+    expect(createModuleSpy).not.toHaveBeenCalled();
   });
 
   it('should handle modal dismiss when deleting a non-initial node', fakeAsync(() => {
@@ -1504,66 +1529,66 @@ describe('Story Editor Component having three story nodes', () => {
     ).toHaveBeenCalledWith(true);
   });
 
-  it('should throw error from getArcColorForNode when node has no arc', () => {
-    expect(() => component.getArcColorForNode('node_1')).toThrowError();
+  it('should throw error from getModuleColorForNode when node has no module', () => {
+    expect(() => component.getModuleColorForNode('node_1')).toThrowError();
   });
 
-  it('should throw error from getArcColorForNode when arc index is invalid', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should throw error from getModuleColorForNode when module index is invalid', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
-    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+    spyOn(component.storyContents, 'getModuleIndex').and.returnValue(-1);
 
-    expect(() => component.getArcColorForNode('node_2')).toThrowError();
+    expect(() => component.getModuleColorForNode('node_2')).toThrowError();
   });
 
-  it('should return a color from the palette in getArcColorForNode', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should return a color from the palette in getModuleColorForNode', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
 
-    const color = component.getArcColorForNode('node_2');
-    expect(color).toBe(StoryDomainConstants.ARC_COLOR_PALETTE[0]);
+    const color = component.getModuleColorForNode('node_2');
+    expect(color).toBe(StoryDomainConstants.MODULE_COLOR_PALETTE[0]);
   });
 
-  it('should call editArc via onEditArcClick when node has an arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should call editModule via onEditModuleClick when node has a module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
-    spyOn(component, 'editArc');
+    spyOn(component, 'editModule');
 
-    component.onEditArcClick('node_2');
+    component.onEditModuleClick('node_2');
 
-    expect(component.editArc).toHaveBeenCalledWith('arc_1');
+    expect(component.editModule).toHaveBeenCalledWith('module_1');
   });
 
-  it('should call removeArcBoundary via onRemoveArcClick when node has an arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_2'])
+  it('should call removeModuleBoundary via onRemoveModuleClick when node has a module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_2'])
     );
-    spyOn(component, 'removeArcBoundary');
+    spyOn(component, 'removeModuleBoundary');
 
-    component.onRemoveArcClick('node_2');
+    component.onRemoveModuleClick('node_2');
 
-    expect(component.removeArcBoundary).toHaveBeenCalledWith('arc_1');
+    expect(component.removeModuleBoundary).toHaveBeenCalledWith('module_1');
   });
 
-  it('should return true from isFirstArc when node belongs to the first arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1', 'node_2'])
+  it('should return true from isFirstModule when node belongs to the first module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
     );
 
-    expect(component.isFirstArc('node_1')).toBe(true);
+    expect(component.isFirstModule('node_1')).toBe(true);
   });
 
-  it('should return false from isFirstArc when node belongs to a later arc', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Module 1', '', ['node_1'])
+  it('should return false from isFirstModule when node belongs to a later module', () => {
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1'])
     );
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_2', 'Module 2', '', ['node_2'])
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_2'])
     );
 
-    expect(component.isFirstArc('node_2')).toBe(false);
+    expect(component.isFirstModule('node_2')).toBe(false);
   });
 });

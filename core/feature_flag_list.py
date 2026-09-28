@@ -110,7 +110,12 @@ class FeatureNames(enum.Enum):
     TECHNICAL_FEEDBACK_DASHBOARD_ENABLED = (
         'technical_feedback_dashboard_enabled'
     )
-    STORY_EDITOR_ARCS = 'story_editor_arcs'
+    # TODO(#27483): The persisted value stays 'story_editor_arcs' until the
+    # feature flag migration job runs, because the value is the model ID
+    # of the FeatureFlagConfigModel that stores this flag's per-classroom
+    # state. Renaming the value earlier would orphan that config and
+    # silently disable the flag.
+    STORY_EDITOR_MODULES = 'story_editor_arcs'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -152,7 +157,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
-    FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.STORY_EDITOR_MODULES,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
@@ -389,10 +394,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.STORY_EDITOR_ARCS.value: (
+    FeatureNames.STORY_EDITOR_MODULES.value: (
         (
-            'This flag enables arc-based chapter groupings in the story editor, '
-            'allowing creators to organize chapters into named arcs.',
+            'This flag enables module-based chapter groupings in the story '
+            'editor, allowing creators to organize chapters into named '
+            'modules.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),

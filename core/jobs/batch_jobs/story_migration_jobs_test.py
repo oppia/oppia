@@ -107,8 +107,11 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
-            'arcs': [
+            'modules': [
                 {
+                    # The ID stays 'arc_default': the frozen v6 -> v7
+                    # converter mints it, and the v7 -> v8 converter only
+                    # renames the container key.
                     'id': 'arc_default',
                     'title': 'All Chapters',
                     'description': '',
@@ -328,8 +331,11 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
-            'arcs': [
+            'modules': [
                 {
+                    # The ID stays 'arc_default': the frozen v6 -> v7
+                    # converter mints it, and the v7 -> v8 converter only
+                    # renames the container key.
                     'id': 'arc_default',
                     'title': 'All Chapters',
                     'description': '',

@@ -69,7 +69,7 @@ STORY_NODE_PROPERTY_UNPUBLISHING_REASON: Final = 'unpublishing_reason'
 
 INITIAL_NODE_ID: Final = 'initial_node_id'
 NODE: Final = 'node'
-ARC: Final = 'arc'
+MODULE: Final = 'module'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION: Final = 'migrate_schema_to_latest_version'
 
@@ -84,16 +84,16 @@ CMD_ADD_STORY_NODE: Final = 'add_story_node'
 CMD_DELETE_STORY_NODE: Final = 'delete_story_node'
 CMD_UPDATE_STORY_NODE_OUTLINE_STATUS: Final = 'update_story_node_outline_status'
 
-# Arc commands.
-CMD_CREATE_ARC: Final = 'create_arc'
-CMD_DELETE_ARC: Final = 'delete_arc'
-CMD_RENAME_ARC: Final = 'rename_arc'
-CMD_REARRANGE_ARCS: Final = 'rearrange_arcs'
-CMD_MOVE_NODE_TO_ARC: Final = 'move_node_to_arc'
-CMD_UPDATE_ARC_PROPERTY: Final = 'update_arc_property'
+# Module commands.
+CMD_CREATE_MODULE: Final = 'create_module'
+CMD_DELETE_MODULE: Final = 'delete_module'
+CMD_RENAME_MODULE: Final = 'rename_module'
+CMD_REARRANGE_MODULES: Final = 'rearrange_modules'
+CMD_MOVE_NODE_TO_MODULE: Final = 'move_node_to_module'
+CMD_UPDATE_MODULE_PROPERTY: Final = 'update_module_property'
 
-ARC_PROPERTY_TITLE: Final = 'title'
-ARC_PROPERTY_DESCRIPTION: Final = 'description'
+MODULE_PROPERTY_TITLE: Final = 'title'
+MODULE_PROPERTY_DESCRIPTION: Final = 'description'
 
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW: Final = 'create_new'
@@ -123,6 +123,13 @@ class StoryChange(change_domain.BaseChange):
         - 'migrate_schema_to_latest_version' (with from_version and
         to_version)
         - 'create_new' (with title)
+        - 'create_module' (with module_id, title, description, node_ids)
+        - 'delete_module' (with module_id)
+        - 'rename_module' (with module_id, new_title)
+        - 'rearrange_modules' (with module_ids_order)
+        - 'move_node_to_module' (with node_id, to_module_id)
+        - 'update_module_property' (with module_id, property_name, new_value,
+        old_value)
     """
 
     # The allowed list of story properties which can be used in
@@ -159,7 +166,7 @@ class StoryChange(change_domain.BaseChange):
 
     # The allowed list of story content properties which can be used in
     # update_story_contents_property command.
-    STORY_CONTENTS_PROPERTIES: List[str] = [INITIAL_NODE_ID, NODE, ARC]
+    STORY_CONTENTS_PROPERTIES: List[str] = [INITIAL_NODE_ID, NODE, MODULE]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
         {
@@ -240,9 +247,9 @@ class StoryChange(change_domain.BaseChange):
             'deprecated_values': {},
         },
         {
-            'name': CMD_CREATE_ARC,
+            'name': CMD_CREATE_MODULE,
             'required_attribute_names': [
-                'arc_id',
+                'module_id',
                 'title',
                 'description',
                 'node_ids',
@@ -253,41 +260,41 @@ class StoryChange(change_domain.BaseChange):
             'deprecated_values': {},
         },
         {
-            'name': CMD_DELETE_ARC,
-            'required_attribute_names': ['arc_id'],
+            'name': CMD_DELETE_MODULE,
+            'required_attribute_names': ['module_id'],
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
         },
         {
-            'name': CMD_RENAME_ARC,
-            'required_attribute_names': ['arc_id', 'new_title'],
+            'name': CMD_RENAME_MODULE,
+            'required_attribute_names': ['module_id', 'new_title'],
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
         },
         {
-            'name': CMD_REARRANGE_ARCS,
-            'required_attribute_names': ['arc_ids_order'],
+            'name': CMD_REARRANGE_MODULES,
+            'required_attribute_names': ['module_ids_order'],
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
         },
         {
-            'name': CMD_MOVE_NODE_TO_ARC,
-            'required_attribute_names': ['node_id', 'to_arc_id'],
+            'name': CMD_MOVE_NODE_TO_MODULE,
+            'required_attribute_names': ['node_id', 'to_module_id'],
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
         },
         {
-            'name': CMD_UPDATE_ARC_PROPERTY,
+            'name': CMD_UPDATE_MODULE_PROPERTY,
             'required_attribute_names': [
-                'arc_id',
+                'module_id',
                 'property_name',
                 'new_value',
                 'old_value',
@@ -295,10 +302,26 @@ class StoryChange(change_domain.BaseChange):
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {
-                'property_name': [ARC_PROPERTY_TITLE, ARC_PROPERTY_DESCRIPTION]
+                'property_name': [
+                    MODULE_PROPERTY_TITLE,
+                    MODULE_PROPERTY_DESCRIPTION,
+                ]
             },
             'deprecated_values': {},
         },
+    ]
+
+    # TODO(#27483): Remove this once a migration job has rewritten the
+    # arc-named commands stored in existing StoryCommitLogEntryModel records.
+    # Until then these names must still be recognised as deprecated rather
+    # than unknown, so that reading historical commit logs does not fail.
+    DEPRECATED_COMMANDS: List[str] = [
+        'create_arc',
+        'delete_arc',
+        'rename_arc',
+        'rearrange_arcs',
+        'move_node_to_arc',
+        'update_arc_property',
     ]
 
 
@@ -368,57 +391,57 @@ class UpdateStoryContentsPropertyNodeCmd(StoryChange):
     old_value: int
 
 
-class CreateArcCmd(StoryChange):
+class CreateModuleCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_CREATE_ARC command.
+    CMD_CREATE_MODULE command.
     """
 
-    arc_id: str
+    module_id: str
     title: str
     description: str
     node_ids: List[str]
 
 
-class DeleteArcCmd(StoryChange):
+class DeleteModuleCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_DELETE_ARC command.
+    CMD_DELETE_MODULE command.
     """
 
-    arc_id: str
+    module_id: str
 
 
-class RenameArcCmd(StoryChange):
+class RenameModuleCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_RENAME_ARC command.
+    CMD_RENAME_MODULE command.
     """
 
-    arc_id: str
+    module_id: str
     new_title: str
 
 
-class RearrangeArcsCmd(StoryChange):
+class RearrangeModulesCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_REARRANGE_ARCS command.
+    CMD_REARRANGE_MODULES command.
     """
 
-    arc_ids_order: List[str]
+    module_ids_order: List[str]
 
 
-class MoveNodeToArcCmd(StoryChange):
+class MoveNodeToModuleCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_MOVE_NODE_TO_ARC command.
+    CMD_MOVE_NODE_TO_MODULE command.
     """
 
     node_id: str
-    to_arc_id: str
+    to_module_id: str
 
 
-class UpdateArcPropertyCmd(StoryChange):
+class UpdateModulePropertyCmd(StoryChange):
     """Class representing the StoryChange's
-    CMD_UPDATE_ARC_PROPERTY command.
+    CMD_UPDATE_MODULE_PROPERTY command.
     """
 
-    arc_id: str
+    module_id: str
     property_name: str
     new_value: str
     old_value: str
@@ -1193,8 +1216,8 @@ class StoryNode:
         return False
 
 
-class ArcDict(TypedDict):
-    """Dictionary representing the Arc object."""
+class ModuleDict(TypedDict):
+    """Dictionary representing the Module object."""
 
     id: str
     title: str
@@ -1202,65 +1225,72 @@ class ArcDict(TypedDict):
     node_ids: List[str]
 
 
-class Arc:
-    """Domain object representing an arc within a story."""
+class Module:
+    """Domain object representing a module within a story.
+
+    A module groups a subset of a story's nodes together under a title and
+    description, and is the unit that end-of-module practice tests are
+    generated from. It was previously called an "arc".
+    """
 
     def __init__(
         self,
-        arc_id: str,
+        module_id: str,
         title: str,
         description: str,
         node_ids: List[str],
     ) -> None:
-        """Initializes the Arc object.
+        """Initializes the Module object.
 
         Args:
-            arc_id: str. The unique ID of the arc.
-            title: str. The title of the arc.
-            description: str. The description of the arc.
-            node_ids: list(str). The list of node IDs in this arc.
+            module_id: str. The unique ID of the module.
+            title: str. The title of the module.
+            description: str. The description of the module.
+            node_ids: list(str). The list of node IDs in this module.
         """
-        self.id = arc_id
+        self.id = module_id
         self.title = title
         self.description = description
         self.node_ids = node_ids
 
     def validate(self) -> None:
-        """Validates the arc object."""
+        """Validates the module object."""
         if not isinstance(self.id, str):
             raise utils.ValidationError(
-                'Expected arc id to be a string, received %s' % self.id
+                'Expected module id to be a string, received %s' % self.id
             )
         if self.id == '':
-            raise utils.ValidationError('Arc id field should not be empty')
+            raise utils.ValidationError('Module id field should not be empty')
         if not isinstance(self.title, str):
             raise utils.ValidationError(
-                'Expected arc title to be a string, received %s' % self.title
+                'Expected module title to be a string, received %s' % self.title
             )
         if self.title == '':
-            raise utils.ValidationError('Arc title field should not be empty')
+            raise utils.ValidationError(
+                'Module title field should not be empty'
+            )
         if not isinstance(self.description, str):
             raise utils.ValidationError(
-                'Expected arc description to be a string, received %s'
+                'Expected module description to be a string, received %s'
                 % self.description
             )
         if not isinstance(self.node_ids, list):
             raise utils.ValidationError(
-                'Expected arc node_ids to be a list, received %s'
+                'Expected module node_ids to be a list, received %s'
                 % self.node_ids
             )
         for node_id in self.node_ids:
             if not isinstance(node_id, str):
                 raise utils.ValidationError(
-                    'Expected each arc node_id to be a string, received %s'
+                    'Expected each module node_id to be a string, received %s'
                     % node_id
                 )
 
-    def to_dict(self) -> ArcDict:
-        """Returns a dict representation of the Arc.
+    def to_dict(self) -> ModuleDict:
+        """Returns a dict representation of the Module.
 
         Returns:
-            ArcDict. A dict representation of the Arc instance.
+            ModuleDict. A dict representation of the Module instance.
         """
         return {
             'id': self.id,
@@ -1270,20 +1300,20 @@ class Arc:
         }
 
     @classmethod
-    def from_dict(cls, arc_dict: ArcDict) -> Arc:
-        """Creates an Arc from a dict.
+    def from_dict(cls, module_dict: ModuleDict) -> Module:
+        """Creates a Module from a dict.
 
         Args:
-            arc_dict: ArcDict. The dict representation of the Arc.
+            module_dict: ModuleDict. The dict representation of the Module.
 
         Returns:
-            Arc. The corresponding Arc instance.
+            Module. The corresponding Module instance.
         """
         return cls(
-            arc_id=arc_dict['id'],
-            title=arc_dict['title'],
-            description=arc_dict['description'],
-            node_ids=arc_dict['node_ids'],
+            module_id=module_dict['id'],
+            title=module_dict['title'],
+            description=module_dict['description'],
+            node_ids=module_dict['node_ids'],
         )
 
 
@@ -1293,12 +1323,12 @@ class StoryContentsDict(TypedDict, total=False):
     nodes: List[StoryNodeDict]
     initial_node_id: Optional[str]
     next_node_id: str
-    arcs: List[ArcDict]
+    modules: List[ModuleDict]
 
 
 class StoryContentsDictForAndroid(TypedDict):
     """Dictionary representing the StoryContents object for Android
-    (without the arcs field for backward compatibility).
+    (without the modules field for backward compatibility).
     """
 
     nodes: List[StoryNodeDict]
@@ -1314,7 +1344,7 @@ class StoryContents:
         story_nodes: List[StoryNode],
         initial_node_id: Optional[str],
         next_node_id: str,
-        arcs: Optional[List[Arc]] = None,
+        modules: Optional[List[Module]] = None,
     ) -> None:
         """Constructs a StoryContents domain object.
 
@@ -1325,12 +1355,12 @@ class StoryContents:
                 story and None if there is only one node(or the starting node).
             next_node_id: str. The id for the next node to be added to the
                 story.
-            arcs: list(Arc)|None. The arcs defining chapter groupings.
+            modules: list(Module)|None. The modules defining chapter groupings.
         """
         self.initial_node_id = initial_node_id
         self.nodes = story_nodes
         self.next_node_id = next_node_id
-        self.arcs = arcs if arcs is not None else []
+        self.modules = modules if modules is not None else []
 
     def validate(self) -> None:
         """Validates various properties of the story contents object.
@@ -1403,44 +1433,49 @@ class StoryContents:
                     'Expected all chapter titles to be distinct.'
                 )
 
-        if not isinstance(self.arcs, list):
+        if not isinstance(self.modules, list):
             raise utils.ValidationError(
-                'Expected arcs field to be a list, received %s' % self.arcs
+                'Expected modules field to be a list, received %s'
+                % self.modules
             )
 
-        arc_ids_list = []
+        module_ids_list = []
         covered_node_ids = set()
-        for arc in self.arcs:
-            if not isinstance(arc, Arc):
+        for module in self.modules:
+            if not isinstance(module, Module):
                 raise utils.ValidationError(
-                    'Expected each arc to be an Arc object, received %s' % arc
+                    'Expected each module to be a Module object, received %s'
+                    % module
                 )
-            arc.validate()
-            arc_ids_list.append(arc.id)
-            for node_id in arc.node_ids:
+            module.validate()
+            module_ids_list.append(module.id)
+            for node_id in module.node_ids:
                 if node_id in covered_node_ids:
                     raise utils.ValidationError(
-                        'Node %s is covered by multiple arcs.' % node_id
+                        'Node %s is covered by multiple modules.' % node_id
                     )
                 covered_node_ids.add(node_id)
 
-        if len(arc_ids_list) > len(set(arc_ids_list)):
-            raise utils.ValidationError('Expected all arc ids to be distinct.')
+        if len(module_ids_list) > len(set(module_ids_list)):
+            raise utils.ValidationError(
+                'Expected all module ids to be distinct.'
+            )
 
-        # It is valid for a story to have nodes and no arcs. If arcs are
+        # It is valid for a story to have nodes and no modules. If modules are
         # present, further validation below ensures they cover nodes.
 
-        if len(self.arcs) > 0:
+        if len(self.modules) > 0:
             all_node_ids = set(node_id_list)
             for node_id in covered_node_ids:
                 if node_id not in all_node_ids:
                     raise utils.ValidationError(
-                        'Arc refers to non-existent node %s.' % node_id
+                        'Module refers to non-existent node %s.' % node_id
                     )
             uncovered = all_node_ids - covered_node_ids
             if uncovered:
                 raise utils.ValidationError(
-                    'Nodes %s are not covered by any arc.' % sorted(uncovered)
+                    'Nodes %s are not covered by any module.'
+                    % sorted(uncovered)
                 )
 
     @overload
@@ -1514,88 +1549,88 @@ class StoryContents:
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
 
-    def get_arc_index(self, arc_id: str) -> int:
-        """Returns the index of the arc with the given ID.
+    def get_module_index(self, module_id: str) -> int:
+        """Returns the index of the module with the given ID.
 
         Args:
-            arc_id: str. The ID of the arc.
+            module_id: str. The ID of the module.
 
         Returns:
-            int. The index of the arc.
+            int. The index of the module.
 
         Raises:
-            ValueError. If the arc is not found.
+            ValueError. If the module is not found.
         """
-        for ind, arc in enumerate(self.arcs):
-            if arc.id == arc_id:
+        for ind, module in enumerate(self.modules):
+            if module.id == module_id:
                 return ind
         raise ValueError(
-            'The arc with id %s is not part of this story.' % arc_id
+            'The module with id %s is not part of this story.' % module_id
         )
 
-    def get_arc(self, arc_id: str) -> Arc:
-        """Returns the arc with the given ID.
+    def get_module(self, module_id: str) -> Module:
+        """Returns the module with the given ID.
 
         Args:
-            arc_id: str. The ID of the arc.
+            module_id: str. The ID of the module.
 
         Returns:
-            Arc. The arc with the given ID.
+            Module. The module with the given ID.
         """
-        return self.arcs[self.get_arc_index(arc_id)]
+        return self.modules[self.get_module_index(module_id)]
 
-    def add_arc(self, arc: Arc) -> None:
-        """Adds a new arc to the story.
+    def add_module(self, module: Module) -> None:
+        """Adds a new module to the story.
 
         Args:
-            arc: Arc. The arc to add.
+            module: Module. The module to add.
         """
-        self.arcs.append(arc)
+        self.modules.append(module)
 
-    def delete_arc(self, arc_id: str) -> None:
-        """Deletes the arc with the given ID.
+    def delete_module(self, module_id: str) -> None:
+        """Deletes the module with the given ID.
 
         Args:
-            arc_id: str. The ID of the arc to delete.
+            module_id: str. The ID of the module to delete.
         """
-        index = self.get_arc_index(arc_id)
-        del self.arcs[index]
+        index = self.get_module_index(module_id)
+        del self.modules[index]
 
-    def rearrange_arcs(self, arc_ids_order: List[str]) -> None:
-        """Rearranges the arcs according to the given order of IDs.
+    def rearrange_modules(self, module_ids_order: List[str]) -> None:
+        """Rearranges the modules according to the given order of IDs.
 
         Args:
-            arc_ids_order: list(str). The ordered list of arc IDs.
+            module_ids_order: list(str). The ordered list of module IDs.
 
         Raises:
-            ValueError. If an arc ID is not found or the list is not a full
-                permutation of existing arc IDs.
+            ValueError. If a module ID is not found or the list is not a full
+                permutation of existing module IDs.
         """
-        old_arcs = {arc.id: arc for arc in self.arcs}
+        old_modules = {module.id: module for module in self.modules}
         if (
-            len(arc_ids_order) != len(self.arcs)
-            or len(set(arc_ids_order)) != len(self.arcs)
-            or set(arc_ids_order) != set(old_arcs.keys())
+            len(module_ids_order) != len(self.modules)
+            or len(set(module_ids_order)) != len(self.modules)
+            or set(module_ids_order) != set(old_modules.keys())
         ):
             raise ValueError(
-                'Expected arc_ids_order to contain each existing arc '
+                'Expected module_ids_order to contain each existing module '
                 'exactly once.'
             )
-        new_arcs = [old_arcs[arc_id] for arc_id in arc_ids_order]
-        self.arcs = new_arcs
+        new_modules = [old_modules[module_id] for module_id in module_ids_order]
+        self.modules = new_modules
 
-    def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:
-        """Moves a node from its current arc to the specified arc.
+    def move_node_to_module(self, node_id: str, to_module_id: str) -> None:
+        """Moves a node from its current module to the specified module.
 
         Args:
             node_id: str. The ID of the node to move.
-            to_arc_id: str. The ID of the destination arc.
+            to_module_id: str. The ID of the destination module.
         """
-        for arc in self.arcs:
-            if node_id in arc.node_ids:
-                arc.node_ids.remove(node_id)
-        target_arc = self.get_arc(to_arc_id)
-        target_arc.node_ids.append(node_id)
+        for module in self.modules:
+            if node_id in module.node_ids:
+                module.node_ids.remove(node_id)
+        target_module = self.get_module(to_module_id)
+        target_module.node_ids.append(node_id)
 
     def get_all_linked_exp_ids(self) -> List[str]:
         """Returns a list of exploration id linked to each of the nodes of
@@ -1660,16 +1695,16 @@ class StoryContents:
             'nodes': [node.to_dict() for node in self.nodes],
             'initial_node_id': self.initial_node_id,
             'next_node_id': self.next_node_id,
-            'arcs': [arc.to_dict() for arc in self.arcs],
+            'modules': [module.to_dict() for module in self.modules],
         }
 
     def to_dict_for_android(self) -> StoryContentsDictForAndroid:
         """Returns a dict representing this StoryContents domain object for
-        Android, without the arcs field for backward compatibility.
+        Android, without the modules field for backward compatibility.
 
         Returns:
             dict. A dict, mapping all fields of StoryContents instance except
-            arcs.
+            modules.
         """
         return {
             'nodes': [node.to_dict() for node in self.nodes],
@@ -1695,9 +1730,9 @@ class StoryContents:
             ],
             story_contents_dict['initial_node_id'],
             story_contents_dict['next_node_id'],
-            arcs=[
-                Arc.from_dict(arc_dict)
-                for arc_dict in story_contents_dict.get('arcs', [])
+            modules=[
+                Module.from_dict(module_dict)
+                for module_dict in story_contents_dict.get('modules', [])
             ],
         )
 
@@ -1724,7 +1759,7 @@ class StoryDict(TypedDict):
 
 
 class StoryDictForAndroid(TypedDict):
-    """Dictionary representing the Story object for Android (without the arcs
+    """Dictionary representing the Story object for Android (without the modules
     field for backward compatibility).
     """
 
@@ -2070,10 +2105,10 @@ class Story:
 
     def to_dict_for_android(self) -> StoryDictForAndroid:
         """Returns a dict representing this Story domain object for Android,
-        without the arcs field for backward compatibility.
+        without the modules field for backward compatibility.
 
         Returns:
-            dict. A dict, mapping all fields of Story instance except arcs.
+            dict. A dict, mapping all fields of Story instance except modules.
         """
         return {
             'id': self.id,
@@ -2391,6 +2426,13 @@ class Story:
         """Converts v6 Story Contents schema to the modern v7 schema.
         v7 schema introduces the arcs field for chapter groupings.
 
+        This converter is frozen: it always writes the v7 wire format (the
+        'arcs' key and 'arc_default' IDs), because its output is immediately
+        passed to _convert_story_contents_v7_dict_to_v8_dict, which renames
+        the container key to 'modules'. Renaming it here too would be
+        redundant, and keeping it untouched preserves the historical meaning
+        of each schema version.
+
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
@@ -2399,7 +2441,12 @@ class Story:
             dict. The converted story_contents_dict.
         """
         node_ids = [node['id'] for node in story_contents_dict['nodes']]
-        story_contents_dict['arcs'] = [
+        # Here we use MyPy ignore because the v7 schema wrote the chapter
+        # groupings under the 'arcs' key, which the current StoryContentsDict
+        # no longer declares. This converter is frozen and must keep emitting
+        # the historical v7 format, since its output is consumed by the v7 to
+        # v8 converter below.
+        story_contents_dict['arcs'] = [  # type: ignore[typeddict-item]
             {
                 'id': 'arc_default',
                 'title': 'All Chapters',
@@ -2407,6 +2454,39 @@ class Story:
                 'node_ids': node_ids,
             }
         ]
+        return story_contents_dict
+
+    @classmethod
+    def _convert_story_contents_v7_dict_to_v8_dict(
+        cls, story_contents_dict: StoryContentsDict
+    ) -> StoryContentsDict:
+        """Converts v7 Story Contents schema to the modern v8 schema.
+
+        v7 schema introduced chapter groupings under the key 'arcs'; v8
+        renames that key to 'modules', since "arc" was a misleading name for
+        the concept. Only the container key is renamed: individual module IDs
+        (e.g. 'arc_default') are left untouched, because they are opaque and
+        are referenced by per-learner progress state.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        # The 'in' guard keeps this converter idempotent: a story that is
+        # already stored at v8 has no 'arcs' key, so it passes through
+        # untouched. This matters because a job may re-run the conversion
+        # chain over stories that a previous run already upgraded.
+        if 'arcs' in story_contents_dict:
+            # Here we use MyPy ignore because the 'arcs' key was removed
+            # from StoryContentsDict when the key was renamed, so MyPy
+            # cannot see it on the TypedDict, even though the persisted v7
+            # dicts that reach this converter still carry it.
+            story_contents_dict['modules'] = story_contents_dict.pop(  # type: ignore[typeddict-item]
+                'arcs'
+            )
         return story_contents_dict
 
     @classmethod
@@ -2894,38 +2974,38 @@ class Story:
                 story_node_to_move.id, [right_neighbour.id]
             )
 
-    def add_arc(self, arc: Arc) -> None:
-        """Adds an arc to the story contents.
+    def add_module(self, module: Module) -> None:
+        """Adds a module to the story contents.
 
         Args:
-            arc: Arc. The arc to add.
+            module: Module. The module to add.
         """
-        self.story_contents.add_arc(arc)
+        self.story_contents.add_module(module)
 
-    def delete_arc(self, arc_id: str) -> None:
-        """Deletes an arc from the story contents.
+    def delete_module(self, module_id: str) -> None:
+        """Deletes a module from the story contents.
 
         Args:
-            arc_id: str. The id of the arc to delete.
+            module_id: str. The id of the module to delete.
         """
-        self.story_contents.delete_arc(arc_id)
+        self.story_contents.delete_module(module_id)
 
-    def rearrange_arcs(self, arc_ids_order: List[str]) -> None:
-        """Rearranges the arcs in the story contents.
+    def rearrange_modules(self, module_ids_order: List[str]) -> None:
+        """Rearranges the modules in the story contents.
 
         Args:
-            arc_ids_order: list(str). The new order of arc IDs.
+            module_ids_order: list(str). The new order of module IDs.
         """
-        self.story_contents.rearrange_arcs(arc_ids_order)
+        self.story_contents.rearrange_modules(module_ids_order)
 
-    def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:
-        """Moves a node to a different arc.
+    def move_node_to_module(self, node_id: str, to_module_id: str) -> None:
+        """Moves a node to a different module.
 
         Args:
             node_id: str. The id of the node to move.
-            to_arc_id: str. The id of the target arc.
+            to_module_id: str. The id of the target module.
         """
-        self.story_contents.move_node_to_arc(node_id, to_arc_id)
+        self.story_contents.move_node_to_module(node_id, to_module_id)
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str

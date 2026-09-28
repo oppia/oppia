@@ -189,7 +189,7 @@ export class ReadOnlyTopic {
           storyDict.upcoming_chapters_expected_days,
           storyDict.overdue_chapters_count,
           storyDict.visited_chapter_titles,
-          storyDict.arcs
+          storyDict.modules
         );
       }
     );
@@ -219,7 +219,7 @@ export class ReadOnlyTopic {
           storyDict.upcoming_chapters_expected_days,
           storyDict.overdue_chapters_count,
           storyDict.visited_chapter_titles,
-          storyDict.arcs
+          storyDict.modules
         );
       }
     );

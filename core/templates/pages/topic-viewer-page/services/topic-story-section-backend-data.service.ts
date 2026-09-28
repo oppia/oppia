@@ -68,7 +68,7 @@ export interface ModuleGroupData {
   iconBg: string;
   headerBackgroundColor: string;
   headerBorderColor: string;
-  arcId: string;
+  modulePosition: string;
   hasPracticeQuestions: boolean;
 }
 
@@ -148,8 +148,8 @@ export class TopicStorySectionBackendDataService {
     storySummary: StorySummary,
     lessonCards: LessonCardData[]
   ): ModuleGroupData[] {
-    const arcs = storySummary.getArcs();
-    if (!arcs || arcs.length === 0) {
+    const modules = storySummary.getModules();
+    if (!modules || modules.length === 0) {
       return [];
     }
 
@@ -158,34 +158,34 @@ export class TopicStorySectionBackendDataService {
       nodeIndexMap.set(node.getId(), index);
     });
 
-    return arcs.map((arc, moduleIndex) => {
+    return modules.map((module, moduleIndex) => {
       const moduleLessonCards: LessonCardData[] = [];
       const paletteColor = this.getModulePaletteColor(moduleIndex);
-      arc.node_ids.forEach(nodeId => {
+      module.node_ids.forEach(nodeId => {
         const nodeIndex = nodeIndexMap.get(nodeId);
         if (nodeIndex !== undefined && lessonCards[nodeIndex]) {
           moduleLessonCards.push(lessonCards[nodeIndex]);
         }
       });
-      // The backend maps an arc to its 1-based position among the topic's
-      // story arcs, so pass the position rather than a parsed arc id.
-      const arcId = String(moduleIndex + 1);
+      // The backend maps a module to its 1-based position among the topic's
+      // story modules, so pass the position rather than a parsed module id.
+      const modulePosition = String(moduleIndex + 1);
       return {
-        moduleTitle: arc.title,
-        moduleDescription: arc.description,
+        moduleTitle: module.title,
+        moduleDescription: module.description,
         lessonCards: moduleLessonCards,
         accentColor: paletteColor.rowAccent,
         iconBg: paletteColor.iconBg,
         headerBackgroundColor: paletteColor.headerBg,
         headerBorderColor: paletteColor.headerBorder,
-        arcId,
+        modulePosition,
         hasPracticeQuestions: false,
       };
     });
   }
 
   getModulePaletteColor(moduleIndex: number): ModulePaletteColor {
-    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
+    const palette = StoryDomainConstants.MODULE_COLOR_PALETTE;
     return palette[moduleIndex % palette.length];
   }
 
@@ -304,8 +304,8 @@ export class TopicStorySectionBackendDataService {
     );
   }
 
-  getEndOfArcUrl(
-    arcId: string,
+  getEndOfModuleUrl(
+    modulePosition: string,
     classroomUrlFragment: string,
     topicUrlFragment: string
   ): string {
@@ -313,11 +313,11 @@ export class TopicStorySectionBackendDataService {
       return '#';
     }
     return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.END_OF_ARC_URL,
+      PracticeSessionPageConstants.END_OF_MODULE_URL,
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
-        arc_id: arcId,
+        module_position: modulePosition,
       }
     );
   }

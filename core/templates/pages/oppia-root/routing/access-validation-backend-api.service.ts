@@ -76,9 +76,9 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_access_practice_session_page/' +
     '<classroom_url_fragment>/<topic_url_fragment>/practice/<node_id>';
 
-  END_OF_ARC_PAGE_ACCESS_VALIDATOR =
+  END_OF_MODULE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>/test/arc/<arc_id>';
+    '<classroom_url_fragment>/<topic_url_fragment>/test/module/<module_position>';
 
   MASTERY_CHALLENGE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
@@ -264,17 +264,17 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  validateAccessToEndOfArcPage(
+  validateAccessToEndOfModulePage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
-    arcId: string
+    modulePosition: string
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.END_OF_ARC_PAGE_ACCESS_VALIDATOR,
+      this.END_OF_MODULE_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
-        arc_id: arcId,
+        module_position: modulePosition,
       }
     );
     return this.http.get<void>(url).toPromise();

@@ -271,12 +271,13 @@ export class UrlService {
   }
 
   /**
-   * This function returns the arc ID from the end-of-arc URL.
-   * @return {string} the arc ID.
+   * This function returns the 1-based position of the module from the
+   * end-of-module URL.
+   * @return {string} the module position.
    */
-  getArcIdFromUrl(): string {
+  getModulePositionFromUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/test\/arc\/(\d+)/);
+    const match = pathname.match(/\/test\/module\/(\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }

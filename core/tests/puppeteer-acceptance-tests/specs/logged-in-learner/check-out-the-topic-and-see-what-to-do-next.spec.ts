@@ -27,7 +27,7 @@
  * - Sticky Progress Navigation Dock appears on scroll (mobile + desktop) with
  *   the active milestone highlighted, scroll arrows when it overflows, and
  *   horizontal scrolling to reveal all twelve lesson nodes.
- * - Timeline displays bold thematic Arc headers, active chapter card in
+ * - Timeline displays bold thematic module headers, active chapter card
  *   expanded state, narrative description, Play CTA, Practice, and Study Guide.
  * - New badge for recently published lessons.
  * - Coming Soon section with a single placeholder card, its message, and
@@ -38,10 +38,10 @@
  * - Complete a lesson and verify chapter progression (collapsed row,
  *   completed indicator, Play Again action).
  * - Adventure navigation dock with clickable lesson nodes.
- * - Starting a lesson in a later arc triggers skip confirmation modal.
- * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
- * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
- * - Smooth-scroll navigates to the selected Arc without reloading the page.
+ * - Starting a lesson in a later module triggers the skip modal.
+ * - Confirming skip marks earlier modules as skipped with SKIPPED badge.
+ * - Skipped module cards show "Start" / "Resume" CTA to revisit.
+ * - Smooth-scroll navigates to the module without reloading the page.
  * - Language selector with text and voiceover dropdowns on chapter cards.
  * - Language fallback info tooltip shows when lesson is not in preferred language.
  * - Language auto-selection waterfall: i18n -> session fallback -> English.
@@ -93,6 +93,8 @@ describe('Logged-in Learner', function () {
     await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
     await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
+    // TODO(#27483): Rename this to 'story_editor_modules' once the feature
+    // flag migration job has renamed the persisted flag value.
     await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
@@ -388,10 +390,10 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.openTopicPage('math', 'fractions');
       // The CUJ Timeline & Chapter Layout requires bold thematic Adventure
       // headers along the vertical timeline; the screenshot below captures the
-      // arc headers on the timeline.
-      await loggedInLearner.expectArcTitlesToBeVisibleOnTimeline();
+      // module headers on the timeline.
+      await loggedInLearner.expectModuleTitlesToBeVisibleOnTimeline();
       await loggedInLearner.expectScreenshotToMatch(
-        'chapterArcHeadersOnTimeline',
+        'chapterModuleHeadersOnTimeline',
         __dirname
       );
 
@@ -527,13 +529,14 @@ describe('Logged-in Learner', function () {
       // The screenshot below captures the dock with the adventure titles
       // and lesson nodes rendered after completing the first lesson.
       await loggedInLearner.expectScreenshotToMatch(
-        'arcTimelineAdventureTitles',
+        'moduleTimelineAdventureTitles',
         __dirname
       );
 
-      // The jump-ahead arc checks point at lesson 4, the first lesson of the
-      // second adventure. The arcs group the 12 published lessons as 1-3,
-      // 4-6, 7-9 and 10-12, so lesson 4 is the first lesson outside the first
+      // The jump-ahead module checks point at lesson 4, the first lesson
+      // of the second adventure. The modules group the 12 published
+      // lessons into 1-3, 4-6, 7-9 and 10-12, so lesson 4 is the first
+      // lesson outside the first
       // (still incomplete) adventure and can trigger the skip flows.
       await loggedInLearner.clickDockBadge(3);
       await loggedInLearner.expectSkipConfirmationModalToShow();
@@ -545,15 +548,17 @@ describe('Logged-in Learner', function () {
   it(
     'should be able to skip directly to an advanced Adventure and unlock harder lessons',
     async function () {
-      await loggedInLearner.skipToLaterArcAndExpectSkippedAdventureCards(3);
+      await loggedInLearner.skipToLaterModuleAndExpectSkippedAdventureCards(3);
 
-      await loggedInLearner.navigateToLaterArcMilestoneAndExpectNoPageReload(3);
+      await loggedInLearner.navigateToLaterModuleMilestoneAndExpectNoPageReload(
+        3
+      );
 
       await loggedInLearner.expandSkippedAdventureByClickingStartCta();
-      // The CUJ Skipped Arc Visualization requires skipped arc cards to
-      // display a Start or Resume CTA so the learner can revisit them.
+      // The CUJ Skipped Module Visualization requires skipped module cards
+      // to display a Start or Resume CTA so the learner can revisit them.
       await loggedInLearner.expectScreenshotToMatch(
-        'arcSkippedAdventureExpanded',
+        'moduleSkippedAdventureExpanded',
         __dirname
       );
 

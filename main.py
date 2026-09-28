@@ -335,7 +335,7 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/can_access_practice_session_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/test/arc/<arc_id>'
+        r'/<topic_url_fragment>/test/module/<module_position>'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.PracticeSessionAccessValidationPage,
     ),
@@ -569,7 +569,7 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/arc/<arc_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'/module/<module_position>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler,
     ),
     get_redirect_route(
@@ -1566,7 +1566,8 @@ URLS.extend(
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
-            r'%s/test/arc/<arc_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+            r'%s/test/module/<module_position>'
+            % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(

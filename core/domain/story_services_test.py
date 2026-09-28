@@ -569,7 +569,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0],
         )
 
-    def test_create_arc(self) -> None:
+    def test_create_module(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -591,8 +591,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -600,18 +600,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Created arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Created module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(len(story.story_contents.arcs), 1)
-        self.assertEqual(story.story_contents.arcs[0].id, 'arc_1')
-        self.assertEqual(story.story_contents.arcs[0].title, 'Adventure 1')
+        self.assertEqual(len(story.story_contents.modules), 1)
+        self.assertEqual(story.story_contents.modules[0].id, 'module_1')
+        self.assertEqual(story.story_contents.modules[0].title, 'Adventure 1')
         self.assertEqual(
-            story.story_contents.arcs[0].node_ids,
+            story.story_contents.modules[0].node_ids,
             [self.NODE_ID_1, self.NODE_ID_2],
         )
 
-    def test_delete_arc(self) -> None:
+    def test_delete_module(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -633,8 +633,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -642,18 +642,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_DELETE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_DELETE_MODULE,
+                    'module_id': 'module_1',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Deleted arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Deleted module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(len(story.story_contents.arcs), 0)
+        self.assertEqual(len(story.story_contents.modules), 0)
 
-    def test_rename_arc(self) -> None:
+    def test_rename_module(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -675,8 +675,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -684,21 +684,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_RENAME_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_RENAME_MODULE,
+                    'module_id': 'module_1',
                     'new_title': 'Adventure 1 renamed',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Renamed arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Renamed module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.arcs[0].title, 'Adventure 1 renamed'
+            story.story_contents.modules[0].title, 'Adventure 1 renamed'
         )
 
-    def test_rearrange_arcs(self) -> None:
+    def test_rearrange_modules(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -720,8 +720,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
@@ -729,8 +729,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_2',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_2',
                     'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
@@ -738,20 +738,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_REARRANGE_ARCS,
-                    'arc_ids_order': ['arc_2', 'arc_1'],
+                    'cmd': story_domain.CMD_REARRANGE_MODULES,
+                    'module_ids_order': ['module_2', 'module_1'],
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Rearranged arcs.'
+            self.USER_ID, self.STORY_ID, changelist, 'Rearranged modules.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            [a.id for a in story.story_contents.arcs], ['arc_2', 'arc_1']
+            [m.id for m in story.story_contents.modules],
+            ['module_2', 'module_1'],
         )
 
-    def test_move_node_to_arc(self) -> None:
+    def test_move_node_to_module(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -773,8 +774,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
@@ -782,8 +783,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_2',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_2',
                     'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
@@ -791,24 +792,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_MOVE_NODE_TO_ARC,
+                    'cmd': story_domain.CMD_MOVE_NODE_TO_MODULE,
                     'node_id': self.NODE_ID_1,
-                    'to_arc_id': 'arc_2',
+                    'to_module_id': 'module_2',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Moved node to arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Moved node to module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertIn(
-            self.NODE_ID_1, story.story_contents.get_arc('arc_2').node_ids
+            self.NODE_ID_1, story.story_contents.get_module('module_2').node_ids
         )
         self.assertNotIn(
-            self.NODE_ID_1, story.story_contents.get_arc('arc_1').node_ids
+            self.NODE_ID_1, story.story_contents.get_module('module_1').node_ids
         )
 
-    def test_update_arc_property_title(self) -> None:
+    def test_update_module_property_title(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -830,8 +831,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -839,21 +840,23 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_UPDATE_ARC_PROPERTY,
-                    'arc_id': 'arc_1',
-                    'property_name': story_domain.ARC_PROPERTY_TITLE,
-                    'new_value': 'Updated Arc',
+                    'cmd': story_domain.CMD_UPDATE_MODULE_PROPERTY,
+                    'module_id': 'module_1',
+                    'property_name': story_domain.MODULE_PROPERTY_TITLE,
+                    'new_value': 'Updated Module',
                     'old_value': 'Adventure 1',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Updated arc title.'
+            self.USER_ID, self.STORY_ID, changelist, 'Updated module title.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.arcs[0].title, 'Updated Arc')
+        self.assertEqual(
+            story.story_contents.modules[0].title, 'Updated Module'
+        )
 
-    def test_update_arc_property_description(self) -> None:
+    def test_update_module_property_description(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -875,8 +878,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Original',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -884,23 +887,26 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_UPDATE_ARC_PROPERTY,
-                    'arc_id': 'arc_1',
-                    'property_name': story_domain.ARC_PROPERTY_DESCRIPTION,
+                    'cmd': story_domain.CMD_UPDATE_MODULE_PROPERTY,
+                    'module_id': 'module_1',
+                    'property_name': story_domain.MODULE_PROPERTY_DESCRIPTION,
                     'new_value': 'Updated desc',
                     'old_value': 'Original',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Updated arc description.'
+            self.USER_ID,
+            self.STORY_ID,
+            changelist,
+            'Updated module description.',
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.arcs[0].description, 'Updated desc'
+            story.story_contents.modules[0].description, 'Updated desc'
         )
 
-    def test_update_story_with_create_arc_command(self) -> None:
+    def test_update_story_with_create_module_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -922,8 +928,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -931,14 +937,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Created arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Created module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(len(story.story_contents.arcs), 1)
-        self.assertEqual(story.story_contents.arcs[0].id, 'arc_1')
-        self.assertEqual(story.story_contents.arcs[0].title, 'Adventure 1')
+        self.assertEqual(len(story.story_contents.modules), 1)
+        self.assertEqual(story.story_contents.modules[0].id, 'module_1')
+        self.assertEqual(story.story_contents.modules[0].title, 'Adventure 1')
 
-    def test_update_story_with_delete_arc_command(self) -> None:
+    def test_update_story_with_delete_module_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -960,8 +966,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -969,18 +975,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_DELETE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_DELETE_MODULE,
+                    'module_id': 'module_1',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Deleted arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Deleted module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(len(story.story_contents.arcs), 0)
+        self.assertEqual(len(story.story_contents.modules), 0)
 
-    def test_update_story_with_rename_arc_command(self) -> None:
+    def test_update_story_with_rename_module_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -1002,8 +1008,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -1011,21 +1017,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_RENAME_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_RENAME_MODULE,
+                    'module_id': 'module_1',
                     'new_title': 'Adventure 1 renamed',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Renamed arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Renamed module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.arcs[0].title, 'Adventure 1 renamed'
+            story.story_contents.modules[0].title, 'Adventure 1 renamed'
         )
 
-    def test_update_story_with_rearrange_arcs_command(self) -> None:
+    def test_update_story_with_rearrange_modules_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -1047,8 +1053,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
@@ -1056,8 +1062,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_2',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_2',
                     'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
@@ -1065,8 +1071,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_3',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_3',
                     'title': 'Adventure 3',
                     'description': '',
                     # Here we use cast because the literal empty list is inferred as
@@ -1076,21 +1082,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_REARRANGE_ARCS,
-                    'arc_ids_order': ['arc_3', 'arc_1', 'arc_2'],
+                    'cmd': story_domain.CMD_REARRANGE_MODULES,
+                    'module_ids_order': ['module_3', 'module_1', 'module_2'],
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Rearranged arcs.'
+            self.USER_ID, self.STORY_ID, changelist, 'Rearranged modules.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            [a.id for a in story.story_contents.arcs],
-            ['arc_3', 'arc_1', 'arc_2'],
+            [m.id for m in story.story_contents.modules],
+            ['module_3', 'module_1', 'module_2'],
         )
 
-    def test_update_story_with_move_node_to_arc_command(self) -> None:
+    def test_update_story_with_move_node_to_module_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -1112,8 +1118,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
@@ -1121,8 +1127,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_2',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_2',
                     'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
@@ -1130,24 +1136,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_MOVE_NODE_TO_ARC,
+                    'cmd': story_domain.CMD_MOVE_NODE_TO_MODULE,
                     'node_id': self.NODE_ID_1,
-                    'to_arc_id': 'arc_2',
+                    'to_module_id': 'module_2',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Moved node to arc.'
+            self.USER_ID, self.STORY_ID, changelist, 'Moved node to module.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertIn(
-            self.NODE_ID_1, story.story_contents.get_arc('arc_2').node_ids
+            self.NODE_ID_1, story.story_contents.get_module('module_2').node_ids
         )
         self.assertNotIn(
-            self.NODE_ID_1, story.story_contents.get_arc('arc_1').node_ids
+            self.NODE_ID_1, story.story_contents.get_module('module_1').node_ids
         )
 
-    def test_update_story_with_update_arc_property_command(self) -> None:
+    def test_update_story_with_update_module_property_command(self) -> None:
         changelist = [
             story_domain.StoryChange(
                 {
@@ -1169,8 +1175,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_CREATE_ARC,
-                    'arc_id': 'arc_1',
+                    'cmd': story_domain.CMD_CREATE_MODULE,
+                    'module_id': 'module_1',
                     'title': 'Adventure 1',
                     'description': 'Original desc',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
@@ -1178,32 +1184,35 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_UPDATE_ARC_PROPERTY,
-                    'arc_id': 'arc_1',
-                    'property_name': story_domain.ARC_PROPERTY_TITLE,
-                    'new_value': 'Updated Arc Title',
+                    'cmd': story_domain.CMD_UPDATE_MODULE_PROPERTY,
+                    'module_id': 'module_1',
+                    'property_name': story_domain.MODULE_PROPERTY_TITLE,
+                    'new_value': 'Updated Module Title',
                     'old_value': 'Adventure 1',
                 }
             ),
             story_domain.StoryChange(
                 {
-                    'cmd': story_domain.CMD_UPDATE_ARC_PROPERTY,
-                    'arc_id': 'arc_1',
-                    'property_name': story_domain.ARC_PROPERTY_DESCRIPTION,
+                    'cmd': story_domain.CMD_UPDATE_MODULE_PROPERTY,
+                    'module_id': 'module_1',
+                    'property_name': story_domain.MODULE_PROPERTY_DESCRIPTION,
                     'new_value': 'Updated desc',
                     'old_value': 'Original desc',
                 }
             ),
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Updated arc properties.'
+            self.USER_ID,
+            self.STORY_ID,
+            changelist,
+            'Updated module properties.',
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.arcs[0].title, 'Updated Arc Title'
+            story.story_contents.modules[0].title, 'Updated Module Title'
         )
         self.assertEqual(
-            story.story_contents.arcs[0].description, 'Updated desc'
+            story.story_contents.modules[0].description, 'Updated desc'
         )
 
     def test_update_story_with_meta_tag_content(self) -> None:
@@ -4069,5 +4078,5 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(story.story_contents_schema_version, 5)
         expected_dict = dict(self.VERSION_5_STORY_CONTENTS_DICT)
-        expected_dict['arcs'] = []
+        expected_dict['modules'] = []
         self.assertEqual(story.story_contents.to_dict(), expected_dict)

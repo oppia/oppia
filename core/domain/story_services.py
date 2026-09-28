@@ -478,56 +478,62 @@ def apply_change_list(
                     story.rearrange_node_in_story(
                         update_node_cmd.old_value, update_node_cmd.new_value
                     )
-            elif change.cmd == story_domain.CMD_CREATE_ARC:
+            elif change.cmd == story_domain.CMD_CREATE_MODULE:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                create_arc_cmd = cast(story_domain.CreateArcCmd, change)
-                arc = story_domain.Arc(
-                    arc_id=create_arc_cmd.arc_id,
-                    title=create_arc_cmd.title,
-                    description=create_arc_cmd.description,
-                    node_ids=create_arc_cmd.node_ids,
+                create_module_cmd = cast(story_domain.CreateModuleCmd, change)
+                module = story_domain.Module(
+                    module_id=create_module_cmd.module_id,
+                    title=create_module_cmd.title,
+                    description=create_module_cmd.description,
+                    node_ids=create_module_cmd.node_ids,
                 )
-                story.add_arc(arc)
-            elif change.cmd == story_domain.CMD_DELETE_ARC:
+                story.add_module(module)
+            elif change.cmd == story_domain.CMD_DELETE_MODULE:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                delete_arc_cmd = cast(story_domain.DeleteArcCmd, change)
-                story.delete_arc(delete_arc_cmd.arc_id)
-            elif change.cmd == story_domain.CMD_RENAME_ARC:
+                delete_module_cmd = cast(story_domain.DeleteModuleCmd, change)
+                story.delete_module(delete_module_cmd.module_id)
+            elif change.cmd == story_domain.CMD_RENAME_MODULE:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                rename_arc_cmd = cast(story_domain.RenameArcCmd, change)
-                story.story_contents.get_arc(rename_arc_cmd.arc_id).title = (
-                    rename_arc_cmd.new_title
+                rename_module_cmd = cast(story_domain.RenameModuleCmd, change)
+                story.story_contents.get_module(
+                    rename_module_cmd.module_id
+                ).title = rename_module_cmd.new_title
+            elif change.cmd == story_domain.CMD_REARRANGE_MODULES:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                rearrange_modules_cmd = cast(
+                    story_domain.RearrangeModulesCmd, change
                 )
-            elif change.cmd == story_domain.CMD_REARRANGE_ARCS:
+                story.rearrange_modules(rearrange_modules_cmd.module_ids_order)
+            elif change.cmd == story_domain.CMD_MOVE_NODE_TO_MODULE:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                rearrange_arcs_cmd = cast(story_domain.RearrangeArcsCmd, change)
-                story.rearrange_arcs(rearrange_arcs_cmd.arc_ids_order)
-            elif change.cmd == story_domain.CMD_MOVE_NODE_TO_ARC:
-                # Here we use cast because we are narrowing down the type from
-                # StoryChange to a specific change command.
-                move_node_cmd = cast(story_domain.MoveNodeToArcCmd, change)
-                story.move_node_to_arc(
-                    move_node_cmd.node_id, move_node_cmd.to_arc_id
+                move_node_cmd = cast(story_domain.MoveNodeToModuleCmd, change)
+                story.move_node_to_module(
+                    move_node_cmd.node_id, move_node_cmd.to_module_id
                 )
-            elif change.cmd == story_domain.CMD_UPDATE_ARC_PROPERTY:
+            elif change.cmd == story_domain.CMD_UPDATE_MODULE_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                update_arc_cmd = cast(story_domain.UpdateArcPropertyCmd, change)
-                arc = story.story_contents.get_arc(update_arc_cmd.arc_id)
+                update_module_cmd = cast(
+                    story_domain.UpdateModulePropertyCmd, change
+                )
+                module = story.story_contents.get_module(
+                    update_module_cmd.module_id
+                )
                 if (
-                    update_arc_cmd.property_name
-                    == story_domain.ARC_PROPERTY_TITLE
+                    update_module_cmd.property_name
+                    == story_domain.MODULE_PROPERTY_TITLE
                 ):
-                    arc.title = update_arc_cmd.new_value
+                    module.title = update_module_cmd.new_value
                 elif (
-                    update_arc_cmd.property_name
-                    == story_domain.ARC_PROPERTY_DESCRIPTION
+                    update_module_cmd.property_name
+                    == story_domain.MODULE_PROPERTY_DESCRIPTION
                 ):
-                    arc.description = update_arc_cmd.new_value
+                    module.description = update_module_cmd.new_value
             elif (
                 change.cmd == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION
             ):

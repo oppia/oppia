@@ -49,6 +49,8 @@ describe('Topic Manager', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
+    // TODO(#27483): Rename this to 'story_editor_modules' once the feature
+    // flag migration job has renamed the persisted flag value.
     await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 

@@ -786,20 +786,21 @@ def get_all_nodes_for_topic(
     return []
 
 
-def get_all_arcs_with_stories_for_topic(
+def get_all_modules_with_stories_for_topic(
     topic: topic_domain.Topic,
-) -> List[Tuple[story_domain.Story, story_domain.Arc]]:
-    """Returns arcs paired with the first published story in the topic.
+) -> List[Tuple[story_domain.Story, story_domain.Module]]:
+    """Returns modules paired with the first published story in the topic.
 
     Args:
         topic: Topic. The topic object.
 
     Returns:
-        list(tuple(Story, Arc)). Story-arc pairs from the first published story.
+        list(tuple(Story, Module)). Story-module pairs from the first
+        published story.
     """
     story_ids = topic.get_canonical_story_ids(include_only_published=True)
     stories = get_stories_by_ids(story_ids)
     for story in stories:
         if story is not None:
-            return [(story, arc) for arc in story.story_contents.arcs]
+            return [(story, module) for module in story.story_contents.modules]
     return []

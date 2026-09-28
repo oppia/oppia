@@ -118,7 +118,7 @@ describe('Story summary model', () => {
     ]);
   });
 
-  it('should return arcs when they are provided', () => {
+  it('should return modules when they are provided', () => {
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -130,9 +130,9 @@ describe('Story summary model', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
       all_node_dicts: [],
-      arcs: [
+      modules: [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Adventure Title',
           description: 'Adventure Description',
           node_ids: ['node_1', 'node_2'],
@@ -143,19 +143,19 @@ describe('Story summary model', () => {
     const storySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
     );
-    const arcs = storySummary.getArcs();
-    expect(arcs.length).toEqual(1);
-    expect(arcs[0].id).toEqual('arc_1');
-    expect(arcs[0].title).toEqual('Adventure Title');
-    expect(arcs[0].description).toEqual('Adventure Description');
-    expect(arcs[0].node_ids).toEqual(['node_1', 'node_2']);
+    const modules = storySummary.getModules();
+    expect(modules.length).toEqual(1);
+    expect(modules[0].id).toEqual('module_1');
+    expect(modules[0].title).toEqual('Adventure Title');
+    expect(modules[0].description).toEqual('Adventure Description');
+    expect(modules[0].node_ids).toEqual(['node_1', 'node_2']);
   });
 
-  it('should return empty array for arcs when they are not provided', () => {
-    expect(_sampleStorySummary.getArcs()).toEqual([]);
+  it('should return empty array for modules when they are not provided', () => {
+    expect(_sampleStorySummary.getModules()).toEqual([]);
   });
 
-  it('should return copies for arcs and node titles', () => {
+  it('should return copies for modules and node titles', () => {
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -167,9 +167,9 @@ describe('Story summary model', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
       all_node_dicts: [],
-      arcs: [
+      modules: [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Adventure Title',
           description: 'Adventure Description',
           node_ids: ['node_1', 'node_2'],
@@ -180,13 +180,13 @@ describe('Story summary model', () => {
     const storySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
     );
-    const arcs = storySummary.getArcs();
+    const modules = storySummary.getModules();
     const nodeTitles = storySummary.getNodeTitles();
 
-    arcs[0].title = 'Mutated title';
+    modules[0].title = 'Mutated title';
     nodeTitles.push('Chapter 3');
 
-    expect(storySummary.getArcs()[0].title).toEqual('Adventure Title');
+    expect(storySummary.getModules()[0].title).toEqual('Adventure Title');
     expect(storySummary.getNodeTitles()).toEqual(['Chapter 1', 'Chapter 2']);
   });
 });

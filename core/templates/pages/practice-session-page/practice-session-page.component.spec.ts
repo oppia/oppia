@@ -45,7 +45,7 @@ class MockPlatformFeatureService {
     NewLessonPlayer: {
       isEnabled: false,
     },
-    StoryEditorArcs: {
+    StoryEditorModules: {
       isEnabled: false,
     },
   };
@@ -254,10 +254,10 @@ describe('Practice session page', () => {
     expect(component['sessionType']).toBe('lesson');
   }));
 
-  it('should determine arc session type from pathname', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+  it('should determine module session type from pathname', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/123'
+      '/learn/math/fractions/test/module/123'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -273,7 +273,7 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    expect(component['sessionType']).toBe('arc');
+    expect(component['sessionType']).toBe('module');
   }));
 
   it('should determine mastery session type from pathname', fakeAsync(() => {
@@ -342,10 +342,10 @@ describe('Practice session page', () => {
     expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
   }));
 
-  it('should build correct retry URL for arc practice', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+  it('should build correct retry URL for module practice', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/1'
+      '/learn/math/fractions/test/module/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -361,7 +361,7 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
+    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/module/1');
   }));
 
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {
@@ -387,12 +387,12 @@ describe('Practice session page', () => {
     );
   }));
 
-  it('should append arc mastered markers to dashboard URL for arc sessions', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
-    spyOn(urlService, 'getArcIdFromUrl').and.returnValue('1');
+  it('should append module mastered markers to dashboard URL for module sessions', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
+    spyOn(urlService, 'getModulePositionFromUrl').and.returnValue('1');
     spyOn(urlService, 'getNodeIdFromPracticeUrl').and.returnValue(null);
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/1'
+      '/learn/math/fractions/test/module/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -411,7 +411,7 @@ describe('Practice session page', () => {
       component.questionPlayerConfig.resultActionButtons.find(
         (button: {type: string}) => button.type === 'DASHBOARD'
       );
-    expect(dashboardActionButton?.url).toContain('arc_mastered=true');
-    expect(dashboardActionButton?.url).toContain('arc_id=1');
+    expect(dashboardActionButton?.url).toContain('module_mastered=true');
+    expect(dashboardActionButton?.url).toContain('module_position=1');
   }));
 });

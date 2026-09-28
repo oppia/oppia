@@ -47,8 +47,8 @@ import {
   ModuleGroupData,
 } from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 
-const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
-const ARC_ID_QUERY_PARAM = 'arc_id';
+const MODULE_MASTERED_QUERY_PARAM = 'module_mastered';
+const MODULE_POSITION_QUERY_PARAM = 'module_position';
 const MOBILE_SCREEN_BREAKPOINT = 480;
 const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
 const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
@@ -72,7 +72,7 @@ interface ModuleNavigationGroupData {
   accentColor: string;
   showPractice: boolean;
   isPracticeCompleted: boolean;
-  arcId: string;
+  modulePosition: string;
 }
 
 @Component({
@@ -108,7 +108,7 @@ export class TopicStorySectionComponent
   comingSoonModuleGroups: ModuleGroupData[] = [];
   moduleNavigationGroups: ModuleNavigationGroupData[] = [];
   activeLessonNumber: number | null = null;
-  activePracticeArcId: string = '';
+  activePracticeModuleId: string = '';
   practiceCard: PracticeCardData = {
     practiceTitle: '',
     practiceDescription: '',
@@ -134,8 +134,8 @@ export class TopicStorySectionComponent
   private pendingNavigationLessonNumber: number | null = null;
   private pendingNavigationModuleIndex: number | null = null;
   private pendingStartUrl: string = '';
-  private completedModulePracticeArcIds: Set<string> = new Set();
-  private hasHandledArcMasteredQueryParams: boolean = false;
+  private completedPracticeModulePositions: Set<string> = new Set();
+  private hasHandledModuleMasteredQueryParams: boolean = false;
   private moduleSkipModalRef: NgbModalRef | null = null;
   private moduleMasteredModalRef: NgbModalRef | null = null;
 
@@ -299,7 +299,7 @@ export class TopicStorySectionComponent
     }
     this.moduleMasteredModalRef = null;
     this.masteredModuleIndex = null;
-    this.hasHandledArcMasteredQueryParams = true;
+    this.hasHandledModuleMasteredQueryParams = true;
   }
 
   getModuleMasteredTitle(): string {
@@ -411,7 +411,9 @@ export class TopicStorySectionComponent
     if (!moduleGroup) {
       return false;
     }
-    return this.completedModulePracticeArcIds.has(moduleGroup.arcId);
+    return this.completedPracticeModulePositions.has(
+      moduleGroup.modulePosition
+    );
   }
 
   isStoryCompleted(): boolean {
@@ -431,7 +433,7 @@ export class TopicStorySectionComponent
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
     // Only one circle should appear filled in the navbar at a time.
-    this.activePracticeArcId = '';
+    this.activePracticeModuleId = '';
 
     if (moduleIndex !== -1) {
       this._expandedModuleIndices.add(moduleIndex);
@@ -470,7 +472,7 @@ export class TopicStorySectionComponent
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
     // Only one circle should appear filled in the navbar at a time.
-    this.activePracticeArcId = '';
+    this.activePracticeModuleId = '';
 
     if (startUrl) {
       this.windowRef.nativeWindow.location.assign(startUrl);
@@ -562,7 +564,7 @@ export class TopicStorySectionComponent
     if (!storyId) {
       return;
     }
-    this.completedModulePracticeArcIds = new Set(
+    this.completedPracticeModulePositions = new Set(
       this.localStorageService.getMasteredModules(storyId)
     );
   }
@@ -574,16 +576,16 @@ export class TopicStorySectionComponent
     }
     this.localStorageService.updateMasteredModules(
       storyId,
-      Array.from(this.completedModulePracticeArcIds)
+      Array.from(this.completedPracticeModulePositions)
     );
   }
 
-  onNavigationPracticeSelected(arcId: string): void {
-    this.activePracticeArcId = arcId;
+  onNavigationPracticeSelected(modulePosition: string): void {
+    this.activePracticeModuleId = modulePosition;
     // Only one circle should appear filled in the navbar at a time.
     this.activeLessonNumber = null;
     setTimeout(() => {
-      this.scrollToElementById('practice-card-' + arcId);
+      this.scrollToElementById('practice-card-' + modulePosition);
     }, 300);
   }
 
@@ -748,8 +750,8 @@ export class TopicStorySectionComponent
   }
 
   private getPracticeCardData(): PracticeCardData {
-    const firstArcId =
-      this.moduleGroups.length > 0 ? this.moduleGroups[0].arcId : '';
+    const firstModuleId =
+      this.moduleGroups.length > 0 ? this.moduleGroups[0].modulePosition : '';
 
     return {
       practiceTitle: this.getPracticeTitle(0),
@@ -757,8 +759,8 @@ export class TopicStorySectionComponent
       thumbnailUrl:
         this.topicStorySectionBackendDataService.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
-      practiceUrl: firstArcId
-        ? this.getEndOfArcUrl(firstArcId)
+      practiceUrl: firstModuleId
+        ? this.getEndOfModuleUrl(firstModuleId)
         : this.topicStorySectionBackendDataService.getGeneralPracticeUrl(
             this.practiceSubtopicIds,
             this.classroomUrlFragment,
@@ -806,7 +808,9 @@ export class TopicStorySectionComponent
     );
 
     this.visibleModuleGroups = this.visibleModuleGroups.map(group => {
-      const updated = moduleGroups.find(g => g.arcId === group.arcId);
+      const updated = moduleGroups.find(
+        g => g.modulePosition === group.modulePosition
+      );
       return updated ? {...updated, lessonCards: group.lessonCards} : group;
     });
   }
@@ -832,9 +836,9 @@ export class TopicStorySectionComponent
     );
   }
 
-  getEndOfArcUrl(arcId: string): string {
-    return this.topicStorySectionBackendDataService.getEndOfArcUrl(
-      arcId,
+  getEndOfModuleUrl(modulePosition: string): string {
+    return this.topicStorySectionBackendDataService.getEndOfModuleUrl(
+      modulePosition,
       this.classroomUrlFragment,
       this.topicUrlFragment
     );
@@ -932,7 +936,7 @@ export class TopicStorySectionComponent
 
         const isPracticeCompleted =
           visibleLessons.length > 0 &&
-          this.completedModulePracticeArcIds.has(group.arcId);
+          this.completedPracticeModulePositions.has(group.modulePosition);
 
         return {
           lessons: visibleLessons.map(card => {
@@ -944,7 +948,7 @@ export class TopicStorySectionComponent
           accentColor: group.accentColor,
           showPractice: visibleLessons.length > 0,
           isPracticeCompleted,
-          arcId: group.arcId,
+          modulePosition: group.modulePosition,
         };
       })
       .filter(group => group.lessons.length > 0);
@@ -976,53 +980,58 @@ export class TopicStorySectionComponent
   private maybeShowModuleMasteredModal(): void {
     if (
       this.moduleMasteredModalRef !== null ||
-      this.hasHandledArcMasteredQueryParams
+      this.hasHandledModuleMasteredQueryParams
     ) {
       return;
     }
 
-    const arcMasteredFlagValues = this.urlService.getQueryFieldValuesAsList(
-      ARC_MASTERED_QUERY_PARAM
+    const moduleMasteredFlagValues = this.urlService.getQueryFieldValuesAsList(
+      MODULE_MASTERED_QUERY_PARAM
     );
-    const arcIdValues =
-      this.urlService.getQueryFieldValuesAsList(ARC_ID_QUERY_PARAM);
+    const modulePositionValues = this.urlService.getQueryFieldValuesAsList(
+      MODULE_POSITION_QUERY_PARAM
+    );
 
     if (
-      arcMasteredFlagValues.length === 0 ||
-      arcMasteredFlagValues[0] !== 'true' ||
-      arcIdValues.length === 0
+      moduleMasteredFlagValues.length === 0 ||
+      moduleMasteredFlagValues[0] !== 'true' ||
+      modulePositionValues.length === 0
     ) {
       return;
     }
 
-    const masteredArcId = this.normalizeArcIdFromQueryValue(arcIdValues[0]);
-    if (!masteredArcId) {
+    const masteredModulePosition = this.normalizeModulePositionFromQueryValue(
+      modulePositionValues[0]
+    );
+    if (!masteredModulePosition) {
       return;
     }
 
     const moduleIndex = this.visibleModuleGroups.findIndex(
-      group => group.arcId === masteredArcId
+      group => group.modulePosition === masteredModulePosition
     );
 
     if (moduleIndex === -1 || !this.areAllLessonsCompleted(moduleIndex)) {
       return;
     }
 
-    this.completedModulePracticeArcIds.add(masteredArcId);
+    this.completedPracticeModulePositions.add(masteredModulePosition);
     this.persistMasteredModules();
     this.updateVisibleSections();
 
-    this.hasHandledArcMasteredQueryParams = true;
+    this.hasHandledModuleMasteredQueryParams = true;
     this.masteredModuleIndex = moduleIndex;
     this.openModuleMasteredModal();
   }
 
-  private normalizeArcIdFromQueryValue(rawArcId: string): string | null {
-    if (!rawArcId) {
+  private normalizeModulePositionFromQueryValue(
+    rawModulePosition: string
+  ): string | null {
+    if (!rawModulePosition) {
       return null;
     }
 
-    const match = rawArcId.match(/^\d+/);
+    const match = rawModulePosition.match(/^\d+/);
     if (!match) {
       return null;
     }

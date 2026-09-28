@@ -36,7 +36,7 @@
         <topic-module-navigation
           [moduleGroups]="moduleNavigationGroups"
           [activeLessonNumber]="activeLessonNumber"
-          [activePracticeArcId]="activePracticeArcId"
+          [activePracticeModuleId]="activePracticeModuleId"
           [isInTopicEditorPreview]="isInTopicEditorPreview"
           (lessonSelected)="onNavigationLessonSelected($event)"
           (practiceSelected)="onNavigationPracticeSelected($event)"
@@ -113,7 +113,7 @@
               </ng-container>
 
               <div class="story-practice-card-wrapper"
-                   [id]="'practice-card-' + moduleGroup.arcId"
+                   [id]="'practice-card-' + moduleGroup.modulePosition"
                    *ngIf="shouldShowModuleEndTestCard(moduleIdx)">
                 <topic-module-end-test-card
                   [practiceTitle]="getPracticeTitle(moduleIdx)"
@@ -123,7 +123,7 @@
                   [cardBackgroundColor]="moduleGroup.headerBackgroundColor"
                   [cardAccentColor]="moduleGroup.accentColor"
                   [isPracticeCompleted]="isModulePracticeCompleted(moduleIdx)"
-                  [practiceUrl]="getEndOfArcUrl(moduleGroup.arcId)"
+                  [practiceUrl]="getEndOfModuleUrl(moduleGroup.modulePosition)"
                   [hasPracticeQuestions]="moduleGroup.hasPracticeQuestions">
                 </topic-module-end-test-card>
               </div>
