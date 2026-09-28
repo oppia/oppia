@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.topic_migration_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf, utils

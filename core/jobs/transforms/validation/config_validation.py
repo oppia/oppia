@@ -16,6 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of config models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import platform_parameter_domain as parameter_domain

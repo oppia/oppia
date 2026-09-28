@@ -15,6 +15,8 @@
 
 """Tests for Android platform parameters and feature flags handlers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.tests import test_utils

@@ -21,6 +21,8 @@ the diff between them and the Firebase Authentication server, then either report
 the diff (dry run) or apply it (create missing records and delete stale ones).
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import operator

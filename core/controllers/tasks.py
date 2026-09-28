@@ -46,7 +46,7 @@ class UnsentFeedbackEmailHandler(
     """Handler task of sending emails of feedback messages."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Processes feedback messages for a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -129,7 +129,7 @@ class ContributorDashboardAchievementEmailHandler(
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Sends an email notification to a contributor."""
         payload = json.loads(self.request.body)
         contributor_user_id = payload['contributor_user_id']
@@ -164,7 +164,7 @@ class InstantFeedbackMessageEmailHandler(
     """Handles task of sending feedback message emails instantly."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Sends an email notification to a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -206,7 +206,7 @@ class FeedbackThreadStatusChangeEmailHandler(
     """
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Sends an email notification to a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -251,7 +251,7 @@ class FlagExplorationEmailHandler(
     """
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Sends an email notification to administrators."""
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
@@ -303,7 +303,7 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Attempts to resend an email.
 
         If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
@@ -422,7 +422,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Defers tasks for execution in the background.
 
         Raises:

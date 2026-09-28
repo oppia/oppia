@@ -18,6 +18,8 @@
 reject_invalid_suggestion_and_delete_invalid_translation_jobs.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

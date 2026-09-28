@@ -16,6 +16,8 @@
 
 """Tests for generic controller behavior."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import contextlib

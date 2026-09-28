@@ -16,6 +16,8 @@
 
 """Provides generic transforms for working with the Firebase Admin SDK."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from collections import abc

@@ -16,6 +16,8 @@
 
 """Beam jobs to backfill PinnedOpportunityModels."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

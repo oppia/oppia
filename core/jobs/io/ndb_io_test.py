@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.io.ndb_io."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils

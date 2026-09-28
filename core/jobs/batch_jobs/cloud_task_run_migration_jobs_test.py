@@ -16,6 +16,8 @@
 
 """Tests for cloud_task_run_migration_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

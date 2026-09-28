@@ -16,6 +16,8 @@
 
 """Unit tests for blog model job errors."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import utils

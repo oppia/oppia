@@ -74,7 +74,7 @@ class SkillMasteryDataHandler(
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         assert self.normalized_request is not None
@@ -101,7 +101,7 @@ class SkillMasteryDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_learner_dashboard
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -176,7 +176,7 @@ class SubtopicMasteryDataHandler(
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         assert self.normalized_request is not None

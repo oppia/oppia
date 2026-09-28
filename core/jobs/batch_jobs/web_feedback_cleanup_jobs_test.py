@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.web_feedback_cleanup_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

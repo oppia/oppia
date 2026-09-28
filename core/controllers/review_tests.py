@@ -41,7 +41,7 @@ class ReviewTestsPageDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id: str) -> None:
+    def get(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         story = story_fetchers.get_story_by_id(story_id)
         latest_completed_node_ids = (

@@ -180,7 +180,7 @@ class IncomingAndroidFeedbackReportHandler(
     }
 
     @acl_decorators.is_from_oppia_android
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the

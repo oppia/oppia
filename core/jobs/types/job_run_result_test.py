@@ -16,6 +16,8 @@
 
 """Tests for jobs.types.job_run_result."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import pickle

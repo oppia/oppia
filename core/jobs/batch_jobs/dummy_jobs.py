@@ -16,6 +16,8 @@
 
 """Dummy jobs for testing purposes."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs

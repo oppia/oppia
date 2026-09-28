@@ -16,6 +16,8 @@
 
 """Tests for the controller managing incoming feedback reports."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

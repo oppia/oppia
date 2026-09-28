@@ -14,6 +14,8 @@
 
 """Tests for audit_topics_with_hanging_stories_job.py"""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

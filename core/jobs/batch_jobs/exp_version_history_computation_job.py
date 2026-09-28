@@ -16,6 +16,8 @@
 
 """Job for computation of exploration version history data."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

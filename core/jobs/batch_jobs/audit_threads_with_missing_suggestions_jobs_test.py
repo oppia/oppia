@@ -16,6 +16,8 @@
 
 """Unit tests for audit_threads_with_missing_suggestions_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

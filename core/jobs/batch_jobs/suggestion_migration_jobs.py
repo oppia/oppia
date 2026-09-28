@@ -16,6 +16,8 @@
 
 """Jobs that migrate suggestion models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging

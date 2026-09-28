@@ -16,6 +16,8 @@
 
 """Jobs for identifying and fixing duplicate content IDs in explorations."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import (

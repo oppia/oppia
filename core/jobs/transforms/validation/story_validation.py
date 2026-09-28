@@ -16,6 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of story models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import story_domain

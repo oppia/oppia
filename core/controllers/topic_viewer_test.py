@@ -14,6 +14,8 @@
 
 """Tests for the topic viewer page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feature_flag_list, feconf

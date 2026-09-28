@@ -16,6 +16,8 @@
 
 """Provides an Apache Beam API for operating on GCS."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.platform import models

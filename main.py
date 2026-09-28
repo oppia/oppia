@@ -14,6 +14,8 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging
@@ -1498,6 +1500,10 @@ URLS = [
     get_redirect_route(
         feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER,
         certificate_assessment.CertificateAssessmentAttemptsHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_QUESTION_HANDLER,
+        certificate_assessment.CertificateQuestionHandler,
     ),
 ]
 

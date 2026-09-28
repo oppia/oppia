@@ -14,6 +14,8 @@
 
 """Tests for lesson feedback and platform issue report controllers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from unittest import mock

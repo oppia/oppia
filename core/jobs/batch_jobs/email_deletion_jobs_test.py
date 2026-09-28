@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.blog_validation_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

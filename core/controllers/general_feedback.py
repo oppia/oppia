@@ -14,6 +14,8 @@
 
 """Controllers for learner lesson feedback and platform issue report submissions."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import base64
@@ -302,7 +304,7 @@ class LessonFeedbackSubmitHandler(
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Submits a new lesson feedback entry.
 
         Response: { "id": "<feedback_id>" }
@@ -670,7 +672,7 @@ class PlatformFeedbackSubmitHandler(
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Submits a new issue report (lesson or site).
 
         Response: { "id": "<report_id>" }
@@ -955,6 +957,6 @@ class GeneralFeedbackCaptchaConfigHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         site_key = captcha_services.get_turnstile_site_key()
         self.render_json({'site_key': site_key})

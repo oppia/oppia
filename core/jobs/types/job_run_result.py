@@ -16,6 +16,8 @@
 
 """Objects for holding onto the results produced by Apache Beam jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import heapq

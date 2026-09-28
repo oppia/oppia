@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.transforms.user_validation."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

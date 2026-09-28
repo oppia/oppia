@@ -16,6 +16,8 @@
 
 """Tests for fix_duplicate_content_ids_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import (

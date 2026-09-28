@@ -16,6 +16,8 @@
 
 """Option class for configuring the behavior of Oppia jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import argparse

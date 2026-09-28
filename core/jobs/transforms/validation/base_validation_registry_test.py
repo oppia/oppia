@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.transforms.base_validation_registry."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs.decorators import validation_decorators

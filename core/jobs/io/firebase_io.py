@@ -16,6 +16,8 @@
 
 """Provides PTransforms for operating on Firebase records."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import hashlib

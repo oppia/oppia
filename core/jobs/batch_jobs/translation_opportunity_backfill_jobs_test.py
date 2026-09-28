@@ -16,6 +16,8 @@
 
 """Unit tests for translation_opportunity_backfill_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import re

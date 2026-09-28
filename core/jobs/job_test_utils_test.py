@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.job_test_utils."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from unittest import mock

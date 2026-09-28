@@ -16,6 +16,8 @@
 
 """Tests for exp_end_state_normalization_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import exp_domain, exp_services

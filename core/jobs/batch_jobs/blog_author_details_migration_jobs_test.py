@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.blog_author_details_migration_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

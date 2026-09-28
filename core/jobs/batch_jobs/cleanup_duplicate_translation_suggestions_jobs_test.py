@@ -16,6 +16,8 @@
 
 """Unit tests for cleanup_duplicate_translation_suggestions_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

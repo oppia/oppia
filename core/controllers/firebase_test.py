@@ -14,6 +14,8 @@
 
 """Tests for the firebase controllers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

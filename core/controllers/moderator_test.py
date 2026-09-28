@@ -14,6 +14,8 @@
 
 """Tests for the moderator page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import platform_parameter_list, rights_manager, user_services

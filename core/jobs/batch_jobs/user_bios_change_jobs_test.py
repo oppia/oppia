@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.batch_jobs.user_bios_change_jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils

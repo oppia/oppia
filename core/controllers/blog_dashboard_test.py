@@ -14,6 +14,8 @@
 
 """Tests for the blog dashboard page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import os

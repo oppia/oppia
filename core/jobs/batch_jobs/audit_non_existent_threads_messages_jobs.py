@@ -16,6 +16,8 @@
 
 """Jobs that audit and remove feedback messages whose thread_id does not exist."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs

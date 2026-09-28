@@ -195,7 +195,7 @@ class SuggestionHandler(
     }
 
     @acl_decorators.can_suggest_changes
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Raises:
@@ -403,7 +403,9 @@ class SuggestionToExplorationActionHandler(
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration
     )
-    def put(self, target_id: str, suggestion_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, target_id: str, suggestion_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Args:
@@ -529,7 +531,9 @@ class ResubmitSuggestionHandler(
     }
 
     @acl_decorators.can_resubmit_suggestion
-    def put(self, suggestion_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, suggestion_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Args:
@@ -608,7 +612,9 @@ class SuggestionToSkillActionHandler(
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill
     )
-    def put(self, target_id: str, suggestion_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, target_id: str, suggestion_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Args:
@@ -912,7 +918,9 @@ class ReviewableSuggestionsHandler(
         return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
-    def get(self, target_type: str, suggestion_type: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, target_type: str, suggestion_type: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:
@@ -1048,7 +1056,9 @@ class UserSubmittedSuggestionsHandler(
     }
 
     @acl_decorators.can_suggest_changes
-    def get(self, target_type: str, suggestion_type: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, target_type: str, suggestion_type: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:
@@ -1150,7 +1160,7 @@ class SuggestionListHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
@@ -1201,7 +1211,9 @@ class UpdateTranslationSuggestionHandler(
     }
 
     @acl_decorators.can_update_suggestion
-    def put(self, suggestion_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, suggestion_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Raises:
@@ -1276,7 +1288,9 @@ class UpdateQuestionSuggestionHandler(
     }
 
     @acl_decorators.can_update_suggestion
-    def post(self, suggestion_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, suggestion_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Raises:

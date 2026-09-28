@@ -16,6 +16,8 @@
 
 """Jobs used for migrating the question models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging

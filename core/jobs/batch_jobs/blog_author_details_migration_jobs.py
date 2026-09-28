@@ -35,6 +35,8 @@ blog_services.get_blog_author_details() auto-creates their model using
 the user's actual display name.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import utils

@@ -45,7 +45,7 @@ if MYPY:  # pragma: no cover
 class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the composite entity id."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, input_model: improvements_models.ExplorationStatsTaskEntryModel
     ) -> Iterator[improvements_validation_errors.InvalidCompositeEntityError]:
         """Function that checks if the composite entity id is valid

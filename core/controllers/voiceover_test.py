@@ -14,6 +14,8 @@
 
 """Tests for the voiceover admin page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

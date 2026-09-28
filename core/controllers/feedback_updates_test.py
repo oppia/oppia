@@ -14,6 +14,8 @@
 
 """Tests for the feedback updates."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime
