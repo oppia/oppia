@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for TranslationModalUneditedConfirmationModalComponent.
  */
 
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslationModalUneditedConfirmationModalComponent} from './translation-modal-unedited-confirmation-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('Translation Modal Unedited Confirmation Modal Component', () => {
   let component: TranslationModalUneditedConfirmationModalComponent;
@@ -27,8 +30,12 @@ describe('Translation Modal Unedited Confirmation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TranslationModalUneditedConfirmationModalComponent],
-      providers: [NgbActiveModal],
+      declarations: [
+        TranslationModalUneditedConfirmationModalComponent,
+        MockTranslatePipe,
+      ],
+      providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

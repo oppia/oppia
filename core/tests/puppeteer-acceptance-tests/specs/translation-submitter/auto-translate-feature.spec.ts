@@ -96,7 +96,9 @@ describe('Auto-Translate Feature', function () {
     );
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
 
-    // Mock the backend API for generate translation.
+    // Mock the backend API for generate translation. The mock response must
+    // include the same custom Oppia tags as the original exploration content
+    // (image, math, skillreview) so that validation passes.
     await translationSubmitter.page.setRequestInterception(true);
     translationSubmitter.page.on('request', request => {
       if (request.url().includes('/generate-translation')) {
@@ -105,7 +107,23 @@ describe('Auto-Translate Feature', function () {
           contentType: 'application/json',
           body: JSON.stringify({
             translated_text:
-              '<p>यहाँ <oppia-noninteractive-math math_content-with-value="{&quot;raw_latex&quot;:&quot;\\\\frac{x}{y}&quot;,&quot;svg_filename&quot;:&quot;math_123.svg&quot;}"></oppia-noninteractive-math> है और एक <oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;लिंक&quot;"></oppia-noninteractive-link> भी है।</p>',
+              '<p><strong>बोल्ड पाठ</strong></p>' +
+              '<p><em>इटैलिक पाठ</em></p>' +
+              '<p>यहाँ एक गणितीय सूत्र है ' +
+              '<oppia-noninteractive-math ' +
+              'math_content-with-value="{&quot;raw_latex&quot;:' +
+              '&quot;x^2 + y^2 = z^2&quot;,&quot;svg_filename&quot;:' +
+              '&quot;&quot;}">' +
+              '</oppia-noninteractive-math></p>' +
+              '<oppia-noninteractive-image ' +
+              'filepath-with-value="&quot;img_test.png&quot;" ' +
+              'caption-with-value="&quot;परीक्षण छवि शीर्षक&quot;" ' +
+              'alt-with-value="&quot;परीक्षण छवि&quot;">' +
+              '</oppia-noninteractive-image>' +
+              '<oppia-noninteractive-skillreview ' +
+              'skill_id-with-value="&quot;skill_id&quot;" ' +
+              'text-with-value="&quot;कौशल समीक्षा&quot;">' +
+              '</oppia-noninteractive-skillreview>',
             translation_provider: 'Google',
           }),
         });
