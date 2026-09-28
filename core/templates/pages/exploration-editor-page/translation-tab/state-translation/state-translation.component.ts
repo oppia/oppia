@@ -251,24 +251,37 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (tabId === this.TAB_ID_CONTENT) {
       activeContentId = this.stateContent.contentId;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
+      const firstNonEmptyAnswerGroupIndex = this.stateAnswerGroups.findIndex(
+        answerGroup => !answerGroup.outcome.feedback.isEmpty()
+      );
+      const fallbackAnswerGroupIndex =
+        firstNonEmptyAnswerGroupIndex === -1
+          ? this.stateAnswerGroups.length
+          : firstNonEmptyAnswerGroupIndex;
       if (this.initActiveContentId) {
-        const isValidAnswerGroupIndex =
+        const isInRangeAnswerGroupIndex =
           typeof this.initActiveIndex === 'number' &&
           this.initActiveIndex >= 0 &&
           this.initActiveIndex < this.stateAnswerGroups.length;
+        const isVisibleAnswerGroupIndex =
+          isInRangeAnswerGroupIndex &&
+          !this.stateAnswerGroups[
+            this.initActiveIndex
+          ].outcome.feedback.isEmpty();
         // Default outcome is not an answer group, so getIndexOfActiveCard()
-        // returns -1. Use the default-outcome slot in that case.
-        this.activeAnswerGroupIndex = isValidAnswerGroupIndex
-          ? this.initActiveIndex
-          : this.stateAnswerGroups.length;
+        // returns -1. Keep that slot only when its feedback is nonempty.
+        const isVisibleDefaultOutcomeIndex =
+          !isInRangeAnswerGroupIndex &&
+          !this.stateDefaultOutcome.feedback.isEmpty();
+        if (isVisibleAnswerGroupIndex) {
+          this.activeAnswerGroupIndex = this.initActiveIndex;
+        } else if (isVisibleDefaultOutcomeIndex) {
+          this.activeAnswerGroupIndex = this.stateAnswerGroups.length;
+        } else {
+          this.activeAnswerGroupIndex = fallbackAnswerGroupIndex;
+        }
       } else {
-        const firstNonEmptyAnswerGroupIndex = this.stateAnswerGroups.findIndex(
-          answerGroup => !answerGroup.outcome.feedback.isEmpty()
-        );
-        this.activeAnswerGroupIndex =
-          firstNonEmptyAnswerGroupIndex === -1
-            ? this.stateAnswerGroups.length
-            : firstNonEmptyAnswerGroupIndex;
+        this.activeAnswerGroupIndex = fallbackAnswerGroupIndex;
       }
       if (
         this.stateAnswerGroups.length === 0 ||
@@ -287,11 +300,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       const fallbackHintIndex =
         firstNonEmptyHintIndex === -1 ? 0 : firstNonEmptyHintIndex;
       if (this.initActiveContentId) {
-        const isValidHintIndex =
+        const isVisibleHintIndex =
           typeof this.initActiveIndex === 'number' &&
           this.initActiveIndex >= 0 &&
-          this.initActiveIndex < this.stateHints.length;
-        this.activeHintIndex = isValidHintIndex
+          this.initActiveIndex < this.stateHints.length &&
+          !this.stateHints[this.initActiveIndex].hintContent.isEmpty();
+        this.activeHintIndex = isVisibleHintIndex
           ? this.initActiveIndex
           : fallbackHintIndex;
       } else {
@@ -312,11 +326,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
           ? 0
           : firstNonEmptyCustomizationArgIndex;
       if (this.initActiveContentId) {
-        const isValidCustomizationArgIndex =
+        const isVisibleCustomizationArgIndex =
           typeof this.initActiveIndex === 'number' &&
           this.initActiveIndex >= 0 &&
-          this.initActiveIndex < customizationArgs.length;
-        this.activeCustomizationArgContentIndex = isValidCustomizationArgIndex
+          this.initActiveIndex < customizationArgs.length &&
+          !customizationArgs[this.initActiveIndex].content.isEmpty();
+        this.activeCustomizationArgContentIndex = isVisibleCustomizationArgIndex
           ? this.initActiveIndex
           : fallbackCustomizationArgIndex;
       } else {

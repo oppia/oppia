@@ -422,6 +422,8 @@ describe('State translation component', () => {
         });
 
         it('should select a specified feedback card when initActiveContentId is set', () => {
+          component.stateAnswerGroups[0].outcome.feedback.html =
+            'Answer group feedback';
           component.initActiveContentId = 'feedback_1';
           component.initActiveIndex = 0;
           spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -432,6 +434,45 @@ describe('State translation component', () => {
             translationTabActiveContentIdService.setActiveContent
           ).toHaveBeenCalledWith('feedback_1', 'html');
         });
+
+        it(
+          'should fall back to the first non-empty feedback card when the' +
+            ' initialized answer group is empty',
+          () => {
+            component.initActiveContentId = 'feedback_1';
+            component.initActiveIndex = 0;
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('feedback');
+
+            expect(component.activeAnswerGroupIndex).toBe(
+              component.stateAnswerGroups.length
+            );
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('default_outcome', 'html');
+          }
+        );
+
+        it(
+          'should fall back to the first non-empty answer group when the' +
+            ' initialized default outcome is empty',
+          () => {
+            component.stateDefaultOutcome.feedback.html = '';
+            component.stateAnswerGroups[1].outcome.feedback.html =
+              'Second answer group feedback';
+            component.initActiveContentId = 'default_outcome';
+            component.initActiveIndex = -1;
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('feedback');
+
+            expect(component.activeAnswerGroupIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('feedback_2', 'html');
+          }
+        );
 
         it(
           'should select the default outcome when the initialized content id' +
@@ -464,6 +505,24 @@ describe('State translation component', () => {
             translationTabActiveContentIdService.setActiveContent
           ).toHaveBeenCalledWith('hint_2', 'html');
         });
+
+        it(
+          'should fall back to the first non-empty hint when the initialized' +
+            ' hint is empty',
+          () => {
+            component.stateHints[0].hintContent.html = '';
+            component.initActiveContentId = 'hint_1';
+            component.initActiveIndex = 0;
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('hint');
+
+            expect(component.activeHintIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('hint_2', 'html');
+          }
+        );
 
         it(
           'should fall back to the first non-empty hint when the initialized' +
@@ -536,6 +595,36 @@ describe('State translation component', () => {
           () => {
             component.initActiveContentId = 'ca_filled';
             component.initActiveIndex = 1;
+            component.interactionCustomizationArgTranslatableContent = [
+              {
+                name: 'Empty placeholder',
+                content: SubtitledUnicode.createDefault('', 'ca_empty'),
+              },
+              {
+                name: 'Placeholder',
+                content: SubtitledUnicode.createDefault(
+                  'Type something',
+                  'ca_filled'
+                ),
+              },
+            ];
+            spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+            component.onTabClick('ca');
+
+            expect(component.activeCustomizationArgContentIndex).toBe(1);
+            expect(
+              translationTabActiveContentIdService.setActiveContent
+            ).toHaveBeenCalledWith('ca_filled', 'unicode');
+          }
+        );
+
+        it(
+          'should fall back to the first non-empty customization argument' +
+            ' when the initialized customization argument is empty',
+          () => {
+            component.initActiveContentId = 'ca_empty';
+            component.initActiveIndex = 0;
             component.interactionCustomizationArgTranslatableContent = [
               {
                 name: 'Empty placeholder',
