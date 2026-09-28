@@ -21,7 +21,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AssignedSkill} from 'domain/skill/assigned-skill.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './unassign-skill-from-topics-modal.component.css';
 import {
   TopicsAndSkillsDashboardBackendApiService,
   TopicIdToDiagnosticTestSkillIdsResponse,

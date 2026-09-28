@@ -33,8 +33,6 @@ import {
   ChoiceWithIndex,
 } from './multiple-choice-input-ordered-choices-service';
 
-import '../static/multiple_choice_input.css';
-
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
   templateUrl: './multiple-choice-input-interaction.component.html',

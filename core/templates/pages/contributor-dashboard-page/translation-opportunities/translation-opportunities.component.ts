@@ -42,7 +42,6 @@ import {
   ExplorationOpportunitiesDict,
 } from '../services/contribution-opportunities.service';
 import {TranslateTextService} from '../services/translate-text.service';
-import './translation-opportunities.component.css';
 
 @Component({
   selector: 'oppia-translation-opportunities',

@@ -21,7 +21,6 @@ import {Component, OnInit} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
-import './blog-admin-navbar.component.css';
 
 @Component({
   selector: 'oppia-blog-admin-navbar',

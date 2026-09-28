@@ -78,11 +78,14 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
-import './exploration-editor-page.component.css';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -189,7 +192,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private insertScriptService: InsertScriptService
+    private insertScriptService: InsertScriptService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   setDocumentTitle(): void {
@@ -707,6 +711,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.internetConnectivityService.startCheckingConnection();
 
     this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.SHEPHERD);
 
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(

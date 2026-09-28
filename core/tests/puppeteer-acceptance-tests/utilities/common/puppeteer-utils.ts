@@ -403,9 +403,12 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-
     await this.typeInInputField(usernameSelector, username);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-email-preferences-radio-no'
+    );
     await this.clickOnElementWithSelector(termsCheckboxSelector);
+
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
@@ -1040,8 +1043,8 @@ export class BaseUser {
     if (inputUploadHandle === null) {
       throw new Error('No file input found while attempting to upload a file.');
     }
-    let fileToUpload = filePath;
-    inputUploadHandle.uploadFile(fileToUpload);
+    const fileToUpload = filePath;
+    await inputUploadHandle.uploadFile(fileToUpload);
   }
 
   /**
@@ -1887,12 +1890,20 @@ export class BaseUser {
     shouldBeNavigable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
-
     const currentUrl = this.page.url();
 
-    await chapterElement.click();
-    // Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
-    await this.waitForPageToFullyLoad();
+    if (shouldBeNavigable) {
+      // If it should navigate, wait for navigation concurrently with click to avoid
+      // execution context destroyed errors during page load.
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        chapterElement.click(),
+      ]);
+    } else {
+      await chapterElement.click();
+      await this.page.waitForTimeout(2000); // Wait briefly to verify no navigation happens.
+    }
+
     const newUrl = this.page.url();
     const didNavigate = newUrl !== currentUrl;
 
@@ -2117,6 +2128,55 @@ export class BaseUser {
 
     // Verify Tooltip.
     expect(tooltipText).toBe(expectedToolTip);
+  }
+
+  /**
+   * Performs a long-press on the element matching the given selector. On touch
+   * devices Angular Material tooltips are shown after a long-press instead of
+   * a hover, because the `mouseenter` listener is not bound there.
+   *
+   * Puppeteer has no prebuilt long-press API: its `Touchscreen` class only
+   * exposes `tap`, which dispatches `touchstart` and `touchend` back to back
+   * with no way to hold the touch. Events are therefore dispatched directly
+   * through the Chrome DevTools Protocol, holding the touch for longer than
+   * Material's `LONGPRESS_DELAY` (500 ms).
+   *
+   * The element is scrolled into view before the touch is dispatched: the
+   * touch coordinates are resolved relative to the layout viewport, so an
+   * element that is below the fold would not receive the touch even though it
+   * counts as "visible" for Puppeteer's selector checks.
+   * @param {string} selector - The selector of the element to long-press.
+   */
+  async longPressOnElementWithSelector(selector: string): Promise<void> {
+    const element = await this.page.waitForSelector(selector, {visible: true});
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    // Puppeteer 13 no longer exposes ElementHandle#scrollIntoViewIfNeeded, so
+    // scroll through the native DOM API. 'nearest' scrolls the minimum amount
+    // needed to bring the element fully into view.
+    await element.evaluate(el => {
+      el.scrollIntoView({block: 'nearest', inline: 'nearest'});
+    });
+    const boundingBox = await element.boundingBox();
+    if (!boundingBox) {
+      throw new Error(`Element has no bounding box for selector: ${selector}`);
+    }
+    const x = boundingBox.x + boundingBox.width / 2;
+    const y = boundingBox.y + boundingBox.height / 2;
+
+    const client = await this.page.client();
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{x, y}],
+    });
+    // LONGPRESS_DELAY in Material is 500 ms; wait slightly longer so the
+    // tooltip is shown before lifting the finger.
+    await this.page.waitForTimeout(600);
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchEnd',
+      touchPoints: [],
+    });
   }
 
   /**

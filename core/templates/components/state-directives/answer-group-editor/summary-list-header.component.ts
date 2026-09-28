@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './summary-list-header.component.css';
 
 interface DeleteSummaryEventData {
   index: number;
