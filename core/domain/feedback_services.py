@@ -24,8 +24,6 @@ from core import feconf, utils
 from core.domain import (
     email_manager,
     feedback_domain,
-    platform_parameter_list,
-    platform_parameter_services,
     rights_manager,
     subscription_services,
     taskqueue_services,
@@ -410,19 +408,13 @@ def create_messages(
         suggestion_models_to_update
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
     # TODO(#12079): Figure out a better way to avoid sending feedback
     # thread emails for contributor dashboard suggestions.
     message_changed = (
         len(text) > 0 or old_statuses[index] != new_statuses[index]
     )
     if (
-        server_can_send_emails
-        and feconf.CAN_SEND_TRANSACTIONAL_EMAILS
+        feconf.CAN_SEND_TRANSACTIONAL_EMAILS
         and author_id is not None
         and user_services.is_user_registered(author_id)
         and message_changed
@@ -1301,7 +1293,11 @@ def _get_all_recipient_ids(
                 in this thread, excluding owners of the exploration and the
                 given author.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False
+    )
+    if not exploration_rights:
+        return ([], [])
 
     owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
@@ -1431,6 +1427,8 @@ def _add_message_to_email_buffer(
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
     thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+    if thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        return
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
