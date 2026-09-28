@@ -3051,15 +3051,30 @@ export class LoggedOutUser extends BaseUser {
     linkText: string,
     expectedUrl: string
   ): Promise<void> {
-    const link = this.page
-      .locator(selector)
-      .filter({hasText: new RegExp(`^\\s*${linkText}\\s*$`)})
-      .first();
-    await expect(
-      link,
-      `Link with text "${linkText}" not found.`
-    ).toBeAttached();
-    await expect(link).toHaveAttribute('href', expectedUrl);
+    await this.expectElementToBeAttachedInDOM(selector);
+
+    const url = await this.page.$$eval(
+      selector,
+      (elements, searchText) => {
+        for (const element of elements) {
+          if (element.textContent?.trim() === searchText) {
+            return element.getAttribute('href');
+          }
+        }
+        return null;
+      },
+      linkText
+    );
+
+    if (!url) {
+      throw new Error(`Link with text "${linkText}" not found.`);
+    }
+    if (url !== expectedUrl) {
+      throw new Error(
+        `Link "${linkText}" points to ${url}, expected ${expectedUrl}.`
+      );
+    }
+    showMessage(`Link "${linkText}" points to ${expectedUrl}.`);
   }
 
   /**
@@ -3073,7 +3088,9 @@ export class LoggedOutUser extends BaseUser {
     value: string
   ): Promise<void> {
     await this.expectElementToBeVisible(selector);
-    const values = await this.page.locator(selector).allTextContents();
+    const values = await this.page.$$eval(selector, elements =>
+      elements.map(element => element.textContent ?? '')
+    );
 
     if (!values.includes(value)) {
       throw new Error(
@@ -3108,9 +3125,10 @@ export class LoggedOutUser extends BaseUser {
         .trim();
 
     await this.expectElementToBeVisible(aboutUsSubheadingSelector);
-    const subheadings = await this.page
-      .locator(aboutUsSubheadingSelector)
-      .allTextContents();
+    const subheadings = await this.page.$$eval(
+      aboutUsSubheadingSelector,
+      elements => elements.map(element => element.textContent ?? '')
+    );
 
     const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
     const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
@@ -3174,7 +3192,11 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(expandButtonSelector);
     await this.expectElementToBeVisible(panelContentSelector);
 
-    await this.page.locator(closeButtonSelector).first().dispatchEvent('click');
+    // The close button is clicked through the DOM, since it can be covered
+    // by the expanded panel.
+    await this.page.$eval(closeButtonSelector, button =>
+      (button as HTMLElement).click()
+    );
 
     // The panel is closed when it is removed or loses the "show" class.
     await this.page.waitForFunction((selector: string) => {
@@ -3208,25 +3230,24 @@ export class LoggedOutUser extends BaseUser {
       : volunteerCarouselSlideHeadingsInAboutPage[2];
 
     await this.expectElementToBeVisible(carouselSelector);
-    const slideHeading = this.page.locator(slideHeadingSelector).first();
 
-    // The toContainText assertion retries until the slide transition finishes.
-    await expect(
-      slideHeading,
-      `Expected first volunteer slide heading to contain "${firstSlideHeading}"`
-    ).toContainText(firstSlideHeading);
+    // The text content checks wait until the slide transition finishes.
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      firstSlideHeading
+    );
 
     await this.clickOnElementWithSelector(nextButtonSelector);
-    await expect(
-      slideHeading,
-      `Expected second volunteer slide heading to contain "${secondSlideHeading}"`
-    ).toContainText(secondSlideHeading);
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      secondSlideHeading
+    );
 
     await this.clickOnElementWithSelector(prevButtonSelector);
-    await expect(
-      slideHeading,
-      `Expected first volunteer slide heading to contain "${firstSlideHeading}" again`
-    ).toContainText(firstSlideHeading);
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      firstSlideHeading
+    );
   }
 
   /**
@@ -3237,10 +3258,8 @@ export class LoggedOutUser extends BaseUser {
     const selector = this.isViewportAtMobileWidth()
       ? partnershipStoryBoardMobileSelector
       : partnershipStoryBoardDesktopSelector;
-    await expect(
-      this.page.locator(selector),
-      `Expected ${n} story boards in the About page.`
-    ).toHaveCount(n);
+    await this.expectElementToBeAttachedInDOM(selector);
+    await this.expectNumberOfElementsToBe(selector, n);
   }
 
   /**
@@ -3248,10 +3267,8 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} n - The expected number of impact stats.
    */
   async expectImpactStatsTitlesToBe(n: number): Promise<void> {
-    await expect(
-      this.page.locator(impactStatsTitleSelector),
-      `Expected ${n} impact stats in the About page.`
-    ).toHaveCount(n);
+    await this.expectElementToBeAttachedInDOM(impactStatsTitleSelector);
+    await this.expectNumberOfElementsToBe(impactStatsTitleSelector, n);
   }
 
   /**
@@ -3259,10 +3276,8 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} n - The expected number of charts.
    */
   async expectImpactChartsToBe(n: number): Promise<void> {
-    await expect(
-      this.page.locator(impactChartContainerSelector),
-      `Expected ${n} impact charts in the About page.`
-    ).toHaveCount(n);
+    await this.expectElementToBeAttachedInDOM(impactChartContainerSelector);
+    await this.expectNumberOfElementsToBe(impactChartContainerSelector, n);
   }
 
   /**
@@ -3413,33 +3428,36 @@ export class LoggedOutUser extends BaseUser {
    * service.
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
-    const donorBox = this.page.locator(donorBoxIframe);
-    await expect(
-      donorBox,
-      'The donor box is not present on the donate page.'
-    ).toBeAttached();
+    await this.expectElementToBeAttachedInDOM(donorBoxIframe);
 
     if (!this.isViewportAtMobileWidth()) {
-      await expect(
-        donorBox,
-        'The donor box is not visible on the donate page.'
-      ).toBeVisible();
-      // Wait for the DonorBox frame itself to start loading.
-      await expect
-        .poll(
-          () =>
-            this.page
-              .frames()
-              .some(frame => frame.url().includes('donorbox.org')),
-          {
-            message:
-              'The DonorBox iframe did not finish loading within the expected time.',
-            timeout: 20000,
-          }
-        )
-        .toBe(true);
+      await this.expectElementToBeVisible(donorBoxIframe);
+      await this.waitForDonorBoxFrameToLoad();
     }
     showMessage('The donor box is visible on the donate page.');
+  }
+
+  /**
+   * Waits for the DonorBox iframe to start loading its page.
+   */
+  private async waitForDonorBoxFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const donorBoxFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('donorbox.org'));
+      if (donorBoxFrame) {
+        return;
+      }
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The DonorBox iframe did not finish loading within the expected time.'
+    );
   }
 
   /**
