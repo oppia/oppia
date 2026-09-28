@@ -187,9 +187,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_install_redis_cli() -> None:
             pass
 
-        def mock_install_elasticsearch_dev_server() -> None:
-            pass
-
         def mock_install_playwright_node() -> None:
             pass
 
@@ -235,11 +232,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'install_redis_cli',
             mock_install_redis_cli,
         )
-        swap_install_elasticsearch_dev_server = self.swap(
-            install_third_party_libs,
-            'install_elasticsearch_dev_server',
-            mock_install_elasticsearch_dev_server,
-        )
         swap_install_playwright_node = self.swap(
             install_third_party_libs,
             'install_playwright_node',
@@ -264,9 +256,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with swap_install_gcloud_sdk, swap_install_json_deps_main:
                 with pre_commit_hook_main_swap, pre_push_hook_main_swap:
                     with swap_isdir, swap_mkdir, swap_copytree:
-                        with swap_install_elasticsearch_dev_server:
-                            with swap_install_playwright_node:
-                                install_third_party_libs.main()
+                        with swap_install_playwright_node:
+                            install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -314,8 +305,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertEqual(check_file_removals, expected_check_file_removals)
 
 
-class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
-    """Test the methods for installing Redis and Elasticsearch."""
+class InstallRedisTests(test_utils.GenericTestBase):
+    """Test the methods for installing Redis."""
 
     def test_install_redis_cli_function_calls(self) -> None:
         check_function_calls = {
@@ -356,115 +347,6 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
         with swap_call, untar_files_swap:
             install_third_party_libs.install_redis_cli()
 
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_install_elasticsearch_dev_server_unix(self) -> None:
-        check_function_calls = {
-            'subprocess_call_is_called': False,
-            'download_and_untar_files_is_called': False,
-            'download_and_unzip_files_is_called': False,
-        }
-
-        def mock_is_linux_os() -> bool:
-            return False
-
-        def mock_is_mac_os() -> bool:
-            return True
-
-        def mock_download_and_untar_files(
-            unused_source_url: str,
-            unused_target_parent_dir: str,
-            unused_tar_root_name: str,
-            unused_target_root_name: str,
-        ) -> None:
-            check_function_calls['download_and_untar_files_is_called'] = True
-
-        def mock_call(
-            unused_cmd_tokens: List[str], *_args: str, **_kwargs: str
-        ) -> Ret:
-            check_function_calls['subprocess_call_is_called'] = True
-            # The first subprocess.call() needs to throw an
-            # exception so that the script can execute the installation pathway.
-            if unused_cmd_tokens == [
-                '%s/bin/elasticsearch' % common.ES_PATH,
-                '--version',
-            ]:
-                raise OSError('elasticsearch: command not found')
-
-            return Ret()
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        untar_files_swap = self.swap(
-            install_third_party_libs,
-            'download_and_untar_files',
-            mock_download_and_untar_files,
-        )
-
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True,
-            'download_and_untar_files_is_called': True,
-            'download_and_unzip_files_is_called': False,
-        }
-
-        mac_os_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_os_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
-        with swap_call, untar_files_swap, mac_os_swap, linux_os_swap:
-            install_third_party_libs.install_elasticsearch_dev_server()
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_install_elasticsearch_unrecognized_os(self) -> None:
-
-        def mock_is_mac_os() -> bool:
-            return False
-
-        def mock_is_linux_os() -> bool:
-            return False
-
-        def mock_call(
-            unused_cmd_tokens: List[str], *_args: str, **_kwargs: str
-        ) -> Ret:
-            # The first subprocess.call() needs to throw an
-            # exception so that the script can execute the installation pathway.
-            if unused_cmd_tokens == [
-                '%s/bin/elasticsearch' % common.ES_PATH,
-                '--version',
-            ]:
-                raise OSError('elasticsearch: command not found')
-
-            return Ret()
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
-        os_not_supported_exception = self.assertRaisesRegex(
-            Exception, 'Unrecognized or unsupported operating system.'
-        )
-        with mac_swap, linux_swap, swap_call, os_not_supported_exception:
-            install_third_party_libs.install_elasticsearch_dev_server()
-
-    def test_elasticsearch_already_installed(self) -> None:
-        check_function_calls = {
-            'subprocess_call_is_called': False,
-            'download_and_untar_files_is_called': False,
-            'download_and_unzip_files_is_called': False,
-        }
-
-        def mock_call(
-            unused_cmd_tokens: List[str], *_args: str, **_kwargs: str
-        ) -> Ret:
-            check_function_calls['subprocess_call_is_called'] = True
-
-            return Ret()
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True,
-            'download_and_untar_files_is_called': False,
-            'download_and_unzip_files_is_called': False,
-        }
-
-        with swap_call:
-            install_third_party_libs.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
 
