@@ -34,7 +34,6 @@ import {
   SubtopicMasterySummaryBackendDict,
 } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
-import './progress-tab.component.css';
 
 interface ShowMoreInSectionDict {
   [section: string]: boolean;

@@ -19,8 +19,6 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import './thanks-for-subscribing-modal.component.css';
-
 @Component({
   selector: 'thanks-for-subscribing-modal',
   templateUrl: './thanks-for-subscribing-modal.component.html',

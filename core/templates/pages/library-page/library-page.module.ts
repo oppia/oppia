@@ -18,13 +18,10 @@
 
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {InfiniteScrollModule} from 'ngx-infinite-scroll';
 
 import {LibraryFooterComponent} from './library-footer/library-footer.component';
 import {LibraryPageRootComponent} from './library-page-root.component';
 import {LibraryPageComponent} from './library-page.component';
-import {ActivityTilesInfinityGridComponent} from './search-results/activity-tiles-infinity-grid.component';
-import {SearchResultsComponent} from './search-results/search-results.component';
 import {CommonModule} from '@angular/common';
 import {LibraryPageRoutingModule} from './library-page-routing.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -34,22 +31,17 @@ import {ClassroomCardComponent} from './classroom-card/classroom-card.component'
   imports: [
     CommonModule,
     SharedComponentsModule,
-    InfiniteScrollModule,
     LibraryPageRoutingModule,
     NgbModule,
   ],
   declarations: [
     LibraryFooterComponent,
-    SearchResultsComponent,
-    ActivityTilesInfinityGridComponent,
     LibraryPageComponent,
     LibraryPageRootComponent,
     ClassroomCardComponent,
   ],
   entryComponents: [
     LibraryFooterComponent,
-    SearchResultsComponent,
-    ActivityTilesInfinityGridComponent,
     LibraryPageComponent,
     LibraryPageRootComponent,
     ClassroomCardComponent,

@@ -42,9 +42,6 @@ class FeatureNames(enum.Enum):
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
-    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown'
-    )
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -132,14 +129,9 @@ class FeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
-    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -152,9 +144,13 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
+    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -218,13 +214,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV,
         )
     ),
-    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
-        (
-            'This flag is to show feedback updates in the '
-            'profile pic drop-down menu.',
-            feature_flag_domain.ServerMode.DEV,
-        )
-    ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
         (
             'This flag is to show new contributor admin dashboard.',
@@ -274,7 +263,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
@@ -348,9 +337,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value: (
         (
-            'Enables automatic AI-generated translation suggestions in the.'
+            'Enables automatic AI-generated translation suggestions in the '
             'Contributor Dashboard to assist translators.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
@@ -369,7 +358,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
@@ -377,7 +366,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.STORY_EDITOR_ARCS.value: (

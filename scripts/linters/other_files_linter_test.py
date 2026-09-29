@@ -620,6 +620,11 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '    "url": "http://localhost:8181/",'
                     '    "page_module": '
                     '"core/templates/pages/splash-page/splash-page.module.ts"'
+                    '  },'
+                    '  "android": {'
+                    '    "url": "http://localhost:8181/android",'
+                    '    "page_module": '
+                    '"core/templates/pages/android-page/android-page.module.ts"'
                     '  }'
                     '}'
                 )

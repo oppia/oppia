@@ -59,7 +59,6 @@ import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './state-responses.component.css';
 
 @Component({
   selector: 'oppia-state-responses',

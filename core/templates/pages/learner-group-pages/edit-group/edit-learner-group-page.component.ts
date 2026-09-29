@@ -27,8 +27,6 @@ import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 
-import './edit-learner-group-page.component.css';
-
 @Component({
   selector: 'oppia-edit-learner-group-page',
   templateUrl: './edit-learner-group-page.component.html',

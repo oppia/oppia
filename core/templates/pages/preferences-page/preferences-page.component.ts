@@ -43,9 +43,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 
 import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-require('cropperjs/dist/cropper.min.css');
 
-import './preferences-page.component.css';
 import {FormControl, FormGroup} from '@angular/forms';
 
 interface AudioLanguageChoice {

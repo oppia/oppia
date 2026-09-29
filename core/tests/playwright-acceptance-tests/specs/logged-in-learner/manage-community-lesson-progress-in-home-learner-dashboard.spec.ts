@@ -36,6 +36,7 @@ test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
 
+
   test.beforeAll(async function ({browser}) {
     test.setTimeout(6000000); // Setup is taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
@@ -52,6 +53,11 @@ test.describe('Logged-In Learner', function () {
         3
       );
     }
+    await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 2',
+      'Algebra',
+      3
+    );
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInLearner = await UserFactory.createNewUser(
@@ -67,8 +73,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
-    await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
+    await loggedInLearner.playExplorationAsLoggedInUser(explorationId1);
 
     await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();

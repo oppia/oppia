@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import android_validation_constants, feature_flag_list, feconf
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base, incoming_app_feedback_report
 from core.domain import (
@@ -234,7 +234,7 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
                 'question_versions': question_versions,
                 'question_topic_links': question_topic_links,
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=is_submitted,
         )
@@ -4723,57 +4723,6 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_learner_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/', expected_status_int=401)
-        error_msg = 'You must be logged in to access this resource.'
-        self.assertEqual(response['error'], error_msg)
-
-
-class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
-    """Tests the decorator can_access_learner_dashboard."""
-
-    user = 'user'
-    user_email = 'user@example.com'
-    banned_user = 'banneduser'
-    banned_user_email = 'banned@example.com'
-
-    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-        @acl_decorators.can_access_feedback_updates
-        def get(self) -> None:
-            self.render_json({'success': True})
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.user_email, self.user)
-        self.signup(self.banned_user_email, self.banned_user)
-        self.mark_user_banned(self.banned_user)
-        self.mock_testapp = webtest.TestApp(
-            webapp2.WSGIApplication(
-                [webapp2.Route('/mock/', self.MockHandler)],
-                debug=feconf.DEBUG,
-            )
-        )
-
-    def test_banned_user_cannot_access_feedback_updates(self) -> None:
-        self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/', expected_status_int=401)
-        error_msg = 'You do not have the credentials to access this page.'
-        self.assertEqual(response['error'], error_msg)
-        self.logout()
-
-    def test_exploration_editor_can_access_feedback_updates(self) -> None:
-        self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/')
-        self.assertTrue(response['success'])
-        self.logout()
-
-    def test_guest_user_cannot_access_feedback_updates(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
