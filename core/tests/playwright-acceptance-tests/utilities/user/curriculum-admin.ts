@@ -295,7 +295,9 @@ export class CurriculumAdmin extends TopicManager {
       }
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here (and may be hidden).
-      await this.page.locator(mobileSkillNavToggle).nth(1).click();
+      await this.expectElementToBeAttachedInDOM(mobileSkillNavToggle);
+      const skillNavToggles = await this.page.$$(mobileSkillNavToggle);
+      await this.clickOnElement(skillNavToggles[1]);
       await this.clickOnElementWithSelector(mobileSaveOrPublishSkillSelector);
     } else {
       await this.waitForStaticAssetsToLoad();

@@ -17,7 +17,7 @@
  * common to all the users of the contributor dashboard.
  */
 
-import {Page, ElementHandle, expect} from '@playwright/test';
+import {Page, ElementHandle} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditor} from './exploration-editor';
 
@@ -221,40 +221,50 @@ export class Contributor extends ExplorationEditor {
     await this.expectElementToBeAttachedInDOM(viewBasedBadgeSelector);
 
     // The badges list may be re-rendered (e.g. after changing the badge
-    // type), so we keep checking until the expected badge is found.
-    await expect
-      .poll(
-        async () =>
-          this.page.$$eval(
-            viewBasedBadgeSelector,
-            (badgeElements, selectors) =>
-              badgeElements.map(badgeElement => {
-                const getText = (sel: string): string | undefined =>
-                  badgeElement.querySelector(sel)?.textContent?.trim();
-                return {
-                  value: getText(selectors.value),
-                  caption: getText(selectors.caption),
-                  language: getText(selectors.language),
-                };
-              }),
-            {
-              value: badgeValueSelector,
-              caption: badgeCaptionSelector,
-              language: badgeLanguageSelector,
-            }
-          ),
+    // type), so we wait until the expected badge is found.
+    try {
+      await this.page.waitForFunction(
+        ({
+          selector,
+          value,
+          caption,
+          language,
+          selectors,
+        }: {
+          selector: string;
+          value: string;
+          caption: string;
+          language: string | null;
+          selectors: {value: string; caption: string; language: string};
+        }) =>
+          Array.from(document.querySelectorAll(selector)).some(badge => {
+            const getText = (sel: string): string | undefined =>
+              badge.querySelector(sel)?.textContent?.trim();
+            return (
+              getText(selectors.value) === value &&
+              getText(selectors.caption) === caption &&
+              (!language || getText(selectors.language) === language)
+            );
+          }),
         {
-          message: `Badge "${expectedBadgeValue} ${expectedBadgeCaption}" not found.`,
-          timeout: 10000,
-        }
-      )
-      .toContainEqual(
-        expect.objectContaining({
+          selector: viewBasedBadgeSelector,
           value: expectedBadgeValue,
           caption: expectedBadgeCaption,
-          ...(expectedBadgeLanguage ? {language: expectedBadgeLanguage} : {}),
-        })
+          language: expectedBadgeLanguage,
+          selectors: {
+            value: badgeValueSelector,
+            caption: badgeCaptionSelector,
+            language: badgeLanguageSelector,
+          },
+        },
+        {timeout: 10000}
       );
+    } catch (error) {
+      throw new Error(
+        `Badge "${expectedBadgeValue} ${expectedBadgeCaption}" not found.\n` +
+          `Original error: ${error}`
+      );
+    }
     showMessage(
       `Badge "${expectedBadgeValue} ${expectedBadgeCaption}" is present.`
     );
@@ -450,13 +460,11 @@ export class Contributor extends ExplorationEditor {
     if (!opportunityItem) {
       throw new Error(`Opportunity item ${heading} (${subheading}) not found.`);
     }
-    const statusElement = await opportunityItem.waitForSelector(
-      opportunityStatusLabelSelector
+    await this.expectTextContentToBe(
+      opportunityStatusLabelSelector,
+      expectedStatus,
+      opportunityItem
     );
-    const textContent = await statusElement.evaluate(element =>
-      element.textContent?.trim()
-    );
-    expect(textContent).toBe(expectedStatus);
   }
 
   /**
