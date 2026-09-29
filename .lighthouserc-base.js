@@ -41,38 +41,36 @@ const basePerformanceAssertions = {
   'redirects-http': ['error', {minScore: 1}],
 };
 
+// The performance thresholds every page is expected to meet by default. These
+// reflect the Core Web Vitals "good" thresholds (FCP 1.8s, LCP 2.5s, CLS 0.1)
+// together with Lighthouse's good cutoffs for speed index and total blocking
+// time. Pages that cannot yet meet the baseline specify pagePerfThresholds
+// overrides; each override is a known failure case to be removed as the page
+// improves.
+const IDEAL_BASELINE_THRESHOLDS = {
+  fcp: 1800,
+  speedIndex: 3400,
+  lcp: 2500,
+  tbt: 200,
+  cls: 0.1,
+};
+
 /**
- * Builds the catch-all assert matrix entry with performance metric thresholds.
+ * Builds the catch-all assert matrix entry for non-performance audits.
  *
- * @param {Object} perfThresholds - Performance metric maxNumericValue thresholds
- *   in milliseconds (CLS is unitless).
- * @param {number} perfThresholds.fcp - First Contentful Paint.
- * @param {number} perfThresholds.speedIndex - Speed Index.
- * @param {number} perfThresholds.lcp - Largest Contentful Paint.
- * @param {number} perfThresholds.tbt - Total Blocking Time.
- * @param {number} perfThresholds.cls - Cumulative Layout Shift.
+ * Performance metrics are intentionally not included here. LHCI evaluates every
+ * matching assertMatrix entry for a given URL (see buildAssertMatrix), so any
+ * catch-all performance threshold would also bind to every listed page and
+ * defeat per-page overrides. The uniform ideal baseline is instead applied
+ * inside buildPageAssertions, and per-page thresholds replace it for pages that
+ * cannot yet meet it.
+ *
  * @returns {Object} The catch-all assert matrix entry.
  */
-function buildPerformanceCatchAll(perfThresholds) {
+function buildAuditCatchAll() {
   return {
     matchingUrlPattern: '.*',
     assertions: {
-      // Performance metrics — error-level safety net. Per-page thresholds
-      // override these at tighter values; these catch any unlisted page.
-      'first-contentful-paint': [
-        'error',
-        {maxNumericValue: perfThresholds.fcp},
-      ],
-      'speed-index': ['error', {maxNumericValue: perfThresholds.speedIndex}],
-      'largest-contentful-paint': [
-        'error',
-        {maxNumericValue: perfThresholds.lcp},
-      ],
-      'total-blocking-time': ['error', {maxNumericValue: perfThresholds.tbt}],
-      'cumulative-layout-shift': [
-        'error',
-        {maxNumericValue: perfThresholds.cls},
-      ],
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
       'server-response-time': ['off', {}],
@@ -91,13 +89,18 @@ function buildPerformanceCatchAll(perfThresholds) {
 
 /**
  * Builds the assertion object for a single page, merging base performance
- * assertions with page-specific overrides and per-page performance thresholds.
+ * assertions with page-specific overrides and performance thresholds.
+ *
+ * Every page is held to IDEAL_BASELINE_THRESHOLDS by default. A page that
+ * cannot yet meet the ideal baseline specifies pagePerfThresholds, which
+ * replace the ideal values for that page and represent a known failure case
+ * to be fixed.
  *
  * @param {Object} overrides - Page-specific audit overrides.
  * @param {number} accessibilityMinScore - Minimum accessibility score.
  * @param {Object|null} pagePerfThresholds - Per-page performance metric
- *   thresholds (fcp, speedIndex, lcp, tbt, cls). When provided, these override
- *   the global catch-all thresholds for this page at error level.
+ *   thresholds (fcp, speedIndex, lcp, tbt, cls). When provided, these replace
+ *   IDEAL_BASELINE_THRESHOLDS for this page at error level.
  * @returns {Object} The merged assertion object.
  */
 function buildPageAssertions(
@@ -105,30 +108,17 @@ function buildPageAssertions(
   accessibilityMinScore = 1,
   pagePerfThresholds = null
 ) {
-  const perfAssertions = pagePerfThresholds
-    ? {
-        'first-contentful-paint': [
-          'error',
-          {maxNumericValue: pagePerfThresholds.fcp},
-        ],
-        'speed-index': [
-          'error',
-          {maxNumericValue: pagePerfThresholds.speedIndex},
-        ],
-        'largest-contentful-paint': [
-          'error',
-          {maxNumericValue: pagePerfThresholds.lcp},
-        ],
-        'total-blocking-time': [
-          'error',
-          {maxNumericValue: pagePerfThresholds.tbt},
-        ],
-        'cumulative-layout-shift': [
-          'error',
-          {maxNumericValue: pagePerfThresholds.cls},
-        ],
-      }
-    : {};
+  const perfThresholds = pagePerfThresholds || IDEAL_BASELINE_THRESHOLDS;
+  const perfAssertions = {
+    'first-contentful-paint': ['error', {maxNumericValue: perfThresholds.fcp}],
+    'speed-index': ['error', {maxNumericValue: perfThresholds.speedIndex}],
+    'largest-contentful-paint': [
+      'error',
+      {maxNumericValue: perfThresholds.lcp},
+    ],
+    'total-blocking-time': ['error', {maxNumericValue: perfThresholds.tbt}],
+    'cumulative-layout-shift': ['error', {maxNumericValue: perfThresholds.cls}],
+  };
   return {
     ...basePerformanceAssertions,
     ...perfAssertions,
@@ -139,23 +129,27 @@ function buildPageAssertions(
 }
 
 /**
- * Builds the full assert matrix by prepending the performance catch-all
- * entry and then appending one entry per page.
+ * Builds the full assert matrix by prepending the audit catch-all entry and
+ * then appending one entry per page.
  *
  * @param {Array} pageConfigs - Array of objects, each with:
  *   - matchingUrlPattern {string}: Regex pattern for the URL.
  *   - overrides {Object}: (optional) Page-specific audit overrides.
  *   - accessibilityMinScore {number}: (optional) Min accessibility score.
  *   - pagePerfThresholds {Object}: (optional) Per-page performance thresholds
- *     with keys fcp, speedIndex, lcp, tbt, cls. Overrides the global catch-all
- *     at error level for this specific page.
- * @param {Object} perfThresholds - Performance metric thresholds for the
- *   catch-all entry (fcp, speedIndex, lcp, tbt, cls).
+ *     with keys fcp, speedIndex, lcp, tbt, cls. Replaces
+ *     IDEAL_BASELINE_THRESHOLDS at error level for this specific page.
  * @returns {Array} The full LHCI assert matrix.
  */
-function buildAssertMatrix(pageConfigs, perfThresholds) {
+function buildAssertMatrix(pageConfigs) {
+  // LHCI evaluates every matching assertMatrix entry for a given URL; there is
+  // no first-match-wins behavior (see getAllAssertionResults in
+  // node_modules/@lhci/utils/src/assertions.js, which iterates all entries per
+  // URL group). The audit catch-all '.*' entry is therefore a safety net for
+  // any unlisted page, while each page entry applies the ideal performance
+  // baseline, or a tighter/looser per-page override. Ordering is cosmetic.
   return [
-    buildPerformanceCatchAll(perfThresholds),
+    buildAuditCatchAll(),
     ...pageConfigs.map(
       ({
         matchingUrlPattern,
