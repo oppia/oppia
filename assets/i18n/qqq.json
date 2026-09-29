@@ -140,7 +140,6 @@
   "I18N_ABOUT_PAGE_WHITE_HEART_ICON_ALT": "Alternative text for the heart icon shown in the donate button of the Get Involved section of the About page.",
   "I18N_ACTION_ACCESS_ANDROID_APP": "Text displayed inside a button in the splash page. Clicking on it directs the user to the Google play store URL for the Oppia Android app.",
   "I18N_ACTION_BROWSE_EXPLORATIONS": "Text displayed in a button on the Home and Teach pages. - When the user clicks the button they are taken to the library page.",
-  "I18N_ACTION_BROWSE_LESSONS": "Text displayed in a button on the Home page. - When the user clicks the button they are taken to the library page. The text in the button needs to be less than 29 characters long.",
   "I18N_ACTION_CREATE_EXPLORATION": "Text displayed in a button on the Home and Teach pages. - When the user clicks the button they are taken to their dashboard, and a dialog is opened where the user can create a new exploration.",
   "I18N_ACTION_EXPLORE_LESSONS": "Third button in last section of Oppia's About page targeting lessons in library.",
   "I18N_ACTION_GET_ANDRIOD_APP": "Text displayed on the Android button of the About page which on click redirects users to the Android page.",

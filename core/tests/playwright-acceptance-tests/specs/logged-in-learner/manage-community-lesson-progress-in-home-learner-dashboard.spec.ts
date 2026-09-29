@@ -36,7 +36,6 @@ test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
 
-
   test.beforeAll(async function ({browser}) {
     test.setTimeout(6000000); // Setup is taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
