@@ -51,7 +51,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
-import {LibraryPageConstants} from './library-page.constants';
 import {
   ActivityDict,
   LibraryIndexData,
@@ -64,7 +63,7 @@ class MockWindowRef {
   nativeWindow = {
     innerWidth: 0,
     location: {
-      pathname: '/community-library/top-rated',
+      pathname: '/community-library',
       href: '',
     },
     gtag: jasmine.createSpy('gtag'),
@@ -294,41 +293,6 @@ describe('Library Page Component', () => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');
     spyOn(translateService.onLangChange, 'subscribe');
-    spyOn(
-      libraryPageBackendApiService,
-      'fetchLibraryGroupDataAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        activity_list: [],
-        header_i18n_id: '',
-        preferred_language_codes: [],
-      })
-    );
-    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(900);
-    componentInstance.ngOnInit();
-    spyOn(componentInstance, 'initCarousels');
-    tick();
-    tick();
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
-      'I18N_LIBRARY_LOADING'
-    );
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    expect(
-      libraryPageBackendApiService.fetchLibraryGroupDataAsync
-    ).toHaveBeenCalled();
-    expect(
-      i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit
-    ).toHaveBeenCalled();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    expect(windowDimensionsService.getWidth).toHaveBeenCalled();
-  }));
-
-  it('should initialize for non group pages', fakeAsync(() => {
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(translateService.onLangChange, 'subscribe');
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(
@@ -439,20 +403,6 @@ describe('Library Page Component', () => {
     );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'I18N_LIBRARY_PAGE_TITLE'
-    );
-  });
-
-  it('should set browse mode page title when in group mode', () => {
-    spyOn(translateService, 'instant').and.callThrough();
-    spyOn(pageTitleService, 'setDocumentTitle');
-    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP;
-    componentInstance.setPageTitle();
-
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE'
-    );
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE'
     );
   });
 

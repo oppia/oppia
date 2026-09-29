@@ -30,8 +30,6 @@ const creatorDashboardCreateModeUrl =
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const recentlyPublishedExplorationsPageUrl =
-  testConstants.URLs.recentlyPublishedExplorations;
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
@@ -4063,49 +4061,6 @@ export class LoggedOutUser extends BaseUser {
         );
       }
     }
-  }
-
-  /**
-   * Navigates to the top rated explorations page from the community library.
-   */
-  async navigateToTopRatedLessonsPage(): Promise<void> {
-    await this.navigateToCommunityLibraryPage();
-    await this.clickAndWaitForNavigation('Top-Rated Explorations');
-  }
-
-  /**
-   * Checks if the top rated explorations are in a specific order.
-   * @param {string[]} expectedOrder - The expected order of the top rated explorations.
-   */
-  async expectLessonsInOrder(expectedOrder: string[]): Promise<void> {
-    try {
-      await this.page.waitForSelector(explorationTitleSelector);
-      const explorationTitles = await this.page.$$(explorationTitleSelector);
-      for (let i = 0; i < explorationTitles.length; i++) {
-        const titleText = await this.page.evaluate(
-          el => el.querySelector('span > span').textContent,
-          explorationTitles[i]
-        );
-        if (titleText.trim() !== expectedOrder[i]) {
-          throw new Error(
-            `Exploration at position ${i} is "${titleText.trim()}", but expected "${expectedOrder[i]}".`
-          );
-        }
-      }
-    } catch (error) {
-      const newError = new Error(
-        `Failed to check order explorations: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Navigates to the page recently published explorations page.
-   */
-  async navigateToRecentlyPublishedLessonsPage(): Promise<void> {
-    await this.goto(recentlyPublishedExplorationsPageUrl);
   }
 
   /**

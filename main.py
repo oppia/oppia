@@ -788,9 +788,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_GROUP_DATA_URL, library.LibraryGroupIndexHandler
-    ),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),

@@ -25,12 +25,6 @@ import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-explo
 import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-interface LibraryGroupDataBackendDict {
-  activity_list: ActivityDict[];
-  header_i18n_id: string;
-  preferred_language_codes: string[];
-}
-
 export interface ActivityDict {
   activity_type: string;
   category: string;
@@ -70,19 +64,12 @@ export interface CreatorDashboardData {
   collections_list: CollectionSummaryBackendDict[];
 }
 
-export interface LibraryGroupData {
-  activity_list: ActivityDict[];
-  header_i18n_id: string;
-  preferred_language_codes: string[];
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class LibraryPageBackendApiService {
   LIBRARY_INDEX_HANDLER: string = '/libraryindexhandler';
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
-  LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
   constructor(
     private http: HttpClient,
@@ -109,19 +96,6 @@ export class LibraryPageBackendApiService {
   async fetchCreatorDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this.http
       .get<CreatorDashboardDataBackendDict>(this.CREATOR_DASHBOARD_HANDLER)
-      .toPromise();
-  }
-
-  async fetchLibraryGroupDataAsync(
-    groupName: string
-  ): Promise<LibraryGroupData> {
-    return this.http
-      .get<LibraryGroupDataBackendDict>(this.LIBRARY_GROUP_HANDLER, {
-        params: {
-          group_name: groupName,
-          ...this.getDisplayLanguageParams(),
-        },
-      })
       .toPromise();
   }
 }
