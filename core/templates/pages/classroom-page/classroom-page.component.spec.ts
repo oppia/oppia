@@ -487,7 +487,13 @@ describe('Classroom Page Component', () => {
   }));
 
   it('should hide private classroom banner when user info fetch fails', fakeAsync(() => {
-    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
+    // The rejected promise is created lazily inside callFake so that the
+    // rejection is only produced when getUserInfoAsync() is actually invoked
+    // by ngOnInit (after it awaits validateAccessToClassroomPage and
+    // fetchClassroomDataAsync). Building it eagerly with returnValue leaves the
+    // rejected promise unhandled across those await boundaries, which zone.js
+    // intermittently reports as an "Uncaught (in promise)" error and fails CI.
+    (userService.getUserInfoAsync as jasmine.Spy).and.callFake(() =>
       Promise.reject(new Error('User info error'))
     );
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
