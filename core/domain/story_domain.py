@@ -311,18 +311,10 @@ class StoryChange(change_domain.BaseChange):
         },
     ]
 
-    # TODO(#27483): Remove this once a migration job has rewritten the
-    # arc-named commands stored in existing StoryCommitLogEntryModel records.
-    # Until then these names must still be recognised as deprecated rather
-    # than unknown, so that reading historical commit logs does not fail.
-    DEPRECATED_COMMANDS: List[str] = [
-        'create_arc',
-        'delete_arc',
-        'rename_arc',
-        'rearrange_arcs',
-        'move_node_to_arc',
-        'update_arc_property',
-    ]
+    # The arc-to-module migration job has rewritten the arc-named commands
+    # stored in existing StoryCommitLogEntryModel records, so the legacy
+    # commands no longer need to be recognised as deprecated.
+    DEPRECATED_COMMANDS: List[str] = []
 
 
 class CreateNewStoryCmd(StoryChange):

@@ -23,7 +23,7 @@
  *   description.
  * - Clicking the classroom link in the breadcrumb navigates to the
  *   classroom page.
- * - Twelve published lessons split across four Adventures (three lessons each).
+ * - Twelve published lessons split across four Modules (three lessons each).
  * - Sticky Progress Navigation Dock appears on scroll (mobile + desktop) with
  *   the active milestone highlighted, scroll arrows when it overflows, and
  *   horizontal scrolling to reveal all twelve lesson nodes.
@@ -37,7 +37,7 @@
  *   helper tooltip and unlocked state navigation.
  * - Complete a lesson and verify chapter progression (collapsed row,
  *   completed indicator, Play Again action).
- * - Adventure navigation dock with clickable lesson nodes.
+ * - Module navigation dock with clickable lesson nodes.
  * - Starting a lesson in a later module triggers the skip modal.
  * - Confirming skip marks earlier modules as skipped with SKIPPED badge.
  * - Skipped module cards show "Start" / "Resume" CTA to revisit.
@@ -93,9 +93,7 @@ describe('Logged-in Learner', function () {
     await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
     await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
-    // TODO(#27483): Rename this to 'story_editor_modules' once the feature
-    // flag migration job has renamed the persisted flag value.
-    await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
+    await releaseCoordinator.enableFeatureFlag('story_editor_modules');
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
@@ -166,9 +164,9 @@ describe('Logged-in Learner', function () {
       comingSoonChapterName,
       explorationIds[publishedLessonNames.length]
     );
-    await curriculumAdmin.splitIntoAdventure('Subtracting Fractions');
-    await curriculumAdmin.splitIntoAdventure('Equivalent Fractions');
-    await curriculumAdmin.splitIntoAdventure('Fractions on a Number Line');
+    await curriculumAdmin.splitIntoModule('Subtracting Fractions');
+    await curriculumAdmin.splitIntoModule('Equivalent Fractions');
+    await curriculumAdmin.splitIntoModule('Fractions on a Number Line');
 
     await curriculumAdmin.addChapter(
       draftChapterName,
@@ -249,21 +247,21 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectToBeOnClassroomPage('math');
       await loggedInLearner.openTopicPage('math', 'fractions');
 
-      // The Adventure Navigation Dock renders when Adventures exist: it shows
+      // The Module Navigation Dock renders when Modules exist: it shows
       // a horizontal chapter-node track with left/right scroll arrows and the
       // active node highlighted (verified in the assertions below).
-      await loggedInLearner.expectAdventureNavigationDockToBeVisible();
-      // The CUJ does not prescribe adventure or lesson counts, so these checks
-      // validate the fixture structure (four Adventures of three lessons each)
+      await loggedInLearner.expectModuleNavigationDockToBeVisible();
+      // The CUJ does not prescribe module or lesson counts, so these checks
+      // validate the fixture structure (four Modules of three lessons each)
       // that the later sections rely on.
-      await loggedInLearner.expectAdventureCountToBe(4);
-      await loggedInLearner.expectAdventureTitlesToBeVisible();
+      await loggedInLearner.expectModuleCountToBe(4);
+      await loggedInLearner.expectModuleTitlesToBeVisible();
       await loggedInLearner.expectScreenshotToMatch(
         'topicPageNavigationDockBadges',
         __dirname
       );
 
-      await loggedInLearner.expectEachAdventureToHaveLessonCount(3);
+      await loggedInLearner.expectEachModuleToHaveLessonCount(3);
 
       await loggedInLearner.expectDockToStickToTopWithActiveMilestoneHighlighted();
       await loggedInLearner.expectScreenshotToMatch(
@@ -388,7 +386,7 @@ describe('Logged-in Learner', function () {
       );
 
       await loggedInLearner.openTopicPage('math', 'fractions');
-      // The CUJ Timeline & Chapter Layout requires bold thematic Adventure
+      // The CUJ Timeline & Chapter Layout requires bold thematic Module
       // headers along the vertical timeline; the screenshot below captures the
       // module headers on the timeline.
       await loggedInLearner.expectModuleTitlesToBeVisibleOnTimeline();
@@ -522,22 +520,22 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
-      await loggedInLearner.expectAdventureNavigationDockToBeVisible();
+      await loggedInLearner.expectModuleNavigationDockToBeVisible();
 
-      await loggedInLearner.expectAdventureTitlesToBeVisible();
-      await loggedInLearner.expectAdventureCountToBeGreaterThanZero();
-      // The screenshot below captures the dock with the adventure titles
+      await loggedInLearner.expectModuleTitlesToBeVisible();
+      await loggedInLearner.expectModuleCountToBeGreaterThanZero();
+      // The screenshot below captures the dock with the module titles
       // and lesson nodes rendered after completing the first lesson.
       await loggedInLearner.expectScreenshotToMatch(
-        'moduleTimelineAdventureTitles',
+        'moduleTimelineModuleTitles',
         __dirname
       );
 
       // The jump-ahead module checks point at lesson 4, the first lesson
-      // of the second adventure. The modules group the 12 published
+      // of the second module. The modules group the 12 published
       // lessons into 1-3, 4-6, 7-9 and 10-12, so lesson 4 is the first
       // lesson outside the first
-      // (still incomplete) adventure and can trigger the skip flows.
+      // (still incomplete) module and can trigger the skip flows.
       await loggedInLearner.clickDockBadge(3);
       await loggedInLearner.expectSkipConfirmationModalToShow();
       await loggedInLearner.cancelSkipConfirmationModal();
@@ -546,19 +544,19 @@ describe('Logged-in Learner', function () {
   );
 
   it(
-    'should be able to skip directly to an advanced Adventure and unlock harder lessons',
+    'should be able to skip directly to an advanced Module and unlock harder lessons',
     async function () {
-      await loggedInLearner.skipToLaterModuleAndExpectSkippedAdventureCards(3);
+      await loggedInLearner.skipToLaterModuleAndExpectSkippedModuleCards(3);
 
       await loggedInLearner.navigateToLaterModuleMilestoneAndExpectNoPageReload(
         3
       );
 
-      await loggedInLearner.expandSkippedAdventureByClickingStartCta();
+      await loggedInLearner.expandSkippedModuleByClickingStartCta();
       // The CUJ Skipped Module Visualization requires skipped module cards
       // to display a Start or Resume CTA so the learner can revisit them.
       await loggedInLearner.expectScreenshotToMatch(
-        'moduleSkippedAdventureExpanded',
+        'moduleSkippedModuleExpanded',
         __dirname
       );
 
@@ -626,7 +624,7 @@ describe('Logged-in Learner', function () {
       await loggedInLearner.expectMasteryChallengeToBeUnlocked();
       await loggedInLearner.clickMasteryChallengeAndNavigateToPracticeSession();
       // Return to the topic page to verify that it now renders the
-      // adventure's practice test card (with its Practice Test CTA) after the
+      // module's practice test card (with its Practice Test CTA) after the
       // challenge was unlocked and visited.
       await loggedInLearner.openTopicPage('math', 'fractions');
 

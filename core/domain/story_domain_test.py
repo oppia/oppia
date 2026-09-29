@@ -47,15 +47,14 @@ class StoryChangeTests(test_utils.GenericTestBase):
             story_domain.StoryChange({'cmd': 'invalid'})
 
     def test_story_change_object_with_deprecated_arc_cmd(self) -> None:
-        # The 6 arc-named commands were replaced by their module equivalents.
-        # They must still be recognised as deprecated rather than unknown, so
-        # that reading historical commit logs does not raise a hard failure.
-        for deprecated_cmd in story_domain.StoryChange.DEPRECATED_COMMANDS:
-            with self.assertRaisesRegex(
-                utils.DeprecatedCommandError,
-                'Command %s is deprecated' % deprecated_cmd,
-            ):
-                story_domain.StoryChange({'cmd': deprecated_cmd})
+        # The arc-to-module migration job rewrites the legacy arc-named
+        # commands stored in commit logs, so they no longer need to be
+        # recognised as deprecated: an arc-named command is now simply an
+        # unknown command.
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command create_arc is not allowed'
+        ):
+            story_domain.StoryChange({'cmd': 'create_arc'})
 
     def test_story_change_object_with_missing_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
@@ -2728,10 +2727,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_node_covered_by_multiple_modules(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_1'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_1'])
         )
         self._assert_validation_error(
             'Node node_1 is covered by multiple modules.'
@@ -2739,17 +2738,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_duplicate_module_ids(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1 dup', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1 dup', '', ['node_1'])
         )
         self._assert_validation_error('Expected all module ids to be distinct.')
 
     def test_module_refers_to_non_existent_node(self) -> None:
         self.story.story_contents.add_module(
             story_domain.Module(
-                'module_1', 'Adventure 1', '', ['nonexistent_node']
+                'module_1', 'Module 1', '', ['nonexistent_node']
             )
         )
         self._assert_validation_error(
@@ -2758,7 +2757,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_nodes_not_covered_by_any_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
         self._assert_validation_error(
             'Nodes \\[\'node_1\'\\] are not covered by any module.'
@@ -2766,10 +2765,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_module_index(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         self.assertEqual(
             self.story.story_contents.get_module_index('module_1'), 0
@@ -2786,7 +2785,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.story_contents.get_module_index('nonexistent_module')
 
     def test_get_module(self) -> None:
-        module = story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+        module = story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         self.story.story_contents.add_module(module)
         self.assertEqual(
             self.story.story_contents.get_module('module_1'), module
@@ -2794,7 +2793,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_module(self) -> None:
         module = story_domain.Module(
-            'module_1', 'Adventure 1', '', ['node_1', 'node_2']
+            'module_1', 'Module 1', '', ['node_1', 'node_2']
         )
         self.story.story_contents.add_module(module)
         self.assertIn(module, self.story.story_contents.modules)
@@ -2802,10 +2801,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_delete_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         self.story.story_contents.delete_module('module_1')
         self.assertEqual(len(self.story.story_contents.modules), 1)
@@ -2813,10 +2812,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_modules(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         self.story.story_contents.rearrange_modules(['module_2', 'module_1'])
         self.assertEqual(
@@ -2826,7 +2825,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_modules_with_invalid_module_list(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         with self.assertRaisesRegex(
             ValueError,
@@ -2838,10 +2837,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_modules_with_unknown_module_id(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         with self.assertRaisesRegex(
             ValueError,
@@ -2853,10 +2852,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_move_node_to_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         self.story.story_contents.move_node_to_module('node_1', 'module_2')
         self.assertNotIn(
@@ -2868,17 +2867,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_delete_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.delete_module('module_1')
         self.assertEqual(len(self.story.story_contents.modules), 0)
 
     def test_story_rearrange_modules(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.add_module(
-            story_domain.Module('module_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         self.story.rearrange_modules(['module_2', 'module_1'])
         self.assertEqual(
@@ -3112,7 +3111,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_move_node_to_module_when_node_not_in_any_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
         self.story.story_contents.move_node_to_module('node_1', 'module_1')
         self.assertIn(
@@ -3133,14 +3132,14 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_delete_node_removes_from_module(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(len(self.story.story_contents.nodes), 1)
 
     def test_create_module(self) -> None:
         module = story_domain.Module(
-            'module_1', 'Adventure 1', '', ['node_1', 'node_2']
+            'module_1', 'Module 1', '', ['node_1', 'node_2']
         )
         self.story.add_module(module)
         self.assertIn(module, self.story.story_contents.modules)
@@ -3148,7 +3147,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_module_property(self) -> None:
         self.story.story_contents.add_module(
-            story_domain.Module('module_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         self.story.story_contents.get_module('module_1').title = 'Updated Title'
         self.story.story_contents.get_module('module_1').description = (

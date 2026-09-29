@@ -265,8 +265,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story.story_contents.add_module(
             story_domain.Module(
                 'module_1',
-                'Adventure 1',
-                'First adventure',
+                'Module 1',
+                'First module',
                 ['node_1', 'node_2', 'node_3'],
             )
         )
@@ -379,8 +379,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 [
                     {
                         'id': 'module_1',
-                        'title': 'Adventure 1',
-                        'description': 'First adventure',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1', 'node_2', 'node_3'],
                     }
                 ],
@@ -481,8 +481,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story.story_contents.add_module(
             story_domain.Module(
                 'module_1',
-                'Adventure 1',
-                'First adventure',
+                'Module 1',
+                'First module',
                 ['node_1', 'node_2'],
             )
         )

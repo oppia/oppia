@@ -110,12 +110,10 @@ class FeatureNames(enum.Enum):
     TECHNICAL_FEEDBACK_DASHBOARD_ENABLED = (
         'technical_feedback_dashboard_enabled'
     )
-    # TODO(#27483): The persisted value stays 'story_editor_arcs' until the
-    # feature flag migration job runs, because the value is the model ID
-    # of the FeatureFlagConfigModel that stores this flag's per-classroom
-    # state. Renaming the value earlier would orphan that config and
-    # silently disable the flag.
-    STORY_EDITOR_MODULES = 'story_editor_arcs'
+    # This value is the model ID of the FeatureFlagConfigModel that stores
+    # this flag's state. The migration job renames the persisted row from
+    # 'story_editor_arcs' to this value.
+    STORY_EDITOR_MODULES = 'story_editor_modules'
 
 
 # Names of feature objects defined in FeatureNames should be added

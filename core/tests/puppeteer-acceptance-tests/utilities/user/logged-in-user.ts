@@ -381,10 +381,10 @@ const desktopClassroomBreadcrumbLinkSelector =
   '.topic-header-breadcrumbs-desktop a[href="/learn/math"]';
 const mobileClassroomBreadcrumbLinkSelector =
   '.e2e-test-mobile-breadcrumbs-classroom';
-const adventureNavigationSelector = '.module-navigation-container';
-const adventureNavigationWrapperSelector = '.module-navigation-wrapper';
-const adventureNavigationArrowLeftSelector = '.module-navigation-arrow--left';
-const adventureNavigationArrowRightSelector = '.module-navigation-arrow--right';
+const moduleNavigationSelector = '.module-navigation-container';
+const moduleNavigationWrapperSelector = '.module-navigation-wrapper';
+const moduleNavigationArrowLeftSelector = '.module-navigation-arrow--left';
+const moduleNavigationArrowRightSelector = '.module-navigation-arrow--right';
 const dockStickyWrapperSelector = '.module-navigation-sticky-wrapper';
 const topicStoryCardSelector = '.e2e-test-story-card';
 const topicStoryTitleSelector = '.e2e-test-story-title';
@@ -427,22 +427,22 @@ const masteryChallengeHelperDescriptionSelector =
 const masteryChallengeLockedModalCancelButtonSelector =
   '.mastery-challenge-locked-modal-cancel-button';
 const topicStudySkillsCtaSelector = '.e2e-test-study-skills-cta';
-const adventureGroupSelector = '.module-group';
+const moduleGroupSelector = '.module-group';
 const moduleTitleSelector = '.module-title';
-const adventureHeaderSelector = '.module-header';
-const adventureEndTestCardSelector = '.module-end-test-card';
-const adventureEndTestTitleSelector = '.module-end-test-card-title';
-const adventureEndTestPracticeButtonSelector =
+const moduleHeaderSelector = '.module-header';
+const moduleEndTestCardSelector = '.module-end-test-card';
+const moduleEndTestTitleSelector = '.module-end-test-card-title';
+const moduleEndTestPracticeButtonSelector =
   '.module-end-test-card-practice-button';
 const topicPracticeSessionContainerSelector =
   '.e2e-test-practice-session-container';
 const moduleSkipModalSelector = '.module-skip-confirmation-modal';
 const moduleSkipProceedButtonSelector = '.module-skip-confirmation-proceed';
 const moduleSkipCancelButtonSelector = '.module-skip-confirmation-cancel';
-const skippedAdventureCardSelector = '.skipped-module-card';
-const skippedAdventureBadgeSelector = '.skipped-module-badge';
-const skippedAdventureMessageSelector = '.skipped-module-message';
-const skippedAdventureStartCtaSelector = '.skipped-module-start-cta';
+const skippedModuleCardSelector = '.skipped-module-card';
+const skippedModuleBadgeSelector = '.skipped-module-badge';
+const skippedModuleMessageSelector = '.skipped-module-message';
+const skippedModuleStartCtaSelector = '.skipped-module-start-cta';
 const topicLessonLanguageSelector = '.e2e-test-topic-lesson-language-selector';
 const topicTextLanguageSelector =
   '.e2e-test-topic-lesson-text-language-selector';
@@ -4943,55 +4943,53 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies that the adventure navigation dock is visible.
+   * Verifies that the module navigation dock is visible.
    */
-  async expectAdventureNavigationDockToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(adventureNavigationSelector);
+  async expectModuleNavigationDockToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(moduleNavigationSelector);
   }
 
   /**
-   * Verifies that the given number of adventure groups is present on the
+   * Verifies that the given number of module groups is present on the
    * timeline.
-   * @param {number} count - The expected number of adventures.
+   * @param {number} count - The expected number of modules.
    */
-  async expectAdventureCountToBe(count: number): Promise<void> {
-    const adventureGroups = await this.page.$$(adventureGroupSelector);
-    expect(adventureGroups.length).toBe(count);
+  async expectModuleCountToBe(count: number): Promise<void> {
+    const moduleGroups = await this.page.$$(moduleGroupSelector);
+    expect(moduleGroups.length).toBe(count);
   }
 
   /**
-   * Verifies that at least one adventure group is present on the timeline.
+   * Verifies that at least one module group is present on the timeline.
    */
-  async expectAdventureCountToBeGreaterThanZero(): Promise<void> {
-    const adventureGroups = await this.page.$$(adventureGroupSelector);
-    expect(adventureGroups.length).toBeGreaterThan(0);
+  async expectModuleCountToBeGreaterThanZero(): Promise<void> {
+    const moduleGroups = await this.page.$$(moduleGroupSelector);
+    expect(moduleGroups.length).toBeGreaterThan(0);
   }
 
   /**
-   * Verifies that adventure titles are visible on the timeline.
+   * Verifies that module titles are visible on the timeline.
    */
-  async expectAdventureTitlesToBeVisible(): Promise<void> {
+  async expectModuleTitlesToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(moduleTitleSelector);
   }
 
   /**
-   * Verifies that every adventure group on the timeline contains the given
-   * number of lesson cards. Collapsed adventure groups are expanded first so
+   * Verifies that every module group on the timeline contains the given
+   * number of lesson cards. Collapsed module groups are expanded first so
    * that their lessons can be counted.
-   * @param {number} lessonCount - The expected number of lessons per adventure.
+   * @param {number} lessonCount - The expected number of lessons per module.
    */
-  async expectEachAdventureToHaveLessonCount(
-    lessonCount: number
-  ): Promise<void> {
-    const adventureGroups = await this.page.$$(adventureGroupSelector);
-    for (const group of adventureGroups) {
+  async expectEachModuleToHaveLessonCount(lessonCount: number): Promise<void> {
+    const moduleGroups = await this.page.$$(moduleGroupSelector);
+    for (const group of moduleGroups) {
       let lessonCards = await group.$$(topicLessonCardSelector);
       if (lessonCards.length === 0) {
-        const adventureHeader = await group.$(adventureHeaderSelector);
-        if (!adventureHeader) {
-          throw new Error('Adventure header not found.');
+        const moduleHeader = await group.$(moduleHeaderSelector);
+        if (!moduleHeader) {
+          throw new Error('Module header not found.');
         }
-        await this.clickOnElement(adventureHeader);
+        await this.clickOnElement(moduleHeader);
         await this.page.waitForTimeout(500);
         lessonCards = await group.$$(topicLessonCardSelector);
       }
@@ -5002,7 +5000,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies that the navigation dock sticks to the top of the viewport when
    * the page is scrolled and that the active milestone badge is highlighted
-   * with the adventure's accent color.
+   * with the module's accent color.
    */
   async expectDockToStickToTopWithActiveMilestoneHighlighted(): Promise<void> {
     await this.page.evaluate(() => {
@@ -5011,9 +5009,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForTimeout(500);
 
     const dockState = await this.page.evaluate(
-      (adventureNavigationSel: string, badgeSel: string) => {
+      (moduleNavigationSel: string, badgeSel: string) => {
         const headerElement = document.querySelector('.topic-header');
-        const dockElement = document.querySelector(adventureNavigationSel);
+        const dockElement = document.querySelector(moduleNavigationSel);
         const dockBadges = document.querySelectorAll(badgeSel);
         return {
           headerBottom: headerElement?.getBoundingClientRect().bottom ?? 0,
@@ -5045,7 +5043,7 @@ export class LoggedInUser extends BaseUser {
     expect(Math.abs(dockState.dockTop - 56)).toBeLessThanOrEqual(2);
 
     // The first badge represents the active (next) lesson, so it uses the
-    // adventure's accent color with white text, while the following badge
+    // module's accent color with white text, while the following badge
     // (a not-yet-started lesson) keeps a white background.
     expect(dockState.activeBadgeBackground).not.toBe('rgb(255, 255, 255)');
     expect(dockState.activeBadgeColor).toBe('rgb(255, 255, 255)');
@@ -5065,16 +5063,14 @@ export class LoggedInUser extends BaseUser {
    */
   async expectDockScrollArrowsToBeShownOnlyWhenOverflowing(): Promise<void> {
     const hasRightArrow = await this.isElementVisible(
-      adventureNavigationArrowRightSelector
+      moduleNavigationArrowRightSelector
     );
 
     if (hasRightArrow) {
       // Overflowing dock (narrow/mobile viewport): the right arrow is
       // visible. Click it and verify the dock scrolls horizontally, revealing
       // the left arrow.
-      await this.clickOnElementWithSelector(
-        adventureNavigationArrowRightSelector
-      );
+      await this.clickOnElementWithSelector(moduleNavigationArrowRightSelector);
       await this.page.waitForTimeout(700);
 
       const scrolledState = await this.page.evaluate(
@@ -5086,16 +5082,14 @@ export class LoggedInUser extends BaseUser {
             leftArrowVisible: leftArrow ? true : false,
           };
         },
-        adventureNavigationWrapperSelector,
-        adventureNavigationArrowLeftSelector
+        moduleNavigationWrapperSelector,
+        moduleNavigationArrowLeftSelector
       );
       expect(scrolledState.scrollLeft).toBeGreaterThan(5);
       expect(scrolledState.leftArrowVisible).toBe(true);
 
       // Scroll back to the start, which hides the left arrow again.
-      await this.clickOnElementWithSelector(
-        adventureNavigationArrowLeftSelector
-      );
+      await this.clickOnElementWithSelector(moduleNavigationArrowLeftSelector);
       await this.page.waitForTimeout(700);
 
       const resetState = await this.page.evaluate(
@@ -5107,8 +5101,8 @@ export class LoggedInUser extends BaseUser {
             leftArrowVisible: leftArrow ? true : false,
           };
         },
-        adventureNavigationWrapperSelector,
-        adventureNavigationArrowLeftSelector
+        moduleNavigationWrapperSelector,
+        moduleNavigationArrowLeftSelector
       );
       expect(resetState.scrollLeft).toBeLessThan(5);
       expect(resetState.leftArrowVisible).toBe(false);
@@ -5125,8 +5119,8 @@ export class LoggedInUser extends BaseUser {
             leftArrowVisible: leftArrow ? true : false,
           };
         },
-        adventureNavigationWrapperSelector,
-        adventureNavigationArrowLeftSelector
+        moduleNavigationWrapperSelector,
+        moduleNavigationArrowLeftSelector
       );
       expect(dockState.leftArrowVisible).toBe(false);
       expect(dockState.scrollWidth).toBeLessThanOrEqual(dockState.clientWidth);
@@ -5443,13 +5437,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies that the adventure end-of-module practice test card and its
+   * Verifies that the module end-of-module practice test card and its
    * Test button are visible.
    */
   async expectPracticeTestCardToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(adventureEndTestCardSelector);
-    await this.expectElementToBeVisible(adventureEndTestTitleSelector);
-    await this.expectElementToBeVisible(adventureEndTestPracticeButtonSelector);
+    await this.expectElementToBeVisible(moduleEndTestCardSelector);
+    await this.expectElementToBeVisible(moduleEndTestTitleSelector);
+    await this.expectElementToBeVisible(moduleEndTestPracticeButtonSelector);
   }
 
   /**
@@ -5470,18 +5464,18 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Returns the lesson circle badges in the adventure navigation dock.
+   * Returns the lesson circle badges in the module navigation dock.
    * Icon-only badges (practice tests and the Mastery Challenge) are excluded
-   * so that the returned indexes map one-to-one to the adventure (module)
+   * so that the returned indexes map one-to-one to the module (module)
    * lesson nodes.
    */
   private async getDockCircleBadges(): Promise<ElementHandle<Element>[]> {
     await this.page.waitForSelector(
-      `${adventureNavigationSelector} topic-module-circle-badge`,
+      `${moduleNavigationSelector} topic-module-circle-badge`,
       {timeout: 30000}
     );
     const allBadges = await this.page.$$(
-      `${adventureNavigationSelector} topic-module-circle-badge`
+      `${moduleNavigationSelector} topic-module-circle-badge`
     );
     const lessonBadges: ElementHandle<Element>[] = [];
     for (const badge of allBadges) {
@@ -5512,7 +5506,7 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Clicks the dock badge at the given index and then the Start button of the
-   * selected lesson. Starting a lesson of a later, incomplete adventure
+   * selected lesson. Starting a lesson of a later, incomplete module
    * triggers the skip confirmation modal.
    * @param {number} moduleNodeIndex - The zero-based index of the dock lesson
    *   badge for the later module.
@@ -5556,14 +5550,14 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Selects the later module's lesson from the navigation dock, clicks its
-   * button, confirms the skip, and verifies that the earlier adventures are
+   * button, confirms the skip, and verifies that the earlier modules are
    * shown as skipped cards with the SKIPPED badge, message, and Start CTA.
    * Confirming the skip starts the selected lesson, so the test returns to
    * the topic page to verify that the skip state was persisted.
    * @param {number} moduleNodeIndex - The zero-based index of the dock lesson
    *   badge for the later module.
    */
-  async skipToLaterModuleAndExpectSkippedAdventureCards(
+  async skipToLaterModuleAndExpectSkippedModuleCards(
     moduleNodeIndex: number
   ): Promise<void> {
     const circleBadges = await this.getDockCircleBadges();
@@ -5583,7 +5577,7 @@ export class LoggedInUser extends BaseUser {
 
       // Confirming the skip starts the selected lesson, which navigates away
       // from the topic page. Wait for the lesson player to load and then
-      // return to the topic page, where the earlier adventures are restored
+      // return to the topic page, where the earlier modules are restored
       // as skipped cards.
       await this.waitForPageToFullyLoad();
       expect(this.page.url()).toContain('/explore/');
@@ -5594,16 +5588,16 @@ export class LoggedInUser extends BaseUser {
         redesignedTopicViewerContainerSelector
       );
 
-      await this.expectElementToBeVisible(skippedAdventureCardSelector);
-      const skippedCards = await this.page.$$(skippedAdventureCardSelector);
+      await this.expectElementToBeVisible(skippedModuleCardSelector);
+      const skippedCards = await this.page.$$(skippedModuleCardSelector);
       expect(skippedCards.length).toBeGreaterThan(0);
-      await this.expectElementToBeVisible(skippedAdventureBadgeSelector);
+      await this.expectElementToBeVisible(skippedModuleBadgeSelector);
       await this.expectTextContentToContain(
-        skippedAdventureBadgeSelector,
+        skippedModuleBadgeSelector,
         'SKIPPED'
       );
-      await this.expectElementToBeVisible(skippedAdventureMessageSelector);
-      await this.expectElementToBeVisible(skippedAdventureStartCtaSelector);
+      await this.expectElementToBeVisible(skippedModuleMessageSelector);
+      await this.expectElementToBeVisible(skippedModuleStartCtaSelector);
     }
   }
 
@@ -5677,14 +5671,14 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks the Start CTA of the first skipped adventure card and verifies that
-   * the skipped adventure expands to show its lessons. Other skipped
-   * adventures (if any) remain as skipped cards.
+   * Clicks the Start CTA of the first skipped module card and verifies that
+   * the skipped module expands to show its lessons. Other skipped
+   * modules (if any) remain as skipped cards.
    */
-  async expandSkippedAdventureByClickingStartCta(): Promise<void> {
-    const startCtas = await this.page.$$(skippedAdventureStartCtaSelector);
+  async expandSkippedModuleByClickingStartCta(): Promise<void> {
+    const startCtas = await this.page.$$(skippedModuleStartCtaSelector);
     expect(startCtas.length).toBeGreaterThan(0);
-    const skippedCardsBefore = await this.page.$$(skippedAdventureCardSelector);
+    const skippedCardsBefore = await this.page.$$(skippedModuleCardSelector);
     // Use the stabilized click helper instead of a raw Puppeteer click:
     // the page is still smooth-scrolling toward the previously selected
     // module, and a raw click's coordinates can land off-target
@@ -5692,9 +5686,9 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElement(startCtas[0]);
     await this.page.waitForTimeout(1000);
 
-    // The clicked skipped adventure expands into a full module, so exactly
+    // The clicked skipped module expands into a full module, so exactly
     // one fewer skipped card remains.
-    const skippedCardsAfter = await this.page.$$(skippedAdventureCardSelector);
+    const skippedCardsAfter = await this.page.$$(skippedModuleCardSelector);
     expect(skippedCardsAfter.length).toBe(skippedCardsBefore.length - 1);
     const lessonCards = await this.page.$$(topicLessonCardSelector);
     expect(lessonCards.length).toBeGreaterThan(0);
@@ -5722,7 +5716,7 @@ export class LoggedInUser extends BaseUser {
       moduleStates.push(state);
     }
 
-    const skippedCards = await this.page.$$(skippedAdventureCardSelector);
+    const skippedCards = await this.page.$$(skippedModuleCardSelector);
     const skippedCardTitles: string[] = [];
     for (const card of skippedCards) {
       const title = await card.evaluate(el => {

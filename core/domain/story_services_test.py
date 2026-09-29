@@ -593,7 +593,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -605,7 +605,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(len(story.story_contents.modules), 1)
         self.assertEqual(story.story_contents.modules[0].id, 'module_1')
-        self.assertEqual(story.story_contents.modules[0].title, 'Adventure 1')
+        self.assertEqual(story.story_contents.modules[0].title, 'Module 1')
         self.assertEqual(
             story.story_contents.modules[0].node_ids,
             [self.NODE_ID_1, self.NODE_ID_2],
@@ -635,7 +635,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -677,7 +677,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -686,7 +686,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_RENAME_MODULE,
                     'module_id': 'module_1',
-                    'new_title': 'Adventure 1 renamed',
+                    'new_title': 'Module 1 renamed',
                 }
             ),
         ]
@@ -695,7 +695,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.modules[0].title, 'Adventure 1 renamed'
+            story.story_contents.modules[0].title, 'Module 1 renamed'
         )
 
     def test_rearrange_modules(self) -> None:
@@ -722,7 +722,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -731,7 +731,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_2',
-                    'title': 'Adventure 2',
+                    'title': 'Module 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -776,7 +776,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -785,7 +785,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_2',
-                    'title': 'Adventure 2',
+                    'title': 'Module 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -833,7 +833,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -844,7 +844,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'module_id': 'module_1',
                     'property_name': story_domain.MODULE_PROPERTY_TITLE,
                     'new_value': 'Updated Module',
-                    'old_value': 'Adventure 1',
+                    'old_value': 'Module 1',
                 }
             ),
         ]
@@ -880,7 +880,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Original',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -930,7 +930,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -942,7 +942,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(len(story.story_contents.modules), 1)
         self.assertEqual(story.story_contents.modules[0].id, 'module_1')
-        self.assertEqual(story.story_contents.modules[0].title, 'Adventure 1')
+        self.assertEqual(story.story_contents.modules[0].title, 'Module 1')
 
     def test_update_story_with_delete_module_command(self) -> None:
         changelist = [
@@ -968,7 +968,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1010,7 +1010,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1019,7 +1019,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_RENAME_MODULE,
                     'module_id': 'module_1',
-                    'new_title': 'Adventure 1 renamed',
+                    'new_title': 'Module 1 renamed',
                 }
             ),
         ]
@@ -1028,7 +1028,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.modules[0].title, 'Adventure 1 renamed'
+            story.story_contents.modules[0].title, 'Module 1 renamed'
         )
 
     def test_update_story_with_rearrange_modules_command(self) -> None:
@@ -1055,7 +1055,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -1064,7 +1064,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_2',
-                    'title': 'Adventure 2',
+                    'title': 'Module 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -1073,7 +1073,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_3',
-                    'title': 'Adventure 3',
+                    'title': 'Module 3',
                     'description': '',
                     # Here we use cast because the literal empty list is inferred as
                     # List[Any], but the change dict expects List[str].
@@ -1120,7 +1120,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -1129,7 +1129,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_2',
-                    'title': 'Adventure 2',
+                    'title': 'Module 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -1177,7 +1177,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_MODULE,
                     'module_id': 'module_1',
-                    'title': 'Adventure 1',
+                    'title': 'Module 1',
                     'description': 'Original desc',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1188,7 +1188,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'module_id': 'module_1',
                     'property_name': story_domain.MODULE_PROPERTY_TITLE,
                     'new_value': 'Updated Module Title',
-                    'old_value': 'Adventure 1',
+                    'old_value': 'Module 1',
                 }
             ),
             story_domain.StoryChange(

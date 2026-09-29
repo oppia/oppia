@@ -1313,7 +1313,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
@@ -1322,7 +1322,7 @@ describe('Story update service', () => {
       'module_1'
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
     expect(
       _sampleStory.getStoryContents().getModules()[0].getDescription()
@@ -1339,7 +1339,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
@@ -1347,7 +1347,7 @@ describe('Story update service', () => {
       {
         cmd: 'create_module',
         module_id: 'module_1',
-        title: 'Adventure 1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: ['node_1'],
       },
@@ -1358,7 +1358,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
@@ -1373,7 +1373,7 @@ describe('Story update service', () => {
       'module_1'
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
     expect(
       _sampleStory.getStoryContents().getModules()[0].getDescription()
@@ -1384,7 +1384,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
@@ -1393,7 +1393,7 @@ describe('Story update service', () => {
       {
         cmd: 'create_module',
         module_id: 'module_1',
-        title: 'Adventure 1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
@@ -1408,26 +1408,26 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
 
     storyUpdateService.renameModule(
       _sampleStory,
       'module_1',
-      'New Adventure Title'
+      'New Module Title'
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'New Adventure Title'
+      'New Module Title'
     );
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
   });
 
@@ -1435,27 +1435,27 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
     storyUpdateService.renameModule(
       _sampleStory,
       'module_1',
-      'New Adventure Title'
+      'New Module Title'
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'create_module',
         module_id: 'module_1',
-        title: 'Adventure 1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
         cmd: 'rename_module',
         module_id: 'module_1',
-        new_title: 'New Adventure Title',
+        new_title: 'New Module Title',
       },
     ]);
   });
@@ -1464,19 +1464,19 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
 
     storyUpdateService.updateModuleProperty(
       _sampleStory,
       'module_1',
       'title',
-      'Adventure 1',
+      'Module 1',
       'New Title'
     );
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
@@ -1485,7 +1485,7 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
-      'Adventure 1'
+      'Module 1'
     );
   });
 
@@ -1493,7 +1493,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
@@ -1525,7 +1525,7 @@ describe('Story update service', () => {
       storyUpdateService.createModule(
         _sampleStory,
         'module_1',
-        'Adventure 1',
+        'Module 1',
         'Description 1',
         []
       );
@@ -1533,14 +1533,14 @@ describe('Story update service', () => {
         _sampleStory,
         'module_1',
         'title',
-        'Adventure 1',
+        'Module 1',
         'New Title'
       );
       expect(undoRedoService.getCommittableChangeList()).toEqual([
         {
           cmd: 'create_module',
           module_id: 'module_1',
-          title: 'Adventure 1',
+          title: 'Module 1',
           description: 'Description 1',
           node_ids: [],
         },
@@ -1548,7 +1548,7 @@ describe('Story update service', () => {
           cmd: 'update_module_property',
           module_id: 'module_1',
           property_name: 'title',
-          old_value: 'Adventure 1',
+          old_value: 'Module 1',
           new_value: 'New Title',
         },
       ]);
@@ -1571,7 +1571,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
@@ -1591,14 +1591,14 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
     storyUpdateService.createModule(
       _sampleStory,
       'module_2',
-      'Adventure 2',
+      'Module 2',
       'Description 2',
       []
     );
@@ -1632,14 +1632,14 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       []
     );
     storyUpdateService.createModule(
       _sampleStory,
       'module_2',
-      'Adventure 2',
+      'Module 2',
       'Description 2',
       []
     );
@@ -1648,14 +1648,14 @@ describe('Story update service', () => {
       {
         cmd: 'create_module',
         module_id: 'module_1',
-        title: 'Adventure 1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
         cmd: 'create_module',
         module_id: 'module_2',
-        title: 'Adventure 2',
+        title: 'Module 2',
         description: 'Description 2',
         node_ids: [],
       },
@@ -1670,14 +1670,14 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Description 1',
       ['node_1', 'node_2']
     );
     storyUpdateService.createModule(
       _sampleStory,
       'module_2',
-      'Adventure 2',
+      'Module 2',
       'Description 2',
       []
     );
@@ -1714,14 +1714,14 @@ describe('Story update service', () => {
       storyUpdateService.createModule(
         _sampleStory,
         'module_1',
-        'Adventure 1',
+        'Module 1',
         'Description 1',
         ['node_1', 'node_2']
       );
       storyUpdateService.createModule(
         _sampleStory,
         'module_2',
-        'Adventure 2',
+        'Module 2',
         'Description 2',
         []
       );
@@ -1730,14 +1730,14 @@ describe('Story update service', () => {
         {
           cmd: 'create_module',
           module_id: 'module_1',
-          title: 'Adventure 1',
+          title: 'Module 1',
           description: 'Description 1',
           node_ids: ['node_1', 'node_2'],
         },
         {
           cmd: 'create_module',
           module_id: 'module_2',
-          title: 'Adventure 2',
+          title: 'Module 2',
           description: 'Description 2',
           node_ids: [],
         },
@@ -1754,7 +1754,7 @@ describe('Story update service', () => {
     storyUpdateService.createModule(
       _sampleStory,
       'module_1',
-      'Adventure 1',
+      'Module 1',
       'Desc',
       []
     );

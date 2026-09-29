@@ -133,8 +133,8 @@ describe('Story summary model', () => {
       modules: [
         {
           id: 'module_1',
-          title: 'Adventure Title',
-          description: 'Adventure Description',
+          title: 'Module Title',
+          description: 'Module Description',
           node_ids: ['node_1', 'node_2'],
         },
       ],
@@ -146,8 +146,8 @@ describe('Story summary model', () => {
     const modules = storySummary.getModules();
     expect(modules.length).toEqual(1);
     expect(modules[0].id).toEqual('module_1');
-    expect(modules[0].title).toEqual('Adventure Title');
-    expect(modules[0].description).toEqual('Adventure Description');
+    expect(modules[0].title).toEqual('Module Title');
+    expect(modules[0].description).toEqual('Module Description');
     expect(modules[0].node_ids).toEqual(['node_1', 'node_2']);
   });
 
@@ -170,8 +170,8 @@ describe('Story summary model', () => {
       modules: [
         {
           id: 'module_1',
-          title: 'Adventure Title',
-          description: 'Adventure Description',
+          title: 'Module Title',
+          description: 'Module Description',
           node_ids: ['node_1', 'node_2'],
         },
       ],
@@ -186,7 +186,7 @@ describe('Story summary model', () => {
     modules[0].title = 'Mutated title';
     nodeTitles.push('Chapter 3');
 
-    expect(storySummary.getModules()[0].title).toEqual('Adventure Title');
+    expect(storySummary.getModules()[0].title).toEqual('Module Title');
     expect(storySummary.getNodeTitles()).toEqual(['Chapter 1', 'Chapter 2']);
   });
 });
