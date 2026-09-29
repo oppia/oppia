@@ -134,7 +134,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         )
 
 
-class FeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
+class FeatureFlagConfigModel(base_models.BaseModel):
     """A class that represents named dynamic feature-flag.
     This model only stores fields that can be updated in run time.
 
