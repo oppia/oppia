@@ -134,7 +134,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         )
 
 
-class FeatureFlagConfigModel(base_models.BaseModel):
+class FeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
     """A class that represents named dynamic feature-flag.
     This model only stores fields that can be updated in run time.
 
@@ -157,6 +157,27 @@ class FeatureFlagConfigModel(base_models.BaseModel):
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """FeatureFlagConfigModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'force_enable_for_all_users': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def create(
