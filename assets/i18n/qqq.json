@@ -1160,6 +1160,8 @@
   "I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",
   "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_1": "First paragraph of the modal confirming if the user wants to save a plain text math formula.",
   "I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_2": "Second paragraph of the modal confirming if the user wants to save a plain text math formula.",
+  "I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BODY": "Body text of the modal asking the user to confirm they want to submit an auto-generated translation without editing it.",
+  "I18N_MODAL_CONFIRM_UNEDITED_AUTO_TRANSLATION_BUTTON": "Text on the confirm button of the modal asking the user to confirm they want to submit an auto-generated translation without editing it.",
   "I18N_MODAL_CONTINUE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to continue with the action.\n{{Identical|Continue}}",
   "I18N_MODAL_REMOVE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to remove a syllabus item from the learner group syllabus.",
   "I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "The text which is displayed in the classrooms page. Gives information about classrooms.",
