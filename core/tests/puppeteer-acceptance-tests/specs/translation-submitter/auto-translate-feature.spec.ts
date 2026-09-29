@@ -104,8 +104,7 @@ describe('Auto-Translate Feature', function () {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
-            translated_text:
-              '<p>यहाँ अनुवादित पाठ है।</p>',
+            translated_text: '<p>यहाँ अनुवादित पाठ है।</p>',
             translation_provider: 'Google',
           }),
         });

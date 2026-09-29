@@ -22,45 +22,103 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslationModalUneditedConfirmationModalComponent} from './translation-modal-unedited-confirmation-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {Subject} from 'rxjs';
 
-describe('Translation Modal Unedited Confirmation Modal Component', () => {
-  let component: TranslationModalUneditedConfirmationModalComponent;
-  let fixture: ComponentFixture<TranslationModalUneditedConfirmationModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
+describe(
+  'Translation Modal Unedited Confirmation Modal Component' +
+    ' with NgbActiveModal',
+  () => {
+    let component: TranslationModalUneditedConfirmationModalComponent;
+    let fixture: ComponentFixture<TranslationModalUneditedConfirmationModalComponent>;
+    let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        TranslationModalUneditedConfirmationModalComponent,
-        MockTranslatePipe,
-      ],
-      providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
-  }));
+    beforeEach(waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [
+          TranslationModalUneditedConfirmationModalComponent,
+          MockTranslatePipe,
+        ],
+        providers: [
+          NgbActiveModal,
+          {provide: MatBottomSheetRef, useValue: null},
+        ],
+        schemas: [NO_ERRORS_SCHEMA],
+      }).compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(
-      TranslationModalUneditedConfirmationModalComponent
-    );
-    component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        TranslationModalUneditedConfirmationModalComponent
+      );
+      component = fixture.componentInstance;
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
+      fixture.detectChanges();
+    });
 
-  it('should initialize component', () => {
-    expect(component).toBeDefined();
-  });
+    it('should initialize component', () => {
+      expect(component).toBeDefined();
+    });
 
-  it('should close modal on confirm', () => {
-    spyOn(ngbActiveModal, 'close');
-    component.confirm();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
+    it('should close modal on confirm', () => {
+      spyOn(ngbActiveModal, 'close');
+      component.confirm();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    });
 
-  it('should dismiss modal on cancel', () => {
-    spyOn(ngbActiveModal, 'dismiss');
-    component.cancel();
-    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
-  });
-});
+    it('should dismiss modal on cancel', () => {
+      spyOn(ngbActiveModal, 'dismiss');
+      component.cancel();
+      expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+    });
+  }
+);
+
+describe(
+  'Translation Modal Unedited Confirmation Modal Component' +
+    ' with MatBottomSheetRef',
+  () => {
+    let component: TranslationModalUneditedConfirmationModalComponent;
+    let fixture: ComponentFixture<TranslationModalUneditedConfirmationModalComponent>;
+    let bottomSheetRef: jasmine.SpyObj<
+      MatBottomSheetRef<TranslationModalUneditedConfirmationModalComponent>
+    >;
+
+    beforeEach(waitForAsync(() => {
+      bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+        'dismiss',
+        'keydownEvents',
+      ]);
+      bottomSheetRef.keydownEvents.and.returnValue(
+        new Subject<KeyboardEvent>().asObservable()
+      );
+      TestBed.configureTestingModule({
+        declarations: [
+          TranslationModalUneditedConfirmationModalComponent,
+          MockTranslatePipe,
+        ],
+        providers: [
+          {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+          {provide: NgbActiveModal, useValue: null},
+        ],
+        schemas: [NO_ERRORS_SCHEMA],
+      }).compileComponents();
+    }));
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        TranslationModalUneditedConfirmationModalComponent
+      );
+      component = fixture.componentInstance;
+    });
+
+    it('should dismiss bottomSheetRef when confirm is called', () => {
+      component.confirm();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+    });
+
+    it('should dismiss bottomSheetRef when cancel is called', () => {
+      component.cancel();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    });
+  }
+);
