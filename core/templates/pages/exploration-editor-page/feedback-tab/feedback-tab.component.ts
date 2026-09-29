@@ -63,7 +63,6 @@ interface CreatorFeedbackListState<TSummary> {
   cursorHistory: (string | null)[];
   moreAvailable: boolean;
 }
-import './feedback-tab.component.css';
 
 @Component({
   selector: 'oppia-feedback-tab',
@@ -76,7 +75,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   readonly creatorReportFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: true,
-    showLesson: false,
+    showLesson: true,
     showResponse: false,
     showScreenshot: true,
     showLessonMetadata: true,
@@ -85,7 +84,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   };
   readonly creatorLessonFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: false,
-    showLesson: false,
+    showLesson: true,
     showResponse: true,
     showScreenshot: false,
     showLessonMetadata: true,
