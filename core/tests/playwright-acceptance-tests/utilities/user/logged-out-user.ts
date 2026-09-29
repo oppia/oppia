@@ -2954,10 +2954,10 @@ export class LoggedOutUser extends BaseUser {
    * subscribing to the newsletter.
    */
   async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
-    await expect(
-      this.page.locator(newsletterSubscriptionThanksMessage),
-      'Thank you message does not exist or incorrect'
-    ).toContainText('Thanks for subscribing!');
+    await this.expectTextContentToContain(
+      newsletterSubscriptionThanksMessage,
+      'Thanks for subscribing!'
+    );
     showMessage('Subscribed to newsletter successfully');
   }
 
@@ -2968,12 +2968,15 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} expectedUrl - The expected href of the link.
    */
   async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
-    const link = this.page.locator(selector).first();
-    await expect(link).toBeVisible();
-    await expect(
-      link,
-      `The ${selector} does not link to ${expectedUrl}.`
-    ).toHaveAttribute('href', expectedUrl);
+    await this.expectElementToBeVisible(selector);
+    const url = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
+    );
+    if (url !== expectedUrl) {
+      throw new Error(
+        `The ${selector} links to ${url}, expected ${expectedUrl}.`
+      );
+    }
   }
 
   /**
