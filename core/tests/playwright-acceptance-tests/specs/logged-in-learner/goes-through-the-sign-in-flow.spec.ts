@@ -60,7 +60,8 @@ test.describe('Logged In Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Test Topic',
       'Test Skill',
-      'Test Skill'
+      'Test Skill',
+      true
     );
 
     await curriculumAdmin.createAndPublishClassroom(

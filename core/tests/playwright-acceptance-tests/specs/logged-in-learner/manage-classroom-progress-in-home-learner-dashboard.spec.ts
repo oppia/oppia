@@ -60,7 +60,8 @@ test.describe('Logged-In Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Division',
       'Division subtopics',
-      'Division skills'
+      'Division skills',
+      true
     );
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
