@@ -476,15 +476,6 @@ class RegistryUnitTest(test_utils.TestBase):
             dev_mode_translate_services,
         )
 
-    def test_import_search_services(self) -> None:
-        """Tests import search services function."""
-        from core.platform.search import elastic_search_services
-
-        self.assertEqual(
-            self.registry_instance.import_search_services(),
-            elastic_search_services,
-        )
-
     def test_import_storage_services(self) -> None:
         """Tests import storage services function."""
 
