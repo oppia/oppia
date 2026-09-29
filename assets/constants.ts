@@ -18,8 +18,6 @@
  */
 
 export default {
-  "DUPLICATE_ISSUE_LABEL": "potential-duplicate",
-
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL and classroom name for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
@@ -7605,22 +7603,6 @@ export default {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Change your Oppia profile settings and preferences."
-        }
-      ]
-    },
-    "FEEDBACK_UPDATES": {
-      "ROUTE": "feedback-updates",
-      "TITLE": "Feedback Updates",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
         }
       ]
     },
