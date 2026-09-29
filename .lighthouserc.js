@@ -614,7 +614,7 @@ module.exports = {
           accessibilityMinScore: 0.9,
         },
         {
-          matchingUrlPattern: '^http://[^/]+/blog/.+$',
+          matchingUrlPattern: '^http://[^/]+/blog/(?!author/).+$',
           accessibilityMinScore: 0.9,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
@@ -654,6 +654,282 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://[^/]+/voiceover-admin$',
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/blog/author/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 70000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            'image-aspect-ratio': ['error', {minScore: 0}],
+            'uses-responsive-images': ['error', {minScore: 0.5}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/facilitator-dashboard$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/create-learner-group$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/edit-learner-group/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/learner-group/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/technical-feedback-dashboard$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/technical-feedback-dashboard/.+/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/error/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/error/iframed$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/maintenance$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/lesson/.+$',
+          pagePerfThresholds: {
+            fcp: 16125,
+            speedIndex: 24180,
+            lcp: 84690,
+            tbt: 3945,
+            cls: 0.15,
+          },
+          accessibilityMinScore: 0.91,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            deprecations: ['error', {minScore: 0}],
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/embed/lesson/.+$',
+          pagePerfThresholds: {
+            fcp: 16125,
+            speedIndex: 24180,
+            lcp: 84690,
+            tbt: 3945,
+            cls: 0.15,
+          },
+          accessibilityMinScore: 0.91,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            deprecations: ['error', {minScore: 0}],
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/collection_editor/.+$',
+          pagePerfThresholds: {
+            fcp: 16125,
+            speedIndex: 30675,
+            lcp: 97110,
+            tbt: 3870,
+            cls: 0.15,
+          },
+          accessibilityMinScore: 0.95,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            deprecations: ['error', {minScore: 0}],
+            redirects: ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/collection/.+$',
+          pagePerfThresholds: {
+            fcp: 16035,
+            speedIndex: 24180,
+            lcp: 84690,
+            tbt: 3945,
+            cls: 0.15,
+          },
+          accessibilityMinScore: 0.91,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            deprecations: ['error', {minScore: 0}],
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/math/certificate-offering-available$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/certificate-creator-dashboard$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/create-certificate-assessment-offering$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/edit-certificate-assessment-offering/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/certificate-assessment/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/certificate-assessment-result/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/learn/.+/review-test/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 60000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
       ]),

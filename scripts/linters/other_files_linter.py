@@ -151,41 +151,10 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
 # PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
 # this list without asking @Hardikgoyal2003.
 LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
-    # These routes correspond to features that have not yet been released.
-    'CERTIFICATE_ASSESSMENT_PLAYER',
-    'CERTIFICATE_ASSESSMENT_RESULT',
-    'CERTIFICATE_CREATOR_DASHBOARD',
-    'CERTIFICATE_OFFERING_AVAILABLE',
-    'CREATE_CERTIFICATE_OFFERING',
-    'EDIT_CERTIFICATE_OFFERING',
-    'END_OF_ARC_TEST',
-    'FACILITATOR_DASHBOARD',
-    'LEARNER_GROUP_CREATOR',
-    'LEARNER_GROUP_EDITOR',
-    'LEARNER_GROUP_VIEWER',
-    'MASTERY_CHALLENGE',
-    'NEW_LESSON_PLAYER',
-    'NODE_PRACTICE_SESSION',
-    'TECHNICAL_FEEDBACK_DASHBOARD',
-    'TECHNICAL_FEEDBACK_DETAIL',
-    # Deprecation needs to be discussed with the prodops team first.
-    'BLOG_AUTHOR_PROFILE_PAGE',
-    'COLLECTION_EDITOR',
-    'COLLECTION_PLAYER',
-    # These routes are deprecated or slated for deprecation.
-    'FEEDBACK_UPDATES',
-    'LIBRARY_RECENTLY_PUBLISHED',
-    'LIBRARY_TOP_RATED',
-    'REVIEW_TEST',
-    # These routes are excluded either because they are for redirection or
-    # because they are rarely used.
-    'ERROR',
-    'EXPLORATION_PLAYER_EMBED',
-    'ERROR_IFRAMED',
-    'LESSON_PLAYER_EMBED',
+    # The login and logout routes are pure redirect handlers without a
+    # dedicated page to audit, so they cannot have a Lighthouse page entry.
     'LOGIN',
     'LOGOUT',
-    'MAINTENANCE',
 }
 
 

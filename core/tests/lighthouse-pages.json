@@ -182,5 +182,89 @@
   "voiceover-admin": {
     "url": "http://localhost:8181/voiceover-admin",
     "page_module": "core/templates/pages/voiceover-admin-page/voiceover-admin-page.module.ts"
+  },
+  "error": {
+    "url": "http://localhost:8181/error/404",
+    "page_module": "core/templates/pages/error-pages/error-page.module.ts"
+  },
+  "error-iframed": {
+    "url": "http://localhost:8181/error/iframed",
+    "page_module": "core/templates/pages/error-pages/error-iframed-page/error-iframed-page.module.ts"
+  },
+  "maintenance": {
+    "url": "http://localhost:8181/maintenance",
+    "page_module": "core/templates/pages/maintenance-page/maintenance-page.module.ts"
+  },
+  "blog-author-profile": {
+    "url": "http://localhost:8181/blog/author/username1",
+    "page_module": "core/templates/pages/blog-author-profile-page/blog-author-profile-page.module.ts"
+  },
+  "facilitator-dashboard": {
+    "url": "http://localhost:8181/facilitator-dashboard",
+    "page_module": "core/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.module.ts"
+  },
+  "learner-group-creator": {
+    "url": "http://localhost:8181/create-learner-group",
+    "page_module": "core/templates/pages/learner-group-pages/create-group/create-learner-group-page.module.ts"
+  },
+  "learner-group-editor": {
+    "url": "http://localhost:8181/edit-learner-group/learner-group-1",
+    "page_module": "core/templates/pages/learner-group-pages/edit-group/edit-learner-group-page.module.ts"
+  },
+  "learner-group-viewer": {
+    "url": "http://localhost:8181/learner-group/learner-group-1",
+    "page_module": "core/templates/pages/learner-group-pages/view-group/view-learner-group-page.module.ts"
+  },
+  "technical-feedback-dashboard": {
+    "url": "http://localhost:8181/technical-feedback-dashboard",
+    "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
+  },
+  "technical-feedback-detail": {
+    "url": "http://localhost:8181/technical-feedback-dashboard/oppia/1",
+    "page_module": "core/templates/pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module.ts"
+  },
+  "new-lesson-player": {
+    "url": "http://localhost:8181/lesson/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.module.ts"
+  },
+  "lesson-player-embed": {
+    "url": "http://localhost:8181/embed/lesson/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.module.ts"
+  },
+  "collection-editor": {
+    "url": "http://localhost:8181/collection_editor/create/0",
+    "page_module": "core/templates/pages/collection-editor-page/collection-editor-page.module.ts"
+  },
+  "collection-player": {
+    "url": "http://localhost:8181/collection/0",
+    "page_module": "core/templates/pages/collection-player-page/collection-player-page.module.ts"
+  },
+  "certificate-creator-dashboard": {
+    "url": "http://localhost:8181/certificate-creator-dashboard",
+    "page_module": "core/templates/pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module.ts"
+  },
+  "create-certificate-offering": {
+    "url": "http://localhost:8181/create-certificate-assessment-offering",
+    "page_module": "core/templates/pages/create-certificate-offering-page/create-certificate-offering-page.module.ts"
+  },
+  "certificate-offering-available": {
+    "url": "http://localhost:8181/learn/math/certificate-offering-available",
+    "page_module": "core/templates/pages/certificate-offering-available-page/certificate-offering-available-page.module.ts"
+  },
+  "review-test": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/review-test/help-jamie-win-arcade",
+    "page_module": "core/templates/pages/review-test-page/review-test-page.module.ts"
+  },
+  "certificate-assessment-player": {
+    "url": "http://localhost:8181/certificate-assessment/1",
+    "page_module": "core/templates/pages/certificate-assessment-player-page/certificate-assessment-player-page.module.ts"
+  },
+  "certificate-assessment-result": {
+    "url": "http://localhost:8181/certificate-assessment-result/1",
+    "page_module": "core/templates/pages/certificate-assessment-result-page/certificate-assessment-result-page.module.ts"
+  },
+  "edit-certificate-offering": {
+    "url": "http://localhost:8181/edit-certificate-assessment-offering/1",
+    "page_module": "core/templates/pages/edit-certificate-offering-page/edit-certificate-offering-page.module.ts"
   }
 }
