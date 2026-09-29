@@ -147,16 +147,6 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     },
 ]
 
-# Routes that are not covered by Lighthouse tests. Each entry is a
-# PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
-# this list without asking @Hardikgoyal2003.
-LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
-    # The login and logout routes are pure redirect handlers without a
-    # dedicated page to audit, so they cannot have a Lighthouse page entry.
-    'LOGIN',
-    'LOGOUT',
-}
-
 
 class CustomLintChecksManager(linter_utils.BaseLinter):
     """Manages other files lint checks."""
@@ -485,7 +475,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         # Find routes that have no corresponding Lighthouse page entry.
         uncovered_keys = []
         for key, modules in sorted(key_to_modules.items()):
-            if key in LIGHTHOUSE_ROUTE_EXCLUSIONS:
+            # The login and logout routes are pure redirect handlers without
+            # a dedicated page to audit, so they cannot have a Lighthouse
+            # page entry and are not part of the coverage check.
+            if key in ('LOGIN', 'LOGOUT'):
                 continue
             covered = any(os.path.normpath(m) in lh_modules for m in modules)
             if not covered:
