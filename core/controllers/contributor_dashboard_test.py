@@ -51,10 +51,12 @@ from typing import Dict, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models, suggestion_models
+    from mypy_imports import opportunity_models, suggestion_models, user_models
 
-opportunity_models, suggestion_models = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.SUGGESTION]
+opportunity_models, suggestion_models, user_models = (
+    models.Registry.import_models(
+        [models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.USER]
+    )
 )
 
 
@@ -150,6 +152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # corresponding exploration has one initial state and one end state.
         self.expected_opportunity_dict_1 = {
             'id': '0',
+            'topic_id': self.topic_id,
             'topic_name': 'topic',
             'story_title': 'title story_id_0',
             'chapter_title': 'Node1',
@@ -161,6 +164,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         }
         self.expected_opportunity_dict_2 = {
             'id': '1',
+            'topic_id': self.topic_id,
             'topic_name': 'topic',
             'story_title': 'title story_id_1',
             'chapter_title': 'Node1',
@@ -172,6 +176,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         }
         self.expected_opportunity_dict_3 = {
             'id': '2',
+            'topic_id': self.topic_id_1,
             'topic_name': 'topic1',
             'story_title': 'title story_id_2',
             'chapter_title': 'Node1',
@@ -279,7 +284,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi', 'topic_name': 'topic'},
+            params={'language_code': 'hi', 'topic_id': self.topic_id},
         )
 
         self.assertEqual(
@@ -430,7 +435,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'topic_name': 'topic'},
+                params={'language_code': 'hi', 'topic_id': self.topic_id},
             )
             self.assertEqual(len(response['opportunities']), 1)
             self.assertItemsEqual(
@@ -443,7 +448,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={
                     'language_code': 'hi',
-                    'topic_name': 'topic',
+                    'topic_id': self.topic_id,
                     'cursor': response['next_cursor'],
                 },
             )
@@ -472,7 +477,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=400,
             )
 
-    def test_get_translation_opportunities_without_topic_name_returns_all_topics(  # pylint: disable=line-too-long
+    def test_get_translation_opportunities_without_topic_id_returns_all_topics(  # pylint: disable=line-too-long
         self,
     ) -> None:
         response = self.get_json(
@@ -491,12 +496,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_translation_opportunities_with_empty_topic_name_returns_all_topics(  # pylint: disable=line-too-long
+    def test_get_translation_opportunities_with_empty_topic_id_returns_all_topics(  # pylint: disable=line-too-long
         self,
     ) -> None:
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi', 'topic_name': ''},
+            params={'language_code': 'hi', 'topic_id': ''},
         )
 
         self.assertItemsEqual(
@@ -509,6 +514,59 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         )
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
+
+    def test_get_translation_opportunities_does_not_filter_by_topic_name(
+        self,
+    ) -> None:
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi', 'topic_id': 'topic'},
+        )
+
+        self.assertEqual(response['opportunities'], [])
+        self.assertFalse(response['more'])
+
+    def test_get_translation_opportunities_rejects_topic_name_param(
+        self,
+    ) -> None:
+        self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi', 'topic_name': 'topic'},
+            expected_status_int=400,
+        )
+
+    def test_get_translation_opportunities_by_topic_id_after_topic_rename(
+        self,
+    ) -> None:
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id,
+            self.topic_id,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+                        'old_value': 'topic',
+                        'new_value': 'renamed topic',
+                    }
+                )
+            ],
+            'Rename topic.',
+        )
+
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi', 'topic_id': self.topic_id},
+        )
+
+        # The same opportunities are returned for the topic, now carrying the
+        # topic's new name.
+        self.assertItemsEqual(
+            [opp['id'] for opp in response['opportunities']], ['0', '1']
+        )
+        for opportunity in response['opportunities']:
+            self.assertEqual(opportunity['topic_id'], self.topic_id)
+            self.assertEqual(opportunity['topic_name'], 'renamed topic')
 
     def test_get_opportunity_for_invalid_opportunity_type(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -543,7 +601,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'},
+            params={'topic_id': self.topic_id},
         )
 
         # Should only return opportunities that have corresponding translation
@@ -730,6 +788,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             expected_opp_dict_1 = {
                 'id': '0',
+                'topic_id': 'topic',
                 'topic_name': 'topic',
                 'story_title': 'title story_id_0',
                 'chapter_title': 'Node1',
@@ -741,6 +800,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             }
             expected_opp_dict_2 = {
                 'id': '2',
+                'topic_id': 'topic 2',
                 'topic_name': 'topic2',
                 'story_title': 'title story_id_2',
                 'chapter_title': 'Node1',
@@ -826,14 +886,15 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             return_value=mock_pinned_lesson_summary,
         ):
             opportunity_services.update_pinned_opportunity_model(
-                self.CURRICULUM_ADMIN_USERNAME, 'hi', 'topic', '0'
+                self.CURRICULUM_ADMIN_USERNAME, 'hi', self.topic_id, '0'
             )
             response = self.get_json(
                 '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-                params={'language_code': 'hi', 'topic_name': 'topic'},
+                params={'language_code': 'hi', 'topic_id': self.topic_id},
             )
             expected_opp_dict_1 = {
                 'id': '0',
+                'topic_id': 'topic 1',
                 'topic_name': 'topic',
                 'story_title': 'title story_id_0',
                 'chapter_title': 'Node1',
@@ -845,6 +906,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             }
             expected_opp_dict_2 = {
                 'id': '1',
+                'topic_id': self.topic_id,
                 'topic_name': 'topic',
                 'story_title': 'title story_id_1',
                 'chapter_title': 'Node1',
@@ -862,81 +924,93 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_pin_translation_opportunity(self) -> None:
         self.login(self.OWNER_EMAIL)
-        topic_id = 'topic123'
         language_code = 'en'
         opportunity_id = 'opp123'
-        mock_topic = topic_domain.Topic(
-            topic_id='topic123',
-            name='Topic 1',
-            abbreviated_name='abb name',
-            url_fragment='url',
-            description='description',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            subtopic_schema_version=1,
-            next_subtopic_id=1,
-            language_code='en',
-            version=1,
-            story_reference_schema_version=1,
-            meta_tag_content='tag',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='dummy',
-            skill_ids_for_diagnostic_test=[],
-            thumbnail_filename='svg',
-            thumbnail_bg_color='green',
-            thumbnail_size_in_bytes=3,
+        csrf_token = self.get_new_csrf_token()
+
+        # 1. Test pinning exploration with default entity type.
+        request_dict = {
+            'topic_id': self.topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id,
+        }
+        self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200,
         )
 
-        # Here we use object because we need to return
-        # a mock topic from method get_topic_by_name.
-        with unittest.mock.patch.object(
-            topic_fetchers, 'get_topic_by_name', return_value=mock_topic
-        ):
+        # The pinned opportunity is stored against the topic's ID.
+        pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
+            self.owner_id, language_code, self.topic_id
+        )
+        assert pinned_opportunity is not None
+        self.assertEqual(pinned_opportunity.opportunity_id, opportunity_id)
+        self.assertEqual(
+            pinned_opportunity.entity_type, feconf.ENTITY_TYPE_EXPLORATION
+        )
 
-            # 1. Test pinning exploration with default entity type.
-            request_dict = {
-                'topic_id': topic_id,
-                'language_code': language_code,
-                'opportunity_id': opportunity_id,
-            }
-            csrf_token = self.get_new_csrf_token()
+        # 2. Test pinning with a different valid entity type ('story').
+        request_dict = {
+            'topic_id': self.topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id,
+            'entity_type': feconf.ENTITY_TYPE_STORY,
+        }
+        self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200,
+        )
+        pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
+            self.owner_id, language_code, self.topic_id
+        )
+        assert pinned_opportunity is not None
+        self.assertEqual(
+            pinned_opportunity.entity_type, feconf.ENTITY_TYPE_STORY
+        )
 
-            _ = self.put_json(
-                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-                request_dict,
-                csrf_token=csrf_token,
-                expected_status_int=200,
+        # 3. Test pinning with an invalid entity type returns 400.
+        request_dict = {
+            'topic_id': self.topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id,
+            'entity_type': 'invalid_type',
+        }
+        self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+    def test_pin_translation_opportunity_with_invalid_topic_id(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # A topic name is not accepted in place of a topic ID.
+        response = self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            {
+                'topic_id': 'topic',
+                'language_code': 'en',
+                'opportunity_id': 'opp123',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'The supplied input topic ID: topic is not valid',
+        )
+        self.assertIsNone(
+            user_models.PinnedOpportunityModel.get_model(
+                self.owner_id, 'en', 'topic'
             )
-
-            # 2. Test pinning with a different valid entity type ('story').
-            request_dict = {
-                'topic_id': topic_id,
-                'language_code': language_code,
-                'opportunity_id': opportunity_id,
-                'entity_type': feconf.ENTITY_TYPE_STORY,
-            }
-            _ = self.put_json(
-                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-                request_dict,
-                csrf_token=csrf_token,
-                expected_status_int=200,
-            )
-
-            # 3. Test pinning with an invalid entity type returns 400.
-            request_dict = {
-                'topic_id': topic_id,
-                'language_code': language_code,
-                'opportunity_id': opportunity_id,
-                'entity_type': 'invalid_type',
-            }
-            _ = self.put_json(
-                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-                request_dict,
-                csrf_token=csrf_token,
-                expected_status_int=400,
-            )
+        )
 
     def test_pin_translation_opportunity_with_language_code_set_to_none(
         self,
@@ -963,53 +1037,29 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_unpin_translation_opportunity(self) -> None:
         self.login(self.OWNER_EMAIL)
-        topic_id = 'topic123'
         language_code = 'en'
-        opportunity_id = None
-
-        mock_topic = topic_domain.Topic(
-            topic_id='topic123',
-            name='Topic 1',
-            abbreviated_name='abb name',
-            url_fragment='url',
-            description='description',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            subtopic_schema_version=1,
-            next_subtopic_id=1,
-            language_code='en',
-            version=1,
-            story_reference_schema_version=1,
-            meta_tag_content='tag',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='dummy',
-            skill_ids_for_diagnostic_test=[],
-            thumbnail_filename='svg',
-            thumbnail_bg_color='green',
-            thumbnail_size_in_bytes=3,
+        csrf_token = self.get_new_csrf_token()
+        opportunity_services.update_pinned_opportunity_model(
+            self.owner_id, language_code, self.topic_id, 'opp123'
         )
 
-        # Here we use object because we need to return
-        # a mock topic from method get_topic_by_name.
-        with unittest.mock.patch.object(
-            topic_fetchers, 'get_topic_by_name', return_value=mock_topic
-        ):
+        request_dict = {
+            'topic_id': self.topic_id,
+            'language_code': language_code,
+            'opportunity_id': None,
+        }
+        self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200,
+        )
 
-            request_dict = {
-                'topic_id': topic_id,
-                'language_code': language_code,
-                'opportunity_id': opportunity_id,
-            }
-            csrf_token = self.get_new_csrf_token()
-
-            _ = self.put_json(
-                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-                request_dict,
-                csrf_token=csrf_token,
-                expected_status_int=200,
-            )
+        pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
+            self.owner_id, language_code, self.topic_id
+        )
+        assert pinned_opportunity is not None
+        self.assertIsNone(pinned_opportunity.opportunity_id)
 
     def test_skip_story_if_story_is_none(self) -> None:
         # Create a new exploration and linked story.
@@ -1039,7 +1089,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with swap_with_corrupt_story:
             response = self.get_json(
                 '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-                params={'topic_name': 'topic'},
+                params={'topic_id': self.topic_id},
             )
 
         # The 'None' story should be skipped.
@@ -1102,7 +1152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'},
+            params={'topic_id': self.topic_id},
         )
 
         # The newly created translation suggestion with valid exploration
@@ -1112,6 +1162,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             [
                 {
                     'id': exp_100.id,
+                    'topic_id': self.topic_id,
                     'topic_name': 'topic',
                     'story_title': 'title story_id_100',
                     'chapter_title': 'Node1',
@@ -1156,7 +1207,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'},
+            params={'topic_id': self.topic_id},
         )
 
         # After the state is deleted, the corresponding suggestion should not be
@@ -1220,7 +1271,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'},
+            params={'topic_id': self.topic_id},
         )
 
         # Since there was a valid translation suggestion created in the setup,
@@ -1231,6 +1282,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             [
                 {
                     'id': exp_100.id,
+                    'topic_id': self.topic_id,
                     'topic_name': 'topic',
                     'story_title': 'title story_id_100',
                     'chapter_title': 'Node1',
@@ -1269,14 +1321,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'},
+            params={'topic_id': self.topic_id},
         )
 
         # After the original exploration content is deleted, the corresponding
         # suggestion should not be returned.
         self.assertEqual(len(response['opportunities']), 0)
 
-    def test_get_reviewable_translation_opportunities_with_null_topic_name(
+    def test_get_reviewable_translation_opportunities_with_null_topic_id(
         self,
     ) -> None:
         # Create a translation suggestion for exploration 0.
@@ -1311,9 +1363,25 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'topic_id': 'Invalid'},
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The supplied input topic ID: Invalid is not valid',
+        )
+
+    def test_get_reviewable_translation_opportunities_rejects_topic_name(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        # The topic's name is not a valid topic ID.
         self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'Invalid'},
+            params={'topic_id': 'topic'},
             expected_status_int=400,
         )
 
@@ -2081,9 +2149,9 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-    def test_get_translatable_topic_names(self) -> None:
+    def test_get_translatable_topics(self) -> None:
         response = self.get_json('/gettranslatabletopicnames')
-        self.assertEqual(response, {'topic_names': []})
+        self.assertEqual(response, {'topics': []})
 
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
@@ -2108,13 +2176,35 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         # Unpublished topics should be translatable.
         response = self.get_json('/gettranslatabletopicnames')
-        self.assertEqual(response, {'topic_names': ['topic']})
+        self.assertEqual(response, {'topics': [{'id': '0', 'name': 'topic'}]})
 
         topic_services.publish_topic(topic_id, self.admin_id)
 
         # Published topics should be translatable.
         response = self.get_json('/gettranslatabletopicnames')
-        self.assertEqual(response, {'topic_names': ['topic']})
+        self.assertEqual(response, {'topics': [{'id': '0', 'name': 'topic'}]})
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id,
+            topic_id,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+                        'old_value': 'topic',
+                        'new_value': 'renamed topic',
+                    }
+                )
+            ],
+            'Rename topic.',
+        )
+
+        # A renamed topic keeps its ID.
+        response = self.get_json('/gettranslatabletopicnames')
+        self.assertEqual(
+            response, {'topics': [{'id': '0', 'name': 'renamed topic'}]}
+        )
 
 
 class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
@@ -2134,7 +2224,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
-        self.assertEqual(response, {'topic_names_per_classroom': []})
+        self.assertEqual(response, {'topics_per_classroom': []})
 
     def test_topic_name_should_be_returned_when_topic_is_not_published(
         self,
@@ -2176,8 +2266,11 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response,
             {
-                'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                'topics_per_classroom': [
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [{'id': topic_id_1, 'name': 'topic 1'}],
+                    }
                 ]
             },
         )
@@ -2225,8 +2318,11 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response,
             {
-                'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                'topics_per_classroom': [
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [{'id': topic_id_1, 'name': 'topic 1'}],
+                    }
                 ]
             },
         )
@@ -2305,14 +2401,23 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         topic_services.publish_topic(topic_id_3, self.admin_id)
 
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
-        expected_response = {
-            'topic_names_per_classroom': [
-                {'classroom': '', 'topics': ['topic 3']},
-                {'classroom': 'Class 1', 'topics': ['topic']},
-                {'classroom': 'Class 2', 'topics': ['topic 2']},
-            ]
-        }
-        self.assertItemsEqual(response, expected_response)
+        self.assertItemsEqual(
+            response['topics_per_classroom'],
+            [
+                {
+                    'classroom': '',
+                    'topics': [{'id': topic_id_3, 'name': 'topic 3'}],
+                },
+                {
+                    'classroom': 'Class 1',
+                    'topics': [{'id': topic_id_1, 'name': 'topic 1'}],
+                },
+                {
+                    'classroom': 'Class 2',
+                    'topics': [{'id': topic_id_2, 'name': 'topic 2'}],
+                },
+            ],
+        )
 
 
 class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
@@ -3075,11 +3180,15 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_handler_returns_400_for_invalid_topic_name(self) -> None:
-        self.get_json(
-            '%s?language_code=hi&entity_type=exploration&topic_name=invalid'
+    def test_handler_returns_400_for_invalid_topic_id(self) -> None:
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_id=invalid'
             % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL,
             expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The supplied input topic ID: invalid is not valid',
         )
 
     @test_utils.enable_feature_flags(
@@ -3182,7 +3291,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_handler_filters_opportunities_by_topic_name(self) -> None:
+    def test_handler_filters_opportunities_by_topic_id(self) -> None:
         user_services.allow_user_to_review_translation_in_language(
             self.admin_id, 'hi'
         )
@@ -3263,38 +3372,56 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             'Translation suggestion',
         )
 
-        opportunity_models.TranslationOpportunityModel.create_new(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_1',
-            topic_ids=['topic_id_1'],
-            content_count=2,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={},
-        ).put()
+        opportunity_model = (
+            opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id='exp_1',
+                topic_ids=['topic_id_1'],
+                content_count=2,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={},
+            )
+        )
+        opportunity_model.put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
-        # Query filtering by topic name 'Topic 1'.
+        # Query filtering by the ID of 'Topic 1'.
         response = self.get_json(
-            '%s?language_code=hi&entity_type=exploration&topic_name=Topic+1'
+            '%s?language_code=hi&entity_type=exploration&topic_id=topic_id_1'
             % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
         )
         self.assertEqual(len(response['opportunities']), 1)
         self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
 
-        # Query filtering by topic name 'Topic 2', which should return empty list.
+        # Query filtering by the ID of 'Topic 2', which should return an empty
+        # list.
         response = self.get_json(
-            '%s?language_code=hi&entity_type=exploration&topic_name=Topic+2'
+            '%s?language_code=hi&entity_type=exploration&topic_id=topic_id_2'
             % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
         )
         self.assertEqual(response['opportunities'], [])
+
+        # Once the opportunity is also linked to 'Topic 2', it is returned
+        # when filtering by that topic, even though its topic_name still
+        # reflects 'Topic 1'.
+        opportunity_model.topic_ids = ['topic_id_1', 'topic_id_2']
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_id=topic_id_2'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
+        self.assertEqual(response['opportunities'][0]['topic_name'], 'Topic 1')
 
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_handler_handles_empty_topic_name(self) -> None:
+    def test_handler_handles_empty_topic_id(self) -> None:
         user_services.allow_user_to_review_translation_in_language(
             self.admin_id, 'hi'
         )
@@ -3352,10 +3479,10 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        # An empty topic name is how the dashboard says "all topics", so the
-        # opportunity is returned even though it belongs to a topic.
+        # An empty topic ID means "all topics", so the opportunity is returned
+        # even though it belongs to a topic.
         response = self.get_json(
-            '%s?language_code=hi&entity_type=exploration&topic_name='
+            '%s?language_code=hi&entity_type=exploration&topic_id='
             % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
         )
 

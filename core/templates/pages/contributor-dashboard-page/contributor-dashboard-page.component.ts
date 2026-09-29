@@ -54,7 +54,7 @@ export class ContributorDashboardPageComponent implements OnInit {
   tabsDetails!: ContributorDashboardTabsDetails;
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
-  topicName!: string;
+  topicId!: string;
   activeEntityType: string =
     ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   activeTabName!: string;
@@ -130,12 +130,10 @@ export class ContributorDashboardPageComponent implements OnInit {
     );
   }
 
-  onChangeTopic(topicName: string): void {
-    this.topicName = topicName;
-    this.translationTopicService.setActiveTopicName(this.topicName);
-    this.localStorageService.updateLastSelectedTranslationTopicName(
-      this.topicName
-    );
+  onChangeTopic(topicId: string): void {
+    this.topicId = topicId;
+    this.translationTopicService.setActiveTopicId(this.topicId);
+    this.localStorageService.updateLastSelectedTranslationTopicId(this.topicId);
   }
 
   showTopicSelector(): boolean {
@@ -183,8 +181,8 @@ export class ContributorDashboardPageComponent implements OnInit {
     this.userCanReviewQuestions = false;
     this.defaultHeaderVisible = true;
 
-    const prevSelectedTopicName =
-      this.localStorageService.getLastSelectedTranslationTopicName();
+    const prevSelectedTopicId =
+      this.localStorageService.getLastSelectedTranslationTopicId();
 
     this.userService
       .getUserContributionRightsDataAsync()
@@ -238,23 +236,23 @@ export class ContributorDashboardPageComponent implements OnInit {
     });
 
     this.contributionOpportunitiesService
-      .getTranslatableTopicNamesAsync()
-      .then(topicNames => {
+      .getTranslatableTopicsAsync()
+      .then(topics => {
         // TODO(#15710): Set default active topic to 'All'.
-        if (topicNames.length <= 0) {
-          this.translationTopicService.setActiveTopicName(
-            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
+        if (topics.length <= 0) {
+          this.translationTopicService.setActiveTopicId(
+            ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
           );
           return;
         }
-        this.topicName = topicNames[0];
+        this.topicId = topics[0].id;
         if (
-          prevSelectedTopicName &&
-          topicNames.indexOf(prevSelectedTopicName) !== -1
+          prevSelectedTopicId &&
+          topics.some(topic => topic.id === prevSelectedTopicId)
         ) {
-          this.topicName = prevSelectedTopicName;
+          this.topicId = prevSelectedTopicId;
         }
-        this.translationTopicService.setActiveTopicName(this.topicName);
+        this.translationTopicService.setActiveTopicId(this.topicId);
       });
 
     this.activeTabName = 'myContributionTab';

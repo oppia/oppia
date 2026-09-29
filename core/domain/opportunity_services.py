@@ -1391,7 +1391,7 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
 def get_translation_opportunities_with_new_models(
     entity_type: Optional[str],
     language_code: str,
-    topic_name: Optional[str] = None,
+    topic_id: Optional[str] = None,
     cursor: Optional[str] = None,
 ) -> Tuple[
     List[opportunity_domain.TranslationOpportunityCardInfo],
@@ -1399,13 +1399,14 @@ def get_translation_opportunities_with_new_models(
     bool,
 ]:
     """Returns a list of translation opportunity card info objects for the given
-    entity type, filtered by topic name and language code.
+    entity type, filtered by topic ID and language code.
 
     Args:
         entity_type: str or None. The entity type to fetch opportunities for.
             If None, opportunities for all entity types are returned.
         language_code: str. The language code to filter by.
-        topic_name: str or None. The name of the topic to filter by.
+        topic_id: str or None. The ID of the topic to filter by. If None or
+            empty, opportunities from all topics are returned.
         cursor: str or None. The datastore cursor for pagination.
 
     Returns:
@@ -1417,13 +1418,6 @@ def get_translation_opportunities_with_new_models(
             more: bool. If True, there are (probably) more results after this
                 batch.
     """
-    topic_id = None
-    if topic_name:
-        topic = topic_fetchers.get_topic_by_name(topic_name, strict=False)
-        if topic is None:
-            return [], None, False
-        topic_id = topic.id
-
     page_size = constants.OPPORTUNITIES_PAGE_SIZE
     opportunity_models_list, cursor, more = (
         opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
@@ -1677,7 +1671,7 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
 
 
 def get_translation_opportunities(
-    language_code: str, topic_name: Optional[str], cursor: Optional[str]
+    language_code: str, topic_id: Optional[str], cursor: Optional[str]
 ) -> Tuple[
     List[opportunity_domain.ExplorationOpportunitySummary], Optional[str], bool
 ]:
@@ -1685,14 +1679,14 @@ def get_translation_opportunities(
     language.
 
     Args:
+        language_code: str. The language for which translation opportunities
+            should be fetched.
+        topic_id: str or None. The ID of the topic for which translation
+            opportunities should be fetched. If topic_id is None or empty,
+            fetch translation opportunities from all topics.
         cursor: str or None. If provided, the list of returned entities
             starts from this datastore cursor. Otherwise, the returned
             entities start from the beginning of the full list of entities.
-        language_code: str. The language for which translation opportunities
-            should be fetched.
-        topic_name: str or None. The topic for which translation opportunities
-            should be fetched. If topic_name is None or empty, fetch
-            translation opportunities from all topics.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
@@ -1706,7 +1700,7 @@ def get_translation_opportunities(
     page_size = constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
-            page_size, cursor, language_code, topic_name
+            page_size, cursor, language_code, topic_id
         )
     )
     opportunity_summaries = []

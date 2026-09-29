@@ -17,6 +17,8 @@
  */
 
 import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {ALL_TOPICS_OPTION} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -46,33 +48,67 @@ describe('Translation topic service', () => {
 
     spyOn(
       contributionOpportunitiesService,
-      'getTranslatableTopicNamesAsync'
-    ).and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
+      'getTranslatableTopicsAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        ALL_TOPICS_OPTION,
+        {id: 'topic_id_1', name: 'Topic 1'},
+        {id: 'topic_id_2', name: 'Topic 2'},
+      ])
+    );
   });
 
   describe('Translation topic service', () => {
-    it('should correctly set and get topic names', fakeAsync(() => {
-      translationTopicService.setActiveTopicName('Topic 1');
+    it('should correctly set and get topic IDs', fakeAsync(() => {
+      translationTopicService.setActiveTopicId('topic_id_1');
       tick();
-      expect(translationTopicService.getActiveTopicName()).toBe('Topic 1');
+      expect(translationTopicService.getActiveTopicId()).toBe('topic_id_1');
     }));
 
-    it('should not allow invalid topic names to be set', fakeAsync(() => {
-      const logErrorSpy = spyOn(loggerService, 'error').and.callThrough();
-
-      translationTopicService.setActiveTopicName('Topic 3');
+    it('should allow the "all topics" sentinel to be set', fakeAsync(() => {
+      translationTopicService.setActiveTopicId(
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+      );
       tick();
-      expect(translationTopicService.getActiveTopicName()).toBeUndefined();
-      expect(logErrorSpy).toHaveBeenCalledWith(
-        'Invalid active topic name: Topic 3'
+      expect(translationTopicService.getActiveTopicId()).toBe(
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+      );
+    }));
+
+    it('should emit an event when the active topic changes', fakeAsync(() => {
+      const emitSpy = spyOn(
+        translationTopicService.onActiveTopicChanged,
+        'emit'
       );
 
-      translationTopicService.setActiveTopicName(null as unknown as string);
+      translationTopicService.setActiveTopicId('topic_id_2');
       tick();
-      expect(translationTopicService.getActiveTopicName()).toBeUndefined();
+
+      expect(emitSpy).toHaveBeenCalled();
     }));
 
-    it('should emit the new topic name', () => {
+    it('should not allow invalid topic IDs to be set', fakeAsync(() => {
+      const logErrorSpy = spyOn(loggerService, 'error').and.callThrough();
+      const emitSpy = spyOn(
+        translationTopicService.onActiveTopicChanged,
+        'emit'
+      );
+
+      translationTopicService.setActiveTopicId('topic_id_3');
+      tick();
+      expect(translationTopicService.getActiveTopicId()).toBeUndefined();
+      expect(logErrorSpy).toHaveBeenCalledWith(
+        'Invalid active topic ID: topic_id_3'
+      );
+
+      // A topic name is not a valid topic ID.
+      translationTopicService.setActiveTopicId('Topic 1');
+      tick();
+      expect(translationTopicService.getActiveTopicId()).toBeUndefined();
+      expect(emitSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should expose the active topic changed event emitter', () => {
       const newTopicEventEmitter = new EventEmitter();
       expect(translationTopicService.onActiveTopicChanged).toEqual(
         newTopicEventEmitter

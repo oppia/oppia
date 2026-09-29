@@ -135,7 +135,7 @@ export class ContributionAndReviewService {
     fetcher: SuggestionFetcher,
     shouldResetOffset: boolean,
     entityId: string | null,
-    topicName: string | null,
+    topicId: string | null,
     targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
@@ -156,7 +156,7 @@ export class ContributionAndReviewService {
         fetcher.offset,
         fetcher.sortKey,
         entityId,
-        topicName,
+        topicId,
         targetType
       )
       .then(responseBody => {
@@ -376,14 +376,14 @@ export class ContributionAndReviewService {
   async getReviewableQuestionSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    topicName: string | null
+    topicId: string | null
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset,
       null,
-      topicName
+      topicId
     );
   }
 

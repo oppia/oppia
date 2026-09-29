@@ -19,7 +19,10 @@
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
-import {ContributionOpportunitiesBackendApiService} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {
+  ContributionOpportunitiesBackendApiService,
+  TranslatableTopic,
+} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {LoginRequiredModalContent} from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
@@ -81,14 +84,14 @@ export class ContributionOpportunitiesService {
 
   private async _getTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
+    topicId: string,
     cursor: string,
     entityType?: string
   ) {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
         languageCode,
-        topicName,
+        topicId,
         cursor,
         entityType
       )
@@ -102,8 +105,8 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private async _getTranslatableTopicNamesAsync() {
-    return this.contributionOpportunitiesBackendApiService.fetchTranslatableTopicNamesAsync();
+  private async _getTranslatableTopicsAsync() {
+    return this.contributionOpportunitiesBackendApiService.fetchTranslatableTopicsAsync();
   }
 
   showRequiresLoginModal(): void {
@@ -119,12 +122,12 @@ export class ContributionOpportunitiesService {
 
   async getTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
+    topicId: string,
     entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
     return this._getTranslationOpportunitiesAsync(
       languageCode,
-      topicName,
+      topicId,
       '',
       entityType
     );
@@ -145,13 +148,13 @@ export class ContributionOpportunitiesService {
 
   async getMoreTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
+    topicId: string,
     entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
         languageCode,
-        topicName,
+        topicId,
         this._translationOpportunitiesCursor,
         entityType
       );
@@ -160,13 +163,13 @@ export class ContributionOpportunitiesService {
   }
 
   async getReviewableTranslationOpportunitiesAsync(
-    topicName: string,
+    topicId: string,
     languageCode?: string,
     entityType?: string
   ): Promise<ExplorationOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(
-        topicName,
+        topicId,
         languageCode,
         entityType
       )
@@ -178,8 +181,8 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  async getTranslatableTopicNamesAsync(): Promise<string[]> {
-    return this._getTranslatableTopicNamesAsync();
+  async getTranslatableTopicsAsync(): Promise<TranslatableTopic[]> {
+    return this._getTranslatableTopicsAsync();
   }
 
   get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
@@ -187,35 +190,35 @@ export class ContributionOpportunitiesService {
   }
 
   async pinReviewableTranslationOpportunityAsync(
-    topicName: string,
+    topicId: string,
     languageCode: string,
     explorationId: string
   ): Promise<void> {
     this.pinnedOpportunitiesChanged.emit({
-      topicName,
+      topicId,
       languageCode,
       explorationId,
     });
     return this.contributionOpportunitiesBackendApiService.pinTranslationOpportunity(
       languageCode,
-      topicName,
+      topicId,
       explorationId
     );
   }
 
   async unpinReviewableTranslationOpportunityAsync(
-    topicName: string,
+    topicId: string,
     languageCode: string,
     explorationId: string
   ): Promise<void> {
     this.unpinnedOpportunitiesChanged.emit({
-      topicName,
+      topicId,
       languageCode,
       explorationId,
     });
     return this.contributionOpportunitiesBackendApiService.unpinTranslationOpportunity(
       languageCode,
-      topicName
+      topicId
     );
   }
 

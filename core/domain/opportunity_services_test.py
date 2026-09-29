@@ -244,7 +244,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -253,7 +253,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -266,7 +266,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -275,7 +275,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
 
@@ -288,7 +288,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -296,7 +296,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
 
@@ -311,7 +311,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -332,7 +332,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -342,7 +342,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -351,7 +351,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -361,7 +361,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -370,7 +370,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -380,7 +380,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -405,9 +405,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'Change topic title.',
         )
 
+        # Opportunities are filtered by topic ID, so renaming the topic does
+        # not affect which opportunities are returned for it.
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'A new topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -416,12 +418,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.story_title, 'A story')
         self.assertEqual(opportunity.topic_name, 'A new topic')
 
+        # The topic's name is not a valid topic ID filter.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities(
+                'hi', 'A new topic', None
+            )
+        )
+        self.assertEqual(len(translation_opportunities), 0)
+
     def test_opportunities_updates_with_updating_story_title(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -447,7 +457,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -460,7 +470,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -487,7 +497,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -500,7 +510,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -639,7 +649,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -758,7 +768,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -804,7 +814,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         # after translation completion.
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -827,7 +837,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -961,7 +971,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -972,7 +982,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -988,7 +998,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -999,7 +1009,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -1008,7 +1018,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.add_exploration_0_to_story()
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 1)
@@ -1019,7 +1029,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
-                'hi', 'topic', None
+                'hi', self.TOPIC_ID, None
             )
         )
         self.assertEqual(len(translation_opportunities), 0)
@@ -1900,12 +1910,12 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_get_translation_opportunities_with_nonexistent_topic_name_returns_empty(
+    def test_get_translation_opportunities_with_nonexistent_topic_id_returns_empty(
         self,
     ) -> None:
         cards, _, _ = (
             opportunity_services.get_translation_opportunities_with_new_models(
-                feconf.ENTITY_TYPE_EXPLORATION, 'hi', topic_name='Nonexistent'
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', topic_id='nonexistent'
             )
         )
         self.assertEqual(len(cards), 0)
@@ -2179,7 +2189,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_get_translation_opportunities_with_valid_topic_name_filter(
+    def test_get_translation_opportunities_with_valid_topic_id_filter(
         self,
     ) -> None:
         entity_types_and_ids = {
@@ -2192,11 +2202,21 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities_with_new_models(
                 feconf.ENTITY_TYPE_EXPLORATION,
                 'hi',
-                topic_name='Topic 1',
+                topic_id='topic_id_1',
             )
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_1')
+
+        # The topic's name is not a valid topic ID filter.
+        cards, _, _ = (
+            opportunity_services.get_translation_opportunities_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'hi',
+                topic_id='Topic 1',
+            )
+        )
+        self.assertEqual(len(cards), 0)
 
     @test_utils.enable_feature_flags(
         [

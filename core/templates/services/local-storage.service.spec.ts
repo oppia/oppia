@@ -171,25 +171,25 @@ describe('LocalStorageService', () => {
       ).toBeNull();
     });
 
-    it('should correctly save a topic name', () => {
-      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
-      expect(localStorageService.getLastSelectedTranslationTopicName()).toBe(
-        'Topic 1'
+    it('should correctly save a topic ID', () => {
+      localStorageService.updateLastSelectedTranslationTopicId('topic_id_1');
+      expect(localStorageService.getLastSelectedTranslationTopicId()).toBe(
+        'topic_id_1'
       );
 
-      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
-      expect(localStorageService.getLastSelectedTranslationTopicName()).toBe(
-        'Topic 1'
+      localStorageService.updateLastSelectedTranslationTopicId('topic_id_2');
+      expect(localStorageService.getLastSelectedTranslationTopicId()).toBe(
+        'topic_id_2'
       );
     });
 
-    it('should not save a topic name when storage is not available', () => {
+    it('should not save a topic ID when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 
-      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
+      localStorageService.updateLastSelectedTranslationTopicId('topic_id_1');
 
       expect(
-        localStorageService.getLastSelectedTranslationTopicName()
+        localStorageService.getLastSelectedTranslationTopicId()
       ).toBeNull();
     });
 

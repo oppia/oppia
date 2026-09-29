@@ -55,7 +55,9 @@ export class LocalStorageService {
 
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = 'last_selected_translation_lang';
 
-  LAST_SELECTED_TRANSLATION_TOPIC_NAME = 'last_selected_translation_topic';
+  // A new key is used for the topic ID, since values stored under the old
+  // 'last_selected_translation_topic' key are topic names.
+  LAST_SELECTED_TRANSLATION_TOPIC_ID_KEY = 'last_selected_translation_topic_id';
 
   LAST_SELECTED_LANGUAGE_ACCENT_KEY = 'last_selected_language_accent_key';
 
@@ -226,34 +228,34 @@ export class LocalStorageService {
   }
 
   /**
-   * Save the given active topic name to localStorage.
-   * @param topicName
+   * Save the given active topic ID to localStorage.
+   * @param topicId
    */
-  updateLastSelectedTranslationTopicName(topicName: string): void {
+  updateLastSelectedTranslationTopicId(topicId: string): void {
     if (this.isStorageAvailable()) {
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).setItem(
-        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME,
-        topicName
+        this.LAST_SELECTED_TRANSLATION_TOPIC_ID_KEY,
+        topicId
       );
     }
   }
 
   /**
-   * Retrieve the local save of the last selected topic for translation.
-   * @returns {String} The local save of the last selected topic for
-   *   translation if it exists, else null.
+   * Retrieve the ID of the last selected topic for translation.
+   * @returns {String} The ID of the last selected topic for translation if it
+   *   exists, else null.
    */
-  getLastSelectedTranslationTopicName(): string | null {
+  getLastSelectedTranslationTopicId(): string | null {
     if (this.isStorageAvailable()) {
       return (
         // It is possible that storage does not exist or the user does not have
         // permission to access it but this condition is already being checked
         // by calling 'isStorageAvailable()' so the typecast is safe.
         (this.storage as Storage).getItem(
-          this.LAST_SELECTED_TRANSLATION_TOPIC_NAME
+          this.LAST_SELECTED_TRANSLATION_TOPIC_ID_KEY
         )
       );
     }
