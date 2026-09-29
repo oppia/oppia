@@ -35,6 +35,17 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                 response.mustcontain('<oppia-root></oppia-root>')
                 response.mustcontain('oppia-feature-flags')
 
+    def test_error_page_with_status_code_returns_oppia_root(self) -> None:
+        """Tests that error pages with a status code render the oppia root page
+        with a 200 status.
+        """
+        for status_code in ('400', '401', '404', '500'):
+            response = self.get_html_response(
+                '/error/%s' % status_code, expected_status_int=200
+            )
+            response.mustcontain('<oppia-root></oppia-root>')
+            response.mustcontain('oppia-feature-flags')
+
     def test_explore_and_embed_urls_render_with_no_iframe_restriction(
         self,
     ) -> None:

@@ -19,7 +19,7 @@
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {ActivatedRoute, UrlSegment} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ErrorPageRootComponent} from './error-page-root.component';
@@ -135,18 +135,20 @@ describe('ErrorPageRootComponent', () => {
     expect(getElementsByTagNameSpy).not.toHaveBeenCalled();
   });
 
-  it('should default to 404 in case of nested url', () => {
+  it('should default to 404 when no valid status code is present', () => {
     const parentNgOnInitSpy = spyOn(BaseRootComponent.prototype, 'ngOnInit');
-    component.activatedRoute.snapshot.url = [new UrlSegment('nested_path', {})];
+    spyOn(component.activatedRoute.snapshot.paramMap, 'get').and.returnValue(
+      null
+    );
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
       'getElementsByTagName'
-    );
+    ).and.returnValue([{getAttribute: () => null}]);
 
     component.ngOnInit();
 
     expect(component.statusCode).toEqual('404');
     expect(parentNgOnInitSpy).toHaveBeenCalledTimes(1);
-    expect(getElementsByTagNameSpy).not.toHaveBeenCalled();
+    expect(getElementsByTagNameSpy).toHaveBeenCalledWith('body');
   });
 });
