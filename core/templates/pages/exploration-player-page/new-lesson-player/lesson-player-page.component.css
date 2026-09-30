@@ -48,6 +48,10 @@ oppia-new-conversation-skin {
   width: 100% ;
 }
 
+.oppia-new-player-content ::ng-deep .oppia-form-error {
+  font-size: smaller;
+}
+
 oppia-new-audio-bar {
   z-index: 2;
 }

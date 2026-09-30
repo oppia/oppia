@@ -566,7 +566,6 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, mat-form-field.ng-inval
 
 .oppia-form-error {
   color: red;
-  font-size: smaller;
 }
 
 .oppia-form-error-container {
