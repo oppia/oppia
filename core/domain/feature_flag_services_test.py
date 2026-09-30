@@ -29,7 +29,7 @@ from core.domain import feature_flag_services as feature_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Tuple
+from typing import Any, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -859,3 +859,83 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         for feature_status in feature_status_for_users:
             self.assertTrue(feature_status)
+
+    def test_evaluating_all_feature_flags_fetches_user_groups_once(
+        self,
+    ) -> None:
+        user_models.UserGroupModel(
+            id=self.USER_GROUP_1,
+            name='USER_GROUP_1',
+            user_ids=[self.owner_id],
+        ).put()
+        query_call_count = 0
+        original_query = user_models.UserGroupModel.query
+
+        # Here we use type Any because this mock forwards all of its
+        # arguments to the original query method.
+        def mock_query(*args: Any, **kwargs: Any) -> Any:
+            nonlocal query_call_count
+            query_call_count += 1
+            return original_query(*args, **kwargs)
+
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list()
+        )
+        swap_registry = self._swap_name_to_description_feature_stage_registry()
+        with swap_all_feature_flags, swap_all_feature_names_set, swap_registry:
+            with self.swap_name_to_description_feature_stage_dict, self.swap(
+                constants, 'DEV_MODE', True
+            ):
+                # Enable every feature flag only for USER_GROUP_1, so that
+                # evaluating them needs the owner's user groups.
+                for feature_name in self.feature_names:
+                    feature_services.update_feature_flag(
+                        feature_name, False, 0, [self.USER_GROUP_1]
+                    )
+                with self.swap(user_models.UserGroupModel, 'query', mock_query):
+                    feature_flag_values = (
+                        feature_services.evaluate_all_feature_flag_configs(
+                            self.owner_id
+                        )
+                    )
+
+        self.assertEqual(
+            feature_flag_values,
+            {feature_name: True for feature_name in self.feature_names},
+        )
+        self.assertEqual(query_call_count, 1)
+
+    def test_user_groups_are_not_fetched_if_no_feature_flag_uses_them(
+        self,
+    ) -> None:
+        swap_query = self.swap_with_call_counter(
+            user_models.UserGroupModel, 'query'
+        )
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list()
+        )
+        swap_registry = self._swap_name_to_description_feature_stage_registry()
+        with swap_all_feature_flags, swap_all_feature_names_set, swap_registry:
+            with self.swap_name_to_description_feature_stage_dict, self.swap(
+                constants, 'DEV_MODE', True
+            ), swap_query as query_counter:
+                feature_flag_values = (
+                    feature_services.evaluate_all_feature_flag_configs(
+                        self.owner_id
+                    )
+                )
+                is_dev_feature_flag_enabled = (
+                    feature_services.is_feature_flag_enabled(
+                        self.dev_feature_flag.name, self.owner_id
+                    )
+                )
+
+        # All the feature flags are force-enabled in setUp and none of them
+        # are enabled for any user groups, so the user's groups are never
+        # needed and should not be fetched.
+        self.assertEqual(query_counter.times_called, 0)
+        self.assertTrue(is_dev_feature_flag_enabled)
+        self.assertEqual(
+            feature_flag_values,
+            {feature_name: True for feature_name in self.feature_names},
+        )

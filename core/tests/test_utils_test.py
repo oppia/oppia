@@ -71,6 +71,27 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
             feature_flag_services.is_feature_flag_enabled('blog_pages', None)
         )
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+    )
+    def test_enable_feature_flags_decorator_applies_to_all_flag_values(
+        self,
+    ) -> None:
+        """Tests that the decorator also affects the values returned by
+        evaluate_all_feature_flag_configs, which is what the frontend uses.
+        """
+        feature_flag_values = (
+            feature_flag_services.evaluate_all_feature_flag_configs(None)
+        )
+        self.assertTrue(feature_flag_values['dummy_feature_flag_for_e2e_tests'])
+        self.assertFalse(
+            any(
+                is_enabled
+                for name, is_enabled in feature_flag_values.items()
+                if name != 'dummy_feature_flag_for_e2e_tests'
+            )
+        )
+
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
     """Test for testing test_utils.FunctionWrapper."""
