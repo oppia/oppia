@@ -111,6 +111,7 @@ class FeatureNames(enum.Enum):
     # this flag's state. The migration job renames the persisted row from
     # 'story_editor_arcs' to this value.
     STORY_EDITOR_MODULES = 'story_editor_modules'
+    ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
 
 
 # Names of feature objects defined in FeatureNames should be added

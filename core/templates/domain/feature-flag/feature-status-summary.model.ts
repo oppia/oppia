@@ -55,6 +55,7 @@ export enum FeatureNames {
   // feature status summary; the migration job renames the persisted
   // FeatureFlagConfigModel id from 'story_editor_arcs' to this value.
   StoryEditorModules = 'story_editor_modules',
+  EnableDropdownPagination = 'enable_dropdown_pagination',
 }
 
 export interface FeatureStatusSummaryBackendDict {
