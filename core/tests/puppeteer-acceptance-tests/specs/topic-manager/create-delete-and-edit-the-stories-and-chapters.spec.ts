@@ -26,7 +26,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const {DEFAULT_SPEC_TIMEOUT_MSECS} = testConstants;
 
 describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
@@ -110,10 +110,13 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to edit and preview the story', async function () {
+    // Pass all 5 arguments to ensure the "Create Story" button is enabled.
     await topicManager.addStoryToTopic(
-      'The Broken Calculator',
-      'the-broken-calculator',
-      'Arithmetic Operations'
+      'The Broken Calculator 2',
+      'the-broken-calculator-two',
+      'Arithmetic Operations',
+      'this is a meta tag',
+      testConstants.data.profilePicture
     );
     await topicManager.editStoryDetails(
       'New Story Title',
@@ -130,19 +133,26 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to save chapters with mobile supported explorations', async function () {
+    // Open the story editor first to recover from the previous test's preview tab.
+    await topicManager.openStoryEditor(
+      'New Story Title',
+      'Arithmetic Operations'
+    );
+
     // Revert the story name and add a chapter using the main exploration.
     await topicManager.editStoryDetails(
-      'The Broken Calculator',
+      'The Broken Calculator 3',
       'Learn how to solve problems without a calculator.',
       'Learn how to solve problems without a calculator.',
-      'the-broken-calculator'
+      'the-broken-calculator-three'
     );
-    await topicManager.addChapter('Solve Problems', explorationId);
+    // Corrected chapter name to match Test 1.
+    await topicManager.addChapter('Solving Problems', explorationId);
     await topicManager.saveStoryDraft();
 
     // Add simple chapter.
     await topicManager.openStoryEditor(
-      'The Broken Calculator',
+      'The Broken Calculator 3',
       'Arithmetic Operations'
     );
     await topicManager.addChapter('Simple Exploration', simpleExplorationId);
@@ -155,13 +165,13 @@ describe('Topic Manager', function () {
     // Try to add a chapter using a Programming Exploration (Code Editor
     // interaction is not mobile-supported) and expect an error.
     await topicManager.openStoryEditor(
-      'The Broken Calculator',
+      'The Broken Calculator 3',
       'Arithmetic Operations'
     );
     await topicManager.addChapterWithoutSaving(
       'Programming Exploration',
       unsupportedExplorationId,
-      'The Broken Calculator',
+      'The Broken Calculator 3',
       'Arithmetic Operations'
     );
     await topicManager.clickOnElementWithText('Create Chapter');
@@ -174,7 +184,7 @@ describe('Topic Manager', function () {
     await topicManager.addChapterWithoutSaving(
       'Duplicate Exploration Chapter',
       simpleExplorationId,
-      'The Broken Calculator',
+      'The Broken Calculator 3',
       'Arithmetic Operations'
     );
     await topicManager.clickOnElementWithText('Create Chapter');
@@ -184,17 +194,20 @@ describe('Topic Manager', function () {
 
     // Verify initial order.
     await topicManager.expectChaptersOrderToBe([
-      'Solve Problems',
+      'Solving Problems',
       'Simple Exploration',
     ]);
 
-    // Drag 'Simple Exploration' chapter above 'Solve Problems' chapter.
-    await topicManager.reorderChapters('Simple Exploration', 'Solve Problems');
+    // Drag 'Simple Exploration' chapter above 'Solving Problems' chapter.
+    await topicManager.reorderChapters(
+      'Simple Exploration',
+      'Solving Problems'
+    );
 
     // Verify new order.
     await topicManager.expectChaptersOrderToBe([
       'Simple Exploration',
-      'Solve Problems',
+      'Solving Problems',
     ]);
     await topicManager.discardStoryChanges();
   });
@@ -203,14 +216,14 @@ describe('Topic Manager', function () {
     'should be able to edit and preview the chapter',
     async function () {
       await topicManager.openStoryEditor(
-        'The Broken Calculator',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
-      await topicManager.ensureChapterIsInitial('Solve Problems');
+      await topicManager.ensureChapterIsInitial('Solving Problems');
 
       await topicManager.openChapterEditor(
-        'Solve Problems',
-        'The Broken Calculator',
+        'Solving Problems',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
       await topicManager.addAcquiredSkill('Addition');
@@ -218,7 +231,7 @@ describe('Topic Manager', function () {
 
       await topicManager.openChapterEditor(
         'Simple Exploration',
-        'The Broken Calculator',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
       await topicManager.editChapterDetails(
@@ -266,28 +279,28 @@ describe('Topic Manager', function () {
       await topicManager.removePrerequisiteSkillFromChapter('Subtraction');
       await topicManager.saveStoryDraft();
 
-      // Delete the acquired skill from the current chapter before removing
+      // Delete the acquired skill from the current chapter before removing.
       // the dependent skill from the earlier chapter.
       await topicManager.removeAcquiredSkill('Subtraction');
       await topicManager.saveStoryDraft();
 
       await topicManager.openChapterEditor(
-        'Solve Problems',
-        'The Broken Calculator',
+        'Solving Problems',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
       await topicManager.removeAcquiredSkill('Addition');
       await topicManager.saveStoryDraft();
 
       await topicManager.openChapterEditor(
-        'Solve Problems',
-        'The Broken Calculator',
+        'Solving Problems',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
       await topicManager.expectAquiredSkillToBeVisible('Addition', false);
       await topicManager.openChapterEditor(
         'New Title',
-        'The Broken Calculator',
+        'The Broken Calculator 3',
         'Arithmetic Operations'
       );
       await topicManager.expectPrerequisiteSkillToBeVisible('Addition', false);
