@@ -601,7 +601,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -619,7 +619,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     'question_versions': {'question_1': 1},
                     'question_topic_links': {'question_1': ['topic_1']},
                 },
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )
@@ -638,7 +638,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -667,8 +667,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     'question_versions': {'question_1': 1},
                     'question_topic_links': {'question_1': ['topic_1']},
                 },
-                started_at=datetime.datetime.utcnow(),
-                finished_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
+                finished_at=utils.get_current_utc_datetime(),
                 is_submitted=True,
             )
         # A submitted attempt for a different certificate is not counted.
@@ -685,8 +685,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
+            finished_at=utils.get_current_utc_datetime(),
             is_submitted=True,
         )
         # An in-progress attempt is ignored even if it carries a higher index.
@@ -703,7 +703,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -776,7 +776,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=4, seconds=30)
             ),
             finished_at=None,
@@ -856,7 +856,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=9, seconds=30)
             ),
             finished_at=None,
@@ -928,7 +928,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=10, seconds=1)
             ),
             finished_at=None,
@@ -1011,8 +1011,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
+            finished_at=utils.get_current_utc_datetime(),
             is_submitted=True,
         )
         with self.assertRaisesRegex(
@@ -1070,7 +1070,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     question_id_3: [self.topic_id],
                 },
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1180,7 +1180,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     question_id: ['topic_1'] for question_id in question_ids
                 },
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )

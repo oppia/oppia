@@ -40,7 +40,6 @@ from core.domain import (
     exp_services,
     rights_domain,
     rights_manager,
-    search_services,
     subscription_services,
     user_domain,
     user_services,
@@ -74,13 +73,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW: Final = 'create_new'
-
-# Name for the collection search index.
-SEARCH_INDEX_COLLECTIONS: Final = 'collections'
-
-# The maximum number of iterations allowed for populating the results of a
-# search query.
-MAX_ITERATIONS: Final = 10
 
 
 class SnapshotsMetadataDict(TypedDict):
@@ -418,14 +410,24 @@ def get_collection_and_collection_rights_by_id(
         )
     )
 
+    # Here we use cast because query result has a generic model type.
+    collection_model = cast(
+        Optional[collection_models.CollectionModel],
+        collection_and_rights[0][0],
+    )
     collection = None
-    if collection_and_rights[0][0] is not None:
-        collection = get_collection_from_model(collection_and_rights[0][0])
+    if collection_model is not None:
+        collection = get_collection_from_model(collection_model)
 
+    # Here we use cast because query result has a generic model type.
+    collection_rights_model = cast(
+        Optional[collection_models.CollectionRightsModel],
+        collection_and_rights[1][0],
+    )
     collection_rights = None
-    if collection_and_rights[1][0] is not None:
+    if collection_rights_model is not None:
         collection_rights = rights_manager.get_activity_rights_from_model(
-            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+            collection_rights_model, constants.ACTIVITY_TYPE_COLLECTION
         )
 
     return (collection, collection_rights)
@@ -718,72 +720,6 @@ def get_collection_summaries_where_user_has_role(
     ]
 
 
-def get_collection_ids_matching_query(
-    query_string: str,
-    categories: List[str],
-    language_codes: List[str],
-    offset: Optional[int] = None,
-) -> Tuple[List[str], Optional[int]]:
-    """Returns a list with all collection ids matching the given search query
-    string, as well as a search offset for future fetches.
-
-    Args:
-        query_string: str. The search query string.
-        categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these categories.
-        language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        offset: int or None. Offset indicating where, in the list of
-            collections, to start the search from.
-
-    Returns:
-        2-tuple of (returned_collection_ids, search_offset). Where:
-            returned_collection_ids : list(str). A list with all collection ids
-                matching the given search query string, as well as a search
-                offset for future fetches. The list contains exactly
-                feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
-                that many, otherwise it contains all remaining results. (If this
-                behaviour does not occur, an error will be logged.)
-            search_offset: int. Search offset for future fetches.
-    """
-    returned_collection_ids: List[str] = []
-    search_offset = offset
-
-    for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
-            returned_collection_ids
-        )
-
-        collection_ids, search_offset = search_services.search_collections(
-            query_string,
-            categories,
-            language_codes,
-            remaining_to_fetch,
-            offset=search_offset,
-        )
-
-        # Collection model cannot be None as we are fetching the collection ids
-        # through query and there cannot be a collection id for which there is
-        # no collection.
-        for ind, _ in enumerate(
-            collection_models.CollectionSummaryModel.get_multi(collection_ids)
-        ):
-            returned_collection_ids.append(collection_ids[ind])
-
-        # The number of collections in a page is always less than or equal to
-        # feconf.SEARCH_RESULTS_PAGE_SIZE.
-        if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-            search_offset is None
-        ):
-            break
-
-    return (returned_collection_ids, search_offset)
-
-
 # Repository SAVE and DELETE methods.
 def apply_change_list(
     collection_id: str,
@@ -1039,7 +975,6 @@ def _save_collection(
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id]
     )
-    index_collections_given_ids([collection.id])
 
     collection.version += 1
 
@@ -1168,9 +1103,6 @@ def delete_collections(
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids
     )
-
-    # Delete the collection from search.
-    search_services.delete_collections_from_search_index(collection_ids)
 
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
@@ -1469,10 +1401,10 @@ def save_collection_summary(
         ),
     }
 
-    collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id
-        )
+    collection_summary_model: Optional[
+        collection_models.CollectionSummaryModel
+    ] = collection_models.CollectionSummaryModel.get_by_id(
+        collection_summary.id
     )
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
@@ -1592,8 +1524,6 @@ def load_demo(collection_id: str) -> None:
     system_user = user_services.get_system_user()
     publish_collection_and_update_user_profiles(system_user, collection_id)
 
-    index_collections_given_ids([collection_id])
-
     # Now, load all of the demo explorations that are part of the collection.
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
@@ -1602,20 +1532,3 @@ def load_demo(collection_id: str) -> None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
-
-
-def index_collections_given_ids(collection_ids: List[str]) -> None:
-    """Adds the given collections to the search index.
-
-    Args:
-        collection_ids: list(str). List of collection ids whose collections are
-            to be indexed.
-    """
-    collection_summaries = get_collection_summaries_matching_ids(collection_ids)
-    search_services.index_collection_summaries(
-        [
-            collection_summary
-            for collection_summary in collection_summaries
-            if collection_summary is not None
-        ]
-    )
