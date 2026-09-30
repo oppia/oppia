@@ -32,7 +32,6 @@ from core.domain import (
     html_cleaner,
     opportunity_services,
     platform_parameter_list,
-    web_platform_parameter_services,
     question_domain,
     question_services,
     skill_domain,
@@ -42,6 +41,7 @@ from core.domain import (
     translation_domain,
     translation_services,
     user_services,
+    web_platform_parameter_services,
 )
 from core.platform import models
 from extensions import domain

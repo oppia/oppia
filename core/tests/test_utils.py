@@ -55,10 +55,7 @@ from core.domain import (
     interaction_registry,
     object_registry,
     param_domain,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
-    web_platform_parameter_services,
     question_domain,
     question_services,
     rights_manager,
@@ -76,6 +73,9 @@ from core.domain import (
     topic_services,
     translation_domain,
     user_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
 )
 from core.platform import models
 from core.platform.taskqueue import cloud_tasks_emulator

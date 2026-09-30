@@ -32,9 +32,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
     question_services,
     rights_domain,
     rights_manager,
@@ -42,6 +40,8 @@ from core.domain import (
     stats_services,
     translation_domain,
     user_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
     wipeout_service,
 )
 from core.platform import models

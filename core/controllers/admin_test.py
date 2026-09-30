@@ -32,9 +32,7 @@ from core.domain import (
     exp_services,
     fs_services,
     opportunity_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
     question_fetchers,
     question_services,
     recommendations_services,
@@ -54,6 +52,8 @@ from core.domain import (
     translation_domain,
     user_services,
     voiceover_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
     wipeout_service,
 )
 from core.platform import models

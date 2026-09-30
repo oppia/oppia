@@ -32,10 +32,10 @@ from core.domain import (
     exp_fetchers,
     fs_services,
     platform_parameter_list,
-    web_platform_parameter_services,
     role_services,
     state_domain,
     user_domain,
+    web_platform_parameter_services,
 )
 from core.platform import models
 

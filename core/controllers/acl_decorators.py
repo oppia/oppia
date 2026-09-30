@@ -34,7 +34,6 @@ from core.domain import (
     feature_flag_services,
     feedback_services,
     platform_parameter_list,
-    web_platform_parameter_services,
     question_services,
     rights_manager,
     role_services,
@@ -49,6 +48,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_services,
+    web_platform_parameter_services,
 )
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar

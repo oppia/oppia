@@ -31,10 +31,10 @@ if MYPY:  # pragma: no cover
     # at runtime.
     from core.domain import (
         param_domain,
-        web_platform_parameter_domain,
         question_domain,
         state_domain,
         translation_domain,
+        web_platform_parameter_domain,
     )
 
     # After importing modules under the `if MYPY` clause they are not

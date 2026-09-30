@@ -38,7 +38,6 @@ from core.domain import (
     learner_progress_services,
     moderator_services,
     platform_parameter_list,
-    web_platform_parameter_services,
     question_services,
     rating_services,
     recommendations_services,
@@ -51,6 +50,7 @@ from core.domain import (
     translation_fetchers,
     translation_services,
     user_services,
+    web_platform_parameter_services,
 )
 
 from typing import Dict, List, Optional, TypedDict, Union

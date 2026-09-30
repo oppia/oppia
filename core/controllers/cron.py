@@ -25,12 +25,12 @@ from core.domain import (
     cron_services,
     email_manager,
     platform_parameter_list,
-    web_platform_parameter_services,
     story_services,
     suggestion_registry,
     suggestion_services,
     taskqueue_services,
     user_services,
+    web_platform_parameter_services,
 )
 from core.jobs.batch_jobs import (
     cloud_task_run_migration_jobs,

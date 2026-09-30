@@ -34,13 +34,13 @@ from core.domain import (
     general_feedback_domain,
     image_validation_services,
     improvements_domain,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
     question_domain,
     skill_domain,
     state_domain,
     stats_domain,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
 )
 
 from typing import Any, Dict, Mapping

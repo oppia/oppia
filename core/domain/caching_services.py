@@ -24,10 +24,10 @@ from core.domain import (
     caching_domain,
     collection_domain,
     exp_domain,
-    web_platform_parameter_domain,
     skill_domain,
     story_domain,
     topic_domain,
+    web_platform_parameter_domain,
 )
 from core.platform import models
 

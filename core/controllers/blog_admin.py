@@ -23,12 +23,12 @@ from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
     blog_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
-    web_platform_parameter_services,
     role_services,
     user_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
 )
 
 from typing import Dict, Final, Optional, TypedDict

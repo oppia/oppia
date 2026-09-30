@@ -27,9 +27,7 @@ from core.domain import (
     email_manager,
     exp_domain,
     exp_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
-    web_platform_parameter_registry,
     question_domain,
     story_domain,
     story_services,
@@ -38,6 +36,8 @@ from core.domain import (
     taskqueue_services,
     translation_domain,
     user_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_registry,
 )
 from core.jobs.batch_jobs import (
     cloud_task_run_migration_jobs,

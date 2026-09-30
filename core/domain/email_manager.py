@@ -31,8 +31,6 @@ from core.domain import (
     general_feedback_domain,
     html_cleaner,
     platform_parameter_list,
-    web_platform_parameter_registry,
-    web_platform_parameter_services,
     rights_domain,
     story_domain,
     subscription_services,
@@ -40,6 +38,8 @@ from core.domain import (
     taskqueue_services,
     topic_services,
     user_services,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
 )
 from core.platform import models
 

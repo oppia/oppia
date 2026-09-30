@@ -24,8 +24,8 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     caching_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
+    web_platform_parameter_domain,
 )
 from core.domain import web_platform_parameter_registry as registry
 from core.domain import web_platform_parameter_services as parameter_services

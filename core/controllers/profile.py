@@ -29,12 +29,12 @@ from core.domain import (
     email_manager,
     feature_flag_services,
     platform_parameter_list,
-    web_platform_parameter_services,
     role_services,
     subscription_services,
     summary_services,
     takeout_service,
     user_services,
+    web_platform_parameter_services,
     wipeout_service,
 )
 

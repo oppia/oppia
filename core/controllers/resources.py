@@ -25,11 +25,12 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
-    web_platform_parameter_domain,
     platform_parameter_list,
+    value_generators_domain,
+    web_platform_parameter_domain,
 )
 from core.domain import web_platform_parameter_registry as registry
-from core.domain import web_platform_parameter_services, value_generators_domain
+from core.domain import web_platform_parameter_services
 
 from typing import Dict, TypedDict
 
