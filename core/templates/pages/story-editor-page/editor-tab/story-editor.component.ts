@@ -59,9 +59,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   disconnectedNodes!: string[];
   linearNodesList!: StoryNode[];
   nodes!: StoryNode[];
-  allowedBgColors: string[] = [
-    ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story,
-  ];
+  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
 
   initialNodeId!: string;
   notesEditorIsShown!: boolean;

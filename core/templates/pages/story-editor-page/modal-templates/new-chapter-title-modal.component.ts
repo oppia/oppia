@@ -48,9 +48,7 @@ export class NewChapterTitleModalComponent implements OnInit {
   categoryIsDefault!: boolean;
   statesWithRestrictedInteractions!: string[];
   statesWithTooFewMultipleChoiceOptions!: string[];
-  allowedBgColors: string[] = [
-    ...newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter,
-  ];
+  allowedBgColors = newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
 
   constructor(
     private curatedExplorationValidationService: CuratedExplorationValidationService,

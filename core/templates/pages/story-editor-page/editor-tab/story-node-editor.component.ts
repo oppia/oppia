@@ -87,9 +87,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   storyNodeIds!: string[];
   nodeIdToTitleMap!: Record<string, string>;
   skillInfoHasLoaded = false;
-  allowedBgColors: string[] = [
-    ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter,
-  ];
+  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
   isStoryPublished!: () => boolean;
   currentTitle!: string;
   editableTitle!: string;
