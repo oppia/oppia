@@ -431,7 +431,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_module_page_with_zero_module_position(self) -> None:
+    def test_end_of_module_page_with_zero_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
@@ -443,7 +443,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_module_page_with_large_module_position(self) -> None:
+    def test_end_of_module_page_with_large_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
@@ -670,7 +670,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_any_user_can_access_end_of_module_page_with_module_position(
+    def test_any_user_can_access_end_of_module_page_with_module_id(
         self,
     ) -> None:
         story_id = 'story_id_2'
@@ -749,7 +749,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_end_of_module_page_with_out_of_range_module_position(self) -> None:
+    def test_end_of_module_page_with_out_of_range_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
@@ -773,7 +773,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_module_page_with_invalid_module_position(self) -> None:
+    def test_end_of_module_page_with_invalid_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
@@ -785,7 +785,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_module_page_with_non_ascii_module_position(self) -> None:
+    def test_end_of_module_page_with_non_ascii_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
@@ -797,7 +797,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_module_page_with_emoji_module_position(self) -> None:
+    def test_end_of_module_page_with_emoji_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (

@@ -50,7 +50,7 @@ class MockAccessValidationBackendApiService {
   validateAccessToEndOfModulePage(
     _classroomUrlFragment: string,
     _topicUrlFragment: string,
-    _modulePosition: string
+    _moduleId: string
   ) {
     return Promise.resolve();
   }
@@ -246,7 +246,7 @@ describe('PracticeSessionAccessGuard', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
-  it('should allow access for end-of-module when module_position is present', fakeAsync(() => {
+  it('should allow access for end-of-module when module_id is present', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
       'validateAccessToEndOfModulePage'
@@ -260,7 +260,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      module_position: '1',
+      module_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -331,7 +331,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
-  it('should redirect to 404 when StoryEditorModules flag is disabled and module_position is present', fakeAsync(() => {
+  it('should redirect to 404 when StoryEditorModules flag is disabled and module_id is present', fakeAsync(() => {
     mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
@@ -340,7 +340,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      module_position: '1',
+      module_id: '1',
     };
 
     guard

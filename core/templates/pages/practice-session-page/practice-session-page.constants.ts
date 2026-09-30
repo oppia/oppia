@@ -30,7 +30,7 @@ export const PracticeSessionPageConstants = {
 
   MODULE_PRACTICE_DATA_URL:
     '/practice_session/data/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/module/<module_position>',
+    '<topic_url_fragment>/module/<module_id>',
 
   MASTERY_CHALLENGE_DATA_URL:
     '/practice_session/data/<classroom_url_fragment>/' + '<topic_url_fragment>',
@@ -47,7 +47,7 @@ export const PracticeSessionPageConstants = {
 
   END_OF_MODULE_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/test/module/' +
-    '<module_position>',
+    '<module_id>',
 
   MASTERY_CHALLENGE_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/' +

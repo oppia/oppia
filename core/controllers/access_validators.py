@@ -322,7 +322,7 @@ class PracticeSessionAccessValidationPage(
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
-        'module_position': {
+        'module_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
@@ -346,7 +346,7 @@ class PracticeSessionAccessValidationPage(
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
         node_id = self.request.route_kwargs.get('node_id')
-        module_position = self.request.route_kwargs.get('module_position')
+        module_id = self.request.route_kwargs.get('module_id')
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         assert isinstance(topic_url_fragment, str)
@@ -357,8 +357,8 @@ class PracticeSessionAccessValidationPage(
             self._validate_node_id(topic, node_id)
             return
 
-        if module_position is not None:
-            self._validate_module_position(topic, module_position)
+        if module_id is not None:
+            self._validate_module_id(topic, module_id)
             return
 
         if subtopics is None:
@@ -409,12 +409,10 @@ class PracticeSessionAccessValidationPage(
         Returns:
             list(Module). All modules in order.
         """
-        return [
-            module
-            for _, module in story_fetchers.get_all_modules_with_stories_for_topic(
-                topic
-            )
-        ]
+        stories_with_modules = (
+            story_fetchers.get_all_modules_with_stories_for_topic(topic)
+        )
+        return [module for _, module in stories_with_modules]
 
     def _validate_node_id(
         self, topic: topic_domain.Topic, node_id: str
@@ -438,32 +436,30 @@ class PracticeSessionAccessValidationPage(
                 'Node with id %s is not part of this topic.' % node_id
             )
 
-    def _validate_module_position(
-        self, topic: topic_domain.Topic, module_position: str
+    def _validate_module_id(
+        self, topic: topic_domain.Topic, module_id: str
     ) -> None:
-        """Validates that the given module position exists in the first story.
+        """Validates that the given module ID exists in the first story.
 
-        The module_position parameter is a 1-based index that maps to the nth
-        module in the first published story of the topic (e.g., '1' maps to
-        the first module). It is a position, not a module ID.
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the first published story of the topic (e.g., '1' maps to the first
+        module).
 
         Args:
             topic: Topic. The topic object.
-            module_position: str. The module position (1-based index) to
-                validate.
+            module_id: str. The module ID (1-based index) to validate.
 
         Raises:
-            NotFoundException. The module position was not found.
+            NotFoundException. The module ID was not found.
         """
         all_modules = self._get_all_modules_for_topic(topic)
         if (
-            not module_position.isascii()
-            or not module_position.isdigit()
-            or not 1 <= int(module_position) <= len(all_modules)
+            not module_id.isascii()
+            or not module_id.isdigit()
+            or not 1 <= int(module_id) <= len(all_modules)
         ):
             raise self.NotFoundException(
-                'Module with position %s is not part of this topic.'
-                % module_position
+                'Module with id %s is not part of this topic.' % module_id
             )
 
 

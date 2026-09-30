@@ -347,7 +347,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_skill_ids_for_nonexistent_module_position(
+    def test_get_returns_empty_skill_ids_for_nonexistent_module_id(
         self,
     ) -> None:
         story_id = 'story_id_2'
@@ -424,7 +424,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_succeeds_with_module_position(self) -> None:
+    def test_get_succeeds_with_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -505,7 +505,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 2',
         )
 
-    def test_get_succeeds_with_default_module_position(self) -> None:
+    def test_get_succeeds_with_default_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -586,7 +586,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 2',
         )
 
-    def test_get_succeeds_with_second_module_position(self) -> None:
+    def test_get_succeeds_with_second_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         exp_id_2 = 'exp_2_b'
@@ -731,7 +731,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_zero_module_position(self) -> None:
+    def test_get_returns_empty_for_zero_module_id(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/module/0'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
@@ -739,7 +739,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_large_module_position(self) -> None:
+    def test_get_returns_empty_for_large_module_id(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/module/999'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
@@ -747,7 +747,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_non_ascii_module_position(self) -> None:
+    def test_get_returns_empty_for_non_ascii_module_id(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/module/%s'
             % (
@@ -759,7 +759,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_emoji_module_position(self) -> None:
+    def test_get_returns_empty_for_emoji_module_id(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/module/%s'
             % (

@@ -447,9 +447,9 @@ describe('Url Service', () => {
       StoryEditorModules: {isEnabled: true},
     });
     mockLocation.pathname = '/learn/math/fractions/test/module/1';
-    expect(urlService.getModulePositionFromUrl()).toBe('1');
+    expect(urlService.getModuleIdFromUrl()).toBe('1');
 
     mockLocation.pathname = '/learn/math/fractions/practice';
-    expect(urlService.getModulePositionFromUrl()).toBe('');
+    expect(urlService.getModuleIdFromUrl()).toBe('');
   });
 });

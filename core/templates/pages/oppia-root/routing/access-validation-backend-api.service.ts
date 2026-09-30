@@ -78,7 +78,7 @@ export class AccessValidationBackendApiService {
 
   END_OF_MODULE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>/test/module/<module_position>';
+    '<classroom_url_fragment>/<topic_url_fragment>/test/module/<module_id>';
 
   MASTERY_CHALLENGE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
@@ -267,14 +267,14 @@ export class AccessValidationBackendApiService {
   validateAccessToEndOfModulePage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
-    modulePosition: string
+    moduleId: string
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.END_OF_MODULE_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
-        module_position: modulePosition,
+        module_id: moduleId,
       }
     );
     return this.http.get<void>(url).toPromise();

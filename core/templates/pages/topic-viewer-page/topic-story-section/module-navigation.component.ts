@@ -38,7 +38,7 @@ interface ModuleNavigationGroup {
   accentColor: string;
   showPractice: boolean;
   isPracticeCompleted: boolean;
-  modulePosition: string;
+  moduleId: string;
 }
 
 export interface ModuleNavigationLessonSelection {
@@ -160,14 +160,14 @@ export class ModuleNavigationComponent
     });
   }
 
-  onPracticeClick(modulePosition: string): void {
-    this.practiceSelected.emit(modulePosition);
+  onPracticeClick(moduleId: string): void {
+    this.practiceSelected.emit(moduleId);
   }
 
-  isActivePractice(modulePosition: string): boolean {
+  isActivePractice(moduleId: string): boolean {
     return (
       this.activePracticeModuleId !== '' &&
-      this.activePracticeModuleId === modulePosition
+      this.activePracticeModuleId === moduleId
     );
   }
 

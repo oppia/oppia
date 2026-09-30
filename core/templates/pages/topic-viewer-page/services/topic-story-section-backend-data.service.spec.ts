@@ -295,8 +295,8 @@ describe('TopicStorySectionBackendDataService', () => {
     expect(groups[0].moduleDescription).toBe('Module Desc');
     expect(groups[0].lessonCards.length).toBe(1);
     expect(groups[0].lessonCards[0].lessonNumber).toBe(1);
-    expect(groups[0].modulePosition).toBe('1');
-    expect(groups[1].modulePosition).toBe('2');
+    expect(groups[0].moduleId).toBe('1');
+    expect(groups[1].moduleId).toBe('2');
     expect(groups[0].hasPracticeQuestions).toBe(false);
   });
 

@@ -52,7 +52,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   loadingMessage: string = 'Loading';
   private sessionType: PracticeSessionType = PracticeSessionType.Mastery;
   private nodeId: string = '';
-  private modulePosition: string = '';
+  private moduleId: string = '';
 
   constructor(
     private urlService: UrlService,
@@ -104,7 +104,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
-            module_position: this.modulePosition,
+            module_id: this.moduleId,
           }
         );
       case PracticeSessionType.Legacy:
@@ -149,7 +149,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
-            module_position: this.modulePosition,
+            module_id: this.moduleId,
           }
         );
       case PracticeSessionType.Legacy:
@@ -186,10 +186,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       }
     );
 
-    if (
-      this.sessionType === PracticeSessionType.Module &&
-      this.modulePosition
-    ) {
+    if (this.sessionType === PracticeSessionType.Module && this.moduleId) {
       topicViewerUrl = this.urlService.addField(
         topicViewerUrl,
         'module_mastered',
@@ -197,8 +194,8 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       );
       topicViewerUrl = this.urlService.addField(
         topicViewerUrl,
-        'module_position',
-        this.modulePosition
+        'module_id',
+        this.moduleId
       );
     }
 
@@ -259,17 +256,17 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
 
   private _determineSessionType(): void {
     const nodeId = this.urlService.getNodeIdFromPracticeUrl();
-    const modulePosition = this.urlService.getModulePositionFromUrl();
+    const moduleId = this.urlService.getModuleIdFromUrl();
 
     if (nodeId) {
       this.sessionType = PracticeSessionType.Lesson;
       this.nodeId = nodeId;
     } else if (
-      modulePosition &&
+      moduleId &&
       this.platformFeatureService.status.StoryEditorModules.isEnabled
     ) {
       this.sessionType = PracticeSessionType.Module;
-      this.modulePosition = modulePosition;
+      this.moduleId = moduleId;
     } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {

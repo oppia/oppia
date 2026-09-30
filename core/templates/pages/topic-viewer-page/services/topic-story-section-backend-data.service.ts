@@ -68,7 +68,7 @@ export interface ModuleGroupData {
   iconBg: string;
   headerBackgroundColor: string;
   headerBorderColor: string;
-  modulePosition: string;
+  moduleId: string;
   hasPracticeQuestions: boolean;
 }
 
@@ -169,7 +169,7 @@ export class TopicStorySectionBackendDataService {
       });
       // The backend maps a module to its 1-based position among the topic's
       // story modules, so pass the position rather than a parsed module id.
-      const modulePosition = String(moduleIndex + 1);
+      const moduleId = String(moduleIndex + 1);
       return {
         moduleTitle: module.title,
         moduleDescription: module.description,
@@ -178,7 +178,7 @@ export class TopicStorySectionBackendDataService {
         iconBg: paletteColor.iconBg,
         headerBackgroundColor: paletteColor.headerBg,
         headerBorderColor: paletteColor.headerBorder,
-        modulePosition,
+        moduleId,
         hasPracticeQuestions: false,
       };
     });
@@ -305,7 +305,7 @@ export class TopicStorySectionBackendDataService {
   }
 
   getEndOfModuleUrl(
-    modulePosition: string,
+    moduleId: string,
     classroomUrlFragment: string,
     topicUrlFragment: string
   ): string {
@@ -317,7 +317,7 @@ export class TopicStorySectionBackendDataService {
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
-        module_position: modulePosition,
+        module_id: moduleId,
       }
     );
   }

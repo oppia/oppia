@@ -53,7 +53,7 @@ class PracticeSessionsPageDataHandler(
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
-        'module_position': {
+        'module_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
@@ -86,7 +86,7 @@ class PracticeSessionsPageDataHandler(
             'selected_subtopic_ids'
         )
         node_id = self.request.route_kwargs.get('node_id')
-        module_position = self.request.route_kwargs.get('module_position')
+        module_id = self.request.route_kwargs.get('module_id')
 
         selected_skill_ids: List[str] = []
         if selected_subtopic_ids is not None:
@@ -95,9 +95,9 @@ class PracticeSessionsPageDataHandler(
                     selected_skill_ids.extend(subtopic.skill_ids)
         elif node_id is not None:
             selected_skill_ids = self._get_skill_ids_for_node(topic, node_id)
-        elif module_position is not None:
+        elif module_id is not None:
             selected_skill_ids = self._get_skill_ids_for_module(
-                topic, module_position
+                topic, module_id
             )
         else:
             # Mastery challenge: collect all skills from all subtopics.
@@ -155,18 +155,18 @@ class PracticeSessionsPageDataHandler(
                 return node.acquired_skill_ids
         return []
 
-    def _get_story_and_module_for_module_position(
-        self, topic: topic_domain.Topic, module_position: str
+    def _get_story_and_module_for_module_id(
+        self, topic: topic_domain.Topic, module_id: str
     ) -> Optional[Tuple[story_domain.Story, story_domain.Module]]:
-        """Returns the story-module pair matching the given module position.
+        """Returns the story-module pair matching the given module ID.
 
-        The module_position parameter is a 1-based index that maps to the nth
-        module in the first published story of the topic (e.g., '1' maps to
-        the first module). It is a position, not a module ID.
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the first published story of the topic (e.g., '1' maps to the first
+        module).
 
         Args:
             topic: Topic. The topic object.
-            module_position: str. The module position (1-based index).
+            module_id: str. The module ID (1-based index).
 
         Returns:
             tuple(Story, Module) or None. The matching story-module pair, or
@@ -175,30 +175,30 @@ class PracticeSessionsPageDataHandler(
         modules_with_stories = (
             story_fetchers.get_all_modules_with_stories_for_topic(topic)
         )
-        if module_position.isascii() and module_position.isdigit():
-            module_index = int(module_position)
+        if module_id.isascii() and module_id.isdigit():
+            module_index = int(module_id)
             if 1 <= module_index <= len(modules_with_stories):
                 return modules_with_stories[module_index - 1]
         return None
 
     def _get_skill_ids_for_module(
-        self, topic: topic_domain.Topic, module_position: str
+        self, topic: topic_domain.Topic, module_id: str
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given module.
 
-        The module_position parameter is a 1-based index that maps to the nth
-        module in the first published story of the topic (e.g., '1' maps to
-        the first module). It is a position, not a module ID.
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the first published story of the topic (e.g., '1' maps to the first
+        module).
 
         Args:
             topic: Topic. The topic object.
-            module_position: str. The module position (1-based index).
+            module_id: str. The module ID (1-based index).
 
         Returns:
             list(str). The skill IDs for all nodes in the module.
         """
-        story_module = self._get_story_and_module_for_module_position(
-            topic, module_position
+        story_module = self._get_story_and_module_for_module_id(
+            topic, module_id
         )
         if story_module is None:
             return []

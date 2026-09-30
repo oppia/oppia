@@ -85,7 +85,7 @@ describe('ModuleNavigationComponent', () => {
         accentColor: '#000',
         showPractice: false,
         isPracticeCompleted: false,
-        modulePosition: '1',
+        moduleId: '1',
       },
     ];
 
@@ -125,7 +125,7 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      modulePosition: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(true);
@@ -140,7 +140,7 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      modulePosition: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
@@ -152,7 +152,7 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      modulePosition: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
@@ -267,7 +267,7 @@ describe('ModuleNavigationComponent', () => {
             accentColor: '#000',
             showPractice: true,
             isPracticeCompleted: false,
-            modulePosition: '1',
+            moduleId: '1',
           },
         ],
         false

@@ -49,19 +49,19 @@
                                    [iconName]="getPracticeBadgeIconName()"
                                    [title]="'I18N_TOPIC_VIEWER_PRACTICE_TEST_BUTTON' | translate"
                                    [size]="'sm'"
-                                   [backgroundColor]="isActivePractice(moduleGroup.modulePosition) ? moduleGroup.accentColor : '#fff'"
+                                   [backgroundColor]="isActivePractice(moduleGroup.moduleId) ? moduleGroup.accentColor : '#fff'"
                                    [borderColor]="moduleGroup.accentColor"
-                                   [textColor]="isActivePractice(moduleGroup.modulePosition) ? '#fff' : moduleGroup.accentColor"
+                                   [textColor]="isActivePractice(moduleGroup.moduleId) ? '#fff' : moduleGroup.accentColor"
                                    class="module-navigation-clickable"
                                    [style.grid-column]="moduleGroup.lessons.length + 1"
                                    [style.grid-row]="1"
-                                   (click)="onPracticeClick(moduleGroup.modulePosition)"
+                                   (click)="onPracticeClick(moduleGroup.moduleId)"
                                    [attr.aria-label]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
                                    [attr.title]="'I18N_TOPIC_VIEWER_GO_TO_PRACTICE' | translate"
                                    role="button"
                                    tabindex="0"
-                                   (keydown.enter)="onPracticeClick(moduleGroup.modulePosition)"
-                                   (keydown.space)="onPracticeClick(moduleGroup.modulePosition); $event.preventDefault()">
+                                   (keydown.enter)="onPracticeClick(moduleGroup.moduleId)"
+                                   (keydown.space)="onPracticeClick(moduleGroup.moduleId); $event.preventDefault()">
         </topic-module-circle-badge>
 
         <span *ngFor="let lesson of moduleGroup.lessons; index as i"
@@ -81,7 +81,7 @@
               [class.module-navigation-progress-dot--line-completed]="isLastLessonCompleted(moduleGroup)"
               [style.grid-column]="moduleGroup.lessons.length + 1"
               [style.grid-row]="2"
-              [ngStyle]="{'border-color': (moduleGroup.isPracticeCompleted || isActivePractice(moduleGroup.modulePosition)) ? '#27a844' : '#c9c9c9'}">
+              [ngStyle]="{'border-color': (moduleGroup.isPracticeCompleted || isActivePractice(moduleGroup.moduleId)) ? '#27a844' : '#c9c9c9'}">
           <i *ngIf="moduleGroup.isPracticeCompleted" class="material-icons">check</i>
         </span>
       </div>

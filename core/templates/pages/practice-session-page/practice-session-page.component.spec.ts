@@ -389,7 +389,7 @@ describe('Practice session page', () => {
 
   it('should append module mastered markers to dashboard URL for module sessions', fakeAsync(() => {
     mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
-    spyOn(urlService, 'getModulePositionFromUrl').and.returnValue('1');
+    spyOn(urlService, 'getModuleIdFromUrl').and.returnValue('1');
     spyOn(urlService, 'getNodeIdFromPracticeUrl').and.returnValue(null);
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/test/module/1'
@@ -412,6 +412,6 @@ describe('Practice session page', () => {
         (button: {type: string}) => button.type === 'DASHBOARD'
       );
     expect(dashboardActionButton?.url).toContain('module_mastered=true');
-    expect(dashboardActionButton?.url).toContain('module_position=1');
+    expect(dashboardActionButton?.url).toContain('module_id=1');
   }));
 });

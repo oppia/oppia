@@ -271,11 +271,10 @@ export class UrlService {
   }
 
   /**
-   * This function returns the 1-based position of the module from the
-   * end-of-module URL.
-   * @return {string} the module position.
+   * This function returns the module ID from the end-of-module URL.
+   * @return {string} the module ID.
    */
-  getModulePositionFromUrl(): string {
+  getModuleIdFromUrl(): string {
     const pathname = this.getPathname();
     const match = pathname.match(/\/test\/module\/(\d+)/);
     if (match) {

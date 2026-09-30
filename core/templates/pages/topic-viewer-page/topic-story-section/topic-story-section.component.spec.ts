@@ -384,7 +384,7 @@ describe('TopicStorySectionComponent', () => {
     iconBg: '',
     headerBackgroundColor: '',
     headerBorderColor: '',
-    modulePosition: '1',
+    moduleId: '1',
     hasPracticeQuestions: false,
   });
 
@@ -456,13 +456,13 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.moduleGroups.length).toBe(2);
     expect(component.moduleGroups[0].moduleTitle).toBe('Module 1');
-    expect(component.moduleGroups[0].modulePosition).toBe('1');
+    expect(component.moduleGroups[0].moduleId).toBe('1');
     expect(component.moduleGroups[0].lessonCards.length).toBe(1);
     expect(component.moduleGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
     expect(component.moduleGroups[1].moduleTitle).toBe('Module 2');
-    expect(component.moduleGroups[1].modulePosition).toBe('2');
+    expect(component.moduleGroups[1].moduleId).toBe('2');
     expect(component.moduleGroups[1].lessonCards.length).toBe(1);
     expect(component.moduleGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
@@ -1957,7 +1957,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        modulePosition: '1',
+        moduleId: '1',
         hasPracticeQuestions: false,
       },
       {
@@ -1971,7 +1971,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        modulePosition: '2',
+        moduleId: '2',
         hasPracticeQuestions: false,
       },
       {
@@ -1989,7 +1989,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        modulePosition: '3',
+        moduleId: '3',
         hasPracticeQuestions: false,
       },
     ];
@@ -2397,7 +2397,7 @@ describe('TopicStorySectionComponent', () => {
         accentColor: '#27a844',
         showPractice: true,
         isPracticeCompleted: false,
-        modulePosition: '1',
+        moduleId: '1',
       },
     ]);
   });
@@ -2640,7 +2640,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -2665,7 +2665,7 @@ describe('TopicStorySectionComponent', () => {
     );
   }));
 
-  it('should handle malformed module_position query values when showing mastered modal', fakeAsync(() => {
+  it('should handle malformed module_id query values when showing mastered modal', fakeAsync(() => {
     const createNode = (nodeId: string, title: string) => {
       const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
         'getTitle',
@@ -2717,7 +2717,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1/story'];
       }
       return [];
@@ -2912,7 +2912,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -2969,7 +2969,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3089,7 +3089,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3108,7 +3108,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModulePracticeCompleted(0)).toBe(true);
   }));
 
-  it('should not show the mastered modal when module_position does not start with a digit', fakeAsync(() => {
+  it('should not show the mastered modal when module_id does not start with a digit', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3139,7 +3139,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['abc'];
       }
       return [];
@@ -3154,7 +3154,7 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should not show the mastered modal when module_position is empty', fakeAsync(() => {
+  it('should not show the mastered modal when module_id is empty', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3185,7 +3185,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return [''];
       }
       return [];
@@ -3200,7 +3200,7 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should not show the mastered modal when module_position does not match any module', fakeAsync(() => {
+  it('should not show the mastered modal when module_id does not match any module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3231,7 +3231,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['5'];
       }
       return [];
@@ -3305,7 +3305,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3444,7 +3444,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3654,7 +3654,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3834,7 +3834,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3891,7 +3891,7 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'module_position') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -5076,7 +5076,7 @@ describe('TopicStorySectionComponent', () => {
       createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
       createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    Reflect.set(component, 'completedPracticeModulePositions', new Set(['1']));
+    Reflect.set(component, 'completedPracticeModuleIds', new Set(['1']));
 
     (
       Reflect.get(component, 'markSkippedModulesBefore') as (

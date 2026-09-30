@@ -48,15 +48,13 @@ export class PracticeSessionAccessGuard implements CanActivate {
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
     const nodeId = route.paramMap.get('node_id') || '';
-    const modulePosition = route.paramMap.get('module_position') || '';
+    const moduleId = route.paramMap.get('module_id') || '';
 
     const isStoryEditorModulesEnabled =
       this.platformFeatureService.status.StoryEditorModules.isEnabled;
 
     if (
-      (nodeId ||
-        modulePosition ||
-        (!selectedSubtopicIds && !nodeId && !modulePosition)) &&
+      (nodeId || moduleId || (!selectedSubtopicIds && !nodeId && !moduleId)) &&
       !isStoryEditorModulesEnabled
     ) {
       return new Promise<boolean>(resolve => {
@@ -74,12 +72,12 @@ export class PracticeSessionAccessGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       let validationPromise: Promise<void>;
 
-      if (modulePosition) {
+      if (moduleId) {
         validationPromise =
           this.accessValidationBackendApiService.validateAccessToEndOfModulePage(
             classroomUrlFragment,
             topicUrlFragment,
-            modulePosition
+            moduleId
           );
       } else if (selectedSubtopicIds) {
         validationPromise =

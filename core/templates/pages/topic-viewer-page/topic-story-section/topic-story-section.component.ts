@@ -48,7 +48,7 @@ import {
 } from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 
 const MODULE_MASTERED_QUERY_PARAM = 'module_mastered';
-const MODULE_POSITION_QUERY_PARAM = 'module_position';
+const MODULE_ID_QUERY_PARAM = 'module_id';
 const MOBILE_SCREEN_BREAKPOINT = 480;
 const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
 const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
@@ -72,7 +72,7 @@ interface ModuleNavigationGroupData {
   accentColor: string;
   showPractice: boolean;
   isPracticeCompleted: boolean;
-  modulePosition: string;
+  moduleId: string;
 }
 
 @Component({
@@ -134,7 +134,7 @@ export class TopicStorySectionComponent
   private pendingNavigationLessonNumber: number | null = null;
   private pendingNavigationModuleIndex: number | null = null;
   private pendingStartUrl: string = '';
-  private completedPracticeModulePositions: Set<string> = new Set();
+  private completedPracticeModuleIds: Set<string> = new Set();
   private hasHandledModuleMasteredQueryParams: boolean = false;
   private moduleSkipModalRef: NgbModalRef | null = null;
   private moduleMasteredModalRef: NgbModalRef | null = null;
@@ -411,9 +411,7 @@ export class TopicStorySectionComponent
     if (!moduleGroup) {
       return false;
     }
-    return this.completedPracticeModulePositions.has(
-      moduleGroup.modulePosition
-    );
+    return this.completedPracticeModuleIds.has(moduleGroup.moduleId);
   }
 
   isStoryCompleted(): boolean {
@@ -564,7 +562,7 @@ export class TopicStorySectionComponent
     if (!storyId) {
       return;
     }
-    this.completedPracticeModulePositions = new Set(
+    this.completedPracticeModuleIds = new Set(
       this.localStorageService.getMasteredModules(storyId)
     );
   }
@@ -576,16 +574,16 @@ export class TopicStorySectionComponent
     }
     this.localStorageService.updateMasteredModules(
       storyId,
-      Array.from(this.completedPracticeModulePositions)
+      Array.from(this.completedPracticeModuleIds)
     );
   }
 
-  onNavigationPracticeSelected(modulePosition: string): void {
-    this.activePracticeModuleId = modulePosition;
+  onNavigationPracticeSelected(moduleId: string): void {
+    this.activePracticeModuleId = moduleId;
     // Only one circle should appear filled in the navbar at a time.
     this.activeLessonNumber = null;
     setTimeout(() => {
-      this.scrollToElementById('practice-card-' + modulePosition);
+      this.scrollToElementById('practice-card-' + moduleId);
     }, 300);
   }
 
@@ -751,7 +749,7 @@ export class TopicStorySectionComponent
 
   private getPracticeCardData(): PracticeCardData {
     const firstModuleId =
-      this.moduleGroups.length > 0 ? this.moduleGroups[0].modulePosition : '';
+      this.moduleGroups.length > 0 ? this.moduleGroups[0].moduleId : '';
 
     return {
       practiceTitle: this.getPracticeTitle(0),
@@ -808,9 +806,7 @@ export class TopicStorySectionComponent
     );
 
     this.visibleModuleGroups = this.visibleModuleGroups.map(group => {
-      const updated = moduleGroups.find(
-        g => g.modulePosition === group.modulePosition
-      );
+      const updated = moduleGroups.find(g => g.moduleId === group.moduleId);
       return updated ? {...updated, lessonCards: group.lessonCards} : group;
     });
   }
@@ -836,9 +832,9 @@ export class TopicStorySectionComponent
     );
   }
 
-  getEndOfModuleUrl(modulePosition: string): string {
+  getEndOfModuleUrl(moduleId: string): string {
     return this.topicStorySectionBackendDataService.getEndOfModuleUrl(
-      modulePosition,
+      moduleId,
       this.classroomUrlFragment,
       this.topicUrlFragment
     );
@@ -936,7 +932,7 @@ export class TopicStorySectionComponent
 
         const isPracticeCompleted =
           visibleLessons.length > 0 &&
-          this.completedPracticeModulePositions.has(group.modulePosition);
+          this.completedPracticeModuleIds.has(group.moduleId);
 
         return {
           lessons: visibleLessons.map(card => {
@@ -948,7 +944,7 @@ export class TopicStorySectionComponent
           accentColor: group.accentColor,
           showPractice: visibleLessons.length > 0,
           isPracticeCompleted,
-          modulePosition: group.modulePosition,
+          moduleId: group.moduleId,
         };
       })
       .filter(group => group.lessons.length > 0);
@@ -988,34 +984,34 @@ export class TopicStorySectionComponent
     const moduleMasteredFlagValues = this.urlService.getQueryFieldValuesAsList(
       MODULE_MASTERED_QUERY_PARAM
     );
-    const modulePositionValues = this.urlService.getQueryFieldValuesAsList(
-      MODULE_POSITION_QUERY_PARAM
+    const moduleIdValues = this.urlService.getQueryFieldValuesAsList(
+      MODULE_ID_QUERY_PARAM
     );
 
     if (
       moduleMasteredFlagValues.length === 0 ||
       moduleMasteredFlagValues[0] !== 'true' ||
-      modulePositionValues.length === 0
+      moduleIdValues.length === 0
     ) {
       return;
     }
 
-    const masteredModulePosition = this.normalizeModulePositionFromQueryValue(
-      modulePositionValues[0]
+    const masteredModuleId = this.normalizeModuleIdFromQueryValue(
+      moduleIdValues[0]
     );
-    if (!masteredModulePosition) {
+    if (!masteredModuleId) {
       return;
     }
 
     const moduleIndex = this.visibleModuleGroups.findIndex(
-      group => group.modulePosition === masteredModulePosition
+      group => group.moduleId === masteredModuleId
     );
 
     if (moduleIndex === -1 || !this.areAllLessonsCompleted(moduleIndex)) {
       return;
     }
 
-    this.completedPracticeModulePositions.add(masteredModulePosition);
+    this.completedPracticeModuleIds.add(masteredModuleId);
     this.persistMasteredModules();
     this.updateVisibleSections();
 
@@ -1024,14 +1020,12 @@ export class TopicStorySectionComponent
     this.openModuleMasteredModal();
   }
 
-  private normalizeModulePositionFromQueryValue(
-    rawModulePosition: string
-  ): string | null {
-    if (!rawModulePosition) {
+  private normalizeModuleIdFromQueryValue(rawModuleId: string): string | null {
+    if (!rawModuleId) {
       return null;
     }
 
-    const match = rawModulePosition.match(/^\d+/);
+    const match = rawModuleId.match(/^\d+/);
     if (!match) {
       return null;
     }

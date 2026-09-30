@@ -7487,7 +7487,7 @@ export default {
       ]
     },
     "END_OF_MODULE_TEST": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/module/:module_position",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/module/:module_id",
       "TITLE": "End-of-Module Test",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
