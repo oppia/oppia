@@ -33,7 +33,7 @@
               class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
               (click)="openInteractionCustomizerModal()"
               aria-label="Add interaction"
-              *ngIf="editabilityService.isEditable()">
+              *ngIf="isEditable">
         + ADD INTERACTION
       </button>
     </div>
@@ -57,10 +57,10 @@
           <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
             <div *ngIf="hasLoaded"
                  class="e2e-test-interaction"
-                 [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
+                 [ngClass]="{'oppia-editable-section': isEditable && !interactionIsDisabled}">
               <div class="oppia-interaction-preview oppia-transition-200"
                    (click)="openInteractionCustomizerModal()"
-                   *ngIf="editabilityService.isEditable()"
+                   *ngIf="isEditable"
                    role="button"
                    aria-label="edit interaction">
               </div>
@@ -74,14 +74,14 @@
                     class="oppia-open-interaction-customizer-button fas fa-pen"
                     (click)="openInteractionCustomizerModal()"
                     (keydown)="focusOnCollapseAnswersAndResponses($event)"
-                    *ngIf="editabilityService.isEditable()"
+                    *ngIf="isEditable"
                     aria-label="Customize Interaction"
                     #customizeInteractionButton>
             </button>
             <button type="button"
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
-                    *ngIf="editabilityService.isEditable()">
+                    *ngIf="isEditable">
               <i class="fas fa-times oppia-delete-interaction-icon" title="Delete interaction"></i>
             </button>
           </div>
