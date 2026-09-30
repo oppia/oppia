@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import './campaign-banner.component.css';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';

@@ -39,7 +39,6 @@ import {
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './feedback-detail-page.component.css';
 
 interface BrowserDetails {
   name: string;
@@ -499,6 +498,17 @@ export class FeedbackDetailPageComponent {
     return (
       `/create/${encodeURIComponent(feedback.lesson_metadata.exploration_id)}` +
       `#/feedback/lesson_feedback/${encodeURIComponent(feedback.parent_feedback_id)}`
+    );
+  }
+
+  shouldShowStatusOption(statusOption: FeedbackStatus): boolean {
+    if (!this.feedbackDetailResponse) {
+      return false;
+    }
+    return !(
+      statusOption === FeedbackStatus.COMPLIMENT &&
+      this.getFeedbackCategory(this.feedbackDetailResponse) ===
+        ReportAnIssueCategory.TYPO
     );
   }
 }

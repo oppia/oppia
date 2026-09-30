@@ -53,8 +53,6 @@ class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
         classroom_id: ID of the classroom the assessment offering belongs to.
         topics: List of topics covered in the assessment offering.
         total_questions: Total number of questions in the assessment.
-        time_limit_in_minutes: Time limit for completing the assessment, in
-            minutes.
         demonstrates: List of plain-text strings describing what the
             certificate demonstrates (e.g. skills or competencies earned
             upon completion).
@@ -67,7 +65,6 @@ class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
     classroom_id: str
     topics: List[CertificateAssessmentOfferingTopicDict]
     total_questions: int
-    time_limit_in_minutes: int
     demonstrates: List[str]
     async_status: str
 
@@ -207,7 +204,6 @@ class CertificateAssessmentOfferingHandler(
                 }
             },
             'total_questions': {'schema': {'type': 'int'}},
-            'time_limit_in_minutes': {'schema': {'type': 'int'}},
             'demonstrates': {
                 'schema': {
                     'type': 'list',
@@ -248,9 +244,6 @@ class CertificateAssessmentOfferingHandler(
         ]
         total_questions = int(self.normalized_payload['total_questions'])
 
-        time_limit_in_minutes = int(
-            self.normalized_payload['time_limit_in_minutes']
-        )
         demonstrates = list(self.normalized_payload['demonstrates'])
         certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
             title=self.normalized_payload['title'],
@@ -258,7 +251,6 @@ class CertificateAssessmentOfferingHandler(
             classroom_id=self.normalized_payload['classroom_id'],
             topic_ids=topic_ids,
             total_questions=total_questions,
-            time_limit_in_minutes=time_limit_in_minutes,
             demonstrates=demonstrates,
             async_status=self.normalized_payload['async_status'],
         )
@@ -301,7 +293,6 @@ class CertificateAssessmentOfferingByIdHandler(
                 }
             },
             'total_questions': {'schema': {'type': 'int'}},
-            'time_limit_in_minutes': {'schema': {'type': 'int'}},
             'demonstrates': {
                 'schema': {
                     'type': 'list',
@@ -359,9 +350,6 @@ class CertificateAssessmentOfferingByIdHandler(
         ]
         total_questions = int(self.normalized_payload['total_questions'])
 
-        time_limit_in_minutes = int(
-            self.normalized_payload['time_limit_in_minutes']
-        )
         demonstrates = list(self.normalized_payload['demonstrates'])
         try:
             certificate_offering = certificate_assessment_services.update_certificate_assessment_offering(
@@ -371,7 +359,6 @@ class CertificateAssessmentOfferingByIdHandler(
                 classroom_id=self.normalized_payload['classroom_id'],
                 topic_ids=topic_ids,
                 total_questions=total_questions,
-                time_limit_in_minutes=time_limit_in_minutes,
                 demonstrates=demonstrates,
                 async_status=self.normalized_payload['async_status'],
             )
@@ -527,35 +514,6 @@ class SubmitCertificateAssessmentHandler(
             raise self.InvalidInputException(e) from e
         self.render_json(
             {'attempt_id': attempt.attempt_id, 'is_submitted': True}
-        )
-
-
-class CertificateQuestionHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Fetches question state data for an in-progress certificate attempt."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'attempt_id': {'schema': {'type': 'basestring'}},
-        'question_id': {'schema': {'type': 'basestring'}},
-    }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.can_access_certificate_assessment_attempt
-    def get(self, attempt_id: str, question_id: str) -> None:
-        assert self.user_id is not None
-        try:
-            question_state_data = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                self.user_id, attempt_id, question_id
-            )
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e) from e
-        self.render_json(
-            {
-                'question_id': question_id,
-                'question_state_data': question_state_data,
-            }
         )
 
 

@@ -267,11 +267,11 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
-
+const explorationFeedbackTabTitleSelector =
+  '.e2e-test-exploration-feedback-title';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
-const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const languageDropdownValueSelector =
   'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
@@ -552,6 +552,7 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Truncates a card name the same way the frontend graph visualization does.
@@ -2914,6 +2915,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expects new exploration feedback tab to be visible.
+   */
+  async expectNewExplorationFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+    await this.expectTextContentToBe(
+      explorationFeedbackTabTitleSelector,
+      'Exploration Feedback'
+    );
+  }
+
+  /**
    * Fetches the exploration ID from the current URL of the exploration editor page.
    * The exploration ID is the string after '/create/' in the URL.
    */
@@ -3700,7 +3712,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -3733,7 +3744,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
-    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -4999,6 +5009,30 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds a Hindi translation to the "Content" of the "Introduction" card of the
+   * given published exploration, then saves the draft. This is used in
+   * acceptance tests to give a lesson a non-English text language so that the
+   * language selector and fallback info tooltip render on the redesigned topic
+   * viewer page. The exploration must already be linked to a story so that the
+   * translation-mode switcher is available in the translation tab.
+   * @param {string} explorationId - The ID of the published exploration to
+   *     which the Hindi translation is added.
+   */
+  async addHindiTranslationToExploration(explorationId: string): Promise<void> {
+    await this.navigateToExplorationEditor(explorationId);
+    await this.waitForPageToFullyLoad();
+    await this.navigateToCard('Introduction');
+    await this.navigateToTranslationsTab();
+    await this.dismissTranslationTabWelcomeModal();
+    await this.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Content',
+      'यह अंशों का परिचय है।'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
    * Function to verify if the preview is on a particular card by checking the content of the card.
    * @param {string} cardName - The name of the card to check.
    * @param {string} expectedCardContent - The expected text content of the card.
@@ -6214,10 +6248,12 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (title === explorationName) {
-      const explorationTileElement = await this.page.$(
-        explorationSummaryTileTitleSelector
-      );
-      await explorationTileElement?.click();
+      await this.page.evaluate(selector => {
+        const titleElement = document.querySelector(selector);
+        if (titleElement) {
+          titleElement.parentElement.click();
+        }
+      }, explorationSummaryTileTitleSelector);
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }

@@ -1175,6 +1175,11 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 'content_html': '<p>This is a content.</p>',
                 'translation_html': '<p>This is translated html.</p>',
                 'data_format': 'html',
+                # Auto-generation metadata fields are always present in
+                # to_dict() output (set to None for manual suggestions).
+                'was_auto_generated': None,
+                'auto_generation_provider': None,
+                'was_edited': None,
             },
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
