@@ -103,7 +103,6 @@ describe('Sign up page component', () => {
   });
 
   it('should intialize', fakeAsync(() => {
-    const canSendEmails = true;
     const hasAgreedToLatestTerms = true;
     const hasEverRegistered = true;
     const username = 'test_user';
@@ -116,7 +115,6 @@ describe('Sign up page component', () => {
       'fetchSignupPageDataAsync'
     ).and.returnValue(
       Promise.resolve({
-        server_can_send_emails: canSendEmails,
         has_agreed_to_latest_terms: hasAgreedToLatestTerms,
         has_ever_registered: hasEverRegistered,
         username: username,
@@ -285,7 +283,6 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'yes');
     tick();
@@ -304,7 +301,6 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', null);
     expect(componentInstance.emailPreferencesWarningText).toEqual(
@@ -323,7 +319,6 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'no');
     tick();
@@ -352,7 +347,6 @@ describe('Sign up page component', () => {
       };
 
       componentInstance.hasUsername = false;
-      componentInstance.showEmailPreferencesForm = true;
 
       componentInstance.submitPrerequisitesForm(
         sentRequestParams.agreed_to_terms,
@@ -372,7 +366,6 @@ describe('Sign up page component', () => {
       return_url: 'creator-dashboard',
     });
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     expect(() => {
       componentInstance.submitPrerequisitesForm(true, 'username', 'not_valid');
@@ -390,7 +383,6 @@ describe('Sign up page component', () => {
     );
     spyOn(componentInstance, 'showRegistrationSessionExpiredModal');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'no');
     tick();
