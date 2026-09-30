@@ -32,9 +32,9 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
     platform_parameter_list,
-    platform_parameter_registry,
+    web_platform_parameter_registry,
     question_services,
     rights_domain,
     rights_manager,
@@ -2918,14 +2918,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         # Set the default email config.
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             (
                 platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
             ),
             self.admin_id,
             'Updating email body.',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {

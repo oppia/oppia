@@ -97,7 +97,7 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         with (
             self.swap_to_always_return(
                 feature_flag_domain,
-                'get_server_mode',
+                'get_web_platform_parameter_server_mode',
                 feature_flag_domain.ServerMode.PROD,
             ),
             self.assertRaisesRegex(PermissionError, 'Refusing to mutate prod'),
@@ -285,7 +285,7 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
     def test_prod_mode_job_is_ok(self) -> None:
         with self.swap_to_always_return(
             feature_flag_domain,
-            'get_server_mode',
+            'get_web_platform_parameter_server_mode',
             feature_flag_domain.ServerMode.PROD,
         ):
             self.assert_job_output_is_empty()

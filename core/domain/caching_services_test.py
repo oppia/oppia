@@ -28,7 +28,7 @@ from core.domain import (
     collection_domain,
     exp_domain,
 )
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.domain import skill_domain, story_domain, topic_domain
 from core.platform import models
 from core.tests import test_utils

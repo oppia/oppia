@@ -20,7 +20,7 @@ import logging
 import re
 import textwrap
 
-from core.domain import platform_parameter_list, platform_parameter_services
+from core.domain import platform_parameter_list, web_platform_parameter_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Union
@@ -133,7 +133,7 @@ def send_mail(
     if not _is_sender_email_valid(sender_email):
         raise ValueError('Malformed sender email address: %s' % sender_email)
     admin_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
+        web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
     )

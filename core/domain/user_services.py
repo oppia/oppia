@@ -32,7 +32,7 @@ from core.domain import (
     exp_fetchers,
     fs_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
     role_services,
     state_domain,
     user_domain,
@@ -344,7 +344,7 @@ def get_users_settings(
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result: List[Optional[user_domain.UserSettings]] = []
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
+        web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )

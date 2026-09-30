@@ -24,7 +24,7 @@ from core.domain import (
     caching_domain,
     collection_domain,
     exp_domain,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
     skill_domain,
     story_domain,
     topic_domain,
@@ -59,7 +59,7 @@ if MYPY:  # pragma: no cover
         skill_domain.Skill,
         story_domain.Story,
         topic_domain.Topic,
-        platform_parameter_domain.PlatformParameter,
+        web_platform_parameter_domain.PlatformParameter,
     ]
 
 memory_cache_services = models.Registry.import_cache_services()
@@ -116,7 +116,7 @@ class DeserializationFunctionsDict(TypedDict):
     skill: Callable[[str], skill_domain.Skill]
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
-    platform: Callable[[str], platform_parameter_domain.PlatformParameter]
+    platform: Callable[[str], web_platform_parameter_domain.PlatformParameter]
     default: Callable[[str], str]
 
 
@@ -128,7 +128,7 @@ class SerializationFunctionsDict(TypedDict):
     skill: Callable[[skill_domain.Skill], str]
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
-    platform: Callable[[platform_parameter_domain.PlatformParameter], str]
+    platform: Callable[[web_platform_parameter_domain.PlatformParameter], str]
     default: Callable[[str], str]
 
 
@@ -152,7 +152,7 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_STORY: story_domain.Story.deserialize,
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
-        platform_parameter_domain.PlatformParameter.deserialize
+        web_platform_parameter_domain.PlatformParameter.deserialize
     ),
     CACHE_NAMESPACE_DEFAULT: json.loads,
 }
@@ -250,7 +250,7 @@ def get_multi(
     namespace: Literal['platform'],
     sub_namespace: str | None,
     obj_ids: List[str],
-) -> Dict[str, platform_parameter_domain.PlatformParameter]: ...
+) -> Dict[str, web_platform_parameter_domain.PlatformParameter]: ...
 
 
 @overload
@@ -348,7 +348,9 @@ def set_multi(
 def set_multi(
     namespace: Literal['platform'],
     sub_namespace: str | None,
-    id_value_mapping: Dict[str, platform_parameter_domain.PlatformParameter],
+    id_value_mapping: Dict[
+        str, web_platform_parameter_domain.PlatformParameter
+    ],
 ) -> bool: ...
 
 

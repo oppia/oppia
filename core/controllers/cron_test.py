@@ -27,9 +27,9 @@ from core.domain import (
     email_manager,
     exp_domain,
     exp_services,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
     platform_parameter_list,
-    platform_parameter_registry,
+    web_platform_parameter_registry,
     question_domain,
     story_domain,
     story_services,
@@ -1133,14 +1133,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
             ),
             self.admin_id,
             'Updating value.',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {

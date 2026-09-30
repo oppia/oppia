@@ -38,7 +38,7 @@ from core.domain import (
     learner_progress_services,
     moderator_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
     question_services,
     rating_services,
     recommendations_services,
@@ -292,7 +292,7 @@ class ExplorationHandler(
                 'preferred_language_codes': preferred_language_codes,
                 'auto_tts_enabled': exploration.auto_tts_enabled,
                 'record_playthrough_probability': (
-                    platform_parameter_services.get_platform_parameter_value(
+                    web_platform_parameter_services.get_web_platform_parameter_value(
                         platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value
                     )
                 ),

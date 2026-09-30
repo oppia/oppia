@@ -29,7 +29,7 @@ from core.domain import (
     email_manager,
     feature_flag_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
     role_services,
     subscription_services,
     summary_services,
@@ -165,7 +165,7 @@ class BulkEmailWebhookEndpoint(
         """Handles POST requests."""
         assert self.normalized_request is not None
         mailchimp_audience_id = (
-            platform_parameter_services.get_platform_parameter_value(
+            web_platform_parameter_services.get_web_platform_parameter_value(
                 platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
             )
         )
@@ -720,7 +720,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
-                % platform_parameter_services.get_platform_parameter_value(
+                % web_platform_parameter_services.get_web_platform_parameter_value(
                     platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
                 )
             )

@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Registry for platform parameters."""
+"""Registry for web platform parameters."""
 
 from __future__ import annotations
 
 from core import feconf
 from core.domain import (
     caching_services,
-    platform_parameter_domain,
     platform_parameter_list,
+    web_platform_parameter_domain,
 )
 from core.platform import models
 
@@ -43,28 +43,28 @@ class Registry:
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT: Dict[
-        platform_parameter_domain.DataTypes, Union[bool, str, int, float]
+        web_platform_parameter_domain.DataTypes, Union[bool, str, int, float]
     ] = {
-        platform_parameter_domain.DataTypes.BOOL: False,
-        platform_parameter_domain.DataTypes.NUMBER: 0,
-        platform_parameter_domain.DataTypes.STRING: '',
+        web_platform_parameter_domain.DataTypes.BOOL: False,
+        web_platform_parameter_domain.DataTypes.NUMBER: 0,
+        web_platform_parameter_domain.DataTypes.STRING: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
     parameter_registry: Dict[
-        str, platform_parameter_domain.PlatformParameter
+        str, web_platform_parameter_domain.PlatformParameter
     ] = {}
 
     @classmethod
-    def create_platform_parameter(
+    def create_web_platform_parameter(
         cls,
         name: ParamName,
         description: str,
-        data_type: platform_parameter_domain.DataTypes,
+        data_type: web_platform_parameter_domain.DataTypes,
         default: Optional[Union[bool, int, str, float]] = None,
-    ) -> platform_parameter_domain.PlatformParameter:
+    ) -> web_platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter.
 
         Args:
@@ -94,7 +94,7 @@ class Registry:
                 ' %s.' % (data_type.value, allowed_data_types)
             )
 
-        param_dict: platform_parameter_domain.PlatformParameterDict = {
+        param_dict: web_platform_parameter_domain.PlatformParameterDict = {
             'name': name.value,
             'description': description,
             'data_type': data_type.value,
@@ -104,11 +104,13 @@ class Registry:
             ),
             'default_value': default,
         }
-        return cls.init_platform_parameter_from_dict(param_dict)
+        return cls.init_web_platform_parameter_from_dict(param_dict)
 
     @classmethod
-    def init_platform_parameter(
-        cls, name: str, instance: platform_parameter_domain.PlatformParameter
+    def init_web_platform_parameter(
+        cls,
+        name: str,
+        instance: web_platform_parameter_domain.PlatformParameter,
     ) -> None:
         """Initializes parameter_registry with keys as the parameter names and
         values as instances of the specified parameter.
@@ -125,9 +127,9 @@ class Registry:
         cls.parameter_registry[name] = instance
 
     @classmethod
-    def get_platform_parameter(
+    def get_web_platform_parameter(
         cls, name: str
-    ) -> platform_parameter_domain.PlatformParameter:
+    ) -> web_platform_parameter_domain.PlatformParameter:
         """Returns the instance of the specified name of the platform
         parameter.
 
@@ -141,11 +143,15 @@ class Registry:
         Raises:
             Exception. The given name of the platform parameter doesn't exist.
         """
-        parameter_from_cache = cls.load_platform_parameter_from_memcache(name)
+        parameter_from_cache = cls.load_web_platform_parameter_from_memcache(
+            name
+        )
         if parameter_from_cache is not None:
             return parameter_from_cache
 
-        parameter_from_storage = cls.load_platform_parameter_from_storage(name)
+        parameter_from_storage = cls.load_web_platform_parameter_from_storage(
+            name
+        )
         if parameter_from_storage is not None:
             parameter = parameter_from_storage
         elif name in cls.parameter_registry:
@@ -163,13 +169,13 @@ class Registry:
         return parameter
 
     @classmethod
-    def update_platform_parameter(
+    def update_web_platform_parameter(
         cls,
         name: str,
         committer_id: str,
         commit_message: str,
-        new_rules: List[platform_parameter_domain.PlatformParameterRule],
-        default_value: platform_parameter_domain.PlatformDataTypes,
+        new_rules: List[web_platform_parameter_domain.PlatformParameterRule],
+        default_value: web_platform_parameter_domain.PlatformDataTypes,
     ) -> None:
         """Updates the platform parameter with new rules.
 
@@ -182,7 +188,7 @@ class Registry:
             default_value: PlatformDataTypes. The new default value of
                 platform parameter.
         """
-        param = cls.get_platform_parameter(name)
+        param = cls.get_web_platform_parameter(name)
 
         # Create a temporary param instance with new rules for validation,
         # if the new rules are invalid, an exception will be raised in
@@ -194,7 +200,7 @@ class Registry:
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
-        model_instance = cls._to_platform_parameter_model(param)
+        model_instance = cls._to_web_platform_parameter_config_model(param)
         param.set_rules(new_rules)
         param.set_default_value(default_value)
         cls.parameter_registry[param.name] = param
@@ -207,7 +213,7 @@ class Registry:
             [
                 {
                     'cmd': (
-                        platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+                        web_platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
                     ),
                     'new_rules': new_rule_dicts,
                     'default_value': default_value,
@@ -220,7 +226,7 @@ class Registry:
         )
 
     @classmethod
-    def get_all_platform_parameter_names(cls) -> List[str]:
+    def get_all_web_platform_parameter_names(cls) -> List[str]:
         """Return a list of all the platform parameter names.
 
         Returns:
@@ -229,8 +235,8 @@ class Registry:
         return list(cls.parameter_registry.keys())
 
     @classmethod
-    def evaluate_all_platform_parameters(
-        cls, context: platform_parameter_domain.EvaluationContext
+    def evaluate_all_web_platform_parameters(
+        cls, context: web_platform_parameter_domain.EvaluationContext
     ) -> Dict[str, Union[str, bool, int, float]]:
         """Evaluate all platform parameters with the given context.
 
@@ -242,15 +248,15 @@ class Registry:
             results of evaluation of the corresponding parameters.
         """
         result_dict = {}
-        for parameter_name in cls.get_all_platform_parameter_names():
-            parameter = cls.get_platform_parameter(parameter_name)
+        for parameter_name in cls.get_all_web_platform_parameter_names():
+            parameter = cls.get_web_platform_parameter(parameter_name)
             result_dict[parameter_name] = parameter.evaluate(context)
         return result_dict
 
     @classmethod
-    def init_platform_parameter_from_dict(
-        cls, parameter_dict: platform_parameter_domain.PlatformParameterDict
-    ) -> platform_parameter_domain.PlatformParameter:
+    def init_web_platform_parameter_from_dict(
+        cls, parameter_dict: web_platform_parameter_domain.PlatformParameterDict
+    ) -> web_platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter using the given
         dict representation of a platform parameter.
 
@@ -261,18 +267,18 @@ class Registry:
         Returns:
             PlatformParameter. The created platform parameter.
         """
-        parameter = platform_parameter_domain.PlatformParameter.from_dict(
+        parameter = web_platform_parameter_domain.PlatformParameter.from_dict(
             parameter_dict
         )
 
-        cls.init_platform_parameter(parameter.name, parameter)
+        cls.init_web_platform_parameter(parameter.name, parameter)
 
         return parameter
 
     @classmethod
-    def load_platform_parameter_from_storage(
+    def load_web_platform_parameter_from_storage(
         cls, name: str
-    ) -> Optional[platform_parameter_domain.PlatformParameter]:
+    ) -> Optional[web_platform_parameter_domain.PlatformParameter]:
         """Loads platform parameter from storage.
 
         Args:
@@ -282,7 +288,7 @@ class Registry:
             PlatformParameter|None. The loaded instance, None if it's not found
             in storage.
         """
-        parameter_model = config_models.PlatformParameterModel.get(
+        parameter_model = config_models.WebPlatformParameterConfigModel.get(
             name, strict=False
         )
 
@@ -292,7 +298,7 @@ class Registry:
                 default_value = param_with_init_settings.default_value
             else:
                 default_value = parameter_model.default_value
-            return platform_parameter_domain.PlatformParameter.from_dict(
+            return web_platform_parameter_domain.PlatformParameter.from_dict(
                 {
                     'name': param_with_init_settings.name,
                     'description': param_with_init_settings.description,
@@ -306,9 +312,9 @@ class Registry:
             return None
 
     @classmethod
-    def load_platform_parameter_from_memcache(
+    def load_web_platform_parameter_from_memcache(
         cls, name: str
-    ) -> Optional[platform_parameter_domain.PlatformParameter]:
+    ) -> Optional[web_platform_parameter_domain.PlatformParameter]:
         """Loads cached platform parameter from memcache.
 
         Args:
@@ -324,9 +330,9 @@ class Registry:
         return cached_parameter
 
     @classmethod
-    def _to_platform_parameter_model(
-        cls, param: platform_parameter_domain.PlatformParameter
-    ) -> config_models.PlatformParameterModel:
+    def _to_web_platform_parameter_config_model(
+        cls, param: web_platform_parameter_domain.PlatformParameter
+    ) -> config_models.WebPlatformParameterConfigModel:
         """Returns the platform parameter model corresponding to the given
         domain object.
 
@@ -334,55 +340,57 @@ class Registry:
             param: PlatformParameter. The platform parameter domain object.
 
         Returns:
-            PlatformParameterModel. The corresponding storage model.
+            WebPlatformParameterConfigModel. The corresponding storage model.
         """
-        model_instance = config_models.PlatformParameterModel.get(
+        model_instance = config_models.WebPlatformParameterConfigModel.get(
             param.name, strict=False
         )
         if model_instance is None:
-            model_instance = config_models.PlatformParameterModel.create(
-                param.name,
-                [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
-                default_value=param.default_value,
+            model_instance = (
+                config_models.WebPlatformParameterConfigModel.create(
+                    param.name,
+                    [rule.to_dict() for rule in param.rules],
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                    default_value=param.default_value,
+                )
             )
         return model_instance
 
 
 # Platform parameters should all be defined below.
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
     'Default content for the email sent after an exploration is '
     'unpublished by a moderator. These emails are only sent if the '
     'functionality is enabled in feconf.py. Leave this field blank '
     'if emails should not be sent.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default=(
         'I\'m writing to inform you that I have unpublished the above '
         'exploration.'
     ),
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.EMAIL_SENDER_NAME,
     'The default sender name for outgoing emails.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='Site Admin',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.EMAIL_FOOTER,
     'The footer to append to all outgoing emails. This should be '
     'written in HTML and include an unsubscribe link. The '
     'LINK_TO_PREFERENCES_PAGE placeholder is replaced with the '
     'preferences page URL before sending.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default=(
         'You can change your email preferences via the '
         '<a href="%s">Preferences</a> page.'
@@ -390,81 +398,81 @@ Registry.create_platform_parameter(
     ),
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
     'Content of email sent after a new user signs up. Set the email '
     'subject. These emails are only sent if the functionality is enabled '
     'in feconf.py.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='THIS IS A PLACEHOLDER.',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.SIGNUP_EMAIL_BODY_CONTENT,
     'Content of email sent after a new user signs up. (The email body '
     'should be written with HTML and not include a salutation or footer.) '
     'These emails are only sent if the functionality is enabled in '
     'feconf.py.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.PROMO_BAR_ENABLED,
     'Whether the promo bar should be enabled for all users',
-    platform_parameter_domain.DataTypes.BOOL,
+    web_platform_parameter_domain.DataTypes.BOOL,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.PROMO_BAR_MESSAGE,
     'The message to show to all users if the promo bar is enabled',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     'Always ask learners for answer details. For testing -- do not use',
-    platform_parameter_domain.DataTypes.BOOL,
+    web_platform_parameter_domain.DataTypes.BOOL,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
     'The maximum number of tags that can be selected to categorize the blog '
     'post',
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=10,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
     'The bounce-rate a state must exceed to create a new improvements task.',
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=0.20,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
     'The bounce-rate a state must fall under to discard its improvement task.',
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=0.20,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
     'The minimum number of times an exploration is started before it can '
     'generate high bounce-rate improvements tasks.',
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=100,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
     'Enable sending Contributor Dashboard reviewers email notifications '
     'about suggestions that need review. The default value is false.',
-    platform_parameter_domain.DataTypes.BOOL,
+    web_platform_parameter_domain.DataTypes.BOOL,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
     (
         'Enable sending admins email notifications if there are Contributor '
@@ -472,20 +480,20 @@ Registry.create_platform_parameter(
         'than %s days. The default value is false.'
         % (suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
     ),
-    platform_parameter_domain.DataTypes.BOOL,
+    web_platform_parameter_domain.DataTypes.BOOL,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
     (
         'Enable sending admins email notifications if Contributor Dashboard '
         'reviewers are needed in specific suggestion types. The default value '
         'is false.'
     ),
-    platform_parameter_domain.DataTypes.BOOL,
+    web_platform_parameter_domain.DataTypes.BOOL,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
     (
         'The maximum number of Contributor Dashboard suggestions per reviewer.'
@@ -493,70 +501,70 @@ Registry.create_platform_parameter(
         'for any given suggestion type on the dashboard, the admins are '
         'notified by email.'
     ),
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=5,
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
     'The probability of recording playthroughs',
-    platform_parameter_domain.DataTypes.NUMBER,
+    web_platform_parameter_domain.DataTypes.NUMBER,
     default=0.2,
 )
 
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
     'Email address used for system issued actions.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='system@example.com',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.SYSTEM_EMAIL_NAME,
     'Email name for system issued actions.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='.',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.ADMIN_EMAIL_ADDRESS,
     'Email address used for admin issued actions.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='testadmin@example.com',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.NOREPLY_EMAIL_ADDRESS,
     'Email address used for mails sent by Oppia.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='noreply@example.com',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.MAILCHIMP_AUDIENCE_ID,
     'Audience ID of the mailing list for Oppia in Mailchimp.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.MAILCHIMP_USERNAME,
     'Username of the mailing list for Oppia in Mailchimp.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.MAILGUN_DOMAIN_NAME,
     'Domain name for Mailgun email API.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='',
 )
 
-Registry.create_platform_parameter(
+Registry.create_web_platform_parameter(
     ParamName.OPPIA_SITE_URL_FOR_EMAILS,
     'Oppia site URL used in emails.',
-    platform_parameter_domain.DataTypes.STRING,
+    web_platform_parameter_domain.DataTypes.STRING,
     default='http://localhost:8181',
 )

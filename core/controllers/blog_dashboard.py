@@ -25,7 +25,7 @@ from core.domain import (
     blog_services,
     fs_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
 )
 
 from typing import Dict, List, Optional, TypedDict
@@ -282,7 +282,7 @@ class BlogPostHandler(
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id
         )
-        max_no_of_tags = platform_parameter_services.get_platform_parameter_value(
+        max_no_of_tags = web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST

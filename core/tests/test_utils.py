@@ -55,10 +55,10 @@ from core.domain import (
     interaction_registry,
     object_registry,
     param_domain,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
     platform_parameter_list,
-    platform_parameter_registry,
-    platform_parameter_services,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
     question_domain,
     question_services,
     rights_manager,
@@ -395,12 +395,12 @@ def swap_get_platform_parameter_value_function(
     platform_parameter_name_value_tuples: List[
         Tuple[
             platform_parameter_list.ParamName,
-            platform_parameter_domain.PlatformDataTypes,
+            web_platform_parameter_domain.PlatformDataTypes,
         ]
     ],
 ) -> Iterator[None]:
-    """Mocks get_platform_parameter_value function within the context of a
-    'with' statement. get_platform_parameter_value will return the value of
+    """Mocks get_web_platform_parameter_value function within the context of a
+    'with' statement. get_web_platform_parameter_value will return the value of
     the platform parameter if the parameter is present in the
     platform_parameter_names list.
 
@@ -415,8 +415,8 @@ def swap_get_platform_parameter_value_function(
 
     def mock_get_platform_parameter_value(
         parameter_name: str,
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Mocks get_platform_parameter_value function to return the value of
+    ) -> web_platform_parameter_domain.PlatformDataTypes:
+        """Mocks get_web_platform_parameter_value function to return the value of
         the platform parameter if the parameter is present in the
         platform_parameter_names list.
 
@@ -436,25 +436,25 @@ def swap_get_platform_parameter_value_function(
             (x.value, y) for x, y in platform_parameter_name_value_tuples
         )
         if parameter_name not in platform_parameter_name_value_dict:
-            return platform_parameter_registry.Registry.get_platform_parameter(
+            return web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 parameter_name
             ).default_value
         return platform_parameter_name_value_dict[parameter_name]
 
     original_get_platform_parameter_value = getattr(
-        platform_parameter_services, 'get_platform_parameter_value'
+        web_platform_parameter_services, 'get_web_platform_parameter_value'
     )
     setattr(
-        platform_parameter_services,
-        'get_platform_parameter_value',
+        web_platform_parameter_services,
+        'get_web_platform_parameter_value',
         mock_get_platform_parameter_value,
     )
     try:
         yield
     finally:
         setattr(
-            platform_parameter_services,
-            'get_platform_parameter_value',
+            web_platform_parameter_services,
+            'get_web_platform_parameter_value',
             original_get_platform_parameter_value,
         )
 
@@ -463,7 +463,7 @@ def set_platform_parameters(
     platform_parameter_name_value_tuples: List[
         Tuple[
             platform_parameter_list.ParamName,
-            platform_parameter_domain.PlatformDataTypes,
+            web_platform_parameter_domain.PlatformDataTypes,
         ]
     ],
 ) -> Callable[

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The service file for platform parameters."""
+"""Services for web platform parameters."""
 
 from __future__ import annotations
 
@@ -25,8 +25,8 @@ import os
 
 from core import feconf
 from core.constants import constants
-from core.domain import platform_parameter_domain, platform_parameter_list
-from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_list, web_platform_parameter_domain
+from core.domain import web_platform_parameter_registry as registry
 
 from typing import Dict, Final, List
 
@@ -42,7 +42,7 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
 # code is a library in Python's site-packages).
 #
 # Note that os.path.abspath(__file__) provides the path of the current
-# platform_parameter_services.py module.
+# web_platform_parameter_services.py module.
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
@@ -51,15 +51,15 @@ PACKAGE_JSON_FILE_PATH: Final = os.path.join(
 )
 
 
-class PlatformParameterNotFoundException(Exception):
+class WebPlatformParameterNotFoundException(Exception):
     """Exception thrown when an unknown platform parameter is requested."""
 
     pass
 
 
-def create_evaluation_context_for_client(
-    client_context_dict: platform_parameter_domain.ClientSideContextDict,
-) -> platform_parameter_domain.EvaluationContext:
+def create_web_platform_parameter_evaluation_context_for_client(
+    client_context_dict: web_platform_parameter_domain.ClientSideContextDict,
+) -> web_platform_parameter_domain.EvaluationContext:
     """Returns context instance for evaluation, using the information
     provided by clients.
 
@@ -69,13 +69,14 @@ def create_evaluation_context_for_client(
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    return platform_parameter_domain.EvaluationContext.from_dict(
-        client_context_dict, {'server_mode': get_server_mode()}
+    return web_platform_parameter_domain.EvaluationContext.from_dict(
+        client_context_dict,
+        {'server_mode': get_web_platform_parameter_server_mode()},
     )
 
 
-def get_all_platform_parameters_dicts() -> (
-    List[platform_parameter_domain.PlatformParameterDict]
+def get_all_web_platform_parameters_dicts() -> (
+    List[web_platform_parameter_domain.PlatformParameterDict]
 ):
     """Returns dict representations of all platform parameters. This method
     is used for providing detailed platform parameters information to the
@@ -86,12 +87,16 @@ def get_all_platform_parameters_dicts() -> (
         platform parameters.
     """
     return [
-        registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
+        registry.Registry.get_web_platform_parameter(
+            _plat_param.value
+        ).to_dict()
         for _plat_param in platform_parameter_list.ALL_PLATFORM_PARAMS_LIST
     ]
 
 
-def get_server_mode() -> platform_parameter_domain.ServerMode:
+def get_web_platform_parameter_server_mode() -> (
+    web_platform_parameter_domain.ServerMode
+):
     """Returns the running mode of Oppia.
 
     Returns:
@@ -107,18 +112,18 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
         % (os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified'))
     )
     return (
-        platform_parameter_domain.ServerMode.DEV
+        web_platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
         else (
-            platform_parameter_domain.ServerMode.PROD
+            web_platform_parameter_domain.ServerMode.PROD
             if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else platform_parameter_domain.ServerMode.TEST
+            else web_platform_parameter_domain.ServerMode.TEST
         )
     )
 
 
-def _create_evaluation_context_for_server() -> (
-    platform_parameter_domain.EvaluationContext
+def _create_web_platform_parameter_evaluation_context_for_server() -> (
+    web_platform_parameter_domain.EvaluationContext
 ):
     """Returns evaluation context with information of the server.
 
@@ -146,18 +151,18 @@ def _create_evaluation_context_for_server() -> (
         else:
             current_app_version = current_app_version.replace('-', '.')
 
-    return platform_parameter_domain.EvaluationContext.from_dict(
+    return web_platform_parameter_domain.EvaluationContext.from_dict(
         {
             'platform_type': 'Web',
             'app_version': current_app_version,
         },
-        {'server_mode': get_server_mode()},
+        {'server_mode': get_web_platform_parameter_server_mode()},
     )
 
 
-def get_platform_parameter_value(
+def get_web_platform_parameter_value(
     parameter_name: str,
-) -> platform_parameter_domain.PlatformDataTypes:
+) -> web_platform_parameter_domain.PlatformDataTypes:
     """Returns the value of the platform parameter.
 
     Args:
@@ -168,23 +173,23 @@ def get_platform_parameter_value(
         PlatformDataTypes. The value of the platform parameter.
 
     Raises:
-        PlatformParameterNotFoundException. Platform parameter is not valid.
+        WebPlatformParameterNotFoundException. Platform parameter is not valid.
     """
-    all_platform_params_dicts = get_all_platform_parameters_dicts()
+    all_platform_params_dicts = get_all_web_platform_parameters_dicts()
     all_platform_params_names_set = set(
         param['name'] for param in all_platform_params_dicts
     )
     if parameter_name not in all_platform_params_names_set:
-        raise PlatformParameterNotFoundException(
+        raise WebPlatformParameterNotFoundException(
             'Unknown platform parameter: %s.' % parameter_name
         )
 
-    context = _create_evaluation_context_for_server()
-    param = registry.Registry.get_platform_parameter(parameter_name)
+    context = _create_web_platform_parameter_evaluation_context_for_server()
+    param = registry.Registry.get_web_platform_parameter(parameter_name)
     return param.evaluate(context)
 
 
-def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
+def get_web_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     """Returns the schema for the platform parameter.
 
     Args:
@@ -197,7 +202,7 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     Raises:
         Exception. The platform parameter does not have valid data type.
     """
-    parameter = registry.Registry.get_platform_parameter(param_name)
+    parameter = registry.Registry.get_web_platform_parameter(param_name)
     if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
         schema_type = copy.deepcopy(
             DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type]
@@ -210,6 +215,6 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
             % (
                 parameter.name,
                 parameter.data_type,
-                platform_parameter_domain.PlatformDataTypes,
+                web_platform_parameter_domain.PlatformDataTypes,
             )
         )

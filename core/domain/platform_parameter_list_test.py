@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_registry
+from core.domain import web_platform_parameter_registry
 from core.tests import test_utils
 
 
@@ -58,10 +58,10 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
+            web_platform_parameter_registry.Registry.get_all_web_platform_parameter_names()
         )
         for name in all_names:
-            param = platform_parameter_registry.Registry.get_platform_parameter(
+            param = web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 name
             )
             param.validate()
@@ -81,7 +81,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         """
         self.assertEqual(
             len(
-                platform_parameter_registry.Registry.get_all_platform_parameter_names()
+                web_platform_parameter_registry.Registry.get_all_web_platform_parameter_names()
             ),
             len(self.EXPECTED_PARAM_NAMES),
         )
@@ -99,7 +99,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         make sure it's also deleted from EXPECTED_PARAM_NAMES.
         """
         existing_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
+            web_platform_parameter_registry.Registry.get_all_web_platform_parameter_names()
         )
         missing_names = set(self.EXPECTED_PARAM_NAMES) - set(existing_names)
 
@@ -120,7 +120,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         the EXPECTED_PARAM_NAMES list as well.
         """
         existing_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
+            web_platform_parameter_registry.Registry.get_all_web_platform_parameter_names()
         )
         unexpected_names = set(existing_names) - set(self.EXPECTED_PARAM_NAMES)
 

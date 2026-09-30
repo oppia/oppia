@@ -31,7 +31,7 @@ if MYPY:  # pragma: no cover
     # at runtime.
     from core.domain import (
         param_domain,
-        platform_parameter_domain,
+        web_platform_parameter_domain,
         question_domain,
         state_domain,
         translation_domain,
@@ -63,7 +63,7 @@ if MYPY:  # pragma: no cover
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
         translation_domain.WrittenTranslationsDict,
-        List[platform_parameter_domain.PlatformParameterRuleDict],
+        List[web_platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,
         state_domain.SubtitledHtmlDict,

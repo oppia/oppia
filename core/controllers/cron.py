@@ -25,7 +25,7 @@ from core.domain import (
     cron_services,
     email_manager,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
     story_services,
     suggestion_registry,
     suggestion_services,
@@ -126,7 +126,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
-        if not platform_parameter_services.get_platform_parameter_value(
+        if not web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})
@@ -172,7 +172,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
             feconf.ROLE_ID_TRANSLATION_ADMIN
         )
 
-        if platform_parameter_services.get_platform_parameter_value(
+        if web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             suggestion_types_needing_reviewers = (
@@ -185,7 +185,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 suggestion_types_needing_reviewers,
             )
 
-        if platform_parameter_services.get_platform_parameter_value(
+        if web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             info_about_suggestions_waiting_too_long_for_review = (
@@ -218,7 +218,7 @@ class CronMailReviewerNewSuggestionsHandler(
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
-        if not platform_parameter_services.get_platform_parameter_value(
+        if not web_platform_parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})

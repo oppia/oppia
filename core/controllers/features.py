@@ -22,7 +22,7 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     opportunity_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
 )
 
 from typing import Dict
@@ -61,7 +61,7 @@ class ExplorationFeaturesHandler(
                 'exploration_is_curated': opportunity_services.is_exploration_available_for_contribution(
                     exploration_id
                 ),
-                'always_ask_learners_for_answer_details': platform_parameter_services.get_platform_parameter_value(
+                'always_ask_learners_for_answer_details': web_platform_parameter_services.get_web_platform_parameter_value(
                     platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
                 ),
             }

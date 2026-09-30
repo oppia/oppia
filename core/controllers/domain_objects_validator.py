@@ -34,9 +34,9 @@ from core.domain import (
     general_feedback_domain,
     image_validation_services,
     improvements_domain,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
     platform_parameter_list,
-    platform_parameter_registry,
+    web_platform_parameter_registry,
     question_domain,
     skill_domain,
     state_domain,
@@ -97,9 +97,9 @@ def validate_suggestion_change(
 
 def validate_platform_params_values_for_blog_admin(
     new_platform_parameter_values: Mapping[
-        str, platform_parameter_domain.PlatformDataTypes
+        str, web_platform_parameter_domain.PlatformDataTypes
     ],
-) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
+) -> Mapping[str, web_platform_parameter_domain.PlatformDataTypes]:
     """Validates new platform parameter values.
 
     Args:
@@ -125,11 +125,13 @@ def validate_platform_params_values_for_blog_admin(
             raise Exception(
                 'The value of %s platform parameter is not of valid type, '
                 'it should be one of %s.'
-                % (name, str(platform_parameter_domain.PlatformDataTypes))
+                % (name, str(web_platform_parameter_domain.PlatformDataTypes))
             )
 
-        parameter = platform_parameter_registry.Registry.get_platform_parameter(
-            name
+        parameter = (
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
+                name
+            )
         )
 
         if not (
@@ -162,8 +164,10 @@ def validate_platform_params_values_for_blog_admin(
 
 
 def validate_new_default_value_of_platform_parameter(
-    default_value: Mapping[str, platform_parameter_domain.PlatformDataTypes],
-) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
+    default_value: Mapping[
+        str, web_platform_parameter_domain.PlatformDataTypes
+    ],
+) -> Mapping[str, web_platform_parameter_domain.PlatformDataTypes]:
     """Validates new default value of platform parameter.
 
     Args:
@@ -181,7 +185,7 @@ def validate_new_default_value_of_platform_parameter(
         raise Exception(
             'Expected type to be %s but received %s'
             % (
-                platform_parameter_domain.PlatformDataTypes,
+                web_platform_parameter_domain.PlatformDataTypes,
                 default_value['value'],
             )
         )

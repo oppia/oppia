@@ -22,8 +22,8 @@ import enum
 
 from core import feconf, utils
 from core.domain import caching_services
-from core.domain import platform_parameter_domain as parameter_domain
-from core.domain import platform_parameter_registry as registry
+from core.domain import web_platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_registry as registry
 from core.tests import test_utils
 
 from typing import List
@@ -64,7 +64,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def _create_example_parameter_with_name(self, name: str) -> None:
         """Creates and returns an example parameter with the given name."""
-        registry.Registry.init_platform_parameter_from_dict(
+        registry.Registry.init_web_platform_parameter_from_dict(
             {
                 'name': name,
                 'description': 'for test',
@@ -92,9 +92,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     ) -> parameter_domain.PlatformParameter:
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
-        # names for our tests and create_platform_parameter only accepts
+        # names for our tests and create_web_platform_parameter only accepts
         # platform parameter name of type platform_parameter_list.ParamName.
-        return registry.Registry.create_platform_parameter(
+        return registry.Registry.create_web_platform_parameter(
             ParamName.PARAMETER_A, 'test', data_types  # type: ignore[arg-type]
         )
 
@@ -115,7 +115,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            registry.Registry.create_platform_parameter(
+            registry.Registry.create_web_platform_parameter(
                 ParamName.PARAMETER_A, 'test', DataType.INVALID  # type: ignore[arg-type]
             )
 
@@ -145,20 +145,20 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_get_platform_parameter(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
-        parameter = registry.Registry.get_platform_parameter(parameter_name)
+        parameter = registry.Registry.get_web_platform_parameter(parameter_name)
         self.assertIsNotNone(parameter)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self) -> None:
         with self.assertRaisesRegex(Exception, 'not found'):
-            registry.Registry.get_platform_parameter('parameter_a')
+            registry.Registry.get_web_platform_parameter('parameter_a')
 
     def test_get_all_parameter_names(self) -> None:
         parameter_names = ['parameter_a', 'parameter_b']
         for parameter_name in parameter_names:
             self._create_example_parameter_with_name(parameter_name)
         self.assertEqual(
-            sorted(registry.Registry.get_all_platform_parameter_names()),
+            sorted(registry.Registry.get_all_web_platform_parameter_names()),
             sorted(parameter_names),
         )
 
@@ -167,13 +167,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self._create_example_parameter_with_name(parameter_name)
 
         self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
+            registry.Registry.load_web_platform_parameter_from_memcache(
                 parameter_name
             )
         )
-        registry.Registry.get_platform_parameter(parameter_name)
+        registry.Registry.get_web_platform_parameter(parameter_name)
         self.assertIsNotNone(
-            registry.Registry.load_platform_parameter_from_memcache(
+            registry.Registry.load_web_platform_parameter_from_memcache(
                 parameter_name
             )
         )
@@ -182,7 +182,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        registry.Registry.update_platform_parameter(
+        registry.Registry.update_web_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
@@ -201,7 +201,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'default',
         )
-        parameter_updated = registry.Registry.get_platform_parameter(
+        parameter_updated = registry.Registry.get_web_platform_parameter(
             parameter_name
         )
 
@@ -215,7 +215,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        registry.Registry.update_platform_parameter(
+        registry.Registry.update_web_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
@@ -235,7 +235,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'default',
         )
         self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
+            registry.Registry.load_web_platform_parameter_from_memcache(
                 parameter_name
             )
         )
@@ -244,11 +244,11 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        param = registry.Registry.get_platform_parameter(parameter_name)
+        param = registry.Registry.get_web_platform_parameter(parameter_name)
         param.validate()
 
         with self.assertRaisesRegex(utils.ValidationError, 'Expected string'):
-            registry.Registry.update_platform_parameter(
+            registry.Registry.update_web_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
@@ -272,12 +272,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
         self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_storage(
+            registry.Registry.load_web_platform_parameter_from_storage(
                 parameter_name
             )
         )
 
-        registry.Registry.update_platform_parameter(
+        registry.Registry.update_web_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
@@ -298,7 +298,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         )
 
         parameter_updated = (
-            registry.Registry.load_platform_parameter_from_storage(
+            registry.Registry.load_web_platform_parameter_from_storage(
                 parameter_name
             )
         )
@@ -314,7 +314,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             new_rules: List[parameter_domain.PlatformParameterRule],
             default_value: parameter_domain.PlatformDataTypes,
         ) -> None:
-            param = registry.Registry.get_platform_parameter(name)
+            param = registry.Registry.get_web_platform_parameter(name)
 
             new_rule_dicts = [rules.to_dict() for rules in new_rules]
             param_dict = param.to_dict()
@@ -323,7 +323,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             updated_param = param.from_dict(param_dict)
             updated_param.validate()
 
-            model_instance = registry.Registry._to_platform_parameter_model(  # pylint: disable=protected-access
+            model_instance = registry.Registry._to_web_platform_parameter_config_model(  # pylint: disable=protected-access
                 param
             )
             param.set_rules(new_rules)
@@ -354,12 +354,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         with self.swap(
             registry.Registry,
-            'update_platform_parameter',
+            'update_web_platform_parameter',
             _mock_update_platform_parameter,
         ):
             parameter_name = 'parameter_b'
             self._create_example_parameter_with_name(parameter_name)
-            registry.Registry.update_platform_parameter(
+            registry.Registry.update_web_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
@@ -380,7 +380,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
             parameter_storage = (
-                registry.Registry.load_platform_parameter_from_storage(
+                registry.Registry.load_web_platform_parameter_from_storage(
                     parameter_name
                 )
             )
@@ -399,7 +399,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'server_mode': FeatureStages.DEV,
             },
         )
-        registry.Registry.init_platform_parameter_from_dict(
+        registry.Registry.init_web_platform_parameter_from_dict(
             {
                 'name': 'parameter_a',
                 'description': 'for test',
@@ -421,7 +421,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'default_value': '333',
             }
         )
-        registry.Registry.init_platform_parameter_from_dict(
+        registry.Registry.init_web_platform_parameter_from_dict(
             {
                 'name': 'parameter_b',
                 'description': 'for test',
@@ -435,7 +435,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            registry.Registry.evaluate_all_platform_parameters(context),
+            registry.Registry.evaluate_all_web_platform_parameters(context),
             {
                 'parameter_a': '222',
                 'parameter_b': False,

@@ -22,7 +22,7 @@ import collections
 import enum
 
 from core import feconf, utils
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
 from typing import Dict, Final, List, Optional, Union

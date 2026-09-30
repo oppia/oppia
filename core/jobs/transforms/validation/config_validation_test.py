@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import config_validation
 from core.jobs.types import base_validation_errors

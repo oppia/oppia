@@ -40,10 +40,10 @@ from core.domain import (
     fs_services,
     opportunity_services,
 )
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services as parameter_services
+from core.domain import web_platform_parameter_registry as registry
+from core.domain import web_platform_parameter_services as parameter_services
 from core.domain import (
     question_domain,
     question_services,
@@ -458,7 +458,7 @@ class AdminHandler(
         ]
 
         platform_params_dicts = (
-            parameter_services.get_all_platform_parameters_dicts()
+            parameter_services.get_all_web_platform_parameters_dicts()
         )
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
@@ -785,7 +785,7 @@ class AdminHandler(
                 assert default_value is not None
 
                 try:
-                    registry.Registry.update_platform_parameter(
+                    registry.Registry.update_web_platform_parameter(
                         platform_param_name,
                         self.user_id,
                         commit_message,
@@ -794,7 +794,7 @@ class AdminHandler(
                     )
                 except (
                     utils.ValidationError,
-                    parameter_services.PlatformParameterNotFoundException,
+                    parameter_services.WebPlatformParameterNotFoundException,
                 ) as e:
                     raise self.InvalidInputException(e)
 
@@ -3264,7 +3264,7 @@ class AdminSuperAdminPrivilegesHandler(
             NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
-        if self.email != parameter_services.get_platform_parameter_value(
+        if self.email != parameter_services.get_web_platform_parameter_value(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         ):
             raise self.UnauthorizedUserException(
@@ -3291,8 +3291,10 @@ class AdminSuperAdminPrivilegesHandler(
                 super admin account.
         """
         assert self.normalized_request is not None
-        admin_email_address = parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        admin_email_address = (
+            parameter_services.get_web_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+            )
         )
         if self.email != admin_email_address:
             raise self.UnauthorizedUserException(

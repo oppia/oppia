@@ -34,7 +34,7 @@ from core.domain import (
     feature_flag_services,
     feedback_services,
     platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_services,
     question_services,
     rights_manager,
     role_services,
@@ -1352,8 +1352,11 @@ def can_delete_any_user(
             raise self.NotLoggedInException
 
         email = user_services.get_email_from_user_id(self.user_id)
-        if email != platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        if (
+            email
+            != web_platform_parameter_services.get_web_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+            )
         ):
             raise self.UnauthorizedUserException(
                 '%s cannot delete any user.' % self.user_id

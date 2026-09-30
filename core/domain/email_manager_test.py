@@ -31,11 +31,11 @@ from core.domain import (
     exp_domain,
     general_feedback_domain,
     html_cleaner,
-    platform_parameter_domain,
+    web_platform_parameter_domain,
 )
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
-    platform_parameter_registry,
+    web_platform_parameter_registry,
     question_domain,
     rights_domain,
     story_domain,
@@ -677,12 +677,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
             new_email_subject_content: str. The email subject.
             new_email_body_content: str. The email body.
         """
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
             self.admin_id,
             'Updating email subject.',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -694,16 +694,16 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
             ).default_value,
         )
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value,
             self.admin_id,
             'Updating email body.',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -715,50 +715,50 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
             ).default_value,
         )
 
     def _reset_signup_email_content_platform_parameters(self) -> None:
         """Resets email content platform parameters."""
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
             self.admin_id,
             'Resetting email subject.',
             [],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
             ).default_value,
         )
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value,
             self.admin_id,
             'Resetting email body.',
             [],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
             ).default_value,
         )
 
     def _reset_the_email_platform_params_value(self) -> None:
         """Resets the email name and footer platform parameters."""
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Reset the sender name to default',
             [],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_SENDER_NAME.value
             ).default_value,
         )
 
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Reset the email footer to default',
             [],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_FOOTER.value
             ).default_value,
         )
@@ -865,12 +865,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_partially_modified(
         self,
     ) -> None:
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
             self.admin_id,
             'Updating email subject.',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -882,7 +882,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
             ).default_value,
         )
@@ -993,12 +993,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
         ]
     )
     def test_contents_of_signup_email_are_correct(self) -> None:
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -1010,16 +1010,16 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_SENDER_NAME.value
             ).default_value,
         )
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Update email footer',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -1031,7 +1031,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_FOOTER.value
             ).default_value,
         )
@@ -1197,12 +1197,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
         ]
     )
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -1214,16 +1214,16 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_SENDER_NAME.value
             ).default_value,
         )
-        platform_parameter_registry.Registry.update_platform_parameter(
+        web_platform_parameter_registry.Registry.update_web_platform_parameter(
             param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Update email footer',
             [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -1235,7 +1235,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     }
                 )
             ],
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param_list.ParamName.EMAIL_FOOTER.value
             ).default_value,
         )
