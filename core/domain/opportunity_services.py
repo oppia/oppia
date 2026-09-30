@@ -1441,6 +1441,35 @@ def get_translation_opportunities_with_new_models(
     return card_infos, cursor, more
 
 
+def get_translation_opportunities_count_with_new_models(
+    entity_type: Optional[str],
+    language_code: str,
+    topic_name: Optional[str] = None,
+) -> int:
+    """Returns the total count of translation opportunities for the given
+    entity type, filtered by topic name and language code.
+
+    Args:
+        entity_type: str or None. The entity type to count opportunities
+            for. If None, all entity types are included.
+        language_code: str. The language code to filter by.
+        topic_name: str or None. The name of the topic to filter by.
+
+    Returns:
+        int. The total number of matching translation opportunities.
+    """
+    topic_id = None
+    if topic_name:
+        topic = topic_fetchers.get_topic_by_name(topic_name, strict=False)
+        if topic is None:
+            return 0
+        topic_id = topic.id
+
+    return opportunity_models.TranslationOpportunityModel.count_by_entity_type_and_topic(
+        entity_type, topic_id, language_code
+    )
+
+
 def _get_translation_opportunity_cards_from_models(
     opportunity_models_list: Sequence[
         opportunity_models.TranslationOpportunityModel
@@ -1739,6 +1768,27 @@ def get_translation_opportunities(
     return opportunity_summaries, cursor, more
 
 
+def get_translation_opportunities_count(
+    language_code: str, topic_name: Optional[str]
+) -> int:
+    """Returns the total count of translation opportunities available
+    for translation in a specific language.
+
+    Args:
+        language_code: str. The language for which translation
+            opportunities should be counted.
+        topic_name: str or None. The topic for which translation
+            opportunities should be counted. If None or empty, count
+            from all topics.
+
+    Returns:
+        int. The total number of matching translation opportunities.
+    """
+    return opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+        language_code, topic_name
+    )
+
+
 def _build_entity_id_to_translation_suggestion_in_review_count(
     entity_ids: List[str], language_code: str
 ) -> Dict[str, int]:
@@ -1936,6 +1986,16 @@ def get_skill_opportunities(
         )
         opportunities.append(skill_opportunity)
     return opportunities, cursor, more
+
+
+def get_skill_opportunities_count() -> int:
+    """Returns the total count of skill opportunities available for
+    adding questions.
+
+    Returns:
+        int. The total number of skill opportunities.
+    """
+    return opportunity_models.SkillOpportunityModel.count_skill_opportunities()
 
 
 def get_skill_opportunities_by_ids(
