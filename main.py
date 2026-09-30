@@ -45,7 +45,6 @@ from core.controllers import (
     feature_flag,
     features,
     feedback,
-    feedback_updates,
     firebase,
     general_feedback,
     improvements,
@@ -491,6 +490,10 @@ URLS = [
         contributor_dashboard.ContributionOpportunitiesHandlerV2,
     ),
     get_redirect_route(
+        r'%s' % feconf.OPPORTUNITIES_COUNT_URL,
+        contributor_dashboard.OpportunitiesCountHandler,
+    ),
+    get_redirect_route(
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler,
     ),
@@ -734,16 +737,8 @@ URLS = [
         learner_dashboard.LearnerDashboardExplorationsProgressHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.FEEDBACK_UPDATES_DATA_URL,
-        feedback_updates.FeedbackUpdatesHandler,
-    ),
-    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler,
-    ),
-    get_redirect_route(
-        r'%s/<thread_id>' % feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
-        feedback_updates.FeedbackThreadHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.MERGE_SKILLS_URL,
