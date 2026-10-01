@@ -1596,6 +1596,52 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, authored_question_suggestion_id)
         self.assertEqual(question_suggestion_offset, 1)
 
+    def test_user_created_suggestions_by_offset_filters_by_language_code(
+        self,
+    ) -> None:
+        user_id = 'author_language_filter'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW,
+            user_id,
+            'reviewer_2',
+            self.change_cmd,
+            self.score_category,
+            'exploration.exp1.thread_lang_en',
+            'en',
+        )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW,
+            user_id,
+            'reviewer_2',
+            self.change_cmd,
+            self.score_category,
+            'exploration.exp1.thread_lang_hi',
+            'hi',
+        )
+
+        results, offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=10,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                language_code='hi',
+            )
+        )
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'exploration.exp1.thread_lang_hi')
+        self.assertEqual(offset, 1)
+
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
         self,
     ) -> None:

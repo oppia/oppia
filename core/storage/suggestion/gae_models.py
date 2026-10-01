@@ -1226,6 +1226,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         user_id: str,
         sort_key: Optional[str],
         target_type: Optional[str] = None,
+        language_code: Optional[str] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches suggestions of suggestion_type which the supplied user has
         created.
@@ -1238,6 +1239,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query.
             sort_key: str|None. The key to sort the suggestions by.
             target_type: str|None. Optional target type to filter suggestions.
+            language_code: str|None. Optional language code to filter
+                suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -1252,6 +1255,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ]
         if target_type is not None:
             filters.append(cls.target_type == target_type)
+        if language_code is not None:
+            filters.append(cls.language_code == language_code)
 
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(*filters)
