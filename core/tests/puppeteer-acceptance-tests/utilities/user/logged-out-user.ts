@@ -597,6 +597,9 @@ const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
 const storyTitleSelector = '.e2e-test-story-title';
 const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const lessonInfoModalObjectiveSelector = '.oppia-exploration-description';
+const lessonInfoModalTagsSelector = '.exploration-tags';
+const explorationHeaderSelector = '.e2e-test-exploration-header';
 const progressReminderModalHeaderSelector =
   '.e2e-test-progress-reminder-continue-text';
 const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
@@ -8557,6 +8560,46 @@ export class LoggedOutUser extends BaseUser {
 
     throw new Error(
       `The lesson tile titled "${title}" was not found. Tiles found: ${titlesFound.join(', ')}`
+    );
+  }
+
+  /**
+   * Checks if the exploration title in the exploration player header matches
+   * the expected title.
+   * @param title - The expected title.
+   */
+  async expectExplorationTitleInPlayerToBe(title: string): Promise<void> {
+    await this.expectElementToBeVisible(explorationHeaderSelector);
+    await this.expectTextContentToMatch(explorationHeaderSelector, title);
+  }
+
+  /**
+   * Checks if the exploration objective in the lesson info modal matches
+   * the expected objective.
+   * @param objective - The expected objective.
+   */
+  async expectLessonInfoModalObjectiveToBe(objective: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalObjectiveSelector);
+    await this.expectTextContentToMatch(
+      lessonInfoModalObjectiveSelector,
+      objective
+    );
+  }
+
+  /**
+   * Checks if the lesson info modal tags section contains the expected text.
+   * @param tagText - The expected tags text.
+   */
+  async expectLessonInfoModalTagsToBe(tagText: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalTagsSelector);
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim().includes(value);
+      },
+      {},
+      lessonInfoModalTagsSelector,
+      tagText
     );
   }
 }

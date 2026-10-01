@@ -193,7 +193,7 @@ describe('Translation Reviewer: filter opportunities by entity type', function (
     );
   }, 2100000);
 
-  it('should Filter opportunities by Entity Type', async function () {
+  it('should filter opportunities by entity type', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
     await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
@@ -210,9 +210,9 @@ describe('Translation Reviewer: filter opportunities by entity type', function (
       SKILL_SUBHEADING,
       OPPORTUNITY_ACTION_BUTTON_LABEL
     );
-  });
 
-  it('should Filter opportunities by Entity Type for skills', async function () {
+    // Filtering by skills shows only the submitted skill translations and
+    // removes the exploration translations from the list.
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
@@ -223,6 +223,11 @@ describe('Translation Reviewer: filter opportunities by entity type', function (
     await translationReviewer.expectOpportunityToBePresent(
       HINDI_SKILL_DESCRIPTION,
       SKILL_NAME
+    );
+    await translationReviewer.expectOpportunityToBePresent(
+      CHAPTER_NAME,
+      LESSON_SUBHEADING,
+      false
     );
   });
 

@@ -18,8 +18,6 @@
  *
  * TR.2 Review exploration metadata translations.
  * TR.2 Review skill translations.
- * TR.2 Accept a translation.
- * TR.2 Reject a translation.
  *
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
  */
@@ -201,10 +199,10 @@ describe('Translation Reviewer: review translations', function () {
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
   }, 2100000);
 
-  it('should Review skill translations', async function () {
+  it('should review skill translations', async function () {
     // Reaching a skill's suggestions through its opportunity card is a
-    // different path from the skills filter above, which skips the card, so
-    // both are covered.
+    // different path from the skills filter, which skips the card, so both
+    // are covered.
     await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       SKILL_NAME,
@@ -214,9 +212,7 @@ describe('Translation Reviewer: review translations', function () {
       HINDI_SKILL_EXPLANATION,
       SKILL_NAME
     );
-  });
 
-  it('should Accept a translation and Reject a translation', async function () {
     // The skill has two pending suggestions. Opening the first row means one
     // suggestion still follows it, which is what makes the labels below
     // deterministic rather than dependent on how the list is sorted.
@@ -248,7 +244,7 @@ describe('Translation Reviewer: review translations', function () {
     );
   });
 
-  it('should Review exploration metadata translations', async function () {
+  it('should review exploration metadata translations', async function () {
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.LESSONS
     );

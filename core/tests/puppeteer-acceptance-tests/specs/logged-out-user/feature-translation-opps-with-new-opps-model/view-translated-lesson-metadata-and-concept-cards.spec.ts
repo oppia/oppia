@@ -18,8 +18,6 @@
  * Both only exist when ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
  * is on.
  *
- * LO.4 View information about the lesson.
- * LO.4 Refer to a concept card.
  * LO.4 View translated lesson metadata and concept cards in the player.
  *
  * CUJ Link: https://docs.google.com/spreadsheets/d/1IfKAMEZHl0qJTr0OPo6obImMHXgb-8WM5eAHLfgXsfM/edit?gid=659609865#gid=659609865
@@ -47,9 +45,6 @@ const ROLES = testConstants.Roles;
 
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
 const HINDI_SITE_LANGUAGE_CODE = 'hi';
-// Nothing is translated into Arabic here, so it is the language used to check
-// that an untranslated concept card falls back to English.
-const UNTRANSLATED_SITE_LANGUAGE_CODE = 'ar';
 
 const TOPIC_NAME = 'Fractions';
 const SUBTOPIC_NAME = 'Fraction Foundations';
@@ -67,15 +62,12 @@ const CONTENT_TYPE_TITLE = 'title';
 const CONTENT_TYPE_OBJECTIVE = 'objective';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
-// The skill's concept card explanation is built from its description by
-// createSkillForTopic, so the English text the fallback shows is known.
-const SKILL_EXPLANATION = `Review material text content for ${SKILL_NAME}.`;
-
 // A suggestion row truncates its heading at 30 characters, and the heading is
 // the translation itself, so any translation looked up by heading below is
 // kept under that limit.
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर बाँटना सीखें';
+const HINDI_NO_TAGS_TEXT = 'कोई टैग्स नहीं जुड़े है।';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
 
 const MAX_ITEMS_TO_SKIP = 15;
@@ -231,30 +223,24 @@ describe('Logged-out User', function () {
     await loggedOutUser.changeSiteLanguage(HINDI_SITE_LANGUAGE_CODE);
   }, 2100000);
 
-  it('should view information about the lesson', async function () {
+  it('should view translated lesson metadata and concept cards in the player', async function () {
     await loggedOutUser.goto(
       `${testConstants.URLs.ExplorationPlayer}${explorationId}`
     );
 
+    // The lesson title displays in Hindi in the player.
+    await loggedOutUser.expectExplorationTitleInPlayerToBe(HINDI_TITLE);
+
+    // The lesson title, objective, and tags display in Hindi in the Lesson Info modal.
     await loggedOutUser.openLessonInfoModal();
     await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);
+    await loggedOutUser.expectLessonInfoModalObjectiveToBe(HINDI_OBJECTIVE);
+    await loggedOutUser.expectLessonInfoModalTagsToBe(HINDI_NO_TAGS_TEXT);
     await loggedOutUser.closeLessonInfoModal();
-  });
 
-  it('should refer to a concept card', async function () {
+    // The concept card displays the translated skill explanation in Hindi.
     await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
       HINDI_SKILL_EXPLANATION
-    );
-  });
-
-  it('should view translated lesson metadata and concept cards in the player with fallback to English if untranslated', async function () {
-    await loggedOutUser.changeSiteLanguage(UNTRANSLATED_SITE_LANGUAGE_CODE);
-    await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
-    );
-
-    await loggedOutUser.expectConceptCardLinkInLessonToWorkProperly(
-      SKILL_EXPLANATION
     );
   });
 

@@ -152,7 +152,7 @@ describe('Translation Submitter', function () {
     );
   }, 2100000);
 
-  it('should Filter opportunities by Entity Type', async function () {
+  it('should filter opportunities by entity type', async function () {
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -209,11 +209,8 @@ describe('Translation Submitter', function () {
       LESSON_SUBHEADING,
       false
     );
-  });
 
-  it('should not show the content type filter on tabs that cannot use it', async function () {
-    // "Submit Question" is not checked here because that tab is only shown to
-    // a user who can suggest questions, which a translator cannot.
+    // The filter is only shown on tabs that can use it.
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
@@ -226,7 +223,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectContentTypeFilterToBeVisible(false);
   });
 
-  it('should Translate exploration metadata', async function () {
+  it('should translate exploration metadata', async function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
@@ -277,7 +274,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.closeTranslateTextModal();
   });
 
-  it('should Translate a skill', async function () {
+  it('should translate a skill', async function () {
     await translationSubmitter.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
@@ -318,7 +315,7 @@ describe('Translation Submitter', function () {
     );
   });
 
-  it('should View the translation I submitted', async function () {
+  it('should view the translation I submitted', async function () {
     // The contributions list is filtered by the Content Type selector, which
     // the previous test left on "Skills". The selector is only shown on the
     // "Translate Text" tab, so it is reset here before switching across,
