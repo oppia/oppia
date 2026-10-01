@@ -25,6 +25,7 @@ from unittest import mock
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
+    email_manager,
     exp_services,
     feature_flag_services,
     fs_services,
@@ -1333,6 +1334,52 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     reference.story_unpublish_type,
                     topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
                 )
+
+    def test_unpublish_story_temporarily_sends_email_to_curriculum_admins(
+        self,
+    ) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        email_mock = mock.Mock()
+        with self.swap(
+            email_manager,
+            'send_mail_to_notify_curriculum_admins_story_temporarily_unpublished',
+            email_mock,
+        ):
+            topic_services.unpublish_story(
+                self.TOPIC_ID,
+                self.story_id_1,
+                self.user_id_admin,
+                topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+            )
+
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        email_mock.assert_called_once_with(
+            [self.user_id_admin], self.story_id_1, story.title, topic.name
+        )
+
+    def test_unpublish_story_permanently_does_not_send_temporary_unpublish_email(
+        self,
+    ) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        email_mock = mock.Mock()
+        with self.swap(
+            email_manager,
+            'send_mail_to_notify_curriculum_admins_story_temporarily_unpublished',
+            email_mock,
+        ):
+            topic_services.unpublish_story(
+                self.TOPIC_ID,
+                self.story_id_1,
+                self.user_id_admin,
+                topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+            )
+
+        email_mock.assert_not_called()
 
     def test_invalid_publish_and_unpublish_story(self) -> None:
         with self.assertRaisesRegex(

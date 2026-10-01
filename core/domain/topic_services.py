@@ -27,6 +27,7 @@ from core.constants import constants
 from core.domain import (
     caching_services,
     change_domain,
+    email_manager,
     feature_flag_services,
     feedback_services,
     fs_services,
@@ -1832,6 +1833,16 @@ def unpublish_story(
     ):
         _cleanup_permanently_unpublished_story(
             story.story_contents.get_all_linked_exp_ids()
+        )
+    elif (
+        unpublish_type
+        == topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+    ):
+        curriculum_admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
+        email_manager.send_mail_to_notify_curriculum_admins_story_temporarily_unpublished(
+            curriculum_admin_ids, story.id, story.title, topic.name
         )
 
 

@@ -214,6 +214,23 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_subject': 'Chapter Publication Notifications',
 }
 
+CURRICULUM_ADMIN_STORY_TEMPORARILY_UNPUBLISHED_EMAIL_DATA: Dict[str, str] = {
+    'email_body_template': (
+        'Dear Curriculum Admin,<br><br>'
+        'The story "<b>%s</b>" in topic "<b>%s</b>" has been temporarily '
+        'unpublished.<br><br>'
+        'Please note that corresponding translation opportunities on the '
+        'Contributor Dashboard have been retained. To avoid disrupting '
+        'learners currently engaged with this story, please ensure it is '
+        'republished within 24 hours.<br><br>'
+        'You can view and edit the story here: <a href="%s">Story Editor</a>.'
+        '<br><br>'
+        'Regards,<br>'
+        'Oppia Foundation'
+    ),
+    'email_subject': 'Story Temporarily Unpublished: %s',
+}
+
 VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL: Dict[str, str] = {
     'email_body_template': (
         'Hi Tech-Lead (cc Voiceover Admins),<br><br>'
@@ -501,6 +518,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
     feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID
+    ),
+    feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
@@ -2926,6 +2946,81 @@ def send_reminder_mail_to_notify_curriculum_admins(
                 noreply_email_address,
                 sender_name=system_email_name,
             )
+
+
+def send_mail_to_notify_curriculum_admins_story_temporarily_unpublished(
+    curriculum_admin_ids: List[str],
+    story_id: str,
+    story_title: str,
+    topic_name: str,
+) -> None:
+    """Sends an email to curriculum admins reminding them that a story
+    has been temporarily unpublished and should be republished within 24 hours.
+
+    Args:
+        curriculum_admin_ids: list(str). The user IDs of the admins to notify.
+        story_id: str. The ID of the story.
+        story_title: str. The title of the story.
+        topic_name: str. The name of the corresponding topic.
+    """
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+    if len(curriculum_admin_ids) == 0:
+        logging.error('There were no curriculum admins to notify.')
+        return
+
+    email_body_template = (
+        CURRICULUM_ADMIN_STORY_TEMPORARILY_UNPUBLISHED_EMAIL_DATA[
+            'email_body_template'
+        ]
+    )
+    email_subject = (
+        CURRICULUM_ADMIN_STORY_TEMPORARILY_UNPUBLISHED_EMAIL_DATA[
+            'email_subject'
+        ]
+        % story_title
+    )
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+    story_link = '%s%s/%s' % (
+        oppia_site_url,
+        str(feconf.STORY_EDITOR_URL_PREFIX),
+        story_id,
+    )
+
+    email_body = email_body_template % (
+        story_title,
+        topic_name,
+        story_link,
+    )
+
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(noreply_email_address, str)
+    system_email_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
+        )
+    )
+    assert isinstance(system_email_name, str)
+
+    for curriculum_admin_id in curriculum_admin_ids:
+        _send_email(
+            curriculum_admin_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED,
+            email_subject,
+            email_body,
+            noreply_email_address,
+            sender_name=system_email_name,
+        )
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:

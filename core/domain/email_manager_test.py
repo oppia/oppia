@@ -191,6 +191,12 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 False,
                 False,
             ),
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED: (
+                True,
+                False,
+                False,
+                False,
+            ),
         }
 
         for intent, results in expected_validation_results.items():
@@ -9183,6 +9189,128 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
                 [mock.Mock()], [mock.Mock()]
             )
         self.assertEqual(logs, ['This app cannot send emails to users.'])
+
+
+class NotifyCurriculumAdminsStoryTemporarilyUnpublishedTests(
+    test_utils.EmailTestBase
+):
+    """Tests for curriculum admin notifications when a story is temporarily
+    unpublished.
+    """
+
+    CURRICULUM_ADMIN_1_USERNAME: Final = 'user1'
+    CURRICULUM_ADMIN_1_EMAIL: Final = 'user1@community.org'
+    CURRICULUM_ADMIN_2_USERNAME: Final = 'user2'
+    CURRICULUM_ADMIN_2_EMAIL: Final = 'user2@community.org'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME
+        )
+        self.admin_1_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_1_EMAIL
+        )
+        self.signup(
+            self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME
+        )
+        self.admin_2_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_2_EMAIL
+        )
+
+    @test_utils.set_platform_parameters([])
+    def test_email_not_sent_if_no_admins_to_notify(self) -> None:
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_curriculum_admins_story_temporarily_unpublished(
+                [], 'story_123', 'Story Title', 'Topic Name'
+            )
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(
+                logs[0], 'There were no curriculum admins to notify.'
+            )
+
+    def test_email_not_sent_when_transactional_emails_disabled(self) -> None:
+        with self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
+        ), self.capture_logging(min_level=logging.ERROR) as logs:
+            email_manager.send_mail_to_notify_curriculum_admins_story_temporarily_unpublished(
+                [self.admin_1_id], 'story_123', 'Story Title', 'Topic Name'
+            )
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(logs, ['This app cannot send emails to users.'])
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, 'System'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                DEV_OPPIA_SITE_URL,
+            ),
+        ]
+    )
+    def test_email_sent_to_curriculum_admins_when_story_temporarily_unpublished(
+        self,
+    ) -> None:
+        expected_email_html_body = (
+            'Dear Curriculum Admin,<br><br>'
+            'The story "<b>Test Story</b>" in topic "<b>Test Topic</b>" has '
+            'been temporarily unpublished.<br><br>'
+            'Please note that corresponding translation opportunities on the '
+            'Contributor Dashboard have been retained. To avoid disrupting '
+            'learners currently engaged with this story, please ensure it is '
+            'republished within 24 hours.<br><br>'
+            'You can view and edit the story here: '
+            '<a href="%s/story_editor/story_123">Story Editor</a>.<br><br>'
+            'Regards,<br>'
+            'Oppia Foundation'
+        ) % DEV_OPPIA_SITE_URL
+
+        expected_subject = 'Story Temporarily Unpublished: Test Story'
+
+        email_manager.send_mail_to_notify_curriculum_admins_story_temporarily_unpublished(
+            [self.admin_1_id, self.admin_2_id],
+            'story_123',
+            'Test Story',
+            'Test Topic',
+        )
+
+        messages_admin_1 = self._get_sent_email_messages(
+            self.CURRICULUM_ADMIN_1_EMAIL
+        )
+        self.assertEqual(len(messages_admin_1), 1)
+        self.assertEqual(
+            messages_admin_1[0].to, [self.CURRICULUM_ADMIN_1_EMAIL]
+        )
+        self.assertEqual(messages_admin_1[0].subject, expected_subject)
+        self.assertEqual(messages_admin_1[0].html, expected_email_html_body)
+
+        messages_admin_2 = self._get_sent_email_messages(
+            self.CURRICULUM_ADMIN_2_EMAIL
+        )
+        self.assertEqual(len(messages_admin_2), 1)
+        self.assertEqual(
+            messages_admin_2[0].to, [self.CURRICULUM_ADMIN_2_EMAIL]
+        )
+        self.assertEqual(messages_admin_2[0].subject, expected_subject)
+        self.assertEqual(messages_admin_2[0].html, expected_email_html_body)
+
+        all_models: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.get_all().fetch()
+        )
+        self.assertEqual(len(all_models), 2)
+        for sent_email_model in all_models:
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_STORY_TEMPORARILY_UNPUBLISHED,
+            )
+            self.assertEqual(sent_email_model.subject, expected_subject)
+            self.assertEqual(
+                sent_email_model.html_body, expected_email_html_body
+            )
 
 
 class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
