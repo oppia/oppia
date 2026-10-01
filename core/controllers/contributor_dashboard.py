@@ -1101,8 +1101,8 @@ class OpportunitiesCountHandler(
         Raises:
             NotFoundException. The opportunity_type is not valid.
         """
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -1118,8 +1118,8 @@ class OpportunitiesCountHandler(
             if language_code is None:
                 raise self.InvalidInputException('language_code is required')
 
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            if web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
                 self.user_id,
             ):
                 count = opportunity_services.get_translation_opportunities_count_with_new_models(

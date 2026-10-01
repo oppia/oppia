@@ -3816,14 +3816,14 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_skill_opportunities_count(self) -> None:
         response = self.get_json('/opportunitiescounthandler/skill')
         self.assertEqual(response['total_count'], 1)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_translation_opportunities_count(self) -> None:
         response = self.get_json(
@@ -3833,8 +3833,8 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION,
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION,
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
         ]
     )
     def test_get_translation_opportunities_count_with_new_models(self) -> None:
@@ -3845,7 +3845,7 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['total_count'], 0)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_translation_count_missing_language_code(self) -> None:
         self.get_json(
@@ -3853,7 +3853,7 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_invalid_opportunity_type(self) -> None:
         self.get_json(

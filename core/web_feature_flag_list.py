@@ -134,6 +134,7 @@ DEV_FEATURES_LIST = [
     WebFeatureNames.SHOW_TRANSLATION_SIZE,
     WebFeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     WebFeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
+    WebFeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -389,12 +390,12 @@ WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             web_feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
+    WebFeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
         (
             'This flag enables dropdown-based page navigation on the '
             'Contributor Dashboard, replacing the simple Previous/Next '
             'pagination buttons with a page selector dropdown.',
-            feature_flag_domain.ServerMode.DEV,
+            web_feature_flag_domain.ServerMode.DEV,
         )
     ),
 }
