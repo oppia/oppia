@@ -1107,6 +1107,22 @@ const shard4Setup = async function (browser, page) {
   );
 };
 
+const shard5Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 5 audits the technical-feedback dashboard and its detail page, which
+  // are gated on ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD. That action is
+  // granted only by the TECH_TEAM_LEAD role (see role_services.py), so it has
+  // to be assigned here or both pages redirect to the error page.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['TECH_TEAM_LEAD'])
+  );
+  // The remaining pages on this shard (facilitator dashboard, learner group
+  // creator/editor/viewer, and the certificate pages) are either login-only or
+  // read the entities that the audit fixtures already create, and their URLs
+  // carry hardcoded ids rather than "{{entity}}" placeholders, so no entity
+  // generation or URL capture is needed here.
+};
+
 const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
@@ -1147,14 +1163,15 @@ const main = async function () {
   }
 
   const shard = Number(process.env.LIGHTHOUSE_SHARD);
-  // Shards have dedicated, minimal setups. Shards 2, 3 and 4 seed the data
-  // their pages need; shard 1 audits only static, public pages, so it needs no
-  // setup at all.
+  // Shards have dedicated, minimal setups. Shards 2, 3, 4 and 5 assign the
+  // roles their pages need and seed any data those pages read; shard 1 audits
+  // only static, public pages, so it needs no setup at all.
   const shardSetupRunners = {
     1: async function () {},
     2: shard2Setup,
     3: shard3Setup,
     4: shard4Setup,
+    5: shard5Setup,
   };
   const runShardSetup = shardSetupRunners[shard];
   if (!runShardSetup) {
@@ -1175,7 +1192,9 @@ const main = async function () {
         ? 'data-player'
         : shard === 4
           ? 'editors'
-          : 'static';
+          : shard === 5
+            ? 'role-gated'
+            : 'static';
   const ranBlogSetup = setupKind === 'blog';
   const ranExplorationSetup =
     setupKind === 'data-player' || setupKind === 'blog';

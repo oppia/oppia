@@ -76,10 +76,9 @@ _PARSER.add_argument(
     help=(
         'The one-based index of the Lighthouse shard being run. Each shard '
         'runs only the setup its pages need: shard 1 audits the static and '
-        'public pages so its setup is skipped, shard 2 audits the blog and '
-        'logged-in-user pages so only the blog setup runs, and the remaining '
-        'shards audit the data-dependent pages so all data setup except the '
-        'blog runs.'
+        'public pages so its setup is skipped, and every other shard runs a '
+        'setup that assigns the roles its pages need and seeds any data they '
+        'read.'
     ),
     type=int,
     required=True,

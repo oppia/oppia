@@ -31,11 +31,7 @@
     "preferences",
     "profile",
     "contributor-admin-dashboard",
-    "blog-author-profile",
-    "facilitator-dashboard",
-    "technical-feedback-dashboard",
-    "technical-feedback-detail",
-    "learner-group-creator"
+    "blog-author-profile"
   ],
   "3": [
     "classroom-admin",
@@ -51,8 +47,7 @@
     "new-lesson-player",
     "lesson-player-embed",
     "collection-editor",
-    "collection-player",
-    "certificate-offering-available"
+    "collection-player"
   ],
   "4": [
     "topics-and-skills-dashboard",
@@ -65,7 +60,14 @@
     "diagnostic-test-player",
     "practice-session",
     "subtopic-viewer",
-    "review-test",
+    "review-test"
+  ],
+  "5": [
+    "facilitator-dashboard",
+    "technical-feedback-dashboard",
+    "technical-feedback-detail",
+    "learner-group-creator",
+    "certificate-offering-available",
     "certificate-creator-dashboard",
     "create-certificate-offering",
     "edit-certificate-offering",

@@ -1614,6 +1614,37 @@ URLS.extend(
             r'%s/<exploration_id>' % feconf.LESSON_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
+        # The certificate, learner group and technical feedback pages below are
+        # handled by the frontend router, but their routes contain url
+        # fragments, so they need manual backend registrations. Without these
+        # the backend returns a 404 status and the Lighthouse audit of these
+        # pages fails.
+        get_redirect_route(
+            r'/edit-certificate-assessment-offering/<certificate_offering_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment/<certificate_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment-result/<attempt_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/edit-learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learn/<classroom_url_fragment>/certificate-offering-available',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/technical-feedback-dashboard/<team>/<report_id>',
+            oppia_root.OppiaRootPage,
+        ),
     )
 )
 

@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from core import feature_flag_list
 from core.constants import constants
@@ -45,6 +46,57 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
             )
             response.mustcontain('<oppia-root></oppia-root>')
             response.mustcontain('oppia-feature-flags')
+
+    def test_urls_with_url_fragments_return_oppia_root(self) -> None:
+        """Tests that frontend-routed pages whose routes contain url fragments
+        render the oppia root page with a 200 status.
+
+        Angular router syntax uses ":name" for url fragments, which webapp2 does
+        not understand, so these routes are registered manually in main.py
+        instead of by the auto-registration loop. Without a matching manual
+        route the backend falls through to the catch-all and returns a 404,
+        which fails the Lighthouse audit of the page.
+        """
+        urls_with_url_fragments = [
+            '/certificate-assessment/1',
+            '/certificate-assessment-result/1',
+            '/edit-certificate-assessment-offering/1',
+            '/edit-learner-group/learner-group-1',
+            '/learn/math/certificate-offering-available',
+            '/learner-group/learner-group-1',
+            '/technical-feedback-dashboard/oppia/1',
+        ]
+        for url in urls_with_url_fragments:
+            response = self.get_html_response(url, expected_status_int=200)
+            response.mustcontain('<oppia-root></oppia-root>')
+            response.mustcontain('oppia-feature-flags')
+
+    def test_every_manually_registered_url_fragment_route_is_reachable(
+        self,
+    ) -> None:
+        """Tests that each manual route in main.py that has a url fragment is
+        matched by a concrete example URL, so that no such route is dead.
+
+        This guards the certificate, learner group and technical feedback pages
+        audited by Lighthouse shard 5, whose routes are all of this shape.
+        """
+        manually_registered_url_fragments = [
+            '/edit-certificate-assessment-offering/<certificate_offering_id>',
+            '/certificate-assessment/<certificate_id>',
+            '/certificate-assessment-result/<attempt_id>',
+            '/edit-learner-group/<learner_group_id>',
+            '/learner-group/<learner_group_id>',
+            '/learn/<classroom_url_fragment>/certificate-offering-available',
+            '/technical-feedback-dashboard/<team>/<report_id>',
+        ]
+        for route in manually_registered_url_fragments:
+            # Substitute each fragment with a concrete value to build a URL that
+            # the route should match.
+            example_url = re.sub(r'<[^>]+>', '1', route)
+            response = self.get_html_response(
+                example_url, expected_status_int=200
+            )
+            response.mustcontain('<oppia-root></oppia-root>')
 
     def test_explore_and_embed_urls_render_with_no_iframe_restriction(
         self,
