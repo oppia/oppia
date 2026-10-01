@@ -5814,7 +5814,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Splits into a new module (module) after the specified chapter.
+   * Splits into a new module after the specified chapter.
    * Finds the split button that appears between the target chapter and the
    * next chapter, and clicks it to create a new module boundary.
    * @param {string} afterChapterName - The name of the chapter after which

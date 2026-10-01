@@ -5396,7 +5396,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Returns the lesson circle badges in the module navigation dock.
    * Icon-only badges (practice tests and the Mastery Challenge) are excluded
-   * so that the returned indexes map one-to-one to the module (module)
+   * so that the returned indexes map one-to-one to the module
    * lesson nodes.
    */
   private async getDockCircleBadges(): Promise<ElementHandle<Element>[]> {
