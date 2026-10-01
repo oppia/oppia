@@ -134,7 +134,6 @@ DEV_FEATURES_LIST = [
     WebFeatureNames.SHOW_TRANSLATION_SIZE,
     WebFeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     WebFeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    WebFeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
