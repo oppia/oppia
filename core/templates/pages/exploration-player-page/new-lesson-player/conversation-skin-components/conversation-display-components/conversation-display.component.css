@@ -1,4 +1,3 @@
-
 .conversation-skin-oppia-completed-state-card,
 .oppia-learner-view-card-top-section {
   background-color: #fff;
@@ -86,7 +85,14 @@ oppia-content-language-selector {
 
 /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
 .conversation-skin-audio-highlight {
-  border: 3px solid #f3d140;
+  background-color: #d9f1ec;
+  /* Inset shadow instead of a border so the card doesn't shift by a few
+     pixels every time the highlight turns on and off. */
+  box-shadow: inset 4px 0 0 #0f766e;
+}
+
+[dir='rtl'] .conversation-skin-audio-highlight {
+  box-shadow: inset -4px 0 0 #0f766e;
 }
 
 .conversation-skin-future-tutor-card {
@@ -103,6 +109,10 @@ oppia-content-language-selector {
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
   background-color: rgba(224,242,241,0.4);
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-audio-highlight.conversation-skin-oppia-feedback-content {
+  background-color: #d9f1ec;
 }
 
 .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
