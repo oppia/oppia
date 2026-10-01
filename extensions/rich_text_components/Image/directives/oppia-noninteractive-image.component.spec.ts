@@ -201,6 +201,78 @@ describe('NoninteractiveImage', () => {
   });
 
   it(
+    'should load target exploration image from the exploration namespace' +
+      ' for a translation suggestion',
+    () => {
+      spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
+      const getImageUrlForPreviewSpy = spyOn(
+        assetsBackendApiService,
+        'getImageUrlForPreview'
+      ).and.returnValue(dataUrlPng);
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
+        AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS
+      );
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
+      // The filepath is not in the list of newly added images, so it is a
+      // target-content image and must be read from the exploration namespace.
+      spyOn(
+        pageContextService,
+        'getImageContextNewImageFilenames'
+      ).and.returnValue([]);
+
+      component.ngOnInit();
+
+      expect(getImageUrlForPreviewSpy).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        'expId',
+        'img_20210704_215434_tac36akwgg_height_691_width_392.svg'
+      );
+    }
+  );
+
+  it(
+    'should load translator-added image from the suggestion namespace' +
+      ' for a translation suggestion',
+    () => {
+      spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
+      const getImageUrlForPreviewSpy = spyOn(
+        assetsBackendApiService,
+        'getImageUrlForPreview'
+      ).and.returnValue(dataUrlPng);
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
+        AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS
+      );
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
+      // The filepath is in the list of newly added images, so it stays in
+      // the suggestion namespace.
+      spyOn(
+        pageContextService,
+        'getImageContextNewImageFilenames'
+      ).and.returnValue([
+        'img_20210704_215434_tac36akwgg_height_691_width_392.svg',
+      ]);
+
+      component.ngOnInit();
+
+      expect(getImageUrlForPreviewSpy).toHaveBeenCalledWith(
+        AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+        'expId',
+        'img_20210704_215434_tac36akwgg_height_691_width_392.svg'
+      );
+    }
+  );
+
+  it(
     'should display error when the image cannot be loaded' +
       ' from the local storage and the server',
     () => {
