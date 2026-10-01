@@ -113,6 +113,9 @@ class MockPlatformFeatureService {
     EnableTranslationOppsWithNewOppModels: {
       isEnabled: false,
     },
+    EnableDropdownPagination: {
+      isEnabled: false,
+    },
   };
 }
 
