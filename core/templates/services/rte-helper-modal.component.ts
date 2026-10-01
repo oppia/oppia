@@ -197,7 +197,7 @@ export class RteHelperModalComponent {
       (spec: CustomizationArgsSpecsType[number]) => {
         if (spec.schema) {
           const schema = (
-            spec.schema.type === 'list'
+            (spec.schema.type as string) === 'list'
               ? (spec.schema as ListSchema).items
               : spec.schema
           ) as UnicodeSchema;
