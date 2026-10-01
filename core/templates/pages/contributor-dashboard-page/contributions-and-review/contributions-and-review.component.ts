@@ -906,29 +906,31 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
       ];
 
     return fetchFunction(shouldResetOffset)
-      .then((response: {
-        suggestionIdToDetails: Record<string, SuggestionDetails>;
-        more: boolean;
-      }) => {
-        if (
-          this.activeTabType !== requestedTabType ||
-          this.activeTabSubtype !== requestedTabSubtype
-        ) {
-          // The active tab changed while this request was in flight, so this
-          // is a stale response. Ignore it to avoid processing data for a tab
-          // the user has already navigated away from.
-          return {opportunitiesDicts: [], more: false};
+      .then(
+        (response: {
+          suggestionIdToDetails: Record<string, SuggestionDetails>;
+          more: boolean;
+        }) => {
+          if (
+            this.activeTabType !== requestedTabType ||
+            this.activeTabSubtype !== requestedTabSubtype
+          ) {
+            // The active tab changed while this request was in flight, so this
+            // is a stale response. Ignore it to avoid processing data for a tab
+            // the user has already navigated away from.
+            return {opportunitiesDicts: [], more: false};
+          }
+          Object.keys(response.suggestionIdToDetails).forEach((id: string) => {
+            this.contributions[id] = response.suggestionIdToDetails[id];
+          });
+          return {
+            opportunitiesDicts: this.getContributionSummaries(
+              response.suggestionIdToDetails
+            ),
+            more: response.more,
+          };
         }
-        Object.keys(response.suggestionIdToDetails).forEach((id: string) => {
-          this.contributions[id] = response.suggestionIdToDetails[id];
-        });
-        return {
-          opportunitiesDicts: this.getContributionSummaries(
-            response.suggestionIdToDetails
-          ),
-          more: response.more,
-        };
-      })
+      )
       .catch((error: HttpErrorResponse) => {
         // A banned or otherwise non-full-user has no ACTION_SUGGEST_CHANGES
         // permission, so the suggestion endpoints respond with 401. Handle it
@@ -940,7 +942,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         }
         throw error;
       });
-
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {

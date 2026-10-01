@@ -193,19 +193,21 @@ export class RteHelperModalComponent {
       ? this.translationLanguageService.getActiveLanguageDirection()
       : 'auto';
 
-    this.customizationArgSpecs.forEach(spec => {
-      if (spec.schema) {
-        const schema = (
-          spec.schema.type === 'list'
-            ? (spec.schema as ListSchema).items
-            : spec.schema
-        ) as UnicodeSchema;
-        if (!schema.ui_config) {
-          schema.ui_config = {};
+    this.customizationArgSpecs.forEach(
+      (spec: CustomizationArgsSpecsType[number]) => {
+        if (spec.schema) {
+          const schema = (
+            spec.schema.type === 'list'
+              ? (spec.schema as ListSchema).items
+              : spec.schema
+          ) as UnicodeSchema;
+          if (!schema.ui_config) {
+            schema.ui_config = {};
+          }
+          schema.ui_config.languageDirection = activeLanguageDirection;
         }
-        schema.ui_config.languageDirection = activeLanguageDirection;
       }
-    });
+    );
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
