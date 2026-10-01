@@ -81,6 +81,14 @@ export class NewConversationSkinComponent {
 
   _editorPreviewMode!: boolean;
 
+  get isInPreviewMode(): boolean {
+    return this._editorPreviewMode;
+  }
+
+  get openInNewWindow(): boolean {
+    return this.isIframed;
+  }
+
   isLoggedIn!: boolean;
   voiceoversAreLoaded: boolean = false;
   explorationId!: string;

@@ -134,16 +134,12 @@ export class StatisticsTabComponent implements OnInit, OnDestroy {
 
       this.stateInteractionStatsService
         .computeStatsAsync(this.expId, state)
-        .then(stats => {
+        .then(() => {
           const modalRef = this.ngbModal.open(StateStatsModalComponent, {
             backdrop: false,
           });
 
-          modalRef.componentInstance.interactionArgs =
-            state.interaction.customizationArgs;
           modalRef.componentInstance.stateName = stateName;
-          modalRef.componentInstance.visualizationsInfo =
-            stats.visualizationsInfo;
           modalRef.componentInstance.stateStats =
             this.expStats.getStateStats(stateName);
 
