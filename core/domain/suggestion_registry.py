@@ -31,7 +31,6 @@ from core.domain import (
     fs_services,
     html_cleaner,
     opportunity_services,
-    platform_parameter_list,
     question_domain,
     question_services,
     skill_domain,
@@ -41,6 +40,7 @@ from core.domain import (
     translation_domain,
     translation_services,
     user_services,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 from core.platform import models
@@ -1537,7 +1537,7 @@ class CommunityContributionStats:
             lang_code
         ]
         max_number_of_suggestions_per_reviewer = web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
         )
         assert isinstance(max_number_of_suggestions_per_reviewer, int)
         return bool(
@@ -1582,7 +1582,7 @@ class CommunityContributionStats:
             return True
 
         max_number_of_suggestions_per_reviewer = web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
         )
         assert isinstance(max_number_of_suggestions_per_reviewer, int)
 

@@ -34,12 +34,12 @@ from core.domain import (
     general_feedback_domain,
     image_validation_services,
     improvements_domain,
-    platform_parameter_list,
     question_domain,
     skill_domain,
     state_domain,
     stats_domain,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
     web_platform_parameter_registry,
 )
 
@@ -148,7 +148,7 @@ def validate_platform_params_values_for_blog_admin(
 
         if (
             name
-            == platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            == web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         ):
             assert isinstance(value, int)
             if value <= 0:

@@ -55,7 +55,6 @@ from core.domain import (
     interaction_registry,
     object_registry,
     param_domain,
-    platform_parameter_list,
     question_domain,
     question_services,
     rights_manager,
@@ -74,6 +73,7 @@ from core.domain import (
     translation_domain,
     user_services,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
     web_platform_parameter_registry,
     web_platform_parameter_services,
 )
@@ -394,7 +394,7 @@ def enable_feature_flags(
 def swap_get_platform_parameter_value_function(
     platform_parameter_name_value_tuples: List[
         Tuple[
-            platform_parameter_list.ParamName,
+            web_platform_parameter_list.ParamName,
             web_platform_parameter_domain.PlatformDataTypes,
         ]
     ],
@@ -462,7 +462,7 @@ def swap_get_platform_parameter_value_function(
 def set_platform_parameters(
     platform_parameter_name_value_tuples: List[
         Tuple[
-            platform_parameter_list.ParamName,
+            web_platform_parameter_list.ParamName,
             web_platform_parameter_domain.PlatformDataTypes,
         ]
     ],

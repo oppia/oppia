@@ -24,7 +24,7 @@ from core.domain import (
     blog_domain,
     blog_services,
     fs_services,
-    platform_parameter_list,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 
@@ -283,7 +283,7 @@ class BlogPostHandler(
             blog_post.author_id
         )
         max_no_of_tags = web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 

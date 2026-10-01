@@ -25,9 +25,9 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
-    platform_parameter_list,
     value_generators_domain,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
 )
 from core.domain import web_platform_parameter_registry as registry
 from core.domain import web_platform_parameter_services
@@ -231,13 +231,13 @@ class PromoBarHandler(
 
         promo_bar_enabled_parameter = (
             registry.Registry.get_web_platform_parameter(
-                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
+                web_platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
             )
         )
 
         promo_bar_message_parameter = (
             registry.Registry.get_web_platform_parameter(
-                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
+                web_platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
             )
         )
 

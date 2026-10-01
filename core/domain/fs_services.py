@@ -452,16 +452,14 @@ def get_static_asset_url(filepath: str) -> str:
     # Caching services should be refactored to eliminate dependency on
     # multiple domain objects.
     from core.domain import (
-        platform_parameter_list,
+        web_platform_parameter_list,
         web_platform_parameter_services,
     )
 
     # TODO(release-scripts#137): Remove once site URL is verified on all
     # servers.
-    oppia_site_url = (
-        web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
-        )
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     logging.info(
         'Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url

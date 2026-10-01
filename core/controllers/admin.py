@@ -39,7 +39,6 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     opportunity_services,
-    platform_parameter_list,
     question_domain,
     question_services,
     recommendations_services,
@@ -66,6 +65,7 @@ from core.domain import (
     voiceover_services,
 )
 from core.domain import web_platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_list
 from core.domain import web_platform_parameter_registry as registry
 from core.domain import web_platform_parameter_services as parameter_services
 from core.domain import wipeout_service
@@ -75,8 +75,8 @@ from typing import Callable, Dict, List, Optional, TypedDict, Union, cast
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
     [
-        platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
-        platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value,
+        web_platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
+        web_platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value,
     ]
 )
 
@@ -84,7 +84,7 @@ PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
 PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set(
     [
         (
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
     ]
 )
@@ -3263,7 +3263,7 @@ class AdminSuperAdminPrivilegesHandler(
         """
         assert self.normalized_payload is not None
         if self.email != parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+            web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         ):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins'
@@ -3291,7 +3291,7 @@ class AdminSuperAdminPrivilegesHandler(
         assert self.normalized_request is not None
         admin_email_address = (
             parameter_services.get_web_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
             )
         )
         if self.email != admin_email_address:

@@ -21,8 +21,8 @@ from __future__ import annotations
 from core import feconf
 from core.domain import (
     caching_services,
-    platform_parameter_list,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
 )
 from core.platform import models
 
@@ -36,7 +36,7 @@ if MYPY:  # pragma: no cover
     [models.Names.CONFIG, models.Names.SUGGESTION]
 )
 
-ParamName = platform_parameter_list.ParamName
+ParamName = web_platform_parameter_list.ParamName
 
 
 class Registry:

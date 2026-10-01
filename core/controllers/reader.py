@@ -37,7 +37,6 @@ from core.domain import (
     interaction_registry,
     learner_progress_services,
     moderator_services,
-    platform_parameter_list,
     question_services,
     rating_services,
     recommendations_services,
@@ -50,6 +49,7 @@ from core.domain import (
     translation_fetchers,
     translation_services,
     user_services,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 
@@ -293,7 +293,7 @@ class ExplorationHandler(
                 'auto_tts_enabled': exploration.auto_tts_enabled,
                 'record_playthrough_probability': (
                     web_platform_parameter_services.get_web_platform_parameter_value(
-                        platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value
+                        web_platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value
                     )
                 ),
                 'has_viewed_lesson_info_modal_once': (

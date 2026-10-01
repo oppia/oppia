@@ -29,10 +29,10 @@ from core.domain import (
     exp_domain,
     exp_services,
     fs_services,
-    platform_parameter_list,
     rights_manager,
     subscription_services,
     user_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -874,11 +874,11 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                web_platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -1443,31 +1443,31 @@ class SignupTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                web_platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                web_platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
                 'body',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                web_platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'footer',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
                 'sender',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1638,7 +1638,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
                 'audience_id',
             )
         ]
@@ -1659,7 +1659,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
                 'audience_id',
             )
         ]
@@ -1697,11 +1697,11 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
                 'audience_id',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]

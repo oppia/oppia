@@ -32,7 +32,6 @@ from core.domain import (
     exp_services,
     fs_services,
     opportunity_services,
-    platform_parameter_list,
     question_fetchers,
     question_services,
     recommendations_services,
@@ -53,6 +52,7 @@ from core.domain import (
     user_services,
     voiceover_services,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
     web_platform_parameter_registry,
     wipeout_service,
 )
@@ -140,7 +140,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_web_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamName.
+        # platform parameter name of type web_platform_parameter_list.ParamName.
         return web_platform_parameter_registry.Registry.create_web_platform_parameter(
             ParamName.TEST_PARAMETER_1,  # type: ignore[arg-type]
             'Param for test.',
@@ -1694,7 +1694,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1704,7 +1704,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1756,7 +1756,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1776,7 +1776,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1808,7 +1808,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1831,7 +1831,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1864,7 +1864,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1885,7 +1885,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -4608,14 +4608,14 @@ class SendDummyMailTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_can_send_dummy_mail(self) -> None:

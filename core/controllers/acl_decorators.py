@@ -33,7 +33,6 @@ from core.domain import (
     email_manager,
     feature_flag_services,
     feedback_services,
-    platform_parameter_list,
     question_services,
     rights_manager,
     role_services,
@@ -48,6 +47,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_services,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 
@@ -1355,7 +1355,7 @@ def can_delete_any_user(
         if (
             email
             != web_platform_parameter_services.get_web_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
             )
         ):
             raise self.UnauthorizedUserException(

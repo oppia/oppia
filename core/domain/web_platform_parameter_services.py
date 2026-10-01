@@ -25,7 +25,10 @@ import os
 
 from core import feconf
 from core.constants import constants
-from core.domain import platform_parameter_list, web_platform_parameter_domain
+from core.domain import (
+    web_platform_parameter_domain,
+    web_platform_parameter_list,
+)
 from core.domain import web_platform_parameter_registry as registry
 
 from typing import Dict, Final, List
@@ -90,7 +93,7 @@ def get_all_web_platform_parameters_dicts() -> (
         registry.Registry.get_web_platform_parameter(
             _plat_param.value
         ).to_dict()
-        for _plat_param in platform_parameter_list.ALL_PLATFORM_PARAMS_LIST
+        for _plat_param in web_platform_parameter_list.ALL_PLATFORM_PARAMS_LIST
     ]
 
 

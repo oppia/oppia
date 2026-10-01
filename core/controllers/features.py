@@ -21,7 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     opportunity_services,
-    platform_parameter_list,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 
@@ -62,7 +62,7 @@ class ExplorationFeaturesHandler(
                     exploration_id
                 ),
                 'always_ask_learners_for_answer_details': web_platform_parameter_services.get_web_platform_parameter_value(
-                    platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
+                    web_platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
                 ),
             }
         )

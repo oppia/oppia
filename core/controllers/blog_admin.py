@@ -23,10 +23,10 @@ from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
     blog_services,
-    platform_parameter_list,
     role_services,
     user_services,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
     web_platform_parameter_registry,
     web_platform_parameter_services,
 )
@@ -78,7 +78,7 @@ class BlogAdminHandler(
     def get(self) -> None:
         """Handles GET requests."""
         max_no_of_tags_parameter = web_platform_parameter_registry.Registry.get_web_platform_parameter(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         platform_params_for_blog_admin = {
             'max_number_of_tags_assigned_to_blog_post': {

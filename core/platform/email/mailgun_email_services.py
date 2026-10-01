@@ -22,7 +22,7 @@ import logging
 
 from core.domain import (
     email_services,
-    platform_parameter_list,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 from core.platform import models
@@ -119,7 +119,7 @@ def send_email_to_recipients(
 
     mailgun_domain_name = (
         web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value
+            web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value
         )
     )
     if not mailgun_domain_name:

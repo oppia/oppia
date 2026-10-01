@@ -22,7 +22,10 @@ import hashlib
 import logging
 
 from core import feconf
-from core.domain import platform_parameter_list, web_platform_parameter_services
+from core.domain import (
+    web_platform_parameter_list,
+    web_platform_parameter_services,
+)
 from core.platform import models
 
 import mailchimp3
@@ -77,7 +80,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
 
     mailchimp_username = (
         web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value
+            web_platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value
         )
     )
     assert isinstance(mailchimp_username, str)
@@ -119,10 +122,8 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
-        mailchimp_audience_id = (
-            web_platform_parameter_services.get_web_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
+        mailchimp_audience_id = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
         )
         assert isinstance(mailchimp_audience_id, str)
         client.lists.members.create(
@@ -165,10 +166,8 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
     subscriber_hash = _get_subscriber_hash(user_email)
     try:
-        mailchimp_audience_id = (
-            web_platform_parameter_services.get_web_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
+        mailchimp_audience_id = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
         )
         assert isinstance(mailchimp_audience_id, str)
         client.lists.members.get(mailchimp_audience_id, subscriber_hash)
@@ -283,7 +282,7 @@ def add_or_update_user_status(
     try:
         try:
             mailchimp_audience_id = web_platform_parameter_services.get_web_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
+                web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
             )
             assert isinstance(mailchimp_audience_id, str)
             client.lists.members.get(mailchimp_audience_id, subscriber_hash)

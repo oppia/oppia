@@ -31,7 +31,7 @@ ServerMode = parameter_domain.ServerMode
 
 
 class DummyParamName(enum.Enum):
-    """Test class to mock platform_parameter_list.
+    """Test class to mock web_platform_parameter_list.
     ALL_PLATFORM_PARAMS_LIST
     """
 

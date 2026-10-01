@@ -31,10 +31,10 @@ from core.domain import (
     auth_services,
     exp_fetchers,
     fs_services,
-    platform_parameter_list,
     role_services,
     state_domain,
     user_domain,
+    web_platform_parameter_list,
     web_platform_parameter_services,
 )
 from core.platform import models
@@ -345,7 +345,7 @@ def get_users_settings(
     result: List[Optional[user_domain.UserSettings]] = []
     system_email_address = (
         web_platform_parameter_services.get_web_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(system_email_address, str)

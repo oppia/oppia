@@ -32,7 +32,6 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
-    platform_parameter_list,
     question_services,
     rights_domain,
     rights_manager,
@@ -41,6 +40,7 @@ from core.domain import (
     translation_domain,
     user_services,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
     web_platform_parameter_registry,
     wipeout_service,
 )
@@ -2920,7 +2920,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         web_platform_parameter_registry.Registry.update_web_platform_parameter(
             (
-                platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
+                web_platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
             ),
             self.admin_id,
             'Updating email body.',
@@ -2944,11 +2944,11 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -2995,17 +2995,17 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
             (
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
                 'Site Admin',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -3037,21 +3037,21 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                web_platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
                 '<a href="http://localhost:8181/preferences">Preferences</a> '
                 'page.',
             ),
             (
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
                 'Site Admin',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -3128,17 +3128,17 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                web_platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
                 '<a href="http://localhost:8181/preferences">Preferences</a> '
                 'page.',
             ),
             (
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
                 'Site Admin',
             ),  # pylint: disable=line-too-long
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]

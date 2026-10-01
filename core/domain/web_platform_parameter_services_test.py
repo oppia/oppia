@@ -24,8 +24,8 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     caching_services,
-    platform_parameter_list,
     web_platform_parameter_domain,
+    web_platform_parameter_list,
 )
 from core.domain import web_platform_parameter_registry as registry
 from core.domain import web_platform_parameter_services as parameter_services
@@ -73,7 +73,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_web_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamName.
+        # platform parameter name of type web_platform_parameter_list.ParamName.
         self.param_a = registry.Registry.create_web_platform_parameter(
             ParamName.PARAM_A,  # type: ignore[arg-type]
             'Parameter named a',
@@ -81,7 +81,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_web_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamName.
+        # platform parameter name of type web_platform_parameter_list.ParamName.
         self.param_b = registry.Registry.create_web_platform_parameter(
             ParamName.PARAM_B,  # type: ignore[arg-type]
             'Parameter named b',
@@ -89,7 +89,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_web_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamName.
+        # platform parameter name of type web_platform_parameter_list.ParamName.
         self.param_c = registry.Registry.create_web_platform_parameter(
             ParamName.PARAM_C,  # type: ignore[arg-type]
             'Parameter named c',
@@ -97,7 +97,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         self.swap_all_platform_params_list = self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             self.param_name_enums,
         )
