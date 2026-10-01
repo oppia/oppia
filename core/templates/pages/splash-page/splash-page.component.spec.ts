@@ -243,9 +243,7 @@ describe('Splash Page', () => {
 
   it('should treat the user as logged out when fetching user info fails', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.reject(
-        new Error('You must complete signup before accessing this resource.')
-      )
+      Promise.reject(new Error('Failed to fetch user info.'))
     );
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();

@@ -155,11 +155,10 @@ export class SplashPageComponent implements OnInit {
         this.loaderService.hideLoadingScreen();
       })
       .catch(() => {
-        // A failed user info request can happen when the user has a partial
-        // login session (a valid session cookie with no signed-up Oppia
-        // account). In that case the user is treated as logged out on this
-        // page, and the server clears the session on the next page that is
-        // served by a regular handler.
+        // This page only needs to know whether the user is logged in, so any
+        // failure is treated as a logged-out user. A rejection handler is
+        // required here: without it, a failed request would leave the loading
+        // screen shown above visible indefinitely.
         this.userIsLoggedIn = false;
         this.loaderService.hideLoadingScreen();
       });

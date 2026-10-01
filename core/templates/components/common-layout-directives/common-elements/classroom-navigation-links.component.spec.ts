@@ -139,7 +139,7 @@ describe('ClassroomNavigationLinksComponent', () => {
 
   it('should stop loading when fetching classroom summaries fails', fakeAsync(() => {
     classroomBackendApiService.getAllClassroomsSummaryAsync.and.rejectWith(
-      new Error('You must complete signup before accessing this resource.')
+      new Error('Failed to fetch classroom summaries.')
     );
 
     component.ngOnInit();

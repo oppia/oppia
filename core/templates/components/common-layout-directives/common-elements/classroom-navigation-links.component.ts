@@ -91,10 +91,10 @@ export class ClassroomNavigationLinksComponent implements OnInit {
           this.classroomCountChange.emit(this.getClassroomCount());
         })
         .catch(() => {
-          // The request can fail for users with a partial login session (a
-          // valid session cookie with no signed-up Oppia account), since the
-          // backend rejects all requests for such sessions until they sign
-          // up. In that case, no classrooms can be shown.
+          // The template shows a skeleton loader while 'isLoading' is true.
+          // Without this handler, a failed request would leave that
+          // placeholder visible indefinitely, since this component is
+          // rendered in the navigation bar on every page.
           this.isLoading = false;
         });
     }
