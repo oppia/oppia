@@ -546,6 +546,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/auto-translate-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/auto-translate-feature.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language.spec.ts",
       "framework": "puppeteer"
@@ -764,6 +769,11 @@
     {
       "name": "logged-in-learner/view-a-collection",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/check-out-the-topic-and-see-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/check-out-the-topic-and-see-what-to-do-next.spec.ts",
       "framework": "puppeteer"
     }
   ]
