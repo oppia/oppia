@@ -198,7 +198,7 @@ export class RteHelperModalComponent {
         if (spec.schema) {
           const schema = (
             (spec.schema.type as string) === 'list'
-              ? (spec.schema as ListSchema).items
+              ? (spec.schema as unknown as ListSchema).items
               : spec.schema
           ) as UnicodeSchema;
           if (!schema.ui_config) {
