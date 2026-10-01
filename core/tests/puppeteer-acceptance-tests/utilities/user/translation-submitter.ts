@@ -58,6 +58,7 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
+const autoTranslateButtonSelector = '.e2e-test-auto-translate-button';
 
 // The instruction line naming the content type being translated, the block
 // listing the validation errors for the current translation, and the single
@@ -750,6 +751,9 @@ export class TranslationSubmitter extends BaseUser {
       saveTranslationButtonSelector,
       enabled
     );
+  }
+  async clickOnAutoTranslateButton(): Promise<void> {
+    await this.clickOnElementWithSelector(autoTranslateButtonSelector);
   }
 }
 
