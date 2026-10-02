@@ -451,7 +451,6 @@
 /core/templates/components/skill-mastery/ @oppia/lace-frontend-reviewers
 /core/templates/components/skills-mastery-list/ @oppia/lace-frontend-reviewers
 /core/templates/domain/question/ @oppia/lace-frontend-reviewers
-/core/templates/domain/review_test/ @oppia/lace-frontend-reviewers
 /core/templates/pages/practice-session-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/questions-list.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/question-directives/ @oppia/lace-frontend-reviewers

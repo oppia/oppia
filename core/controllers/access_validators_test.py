@@ -27,7 +27,6 @@ from core.domain import (
     fs_services,
     learner_group_fetchers,
     learner_group_services,
-    question_services,
     rights_manager,
     skill_services,
     story_domain,
