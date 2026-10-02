@@ -18,7 +18,7 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser} from '@playwright/test';
+import {Browser, Page} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -36,6 +36,8 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {Contributor} from '../user/contributor';
+import {TranslationSubmitter} from '../user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -82,6 +84,19 @@ type BasicRolesUser = LoggedOutUser &
   ExplorationEditor &
   CurriculumAdmin &
   TopicManager;
+
+/**
+ * Test-only utilities that can be composed onto a user via createNewUser().
+ */
+type TestUserUtility = Contributor | TranslationSubmitter;
+
+type TestUserUtilityFactory = (page: Page) => TestUserUtility;
+
+type TestUserUtilityIntersection<
+  TUtilities extends readonly TestUserUtilityFactory[],
+> = TUtilities extends readonly []
+  ? {}
+  : UnionToIntersection<ReturnType<TUtilities[number]>>;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -205,13 +220,19 @@ export class UserFactory {
    */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
+    TUtilities extends readonly TestUserUtilityFactory[] = [],
   >(
     username: string,
     email: string,
     browser: Browser,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    args?: string | string[]
-  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
+    args?: string | string[],
+    utilities: TUtilities | undefined = undefined
+  ): Promise<
+    BasicRolesUser &
+      MultipleRoleIntersection<TRoles> &
+      TestUserUtilityIntersection<TUtilities>
+  > {
     const context = await browser.newContext({
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
@@ -233,12 +254,21 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
+    const utilityInstances = (utilities ?? []).map(utility =>
+      utility(user.page)
+    ) as BaseUser[];
+    if (utilityInstances.length > 0) {
+      user = UserFactory.composeUserWithRoles(user, utilityInstances);
+    }
+
     return (await UserFactory.assignRolesToUser(
       user,
       roles,
       browser,
       args
-    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
+    )) as BasicRolesUser &
+      MultipleRoleIntersection<TRoles> &
+      TestUserUtilityIntersection<TUtilities>;
   };
 
   /**
