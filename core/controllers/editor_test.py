@@ -41,6 +41,7 @@ from core.domain import (
     state_domain,
     stats_services,
     translation_domain,
+    translation_services,
     user_services,
     wipeout_service,
 )
@@ -3594,6 +3595,32 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(response['draft_change_list_id'], 1)
         # Draft changes passed to UI.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
+        self.assertEqual(response['displayable_language_codes'], [])
+        self.assertEqual(response['preferred_language_codes'], [])
+
+    def test_exploration_loaded_with_displayable_and_preferred_language_codes(
+        self,
+    ) -> None:
+        user_services.update_user_settings(
+            self.owner_id, preferred_language_codes=['hi', 'es']
+        )
+        with self.swap_to_always_return(
+            exp_services,
+            'get_story_id_linked_to_exploration',
+            value='story_id',
+        ), self.swap_to_always_return(
+            translation_services,
+            'get_displayable_translation_languages',
+            value=['hi'],
+        ):
+            response = self.get_json(
+                '/createhandler/data/%s' % self.EXP_ID2,
+                params={'apply_draft': True},
+            )
+            self.assertEqual(response['displayable_language_codes'], ['hi'])
+            self.assertEqual(
+                response['preferred_language_codes'], ['hi', 'es']
+            )
 
     def test_exploration_loaded_without_draft_when_draft_version_invalid(
         self,

@@ -39,6 +39,7 @@ from core.domain import (
     stats_domain,
     stats_services,
     translation_fetchers,
+    translation_services,
     user_services,
 )
 
@@ -199,6 +200,34 @@ class ExplorationHandler(
             exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
                 exp_services.get_story_id_linked_to_exploration(exploration_id)
                 is not None
+            )
+
+            displayable_language_codes = []
+            if exp_services.get_story_id_linked_to_exploration(exploration_id):
+                exploration = exp_fetchers.get_exploration_by_id(
+                    exploration_id, strict=False, version=version
+                )
+                if exploration is not None:
+                    displayable_language_codes = (
+                        translation_services.get_displayable_translation_languages(
+                            feconf.TranslatableEntityType.EXPLORATION,
+                            exploration,
+                        )
+                    )
+
+            preferred_language_codes = (
+                user_settings.preferred_language_codes
+                if user_settings is not None
+                else []
+            )
+            # Here we use MyPy ignore because here we are defining new
+            # 'displayable_language_codes' and 'preferred_language_codes' keys
+            # on a well defined TypedDict dictionary.
+            exploration_data['displayable_language_codes'] = (  # type: ignore[typeddict-item]
+                displayable_language_codes
+            )
+            exploration_data['preferred_language_codes'] = (  # type: ignore[typeddict-item]
+                preferred_language_codes
             )
         except Exception as e:
             raise self.NotFoundException from e

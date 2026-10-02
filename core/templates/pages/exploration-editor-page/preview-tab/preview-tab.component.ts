@@ -42,6 +42,7 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
@@ -81,7 +82,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private entityVoiceoversService: EntityVoiceoversService,
     private conversationFlowService: ConversationFlowService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private entityTranslationsService: EntityTranslationsService
   ) {}
 
   getManualParamChanges(
@@ -159,13 +161,25 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
       this.editableExplorationBackendApiService
         .fetchApplyDraftExplorationAsync(explorationId)
         .then(returnDict => {
+          const explorationLanguageCode = returnDict.language_code;
+          let displayableLanguageCodes = [
+            ...(returnDict.displayable_language_codes || []),
+            ...Object.keys(
+              this.entityTranslationsService
+                .languageCodeToLatestEntityTranslations
+            ),
+          ].filter(languageCode => languageCode !== explorationLanguageCode);
+          displayableLanguageCodes = Array.from(
+            new Set(displayableLanguageCodes)
+          );
+
           this.explorationEngineService.init(
             returnDict,
-            0,
+            returnDict.version,
             null,
-            false,
-            [],
-            [],
+            returnDict.auto_tts_enabled,
+            returnDict.preferred_language_codes || [],
+            displayableLanguageCodes,
             () => {
               this.loadPreviewState(initStateNameForPreview, []);
             }
