@@ -72,7 +72,6 @@ const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = '.e2e-test-chapter-title-field';
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
-('input.e2e-test-url-fragment-field');
 const subtopicUrlFragmentField =
   '.e2e-test-subtopic-url-fragment-field .e2e-test-url-fragment-field';
 const richTextAreaField = 'div.e2e-test-rte';
