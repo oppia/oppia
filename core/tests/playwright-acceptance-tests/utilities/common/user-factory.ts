@@ -36,6 +36,20 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {
+  PracticeQuestionSubmitter,
+  QuestionSubmitterFactory,
+} from '../user/practice-question-submitter';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
+import {
+  PracticeQuestionReviewer,
+  PracticeQuestionReviewerFactory,
+} from '../user/practice-question-reviewer';
+import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -49,6 +63,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
  */
 const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
+  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
@@ -80,8 +95,12 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
+  PracticeQuestionSubmitter &
+  TopicManager &
   CurriculumAdmin &
-  TopicManager;
+  Contributor &
+  ContributorAdmin &
+  PracticeQuestionReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -223,7 +242,11 @@ export class UserFactory {
       LoggedOutUserFactory(page),
       LoggedInUserFactory(page),
       ExplorationEditorFactory(page),
+      QuestionSubmitterFactory(page),
       CurriculumAdminFactory(page),
+      ContributorFactory(page),
+      ContributorAdminFactory(page),
+      PracticeQuestionReviewerFactory(page),
       TopicManagerFactory(page),
     ]);
 
