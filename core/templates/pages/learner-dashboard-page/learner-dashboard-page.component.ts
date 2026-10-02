@@ -45,7 +45,6 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -161,9 +160,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
-  communityLibraryUrl =
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
-
   communityLessonsDataLoaded: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
@@ -179,7 +175,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
     private focusManagerService: FocusManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
@@ -531,17 +526,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .catch(errorResponse => {
           // This is placed here in order to satisfy Unit tests.
         });
-    }
-  }
-
-  showUsernamePopover(subscriberUsername: string): string {
-    // The popover on the subscription card is only shown if the length
-    // of the subscriber username is greater than 10 and the user hovers
-    // over the truncated username.
-    if (subscriberUsername.length > 10) {
-      return 'mouseenter';
-    } else {
-      return 'none';
     }
   }
 

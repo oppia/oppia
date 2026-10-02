@@ -247,48 +247,6 @@ describe('Progress Tab Component', () => {
     },
   };
 
-  const multipleTopicsSummaryDict = {
-    id: 'new_sample_topic_id',
-    name: 'New Topic Name',
-    language_code: 'en',
-    description: 'description',
-    version: 1,
-    story_titles: ['Story 1'],
-    total_published_node_count: 2,
-    thumbnail_filename: 'image.svg',
-    thumbnail_bg_color: '#C6DCDA',
-    classroom_name: 'math',
-    classroom_url_fragment: 'math',
-    practice_tab_is_displayed: false,
-    canonical_story_summary_dict: [
-      {
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: [''],
-        all_node_dicts: [newNodeDict],
-        url_fragment: 'new-story-title',
-        topic_name: 'New Topic Name',
-        classroom_url_fragment: 'math',
-        topic_url_fragment: 'new-topic-name',
-      },
-    ],
-    url_fragment: 'new-topic-name',
-    subtopics: [newSubtopic, subtopic],
-    degrees_of_mastery: {
-      skill_id_2: 0,
-      skill_id_3: 0.75,
-    },
-    skill_descriptions: {
-      skill_id_2: 'Skill Description 2',
-      skill_id_3: 'Skill Description 3',
-    },
-  };
-
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
@@ -379,14 +337,6 @@ describe('Progress Tab Component', () => {
     mockResizeEmitter.emit();
 
     expect(component.windowIsNarrow).toBeFalse();
-  });
-
-  it('should sanitize given png base64 data and generate url', () => {
-    let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
-
-    fixture.detectChanges();
-
-    expect(result).toBe('шеллы');
   });
 
   it('should enable the dropdown', () => {
@@ -945,17 +895,5 @@ describe('Progress Tab Component', () => {
     expect(component.learntTopicMastery).toEqual([
       {topic: component.learntTopicsList[0], progress: [100]},
     ]);
-  });
-
-  it('should correctly get total number of skills', () => {
-    const multipleTopics = LearnerTopicSummary.createFromBackendDict(
-      multipleTopicsSummaryDict
-    );
-    const allSkills = [
-      {topic: multipleTopics, progress: [0, 0.75]},
-      {topic: multipleTopics, progress: [0, 0.75]},
-    ];
-
-    expect(allSkills.reduce(component.getTotalSkillCards, 0)).toBe(4);
   });
 });

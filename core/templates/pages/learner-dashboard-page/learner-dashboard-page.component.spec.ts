@@ -804,11 +804,6 @@ describe('Learner dashboard page', () => {
       expect(component.activeSubsection).toBe(newActiveSubsection2);
     });
 
-    it('should show username popover based on its length', () => {
-      expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-      expect(component.showUsernamePopover('abc')).toBe('none');
-    });
-
     it('should get show_redesigned_learner_dashboard flag', () => {
       spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
         ShowRedesignedLearnerDashboard: {

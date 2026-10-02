@@ -33,7 +33,6 @@ import {HomeTabComponent} from './home-tab.component';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -45,7 +44,6 @@ describe('Home tab Component', () => {
   let fixture: ComponentFixture<HomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
   let siteAnalyticsService: SiteAnalyticsService;
   class MockPlatformFeatureService {
@@ -82,7 +80,6 @@ describe('Home tab Component', () => {
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
@@ -740,7 +737,6 @@ describe('Home tab Component', () => {
 describe('Home tab Component Loader visibility tests', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
   class MockPlatformFeatureService {
     status = {
@@ -765,12 +761,7 @@ describe('Home tab Component Loader visibility tests', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeTabComponent);
     component = fixture.componentInstance;
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
-
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
   });
 
   it('should set allCardsLoaded to true immediately when totalLessonCards is 0', () => {
