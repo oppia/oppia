@@ -1908,6 +1908,14 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOnElementWithSelector(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    // Wait for the backend to finish saving the story before returning,
+    // otherwise subsequent actions might fetch an outdated version of the story.
+    await this.page.waitForResponse(
+      response =>
+        response.url().includes('/story_editor_handler/data/') &&
+        response.request().method() === 'PUT'
+    );
   }
 
   /**

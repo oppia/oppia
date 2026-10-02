@@ -3305,6 +3305,14 @@ export class TopicManager extends BaseUser {
       await this.page.keyboard.press('Escape');
       await this.isElementVisible(modalDiv, false, 10000);
     }
+
+    // Wait for the backend to finish saving the story before returning,
+    // otherwise subsequent actions might fetch an outdated version of the story.
+    await this.page.waitForResponse(
+      response =>
+        response.url().includes('/story_editor_handler/data/') &&
+        response.request().method() === 'PUT'
+    );
   }
 
   /**
