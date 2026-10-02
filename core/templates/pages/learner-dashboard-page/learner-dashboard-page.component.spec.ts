@@ -52,10 +52,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -140,10 +138,8 @@ describe('Learner dashboard page', () => {
   let fixture: ComponentFixture<LearnerDashboardPageComponent>;
   let alertsService: AlertsService;
   let csrfTokenService: CsrfTokenService;
-  let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
-  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
@@ -288,7 +284,6 @@ describe('Learner dashboard page', () => {
         ],
         providers: [
           AlertsService,
-          DateTimeFormatService,
           FocusManagerService,
           LearnerDashboardBackendApiService,
           {
@@ -310,7 +305,6 @@ describe('Learner dashboard page', () => {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService,
           },
-          SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
           PageTitleService,
@@ -329,14 +323,10 @@ describe('Learner dashboard page', () => {
 
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
-      dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
       learnerDashboardBackendApiService = TestBed.inject(
         LearnerDashboardBackendApiService
-      );
-      suggestionModalForLearnerDashboardService = TestBed.inject(
-        SuggestionModalForLearnerDashboardService
       );
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
@@ -801,18 +791,6 @@ describe('Learner dashboard page', () => {
       );
     });
 
-    it('should get user profile image png data url correctly', () => {
-      expect(component.getauthorPicturePngDataUrl('username')).toBe(
-        'profile-image-url-png'
-      );
-    });
-
-    it('should get user profile image webp data url correctly', () => {
-      expect(component.getauthorPictureWebpDataUrl('username')).toBe(
-        'profile-image-url-webp'
-      );
-    });
-
     it('should toggle active subsection type when changing subsection type', () => {
       // Active subsection is set as I18N_DASHBOARD_SKILL_PROFICIENCY when
       // component is initialized.
@@ -824,65 +802,6 @@ describe('Learner dashboard page', () => {
       component.setActiveSubsection(newActiveSubsection2);
 
       expect(component.activeSubsection).toBe(newActiveSubsection2);
-    });
-
-    it('should show username popover based on its length', () => {
-      expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-      expect(component.showUsernamePopover('abc')).toBe('none');
-    });
-
-    it('should show new and old content when opening suggestion modal', () => {
-      spyOn(
-        suggestionModalForLearnerDashboardService,
-        'showSuggestionModal'
-      ).and.returnValue(null);
-
-      let newContent = 'New content';
-      let oldContent = 'Old content';
-      let description = 'Description';
-      component.showSuggestionModal(newContent, oldContent, description);
-
-      expect(
-        suggestionModalForLearnerDashboardService.showSuggestionModal
-      ).toHaveBeenCalledWith('edit_exploration_state_content', {
-        newContent: newContent,
-        oldContent: oldContent,
-        description: description,
-      });
-    });
-
-    it('should get css classes based on status', () => {
-      expect(component.getLabelClass('open')).toBe('badge bg-info');
-      expect(component.getLabelClass('compliment')).toBe('badge bg-success');
-      expect(component.getLabelClass('another')).toBe('badge bg-secondary');
-    });
-
-    it('should get human readable status from provided status', () => {
-      expect(component.getHumanReadableStatus('open')).toBe('Open');
-      expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
-      expect(component.getHumanReadableStatus('not_actionable')).toBe(
-        'Not Actionable'
-      );
-    });
-
-    it('should get formatted date string from the timestamp in milliseconds', () => {
-      // This corresponds to Fri, 2 Apr 2021 09:45:00 GMT.
-      let NOW_MILLIS = 1617393321345;
-      spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-        .withArgs(NOW_MILLIS)
-        .and.returnValue('4/2/2021');
-
-      expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-        '4/2/2021'
-      );
-    });
-
-    it('should sanitize given png base64 data and generate url', () => {
-      let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
-
-      fixture.detectChanges();
-
-      expect(result).toBe('шеллы');
     });
 
     it('should get show_redesigned_learner_dashboard flag', () => {

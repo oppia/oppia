@@ -23,7 +23,6 @@ import {
   Output,
   ViewEncapsulation,
 } from '@angular/core';
-import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -86,13 +85,6 @@ export class LearnerGroupsTabComponent {
       {
         groupId: learnerGroupId,
       }
-    );
-  }
-
-  changeActiveSection(): void {
-    this.setActiveSection.emit(
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
-        .LEARNER_GROUPS
     );
   }
 
