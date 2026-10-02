@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import web_platform_parameter_config_migration_jobs
 from core.jobs.types import job_run_result
@@ -88,6 +89,11 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
         legacy_model.rules = [{'filters': [], 'value_when_matched': True}]
         legacy_model.commit('committer_id', 'update', [])
 
+        snapshot_migration_job = web_platform_parameter_config_migration_jobs.MigrateWebPlatformParameterConfigSnapshotModelsJob(
+            self.pipeline
+        )
+        snapshot_migration_job.run()
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -156,5 +162,145 @@ class AuditMigrateWebPlatformParameterConfigJobTests(
         self.assertIsNone(
             config_models.WebPlatformParameterConfigModel.get(
                 'parameter_name', strict=False
+            )
+        )
+
+
+class MigrateWebPlatformParameterConfigSnapshotModelsJobTests(
+    job_test_utils.JobTestBase
+):
+    """Tests for MigrateWebPlatformParameterConfigSnapshotModelsJob."""
+
+    JOB_CLASS: Type[
+        web_platform_parameter_config_migration_jobs.MigrateWebPlatformParameterConfigSnapshotModelsJob
+    ] = (
+        web_platform_parameter_config_migration_jobs.MigrateWebPlatformParameterConfigSnapshotModelsJob
+    )
+
+    def test_migrates_legacy_snapshot_models(self) -> None:
+        snapshot_id = 'parameter_name-1'
+        legacy_metadata = (
+            config_models.PlatformParameterSnapshotMetadataModel.create(
+                snapshot_id,
+                'committer_id',
+                feconf.COMMIT_TYPE_CREATE,
+                'initial commit',
+                [],
+            )
+        )
+        legacy_content = (
+            config_models.PlatformParameterSnapshotContentModel.create(
+                snapshot_id, {'rules': [], 'default_value': False}
+            )
+        )
+        legacy_metadata.update_timestamps()
+        legacy_content.update_timestamps()
+        self.put_multi([legacy_metadata, legacy_content])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT METADATA: '
+                    '%s.' % snapshot_id
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT CONTENT: '
+                    '%s.' % snapshot_id
+                ),
+            ]
+        )
+
+        migrated_metadata = (
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel.get(
+                snapshot_id
+            )
+        )
+        migrated_content = (
+            config_models.WebPlatformParameterConfigSnapshotContentModel.get(
+                snapshot_id
+            )
+        )
+        self.assertEqual(migrated_metadata.committer_id, 'committer_id')
+        self.assertEqual(migrated_metadata.commit_message, 'initial commit')
+        self.assertEqual(
+            migrated_metadata.created_on, legacy_metadata.created_on
+        )
+        self.assertEqual(
+            migrated_content.content,
+            {'rules': [], 'default_value': False},
+        )
+        self.assertEqual(migrated_content.created_on, legacy_content.created_on)
+        self.assertIsNone(
+            config_models.PlatformParameterSnapshotMetadataModel.get(
+                snapshot_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            config_models.PlatformParameterSnapshotContentModel.get(
+                snapshot_id, strict=False
+            )
+        )
+
+
+class AuditMigrateWebPlatformParameterConfigSnapshotModelsJobTests(
+    job_test_utils.JobTestBase
+):
+    """Tests for AuditMigrateWebPlatformParameterConfigSnapshotModelsJob."""
+
+    JOB_CLASS: Type[
+        web_platform_parameter_config_migration_jobs.AuditMigrateWebPlatformParameterConfigSnapshotModelsJob
+    ] = (
+        web_platform_parameter_config_migration_jobs.AuditMigrateWebPlatformParameterConfigSnapshotModelsJob
+    )
+
+    def test_audit_job_does_not_mutate_snapshot_storage(self) -> None:
+        snapshot_id = 'parameter_name-1'
+        legacy_metadata = (
+            config_models.PlatformParameterSnapshotMetadataModel.create(
+                snapshot_id,
+                'committer_id',
+                feconf.COMMIT_TYPE_CREATE,
+                'initial commit',
+                [],
+            )
+        )
+        legacy_content = (
+            config_models.PlatformParameterSnapshotContentModel.create(
+                snapshot_id, {'rules': [], 'default_value': False}
+            )
+        )
+        legacy_metadata.update_timestamps()
+        legacy_content.update_timestamps()
+        self.put_multi([legacy_metadata, legacy_content])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT METADATA: '
+                    '%s.' % snapshot_id
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT CONTENT: '
+                    '%s.' % snapshot_id
+                ),
+            ]
+        )
+
+        self.assertIsNotNone(
+            config_models.PlatformParameterSnapshotMetadataModel.get(
+                snapshot_id
+            )
+        )
+        self.assertIsNotNone(
+            config_models.PlatformParameterSnapshotContentModel.get(snapshot_id)
+        )
+        self.assertIsNone(
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel.get(
+                snapshot_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            config_models.WebPlatformParameterConfigSnapshotContentModel.get(
+                snapshot_id, strict=False
             )
         )

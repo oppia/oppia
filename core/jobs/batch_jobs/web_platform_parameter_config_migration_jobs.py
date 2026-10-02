@@ -121,3 +121,117 @@ class AuditMigrateWebPlatformParameterConfigJob(
     """Audit-only variant of the web parameter config migration job."""
 
     DATASTORE_UPDATES_ALLOWED = False
+
+
+class MigrateWebPlatformParameterConfigSnapshotModelsJob(base_jobs.JobBase):
+    """Migrates platform parameter snapshots to web config snapshot kinds."""
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    def _migrate_snapshot_metadata_model(
+        self,
+        legacy_model: config_models.PlatformParameterSnapshotMetadataModel,
+    ) -> config_models.WebPlatformParameterConfigSnapshotMetadataModel:
+        """Copies legacy snapshot metadata to the web config kind."""
+        with datastore_services.get_ndb_context():
+            return (
+                config_models.WebPlatformParameterConfigSnapshotMetadataModel(
+                    id=legacy_model.id, **legacy_model.to_dict()
+                )
+            )
+
+    def _migrate_snapshot_content_model(
+        self,
+        legacy_model: config_models.PlatformParameterSnapshotContentModel,
+    ) -> config_models.WebPlatformParameterConfigSnapshotContentModel:
+        """Copies legacy snapshot content to the web config kind."""
+        with datastore_services.get_ndb_context():
+            return config_models.WebPlatformParameterConfigSnapshotContentModel(
+                id=legacy_model.id, **legacy_model.to_dict()
+            )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Moves legacy snapshot metadata and content to web config kinds."""
+        legacy_metadata_models = (
+            self.pipeline
+            | 'Get legacy platform parameter snapshot metadata'
+            >> ndb_io.GetModels(
+                config_models.PlatformParameterSnapshotMetadataModel.get_all(
+                    include_deleted=True
+                )
+            )
+        )
+        migrated_metadata_models = (
+            legacy_metadata_models
+            | 'Migrate platform parameter snapshot metadata'
+            >> beam.Map(self._migrate_snapshot_metadata_model)
+        )
+        legacy_content_models = (
+            self.pipeline
+            | 'Get legacy platform parameter snapshot content'
+            >> ndb_io.GetModels(
+                config_models.PlatformParameterSnapshotContentModel.get_all(
+                    include_deleted=True
+                )
+            )
+        )
+        migrated_content_models = (
+            legacy_content_models
+            | 'Migrate platform parameter snapshot content'
+            >> beam.Map(self._migrate_snapshot_content_model)
+        )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            _ = (
+                migrated_metadata_models
+                | 'Put web snapshot metadata' >> ndb_io.PutModels()
+            )
+            _ = (
+                migrated_content_models
+                | 'Put web snapshot content' >> ndb_io.PutModels()
+            )
+            _ = (
+                legacy_metadata_models
+                | 'Get legacy snapshot metadata keys'
+                >> beam.Map(lambda model: model.key)
+                | 'Delete legacy snapshot metadata' >> ndb_io.DeleteModels()
+            )
+            _ = (
+                legacy_content_models
+                | 'Get legacy snapshot content keys'
+                >> beam.Map(lambda model: model.key)
+                | 'Delete legacy snapshot content' >> ndb_io.DeleteModels()
+            )
+
+        metadata_results = (
+            migrated_metadata_models
+            | 'Format migrated metadata IDs'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT METADATA: '
+                    '%s.' % model.id
+                )
+            )
+        )
+        content_results = (
+            migrated_content_models
+            | 'Format migrated content IDs'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED WEB PLATFORM PARAMETER CONFIG SNAPSHOT CONTENT: '
+                    '%s.' % model.id
+                )
+            )
+        )
+        return (
+            metadata_results,
+            content_results,
+        ) | 'Flatten migrated snapshot results' >> beam.Flatten()
+
+
+class AuditMigrateWebPlatformParameterConfigSnapshotModelsJob(
+    MigrateWebPlatformParameterConfigSnapshotModelsJob
+):
+    """Audit-only variant of the snapshot migration job."""
+
+    DATASTORE_UPDATES_ALLOWED = False

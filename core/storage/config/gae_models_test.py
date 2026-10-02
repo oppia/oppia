@@ -44,6 +44,61 @@ class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
         )
 
 
+class WebPlatformParameterConfigSnapshotMetadataModelTests(
+    test_utils.GenericTestBase
+):
+    """Tests for WebPlatformParameterConfigSnapshotMetadataModel."""
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE,
+        )
+
+    def test_create_model(self) -> None:
+        snapshot_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.create(
+            'parameter_name-1',
+            'committer_id',
+            feconf.COMMIT_TYPE_CREATE,
+            'initial commit',
+            [],
+        )
+
+        self.assertIsInstance(
+            snapshot_model,
+            config_models.WebPlatformParameterConfigSnapshotMetadataModel,
+        )
+        self.assertEqual(snapshot_model.id, 'parameter_name-1')
+        self.assertEqual(snapshot_model.committer_id, 'committer_id')
+        self.assertEqual(snapshot_model.commit_message, 'initial commit')
+
+
+class WebPlatformParameterConfigSnapshotContentModelTests(
+    test_utils.GenericTestBase
+):
+    """Tests for WebPlatformParameterConfigSnapshotContentModel."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.WebPlatformParameterConfigSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_create_model(self) -> None:
+        snapshot_content = (
+            config_models.WebPlatformParameterConfigSnapshotContentModel.create(
+                'parameter_name-1', {'default_value': False}
+            )
+        )
+
+        self.assertIsInstance(
+            snapshot_content,
+            config_models.WebPlatformParameterConfigSnapshotContentModel,
+        )
+        self.assertEqual(snapshot_content.id, 'parameter_name-1')
+        self.assertEqual(snapshot_content.content, {'default_value': False})
+
+
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     """Test PlatformParameterModel class."""
 

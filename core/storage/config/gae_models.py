@@ -53,6 +53,25 @@ class PlatformParameterSnapshotContentModel(
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class WebPlatformParameterConfigSnapshotMetadataModel(
+    base_models.BaseSnapshotMetadataModel
+):
+    """Storage model for web platform parameter config snapshot metadata."""
+
+    pass
+
+
+class WebPlatformParameterConfigSnapshotContentModel(
+    base_models.BaseSnapshotContentModel
+):
+    """Storage model for web platform parameter config snapshot content."""
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
 class PlatformParameterModel(base_models.VersionedModel):
     """A class that represents a named dynamic platform parameter.
     This model only stores fields that can be updated in run time.
@@ -141,8 +160,8 @@ class WebPlatformParameterConfigModel(
 ):
     """A class that represents a named dynamic web platform parameter."""
 
-    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
+    SNAPSHOT_METADATA_CLASS = WebPlatformParameterConfigSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = WebPlatformParameterConfigSnapshotContentModel
 
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = datastore_services.IntegerProperty(
