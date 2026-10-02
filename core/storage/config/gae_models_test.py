@@ -245,3 +245,47 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
             config_models.FeatureFlagConfigModel.get_export_policy(),
             expected_export_policy_dict,
         )
+
+
+class AndroidFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test AndroidFeatureFlagConfigModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.AndroidFeatureFlagConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_create_model(self) -> None:
+        model = config_models.AndroidFeatureFlagConfigModel.create(
+            android_feature_flag_name='android_feature',
+            state='enabled',
+            min_app_version=10,
+            max_app_version=20,
+            rollout_percentage=50,
+        )
+        self.assertEqual(model.id, 'android_feature')
+        self.assertEqual(model.state, 'enabled')
+        self.assertEqual(model.min_app_version, 10)
+        self.assertEqual(model.max_app_version, 20)
+        self.assertEqual(model.rollout_percentage, 50)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.AndroidFeatureFlagConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            config_models.AndroidFeatureFlagConfigModel.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'min_app_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'max_app_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
