@@ -83,9 +83,6 @@ describe('Home tab Component', () => {
 
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
