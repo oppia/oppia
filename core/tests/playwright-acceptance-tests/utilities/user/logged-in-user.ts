@@ -110,6 +110,10 @@ const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
+const contributorDashboardContainerSelector =
+  '.e2e-test-oppia-contributor-home';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
@@ -1250,6 +1254,20 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(preferencesMenuLink);
 
     await this.expectElementToBeVisible(preferencesContainerSelector);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard page using the profile dropdown
+   * menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
+    await this.clickOnElementWithSelector(contributorDashboardMenuLink);
+
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
