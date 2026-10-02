@@ -24,7 +24,6 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 
-import './certificate-offering-review-and-availability.component.css';
 // Shape of one difficulty bucket returned by the validation API.
 // Matches /validate_certificate_assessment_offering_handler response.
 export interface DifficultyValidation {

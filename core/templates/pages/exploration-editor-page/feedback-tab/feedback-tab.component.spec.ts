@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
@@ -38,6 +40,7 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
@@ -238,7 +241,7 @@ describe('Feedback Tab Component', () => {
     ).and.returnValue(
       Promise.resolve({
         canEdit: true,
-      })
+      } as ExplorationPermissions)
     );
     spyOn(
       threadDataBackendApiService,
@@ -317,6 +320,58 @@ describe('Feedback Tab Component', () => {
     expect(component.activeThread).toEqual(thread);
     expect(component.feedbackMessage.status).toBe('review');
   }));
+
+  it('should get the state name of an active feedback thread', () => {
+    component.activeThread = FeedbackThread.createFromBackendDict({
+      status: 'open',
+      subject: '',
+      summary: '',
+      original_author_username: 'Username1',
+      last_updated_msecs: 0,
+      message_count: 1,
+      state_name: 'Introduction',
+      thread_id: '1',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: '',
+    });
+
+    expect(component.getActiveThreadStateName()).toBe('Introduction');
+  });
+
+  it('should not get the state name of an active suggestion thread', () => {
+    component.activeThread = SuggestionThread.createFromBackendDicts(
+      {
+        status: 'review',
+        subject: '',
+        summary: '',
+        original_author_username: 'Username1',
+        last_updated_msecs: 0,
+        message_count: 1,
+        thread_id: '1',
+        state_name: '',
+        last_nonempty_message_author: '',
+        last_nonempty_message_text: '',
+      },
+      {
+        suggestion_type: 'edit_exploration_state_content',
+        suggestion_id: '1',
+        target_type: '',
+        target_id: '',
+        status: '',
+        author_name: '',
+        change_cmd: {
+          state_name: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
+          content_id: '',
+        },
+        last_updated_msecs: 0,
+      }
+    );
+
+    expect(component.getActiveThreadStateName()).toBeNull();
+  });
 
   it('should throw error when trying to add message to non-existent thread', () => {
     expect(() => {

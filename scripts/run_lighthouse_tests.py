@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script performs lighthouse checks and creates lighthouse reports.
-Any callers must pass in a flag, either --accessibility or --performance.
-"""
+"""This script performs lighthouse checks and creates lighthouse reports."""
 
 from __future__ import annotations
 
@@ -24,21 +22,18 @@ import os
 import re
 import subprocess
 import sys
+import threading
 
 from core.constants import constants
 from scripts import build, common, servers
 
-from typing import Final, Iterator, List, Optional
+from typing import IO, Final, Iterator, List, Optional
 
-LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
-LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
-LIGHTHOUSE_CONFIG_FILENAMES: Final = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js',
-}
+LIGHTHOUSE_CONFIG_FILENAME: Final = '.lighthouserc.js'
+LIGHTHOUSE_DESKTOP_CONFIG_FILENAME: Final = '.lighthouserc-desktop.js'
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml',
@@ -46,20 +41,18 @@ APP_YAML_FILENAMES: Final = {
 LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
+LIGHTHOUSE_SHARDS_JSON_FILEPATH = os.path.join(
+    'core', 'tests', 'lighthouse-shards.json'
+)
+
+ENTITY_MATCHER: Final = r'\{\{(.*?)\}\}'
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
-    python -m scripts.run_lighthouse_tests
+    python -m scripts.run_lighthouse_tests --shard <shard_number>
 Note that the root folder MUST be named 'oppia'.
 """
-)
-
-_PARSER.add_argument(
-    '--mode',
-    help='Sets the mode for the lighthouse tests',
-    required=True,
-    choices=['accessibility', 'performance'],
 )
 
 _PARSER.add_argument(
@@ -78,14 +71,58 @@ _PARSER.add_argument(
     action='store_true',
 )
 
+_PARSER.add_argument(
+    '--shard',
+    help=(
+        'The one-based index of the Lighthouse shard being run. Each shard '
+        'runs only the setup its pages need: shard 1 audits the static and '
+        'public pages so its setup is skipped, shard 2 audits the blog and '
+        'logged-in-user pages so only the blog setup runs, and the remaining '
+        'shards audit the data-dependent pages so all data setup except the '
+        'blog runs.'
+    ),
+    type=int,
+    required=True,
+)
 
-def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
+
+def _get_puppeteer_setup_environment(shard: int) -> dict[str, str]:
+    """Returns an environment that tells the puppeteer setup which shard runs.
+
+    Args:
+        shard: int. The one-based index of the Lighthouse shard being run.
+
+    Returns:
+        dict(str, str). A copy of the current environment with the shard
+        variable set for the puppeteer setup script to read.
+    """
+    env = os.environ.copy()
+    env['LIGHTHOUSE_SHARD'] = str(shard)
+    return env
+
+
+def _drain_pipe(stream: IO[bytes], output_lines: list[bytes]) -> None:
+    """Reads every line from a subprocess pipe into output_lines.
+
+    Args:
+        stream: IO(byte). A buffered binary pipe from the subprocess.
+        output_lines: list(bytes). The list that the lines are appended to.
+    """
+    for line in iter(stream.readline, b''):
+        output_lines.append(line)
+
+
+def run_lighthouse_puppeteer_script(
+    record: bool = False, shard: int = 1
+) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
         record: bool. Set to True to record the LHCI puppeteer script
             via puppeteer-screen-recorder and False to not. Note that
             puppeteer-screen-recorder must be separately installed to record.
+        shard: int. The one-based index of the Lighthouse shard being run.
+            The script selects the per-shard setup that matches this shard.
 
     Returns:
         dict(str, str). The entities and their IDs that were collected.
@@ -93,7 +130,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
     )
-    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    bash_command = [common.LIGHTHOUSE_NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
         bash_command.append('-record')
@@ -106,11 +143,37 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Video Path:' + video_path)
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_puppeteer_setup_environment(shard),
     )
-    stdout, stderr = process.communicate()
+    # The pipes are always created for a popen with PIPEs, but mypy cannot
+    # narrow the Optional handles without explicit asserts.
+    assert process.stdout is not None
+    assert process.stderr is not None
+
+    # Stream the puppeteer output line by line as it arrives so that the
+    # "[lighthouse-setup]" progress markers are visible live. Buffering the
+    # output until the process finished hid which setup step was stuck when a
+    # step (for example the login, which first navigates the slow /admin page)
+    # took a long time; streaming surfaces the exact step as soon as it
+    # produces output. stderr is drained from a background thread so that the
+    # pipe cannot fill up and block the puppeteer script.
+    stdout_lines: list[bytes] = []
+    stderr_lines: list[bytes] = []
+    stderr_thread = threading.Thread(
+        target=_drain_pipe, args=(process.stderr, stderr_lines)
+    )
+    stderr_thread.start()
+    for line in iter(process.stdout.readline, b''):
+        stdout_lines.append(line)
+        sys.stdout.write(line.decode('utf-8'))
+        sys.stdout.flush()
+    process.wait()
+    stderr_thread.join()
+
     if process.returncode == 0:
-        print(stdout)
         # The entities are collected from the standard output of the
         # puppeteer script. Each entity is a dictionary with the entity
         # name as the key and the entity ID as the value. An entity
@@ -118,7 +181,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         # or skill. The entity ID is the unique identifier for the entity
         # that will be used to inject into the URLs for the Lighthouse checks.
         entities: dict[str, str] = {}
-        for line in stdout.split(b'\n'):
+        for line in stdout_lines:
             # Standard output is in bytes, we need to decode the line to
             # print it.
             entity = get_entity(line.decode('utf-8'))
@@ -134,15 +197,46 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('OUTPUT:')
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        print(stdout.decode('utf-8'))
+        for line in stdout_lines:
+            print(line.decode('utf-8'))
         print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
-        print(stderr.decode('utf-8'))
+        for line in stderr_lines:
+            print(line.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)
         sys.exit(1)
+
+
+def _get_lighthouse_entities(
+    shard: int, record: bool = False
+) -> dict[str, str]:
+    """Runs the puppeteer setup script and returns the entity IDs it collects.
+
+    Shard 1 audits only static and public marketing pages, which render without
+    any seeded database data, roles or feature flags, so its heavy login and
+    data-seeding setup can be skipped entirely. Every other shard runs the
+    setup, and the puppeteer script picks the setup that its pages need based
+    on the shard.
+
+    Args:
+        shard: int. The one-based index of the Lighthouse shard being run.
+        record: bool. Whether to record the puppeteer setup via the screen
+            recorder.
+
+    Returns:
+        dict(str, str). The collected entity IDs, or an empty dict when the
+        running shard is the static shard 1.
+    """
+    if shard == 1:
+        print(
+            'Shard 1 audits only static public pages; skipping lighthouse '
+            'data setup and login.'
+        )
+        return {}
+    return run_lighthouse_puppeteer_script(record, shard)
 
 
 def get_entity(line: str) -> tuple[str, str] | None:
@@ -157,66 +251,185 @@ def get_entity(line: str) -> tuple[str, str] | None:
     """
     url_parts = line.split('/')
     print('Parsing entity ID in line: %s' % line)
-    if 'create' in line:
-        return 'exploration_id', url_parts[4]
-    elif 'topic_editor' in line:
-        return 'topic_id', url_parts[4]
-    elif 'story_editor' in line:
-        return 'story_id', url_parts[4]
-    elif 'skill_editor' in line:
-        return 'skill_id', url_parts[4]
+    url_patterns_to_entity_names = {
+        'create': ('exploration_id', 4),
+        'topic_editor': ('topic_id', 4),
+        'story_editor': ('story_id', 4),
+        'skill_editor': ('skill_id', 4),
+        '/blog/': ('blog_post_url_fragment', 4),
+    }
+    for url_pattern, (
+        entity_name,
+        entity_id_index,
+    ) in url_patterns_to_entity_names.items():
+        if url_pattern in line:
+            return entity_name, url_parts[entity_id_index]
 
     return None
 
 
-def run_lighthouse_checks(lighthouse_mode: str) -> None:
-    """Runs the Lighthouse checks through the Lighthouse config.
+def _get_lighthouse_environment() -> dict[str, str]:
+    """Returns an environment with the Lighthouse node runtime on PATH.
 
-    Args:
-        lighthouse_mode: str. Represents whether the lighthouse checks are in
-            accessibility mode or performance mode.
+    LHCI spawns the Lighthouse child process using the `node` binary that is
+    found on PATH (see node_modules/@lhci/cli/src/collect/node-runner.js).
+    common.py prepends the Node 16 binary to PATH at import time, but
+    Lighthouse 12 requires Node 18.20 or newer and uses JSON import
+    attributes that Node 16 cannot parse. Prepending the Lighthouse node
+    runtime to PATH for the LHCI subprocess ensures that the child process
+    also runs on the Lighthouse node.
     """
+    env = os.environ.copy()
+    env['PATH'] = os.pathsep.join(
+        [os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH), env['PATH']]
+    )
+    # The heap limit is set through NODE_OPTIONS, not as a command-line flag.
+    # A flag placed after the LHCI script path is consumed by LHCI instead of
+    # Node, so the limit would never be applied. NODE_OPTIONS is picked up by
+    # Node itself and propagated to all child Node processes (e.g. the
+    # Lighthouse subprocesses spawned by LHCI). See:
+    # https://stackoverflow.com/a/59572966
+    env['NODE_OPTIONS'] = '--max-old-space-size=4096'
+    return env
+
+
+# Upstream issue: https://github.com/GoogleChrome/lighthouse/issues/17180
+def _patch_lighthouse_target_manager() -> None:
+    """Patches lighthouse target-manager.js to handle Target.getTargetInfo
+    'Not allowed' errors from cross-origin iframes (e.g. Stripe, YouTube on
+    the donate page). Without this patch, Chrome's headless CDP rejects
+    Target.getTargetInfo for cross-origin targets and Lighthouse crashes.
+    """
+    target_manager_path = os.path.join(
+        'node_modules',
+        'lighthouse',
+        'core',
+        'gather',
+        'driver',
+        'target-manager.js',
+    )
+    if not os.path.isfile(target_manager_path):
+        raise RuntimeError(
+            'Could not find Lighthouse target-manager.js at %s to apply '
+            'the cross-origin CDP patch. A Lighthouse upgrade may have moved '
+            'or renamed this file; update the patch in this script.'
+            % target_manager_path
+        )
+    with open(target_manager_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    # Only patch if not already applied.
+    if '/Not allowed/' not in content:
+        patched_content = content.replace(
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;',
+            'if (/\'Target.getTargetInfo\' wasn\'t found/.test(err)) return;\n'
+            '      // Chrome may reject Target.getTargetInfo for '
+            'cross-origin targets.\n'
+            '      if (/Not allowed/.test(err.message)) return;',
+        )
+        if patched_content == content:
+            raise RuntimeError(
+                'Could not apply the cross-origin CDP patch to '
+                'target-manager.js: the expected upstream source line was '
+                'not found. A Lighthouse upgrade may have changed it; '
+                'update the patch in this script.'
+            )
+        with open(target_manager_path, 'w', encoding='utf-8') as f:
+            f.write(patched_content)
+        print(
+            'Patched lighthouse target-manager.js for cross-origin CDP errors.'
+        )
+
+
+def _run_lighthouse_checks_for_config(config_filename: str) -> None:
+    """Runs the Lighthouse checks through the given Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    # The max-old-space-size is a quick fix for node running out of heap memory
-    # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
-        common.NODE_BIN_PATH,
+        common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
-        '--max-old-space-size=4096',
+        '--config=%s' % config_filename,
     ]
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_lighthouse_environment(),
     )
     stdout, stderr = process.communicate()
 
-    print('OUTPUT:')
     # Standard output is in bytes, we need to decode the line to
     # print it.
     print(stdout.decode('utf-8'))
-    if process.returncode == 0:
-        pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
-        all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
-        print(
-            '\033[1m%s out of %s lighthouse checks run, see '
-            'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
-            'for more information.\033[0m' % (pages_count, all_pages_count)
+    # LHCI writes all assertion results to stderr (both pass/fail/warn),
+    # so always print it.
+    stderr_decoded = stderr.decode('utf-8')
+    if stderr_decoded:
+        # Filter out warn-level assertion results from CI output. Only
+        # error-level failures should be visible.
+        filtered = ''.join(
+            line
+            for line in stderr_decoded.splitlines(keepends=True)
+            if '\u26a0\ufe0f' not in line
         )
-        print('Lighthouse checks completed successfully.')
-    else:
+        if filtered:
+            print(filtered)
+    if process.returncode != 0:
         print('Return code: %s' % process.returncode)
-        print('ERROR:')
-        # Error output is in bytes, we need to decode the line to
-        # print it.
-        print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
 
+def _get_form_factor_label(config_filename: str) -> str:
+    """Returns a human-readable form factor label for the given config."""
+    if 'desktop' in config_filename:
+        return 'DESKTOP'
+    return 'MOBILE'
+
+
+def run_lighthouse_checks() -> None:
+    """Runs the Lighthouse checks through the Lighthouse configs."""
+    _patch_lighthouse_target_manager()
+    for config_filename in (
+        LIGHTHOUSE_CONFIG_FILENAME,
+        LIGHTHOUSE_DESKTOP_CONFIG_FILENAME,
+    ):
+        form_factor = _get_form_factor_label(config_filename)
+        pages = os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(',')
+        separator = '=' * 70
+        print(
+            '\n\033[1;36m%s\n'
+            '  LIGHTHOUSE %s CHECKS (%d pages)\n'
+            '%s\033[0m' % (separator, form_factor, len(pages), separator)
+        )
+        print('Config: %s\n' % config_filename)
+        _run_lighthouse_checks_for_config(config_filename)
+        print('\033[1;32m%s checks passed.\033[0m\n' % form_factor)
+
+    pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
+    all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
+    separator = '=' * 70
+    print(
+        '\n\033[1;36m%s\n'
+        '  LIGHTHOUSE SUMMARY\n'
+        '%s\033[0m' % (separator, separator)
+    )
+    print(
+        '\033[1m%s out of %s lighthouse pages run (mobile + desktop), see '
+        'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
+        'for more information.\033[0m' % (pages_count, all_pages_count)
+    )
+    print('Lighthouse checks completed successfully.')
+
+
 def get_lighthouse_pages_config() -> dict[str, str]:
     """Gets the lighthouse pages and their URLs from the config.
+
+    The pages in ``lighthouse-pages.json`` are intentionally grouped by the
+    shard that audits them rather than kept in alphabetical order. Grouping
+    pages that share the same puppeteer setup under one shard keeps each
+    shard's setup steps minimal, so when adding a page, place it next to the
+    pages that run the same setup instead of re-sorting the file.
 
     Returns:
         dict(str, str). The lighthouse page names and their URLs.
@@ -228,6 +441,23 @@ def get_lighthouse_pages_config() -> dict[str, str]:
             pages[page] = config[page]['url']
 
     return pages
+
+
+def get_lighthouse_shards_config() -> dict[str, list[str]]:
+    """Gets the lighthouse page names for each shard from the shards config.
+
+    Each shard lists the pages it audits and drives which data setup the
+    puppeteer script performs; pages are grouped per shard by their setup
+    requirements rather than sorted alphabetically, so keep the page order
+    stable when editing this file.
+
+    Returns:
+        dict(str, list(str)). Maps each shard name to the names of the pages
+        it audits.
+    """
+    with open(LIGHTHOUSE_SHARDS_JSON_FILEPATH, 'r', encoding='utf-8') as f:
+        shards_config = json.load(f)
+        return {name: list(pages) for name, pages in shards_config.items()}
 
 
 def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
@@ -244,13 +474,12 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         ValueError. The entity referenced in the URL is not found in the
             entities.
     """
-    entity_matcher = r'\{\{(.*?)\}\}'
     injected_url = url
-    for match in re.findall(entity_matcher, url):
+    for match in re.findall(ENTITY_MATCHER, url):
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        injected_url = url.replace(
+        injected_url = injected_url.replace(
             '{{%s}}' % entity_name, entities[entity_name]
         )
     return injected_url
@@ -277,6 +506,34 @@ def get_lighthouse_urls_to_run(
     return lighthouse_urls_to_run
 
 
+def _get_resolvable_lighthouse_all_urls(
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
+) -> List[str]:
+    """Gets the URLs across all configured pages whose entities can be
+    resolved.
+
+    Pages whose URLs reference an entity not present in ``entities`` cannot be
+    audited by the current shard (a static-page shard skips the data setup, so
+    it has no entity IDs to inject), so they are omitted from the summary list.
+
+    Args:
+        pages: list(str). The pages to resolve.
+        entities: dict(str, str). The available entities to inject.
+        pages_config: dict(str, str). The configuration for the pages.
+
+    Returns:
+        list(str). The resolvable URLs across the given pages.
+    """
+    resolvable_urls: List[str] = []
+    for page in pages:
+        url = pages_config[page]
+        unresolved_entities = re.findall(ENTITY_MATCHER, url)
+        if any(entity not in entities for entity in unresolved_entities):
+            continue
+        resolvable_urls.append(inject_entities_into_url(url, entities))
+    return resolvable_urls
+
+
 def set_lighthouse_url_environment_variables(
     pages: Optional[str], entities: dict[str, str]
 ) -> None:
@@ -290,7 +547,9 @@ def set_lighthouse_url_environment_variables(
     """
     pages_config: dict[str, str] = get_lighthouse_pages_config()
     all_pages = list(pages_config.keys())
-    all_urls = get_lighthouse_urls_to_run(all_pages, entities, pages_config)
+    all_urls = _get_resolvable_lighthouse_all_urls(
+        all_pages, entities, pages_config
+    )
     os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(all_urls)
 
     pages_to_run = (
@@ -330,16 +589,8 @@ def main(args: Optional[List[str]] = None) -> None:
     # Verify if Chrome is installed.
     common.setup_chrome_bin_env_variable()
 
-    if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
-        lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
-        server_mode = SERVER_MODE_DEV
-    else:
-        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
-        server_mode = SERVER_MODE_PROD
-
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
@@ -347,50 +598,40 @@ def main(args: Optional[List[str]] = None) -> None:
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)
             )
 
-        if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-            if parsed_args.skip_build:
-                print(
-                    'Building files in development mode for setup skipping '
-                    'clean build.'
-                )
-                common.modify_constants(prod_env=False, emulator_mode=True)
-                common.write_hashes_json_file({})
-                servers.run_ng_compilation()
-            else:
-                print('Building files in development mode for setup.')
-                build.main(args=[])
-                servers.run_ng_compilation()
-
-            with managed_lighthouse_appserver(SERVER_MODE_DEV):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-
-            if parsed_args.skip_build:
-                print('Restoring production constants for Lighthouse checks.')
-                common.modify_constants(prod_env=True, emulator_mode=True)
-            else:
-                # Builds ng.
-                print('Building files in production mode.')
-                build.main(args=['--prod_env'])
+        if parsed_args.skip_build:
+            print(
+                'Building files in development mode for setup skipping '
+                'clean build.'
+            )
+            common.modify_constants(prod_env=False, emulator_mode=True)
+            common.write_hashes_json_file({})
+            servers.run_ng_compilation()
         else:
-            # Accessibility mode skip ng build.
+            print('Building files in development mode for setup.')
             build.main(args=[])
             servers.run_ng_compilation()
 
-            with managed_lighthouse_appserver(server_mode):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-                set_lighthouse_url_environment_variables(
-                    parsed_args.pages, entities
-                )
-                run_lighthouse_checks(lighthouse_mode)
-            return
+        with managed_lighthouse_appserver(SERVER_MODE_DEV):
+            entities = _get_lighthouse_entities(
+                parsed_args.shard, parsed_args.record_screen
+            )
 
-        set_lighthouse_url_environment_variables(parsed_args.pages, entities)
-        with managed_lighthouse_appserver(server_mode):
-            run_lighthouse_checks(lighthouse_mode)
+        if parsed_args.skip_build:
+            print('Restoring production constants for Lighthouse checks.')
+            common.modify_constants(prod_env=True, emulator_mode=True)
+        else:
+            # Builds ng.
+            print('Building files in production mode.')
+            build.main(args=['--prod_env'])
+
+        pages_to_run = (
+            ','.join(get_lighthouse_shards_config()[str(parsed_args.shard)])
+            if parsed_args.pages is None
+            else parsed_args.pages
+        )
+        set_lighthouse_url_environment_variables(pages_to_run, entities)
+        with managed_lighthouse_appserver(SERVER_MODE_PROD):
+            run_lighthouse_checks()
 
 
 if __name__ == '__main__':  # pragma: no cover

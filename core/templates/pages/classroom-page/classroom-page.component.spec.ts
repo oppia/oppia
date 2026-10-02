@@ -88,7 +88,7 @@ describe('Classroom Page Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterTestingModule],
-      declarations: [ClassroomPageComponent, MockTranslatePipe],
+      declarations: [ClassroomPageComponent, MockTranslatePipe, CapitalizePipe],
       providers: [
         AlertsService,
         {

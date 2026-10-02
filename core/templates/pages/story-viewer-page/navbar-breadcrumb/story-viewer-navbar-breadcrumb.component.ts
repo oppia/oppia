@@ -32,7 +32,7 @@ import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 @Component({
   selector: 'oppia-story-viewer-navbar-breadcrumb',
   templateUrl: './story-viewer-navbar-breadcrumb.component.html',
-  styleUrls: [],
+  styleUrls: ['./story-viewer-navbar-breadcrumb.component.css'],
 })
 export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

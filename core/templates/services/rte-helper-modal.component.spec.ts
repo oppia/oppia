@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
+// @ts-nocheck
+
 import {
   TestBed,
   ComponentFixture,

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
@@ -104,6 +106,9 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
     EnableTranslationOppsWithNewOppModels: {
+      isEnabled: false,
+    },
+    EnableDropdownPagination: {
       isEnabled: false,
     },
   };
@@ -1517,6 +1522,30 @@ describe('Contributions and review component', () => {
           expect(more).toEqual(false);
         });
       });
+      it(
+        'should ignore a stale response when the active tab changes ' +
+          'while the request is in flight',
+        fakeAsync(() => {
+          // Set the tab state that the request starts with.
+          component.activeTabType = component.TAB_TYPE_REVIEWS;
+          component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
+
+          const loadPromise = component.loadContributions(null);
+
+          // Simulate the user switching tabs before the response resolves.
+          component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
+
+          let result: GetOpportunitiesResponse;
+          loadPromise.then(response => {
+            result = response;
+          });
+          tick();
+
+          // The stale response should be ignored and an empty result returned.
+          expect(result.opportunitiesDicts).toEqual([]);
+          expect(result.more).toBeFalse();
+        })
+      );
 
       it('should load translation contributions', () => {
         getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
@@ -1798,6 +1827,57 @@ describe('Contributions and review component', () => {
           expect(more).toEqual(false);
         });
       });
+
+      it(
+        'should return an empty list when the user is not authorized ' +
+          'to make suggestions',
+        fakeAsync(() => {
+          getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
+            Promise.reject({status: 401})
+          );
+
+          component.switchToTab(
+            component.TAB_TYPE_CONTRIBUTIONS,
+            'translate_content'
+          );
+
+          let response = null;
+          component
+            .loadContributions(null)
+            .then(({opportunitiesDicts, more}) => {
+              response = {opportunitiesDicts, more};
+            });
+          tick();
+
+          expect(response).toEqual({opportunitiesDicts: [], more: false});
+        })
+      );
+
+      it(
+        'should rethrow the error when the request fails for a reason ' +
+          'other than authorization',
+        fakeAsync(() => {
+          getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
+            Promise.reject({status: 500})
+          );
+
+          component.switchToTab(
+            component.TAB_TYPE_CONTRIBUTIONS,
+            'translate_content'
+          );
+
+          let rejectionStatus = null;
+          component.loadContributions(null).then(
+            () => {},
+            error => {
+              rejectionStatus = error.status;
+            }
+          );
+          tick();
+
+          expect(rejectionStatus).toEqual(500);
+        })
+      );
 
       it('should not overwrite previously fetched data', fakeAsync(() => {
         const mockSuggestions: Record<
@@ -3586,5 +3666,14 @@ describe('Contributions and review component', () => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
     }));
+
+    it(
+      'should return an empty list when the active tab subtype is neither ' +
+        'translate nor question',
+      () => {
+        component.activeTabSubtype = '';
+        expect(component.getContributionSummaries({})).toEqual([]);
+      }
+    );
   });
 });

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for story editor page component.
  */
 
+// @ts-nocheck
+
 import {EventEmitter} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

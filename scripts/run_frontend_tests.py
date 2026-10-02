@@ -129,11 +129,18 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     cmd = [
         common.NODE_BIN_PATH,
-        '--max-old-space-size=4096',
-        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start',
-        os.path.join('core', 'tests', 'karma.conf.ts'),
+        '--max-old-space-size=5120',
+        os.path.join(common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'),
+        'test',
+        '--karma-config=core/tests/karma.conf.ts',
+        '--watch=false',
     ]
+
+    # The Angular CLI does not automatically instrument the codebase for
+    # code coverage during testing (unlike the old Webpack istanbul-instrumenter-loader).
+    # We must explicitly pass the --code-coverage flag to Angular CLI to generate the report.
+    if parsed_args.check_coverage:
+        cmd.append('--code-coverage')
 
     specs_to_run: Set[str] = set()
     if parsed_args.specs_to_run:
@@ -179,7 +186,16 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     if specs_to_run:
         print('Running the following specs:', specs_to_run)
-        cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
+        for spec in sorted(specs_to_run):
+            # The Angular CLI's findTests() resolves --include patterns
+            # relative to dirname(main), which is core/templates/. Files
+            # under core/templates/ are found automatically (the prefix is
+            # stripped by findTests). Files outside that directory need a
+            # ../../ prefix to navigate back to the workspace root.
+            if spec.startswith('core/templates/'):
+                cmd.append('--include=%s' % spec)
+            else:
+                cmd.append('--include=../../%s' % spec)
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
@@ -190,12 +206,17 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # CI overhead on par with the previous minify-third-party-only approach.
         build.main(args=['--prod_env', '--skip_ng_build'])
 
-        cmd.append('--prodEnv')
+        # --configuration=production requires a matching
+        # `configurations.production` block in angular.json's test target.
+        # That block performs a fileReplacements swap
+        # (environment.ts → environment.prod.ts), mirroring the build
+        # target's existing production config.
+        cmd.append('--configuration=production')
     else:
         build.main(args=[])
 
     if parsed_args.verbose:
-        cmd.append('--terminalEnabled')
+        os.environ['KARMA_TERMINAL_ENABLED'] = 'true'
 
     for attempt in range(MAX_ATTEMPTS):
         print(f'Attempt {attempt + 1} of {MAX_ATTEMPTS}')

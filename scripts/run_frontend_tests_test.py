@@ -214,14 +214,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     )
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run='
-            'about-page.component.spec.ts,'
-            'home-page.component.spec.ts,'
-            'test-module.spec.js',
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--code-coverage',
+            '--include=../../about-page.component.spec.ts',
+            '--include=../../home-page.component.spec.ts',
+            '--include=../../test-module.spec.js',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
@@ -236,6 +239,43 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 ]
             ],
         )
+
+    def test_frontend_tests_with_specs_to_run_core_templates_path(self) -> None:
+        original_os_path_exists = os.path.exists
+
+        def mock_os_path_exists(path: str) -> bool:
+            if (
+                path
+                == 'core/templates/pages/about-page/about-page.component.spec.ts'
+            ):
+                return True
+            return original_os_path_exists(path)
+
+        os_path_exists_swap = self.swap(os.path, 'exists', mock_os_path_exists)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, os_path_exists_swap:
+                    run_frontend_tests.main(
+                        args=[
+                            '--specs_to_run='
+                            'core/templates/pages/about-page/'
+                            'about-page.component.spec.ts',
+                        ]
+                    )
+        cmd = [
+            common.NODE_BIN_PATH,
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--include=core/templates/pages/about-page/'
+            'about-page.component.spec.ts',
+        ]
+        self.assertIn(cmd, self.cmd_token_list)
 
     def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
@@ -346,11 +386,16 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts',
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--include=../../file1.spec.js',
+            '--include=../../file2.spec.ts',
+            '--include=../../file3.spec.ts',
         ]
         self.assertIn(cmd, self.cmd_token_list)
 
@@ -384,10 +429,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--code-coverage',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn(
@@ -409,10 +458,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--code-coverage',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn(
@@ -441,10 +494,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--code-coverage',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn(
@@ -475,11 +532,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--terminalEnabled',
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertFalse(self.frontend_coverage_checks_called)
@@ -493,11 +552,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--prodEnv',
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--configuration=production',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn('Running test in production environment', self.print_arr)
@@ -511,10 +573,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         cmd = [
             common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--max-old-space-size=5120',
+            os.path.join(
+                common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'
+            ),
+            'test',
+            '--karma-config=core/tests/karma.conf.ts',
+            '--watch=false',
+            '--code-coverage',
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertFalse(self.frontend_coverage_checks_called)

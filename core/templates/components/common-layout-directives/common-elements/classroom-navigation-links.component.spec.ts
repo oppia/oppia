@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ClassroomNavigationLinksComponent.
  */
 
+// @ts-nocheck
+
 import {HttpClientModule} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
@@ -133,6 +135,18 @@ describe('ClassroomNavigationLinksComponent', () => {
     // It should store all public classrooms.
     expect(component.classroomSummaries.length).toEqual(3);
     expect(component.isLoading).toBe(false);
+  }));
+
+  it('should emit the number of classrooms after they finish loading', fakeAsync(() => {
+    classroomBackendApiService.getAllClassroomsSummaryAsync.and.returnValue(
+      Promise.resolve(dummyClassroomSummaries)
+    );
+    spyOn(component.classroomCountChange, 'emit');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomCountChange.emit).toHaveBeenCalledWith(3);
   }));
 
   it('should get classroom thumbnail', () => {

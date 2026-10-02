@@ -153,6 +153,19 @@ describe('Content translation language service', () => {
       expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
     });
 
+    it('should prefer a valid initialContentLanguageCode url parameter over the preferred site language', () => {
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        initialContentLanguageCode: 'zh',
+      });
+      spyOn(
+        mockI18nLanguageCodeService,
+        'getCurrentI18nLanguageCode'
+      ).and.returnValue('fr');
+
+      ctls.init(availableLanguageCodes, [], 'en');
+      expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
+    });
+
     it('should fallback to exploration language when preferred site language is null', () => {
       spyOn(
         mockI18nLanguageCodeService,

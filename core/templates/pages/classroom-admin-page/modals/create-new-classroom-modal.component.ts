@@ -22,7 +22,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
 import {NewClassroomData} from '../new-classroom.model';
 import {ClassroomAdminDataService} from '../services/classroom-admin-data.service';
-import './create-new-classroom-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-classroom-modal',

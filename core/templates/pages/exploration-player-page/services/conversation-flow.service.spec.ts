@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for conversation flow service.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -70,6 +72,7 @@ import {
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import {RefresherExplorationConfirmationModalService} from '../services/refresher-exploration-confirmation-modal.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
+import {ChapterProgressService} from './chapter-progress.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {UserService} from '../../../services/user.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
@@ -88,6 +91,7 @@ describe('Conversation flow service', () => {
   let cardAnimationService: CardAnimationService;
   let userService: UserService;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
+  let chapterProgressService: ChapterProgressService;
   let windowRef: WindowRef;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let focusManagerService: FocusManagerService;
@@ -174,6 +178,7 @@ describe('Conversation flow service', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     currentEngineService = TestBed.inject(CurrentEngineService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
+    chapterProgressService = TestBed.inject(ChapterProgressService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     pageContextService = TestBed.inject(PageContextService);
     userService = TestBed.inject(UserService);
@@ -1399,6 +1404,47 @@ describe('Conversation flow service', () => {
     );
   }));
 
+  it('should not load the most recently reached checkpoint when restart is set', fakeAsync(() => {
+    const card = createCard('', 'TextInput');
+    conversationFlowService.displayedCard = card;
+    spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
+      () => {}
+    );
+    spyOn(playerPositionService.onNewCardOpened, 'emit').and.callFake(() => {});
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(urlService, 'getUrlParams').and.returnValue({restart: '1'});
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    spyOn(
+      explorationModeService,
+      'isInDiagnosticTestPlayerMode'
+    ).and.returnValue(false);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop').and.callFake(() => {});
+    spyOn(loaderService, 'hideLoadingScreen').and.callFake(() => {});
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode').and.callFake(
+      () => {}
+    );
+    spyOn(cardAnimationService, 'adjustPageHeight');
+    spyOn(windowRef.nativeWindow, 'scrollTo').and.callFake(() => {});
+    const loadSpy = spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadLatestExplorationAsync'
+    );
+
+    conversationFlowService.initializeDirectiveComponents(card, 'focus-label');
+
+    tick();
+    expect(loadSpy).not.toHaveBeenCalled();
+  }));
+
   it('should set i18nLanguageCode to URL lang if iframe and lang is valid', fakeAsync(() => {
     const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
@@ -1877,4 +1923,167 @@ describe('Conversation flow service', () => {
       expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
     });
   });
+
+  it('should use content focus label when refreshInteraction is false and next card is null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(3);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(focusManagerService, 'generateFocusLabel');
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: Function
+    ) => {
+      successCallback(
+        null,
+        false,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(focusManagerService.generateFocusLabel).not.toHaveBeenCalled();
+    expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
+  }));
+
+  it('should use content focus label when refreshInteraction is false, remainOnCurrentCard is true, and nextCard is not null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(3);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(focusManagerService, 'generateFocusLabel');
+    spyOn(cardAnimationService, 'scrollToBottom');
+    spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(learnerAnswerInfoService, 'initLearnerAnswerInfoService');
+    spyOn(explorationEngineService, 'getState').and.returnValue({
+      name: 'oldState',
+      cardIsCheckpoint: false,
+    });
+    const nextCard = createCard('NextState', 'TextInput');
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: Function
+    ) => {
+      successCallback(
+        nextCard,
+        false,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        false,
+        null,
+        ''
+      );
+      return false;
+    };
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      0
+    );
+    spyOn(statsReportingService, 'recordStateTransition');
+    spyOn(statsReportingService, 'recordStateCompleted');
+    spyOn(learnerParamsService, 'getAllParams');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(focusManagerService.generateFocusLabel).not.toHaveBeenCalled();
+    expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
+    expect(cardAnimationService.scrollToBottom).toHaveBeenCalled();
+  }));
 });

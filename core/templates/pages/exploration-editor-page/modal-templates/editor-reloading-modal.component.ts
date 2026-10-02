@@ -19,7 +19,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './editor-reloading-modal.component.css';
 
 @Component({
   selector: 'oppia-editor-reloading-modal',
