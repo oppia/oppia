@@ -2177,7 +2177,16 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [
+                            {
+                                'name': 'topic 1',
+                                'id': topic_id_1,
+                                'completeness': None,
+                            }
+                        ],
+                    }
                 ]
             },
         )
@@ -2226,10 +2235,90 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [
+                            {
+                                'name': 'topic 1',
+                                'id': topic_id_1,
+                                'completeness': None,
+                            }
+                        ],
+                    }
                 ]
             },
         )
+
+    def test_topics_are_annotated_and_sorted_by_completeness_with_language(
+        self,
+    ) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='topic low',
+            abbreviated_name='abbrev-low',
+            url_fragment='topic-low',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.admin_id,
+            name='topic high',
+            abbreviated_name='abbrev-high',
+            url_fragment='topic-high',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id,
+            name='Class 1',
+            topic_id_to_prerequisite_topic_ids={topic_id_1: [], topic_id_2: []},
+        )
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_low',
+            topic_id=topic_id_1,
+            topic_name='topic low',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 2},
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_high',
+            topic_id=topic_id_2,
+            topic_name='topic high',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 9},
+        ).put()
+
+        response = self.get_json(
+            '/gettranslatabletopicnamesperclassroom',
+            params={'language_code': 'hi'},
+        )
+
+        topics = response['topic_names_per_classroom'][0]['topics']
+        # Highest completeness first: topic high (90%) before topic low (20%).
+        self.assertEqual(topics[0]['name'], 'topic high')
+        self.assertEqual(topics[0]['completeness'], 90.0)
+        self.assertEqual(topics[1]['name'], 'topic low')
+        self.assertEqual(topics[1]['completeness'], 20.0)
 
     def test_topic_without_classroom_should_also_be_returned(self) -> None:
         # Create topics.
