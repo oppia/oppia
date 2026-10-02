@@ -23,7 +23,7 @@ export const QuestionPlayerConstants = {
   MAX_MASTERY_GAIN_PER_QUESTION: 0.1,
   MAX_MASTERY_LOSS_PER_QUESTION: -0.1,
 
-  COLORS_FOR_PASS_FAIL_MODE: {
+  SCORE_COLORS: {
     // Color orange.
     FAILED_COLOR: 'rgb(217, 92, 12)',
     // Color shallow orange.
@@ -34,10 +34,6 @@ export const QuestionPlayerConstants = {
     PASSED_COLOR_BAR: 'rgb(32, 93, 134)',
     // Color shallow green.
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)',
-  },
-
-  QUESTION_PLAYER_MODE: {
-    PASS_FAIL_MODE: 'PASS_FAIL',
   },
 
   VIEW_HINT_PENALTY: 0.1,

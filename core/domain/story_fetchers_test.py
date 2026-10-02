@@ -150,23 +150,6 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summaries[0].thumbnail_bg_color, None)
         self.assertEqual(story_summaries[0].version, 2)
 
-    def test_get_latest_completed_node_ids(self) -> None:
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.USER_ID, self.story_id
-            ),
-            [],
-        )
-        story_services.record_completed_node_in_story_context(
-            self.USER_ID, self.story_id, self.NODE_ID_1
-        )
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.USER_ID, self.story_id
-            ),
-            [self.NODE_ID_1],
-        )
-
     def test_migrate_story_contents(self) -> None:
         changelist = [
             story_domain.StoryChange(

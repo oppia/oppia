@@ -43,7 +43,7 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
   circle!: SVGCircleElement;
   radius!: number;
   circumference!: number;
-  COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
+  SCORE_COLORS = QuestionPlayerConstants.SCORE_COLORS;
 
   setScore(percent: number): void {
     setTimeout(() => {
@@ -54,19 +54,19 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
 
   getScoreRingColor(): string {
     if (this.testIsPassed) {
-      return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+      return this.SCORE_COLORS.PASSED_COLOR;
     } else {
-      return this.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+      return this.SCORE_COLORS.FAILED_COLOR;
     }
   }
 
   getScoreOuterRingColor(): string {
     if (this.testIsPassed) {
       // Return color green when passed.
-      return this.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+      return this.SCORE_COLORS.PASSED_COLOR_OUTER;
     } else {
       // Return color orange when failed.
-      return this.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+      return this.SCORE_COLORS.FAILED_COLOR_OUTER;
     }
   }
 
