@@ -86,7 +86,7 @@ describe('End chapter confetti component', function () {
       throw new Error('confettiVideoRef is not defined');
     }
     const videoElement = component.confettiVideoRef.nativeElement;
-    spyOn(videoElement, 'play');
+    spyOn(videoElement, 'play').and.returnValue(Promise.resolve());
     spyOn(component.endChapterCelebratoryAudio, 'play');
 
     component.animateConfetti();
@@ -96,6 +96,25 @@ describe('End chapter confetti component', function () {
 
     videoElement.dispatchEvent(new Event('ended'));
 
+    expect(component.confettiIsShown).toBe(false);
+  });
+
+  it('should hide the confetti video if playback is rejected', async () => {
+    component.useVideoConfetti = true;
+    fixture.detectChanges();
+    if (!component.confettiVideoRef) {
+      throw new Error('confettiVideoRef is not defined');
+    }
+    const videoElement = component.confettiVideoRef.nativeElement;
+    spyOn(videoElement, 'play').and.returnValue(
+      Promise.reject(new Error('NotAllowedError'))
+    );
+    spyOn(component.endChapterCelebratoryAudio, 'play');
+
+    component.animateConfetti();
+    await fixture.whenStable();
+
+    expect(videoElement.play).toHaveBeenCalled();
     expect(component.confettiIsShown).toBe(false);
   });
 });

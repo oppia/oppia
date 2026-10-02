@@ -69,12 +69,16 @@ export class NewEndChapterConfettiComponent implements OnInit {
     if (this.useVideoConfetti) {
       const confettiVideo = this.confettiVideoRef?.nativeElement;
       if (confettiVideo) {
-        confettiVideo.currentTime = 0;
-        confettiVideo.play();
-        confettiVideo.onended = () => {
+        const hideConfetti = (): void => {
           this.confettiIsShown = false;
           this.cdRef.detectChanges();
         };
+        // Register the handler before playback so that it is always in
+        // place, and hide the video if the browser rejects playback (for
+        // example, because of autoplay restrictions).
+        confettiVideo.onended = hideConfetti;
+        confettiVideo.currentTime = 0;
+        confettiVideo.play().catch(hideConfetti);
       }
     }
   }

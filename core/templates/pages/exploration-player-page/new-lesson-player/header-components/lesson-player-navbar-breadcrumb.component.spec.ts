@@ -25,6 +25,7 @@ import {
 } from '../../../../domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlService} from '../../../../services/contextual/url.service';
+import {LoggerService} from '../../../../services/contextual/logger.service';
 import {CapitalizePipe} from '../../../../filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from '../../../../domain/classroom/classroom-backend-api.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
@@ -48,6 +49,7 @@ describe('Lesson player navbar breadcrumb component', () => {
   let fixture: ComponentFixture<LessonPlayerNavbarBreadcrumbComponent>;
   let componentInstance: LessonPlayerNavbarBreadcrumbComponent;
   let urlService: UrlService;
+  let loggerService: LoggerService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let capitalizePipe: CapitalizePipe;
@@ -58,6 +60,7 @@ describe('Lesson player navbar breadcrumb component', () => {
       declarations: [LessonPlayerNavbarBreadcrumbComponent, MockTranslatePipe],
       providers: [
         UrlService,
+        LoggerService,
         TopicViewerBackendApiService,
         {provide: CapitalizePipe, useClass: MockCapitalizePipe},
         {
@@ -73,6 +76,7 @@ describe('Lesson player navbar breadcrumb component', () => {
     fixture = TestBed.createComponent(LessonPlayerNavbarBreadcrumbComponent);
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
+    loggerService = TestBed.inject(LoggerService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     capitalizePipe = TestBed.inject(CapitalizePipe);
@@ -98,13 +102,12 @@ describe('Lesson player navbar breadcrumb component', () => {
 
   describe('ngOnInit', () => {
     it('should not fetch topic or classroom data when not linked to a topic', () => {
-      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-        null
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.throwError(
+        'Invalid topic URL fragment'
       );
-      spyOn(
-        urlService,
-        'getClassroomUrlFragmentFromLearnerUrl'
-      ).and.returnValue(null);
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.throwError(
+        'Invalid classroom URL fragment'
+      );
 
       componentInstance.ngOnInit();
 
@@ -143,18 +146,46 @@ describe('Lesson player navbar breadcrumb component', () => {
       expect(componentInstance.classroomName).toBe('Math Classroom');
     });
 
-    it('should throw an error when classroom URL fragment is null', () => {
+    it('should keep the breadcrumb hidden when the topic fetch fails', async () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
       spyOn(
         urlService,
         'getClassroomUrlFragmentFromLearnerUrl'
-      ).and.returnValue(null);
+      ).and.returnValue('classroom1');
+      (
+        topicViewerBackendApiService.fetchTopicDataAsync as jasmine.Spy
+      ).and.returnValue(Promise.reject(new Error('404')));
+      spyOn(loggerService, 'error');
 
-      expect(() => componentInstance.ngOnInit()).toThrowError(
-        'Classroom URL fragment is null'
+      componentInstance.ngOnInit();
+      await fixture.whenStable();
+
+      expect(loggerService.error).toHaveBeenCalledTimes(1);
+      expect(componentInstance.topicName).toBe('');
+      expect(componentInstance.shouldShowBreadcrumb()).toBe(false);
+    });
+
+    it('should keep the breadcrumb hidden when the classroom fetch fails', async () => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic1'
       );
+      spyOn(
+        urlService,
+        'getClassroomUrlFragmentFromLearnerUrl'
+      ).and.returnValue('classroom1');
+      classroomBackendApiService.fetchClassroomDataAsync = jasmine
+        .createSpy('fetchClassroomDataAsync')
+        .and.returnValue(Promise.reject(new Error('404')));
+      spyOn(loggerService, 'error');
+
+      componentInstance.ngOnInit();
+      await fixture.whenStable();
+
+      expect(loggerService.error).toHaveBeenCalledTimes(1);
+      expect(componentInstance.classroomName).toBe('');
+      expect(componentInstance.shouldShowBreadcrumb()).toBe(false);
     });
   });
 
@@ -172,35 +203,15 @@ describe('Lesson player navbar breadcrumb component', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should throw when only the topic URL fragment is present', () => {
+    it('should return false when only the classroom fragment lookup throws', () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
-      spyOn(
-        urlService,
-        'getClassroomUrlFragmentFromLearnerUrl'
-      ).and.returnValue(null);
-
-      expect(() => componentInstance.ngOnInit()).toThrowError(
-        'Classroom URL fragment is null'
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.throwError(
+        'Test error'
       );
-      expect(
-        topicViewerBackendApiService.fetchTopicDataAsync
-      ).not.toHaveBeenCalled();
-    });
-
-    it('should throw when only the classroom URL fragment is present', () => {
-      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-        null
-      );
-      spyOn(
-        urlService,
-        'getClassroomUrlFragmentFromLearnerUrl'
-      ).and.returnValue('classroom1');
-
-      expect(() => componentInstance.ngOnInit()).toThrowError(
-        'Classroom URL fragment is null'
-      );
+      componentInstance.ngOnInit();
+      expect(componentInstance.isLinkedToTopic).toBe(false);
       expect(
         topicViewerBackendApiService.fetchTopicDataAsync
       ).not.toHaveBeenCalled();

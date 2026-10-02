@@ -20,6 +20,7 @@ import {Component, OnInit} from '@angular/core';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 
@@ -34,12 +35,13 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topicName!: string;
   classroomName!: string;
-  classroomUrlFragment!: string | null;
-  topicUrlFragment!: string | null;
+  classroomUrlFragment: string = '';
+  topicUrlFragment: string = '';
   isLinkedToTopic: boolean | null = null;
 
   constructor(
     private urlService: UrlService,
+    private loggerService: LoggerService,
     private capitalizePipe: CapitalizePipe,
     private classroomBackendApiService: ClassroomBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService
@@ -55,28 +57,44 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
       return;
     }
 
-    const topicUrlFragment = this.topicUrlFragment as string;
-    const classroomUrlFragment = this.classroomUrlFragment as string;
+    // If either fetch fails (for example, a 404 for an unknown fragment),
+    // the corresponding name stays empty and the breadcrumb stays hidden.
 
     this.topicViewerBackendApiService
-      .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
-      .then((readOnlyTopic: ReadOnlyTopic) => {
-        this.topicName = readOnlyTopic.getTopicName();
-      });
+      .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
+      .then(
+        (readOnlyTopic: ReadOnlyTopic) => {
+          this.topicName = readOnlyTopic.getTopicName();
+        },
+        () => {
+          this.loggerService.error(
+            'Breadcrumb topic data failed to load for topic ' +
+              this.topicUrlFragment
+          );
+        }
+      );
 
     this.classroomBackendApiService
-      .fetchClassroomDataAsync(classroomUrlFragment)
-      .then(classroomData => {
-        this.classroomName = this.capitalizePipe.transform(
-          classroomData.getName()
-        );
-      });
+      .fetchClassroomDataAsync(this.classroomUrlFragment)
+      .then(
+        classroomData => {
+          this.classroomName = this.capitalizePipe.transform(
+            classroomData.getName()
+          );
+        },
+        () => {
+          this.loggerService.error(
+            'Breadcrumb classroom data failed to load for classroom ' +
+              this.classroomUrlFragment
+          );
+        }
+      );
   }
 
-  // Returns whether the current learner URL has classroom, topic, and
-  // story fragments, which together indicate the exploration is being
-  // played as part of a curated topic (rather than e.g. standalone via
-  // the community library).
+  // Returns whether the current learner URL has both classroom and topic
+  // fragments, which together indicate the exploration is being played as
+  // part of a curated topic (rather than e.g. standalone via the community
+  // library). The URL service throws when a fragment is missing.
   private computeIsLinkedToTopic(): boolean {
     try {
       this.topicUrlFragment =
@@ -86,15 +104,6 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
     } catch (e) {
       return false;
     }
-
-    if (this.topicUrlFragment === null && this.classroomUrlFragment === null) {
-      return false;
-    }
-
-    if (this.topicUrlFragment === null || this.classroomUrlFragment === null) {
-      throw new Error('Classroom URL fragment is null');
-    }
-
     return true;
   }
 
