@@ -18,10 +18,14 @@
 
 import {Page} from '@playwright/test';
 import {LoggedInUser} from './logged-in-user';
-import testConstants from '../common/test-constants';
+import testConstants, {BlogRoles} from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const blogAdminUrl = testConstants.URLs.BlogAdmin;
+
+const roleUpdateUsernameInput = 'input#label-target-update-form-name';
+const updateRoleButtonSelector = 'button.oppia-blog-admin-update-role-button';
 
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
@@ -243,6 +247,24 @@ export class SuperAdmin extends LoggedInUser {
         numberOfLanguages: initalNumberOfLanguages + 1,
       }
     );
+  }
+
+  async navigateToBlogAdminPage(): Promise<void> {
+    await this.goto(blogAdminUrl);
+  }
+
+  async assignUserToRoleFromBlogAdminPage(
+    username: string,
+    role: BlogRoles
+  ): Promise<void> {
+    await this.page.selectOption(
+      'select#label-target-update-form-role-select',
+      role
+    );
+    await this.typeInInputField(roleUpdateUsernameInput, username);
+    await this.clickOnElementWithSelector(updateRoleButtonSelector);
+    await this.expectElementToBeClickable(updateRoleButtonSelector, false);
+    showMessage(`User ${username} assigned role ${role} from blog admin page.`);
   }
 }
 
