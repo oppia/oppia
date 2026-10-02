@@ -213,14 +213,9 @@ export class TranslationStatusService {
         // Voiceovers can only be recorded for text that exists in the active
         // language. Apply this filter only in voiceover mode so translation
         // progress counts stay unchanged.
-        if (
-          this.translationTabActiveModeService.isVoiceoverModeActive() &&
-          !this._isVoiceoveringOriginalLanguage()
-        ) {
-          voiceoverableContentIds = voiceoverableContentIds.filter(contentId =>
-            this._hasNonemptyWrittenTranslation(contentId)
-          );
-        }
+        voiceoverableContentIds = this._getVoiceoverContentIdsRequiringAudio(
+          voiceoverableContentIds
+        );
         this.explorationVoiceoverContentRequiredCount +=
           voiceoverableContentIds.length;
         if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
@@ -371,19 +366,13 @@ export class TranslationStatusService {
 
   _getAvailableContentIds(): string[] {
     let stateName = this.stateEditorService.getActiveStateName();
+    // Empty source cards are hidden in both translation and voiceover
+    // modes, so status colors omit those content IDs in both modes.
     let contentIds =
       this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
         stateName as string
       ) as string[];
-    if (
-      this.translationTabActiveModeService.isVoiceoverModeActive() &&
-      !this._isVoiceoveringOriginalLanguage()
-    ) {
-      contentIds = contentIds.filter(contentId =>
-        this._hasNonemptyWrittenTranslation(contentId)
-      );
-    }
-    return contentIds;
+    return this._getVoiceoverContentIdsRequiringAudio(contentIds);
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {
@@ -408,7 +397,7 @@ export class TranslationStatusService {
   _getActiveStateContentIdStatusColor(contentId: string): string {
     if (
       this.translationTabActiveModeService.isVoiceoverModeActive() &&
-      !this._isVoiceoveringOriginalLanguage() &&
+      !this.isVoiceoveringOriginalLanguage() &&
       !this._hasNonemptyWrittenTranslation(contentId)
     ) {
       return this.PLACEHOLDER_STATUS_COLOR;
@@ -422,7 +411,7 @@ export class TranslationStatusService {
     }
   }
 
-  _isVoiceoveringOriginalLanguage(): boolean {
+  isVoiceoveringOriginalLanguage(): boolean {
     const originalLanguageCode = this.explorationLanguageCodeService.displayed;
     if (typeof originalLanguageCode !== 'string' || !originalLanguageCode) {
       return true;
@@ -430,6 +419,18 @@ export class TranslationStatusService {
     return (
       this.translationLanguageService.getActiveLanguageCode() ===
       originalLanguageCode
+    );
+  }
+
+  _getVoiceoverContentIdsRequiringAudio(contentIds: string[]): string[] {
+    if (
+      !this.translationTabActiveModeService.isVoiceoverModeActive() ||
+      this.isVoiceoveringOriginalLanguage()
+    ) {
+      return contentIds;
+    }
+    return contentIds.filter(contentId =>
+      this._hasNonemptyWrittenTranslation(contentId)
     );
   }
 

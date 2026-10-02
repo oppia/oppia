@@ -313,6 +313,7 @@ describe('State translation component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
+    // Hindi is a non-original voiceover language. Lookups use .hi, not .en.
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
@@ -547,7 +548,7 @@ describe('State translation component', () => {
             ' index is not a number',
           () => {
             component.initActiveContentId = 'hint_2';
-            component.initActiveIndex = undefined as unknown as number;
+            component.initActiveIndex = null;
             spyOn(translationTabActiveContentIdService, 'setActiveContent');
 
             expect(() => {
@@ -684,7 +685,7 @@ describe('State translation component', () => {
             ' when the initialized index is not a number',
           () => {
             component.initActiveContentId = 'ca_filled';
-            component.initActiveIndex = undefined as unknown as number;
+            component.initActiveIndex = null;
             component.interactionCustomizationArgTranslatableContent = [
               {
                 name: 'Empty placeholder',
@@ -1059,16 +1060,6 @@ describe('State translation component', () => {
       });
 
       it(
-        'should get empty content message when original-language text is' +
-          ' empty in voiceover mode',
-        () => {
-          expect(component.getEmptyContentMessage()).toBe(
-            'This field is empty, so a voiceover is not required.'
-          );
-        }
-      );
-
-      it(
         'should get empty content message when a translation is missing in' +
           ' voiceover mode',
         () => {
@@ -1354,6 +1345,7 @@ describe('State translation component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
+    // Hindi is a non-original voiceover language. Lookups use .hi, not .en.
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
@@ -1836,6 +1828,7 @@ describe('State translation component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     TestBed.inject(ExplorationLanguageCodeService).init('en');
     entityTranslationsService.init('exp1', 'exploration', 5);
+    // Hindi is a non-original voiceover language. Lookups use .hi, not .en.
     entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
@@ -2043,6 +2036,48 @@ describe('State translation component', () => {
 
     expect(htmlData).toBe('Translated HTML');
   });
+
+  it(
+    'should return empty html when source text is empty even if a' +
+      ' translation exists',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
+        new EntityTranslation('entityId', 'entityType', 1, 'hi', {
+          content_0: new TranslatedContent('Translated HTML', 'html', true),
+        });
+
+      expect(
+        component.getRequiredHtml(new SubtitledHtml('', 'content_0'))
+      ).toBe('');
+    }
+  );
+
+  it(
+    'should return empty unicode when source text is empty even if a' +
+      ' translation exists',
+    () => {
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('hi');
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
+        new EntityTranslation('entityId', 'entityType', 1, 'hi', {
+          content_1: new TranslatedContent(
+            'Translated UNICODE',
+            'unicode',
+            true
+          ),
+        });
+      const subtitledObject = SubtitledUnicode.createFromBackendDict({
+        content_id: 'content_1',
+        unicode_str: '',
+      });
+
+      expect(component.getRequiredUnicode(subtitledObject)).toBe('');
+    }
+  );
 
   it(
     'should return empty html when a non-original-language translation is' +

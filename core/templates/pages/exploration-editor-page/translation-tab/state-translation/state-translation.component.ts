@@ -95,7 +95,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   activeTranslatedContent!: TranslatedContent;
   activeTab!: string;
   initActiveContentId!: string | null;
-  initActiveIndex!: number;
+  initActiveIndex!: number | null;
   interactionRuleTranslatableContents!: {
     rule: Rule;
     inputName: string;
@@ -134,14 +134,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   isVoiceoveringOriginalLanguage(): boolean {
-    const originalLanguageCode = this.explorationLanguageCodeService.displayed;
-    if (typeof originalLanguageCode !== 'string' || !originalLanguageCode) {
-      return true;
-    }
-    return (
-      this.translationLanguageService.getActiveLanguageCode() ===
-      originalLanguageCode
-    );
+    return this.translationStatusService.isVoiceoveringOriginalLanguage();
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
@@ -149,7 +142,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledHtml.html;
     }
 
-    return this.getVoiceoverDisplayText(
+    return this._getVoiceoverDisplayText(
       subtitledHtml.contentId,
       subtitledHtml.html
     );
@@ -160,7 +153,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledUnicode.unicode;
     }
 
-    return this.getVoiceoverDisplayText(
+    return this._getVoiceoverDisplayText(
       subtitledUnicode.contentId,
       subtitledUnicode.unicode
     );
@@ -168,9 +161,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   getEmptyContentMessage(): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
-      if (this.isVoiceoveringOriginalLanguage()) {
-        return 'This field is empty, so a voiceover is not required.';
-      }
       return (
         'The translation for this section has not been created yet. ' +
         'Switch to translation mode to add a text translation.'
@@ -180,10 +170,14 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getVoiceoverDisplayText(
+  private _getVoiceoverDisplayText(
     contentId: string | null,
     sourceText: string
   ): string {
+    // Empty original-language content is not offered for voiceover.
+    if (!sourceText) {
+      return '';
+    }
     // Voiceovers for the original exploration language use the source text.
     if (this.isVoiceoveringOriginalLanguage()) {
       return sourceText;
