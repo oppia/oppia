@@ -94,7 +94,8 @@ test.describe('Translation Submitter', function () {
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
-      'Math'
+      'Math',
+      true
     );
 
     // Create the exploration containing all rich-text components exercised by
