@@ -1347,8 +1347,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Sorunun ne olduğunu bize bildirin. Eksik bir görsel, çalışmayan bir buton veya üst üste binen metinler varsa belirtin.",
   "I18N_RESET_CODE": "Kodu Sıfırla",
   "I18N_RESTART_EXPLORATION_BUTTON": "Dersi yeniden başlat",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Testi Gözden Geçir",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Testi Gözden Geçir: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Evet, geçerli içeriği yapıştırın",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Hayır, iptal et",
   "I18N_RTE_DISMISS_WARNING": "Kapat",

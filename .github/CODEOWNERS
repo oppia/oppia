@@ -442,7 +442,6 @@
 # Question project.
 /core/controllers/practice_sessions*.py @oppia/lace-backend-reviewers
 /core/controllers/question*.py @oppia/lace-backend-reviewers
-/core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
@@ -454,7 +453,6 @@
 /core/templates/domain/question/ @oppia/lace-frontend-reviewers
 /core/templates/domain/review_test/ @oppia/lace-frontend-reviewers
 /core/templates/pages/practice-session-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/review-test-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/questions-list.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/question-directives/ @oppia/lace-frontend-reviewers
 

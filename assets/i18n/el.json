@@ -1156,8 +1156,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Τι είναι χαλασμένο; Ενημερώστε μας εάν λείπει κάποια εικόνα, δεν λειτουργεί κάποιο κουμπί ή το κείμενο επικαλύπτεται.",
   "I18N_RESET_CODE": "Επαναφορά Κώδιακ",
   "I18N_RESTART_EXPLORATION_BUTTON": "Επανεκκίνηση μαθήματος",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Διαγώνισμα Επανάληψης",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Διαγώνισμα Επανάληψης: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Ναι, επικόλληση έγκυρου περιεχομένου",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Όχι, ακύρωση",
   "I18N_RTE_DISMISS_WARNING": "Απόρριψη",

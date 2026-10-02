@@ -1282,8 +1282,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "के बिग्रिएको छ? यदि कुनै छवि छुटेको छ, बटनले काम गरिरहेको छैन, वा पाठ ओभरल्याप भइरहेको छ भने हामीलाई थाहा दिनुहोस्।",
   "I18N_RESET_CODE": "कोड रिसेट गर्नुहोस्",
   "I18N_RESTART_EXPLORATION_BUTTON": "पाठ पुनः सुरु गर्नुहोस्",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "समीक्षा परीक्षण",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "समीक्षा परीक्षण: <[storyName]> - ओपिया",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "हो, मान्य सामग्री टाँस्नुहोस्",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "होइन, रद्द गर्नुहोस्",
   "I18N_RTE_DISMISS_WARNING": "खारेज गर्नुहोस्",

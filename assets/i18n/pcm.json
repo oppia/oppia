@@ -1222,8 +1222,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Oppia Release Coordinator Panel",
   "I18N_RESET_CODE": "Reset Code",
   "I18N_RESTART_EXPLORATION_BUTTON": "Start lesson from top",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Check test",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Check test: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Yes, paste correct thing wey go work",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "No, cancel am",
   "I18N_RTE_DISMISS_WARNING": "Comot am",

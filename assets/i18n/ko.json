@@ -1286,8 +1286,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "무엇이 문제인가요? 이미지가 누락되었거나, 버튼이 작동하지 않거나, 텍스트가 겹치는 경우 알려주세요.",
   "I18N_RESET_CODE": "코드 재설정",
   "I18N_RESTART_EXPLORATION_BUTTON": "수업을 다시 시작",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "복습 시험",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "리뷰 시험: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "예, 유효한 콘텐츠를 붙여넣습니다",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "아니요, 취소합니다",
   "I18N_RTE_DISMISS_WARNING": "숨기기",

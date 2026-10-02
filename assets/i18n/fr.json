@@ -1227,8 +1227,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Panneau du coordinateur de publication d’Oppia",
   "I18N_RESET_CODE": "Réinitialiser le code",
   "I18N_RESTART_EXPLORATION_BUTTON": "Redémarrer la leçon",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Relire le test",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Test de passage en revue : <[storyName]> — Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Oui, coller le contenu valide",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Non, annuler",
   "I18N_RTE_DISMISS_WARNING": "Ignorer",

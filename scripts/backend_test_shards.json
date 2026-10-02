@@ -7,7 +7,7 @@
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
         "core.controllers.firebase_test",
-        "core.controllers.review_tests_test",
+
         "core.controllers.resources_test",
         "core.controllers.cron_test",
         "extensions.interactions.base_test",

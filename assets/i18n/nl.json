@@ -1347,8 +1347,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Wat is er kapot? Laat het ons weten als er een afbeelding ontbreekt, een knop niet werkt of de ene tekst over de andere heen staat.",
   "I18N_RESET_CODE": "Code opnieuw instellen",
   "I18N_RESTART_EXPLORATION_BUTTON": "Les opnieuw starten",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Toets bekijken",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Beoordelingstest: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Ja, plak geldige inhoud",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Nee, annuleren",
   "I18N_RTE_DISMISS_WARNING": "Sluiten",

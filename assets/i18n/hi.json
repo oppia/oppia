@@ -1223,8 +1223,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "ओपिया रिलीज़ समन्वयक पैनल",
   "I18N_RESET_CODE": "रीसेट कोड",
   "I18N_RESTART_EXPLORATION_BUTTON": "पाठ पुनः आरंभ करें",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "परीक्षण की समीक्षा",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "समीक्षा परीक्षण: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "हाँ, मान्य सामग्री संलग्न करें",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "नहीं, रद्द करें",
   "I18N_RTE_DISMISS_WARNING": "रद्द करें",

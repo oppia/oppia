@@ -1241,8 +1241,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "لوحة Oppia Release Coordinator",
   "I18N_RESET_CODE": "إعادة التعليمات البرمجية",
   "I18N_RESTART_EXPLORATION_BUTTON": "أعِد الدرس",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "فحص المراجعة.",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "اختبار المراجعة: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "نعم، لصق المحتوى الصالح",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "لا، إلغاء",
   "I18N_RTE_DISMISS_WARNING": "تجاهل",

@@ -1200,8 +1200,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Panel Koordinator Rilis Oppia",
   "I18N_RESET_CODE": "Atur Ulang Kode",
   "I18N_RESTART_EXPLORATION_BUTTON": "Ulangi pelajaran",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Ulasan Uji Coba",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Tes Ulasan: <[storyName]> - Oppia",
   "I18N_SAVE_BUTTON_ALERT_TOOLTIP": "Kemajuan tidak dapat disimpan jika Anda belum mencapai checkpoint pertama.",
   "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Kemajuan pembelajaran Anda akan otomatis disimpan jika Anda memiliki akun.",
   "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Sudah memiliki akun?",

@@ -731,7 +731,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Mikä ei toimi? Kerro meille, jos jokin kuva puuttuu, painike ei toimi tai teksti menee muiden kohteiden päälle.",
   "I18N_RESET_CODE": "Nollaa koodi",
   "I18N_RESTART_EXPLORATION_BUTTON": "Aloita oppitunti uudelleen",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Tarkista testi",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Ei, peruuta",
   "I18N_RTE_DISMISS_WARNING": "Hylkää",
   "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "On jo tili?",

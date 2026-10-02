@@ -1193,8 +1193,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Painel do coordenador de liberação da Oppia",
   "I18N_RESET_CODE": "Reiniciar código",
   "I18N_RESTART_EXPLORATION_BUTTON": "Reiniciar a lição",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Teste de revisão",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Teste de revisão: <[storyName]> - Oppia",
   "I18N_SAVE_BUTTON_ALERT_TOOLTIP": "O progresso não poderá ser salvo se você não tiver alcançado o primeiro ponto de controle.",
   "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Seu progresso de aprendizado será salvo automaticamente se você tiver uma conta.",
   "I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Já possui uma conta? \\",

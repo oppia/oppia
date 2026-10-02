@@ -1344,8 +1344,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Čo je pokazené? Dajte nám vedieť, ak chýba obrázok, tlačidlo nefunguje alebo sa prekrýva text.",
   "I18N_RESET_CODE": "Vynulovať kód",
   "I18N_RESTART_EXPLORATION_BUTTON": "Reštartovať lekciu",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Preskúmať test",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Opakovací test: <[storyName]> – Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Áno, vložiť platný obsah",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Nie, zrušiť",
   "I18N_RTE_DISMISS_WARNING": "Zavrieť",

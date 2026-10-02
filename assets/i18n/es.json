@@ -1222,8 +1222,6 @@
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Panel de coordinadores de lanzamiento de Oppia",
   "I18N_RESET_CODE": "Código de reinicio",
   "I18N_RESTART_EXPLORATION_BUTTON": "Reiniciar lección",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Revisar prueba",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Prueba de revisión: <[storyName]> - Oppia",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Sí, pegar contenido válido",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "No, cancelar",
   "I18N_RTE_DISMISS_WARNING": "Descartar",

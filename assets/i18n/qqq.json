@@ -1386,8 +1386,6 @@
   "I18N_REPORT_WEBSITE_ISSUE_TEXTAREA_PLACEHOLDER": "Text which appears as placeholder in textarea of site feedback modal.",
   "I18N_RESET_CODE": "Text which appears on the Reset button in the PencilCode interaction.",
   "I18N_RESTART_EXPLORATION_BUTTON": "Text which appears on the Restart button in the lesson info modal of the learner checkpoints progress.",
-  "I18N_REVIEW_TEST_PAGE_BREADCRUMB": "Text displayed in the review test page. - Text shown in the top left corner of the nav bar.",
-  "I18N_REVIEW_TEST_PAGE_TITLE": "Text displayed on the browser tab when on the review test page.",
   "I18N_RTE_ACCEPT_VALID_CONTENT_PASTE": "Text displayed in the button to accept pasting only the valid components in the rich text editor when both valid and invalid components are pasted.",
   "I18N_RTE_CANCEL_VALID_CONTENT_PASTE": "Text displayed in the button to reject pasting only the valid components in the rich text editor when both valid and invalid components are pasted.",
   "I18N_RTE_DISMISS_WARNING": "Text displayed in the button to dismiss the invalid component paste warning in the rich text editor when only invalid components are pasted.",
