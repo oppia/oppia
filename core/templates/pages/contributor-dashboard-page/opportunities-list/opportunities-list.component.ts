@@ -344,6 +344,10 @@ export class OpportunitiesListComponent {
             this.opportunities = this.opportunities.concat(opportunitiesDicts);
           }
         } catch (error) {
+          // // The service throws 'No more ... opportunities available.' when
+          // its internal availability flag disagrees with this.more. Clear
+          // the spinner and stop paging instead of leaving the tab frozen.
+          this.more = false;
           this.loadingOpportunityData = false;
           this.userIsOnLastPage = this.calculateUserIsOnLastPage(
             this.opportunities,
@@ -351,14 +355,6 @@ export class OpportunitiesListComponent {
             pageNumber,
             this.more
           );
-        },
-        () => {
-          // The service throws 'No more ... opportunities available.' when
-          // its internal availability flag disagrees with this.more. Clear
-          // the spinner and stop paging instead of leaving the tab frozen.
-          this.more = false;
-          this.loadingOpportunityData = false;
-          return;
         }
       };
 
