@@ -1392,10 +1392,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID]
@@ -1458,10 +1456,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
 
         # Return metadata model to the original user ID.
-        metadata_model = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         metadata_model.committer_id = self.user_1_id
         metadata_model.update_timestamps()
@@ -1501,19 +1497,15 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings[self.CONFIG_1_ID]
         )
 
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(
             metadata_model_2.committer_id, config_mappings[self.CONFIG_2_ID]
@@ -1542,20 +1534,16 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings_1[self.CONFIG_1_ID]
         )
 
         # Verify second user is not yet deleted.
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(metadata_model_2.committer_id, self.user_2_id)
 
@@ -1567,10 +1555,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_2_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_3 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_3 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(
             metadata_model_3.committer_id, config_mappings_2[self.CONFIG_2_ID]
@@ -1594,20 +1580,16 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings_1[self.CONFIG_1_ID]
         )
 
         # Verify second user is not yet deleted.
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-2' % self.CONFIG_1_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-2' % self.CONFIG_1_ID
         )
         self.assertEqual(metadata_model_2.committer_id, self.user_2_id)
 
@@ -1619,10 +1601,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_2_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_3 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-2' % self.CONFIG_1_ID
-            )
+        metadata_model_3 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-2' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_3.committer_id, config_mappings_2[self.CONFIG_1_ID]
