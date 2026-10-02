@@ -1822,6 +1822,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(migrated_draft_change_list_1_v35)
 
+        empty_answer_groups: list[state_domain.AnswerGroupDict] = []
+        draft_change_list_3_v34 = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': 'answer_groups',
+                    'new_value': empty_answer_groups,
+                }
+            )
+        ]
+        migrated_draft_change_list_3_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_3_v34, 1, 2, self.EXP_ID
+            )
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_3_v35 is not None
+        self.assertEqual(
+            draft_change_list_3_v34,
+            migrated_draft_change_list_3_v35,
+        )
+
         migrated_draft_change_list_2_v35 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v34, 1, 2, self.EXP_ID
