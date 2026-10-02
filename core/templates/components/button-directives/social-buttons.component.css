@@ -18,10 +18,18 @@
   line-height: 18.75px;
 }
 
-.oppia-footer-social a:hover,
-.oppia-footer-social a:focus {
+.oppia-footer-social a:hover {
   text-decoration: none;
 }
+
+.oppia-footer-social a:focus {
+  outline: 2px solid #fff;
+  text-decoration: none;
+}
+.oppia-footer-social .oppia-github-follow a:focus {
+  outline-color: #000;
+}
+
 .oppia-footer-social a > img {
   width: 30px;
 }
