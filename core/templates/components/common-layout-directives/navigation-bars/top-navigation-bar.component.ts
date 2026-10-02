@@ -495,8 +495,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * open/close action to be performed (aboutMenu,profileMenu).
    */
   openSubmenu(evt: Event, menuName: string): void {
-    // Focus on the current target before opening its submenu.
-    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    // The navigation service only needs the event to set the active menu
+    // name, so the generic Event type is sufficient.
+    this.navigationService.openSubmenu(evt, menuName);
     if (menuName === 'learnMenu') {
       this.updateLearnDropdownOffset();
     } else if (menuName === 'getInvolvedMenu') {
@@ -505,7 +506,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   closeSubmenu(evt: Event): void {
-    this.navigationService.closeSubmenu(evt as KeyboardEvent);
+    this.navigationService.closeSubmenu(evt);
   }
 
   closeSubmenuIfNotMobile(evt: Event): void {
@@ -529,13 +530,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onMenuKeypress(
     evt: KeyboardEvent,
     menuName: string,
-    eventsTobeHandled: Record<string, string>
+    eventsTobeHandled: EventToCodes
   ): void {
-    this.navigationService.onMenuKeypress(
-      evt,
-      menuName,
-      eventsTobeHandled as unknown as EventToCodes
-    );
+    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 

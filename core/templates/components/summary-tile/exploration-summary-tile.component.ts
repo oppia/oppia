@@ -39,6 +39,17 @@ import {
 
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
+// This is what the backend sends for an exploration that nobody has rated yet.
+// 'RatingComputationService.areRatingsShown()' treats it as "no rating", so
+// using it as the default keeps the tile from having to handle 'undefined'.
+const NO_RATINGS: ExplorationRatings = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
+};
+
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
@@ -55,7 +66,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() numViews!: number;
   @Input() objective!: string;
   @Input() category!: string;
-  @Input() ratings!: ExplorationRatings;
+  // An exploration that nobody has rated yet has all-zero rating counts,
+  // which is what the backend sends in that case.
+  @Input() ratings: ExplorationRatings = {...NO_RATINGS};
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;
@@ -73,7 +86,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // will be displayed.
   @Input() isCollectionPreviewTile: boolean = false;
   @Input() isPlaylistTile: boolean = false;
-  @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
   @Input() tags: string[] = [];
@@ -189,12 +201,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.href = this.getExplorationLink();
   }
 
-  // Function will return null when Exploration Ratings are not present.
+  // Function will return null when the exploration has no ratings.
   getAverageRating(): number | null {
-    if (this.ratings) {
-      return this.ratingComputationService.computeAverageRating(this.ratings);
-    }
-    return null;
+    return this.ratingComputationService.computeAverageRating(this.ratings);
   }
 
   // Function will return null when the property 'lastUpdatedMsecs' is null

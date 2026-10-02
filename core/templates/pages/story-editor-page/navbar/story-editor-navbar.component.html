@@ -361,11 +361,11 @@
         <div *ngIf="warningsAreShown"
              class="warning-box">
           <span>Warnings</span>
-          <div *ngFor="let issue of validationIssues;trackBy:$index">
+          <div *ngFor="let issue of validationIssues">
             <hr class="oppia-editor-warnings-separator">
             {{ issue }}
           </div>
-          <div *ngFor="let issue of prepublishValidationIssues; trackBy:$index">
+          <div *ngFor="let issue of prepublishValidationIssues">
             <hr class="oppia-editor-warnings-separator">
             {{ issue }}
           </div>

@@ -145,11 +145,14 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
 
   /**
    * Opens the submenu.
-   * @param {KeyboardEvent} evt
+   * @param {Event} evt - event that triggered the submenu open action.
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: Event, menuName: string): void {
+    // The submenu-open binding is triggered by a mouse click, so the event is
+    // a MouseEvent. The navigation service only needs the event to set the
+    // active menu name, so the generic Event type is sufficient.
     this.navigationService.openSubmenu(evt, menuName);
   }
 }

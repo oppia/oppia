@@ -260,6 +260,41 @@ describe('Moderator Page Component', () => {
     );
   });
 
+  it('should expose featured activity references as schema default value', () => {
+    const references: ActivityIdTypeDict[] = [
+      {
+        id: 'test_id',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = references;
+
+    expect(
+      componentInstance.displayedFeaturedActivityReferencesAsSchemaDefault
+    ).toEqual(references);
+  });
+
+  it('should ignore non-array values when updating featured activity references', () => {
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(null);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
+  it('should reject featured activity references with malformed list items', () => {
+    const newValue = [
+      {
+        id: 'test_id',
+      },
+      {
+        id: 'test_id_2',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
   it('should display error message for nonexistent exploration', () => {
     spyOn(alertsService, 'addWarning');
 

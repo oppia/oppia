@@ -22,7 +22,10 @@ import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
-import {Schema} from 'services/schema-default-value.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import {
   ActivityIdTypeDict,
   CommitMessage,
@@ -77,11 +80,35 @@ export class ModeratorPageComponent {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  get displayedFeaturedActivityReferencesAsSchemaDefault(): SchemaDefaultValue {
+    // The schema-based editor exposes the value as SchemaDefaultValue, but the
+    // referenced activities are normalized as an array of {type, id} dicts.
+    return this.displayedFeaturedActivityReferences as SchemaDefaultValue;
+  }
+
   updateDisplayedFeaturedActivityReferences(
-    newValue: ActivityIdTypeDict[]
+    newValue: SchemaDefaultValue
   ): void {
-    if (this.displayedFeaturedActivityReferences !== newValue) {
-      this.displayedFeaturedActivityReferences = newValue;
+    // Guard against non-array values emitted by the schema-based editor.
+    if (!Array.isArray(newValue)) {
+      return;
+    }
+    // Reject list items that lack string id and type fields so that
+    // isSaveFeaturedActivitiesButtonDisabled() never receives malformed
+    // references from the schema-based editor.
+    for (const item of newValue) {
+      if (
+        typeof item !== 'object' ||
+        item === null ||
+        typeof (item as {id?: unknown}).id !== 'string' ||
+        typeof (item as {type?: unknown}).type !== 'string'
+      ) {
+        return;
+      }
+    }
+    const castedValue = newValue as ActivityIdTypeDict[];
+    if (this.displayedFeaturedActivityReferences !== castedValue) {
+      this.displayedFeaturedActivityReferences = castedValue;
       this.changeDetectorRef.detectChanges();
     }
   }

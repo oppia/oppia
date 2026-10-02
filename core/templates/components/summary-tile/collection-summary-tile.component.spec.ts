@@ -128,13 +128,12 @@ describe('Collection Summary Tile Component', () => {
     component.getCollectionTitle = 'Title';
     component.getLastUpdatedMsec = 1000;
     component.getObjective = 'objective';
-    component.getNodeCount = '1';
+    component.getNodeCount = 1;
     component.getCategory = 'category';
     component.getThumbnailIconUrl = '/subjects/Welcome';
     component.getThumbnailBgColor = 'blue';
     component.isPlaylistTile = true;
     component.isLinkedToEditorPage = true;
-    component.showLearnerDashboardIconsIfPossible = 'true';
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
     fixture.detectChanges();

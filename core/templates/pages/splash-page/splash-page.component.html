@@ -1,5 +1,5 @@
 <div class="splash-page e2e-test-splash-page">
-  <div class="oppia-splash-section-one" dir="auto">
+  <div class="oppia-splash-section-one" [attr.dir]="'auto'">
     <div class="oppia-splash-section-one-left" tabindex="0">
       <h1 class="oppia-splash-h1 e2e-test-home-page-title" [innerHTML]="'I18N_SPLASH_TITLE' | translate"></h1>
       <div class="oppia-splash-h2-container">
@@ -163,7 +163,7 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+        <img [src]="testimonials[displayedTestimonialId].imageUrl"
              [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
              width="350"
              height="350"
@@ -187,7 +187,7 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+        <img [src]="testimonials[displayedTestimonialId].imageUrl"
              [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
              width="350"
              height="350"

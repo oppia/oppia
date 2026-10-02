@@ -152,4 +152,21 @@ describe('Edit Profile Picture Modal Component', () => {
       componentInstance.confirm();
     }).toThrowError('Cropper has not been initialized');
   });
+
+  it('should get the issue URL from the svg sanitizer service', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue(
+      'https://github.com/oppia/oppia/issues/new?title=test'
+    );
+    const invalidTagsAndAttributes = {tags: ['circel'], attrs: []};
+
+    const issueURL = componentInstance.getIssueURL(invalidTagsAndAttributes);
+
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttributes
+    );
+    expect(issueURL).toEqual(
+      'https://github.com/oppia/oppia/issues/new?title=test'
+    );
+  });
 });
