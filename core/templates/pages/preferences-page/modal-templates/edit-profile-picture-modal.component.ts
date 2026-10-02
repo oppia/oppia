@@ -45,7 +45,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   windowIsNarrow: boolean = false;
-  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
+  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
   invalidTagsAndAttributes: {tags: string[]; attrs: string[]} = {
     tags: [],
     attrs: [],

@@ -530,13 +530,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onMenuKeypress(
     evt: KeyboardEvent,
     menuName: string,
-    eventsTobeHandled: Record<string, string>
+    eventsTobeHandled: EventToCodes
   ): void {
-    this.navigationService.onMenuKeypress(
-      evt,
-      menuName,
-      eventsTobeHandled as unknown as EventToCodes
-    );
+    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 

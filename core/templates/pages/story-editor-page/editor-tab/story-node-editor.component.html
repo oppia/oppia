@@ -68,7 +68,7 @@
             <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
             <input id="storyNodePlannedPublicationDate" type="date" class="form-control e2e-test-planned-publication-date-input"
                    [ngModel]="editablePlannedPublicationDate | date:'yyyy-MM-dd'"
-                   (ngModelChange)="editablePlannedPublicationDate = $event"
+                   (ngModelChange)="setEditablePlannedPublicationDate($event)"
                    (blur)="updatePlannedPublicationDate(editablePlannedPublicationDate)">
             <div *ngIf="plannedPublicationDateIsInPast"
                  class="oppia-error-message-container">

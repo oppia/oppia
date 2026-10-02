@@ -259,9 +259,16 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  updatePlannedPublicationDate(dateString: Date | string | null): void {
-    let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
+  setEditablePlannedPublicationDate(dateString: string): void {
+    // The value accessor of a date input emits the raw 'yyyy-MM-dd' string
+    // held by the DOM element, so it is converted here to keep the type of
+    // 'editablePlannedPublicationDate' accurate.
+    this.editablePlannedPublicationDate = dateString
+      ? new Date(dateString)
+      : null;
+  }
 
+  updatePlannedPublicationDate(newPlannedPublicationDate: Date | null): void {
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
       if (newPlannedPublicationDate) {
         let currentDateTime = new Date();

@@ -45,7 +45,6 @@ import {
 } from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import {StoryNode} from 'domain/story/story-node.model';
 import constants from 'assets/constants';
 
 interface IconParametersArray {
@@ -162,7 +161,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  getExplorationUrl(node: StoryNode | ReadOnlyStoryNode): string {
+  getExplorationUrl(node: ReadOnlyStoryNode): string {
     let result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
       result,
@@ -352,6 +351,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     if (this.isChapterDisplayedAsComingSoon(node)) {
       return null;
     }
-    return this.getExplorationUrl(node as unknown as StoryNode);
+    return this.getExplorationUrl(node);
   }
 }

@@ -32,17 +32,23 @@ interface LibraryGroupDataBackendDict {
   preferred_language_codes: string[];
 }
 
+// 'activity_list' mixes exploration and collection summaries. Each summary
+// type only carries some of the fields below: exploration summaries have
+// 'last_updated_msec', 'ratings' and 'translated_metadata_fields', while
+// collection summaries have 'node_count'. The template reads each of them only
+// inside the branch matching 'activity_type', so they are kept non-optional
+// here.
 export interface ActivityDict {
   activity_type: string;
   category: string;
   community_owned: boolean;
   id: string;
   language_code: string;
-  last_updated_msec?: number;
+  last_updated_msec: number;
   node_count: number;
   num_views: number;
   objective: string;
-  ratings?: ExplorationRatings;
+  ratings: ExplorationRatings;
   status: string;
   tags: [];
   thumbnail_bg_color: string;

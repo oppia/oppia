@@ -18,11 +18,9 @@
 
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
-export interface Language {
+interface Language {
   id: string;
   text: string;
-  // 'direction' is optional because audio languages may not specify it.
-  direction?: string;
 }
 
 @Component({

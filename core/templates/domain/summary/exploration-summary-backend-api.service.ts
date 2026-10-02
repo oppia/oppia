@@ -32,17 +32,16 @@ export interface ExplorationSummaryBackendDict {
 }
 
 export interface ExplorationSummaryDict {
-  activity_type?: string;
+  activity_type: string;
   category: string;
   community_owned: boolean;
   human_readable_contributors_summary: HumanReadableContributorsSummary;
   id: string;
   language_code: string;
-  last_updated_msec?: number;
-  node_count?: number;
+  last_updated_msec: number;
   num_views: number;
   objective: string;
-  ratings?: ExplorationRatings;
+  ratings: ExplorationRatings;
   status: string;
   tags: [];
   thumbnail_bg_color: string;
