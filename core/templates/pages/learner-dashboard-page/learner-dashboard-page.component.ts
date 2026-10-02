@@ -39,7 +39,6 @@ import {
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -137,7 +136,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS;
 
   username: string = '';
-  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -157,20 +155,16 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
-  numberOfUnreadThreads!: number;
   activeSection!: string;
   activeSubsection!: string;
 
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
-  explorationTitle!: string;
-  explorationId!: string;
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   communityLessonsDataLoaded: boolean = false;
-  loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
@@ -184,7 +178,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
-    private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
@@ -388,16 +381,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getauthorPicturePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
-    return pngImageUrl;
-  }
-
-  getauthorPictureWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
-    return webpImageUrl;
-  }
-
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE'
@@ -560,16 +543,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     } else {
       return 'none';
     }
-  }
-
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch
-    );
-  }
-
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
   }
 
   isShowRedesignedLearnerDashboardActive(): boolean {
