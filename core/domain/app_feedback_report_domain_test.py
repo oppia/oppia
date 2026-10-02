@@ -311,7 +311,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             REPORT_JSON
         )
         expected_report_datetime = datetime.datetime.fromtimestamp(
-            REPORT_JSON['report_submission_timestamp_sec']
+            REPORT_JSON['report_submission_timestamp_sec'],
+            datetime.timezone.utc,
         )
         expected_report_schema_version = REPORT_JSON[
             'android_report_info_schema_version'

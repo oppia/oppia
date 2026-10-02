@@ -27,15 +27,18 @@ from typing import Any, Dict, List, TypedDict
 
 
 def _format_utc_datetime(value: datetime.datetime) -> str:
-    """Formats a naive UTC datetime as an ISO-8601 string with a 'Z' suffix.
+    """Formats a UTC datetime as an ISO-8601 string with a 'Z' suffix.
 
     Args:
-        value: datetime.datetime. The naive UTC datetime to format.
+        value: datetime.datetime. The UTC datetime to format.
 
     Returns:
         str. The ISO-8601 string representation of the datetime.
     """
-    return value.isoformat() + 'Z'
+    return (
+        utils.normalize_datetime_to_utc(value).replace(tzinfo=None).isoformat()
+        + 'Z'
+    )
 
 
 class CertificateAssessmentOfferingTopicDict(TypedDict):

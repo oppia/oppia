@@ -2840,26 +2840,26 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        from_date = utils.get_current_local_datetime() - datetime.timedelta(
-            days=1
-        )
+        current_date = utils.get_current_utc_date()
+        from_date = current_date - datetime.timedelta(days=1)
         from_date_str = from_date.strftime('%Y-%m-%d')
-        to_date = utils.get_current_local_datetime()
+        to_date = current_date
         to_date_str = to_date.strftime('%Y-%m-%d')
 
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(
-            '/contributorcertificate/%s/%s?language=%s&'
-            'from_date=%s&to_date=%s'
-            % (
-                self.OWNER_USERNAME,
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi',
-                from_date_str,
-                to_date_str,
+        with self.swap(utils, 'get_current_utc_date', lambda: current_date):
+            response = self.get_json(
+                '/contributorcertificate/%s/%s?language=%s&'
+                'from_date=%s&to_date=%s'
+                % (
+                    self.OWNER_USERNAME,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    'hi',
+                    from_date_str,
+                    to_date_str,
+                )
             )
-        )
 
         self.assertEqual(
             response['certificate_data'],

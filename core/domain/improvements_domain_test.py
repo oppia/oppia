@@ -29,7 +29,9 @@ from core.tests import test_utils
 class TaskEntryTests(test_utils.GenericTestBase):
     """Unit tests for the TaskEntry domain object."""
 
-    MOCK_DATE = datetime.datetime(2020, 6, 15, 9, 0, 0, 123456)
+    MOCK_DATE = datetime.datetime(
+        2020, 6, 15, 9, 0, 0, 123456, tzinfo=datetime.timezone.utc
+    )
 
     def setUp(self) -> None:
         super().setUp()

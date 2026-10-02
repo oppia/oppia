@@ -356,12 +356,12 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     # }
     version_data = datastore_services.JsonProperty(required=True)
     # The time at which the learner started this attempt.
-    started_at = datastore_services.DateTimeProperty(
+    started_at = datastore_services.AwareDateTimeProperty(
         required=True, indexed=False
     )
     # The time at which the learner finished this attempt. Is None until
     # the attempt has been finished.
-    finished_at = datastore_services.DateTimeProperty(
+    finished_at = datastore_services.AwareDateTimeProperty(
         required=False, indexed=False
     )
     # Whether the learner has submitted this attempt.

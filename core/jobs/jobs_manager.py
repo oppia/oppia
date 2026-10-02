@@ -23,7 +23,7 @@ import logging
 import pprint
 import traceback
 
-from core import feconf
+from core import feconf, utils
 from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
 from core.jobs.batch_jobs import firebase_server_sync_jobs
@@ -241,7 +241,9 @@ def refresh_state_of_beam_job_run_model(
         job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
             job.current_state, beam_job_models.BeamJobState.UNKNOWN
         ).value
-        job_state_updated = job.current_state_time.replace(tzinfo=None)
+        job_state_updated = utils.normalize_datetime_to_utc(
+            job.current_state_time
+        )
 
         if (
             beam_job_run_model.latest_job_state

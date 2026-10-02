@@ -66,10 +66,12 @@ class UserSettingsModel(base_models.BaseModel):
         required=True, indexed=True, default=feconf.ROLE_ID_FULL_USER
     )
     # When the user last agreed to the terms of the site. May be None.
-    last_agreed_to_terms = datastore_services.DateTimeProperty(default=None)
+    last_agreed_to_terms = datastore_services.AwareDateTimeProperty(
+        default=None
+    )
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
-    last_logged_in = datastore_services.DateTimeProperty(default=None)
+    last_logged_in = datastore_services.AwareDateTimeProperty(default=None)
     # A code associated with profile and full user on Android to provide a PIN
     # based authentication within the account.
     pin = datastore_services.StringProperty(default=None)
@@ -123,18 +125,18 @@ class UserSettingsModel(base_models.BaseModel):
     # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = datastore_services.StringProperty(indexed=True)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = datastore_services.DateTimeProperty(
-        default=None
+    last_started_state_editor_tutorial = (
+        datastore_services.AwareDateTimeProperty(default=None)
     )
     # When the user last started the state translation tutorial. May be None.
     last_started_state_translation_tutorial = (
-        datastore_services.DateTimeProperty(default=None)
+        datastore_services.AwareDateTimeProperty(default=None)
     )
-    last_edited_an_exploration = datastore_services.DateTimeProperty(
+    last_edited_an_exploration = datastore_services.AwareDateTimeProperty(
         default=None
     )
     # When the user last created an exploration.
-    last_created_an_exploration = datastore_services.DateTimeProperty(
+    last_created_an_exploration = datastore_services.AwareDateTimeProperty(
         default=None
     )
     # The preferred dashboard of the user.
@@ -1164,7 +1166,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # IDs of the creators to whom this learner has subscribed.
     creator_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
-    last_checked = datastore_services.DateTimeProperty(default=None)
+    last_checked = datastore_services.AwareDateTimeProperty(default=None)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1602,11 +1604,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # represents a rating given on completion of the exploration.
     rating = datastore_services.IntegerProperty(default=None, indexed=True)
     # When the most recent rating was awarded, or None if not rated.
-    rated_on = datastore_services.DateTimeProperty(default=None, indexed=False)
+    rated_on = datastore_services.AwareDateTimeProperty(
+        default=None, indexed=False
+    )
     # List of uncommitted changes made by the user to the exploration.
     draft_change_list = datastore_services.JsonProperty(default=None)
     # Timestamp of when the change list was last updated.
-    draft_change_list_last_updated = datastore_services.DateTimeProperty(
+    draft_change_list_last_updated = datastore_services.AwareDateTimeProperty(
         default=None
     )
     # The exploration version that this change list applied to.

@@ -102,7 +102,7 @@ class FeconfTests(test_utils.GenericTestBase):
             max_date = max(
                 datetime.datetime.strptime(
                     element.get_text().split(':')[0], '%d %b %Y'
-                )
+                ).replace(tzinfo=datetime.timezone.utc)
                 for element in terms_page_parsed_html.find(
                     'ul', class_='e2e-test-changelog'
                 ).find_all('li')
