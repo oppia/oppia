@@ -55,7 +55,6 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -143,7 +142,6 @@ describe('Learner dashboard page', () => {
   let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
-  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
@@ -310,7 +308,6 @@ describe('Learner dashboard page', () => {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService,
           },
-          SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
           PageTitleService,
@@ -334,9 +331,6 @@ describe('Learner dashboard page', () => {
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
       learnerDashboardBackendApiService = TestBed.inject(
         LearnerDashboardBackendApiService
-      );
-      suggestionModalForLearnerDashboardService = TestBed.inject(
-        SuggestionModalForLearnerDashboardService
       );
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
@@ -829,40 +823,6 @@ describe('Learner dashboard page', () => {
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(component.showUsernamePopover('abc')).toBe('none');
-    });
-
-    it('should show new and old content when opening suggestion modal', () => {
-      spyOn(
-        suggestionModalForLearnerDashboardService,
-        'showSuggestionModal'
-      ).and.returnValue(null);
-
-      let newContent = 'New content';
-      let oldContent = 'Old content';
-      let description = 'Description';
-      component.showSuggestionModal(newContent, oldContent, description);
-
-      expect(
-        suggestionModalForLearnerDashboardService.showSuggestionModal
-      ).toHaveBeenCalledWith('edit_exploration_state_content', {
-        newContent: newContent,
-        oldContent: oldContent,
-        description: description,
-      });
-    });
-
-    it('should get css classes based on status', () => {
-      expect(component.getLabelClass('open')).toBe('badge bg-info');
-      expect(component.getLabelClass('compliment')).toBe('badge bg-success');
-      expect(component.getLabelClass('another')).toBe('badge bg-secondary');
-    });
-
-    it('should get human readable status from provided status', () => {
-      expect(component.getHumanReadableStatus('open')).toBe('Open');
-      expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
-      expect(component.getHumanReadableStatus('not_actionable')).toBe(
-        'Not Actionable'
-      );
     });
 
     it('should get formatted date string from the timestamp in milliseconds', () => {

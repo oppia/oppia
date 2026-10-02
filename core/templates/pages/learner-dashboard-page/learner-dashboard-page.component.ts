@@ -37,8 +37,6 @@ import {
   SubtopicMasterySummaryBackendDict,
 } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import {SuggestionModalForLearnerDashboardService} from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
@@ -191,8 +189,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private loaderService: LoaderService,
-    private suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService,
-    private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private translateService: TranslateService,
@@ -564,29 +560,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     } else {
       return 'none';
     }
-  }
-
-  showSuggestionModal(
-    newContent: string,
-    oldContent: string,
-    description: string
-  ): void {
-    this.suggestionModalForLearnerDashboardService.showSuggestionModal(
-      'edit_exploration_state_content',
-      {
-        newContent: newContent,
-        oldContent: oldContent,
-        description: description,
-      }
-    );
-  }
-
-  getLabelClass(status: string): string {
-    return this.threadStatusDisplayService.getLabelClass(status);
-  }
-
-  getHumanReadableStatus(status: string): string {
-    return this.threadStatusDisplayService.getHumanReadableStatus(status);
   }
 
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
