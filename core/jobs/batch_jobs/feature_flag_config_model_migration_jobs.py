@@ -77,16 +77,6 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                 | 'Put migrated WebFeatureFlagConfigModels'
                 >> ndb_io.PutModels()
             )
-            legacy_model_keys = (
-                legacy_models
-                | 'Get legacy FeatureFlagConfigModel keys'
-                >> beam.Map(lambda model: model.key)
-            )
-            _ = (
-                legacy_model_keys
-                | 'Delete legacy FeatureFlagConfigModels'
-                >> ndb_io.DeleteModels()
-            )
 
         count_result = (
             migrated_models

@@ -71,7 +71,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
             ['group_1', 'group_2'],
         )
 
-        self.assertIsNone(
+        self.assertIsNotNone(
             config_models.FeatureFlagConfigModel.get(
                 'feature_flag_a', strict=False
             )
