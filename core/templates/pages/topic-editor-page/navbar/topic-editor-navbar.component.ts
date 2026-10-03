@@ -41,7 +41,6 @@ import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import './topic-editor-navbar.component.css';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',

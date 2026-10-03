@@ -31,7 +31,10 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Cropper from 'cropperjs';
-import './upload-blog-post-thumbnail.component.css';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',
@@ -59,7 +62,8 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,
     private svgSanitizerService: SvgSanitizerService,
-    private windowDimensionService: WindowDimensionsService
+    private windowDimensionService: WindowDimensionsService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   initializeCropper(): void {
@@ -164,6 +168,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CROPPER);
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: [],

@@ -24,7 +24,6 @@ import {
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import './my-certificates-tab.component.css';
 
 @Component({
   selector: 'oppia-my-certificates-tab',
