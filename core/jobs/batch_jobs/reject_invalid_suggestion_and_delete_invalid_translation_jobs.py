@@ -68,8 +68,17 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         entity_translation_models = _get_entity_translation_models(
             self.pipeline
         )
-        updated_suggestion_dicts = (
+
+        filtered_entity_translation_models = (
             entity_translation_models
+            | 'Filter to match current exploration version'
+            >> beam.ParDo(
+                FilterTranslationModelsMatchingCurrentExplorationVersion()
+            )
+        )
+
+        updated_suggestion_dicts = (
+            filtered_entity_translation_models
             | 'Get translation suggestion dicts'
             >> beam.ParDo(
                 ComputeSuggestionsInReviewForTranslatedContents(
@@ -148,8 +157,17 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJob(
         entity_translation_models = _get_entity_translation_models(
             self.pipeline
         )
-        suggestion_dicts = (
+
+        filtered_entity_translation_models = (
             entity_translation_models
+            | 'Filter to match current exploration version'
+            >> beam.ParDo(
+                FilterTranslationModelsMatchingCurrentExplorationVersion()
+            )
+        )
+
+        suggestion_dicts = (
+            filtered_entity_translation_models
             | 'Get suggestions to be rejected list'
             >> beam.ParDo(
                 ComputeSuggestionsInReviewForTranslatedContents(
@@ -450,8 +468,6 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                     == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
                     suggestion_models.GeneralSuggestionModel.target_id
                     == entity_translation_model.entity_id,
-                    suggestion_models.GeneralSuggestionModel.target_version_at_submission
-                    == (entity_translation_model.entity_version),
                     suggestion_models.GeneralSuggestionModel.language_code
                     == (entity_translation_model.language_code),
                     suggestion_models.GeneralSuggestionModel.status
@@ -739,6 +755,40 @@ class GetLatestModel(beam.DoFn):  # type: ignore[misc]
                     break
 
             yield (entity_id, latest_model)
+
+
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
+class FilterTranslationModelsMatchingCurrentExplorationVersion(beam.DoFn):  # type: ignore[misc]
+    """DoFn to filter entity translation models matching the current
+    exploration version.
+    """
+
+    def process(
+        self,
+        entity_translation_model: translation_models.EntityTranslationsModel,
+    ) -> Iterable[translation_models.EntityTranslationsModel]:
+        """Finds entity translation models matching the current exploration
+        version.
+
+        Args:
+            entity_translation_model: EntityTranslationsModel. An entity
+                translation model.
+
+        Yields:
+            EntityTranslationsModel. The entity translation model matching the
+            current exploration version.
+        """
+        with datastore_services.get_ndb_context():
+            exp_model = exp_models.ExplorationModel.get(
+                entity_translation_model.entity_id, strict=False
+            )
+            if exp_model is None:
+                return
+            if exp_model.version == entity_translation_model.entity_version:
+                yield entity_translation_model
 
 
 def _get_entity_translation_models(
