@@ -16,6 +16,8 @@
 
 """Tests for Android feature-flag domain objects."""
 
+from __future__ import annotations
+
 from core import utils
 from core.domain import android_feature_flag_domain
 from core.tests import test_utils
@@ -98,6 +100,8 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
     def test_validate_with_none_min_app_version_raises_error(self) -> None:
         config = android_feature_flag_domain.AndroidFeatureFlagConfig(
             android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+            # Here we use MyPy ignore because None is intentionally passed to
+            # verify runtime validation of the required minimum version.
             None,  # type: ignore[arg-type]
             None,
             100,
@@ -111,6 +115,8 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
     def test_validate_with_invalid_app_version_type_raises_error(self) -> None:
         config = android_feature_flag_domain.AndroidFeatureFlagConfig(
             android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+            # Here we use MyPy ignore because this test passes an integer to
+            # verify runtime rejection of non-string version values.
             10,  # type: ignore[arg-type]
             None,
             100,
@@ -125,6 +131,8 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
         config = android_feature_flag_domain.AndroidFeatureFlagConfig(
             android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
             '1.2.3',
+            # Here we use MyPy ignore because this test verifies runtime
+            # rejection of a non-string maximum version.
             True,  # type: ignore[arg-type]
             100,
         )
@@ -177,6 +185,8 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_with_invalid_state_type_raises_error(self) -> None:
         config = android_feature_flag_domain.AndroidFeatureFlagConfig(
+            # Here we use MyPy ignore because this test passes an invalid state
+            # type to verify runtime validation.
             'live',  # type: ignore[arg-type]
             None,
             None,

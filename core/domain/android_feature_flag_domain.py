@@ -23,9 +23,8 @@ import json
 
 from core import utils
 
+import packaging.version
 from typing import Optional, TypedDict, cast
-
-from packaging.version import InvalidVersion, Version
 
 
 class AndroidFeatureFlagState(enum.Enum):
@@ -148,13 +147,13 @@ class AndroidFeatureFlagConfig:
             )
 
         try:
-            min_app_version = Version(self._min_app_version)
+            min_app_version = packaging.version.Version(self._min_app_version)
             max_app_version = (
-                Version(self._max_app_version)
+                packaging.version.Version(self._max_app_version)
                 if self._max_app_version is not None
                 else None
             )
-        except InvalidVersion as error:
+        except packaging.version.InvalidVersion as error:
             raise utils.ValidationError(
                 'Android app versions must be valid version strings.'
             ) from error
@@ -176,7 +175,7 @@ class AndroidFeatureFlagConfig:
             )
 
     def to_dict(self) -> AndroidFeatureFlagConfigDict:
-        """ "Returns a dict representation of the AndroidFeatureFlagConfig domain object.
+        """Returns a dict representation of the AndroidFeatureFlagConfig domain object.
 
         Returns:
             dict. A dict mapping of all fields of AndroidFeatureFlagConfig object.
@@ -242,6 +241,8 @@ class AndroidFeatureFlagConfig:
         Returns:
             AndroidFeatureFlagConfig. The corresponding AndroidFeatureFlagConfig domain object.
         """
+        # Here we use cast because json.loads returns Any, and this method is
+        # documented to receive data produced by serialize().
         config_dict = cast(
             AndroidFeatureFlagConfigDict, json.loads(json_string)
         )
