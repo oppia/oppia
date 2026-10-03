@@ -260,14 +260,14 @@ class AndroidFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
         model = config_models.AndroidFeatureFlagConfigModel.create(
             android_feature_flag_name='android_feature',
             state='enabled',
-            min_app_version=10,
-            max_app_version=20,
+            min_app_version='10',
+            max_app_version='20',
             rollout_percentage=50,
         )
         self.assertEqual(model.id, 'android_feature')
         self.assertEqual(model.state, 'enabled')
-        self.assertEqual(model.min_app_version, 10)
-        self.assertEqual(model.max_app_version, 20)
+        self.assertEqual(model.min_app_version, '10')
+        self.assertEqual(model.max_app_version, '20')
         self.assertEqual(model.rollout_percentage, 50)
 
     def test_get_model_association_to_user(self) -> None:
