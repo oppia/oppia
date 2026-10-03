@@ -849,10 +849,6 @@ URLS = [
         reader.ExplorationHandler,
     ),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
-        reader.PretestHandler,
-    ),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
         features.ExplorationFeaturesHandler,
     ),
