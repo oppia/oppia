@@ -38,6 +38,30 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
     def test_validate_with_valid_config(self) -> None:
         self.config.validate()
 
+    def test_setters_update_config_values(self) -> None:
+        self.assertEqual(
+            self.config.state,
+            android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+        )
+        self.assertEqual(self.config.min_app_version, '1.2.3')
+        self.assertIsNone(self.config.max_app_version)
+        self.assertEqual(self.config.rollout_percentage, 50)
+
+        self.config.set_state(
+            android_feature_flag_domain.AndroidFeatureFlagState.FINAL
+        )
+        self.config.set_min_app_version('2.0.0')
+        self.config.set_max_app_version('3.0.0')
+        self.config.set_rollout_percentage(75)
+
+        self.assertEqual(
+            self.config.state,
+            android_feature_flag_domain.AndroidFeatureFlagState.FINAL,
+        )
+        self.assertEqual(self.config.min_app_version, '2.0.0')
+        self.assertEqual(self.config.max_app_version, '3.0.0')
+        self.assertEqual(self.config.rollout_percentage, 75)
+
     def test_from_dict_returns_correct_instance(self) -> None:
         config = android_feature_flag_domain.AndroidFeatureFlagConfig.from_dict(
             {
