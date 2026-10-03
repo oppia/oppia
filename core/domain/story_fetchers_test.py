@@ -112,13 +112,20 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_story_from_model(self) -> None:
-        schema_version = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
+        # Downgrade by two versions rather than one, so that the whole
+        # conversion chain runs. The v6 -> v7 converter is the one that
+        # synthesizes the default 'arc_default' module from the existing node
+        # ids, and the v7 -> v8 converter then renames the 'arcs' key to
+        # 'modules'. Starting at v7 would only exercise the latter, which
+        # renames a key and creates nothing, so the expected default module
+        # below would never appear.
+        schema_version = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 2
         story_model = story_models.StoryModel.get(self.story_id)
         story_model.story_contents_schema_version = schema_version
         story = story_fetchers.get_story_from_model(story_model)
         node_ids = [node.id for node in self.story.story_contents.nodes]
-        self.story.story_contents.arcs = [
-            story_domain.Arc('arc_default', 'All Chapters', '', node_ids)
+        self.story.story_contents.modules = [
+            story_domain.Module('arc_default', 'All Chapters', '', node_ids)
         ]
         self.assertEqual(story.to_dict(), self.story.to_dict())
 
@@ -704,7 +711,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(all_nodes), 1)
 
-    def test_get_all_arcs_with_stories_for_topic(self) -> None:
+    def test_get_all_modules_with_stories_for_topic(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
         self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
         topic_services.publish_story(
@@ -716,27 +723,29 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': [self.NODE_ID_1],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        modules_with_stories = (
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+            )
         )
-        self.assertEqual(len(arcs_with_stories), 1)
-        story, arc = arcs_with_stories[0]
+        self.assertEqual(len(modules_with_stories), 1)
+        story, module = modules_with_stories[0]
         self.assertEqual(story.id, self.story_id)
-        self.assertEqual(arc.id, 'arc_1')
-        self.assertEqual(arc.title, 'Arc 1')
-        self.assertEqual(arc.node_ids, [self.NODE_ID_1])
+        self.assertEqual(module.id, 'module_1')
+        self.assertEqual(module.title, 'Module 1')
+        self.assertEqual(module.node_ids, [self.NODE_ID_1])
 
-    def test_get_all_arcs_with_stories_returns_correct_story(self) -> None:
+    def test_get_all_modules_with_stories_returns_correct_story(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
         self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id_admin)
@@ -750,15 +759,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': [self.NODE_ID_1],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
 
         story_id_2 = story_services.get_new_story_id()
@@ -795,29 +804,31 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'Same arc id in second story',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'Same module id in second story',
                         'node_ids': [self.NODE_ID_1],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(
             self.TOPIC_ID, story_id_2, self.user_id_admin
         )
 
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        modules_with_stories = (
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+            )
         )
-        self.assertEqual(len(arcs_with_stories), 1)
-        first_story, first_arc = arcs_with_stories[0]
+        self.assertEqual(len(modules_with_stories), 1)
+        first_story, first_module = modules_with_stories[0]
         self.assertEqual(first_story.id, self.story_id)
-        self.assertEqual(first_arc.id, 'arc_1')
+        self.assertEqual(first_module.id, 'module_1')
 
-    def test_get_all_arcs_with_stories_excludes_unpublished(self) -> None:
+    def test_get_all_modules_with_stories_excludes_unpublished(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
         self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
         story_services.update_story(
@@ -826,17 +837,19 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': [self.NODE_ID_1],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        modules_with_stories = (
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+            )
         )
-        self.assertEqual(len(arcs_with_stories), 0)
+        self.assertEqual(len(modules_with_stories), 0)

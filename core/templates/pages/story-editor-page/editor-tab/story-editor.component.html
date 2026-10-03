@@ -201,52 +201,52 @@
                 <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
                   <div *ngFor="let node of linearNodesList;index as idx"
                        cdkDrag>
-                    <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && (idx === 0 || !isSameArc(idx))"
-                         class="inline-arc-boundary-row">
-                      <div class="arc-boundary-header"
-                           [style.background-color]="getArcColorForNode(node.getId()).headerBg"
-                           [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
-                        <div class="arc-boundary-info">
-                          <div class="arc-boundary-title-row">
-                            <span class="arc-boundary-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId()).iconBg"
+                    <div *ngIf="isStoryEditorModulesFeatureFlagEnabled() && (idx === 0 || !isSameModule(idx))"
+                         class="inline-module-boundary-row">
+                      <div class="module-boundary-header"
+                           [style.background-color]="getModuleColorForNode(node.getId()).headerBg"
+                           [style.border-color]="getModuleColorForNode(node.getId()).headerBorder">
+                        <div class="module-boundary-info">
+                          <div class="module-boundary-title-row">
+                            <span class="module-boundary-flag-badge"
+                                  [style.background-color]="getModuleColorForNode(node.getId()).iconBg"
                                   aria-hidden="true">
                               <img src="/assets/images/icons/menu-book.svg"
                                    alt=""
-                                   class="arc-boundary-flag-badge-img">
+                                   class="module-boundary-flag-badge-img">
                             </span>
-                            <span class="arc-boundary-title">
-                              {{ getArcForNode(node.getId()).getTitle() }}
+                            <span class="module-boundary-title">
+                              {{ getModuleForNode(node.getId()).getTitle() }}
                             </span>
                           </div>
-                          <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId()).getDescription()">
-                            {{ getArcForNode(node.getId()).getDescription() }}
+                          <span class="module-boundary-description" *ngIf="getModuleForNode(node.getId()).getDescription()">
+                            {{ getModuleForNode(node.getId()).getDescription() }}
                           </span>
-                          <span class="arc-boundary-chapter-count">
-                            {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
+                          <span class="module-boundary-chapter-count">
+                            {{ getModuleForNode(node.getId()).getNodeIds().length }} chapters
                           </span>
                         </div>
-                        <div class="arc-boundary-actions">
-                          <button type="button" class="btn btn-sm arc-edit-button"
-                                  (click)="onEditArcClick(node.getId());$event.stopPropagation()">
+                        <div class="module-boundary-actions">
+                          <button type="button" class="btn btn-sm module-edit-button"
+                                  (click)="onEditModuleClick(node.getId());$event.stopPropagation()">
                             <i class="fas fa-pen" aria-hidden="true"></i>
                             Edit Module
                           </button>
-                          <button type="button" class="btn btn-sm arc-remove-button"
-                                  *ngIf="!isFirstArc(node.getId())"
-                                  (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
+                          <button type="button" class="btn btn-sm module-remove-button"
+                                  *ngIf="!isFirstModule(node.getId())"
+                                  (click)="onRemoveModuleClick(node.getId());$event.stopPropagation()">
                             <i class="far fa-trash-alt" aria-hidden="true"></i>
                             Remove Module Boundary
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx > 0 && isSameArc(idx)"
+                    <div *ngIf="isStoryEditorModulesFeatureFlagEnabled() && idx > 0 && isSameModule(idx)"
                          class="inline-split-line-row">
                       <div class="split-line-container">
                         <div class="split-line"></div>
-                        <button type="button" class="btn btn-sm split-into-arc-button"
-                                (click)="splitIntoArc(idx);$event.stopPropagation()">
+                        <button type="button" class="btn btn-sm split-into-module-button"
+                                (click)="splitIntoModule(idx);$event.stopPropagation()">
                           <i class="fas fa-cut"></i>
                           Split Into Module
                         </button>
@@ -256,7 +256,7 @@
                     <div class="story-editor-node"
                       [ngClass]="{
                         'selected-node': (node.getId() === idOfNodeToEdit),
-                        'story-editor-node--no-bottom-border': isStoryEditorArcsFeatureFlagEnabled() && idx < linearNodesList.length - 1 && isSameArc(idx + 1)
+                        'story-editor-node--no-bottom-border': isStoryEditorModulesFeatureFlagEnabled() && idx < linearNodesList.length - 1 && isSameModule(idx + 1)
                       }"
                          (click)="navigateToChapterWithId(node.getId(), idx)">
                       <div class="story-editor-node-title">
@@ -289,7 +289,7 @@
       </div>
 
       <div class="chapter-list-container"
-           *ngIf="isSerialChapterFeatureFlagEnabled() && !isStoryEditorArcsFeatureFlagEnabled()">
+           *ngIf="isSerialChapterFeatureFlagEnabled() && !isStoryEditorModulesFeatureFlagEnabled()">
         <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
           <div class="story-node-editor-container">
             <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
@@ -402,23 +402,23 @@
         </mat-card>
       </div>
 
-      <div class="chapter-list-container arc-mode-container"
-           *ngIf="isSerialChapterFeatureFlagEnabled() && isStoryEditorArcsFeatureFlagEnabled()">
-        <mat-card class="oppia-page-card chapter-control-container arc-mode-card">
-          <div class="arc-mode-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
+      <div class="chapter-list-container module-mode-container"
+           *ngIf="isSerialChapterFeatureFlagEnabled() && isStoryEditorModulesFeatureFlagEnabled()">
+        <mat-card class="oppia-page-card chapter-control-container module-mode-card">
+          <div class="module-mode-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
                (click)="toggleChapterLists()">
-            <span class="arc-mode-card-heading-text">Chapters</span>
+            <span class="module-mode-card-heading-text">Chapters</span>
             <i class="fa fa-caret-down" *ngIf="!chaptersListIsShown" aria-hidden="true"></i>
             <i class="fa fa-caret-up"   *ngIf="chaptersListIsShown"  aria-hidden="true"></i>
           </div>
 
-          <div *ngIf="chaptersListIsShown" class="arc-mode-card-body">
-            <div class="arc-mode-publish-bar" *ngIf="linearNodesList.length">
-              <label class="arc-mode-publish-label" for="arc-publish-upto">Publish up to Chapter ...</label>
-              <select id="arc-publish-upto"
+          <div *ngIf="chaptersListIsShown" class="module-mode-card-body">
+            <div class="module-mode-publish-bar" *ngIf="linearNodesList.length">
+              <label class="module-mode-publish-label" for="module-publish-upto">Publish up to Chapter ...</label>
+              <select id="module-publish-upto"
                       [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                       (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
-                      class="arc-mode-publish-select e2e-test-publish-up-to-chapter-dropdown"
+                      class="module-mode-publish-select e2e-test-publish-up-to-chapter-dropdown"
                       title="Publish up to chapter selector">
                 <option [value]="-1">None</option>
                 <option *ngFor="let node of linearNodesList;index as idx"
@@ -432,10 +432,10 @@
               This story has no chapters.
             </p>
 
-            <div *ngIf="linearNodesList.length" class="arc-table-wrapper">
-              <table class="arc-chapter-table">
+            <div *ngIf="linearNodesList.length" class="module-table-wrapper">
+              <table class="module-chapter-table">
                 <thead>
-                  <tr class="arc-table-heading">
+                  <tr class="module-table-heading">
                     <th class="col-drag"></th>
                     <th class="col-num">#</th>
                     <th class="col-name">Chapter Name</th>
@@ -450,39 +450,39 @@
                        (cdkDropListDropped)="drop($event)">
                   <ng-container *ngFor="let node of linearNodesList;index as idx">
 
-                    <tr *ngIf="idx === 0 || !isSameArc(idx)" class="arc-header-row">
-                      <td colspan="7" class="arc-header-cell">
-                        <div class="arc-header-card"
-                             [style.background-color]="getArcColorForNode(node.getId()).headerBg"
-                             [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
-                          <div class="arc-header-left">
-                            <span class="arc-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId()).iconBg">
+                    <tr *ngIf="idx === 0 || !isSameModule(idx)" class="module-header-row">
+                      <td colspan="7" class="module-header-cell">
+                        <div class="module-header-card"
+                             [style.background-color]="getModuleColorForNode(node.getId()).headerBg"
+                             [style.border-color]="getModuleColorForNode(node.getId()).headerBorder">
+                          <div class="module-header-left">
+                            <span class="module-flag-badge"
+                                  [style.background-color]="getModuleColorForNode(node.getId()).iconBg">
                               <img src="/assets/images/icons/menu-book.svg"
                                    alt=""
-                                   class="arc-flag-badge-img">
+                                   class="module-flag-badge-img">
                             </span>
-                            <div class="arc-header-text">
-                              <span class="arc-header-title">
-                                {{ getArcForNode(node.getId()).getTitle() }}
+                            <div class="module-header-text">
+                              <span class="module-header-title">
+                                {{ getModuleForNode(node.getId()).getTitle() }}
                               </span>
-                              <span class="arc-header-description"
-                                    *ngIf="getArcForNode(node.getId()).getDescription()">
-                                {{ getArcForNode(node.getId()).getDescription() }}
+                              <span class="module-header-description"
+                                    *ngIf="getModuleForNode(node.getId()).getDescription()">
+                                {{ getModuleForNode(node.getId()).getDescription() }}
                               </span>
-                              <span class="arc-header-chapter-count">
-                                {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
+                              <span class="module-header-chapter-count">
+                                {{ getModuleForNode(node.getId()).getNodeIds().length }} chapters
                               </span>
                             </div>
                           </div>
-                          <div class="arc-header-actions">
-                            <button type="button" class="arc-action-btn arc-edit-btn"
-                                    (click)="onEditArcClick(node.getId());$event.stopPropagation()">
+                          <div class="module-header-actions">
+                            <button type="button" class="module-action-btn module-edit-btn"
+                                    (click)="onEditModuleClick(node.getId());$event.stopPropagation()">
                               <i class="fas fa-pen" aria-hidden="true"></i> Edit Module
                             </button>
-                            <button type="button" class="arc-action-btn arc-remove-btn"
-                                    *ngIf="!isFirstArc(node.getId())"
-                                    (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
+                            <button type="button" class="module-action-btn module-remove-btn"
+                                    *ngIf="!isFirstModule(node.getId())"
+                                    (click)="onRemoveModuleClick(node.getId());$event.stopPropagation()">
                               <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Module Boundary
                             </button>
                           </div>
@@ -490,45 +490,45 @@
                       </td>
                     </tr>
 
-                    <tr *ngIf="idx > 0 && isSameArc(idx)" class="arc-split-row">
-                      <td colspan="7" class="arc-split-cell">
-                        <div class="arc-split-line-container">
-                          <div class="arc-split-line"></div>
-                          <button type="button" class="arc-split-btn"
-                                  (click)="splitIntoArc(idx);$event.stopPropagation()">
+                    <tr *ngIf="idx > 0 && isSameModule(idx)" class="module-split-row">
+                      <td colspan="7" class="module-split-cell">
+                        <div class="module-split-line-container">
+                          <div class="module-split-line"></div>
+                          <button type="button" class="module-split-btn"
+                                  (click)="splitIntoModule(idx);$event.stopPropagation()">
                             <i class="fas fa-cut" aria-hidden="true"></i> Split Into Module
                           </button>
-                          <div class="arc-split-line"></div>
+                          <div class="module-split-line"></div>
                         </div>
                       </td>
                     </tr>
 
-                    <tr class="arc-chapter-row"
+                    <tr class="module-chapter-row"
                         [ngClass]="{
-                          'arc-chapter-row--before-split': idx < linearNodesList.length - 1 && isSameArc(idx + 1)
+                          'module-chapter-row--before-split': idx < linearNodesList.length - 1 && isSameModule(idx + 1)
                         }"
-                        [style.border-left-color]="getArcColorForNode(node.getId()).rowAccent"
+                        [style.border-left-color]="getModuleColorForNode(node.getId()).rowAccent"
                         (click)="navigateToChapterWithId(node.getId(), idx)"
                         cdkDrag
                         [cdkDragDisabled]="isDragAndDropDisabled(node)"
                         [cdkDragData]="node">
-                      <td class="col-drag arc-drag-handle" (click)="$event.stopPropagation()">
+                      <td class="col-drag module-drag-handle" (click)="$event.stopPropagation()">
                         <span class="fas fa-grip-vertical draggable-icon-indicator"
                               *ngIf="node.getStatus() !== 'Published'">
                         </span>
                       </td>
-                      <td class="col-num arc-chapter-num">{{ idx + 1 }}</td>
-                      <td class="col-name arc-chapter-name e2e-test-chapter-title">{{ node.getTitle() }}</td>
-                      <td class="col-status arc-chapter-status e2e-test-chapter-status">
+                      <td class="col-num module-chapter-num">{{ idx + 1 }}</td>
+                      <td class="col-name module-chapter-name e2e-test-chapter-title">{{ node.getTitle() }}</td>
+                      <td class="col-status module-chapter-status e2e-test-chapter-status">
                         {{ node.getStatus() }}
                       </td>
-                      <td class="col-modified arc-chapter-modified">
+                      <td class="col-modified module-chapter-modified">
                         {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
-                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Published'">(published)</div>
-                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
-                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Draft'">(draft added)</div>
+                        <div class="module-modified-sub" *ngIf="node.getStatus() === 'Published'">(published)</div>
+                        <div class="module-modified-sub" *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
+                        <div class="module-modified-sub" *ngIf="node.getStatus() === 'Draft'">(draft added)</div>
                       </td>
-                      <td class="col-date arc-chapter-date">
+                      <td class="col-date module-chapter-date">
                         {{ node.getPlannedPublicationDateMsecs() != null
                             ? getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs())
                             : '-' }}
@@ -569,7 +569,7 @@
               </table>
             </div>
 
-            <button (click)="createNode()" class="btn arc-add-chapter-btn e2e-test-add-chapter-button">
+            <button (click)="createNode()" class="btn module-add-chapter-btn e2e-test-add-chapter-button">
               + ADD CHAPTER
             </button>
           </div>

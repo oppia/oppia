@@ -46,6 +46,16 @@ class StoryChangeTests(test_utils.GenericTestBase):
         ):
             story_domain.StoryChange({'cmd': 'invalid'})
 
+    def test_story_change_object_with_deprecated_arc_cmd(self) -> None:
+        # The arc-to-module migration job rewrites the legacy arc-named
+        # commands stored in commit logs, so they no longer need to be
+        # recognised as deprecated: an arc-named command is now simply an
+        # unknown command.
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command create_arc is not allowed'
+        ):
+            story_domain.StoryChange({'cmd': 'create_arc'})
+
     def test_story_change_object_with_missing_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -525,7 +535,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'nodes': [],
                 'initial_node_id': None,
                 'next_node_id': self.NODE_ID_1,
-                'arcs': [],
+                'modules': [],
             },
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
@@ -539,7 +549,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.to_dict(), expected_story_dict)
 
     def test_to_dict_for_android(self) -> None:
-        """Test that to_dict_for_android returns a dict without arcs."""
+        """Test that to_dict_for_android returns a dict without modules."""
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
             self.STORY_ID,
@@ -571,8 +581,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'meta_tag_content': '',
         }
         self.assertEqual(story.to_dict_for_android(), expected_story_dict)
-        # Verify arcs field is not present in the Android dict.
-        self.assertNotIn('arcs', story.to_dict_for_android()['story_contents'])
+        # Verify modules field is not present in the Android dict.
+        self.assertNotIn(
+            'modules', story.to_dict_for_android()['story_contents']
+        )
 
     def test_get_acquired_skill_ids_for_node_ids(self) -> None:
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
@@ -2554,7 +2566,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_contents_to_dict_for_android(self) -> None:
         """Test that StoryContents.to_dict_for_android returns a dict
-        without arcs.
+        without modules.
         """
         story_node = story_domain.StoryNode.create_default_story_node(
             self.NODE_ID_1,
@@ -2564,7 +2576,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             [story_node], self.NODE_ID_1, '2'
         )
         story_contents_dict = story_contents.to_dict_for_android()
-        self.assertNotIn('arcs', story_contents_dict)
+        self.assertNotIn('modules', story_contents_dict)
         self.assertIn('nodes', story_contents_dict)
         self.assertIn('initial_node_id', story_contents_dict)
         self.assertIn('next_node_id', story_contents_dict)
@@ -2634,227 +2646,243 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.title = ''
         self._assert_validation_error('Title field should not be empty')
 
-    def test_arc_validate_invalid_arc_id(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Title', 'Desc', ['node_1'])
+    def test_module_validate_invalid_module_id(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Title', 'Desc', ['node_1'])
         )
         # Here we use MyPy ignore because we are intentionally assigning an
         # invalid type to test validation.
-        self.story.story_contents.arcs[0].id = 123  # type: ignore[assignment]
+        self.story.story_contents.modules[0].id = 123  # type: ignore[assignment]
         self._assert_validation_error(
-            'Expected arc id to be a string, received 123'
+            'Expected module id to be a string, received 123'
         )
 
-    def test_arc_validate_empty_arc_id(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('', 'Title', 'Desc', ['node_1'])
+    def test_module_validate_empty_module_id(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('', 'Title', 'Desc', ['node_1'])
         )
-        self._assert_validation_error('Arc id field should not be empty')
+        self._assert_validation_error('Module id field should not be empty')
 
-    def test_arc_validate_invalid_title(self) -> None:
-        self.story.story_contents.add_arc(
+    def test_module_validate_invalid_title(self) -> None:
+        self.story.story_contents.add_module(
             # Here we use MyPy ignore because we are intentionally passing an
             # invalid title type to test validation.
-            story_domain.Arc('arc_1', 123, 'Desc', ['node_1'])  # type: ignore[arg-type]
+            story_domain.Module('module_1', 123, 'Desc', ['node_1'])  # type: ignore[arg-type]
         )
         self._assert_validation_error(
-            'Expected arc title to be a string, received 123'
+            'Expected module title to be a string, received 123'
         )
 
-    def test_arc_validate_empty_title(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', '', 'Desc', ['node_1'])
+    def test_module_validate_empty_title(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', '', 'Desc', ['node_1'])
         )
-        self._assert_validation_error('Arc title field should not be empty')
+        self._assert_validation_error('Module title field should not be empty')
 
-    def test_arc_validate_invalid_description(self) -> None:
-        self.story.story_contents.add_arc(
+    def test_module_validate_invalid_description(self) -> None:
+        self.story.story_contents.add_module(
             # Here we use MyPy ignore because we are intentionally passing an
             # invalid description type to test validation.
-            story_domain.Arc('arc_1', 'Title', 456, ['node_1'])  # type: ignore[arg-type]
+            story_domain.Module('module_1', 'Title', 456, ['node_1'])  # type: ignore[arg-type]
         )
         self._assert_validation_error(
-            'Expected arc description to be a string, received 456'
+            'Expected module description to be a string, received 456'
         )
 
-    def test_arc_validate_invalid_node_ids(self) -> None:
-        self.story.story_contents.add_arc(
+    def test_module_validate_invalid_node_ids(self) -> None:
+        self.story.story_contents.add_module(
             # Here we use MyPy ignore because we are intentionally passing a
             # non-list value for node_ids to test validation.
-            story_domain.Arc('arc_1', 'Title', 'Desc', 'not_a_list')  # type: ignore[arg-type]
+            story_domain.Module('module_1', 'Title', 'Desc', 'not_a_list')  # type: ignore[arg-type]
         )
         self._assert_validation_error(
-            'Expected arc node_ids to be a list, received not_a_list'
+            'Expected module node_ids to be a list, received not_a_list'
         )
 
-    def test_arc_validate_non_string_node_id(self) -> None:
-        self.story.story_contents.add_arc(
+    def test_module_validate_non_string_node_id(self) -> None:
+        self.story.story_contents.add_module(
             # Here we use MyPy ignore because we are intentionally passing a
             # list with non-string items to test validation.
-            story_domain.Arc('arc_1', 'Title', 'Desc', [123])  # type: ignore[list-item]
+            story_domain.Module('module_1', 'Title', 'Desc', [123])  # type: ignore[list-item]
         )
         self._assert_validation_error(
-            'Expected each arc node_id to be a string, received 123'
+            'Expected each module node_id to be a string, received 123'
         )
 
-    def test_non_list_arcs_field(self) -> None:
+    def test_non_list_modules_field(self) -> None:
         # Here we use MyPy ignore because we are intentionally assigning an
-        # invalid type to arcs to test validation.
-        self.story.story_contents.arcs = 'invalid'  # type: ignore[assignment]
+        # invalid type to modules to test validation.
+        self.story.story_contents.modules = 'invalid'  # type: ignore[assignment]
         self._assert_validation_error(
-            'Expected arcs field to be a list, received invalid'
+            'Expected modules field to be a list, received invalid'
         )
 
-    def test_arc_not_arc_object(self) -> None:
+    def test_module_not_module_object(self) -> None:
         # Here we use MyPy ignore because we are intentionally assigning a
-        # list with non-Arc items to test validation.
-        self.story.story_contents.arcs = ['not_an_arc']  # type: ignore[list-item]
+        # list with non-Module items to test validation.
+        self.story.story_contents.modules = ['not_a_module']  # type: ignore[list-item]
         self._assert_validation_error(
-            'Expected each arc to be an Arc object, received not_an_arc'
+            'Expected each module to be a Module object, received not_a_module'
         )
 
-    def test_node_covered_by_multiple_arcs(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_node_covered_by_multiple_modules(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_1'])
-        )
-        self._assert_validation_error(
-            'Node node_1 is covered by multiple arcs.'
-        )
-
-    def test_duplicate_arc_ids(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
-        )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1 dup', '', ['node_1'])
-        )
-        self._assert_validation_error('Expected all arc ids to be distinct.')
-
-    def test_arc_refers_to_non_existent_node(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['nonexistent_node'])
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_1'])
         )
         self._assert_validation_error(
-            'Arc refers to non-existent node nonexistent_node.'
+            'Node node_1 is covered by multiple modules.'
         )
 
-    def test_nodes_not_covered_by_any_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+    def test_duplicate_module_ids(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
+        )
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1 dup', '', ['node_1'])
+        )
+        self._assert_validation_error('Expected all module ids to be distinct.')
+
+    def test_module_refers_to_non_existent_node(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module(
+                'module_1', 'Module 1', '', ['nonexistent_node']
+            )
         )
         self._assert_validation_error(
-            'Nodes \\[\'node_1\'\\] are not covered by any arc.'
+            'Module refers to non-existent node nonexistent_node.'
         )
 
-    def test_get_arc_index(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_nodes_not_covered_by_any_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+        self._assert_validation_error(
+            'Nodes \\[\'node_1\'\\] are not covered by any module.'
         )
-        self.assertEqual(self.story.story_contents.get_arc_index('arc_1'), 0)
-        self.assertEqual(self.story.story_contents.get_arc_index('arc_2'), 1)
 
-    def test_get_arc_index_with_nonexistent_arc(self) -> None:
-        with self.assertRaisesRegex(
-            ValueError,
-            'The arc with id nonexistent_arc is not part of this story.',
-        ):
-            self.story.story_contents.get_arc_index('nonexistent_arc')
-
-    def test_get_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
-        self.story.story_contents.add_arc(arc)
-        self.assertEqual(self.story.story_contents.get_arc('arc_1'), arc)
-
-    def test_add_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
-        self.story.story_contents.add_arc(arc)
-        self.assertIn(arc, self.story.story_contents.arcs)
-        self.assertEqual(len(self.story.story_contents.arcs), 1)
-
-    def test_delete_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_get_module_index(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
-        self.story.story_contents.delete_arc('arc_1')
-        self.assertEqual(len(self.story.story_contents.arcs), 1)
-        self.assertEqual(self.story.story_contents.arcs[0].id, 'arc_2')
-
-    def test_rearrange_arcs(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
-        )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
-        )
-        self.story.story_contents.rearrange_arcs(['arc_2', 'arc_1'])
         self.assertEqual(
-            [a.id for a in self.story.story_contents.arcs], ['arc_2', 'arc_1']
+            self.story.story_contents.get_module_index('module_1'), 0
+        )
+        self.assertEqual(
+            self.story.story_contents.get_module_index('module_2'), 1
         )
 
-    def test_rearrange_arcs_with_invalid_arc_list(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_get_module_index_with_nonexistent_module(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            'The module with id nonexistent_module is not part of this story.',
+        ):
+            self.story.story_contents.get_module_index('nonexistent_module')
+
+    def test_get_module(self) -> None:
+        module = story_domain.Module('module_1', 'Module 1', '', ['node_1'])
+        self.story.story_contents.add_module(module)
+        self.assertEqual(
+            self.story.story_contents.get_module('module_1'), module
+        )
+
+    def test_add_module(self) -> None:
+        module = story_domain.Module(
+            'module_1', 'Module 1', '', ['node_1', 'node_2']
+        )
+        self.story.story_contents.add_module(module)
+        self.assertIn(module, self.story.story_contents.modules)
+        self.assertEqual(len(self.story.story_contents.modules), 1)
+
+    def test_delete_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
+        )
+        self.story.story_contents.delete_module('module_1')
+        self.assertEqual(len(self.story.story_contents.modules), 1)
+        self.assertEqual(self.story.story_contents.modules[0].id, 'module_2')
+
+    def test_rearrange_modules(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
+        )
+        self.story.story_contents.rearrange_modules(['module_2', 'module_1'])
+        self.assertEqual(
+            [m.id for m in self.story.story_contents.modules],
+            ['module_2', 'module_1'],
+        )
+
+    def test_rearrange_modules_with_invalid_module_list(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
         with self.assertRaisesRegex(
             ValueError,
-            'Expected arc_ids_order to contain each existing arc exactly once.',
+            'Expected module_ids_order to contain each existing module exactly once.',
         ):
-            self.story.story_contents.rearrange_arcs(['arc_1', 'nonexistent'])
+            self.story.story_contents.rearrange_modules(
+                ['module_1', 'nonexistent']
+            )
 
-    def test_rearrange_arcs_with_unknown_arc_id(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_rearrange_modules_with_unknown_module_id(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
         with self.assertRaisesRegex(
             ValueError,
-            'Expected arc_ids_order to contain each existing arc exactly once.',
+            'Expected module_ids_order to contain each existing module exactly once.',
         ):
-            self.story.story_contents.rearrange_arcs(['arc_1', 'nonexistent'])
+            self.story.story_contents.rearrange_modules(
+                ['module_1', 'nonexistent']
+            )
 
-    def test_move_node_to_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_move_node_to_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
-        self.story.story_contents.move_node_to_arc('node_1', 'arc_2')
+        self.story.story_contents.move_node_to_module('node_1', 'module_2')
         self.assertNotIn(
-            'node_1', self.story.story_contents.get_arc('arc_1').node_ids
+            'node_1', self.story.story_contents.get_module('module_1').node_ids
         )
         self.assertIn(
-            'node_1', self.story.story_contents.get_arc('arc_2').node_ids
+            'node_1', self.story.story_contents.get_module('module_2').node_ids
         )
 
-    def test_story_delete_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_story_delete_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.delete_arc('arc_1')
-        self.assertEqual(len(self.story.story_contents.arcs), 0)
+        self.story.delete_module('module_1')
+        self.assertEqual(len(self.story.story_contents.modules), 0)
 
-    def test_story_rearrange_arcs(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_story_rearrange_modules(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
         )
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+        self.story.story_contents.add_module(
+            story_domain.Module('module_2', 'Module 2', '', ['node_2'])
         )
-        self.story.rearrange_arcs(['arc_2', 'arc_1'])
+        self.story.rearrange_modules(['module_2', 'module_1'])
         self.assertEqual(
-            [a.id for a in self.story.story_contents.arcs], ['arc_2', 'arc_1']
+            [m.id for m in self.story.story_contents.modules],
+            ['module_2', 'module_1'],
         )
 
     def test_convert_story_contents_v5_dict_to_v6_dict(self) -> None:
@@ -2908,11 +2936,97 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             v6_dict  # type: ignore[arg-type]
         )
         self.assertIn('arcs', result)
-        self.assertEqual(len(result['arcs']), 1)
-        self.assertEqual(result['arcs'][0]['id'], 'arc_default')
-        self.assertEqual(result['arcs'][0]['title'], 'All Chapters')
-        self.assertEqual(result['arcs'][0]['description'], '')
-        self.assertEqual(result['arcs'][0]['node_ids'], ['node_1', 'node_2'])
+        # Here we use MyPy ignore because the v7 schema wrote the chapter
+        # groupings under the 'arcs' key, which the current StoryContentsDict
+        # no longer declares. Reading it once here keeps the assertions below
+        # free of further ignores.
+        arcs = result['arcs']  # type: ignore[typeddict-item]
+        self.assertEqual(len(arcs), 1)
+        self.assertEqual(arcs[0]['id'], 'arc_default')
+        self.assertEqual(arcs[0]['title'], 'All Chapters')
+        self.assertEqual(arcs[0]['description'], '')
+        self.assertEqual(arcs[0]['node_ids'], ['node_1', 'node_2'])
+
+    def test_convert_story_contents_v7_dict_to_v8_dict(self) -> None:
+        v7_dict = {
+            'nodes': [{'id': 'node_1'}],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+            'arcs': [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1'],
+                }
+            ],
+        }
+        result = story_domain.Story._convert_story_contents_v7_dict_to_v8_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v7_dict still uses the old
+            # 'arcs' key, which is exactly what we're converting from.
+            v7_dict  # type: ignore[arg-type]
+        )
+        self.assertNotIn('arcs', result)
+        self.assertEqual(
+            result['modules'],
+            [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1'],
+                }
+            ],
+        )
+
+    def test_convert_story_contents_v7_dict_to_v8_dict_without_arcs_key(
+        self,
+    ) -> None:
+        # A story stored at v7 predating the arcs field (e.g. one created
+        # before the v7 migration ran) must not gain an empty 'modules' key,
+        # because StoryContents.from_dict defaults it to [] anyway.
+        v7_dict = {
+            'nodes': [{'id': 'node_1'}],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+        }
+        result = story_domain.Story._convert_story_contents_v7_dict_to_v8_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v7_dict here is a plain dict
+            # that omits the optional 'arcs' key, which is exactly the case
+            # this test is covering.
+            v7_dict  # type: ignore[arg-type]
+        )
+        self.assertNotIn('arcs', result)
+        self.assertNotIn('modules', result)
+
+    def test_convert_story_contents_v6_dict_to_v8_dict(self) -> None:
+        v6_dict = {
+            'nodes': [
+                {'id': 'node_1', 'title': 'Chapter 1'},
+                {'id': 'node_2', 'title': 'Chapter 2'},
+            ],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_3',
+        }
+        v7_dict = story_domain.Story._convert_story_contents_v6_dict_to_v7_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v6_dict doesn't match the
+            # v7 dict type, which is exactly what we're converting from.
+            v6_dict  # type: ignore[arg-type]
+        )
+        # No MyPy ignore is needed here: v7_dict is the return value of the
+        # converter above, which is already declared as a StoryContentsDict.
+        result = story_domain.Story._convert_story_contents_v7_dict_to_v8_dict(  # pylint: disable=protected-access
+            v7_dict
+        )
+        self.assertNotIn('arcs', result)
+        # The frozen v6 -> v7 converter still mints 'arc_default'; only the
+        # container key is renamed, since module IDs are opaque data that
+        # per-learner progress state refers to.
+        self.assertEqual(result['modules'][0]['id'], 'arc_default')
+        self.assertEqual(result['modules'][0]['node_ids'], ['node_1', 'node_2'])
+
+    def test_story_contents_schema_version_is_current(self) -> None:
+        self.assertEqual(feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, 8)
 
     def test_delete_node_with_destination_ids_merge(self) -> None:
         self.story.add_node('node_3', 'Title 3')
@@ -2983,63 +3097,68 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(story_from_dict.to_dict(), story_dict)
 
-    def test_validate_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Title', 'Description', ['node_1'])
-        arc.validate()
-
-    def test_validate_arc_with_duplicate_node_ids(self) -> None:
-        arc = story_domain.Arc(
-            'arc_1', 'Title', 'Description', ['node_1', 'node_1']
+    def test_validate_module(self) -> None:
+        module = story_domain.Module(
+            'module_1', 'Title', 'Description', ['node_1']
         )
-        arc.validate()
+        module.validate()
 
-    def test_move_node_to_arc_when_node_not_in_any_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+    def test_validate_module_with_duplicate_node_ids(self) -> None:
+        module = story_domain.Module(
+            'module_1', 'Title', 'Description', ['node_1', 'node_1']
         )
-        self.story.story_contents.move_node_to_arc('node_1', 'arc_1')
+        module.validate()
+
+    def test_move_node_to_module_when_node_not_in_any_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
+        )
+        self.story.story_contents.move_node_to_module('node_1', 'module_1')
         self.assertIn(
-            'node_1', self.story.story_contents.get_arc('arc_1').node_ids
+            'node_1', self.story.story_contents.get_module('module_1').node_ids
         )
         self.assertIn(
-            'node_2', self.story.story_contents.get_arc('arc_1').node_ids
+            'node_2', self.story.story_contents.get_module('module_1').node_ids
         )
 
-    def test_move_node_to_arc_with_invalid_arc_id(self) -> None:
+    def test_move_node_to_module_with_invalid_module_id(self) -> None:
         with self.assertRaisesRegex(
             ValueError,
-            'The arc with id nonexistent_arc is not part of this story.',
+            'The module with id nonexistent_module is not part of this story.',
         ):
-            self.story.story_contents.move_node_to_arc(
-                'node_1', 'nonexistent_arc'
+            self.story.story_contents.move_node_to_module(
+                'node_1', 'nonexistent_module'
             )
 
-    def test_delete_node_removes_from_arc(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+    def test_delete_node_removes_from_module(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_2'])
         )
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(len(self.story.story_contents.nodes), 1)
 
-    def test_create_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
-        self.story.add_arc(arc)
-        self.assertIn(arc, self.story.story_contents.arcs)
-        self.assertEqual(len(self.story.story_contents.arcs), 1)
-
-    def test_update_arc_property(self) -> None:
-        self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+    def test_create_module(self) -> None:
+        module = story_domain.Module(
+            'module_1', 'Module 1', '', ['node_1', 'node_2']
         )
-        self.story.story_contents.get_arc('arc_1').title = 'Updated Title'
-        self.story.story_contents.get_arc('arc_1').description = (
+        self.story.add_module(module)
+        self.assertIn(module, self.story.story_contents.modules)
+        self.assertEqual(len(self.story.story_contents.modules), 1)
+
+    def test_update_module_property(self) -> None:
+        self.story.story_contents.add_module(
+            story_domain.Module('module_1', 'Module 1', '', ['node_1'])
+        )
+        self.story.story_contents.get_module('module_1').title = 'Updated Title'
+        self.story.story_contents.get_module('module_1').description = (
             'Updated Description'
         )
         self.assertEqual(
-            self.story.story_contents.get_arc('arc_1').title, 'Updated Title'
+            self.story.story_contents.get_module('module_1').title,
+            'Updated Title',
         )
         self.assertEqual(
-            self.story.story_contents.get_arc('arc_1').description,
+            self.story.story_contents.get_module('module_1').description,
             'Updated Description',
         )
 

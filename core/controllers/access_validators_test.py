@@ -373,24 +373,24 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'nonexistent_arc',
+                'nonexistent_module',
             ),
             expected_status_int=404,
         )
@@ -419,9 +419,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_invalid_arc_number(self) -> None:
+    def test_end_of_module_page_with_invalid_module_number(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -431,9 +431,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_zero_arc_index(self) -> None:
+    def test_end_of_module_page_with_zero_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -443,9 +443,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_large_arc_index(self) -> None:
+    def test_end_of_module_page_with_large_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -515,7 +515,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_end_of_arc_page_with_valid_arc_and_deleted_story(self) -> None:
+    def test_end_of_module_page_with_valid_module_and_deleted_story(
+        self,
+    ) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'
         exp_id = 'exp_1'
@@ -558,15 +560,15 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
 
         self.save_new_valid_exploration(exp_id_2, self.admin_id)
@@ -581,7 +583,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -591,7 +593,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_any_user_can_access_end_of_arc_page(self) -> None:
+    def test_any_user_can_access_end_of_module_page(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -646,19 +648,19 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -668,7 +670,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_any_user_can_access_end_of_arc_page_with_arc_position(
+    def test_any_user_can_access_end_of_module_page_with_module_id(
         self,
     ) -> None:
         story_id = 'story_id_2'
@@ -725,19 +727,19 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'default_arc',
-                        'title': 'Default Arc',
-                        'description': 'Default arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'default_module',
+                        'title': 'Default Module',
+                        'description': 'Default module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -747,9 +749,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
-    def test_end_of_arc_page_with_out_of_range_arc_position(self) -> None:
+    def test_end_of_module_page_with_out_of_range_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -771,21 +773,21 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_invalid_arc_id(self) -> None:
+    def test_end_of_module_page_with_invalid_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'nonexistent_arc',
+                'nonexistent_module',
             ),
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_non_ascii_arc_id(self) -> None:
+    def test_end_of_module_page_with_non_ascii_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -795,9 +797,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_emoji_arc_id(self) -> None:
+    def test_end_of_module_page_with_emoji_module_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
@@ -866,7 +868,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_end_of_arc_page_with_story_that_does_not_exist(self) -> None:
+    def test_end_of_module_page_with_story_that_does_not_exist(self) -> None:
         story_id = 'story_id_2'
         deleted_story_id = 'del_story2'
         exp_id = 'exp_2'
@@ -909,15 +911,15 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
         self.save_new_valid_exploration(exp_id_2, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id_2)
@@ -931,12 +933,12 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'nonexistent_arc',
+                'nonexistent_module',
             ),
             expected_status_int=404,
         )

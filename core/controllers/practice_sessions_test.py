@@ -347,7 +347,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_skill_ids_for_nonexistent_arc_id(
+    def test_get_returns_empty_skill_ids_for_nonexistent_module_id(
         self,
     ) -> None:
         story_id = 'story_id_2'
@@ -392,15 +392,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             [
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
 
         self.save_new_valid_exploration(exp_id_2, self.admin_id)
@@ -415,7 +415,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/nonexistent_arc'
+            '%s/staging/%s/module/nonexistent_module'
             % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name',
@@ -424,7 +424,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_succeeds_with_arc_id(self) -> None:
+    def test_get_succeeds_with_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -479,19 +479,19 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -505,7 +505,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 2',
         )
 
-    def test_get_succeeds_with_arc_position(self) -> None:
+    def test_get_succeeds_with_default_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -560,19 +560,19 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'default_arc',
-                        'title': 'Default Arc',
-                        'description': 'Default arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'default_module',
+                        'title': 'Default Module',
+                        'description': 'Default module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -586,7 +586,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 2',
         )
 
-    def test_get_succeeds_with_second_arc_position(self) -> None:
+    def test_get_succeeds_with_second_module_id(self) -> None:
         story_id = 'story_id_2'
         exp_id = 'exp_2'
         exp_id_2 = 'exp_2_b'
@@ -676,28 +676,28 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'default_arc',
-                        'title': 'Default Arc',
-                        'description': 'Default arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'default_module',
+                        'title': 'Default Module',
+                        'description': 'Default module',
                         'node_ids': ['node_1'],
                     }
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_2',
-                        'title': 'Arc 2',
-                        'description': 'Second arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_2',
+                        'title': 'Module 2',
+                        'description': 'Second module',
                         'node_ids': ['node_2'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arcs.',
+            'Added acquired skill IDs and modules.',
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/2'
+            '%s/staging/%s/module/2'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -723,33 +723,33 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_invalid_arc_number(self) -> None:
+    def test_get_returns_empty_for_invalid_module_number(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/abc'
+            '%s/staging/%s/module/abc'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_zero_arc_index(self) -> None:
+    def test_get_returns_empty_for_zero_module_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/0'
+            '%s/staging/%s/module/0'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_large_arc_index(self) -> None:
+    def test_get_returns_empty_for_large_module_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/999'
+            '%s/staging/%s/module/999'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_non_ascii_arc_id(self) -> None:
+    def test_get_returns_empty_for_non_ascii_module_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/%s'
+            '%s/staging/%s/module/%s'
             % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name',
@@ -759,9 +759,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_returns_empty_for_emoji_arc_id(self) -> None:
+    def test_get_returns_empty_for_emoji_module_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/%s'
+            '%s/staging/%s/module/%s'
             % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name',
@@ -848,7 +848,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
 
-    def test_get_arc_skills_with_deleted_story_in_topic(self) -> None:
+    def test_get_module_skills_with_deleted_story_in_topic(self) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'
         exp_id = 'exp_1'
@@ -905,15 +905,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         self.save_new_valid_exploration(exp_id_2, self.admin_id)
@@ -928,13 +928,13 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
 
-    def test_get_arc_skills_no_matching_arc_in_stories(self) -> None:
+    def test_get_module_skills_no_matching_module_in_stories(self) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'
         exp_id = 'exp_1'
@@ -1002,15 +1002,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added arc.',
+            'Added module.',
         )
         topic_services.publish_story(
             self.topic_id, deleted_story_id, self.admin_id
@@ -1018,13 +1018,13 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
-    def test_get_arc_skills_deleted_story_before_valid_story(self) -> None:
+    def test_get_module_skills_deleted_story_before_valid_story(self) -> None:
         story_id = 'story_id'
         deleted_story_id = 'del_story'
         exp_id = 'exp_1'
@@ -1092,25 +1092,27 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added acquired skill IDs and arc.',
+            'Added acquired skill IDs and module.',
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
 
-    def test_get_arc_skills_non_matching_arc_in_earlier_story(self) -> None:
+    def test_get_module_skills_non_matching_module_in_earlier_story(
+        self,
+    ) -> None:
         story_a_id = 'story_a'
         story_b_id = 'story_b'
         exp_id_a = 'exp_a'
@@ -1145,15 +1147,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(self.topic_id, story_a_id, self.admin_id)
         story_services.update_story(
@@ -1208,15 +1210,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_2',
-                        'title': 'Arc 2',
-                        'description': 'Second arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_2',
+                        'title': 'Module 2',
+                        'description': 'Second module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(self.topic_id, story_b_id, self.admin_id)
         story_services.update_story(
@@ -1242,7 +1244,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -1252,7 +1254,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 1',
         )
 
-    def test_get_arc_skills_duplicate_arc_ids_across_stories(self) -> None:
+    def test_get_module_skills_duplicate_module_ids_across_stories(
+        self,
+    ) -> None:
         story_a_id = 'story_a'
         story_b_id = 'story_b'
         exp_id_a = 'exp_a'
@@ -1287,15 +1291,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(self.topic_id, story_a_id, self.admin_id)
         story_services.update_story(
@@ -1350,15 +1354,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'Same arc id in second story',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'Same module id in second story',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(self.topic_id, story_b_id, self.admin_id)
         story_services.update_story(
@@ -1384,7 +1388,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/1'
+            '%s/staging/%s/module/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -1394,7 +1398,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 1',
         )
 
-    def test_get_arc_skills_arc_not_found_in_any_story(self) -> None:
+    def test_get_module_skills_module_not_found_in_any_story(self) -> None:
         story_id = 'story_id'
         exp_id = 'exp_1'
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -1427,15 +1431,15 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 ),
                 story_domain.StoryChange(
                     {
-                        'cmd': story_domain.CMD_CREATE_ARC,
-                        'arc_id': 'arc_1',
-                        'title': 'Arc 1',
-                        'description': 'First arc',
+                        'cmd': story_domain.CMD_CREATE_MODULE,
+                        'module_id': 'module_1',
+                        'title': 'Module 1',
+                        'description': 'First module',
                         'node_ids': ['node_1'],
                     }
                 ),
             ],
-            'Added node and arc.',
+            'Added node and module.',
         )
         topic_services.publish_story(self.topic_id, story_id, self.admin_id)
 
@@ -1456,7 +1460,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             side_effect=mock_get_stories,
         ):
             json_response = self.get_json(
-                '%s/staging/%s/arc/1'
+                '%s/staging/%s/module/1'
                 % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public-topic-name',

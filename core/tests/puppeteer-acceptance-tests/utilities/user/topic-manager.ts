@@ -406,12 +406,13 @@ const warningTextSelector = '.e2e-test-warnings-text';
 const dragHandleSelector = 'tr.cdk-drag';
 const dragHandlerSelector = '.drag-handler';
 
-// Adventure (Arc) selectors.
-const arcEditButtonSelector = '.arc-edit-button';
-const arcRemoveButtonSelector = '.arc-remove-button';
-const editArcTitleFieldSelector = '.e2e-test-edit-arc-title-field';
-const editArcDescriptionFieldSelector = '.e2e-test-edit-arc-description-field';
-const saveEditArcButtonSelector = '.e2e-test-save-edit-arc-button';
+// Module (Module) selectors.
+const moduleEditButtonSelector = '.module-edit-button';
+const moduleRemoveButtonSelector = '.module-remove-button';
+const editModuleTitleFieldSelector = '.e2e-test-edit-module-title-field';
+const editModuleDescriptionFieldSelector =
+  '.e2e-test-edit-module-description-field';
+const saveEditModuleButtonSelector = '.e2e-test-save-edit-module-button';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -5793,13 +5794,13 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Splits into a new adventure (arc) after the specified chapter.
+   * Splits into a new module after the specified chapter.
    * Finds the split button that appears between the target chapter and the
-   * next chapter, and clicks it to create a new adventure boundary.
+   * next chapter, and clicks it to create a new module boundary.
    * @param {string} afterChapterName - The name of the chapter after which
    *     to split.
    */
-  async splitIntoAdventure(afterChapterName: string): Promise<void> {
+  async splitIntoModule(afterChapterName: string): Promise<void> {
     await this.expectChapterListIsVisible();
     const chapterTitleElements = await this.page.$$(chapterTitleSelector);
 
@@ -5818,7 +5819,7 @@ export class TopicManager extends BaseUser {
           if (!parent) {
             return null;
           }
-          return parent.querySelector('.split-into-arc-button');
+          return parent.querySelector('.split-into-module-button');
         });
 
         const splitButtonElement = splitButtonHandle.asElement();
@@ -5826,14 +5827,14 @@ export class TopicManager extends BaseUser {
           await this.clickOnElement(splitButtonElement);
           await this.waitForPageToFullyLoad();
           showMessage(
-            `Split adventure created after chapter "${afterChapterName}".`
+            `Split module created after chapter "${afterChapterName}".`
           );
           return;
         }
 
         throw new Error(
           `Split button not found between "${afterChapterName}" and "${title}". ` +
-            'They may already be in different adventures.'
+            'They may already be in different modules.'
         );
       }
 
@@ -5849,24 +5850,24 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the edit modal for the first non-default adventure and fills in its
+   * Opens the edit modal for the first non-default module and fills in its
    * title and description without saving.
-   * @param {string} title - The new title for the adventure.
-   * @param {string} description - The new description for the adventure.
+   * @param {string} title - The new title for the module.
+   * @param {string} description - The new description for the module.
    */
-  async fillEditAdventureModal(
+  async fillEditModuleModal(
     title: string,
     description?: string
   ): Promise<void> {
-    const editButtons = await this.page.$$(arcEditButtonSelector);
+    const editButtons = await this.page.$$(moduleEditButtonSelector);
     if (editButtons.length < 2) {
       throw new Error(
-        'No non-default adventure found to edit. ' +
-          `Only ${editButtons.length} adventure(s) present.`
+        'No non-default module found to edit. ' +
+          `Only ${editButtons.length} module(s) present.`
       );
     }
     await this.clickOnElement(editButtons[1]);
-    await this.expectElementToBeVisible(editArcTitleFieldSelector);
+    await this.expectElementToBeVisible(editModuleTitleFieldSelector);
 
     // Wait until the modal form is fully initialized (title populated) before
     // clearing, otherwise the clear may run before ngModel sets the value.
@@ -5878,27 +5879,30 @@ export class TopicManager extends BaseUser {
         return el !== null && el.value.length > 0;
       },
       {timeout: 15000},
-      editArcTitleFieldSelector
+      editModuleTitleFieldSelector
     );
 
-    await this.clearAllTextFrom(editArcTitleFieldSelector);
-    await this.typeInInputField(editArcTitleFieldSelector, title);
-    await this.expectElementValueToBe(editArcTitleFieldSelector, title);
+    await this.clearAllTextFrom(editModuleTitleFieldSelector);
+    await this.typeInInputField(editModuleTitleFieldSelector, title);
+    await this.expectElementValueToBe(editModuleTitleFieldSelector, title);
 
     if (description !== undefined) {
-      await this.clearAllTextFrom(editArcDescriptionFieldSelector);
-      await this.typeInInputField(editArcDescriptionFieldSelector, description);
+      await this.clearAllTextFrom(editModuleDescriptionFieldSelector);
+      await this.typeInInputField(
+        editModuleDescriptionFieldSelector,
+        description
+      );
       await this.expectElementValueToBe(
-        editArcDescriptionFieldSelector,
+        editModuleDescriptionFieldSelector,
         description
       );
     }
   }
 
-  /** Saves the adventure metadata and closes the edit modal. */
-  async saveEditAdventureModal(): Promise<void> {
-    await this.clickOnElementWithSelector(saveEditArcButtonSelector);
-    await this.expectElementToBeVisible(editArcTitleFieldSelector, false);
+  /** Saves the module metadata and closes the edit modal. */
+  async saveEditModuleModal(): Promise<void> {
+    await this.clickOnElementWithSelector(saveEditModuleButtonSelector);
+    await this.expectElementToBeVisible(editModuleTitleFieldSelector, false);
   }
 
   /**
@@ -5918,33 +5922,33 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Removes the last adventure boundary by clicking the Remove Arc Boundary
-   * button on the last non-default adventure header. The chapters from the
-   * removed adventure are merged into the previous adventure.
+   * Removes the last module boundary by clicking the Remove Module
+   * button on the last non-default module header. The chapters from the
+   * removed module are merged into the previous module.
    */
-  async removeAdventureBoundary(): Promise<void> {
-    const removeButtons = await this.page.$$(arcRemoveButtonSelector);
+  async removeModuleBoundary(): Promise<void> {
+    const removeButtons = await this.page.$$(moduleRemoveButtonSelector);
     if (removeButtons.length < 1) {
-      throw new Error('No removable adventure boundary found.');
+      throw new Error('No removable module boundary found.');
     }
     await this.clickOnElement(removeButtons[removeButtons.length - 1]);
     await this.waitForPageToFullyLoad();
-    showMessage('Adventure boundary removed.');
+    showMessage('Module boundary removed.');
   }
 
   /**
-   * Expects an adventure header with the given title to be visible or not.
-   * @param {string} title - The expected adventure title.
-   * @param {boolean} visible - Whether the adventure header should be visible.
+   * Expects an module header with the given title to be visible or not.
+   * @param {string} title - The expected module title.
+   * @param {boolean} visible - Whether the module header should be visible.
    */
-  async expectAdventureHeaderToBeVisible(
+  async expectModuleHeaderToBeVisible(
     title: string,
     visible: boolean = true
   ): Promise<void> {
     await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (titleText: string, shouldBeVisible: boolean) => {
-        const headers = document.querySelectorAll('.arc-boundary-title');
+        const headers = document.querySelectorAll('.module-boundary-title');
         const found = Array.from(headers).some(
           el => el.textContent?.trim() === titleText
         );
@@ -5955,7 +5959,7 @@ export class TopicManager extends BaseUser {
       visible
     );
     showMessage(
-      `Adventure header "${title}" is ${visible ? 'visible' : 'not visible'} ` +
+      `Module header "${title}" is ${visible ? 'visible' : 'not visible'} ` +
         'as expected.'
     );
   }
@@ -5992,37 +5996,34 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Expects the number of adventure (arc) boundaries to match the given count.
-   * @param {number} count - The expected number of adventures.
+   * Expects the number of module (module) boundaries to match the count.
+   * @param {number} count - The expected number of modules.
    */
-  async expectAdventureCount(count: number): Promise<void> {
+  async expectModuleCount(count: number): Promise<void> {
     await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (expectedCount: number) => {
-        const headers = document.querySelectorAll('.arc-boundary-header');
+        const headers = document.querySelectorAll('.module-boundary-header');
         return headers.length === expectedCount;
       },
       {timeout: 10000},
       count
     );
-    showMessage(`Expected ${count} adventures found.`);
+    showMessage(`Expected ${count} modules found.`);
   }
 
   /**
-   * Expects an adventure header to have the given title and description.
-   * @param {string} title - The expected adventure title.
-   * @param {string} description - The expected adventure description.
+   * Expects an module header to have the given title and description.
+   * @param {string} title - The expected module title.
+   * @param {string} description - The expected module description.
    */
-  async expectAdventureToHave(
-    title: string,
-    description?: string
-  ): Promise<void> {
+  async expectModuleToHave(title: string, description?: string): Promise<void> {
     await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (titleText: string) => {
-        const headers = document.querySelectorAll('.arc-boundary-header');
+        const headers = document.querySelectorAll('.module-boundary-header');
         return Array.from(headers).some(header => {
-          const titleEl = header.querySelector('.arc-boundary-title');
+          const titleEl = header.querySelector('.module-boundary-title');
           return titleEl?.textContent?.trim() === titleText;
         });
       },
@@ -6033,10 +6034,10 @@ export class TopicManager extends BaseUser {
     if (description !== undefined) {
       await this.page.waitForFunction(
         (titleText: string, descText: string) => {
-          const headers = document.querySelectorAll('.arc-boundary-header');
+          const headers = document.querySelectorAll('.module-boundary-header');
           return Array.from(headers).some(header => {
-            const titleEl = header.querySelector('.arc-boundary-title');
-            const descEl = header.querySelector('.arc-boundary-description');
+            const titleEl = header.querySelector('.module-boundary-title');
+            const descEl = header.querySelector('.module-boundary-description');
             return (
               titleEl?.textContent?.trim() === titleText &&
               descEl?.textContent?.trim() === descText
@@ -6049,22 +6050,20 @@ export class TopicManager extends BaseUser {
       );
     }
 
-    showMessage(`Adventure "${title}" has the expected metadata.`);
+    showMessage(`Module "${title}" has the expected metadata.`);
   }
 
   /**
-   * Expects the given chapters to be in the default "All Chapters" adventure.
-   * This is verified by checking that no other adventure boundaries exist.
+   * Expects the given chapters to be in the default "All Chapters" module.
+   * This is verified by checking that no other module boundaries exist.
    * @param {string[]} chapterNames - The chapter names expected in the story.
    */
-  async expectAllChaptersInSingleAdventure(
-    chapterNames: string[]
-  ): Promise<void> {
-    await this.expectAdventureCount(1);
-    await this.expectAdventureHeaderToBeVisible('All Chapters');
+  async expectAllChaptersInSingleModule(chapterNames: string[]): Promise<void> {
+    await this.expectModuleCount(1);
+    await this.expectModuleHeaderToBeVisible('All Chapters');
     await this.expectChaptersOrderToBe(chapterNames);
     showMessage(
-      `All chapters [${chapterNames.join(', ')}] are in a single adventure.`
+      `All chapters [${chapterNames.join(', ')}] are in a single module.`
     );
   }
 }

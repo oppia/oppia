@@ -19,8 +19,8 @@
 import {
   StoryContents,
   StoryContentsBackendDict,
-  ArcModel,
-  ArcBackendDict,
+  ModuleModel,
+  ModuleBackendDict,
 } from 'domain/story/story-contents-object.model';
 import {StoryNode} from './story-node.model';
 
@@ -532,60 +532,67 @@ describe('Story contents object factory', () => {
     );
   });
 
-  it('should create ArcModel using createNew and provide correct values', () => {
-    const arc = ArcModel.createNew('arc_1', 'Arc 1', 'Description', [
-      'node_1',
-      'node_2',
-    ]);
+  it('should create ModuleModel using createNew and provide correct values', () => {
+    const module = ModuleModel.createNew(
+      'module_1',
+      'Module 1',
+      'Description',
+      ['node_1', 'node_2']
+    );
 
-    expect(arc.getId()).toBe('arc_1');
-    expect(arc.getTitle()).toBe('Arc 1');
-    expect(arc.getDescription()).toBe('Description');
-    expect(arc.getNodeIds()).toEqual(['node_1', 'node_2']);
+    expect(module.getId()).toBe('module_1');
+    expect(module.getTitle()).toBe('Module 1');
+    expect(module.getDescription()).toBe('Description');
+    expect(module.getNodeIds()).toEqual(['node_1', 'node_2']);
   });
 
-  it('should update ArcModel properties via setters', () => {
-    const arc = ArcModel.createNew('arc_1', 'Arc 1', 'Description', ['node_1']);
+  it('should update ModuleModel properties via setters', () => {
+    const module = ModuleModel.createNew(
+      'module_1',
+      'Module 1',
+      'Description',
+      ['node_1']
+    );
 
-    arc.setTitle('Updated Arc');
-    expect(arc.getTitle()).toBe('Updated Arc');
+    module.setTitle('Updated Module');
+    expect(module.getTitle()).toBe('Updated Module');
 
-    arc.setDescription('Updated Description');
-    expect(arc.getDescription()).toBe('Updated Description');
+    module.setDescription('Updated Description');
+    expect(module.getDescription()).toBe('Updated Description');
 
-    arc.setNodeIds(['node_2', 'node_3']);
-    expect(arc.getNodeIds()).toEqual(['node_2', 'node_3']);
+    module.setNodeIds(['node_2', 'node_3']);
+    expect(module.getNodeIds()).toEqual(['node_2', 'node_3']);
   });
 
-  it('should create ArcModel from backend dict', () => {
-    const backendDict: ArcBackendDict = {
-      id: 'arc_1',
-      title: 'Arc 1',
+  it('should create ModuleModel from backend dict', () => {
+    const backendDict: ModuleBackendDict = {
+      id: 'module_1',
+      title: 'Module 1',
       description: 'Description',
       node_ids: ['node_1', 'node_2'],
     };
-    const arc = ArcModel.createFromBackendDict(backendDict);
+    const module = ModuleModel.createFromBackendDict(backendDict);
 
-    expect(arc.getId()).toBe('arc_1');
-    expect(arc.getTitle()).toBe('Arc 1');
-    expect(arc.getDescription()).toBe('Description');
-    expect(arc.getNodeIds()).toEqual(['node_1', 'node_2']);
+    expect(module.getId()).toBe('module_1');
+    expect(module.getTitle()).toBe('Module 1');
+    expect(module.getDescription()).toBe('Description');
+    expect(module.getNodeIds()).toEqual(['node_1', 'node_2']);
   });
 
-  it('should convert ArcModel to backend dict', () => {
-    const backendDict: ArcBackendDict = {
-      id: 'arc_1',
-      title: 'Arc 1',
+  it('should convert ModuleModel to backend dict', () => {
+    const backendDict: ModuleBackendDict = {
+      id: 'module_1',
+      title: 'Module 1',
       description: 'Description',
       node_ids: ['node_1', 'node_2'],
     };
-    const arc = ArcModel.createFromBackendDict(backendDict);
+    const module = ModuleModel.createFromBackendDict(backendDict);
 
-    expect(arc.toBackendDict()).toEqual(backendDict);
+    expect(module.toBackendDict()).toEqual(backendDict);
   });
 
-  it('should create StoryContents with arcs from backend dict', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should create StoryContents with modules from backend dict', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -608,27 +615,30 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
+      modules: [
         {
-          id: 'arc_1',
-          title: 'Arc 1',
+          id: 'module_1',
+          title: 'Module 1',
           description: 'Description 1',
           node_ids: ['node_1'],
         },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
-    expect(storyContents.getArcs().length).toBe(1);
-    expect(storyContents.getArcs()[0].getId()).toBe('arc_1');
-    expect(storyContents.getArcs()[0].getTitle()).toBe('Arc 1');
-    expect(storyContents.getArcs()[0].getDescription()).toBe('Description 1');
-    expect(storyContents.getArcs()[0].getNodeIds()).toEqual(['node_1']);
+    expect(storyContents.getModules().length).toBe(1);
+    expect(storyContents.getModules()[0].getId()).toBe('module_1');
+    expect(storyContents.getModules()[0].getTitle()).toBe('Module 1');
+    expect(storyContents.getModules()[0].getDescription()).toBe(
+      'Description 1'
+    );
+    expect(storyContents.getModules()[0].getNodeIds()).toEqual(['node_1']);
   });
 
-  it('should create StoryContents with empty arcs when arcs is missing', () => {
-    const backendDictWithoutArcs: StoryContentsBackendDict = {
+  it('should create StoryContents with empty modules when modules is missing', () => {
+    const backendDictWithoutModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -653,14 +663,14 @@ describe('Story contents object factory', () => {
       next_node_id: 'node_2',
     };
     const storyContents = StoryContents.createFromBackendDict(
-      backendDictWithoutArcs
+      backendDictWithoutModules
     );
 
-    expect(storyContents.getArcs()).toEqual([]);
+    expect(storyContents.getModules()).toEqual([]);
   });
 
-  it('should return arc index when arc is present', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should return module index when module is present', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -683,21 +693,32 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
-        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
-        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      modules: [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'Desc 1',
+          node_ids: [],
+        },
+        {
+          id: 'module_2',
+          title: 'Module 2',
+          description: 'Desc 2',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
-    expect(storyContents.getArcIndex('arc_1')).toBe(0);
-    expect(storyContents.getArcIndex('arc_2')).toBe(1);
-    expect(storyContents.getArcIndex('non_existent')).toBe(-1);
+    expect(storyContents.getModuleIndex('module_1')).toBe(0);
+    expect(storyContents.getModuleIndex('module_2')).toBe(1);
+    expect(storyContents.getModuleIndex('non_existent')).toBe(-1);
   });
 
-  it('should add arc to story contents', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should add module to story contents', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -720,22 +741,33 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
-        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+      modules: [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'Desc 1',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
-    const newArc = ArcModel.createNew('arc_2', 'Arc 2', 'Desc 2', []);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
+    const newModule = ModuleModel.createNew(
+      'module_2',
+      'Module 2',
+      'Desc 2',
+      []
+    );
 
-    storyContents.addArc(newArc);
+    storyContents.addModule(newModule);
 
-    expect(storyContents.getArcs().length).toBe(2);
-    expect(storyContents.getArcs()[1].getId()).toBe('arc_2');
+    expect(storyContents.getModules().length).toBe(2);
+    expect(storyContents.getModules()[1].getId()).toBe('module_2');
   });
 
-  it('should delete arc from story contents', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should delete module from story contents', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -758,32 +790,43 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
-        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
-        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      modules: [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'Desc 1',
+          node_ids: [],
+        },
+        {
+          id: 'module_2',
+          title: 'Module 2',
+          description: 'Desc 2',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
-    storyContents.deleteArc('arc_1');
+    storyContents.deleteModule('module_1');
 
-    expect(storyContents.getArcs().length).toBe(1);
-    expect(storyContents.getArcs()[0].getId()).toBe('arc_2');
+    expect(storyContents.getModules().length).toBe(1);
+    expect(storyContents.getModules()[0].getId()).toBe('module_2');
   });
 
-  it('should throw error when deleting a non-existent arc', () => {
-    _sampleStoryContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+  it('should throw error when deleting a non-existent module', () => {
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', 'Desc 1', [])
     );
 
     expect(() => {
-      _sampleStoryContents.deleteArc('non_existent');
-    }).toThrowError('The arc with id non_existent does not exist');
+      _sampleStoryContents.deleteModule('non_existent');
+    }).toThrowError('The module with id non_existent does not exist');
   });
 
-  it('should rearrange arcs in story contents', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should rearrange modules in story contents', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -806,22 +849,33 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
-        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
-        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+      modules: [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'Desc 1',
+          node_ids: [],
+        },
+        {
+          id: 'module_2',
+          title: 'Module 2',
+          description: 'Desc 2',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
-    storyContents.rearrangeArcs(['arc_2', 'arc_1']);
+    storyContents.rearrangeModules(['module_2', 'module_1']);
 
-    expect(storyContents.getArcs()[0].getId()).toBe('arc_2');
-    expect(storyContents.getArcs()[1].getId()).toBe('arc_1');
+    expect(storyContents.getModules()[0].getId()).toBe('module_2');
+    expect(storyContents.getModules()[1].getId()).toBe('module_1');
   });
 
-  it('should throw error when rearranging with an arc not in the story', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should throw error when rearranging with a module not in the story', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -844,20 +898,26 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
-        {id: 'arc_1', title: 'Arc 1', description: 'Desc 1', node_ids: []},
+      modules: [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'Desc 1',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
     expect(() => {
-      storyContents.rearrangeArcs(['arc_2']);
-    }).toThrowError('Arc with id arc_2 is not part of this story');
+      storyContents.rearrangeModules(['module_2']);
+    }).toThrowError('Module with id module_2 is not part of this story');
   });
 
-  it('should move node to a different arc', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should move node to a different module', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -898,23 +958,29 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_3',
-      arcs: [
+      modules: [
         {
-          id: 'arc_1',
-          title: 'Arc 1',
+          id: 'module_1',
+          title: 'Module 1',
           description: 'Desc 1',
           node_ids: ['node_1', 'node_2'],
         },
-        {id: 'arc_2', title: 'Arc 2', description: 'Desc 2', node_ids: []},
+        {
+          id: 'module_2',
+          title: 'Module 2',
+          description: 'Desc 2',
+          node_ids: [],
+        },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
-    storyContents.moveNodeToArc('node_1', 'arc_2');
+    storyContents.moveNodeToModule('node_1', 'module_2');
 
-    expect(storyContents.getArcs()[0].getNodeIds()).toEqual(['node_2']);
-    expect(storyContents.getArcs()[1].getNodeIds()).toEqual(['node_1']);
+    expect(storyContents.getModules()[0].getNodeIds()).toEqual(['node_2']);
+    expect(storyContents.getModules()[1].getNodeIds()).toEqual(['node_1']);
   });
 
   it('should set exploration id to null without error', () => {
@@ -925,8 +991,8 @@ describe('Story contents object factory', () => {
     expect(_sampleStoryContents._nodes[0]._explorationId).toBeNull();
   });
 
-  it('should throw an error when target arc is missing in moveNodeToArc', () => {
-    const backendDictWithArcs: StoryContentsBackendDict = {
+  it('should throw an error when target module is missing in moveNodeToModule', () => {
+    const backendDictWithModules: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
         {
@@ -949,24 +1015,25 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
+      modules: [
         {
-          id: 'arc_1',
-          title: 'Arc 1',
+          id: 'module_1',
+          title: 'Module 1',
           description: 'Desc 1',
           node_ids: ['node_1'],
         },
       ],
     };
-    const storyContents =
-      StoryContents.createFromBackendDict(backendDictWithArcs);
+    const storyContents = StoryContents.createFromBackendDict(
+      backendDictWithModules
+    );
 
     expect(() => {
-      storyContents.moveNodeToArc('node_1', 'missing_arc');
-    }).toThrowError('Arc with id missing_arc does not exist');
+      storyContents.moveNodeToModule('node_1', 'missing_module');
+    }).toThrowError('Module with id missing_module does not exist');
   });
 
-  it('should insert arc at the specified index', () => {
+  it('should insert module at the specified index', () => {
     const backendDict: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
@@ -990,22 +1057,22 @@ describe('Story contents object factory', () => {
         },
       ],
       next_node_id: 'node_2',
-      arcs: [
+      modules: [
         {
-          id: 'arc_default',
-          title: 'Default Arc',
+          id: 'module_default',
+          title: 'Default Module',
           description: '',
           node_ids: ['node_1'],
         },
       ],
     };
     const storyContents = StoryContents.createFromBackendDict(backendDict);
-    const newArc = ArcModel.createNew('arc_new', 'New Arc', '', []);
-    storyContents.insertArcAt(0, newArc);
+    const newModule = ModuleModel.createNew('module_new', 'New Module', '', []);
+    storyContents.insertModuleAt(0, newModule);
 
-    expect(storyContents.getArcs().length).toBe(2);
-    expect(storyContents.getArcs()[0].getId()).toBe('arc_new');
-    expect(storyContents.getArcs()[1].getId()).toBe('arc_default');
+    expect(storyContents.getModules().length).toBe(2);
+    expect(storyContents.getModules()[0].getId()).toBe('module_new');
+    expect(storyContents.getModules()[1].getId()).toBe('module_default');
   });
 
   it('should return the initial node id', () => {
@@ -1039,26 +1106,26 @@ describe('Story contents object factory', () => {
     ).not.toContain('node_2');
   });
 
-  it('should throw error when rearranging arcs with wrong length', () => {
-    _sampleStoryContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+  it('should throw error when rearranging modules with wrong length', () => {
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', 'Desc 1', [])
     );
 
     expect(() => {
-      _sampleStoryContents.rearrangeArcs(['arc_1', 'extra_arc']);
-    }).toThrowError('Arc order must include each arc exactly once');
+      _sampleStoryContents.rearrangeModules(['module_1', 'extra_module']);
+    }).toThrowError('Module order must include each module exactly once');
   });
 
-  it('should throw error when rearranging arcs with duplicate id', () => {
-    _sampleStoryContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+  it('should throw error when rearranging modules with duplicate id', () => {
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', 'Desc 1', [])
     );
-    _sampleStoryContents.addArc(
-      ArcModel.createNew('arc_2', 'Arc 2', 'Desc 2', [])
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', 'Desc 2', [])
     );
 
     expect(() => {
-      _sampleStoryContents.rearrangeArcs(['arc_1', 'arc_1']);
-    }).toThrowError('Duplicate arc id in arc order: arc_1');
+      _sampleStoryContents.rearrangeModules(['module_1', 'module_1']);
+    }).toThrowError('Duplicate module id in module order: module_1');
   });
 });
