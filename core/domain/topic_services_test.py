@@ -51,7 +51,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -78,7 +78,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.test_list: List[str] = []
         super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        changelist = [
+        changelist: List[topic_domain.TopicChange] = [
             topic_domain.TopicChange(
                 {
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
@@ -1145,7 +1145,21 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'old_value': 'Dummy Subtopic Title',
                     'new_value': 'New Title',
                 }
-            )
+            ),
+            subtopic_page_domain.SubtopicPageChange(
+                {
+                    'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                    'property_name': (
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    ),
+                    'old_value': '',
+                    'subtopic_id': 1,
+                    'new_value': {
+                        'html': '<p>New page content</p>',
+                        'content_id': 'content',
+                    },
+                }
+            ),
         ]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin,
@@ -1295,6 +1309,150 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
+
+    def test_unpublish_story_updates_chapters_when_serial_chapter_feature_disabled(
+        self,
+    ) -> None:
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_id']
+        )
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+        ]
+    )
+    def test_unpublish_story_keeps_chapters_published_when_serial_chapter_feature_enabled(
+        self,
+    ) -> None:
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_id']
+        )
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        self.assertEqual(
+            story.story_contents.nodes[0].status,
+            constants.STORY_NODE_STATUS_PUBLISHED,
+        )
+
+    def test_publish_story_regenerates_contributor_stats(self) -> None:
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_unpublish_story_regenerates_contributor_stats(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_update_topic_regenerates_stats_for_assignment_change(self) -> None:
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+                    'uncategorized_skill_id': self.skill_id_1,
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin,
+                self.TOPIC_ID,
+                changelist,
+                'Removed skill from topic.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_update_topic_regenerates_stats_for_canonical_story_reference_change(
+        self,
+    ) -> None:
+        # Canonical story reference changes require contributor stats
+        # regeneration even though they are not applied as a topic property
+        # update by the topic change handler.
+        # Here we use type Any because BaseChange accepts nested dictionaries
+        # for update_topic_property values, including story reference dictionaries.
+        old_story_references: List[Dict[str, Any]] = []
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': (
+                        topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES
+                    ),
+                    'old_value': old_story_references,
+                    'new_value': [
+                        {
+                            'story_id': self.story_id_1,
+                            'story_is_published': False,
+                            'story_unpublish_type': None,
+                        }
+                    ],
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin,
+                self.TOPIC_ID,
+                changelist,
+                'Updated canonical story references.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_update_topic_does_not_regenerate_stats_for_metadata_changes(
+        self,
+    ) -> None:
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'Description',
+                    'new_value': 'Updated description.',
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin,
+                self.TOPIC_ID,
+                changelist,
+                'Updated topic description.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 0)
 
     def test_unpublish_story_temporarily_sets_unpublish_type(self) -> None:
         topic_services.publish_story(
@@ -1599,6 +1757,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         with self.swap_to_always_return(
             question_services, 'get_total_question_count_for_skill_ids', 10
+        ):
+            topic_services.publish_story(
+                self.TOPIC_ID, story_id, self.user_id_admin
+            )
+
+        # Republishing an already-published story skips the question-count
+        # validation.
+        with self.swap_to_always_return(
+            question_services, 'get_total_question_count_for_skill_ids', 0
         ):
             topic_services.publish_story(
                 self.TOPIC_ID, story_id, self.user_id_admin
@@ -1982,7 +2149,29 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'content_id': 'content',
                     },
                 }
-            )
+            ),
+            subtopic_page_domain.SubtopicPageChange(
+                {
+                    'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                    'property_name': (
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
+                    ),
+                    'old_value': {'voiceovers_mapping': {'content': {}}},
+                    'subtopic_id': 1,
+                    'new_value': {
+                        'voiceovers_mapping': {
+                            'content': {
+                                'en': {
+                                    'filename': 'test.mp3',
+                                    'file_size_bytes': 100,
+                                    'needs_update': False,
+                                    'duration_secs': 0.3,
+                                }
+                            }
+                        }
+                    },
+                }
+            ),
         ]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Updated html data'
@@ -2268,6 +2457,31 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic'
         )
+
+        # Test updating a subtopic title while the restructured study guide
+        # feature is enabled.
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                    'property_name': topic_domain.SUBTOPIC_PROPERTY_TITLE,
+                    'subtopic_id': 2,
+                    'old_value': 'Title2',
+                    'new_value': 'Updated Title2',
+                }
+            )
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            changelist,
+            'Updated subtopic title.',
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        updated_subtopic = next(
+            subtopic for subtopic in topic.subtopics if subtopic.id == 2
+        )
+        self.assertEqual(updated_subtopic.title, 'Updated Title2')
 
         # Test whether a study guide already existing in datastore can be
         # edited.
