@@ -72,10 +72,8 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(migrated_model.rule_schema_version, 1)
         self.assertFalse(migrated_model.default_value)
-        self.assertIsNone(
-            config_models.PlatformParameterModel.get(
-                'parameter_name', strict=False
-            )
+        self.assertIsNotNone(
+            config_models.PlatformParameterModel.get('parameter_name')
         )
 
     def test_migrates_legacy_version_history(self) -> None:
@@ -230,15 +228,13 @@ class MigrateWebPlatformParameterConfigSnapshotModelsJobTests(
             {'rules': [], 'default_value': False},
         )
         self.assertEqual(migrated_content.created_on, legacy_content.created_on)
-        self.assertIsNone(
+        self.assertIsNotNone(
             config_models.PlatformParameterSnapshotMetadataModel.get(
-                snapshot_id, strict=False
+                snapshot_id
             )
         )
-        self.assertIsNone(
-            config_models.PlatformParameterSnapshotContentModel.get(
-                snapshot_id, strict=False
-            )
+        self.assertIsNotNone(
+            config_models.PlatformParameterSnapshotContentModel.get(snapshot_id)
         )
 
 

@@ -76,16 +76,6 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
                 | 'Put migrated WebPlatformParameterConfigModels'
                 >> ndb_io.PutModels()
             )
-            legacy_model_keys = (
-                legacy_models
-                | 'Get legacy PlatformParameterModel keys'
-                >> beam.Map(lambda model: model.key)
-            )
-            _ = (
-                legacy_model_keys
-                | 'Delete legacy PlatformParameterModels'
-                >> ndb_io.DeleteModels()
-            )
 
         count_result = (
             migrated_models
@@ -189,18 +179,6 @@ class MigrateWebPlatformParameterConfigSnapshotModelsJob(base_jobs.JobBase):
             _ = (
                 migrated_content_models
                 | 'Put web snapshot content' >> ndb_io.PutModels()
-            )
-            _ = (
-                legacy_metadata_models
-                | 'Get legacy snapshot metadata keys'
-                >> beam.Map(lambda model: model.key)
-                | 'Delete legacy snapshot metadata' >> ndb_io.DeleteModels()
-            )
-            _ = (
-                legacy_content_models
-                | 'Get legacy snapshot content keys'
-                >> beam.Map(lambda model: model.key)
-                | 'Delete legacy snapshot content' >> ndb_io.DeleteModels()
             )
 
         metadata_results = (
