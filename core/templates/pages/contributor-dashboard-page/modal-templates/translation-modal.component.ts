@@ -259,6 +259,7 @@ export class TranslationModalComponent {
     ) => {
       if (componentId === 'image') {
         this.hasAltTextModalBeenOpened = true;
+        this.changeDetectorRef.detectChanges();
       }
       // This throws "Expected 3 arguments, but got 2 or more". We need to suppress this error because we are passing all arguments dynamically.
       // @ts-ignore
