@@ -40,7 +40,7 @@ core/templates/pages/practice-session-page/practice-session-page.component.ts
 core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.component.ts
 core/templates/pages/preferences-page/preferences-page.component.ts
 core/templates/pages/profile-page/profile-page.component.ts
-core/templates/pages/review-test-page/review-test-page.component.ts
+
 core/templates/pages/signup-page/signup-page.component.ts
 core/templates/pages/skill-editor-page/editor-tab/skill-editor-main-tab.component.ts
 core/templates/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/misconception-editor.component.ts

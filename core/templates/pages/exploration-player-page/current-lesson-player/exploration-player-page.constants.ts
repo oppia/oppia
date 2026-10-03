@@ -96,14 +96,6 @@ export const ExplorationPlayerConstants = {
   STATISTICAL_CLASSIFICATION: 'statistical_classifier',
   DEFAULT_OUTCOME_CLASSIFICATION: 'default_outcome',
 
-  EXPLORATION_MODE: {
-    DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
-    EXPLORATION: 'exploration',
-    PRETEST: 'pretest',
-    QUESTION_PLAYER: 'question_player',
-    STORY_CHAPTER: 'story_chapter',
-  },
-
   STATS_EVENT_TYPES: {
     EVENT_TYPE_START_EXPLORATION: 'start',
     EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',

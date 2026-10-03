@@ -176,7 +176,6 @@ LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
     'FEEDBACK_UPDATES',
     'LIBRARY_RECENTLY_PUBLISHED',
     'LIBRARY_TOP_RATED',
-    'REVIEW_TEST',
     # These routes are excluded either because they are for redirection or
     # because they are rarely used.
     'ERROR',
