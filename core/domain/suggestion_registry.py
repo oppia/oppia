@@ -31,8 +31,6 @@ from core.domain import (
     fs_services,
     html_cleaner,
     opportunity_services,
-    platform_parameter_list,
-    platform_parameter_services,
     question_domain,
     question_services,
     skill_domain,
@@ -42,6 +40,8 @@ from core.domain import (
     translation_domain,
     translation_services,
     user_services,
+    web_platform_parameter_list,
+    web_platform_parameter_services,
 )
 from core.platform import models
 from extensions import domain
@@ -1536,8 +1536,8 @@ class CommunityContributionStats:
         number_of_suggestions = self.translation_suggestion_counts_by_lang_code[
             lang_code
         ]
-        max_number_of_suggestions_per_reviewer = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+        max_number_of_suggestions_per_reviewer = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
         )
         assert isinstance(max_number_of_suggestions_per_reviewer, int)
         return bool(
@@ -1581,8 +1581,8 @@ class CommunityContributionStats:
         if self.question_reviewer_count == 0:
             return True
 
-        max_number_of_suggestions_per_reviewer = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+        max_number_of_suggestions_per_reviewer = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
         )
         assert isinstance(max_number_of_suggestions_per_reviewer, int)
 
