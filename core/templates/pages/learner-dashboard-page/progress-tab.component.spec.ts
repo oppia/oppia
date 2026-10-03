@@ -41,6 +41,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
     sectionNameI18nId: null,
@@ -957,5 +958,39 @@ describe('Progress Tab Component', () => {
     ];
 
     expect(allSkills.reduce(component.getTotalSkillCards, 0)).toBe(4);
+  });
+
+  it('should correctly calculate subtopic progress', () => {
+    const mockSubtopics = component.partiallyLearntTopicsList[0].subtopics;
+    const masteryWithValues = {1: 0.5};
+    const masteryEmpty = {};
+
+    const progressWithValues = component.getSubtopicProgress(
+      mockSubtopics,
+      masteryWithValues
+    );
+    const progressEmpty = component.getSubtopicProgress(
+      mockSubtopics,
+      masteryEmpty
+    );
+
+    expect(progressWithValues[0]).toBe(50);
+    expect(progressEmpty[0]).toBe(0);
+  });
+
+  it('should return whether current language is RTL', () => {
+    const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should correctly set topic mastery on init', () => {
+    component.partialTopicMastery = [];
+    component.learntTopicMastery = [];
+    component.setTopicMastery();
+    expect(component.partialTopicMastery.length).toBe(1);
+    expect(component.learntTopicMastery.length).toBe(1);
   });
 });

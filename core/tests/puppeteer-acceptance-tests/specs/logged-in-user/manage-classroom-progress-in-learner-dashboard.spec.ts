@@ -24,7 +24,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -32,7 +31,6 @@ const ROLES = testConstants.Roles;
 describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(
     async function () {
@@ -40,16 +38,6 @@ describe('Logged-in User', function () {
         'curriculumAdm',
         'curriculumAdmin@example.com',
         [ROLES.CURRICULUM_ADMIN]
-      );
-
-      releaseCoordinator = await UserFactory.createNewUser(
-        'releaseCoordinator',
-        'release_coordinator@example.com',
-        [ROLES.RELEASE_COORDINATOR]
-      );
-
-      await releaseCoordinator.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
       );
 
       await curriculumAdmin.createNewClassroom('Math', 'math');
