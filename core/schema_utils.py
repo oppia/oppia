@@ -200,10 +200,6 @@ def normalize_against_schema(
             raise Exception(
                 'Could not convert %s to int: %s' % (type(obj).__name__, obj)
             ) from e
-        assert isinstance(obj, numbers.Integral), (
-            'Expected int, received %s' % obj
-        )
-        assert isinstance(obj, int), 'Expected int, received %s' % obj
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         # TODO(#14028): Use just one type.
@@ -579,8 +575,10 @@ class _Validators:
         """
         return obj <= max_value
 
+    # Here we use object because this validator intentionally handles
+    # runtime values that may not be strings.
     @staticmethod
-    def does_not_contain_email(obj: str) -> bool:
+    def does_not_contain_email(obj: object) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
