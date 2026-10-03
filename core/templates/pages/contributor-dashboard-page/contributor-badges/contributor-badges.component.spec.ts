@@ -191,6 +191,7 @@ describe('Contributor badge component', () => {
   describe('when user navigates to contributor badge page ', () => {
     describe('when user has translation badges and question rights ', () => {
       const userContributionRights = {
+        can_submit_translation_for_language_codes: [],
         can_review_translation_for_language_codes: ['es', 'pt', 'hi'],
         can_review_voiceover_for_language_codes: ['es', 'pt', 'hi'],
         can_review_questions: true,
@@ -312,6 +313,7 @@ describe('Contributor badge component', () => {
 
     describe('when user has no translation badges and no question rights ', () => {
       const userContributionRights = {
+        can_submit_translation_for_language_codes: [],
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: [],
         can_review_questions: false,

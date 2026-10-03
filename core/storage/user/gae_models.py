@@ -2725,6 +2725,9 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_translation_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True)
     )
+    can_submit_translation_for_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )
     can_review_voiceover_for_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
@@ -2781,6 +2784,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             'can_review_translation_for_language_codes': (
                 rights_model.can_review_translation_for_language_codes
             ),
+            'can_submit_translation_for_language_codes': (
+                rights_model.can_submit_translation_for_language_codes
+            ),
             'can_review_voiceover_for_language_codes': (
                 rights_model.can_review_voiceover_for_language_codes
             ),
@@ -2802,6 +2808,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'can_review_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
+                'can_submit_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_voiceover_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
                 'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED,
