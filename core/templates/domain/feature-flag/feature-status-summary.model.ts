@@ -22,7 +22,7 @@
  * PascalCase, and the RHS is in snake_case, which is the naming convention
  * of features in the backend.
  */
-export enum FeatureNames {
+export enum WebFeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
@@ -61,17 +61,17 @@ export interface FeatureStatusSummaryBackendDict {
 
 /**
  * Status checker of feature flags, which are keyed on their names defined in
- * FeatureNames. This provides interface for developer to access feature flag
+ * WebFeatureNames. This provides interface for developer to access feature flag
  * values with feature name hint:
  *   featureStatusChecker.DummyFeatureFlagForE2ETests.isEnabled === true
  */
 export type FeatureStatusChecker = {
-  [name in keyof typeof FeatureNames]: {
+  [name in keyof typeof WebFeatureNames]: {
     isEnabled: boolean;
   };
 };
 
-export type FeatureNamesKeys = (keyof typeof FeatureNames)[];
+export type WebFeatureNamesKeys = (keyof typeof WebFeatureNames)[];
 
 /**
  * Item of the status checker of feature flags, which represents the status of
@@ -123,8 +123,12 @@ export class FeatureStatusSummary {
    */
   static createDefault(): FeatureStatusSummary {
     const defaultDict: FeatureStatusSummaryBackendDict = {};
-    const featureNamesKeys = Object.keys(FeatureNames) as FeatureNamesKeys;
-    featureNamesKeys.forEach(name => (defaultDict[FeatureNames[name]] = false));
+    const WebFeatureNamesKeys = Object.keys(
+      WebFeatureNames
+    ) as WebFeatureNamesKeys;
+    WebFeatureNamesKeys.forEach(
+      name => (defaultDict[WebFeatureNames[name]] = false)
+    );
     return this.createFromBackendDict(defaultDict);
   }
 
@@ -149,11 +153,13 @@ export class FeatureStatusSummary {
    */
   toStatusChecker(): FeatureStatusChecker {
     const checker = {} as FeatureStatusChecker;
-    const featureNamesKeys = Object.keys(FeatureNames) as FeatureNamesKeys;
-    featureNamesKeys.forEach(name => {
+    const WebFeatureNamesKeys = Object.keys(
+      WebFeatureNames
+    ) as WebFeatureNamesKeys;
+    WebFeatureNamesKeys.forEach(name => {
       Object.defineProperty(checker, name, {
         value: new FeatureStatusCheckerItem(() =>
-          this.isFeatureEnabled(FeatureNames[name])
+          this.isFeatureEnabled(WebFeatureNames[name])
         ),
       });
     });

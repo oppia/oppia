@@ -29,5 +29,5 @@ export const FeatureFlagDomainConstants = {
 
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
-  UPDATE_FEATURE_FLAG_ACTION: 'update_feature_flag',
+  UPDATE_WEB_FEATURE_FLAG_ACTION: 'update_web_feature_flag',
 } as const;
