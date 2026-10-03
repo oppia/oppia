@@ -78,9 +78,7 @@ def save_language_accent_code_to_beam_job_run_model(
 ) -> None:
     """Saves the Beam job run ID for a language-accent code."""
     existing_model = gae_models.LanguageAccentCodeToBeamJobRunModel.get(
-        gae_models.LanguageAccentCodeToBeamJobRunModel.generate_id(
-            language_accent_code
-        ),
+        language_accent_code,
         strict=False,
     )
     if existing_model is not None:
