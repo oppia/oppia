@@ -105,7 +105,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   allQuestions!: number;
   finalCorrect!: number;
   scorePerSkillMapping!: ScorePerSkillMapping;
-  testIsPassed!: boolean;
   masteryPerSkillMapping!: MasteryPerSkillMapping;
   userIsLoggedIn!: boolean;
   canCreateCollections!: boolean;
@@ -482,7 +481,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.allQuestions = 0;
     this.finalCorrect = 0.0;
     this.scorePerSkillMapping = {};
-    this.testIsPassed = true;
     this.questionsLoading = true;
   }
 
@@ -541,7 +539,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             this.calculateMasteryDegrees(questionStateData);
           }
 
-          this.testIsPassed = true;
           this.siteAnalyticsService.registerPracticeSessionEndEvent(
             this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
             this.urlService.getTopicUrlFragmentFromLearnerUrl(),

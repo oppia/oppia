@@ -194,7 +194,6 @@ describe('Question Player Component', () => {
     expect(component.currentProgress).toBe(0);
     expect(component.totalScore).toBe(0.0);
     expect(component.scorePerSkillMapping).toEqual({});
-    expect(component.testIsPassed).toBe(true);
     expect(
       questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).toHaveBeenCalledWith(false);
@@ -274,7 +273,6 @@ describe('Question Player Component', () => {
     tick();
     tick();
 
-    expect(component.testIsPassed).toBe(true);
     expect(component.calculateScores).toHaveBeenCalled();
     expect(component.userIsLoggedIn).toBe(true);
   }));

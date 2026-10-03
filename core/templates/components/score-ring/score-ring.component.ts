@@ -38,7 +38,6 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() score!: number;
-  @Input() testIsPassed!: boolean;
   @ViewChild('scoreRing') scoreRingElement!: ElementRef<SVGCircleElement>;
   circle!: SVGCircleElement;
   radius!: number;
@@ -53,21 +52,11 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
   }
 
   getScoreRingColor(): string {
-    if (this.testIsPassed) {
-      return this.SCORE_COLORS.PASSED_COLOR;
-    } else {
-      return this.SCORE_COLORS.FAILED_COLOR;
-    }
+    return this.SCORE_COLORS.PASSED_COLOR;
   }
 
   getScoreOuterRingColor(): string {
-    if (this.testIsPassed) {
-      // Return color green when passed.
-      return this.SCORE_COLORS.PASSED_COLOR_OUTER;
-    } else {
-      // Return color orange when failed.
-      return this.SCORE_COLORS.FAILED_COLOR_OUTER;
-    }
+    return this.SCORE_COLORS.PASSED_COLOR_OUTER;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -24,10 +24,6 @@ export const QuestionPlayerConstants = {
   MAX_MASTERY_LOSS_PER_QUESTION: -0.1,
 
   SCORE_COLORS: {
-    // Color orange.
-    FAILED_COLOR: 'rgb(217, 92, 12)',
-    // Color shallow orange.
-    FAILED_COLOR_OUTER: 'rgb(244, 206, 186)',
     // Color green.
     PASSED_COLOR: 'rgb(0, 150, 136)',
     // Color blue.
