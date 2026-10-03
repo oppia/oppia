@@ -114,6 +114,10 @@ describe('TranslationConfigurationTabComponent', () => {
     expect(component.allAvailableProviders).toEqual([
       {id: 'azure', displayName: 'Azure Translator'},
     ]);
+    // 'hi' is already mapped, so unmappedLanguageOptions should only show 'es'.
+    expect(component.unmappedLanguageOptions).toEqual([
+      {code: 'es', name: 'Spanish'},
+    ]);
   }));
 
   it('should add a new language-provider mapping and save', fakeAsync(() => {
@@ -222,11 +226,39 @@ describe('TranslationConfigurationTabComponent', () => {
     ]);
   });
 
-  it('should get unmapped language options', fakeAsync(() => {
+  it('should populate unmappedLanguageOptions on init', fakeAsync(() => {
     fixture.detectChanges();
     tick();
 
-    expect(component.getUnmappedLanguageOptions()).toEqual([
+    // 'hi' is already mapped, so only 'es' (Spanish) should appear.
+    expect(component.unmappedLanguageOptions).toEqual([
+      {code: 'es', name: 'Spanish'},
+    ]);
+  }));
+
+  it('should remove a language from unmappedLanguageOptions after addMapping', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+
+    component.selectedLanguage = 'es';
+    component.selectedProvider = 'azure';
+    component.addMapping();
+    tick();
+
+    // Both 'hi' and 'es' are now mapped, so the list should be empty.
+    expect(component.unmappedLanguageOptions).toEqual([]);
+  }));
+
+  it('should add a language back to unmappedLanguageOptions after removeMapping', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+
+    component.removeMapping('hi');
+    tick();
+
+    // 'hi' is unmapped again; both 'hi' (Hindi) and 'es' (Spanish) are available.
+    expect(component.unmappedLanguageOptions).toEqual([
+      {code: 'hi', name: 'Hindi'},
       {code: 'es', name: 'Spanish'},
     ]);
   }));
