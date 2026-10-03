@@ -657,7 +657,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         suggestion.target_id
       );
       this.pageContextService.setImageContextNewImageFilenames(
-        suggestion.newImageFilenames || []
+        suggestion.new_image_filenames || []
       );
       this._showTranslationSuggestionModal(
         suggestionIdToContribution,
