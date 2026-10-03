@@ -51,9 +51,6 @@ export enum FeatureNames {
   WebFeedbackModalEnabled = 'web_feedback_modal_enabled',
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
   TechnicalFeedbackDashboardEnabled = 'technical_feedback_dashboard_enabled',
-  // This value is the persisted flag name that the server returns in the
-  // feature status summary; the migration job renames the persisted
-  // FeatureFlagConfigModel id from 'story_editor_arcs' to this value.
   StoryEditorModules = 'story_editor_modules',
   EnableDropdownPagination = 'enable_dropdown_pagination',
 }

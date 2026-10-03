@@ -1,10 +1,5 @@
 <div class="modal-header">
-  <!--TODO(#19614): Rename the I18N_STORY_EDITOR_EDIT_ARC and
-  I18N_STORY_EDITOR_SAVE_ARC keys (and their values in all locale files) to
-  drop the stale "arc" terminology. The rendered text already says "Module";
-  only the key names are out of date. This is deferred so that the key rename
-  and the story-editor code rename do not land in the same commit.-->
-  <h3 [innerHTML]="'I18N_STORY_EDITOR_EDIT_ARC' | translate"></h3>
+  <h3 [innerHTML]="'I18N_STORY_EDITOR_EDIT_MODULE' | translate"></h3>
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
@@ -30,6 +25,6 @@
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary e2e-test-cancel-edit-module-button" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate">
   </button>
-  <button type="button" class="btn btn-success e2e-test-save-edit-module-button" (click)="save()" [innerHTML]="'I18N_STORY_EDITOR_SAVE_ARC' | translate">
+  <button type="button" class="btn btn-success e2e-test-save-edit-module-button" (click)="save()" [innerHTML]="'I18N_STORY_EDITOR_SAVE_MODULE' | translate">
   </button>
 </div>

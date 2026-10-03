@@ -18,10 +18,6 @@
  */
 
 import {StoryNode, StoryNodeBackendDict} from './story-node.model';
-// ModuleBackendDict is declared in story-contents-object.model.ts, since
-// the story editor is the owner of the module domain object. It is re-used
-// here rather than declared a second time, so that the two representations
-// of a module can never drift apart.
 import {ModuleBackendDict} from './story-contents-object.model';
 
 export interface StorySummaryBackendDict {
