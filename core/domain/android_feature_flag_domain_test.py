@@ -59,7 +59,7 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
             android_feature_flag_domain.AndroidFeatureFlagConfig.from_dict(
                 {
                     'state': 'unknown',
-                    'min_app_version': None,
+                    'min_app_version': '1.2.3',
                     'max_app_version': None,
                     'rollout_percentage': 100,
                 }
@@ -71,8 +71,10 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
         ):
             android_feature_flag_domain.AndroidFeatureFlagConfig.from_dict(
                 {
-                    'state': None,
-                    'min_app_version': None,
+                    # Here we use MyPy ignore because we are intentionally
+                    # passing None to verify runtime validation.
+                    'state': None,  # type: ignore[typeddict-item]
+                    'min_app_version': '1.2.3',
                     'max_app_version': None,
                     'rollout_percentage': 100,
                 }
@@ -188,7 +190,7 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
             # Here we use MyPy ignore because this test passes an invalid state
             # type to verify runtime validation.
             'live',  # type: ignore[arg-type]
-            None,
+            '1.2.3',
             None,
             100,
         )
@@ -207,5 +209,18 @@ class AndroidFeatureFlagConfigTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Android app versions must be valid version strings',
+        ):
+            config.validate()
+
+    def test_validate_with_boolean_rollout_raises_error(self) -> None:
+        config = android_feature_flag_domain.AndroidFeatureFlagConfig(
+            android_feature_flag_domain.AndroidFeatureFlagState.FINAL,
+            '1.2.3',
+            None,
+            True,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'rollout percentage must be integer between 0 and 100 inclusive',
         ):
             config.validate()
