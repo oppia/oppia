@@ -27,6 +27,8 @@ const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const wikiPrivilegesToFirebaseAccount =
+  testConstants.URLs.WikiPrivilegesToFirebaseAccount;
 const loginPageUrl = testConstants.URLs.Login;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
@@ -37,10 +39,11 @@ const loginPage = '.e2e-test-login-page';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+const signInButton = '.e2e-test-sign-in-button';
 
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
-const invalidEmailErrorContainer = '#mat-error-1';
+const invalidEmailErrorContainer = 'mat-error';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -362,30 +365,79 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Clicks the Oppia Wiki link that explains admin access and verifies its
+   * destination.
+   */
+  async clickAdminAccessInfoLink(): Promise<void> {
+    await this.clickAndVerifyAnchorWithInnerText(
+      'Oppia Wiki',
+      wikiPrivilegesToFirebaseAccount
+    );
+  }
+
+  /**
+   * Verifies the validation error shown for an invalid email address.
+   * @param {string} expectedError - The expected validation error.
+   */
+  async expectValidationError(expectedError: string): Promise<void> {
+    await this.expectElementToBeVisible(invalidEmailErrorContainer);
+    const errorMessage = await this.page.$eval(
+      invalidEmailErrorContainer,
+      el => el.textContent
+    );
+    const trimmedErrorMessage = errorMessage?.trim();
+
+    if (trimmedErrorMessage !== expectedError) {
+      throw new Error(
+        `Validation error does not match. Expected: ${expectedError}, but got: ${trimmedErrorMessage}`
+      );
+    }
+  }
+
+  /**
+   * Verifies the admin email suggestion shown in the sign-in email field.
+   * @param {string} expectedSuggestion - The expected email suggestion.
+   */
+  async expectAdminEmailSuggestion(expectedSuggestion: string): Promise<void> {
+    await this.expectElementToBeVisible(signUpEmailField);
+    await this.clickOnElementWithSelector(signUpEmailField);
+    await this.expectElementToBeVisible(optionText);
+    const suggestion = await this.page.$eval(optionText, el => el.textContent);
+
+    if (suggestion?.trim() !== expectedSuggestion) {
+      throw new Error(
+        `Suggestion does not match. Expected: ${expectedSuggestion}, but got: ${suggestion}`
+      );
+    }
+
+    // Click anywhere on the page to remove focus from the email field.
+    await this.page.click('body');
+  }
+
+  /**
    * Function to enter email and proceed to the next page (username page).
    * This will click "Sign In" and verify the username field is visible.
    * @param {string} email - The email to enter.
    */
   async enterEmailAndProceedToNextPage(email: string): Promise<void> {
     await this.expectElementToBeVisible(signUpEmailField);
-
-    await this.clearAllTextFrom(signUpEmailField);
-    await this.typeInInputField(signUpEmailField, email);
+    await this.page.locator(signUpEmailField).fill(email);
 
     await this.waitForPageToFullyLoad();
-    const invalidEmailErrorContainerElement = await this.page.$(
-      invalidEmailErrorContainer
-    );
-    if (!invalidEmailErrorContainerElement) {
-      await this.clickOnElementWithText('Sign In');
-      await this.page.waitForNavigation({waitUntil: 'networkidle'});
-
-      // Post Check: Check if the login page is closed. We can't check if user
-      // is redirected to the home page it is dependent to "redirects" in URL.
-      await this.expectElementToBeVisible(signUpEmailField, false);
-
-      await this.expectElementToBeVisible(signUpUsernameField);
+    await this.expectElementToBeVisible(signInButton);
+    const signInButtonElement = this.page.locator(signInButton);
+    if (await signInButtonElement.isDisabled()) {
+      return;
     }
+
+    await this.clickOnElementWithSelector(signInButton);
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
+
+    // Post Check: Check if the login page is closed. We can't check if user
+    // is redirected to the home page it is dependent to "redirects" in URL.
+    await this.expectElementToBeVisible(signUpEmailField, false);
+
+    await this.expectElementToBeVisible(signUpUsernameField);
   }
 
   /**
@@ -2143,8 +2195,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(signUpUsernameField);
-    await this.clearAllTextFrom(signUpUsernameField);
-    await this.typeInInputField(signUpUsernameField, username);
+    await this.page.locator(signUpUsernameField).fill(username);
     // Using blur() to remove focus from signUpUsernameField.
     await this.page.evaluate(selector => {
       (document.querySelector(selector) as HTMLElement)?.blur();
