@@ -31,14 +31,9 @@ const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 
 const partnershipsUrl = testConstants.URLs.Partnerships;
-const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
-const blogUrl = testConstants.URLs.Blog;
-const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
-const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
-  '.e2e-test-partnerships-page-partner-with-us-button-at-the-bottom';
 const brochureButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-brochure-button';
 const readMoreStoriesButtonInPartnershipsPage =
@@ -46,11 +41,8 @@ const readMoreStoriesButtonInPartnershipsPage =
 const partnershipHeadingSelector = '.e2e-test-partnership-heading';
 const partneringWithOppiaImageSelector =
   '.e2e-test-partnering-with-oppia-image';
-const learnerStoriesHeadingSelector = '.e2e-test-learner-stories-heading';
 const learnerStoriesCarouselSelector =
   '.e2e-test-learner-stories-coursal-container';
-const partnershipYoutubeVideoIframeSelector =
-  '.e2e-test-partnership-youtube-video-iframe';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabPartnershipsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
