@@ -254,21 +254,22 @@ export class PracticeQuestionSubmitter extends Contributor {
   ): Promise<ElementHandle<Element> | null> {
     await this.navigateToContributorDashboard();
     await this.expectElementToBeVisible(opportunityListItem);
-    const opportunityListItems = await this.page.$$(opportunityListItem);
-    for (const item of opportunityListItems) {
-      const headingElement = await item.waitForSelector(
-        opportunityHeadingTitleSelector,
-        {state: 'visible'}
-      );
-      const heading = await headingElement.evaluate(el =>
-        el.textContent?.trim()
-      );
-
-      if (heading === opportunityHeadingTitle) {
-        return item;
-      }
+    // A locator is re-queried on each use, so it survives the list being
+    // re-rendered after load (element handles from $$ become detached).
+    const item = this.page
+      .locator(opportunityListItem)
+      .filter({
+        has: this.page.locator(opportunityHeadingTitleSelector, {
+          hasText: opportunityHeadingTitle,
+        }),
+      })
+      .first();
+    try {
+      await item.waitFor({state: 'visible', timeout: 30000});
+    } catch {
+      return null;
     }
-    return null;
+    return item.elementHandle();
   }
 
   /**
