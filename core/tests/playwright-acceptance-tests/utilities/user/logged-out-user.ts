@@ -2984,7 +2984,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the main partnership heading text matches expected heading.
    */
   async expectPartnershipHeadingToBe(heading: string): Promise<void> {
-    await this.expectElementToHaveText(partnershipHeadingSelector, heading);
+    await this.expectTextContentToBe(partnershipHeadingSelector, heading);
   }
 
   /**

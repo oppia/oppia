@@ -16,17 +16,20 @@
  * @fileoverview Acceptance test for Interested Partner Organization.
  */
 
+import {test} from '@playwright/test';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {UserFactory} from '../../utilities/common/user-factory';
 
-describe('Interested Partner Organization', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Partner Organization', function () {
   let partnerOrganizationUser: LoggedOutUser;
 
-  beforeAll(async function () {
-    partnerOrganizationUser = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    partnerOrganizationUser = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it("should be able to learn about Oppia's partnership program", async function () {
+  test("should be able to learn about Oppia's partnership program", async function () {
     // Navigate to splash page and verify screenshot.
     await partnerOrganizationUser.navigateToSplashPageAsLoggedOutUser();
     await partnerOrganizationUser.expectScreenshotToMatch('homePage');
@@ -79,12 +82,12 @@ describe('Interested Partner Organization', function () {
     await partnerOrganizationUser.verifyLearnerStoriesCarouselInPartnershipPageWorksProperly();
   });
 
-  it('should be able to open partnership form', async function () {
+  test('should be able to open partnership form', async function () {
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.clickPartnerWithUsButtonInPartnershipsPage();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
