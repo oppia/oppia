@@ -57,7 +57,8 @@ test.describe('Logged-in Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values',
-      'Place Values'
+      'Place Values',
+      true
     );
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
     await curriculumAdmin.publishClassroom('Math');
