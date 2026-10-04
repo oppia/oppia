@@ -2478,13 +2478,5 @@ describe('Conversation skin component', () => {
       isInQuestionModeSpy.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
     }));
-
-    it('should report whether the skin should open in a new window', () => {
-      componentInstance.isIframed = false;
-      expect(componentInstance.openInNewWindow).toBe(false);
-
-      componentInstance.isIframed = true;
-      expect(componentInstance.openInNewWindow).toBe(true);
-    });
   });
 });

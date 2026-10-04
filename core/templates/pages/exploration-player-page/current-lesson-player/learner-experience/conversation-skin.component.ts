@@ -90,10 +90,6 @@ export class ConversationSkinComponent {
   collectionSummary: CollectionSummaryBackendDict | string | null = null;
   moveToExploration: boolean = false;
 
-  get openInNewWindow(): boolean {
-    return this.isIframed;
-  }
-
   pidInUrl: string | null = null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
