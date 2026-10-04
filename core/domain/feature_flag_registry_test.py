@@ -58,6 +58,27 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             )
         self.assertIsNotNone(feature_flag)
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
+        self.assertIsNone(feature_flag.feature_flag_spec.developer_notes)
+
+        swap_with_notes = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.FEATURE_A.value: (
+                    'test description',
+                    FeatureStages.DEV,
+                    'developer note',
+                )
+            },
+        )
+        with swap_with_notes:
+            feature_flag = registry.Registry.get_feature_flag(
+                FeatureNames.FEATURE_A.value
+            )
+        self.assertIsNotNone(feature_flag)
+        self.assertEqual(
+            feature_flag.feature_flag_spec.developer_notes, 'developer note'
+        )
 
     def test_get_non_existing_feature_failure(self) -> None:
         with self.assertRaisesRegex(

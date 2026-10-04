@@ -25,7 +25,7 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Set
+from typing import Dict, List, Mapping, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -105,9 +105,24 @@ def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
     if name not in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
         raise Exception('Feature flag not found: %s.' % name)
 
+    feature_flag_spec_values = (
+        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name]
+    )
+    if len(feature_flag_spec_values) > 2:
+        # Here we use cast because mypy does not narrow the tuple
+        # length based on the len() check.
+        feature_flag_spec_values_with_notes = cast(
+            Tuple[str, feature_flag_domain.ServerMode, Optional[str]],
+            feature_flag_spec_values,
+        )
+        developer_notes = feature_flag_spec_values_with_notes[2]
+    else:
+        developer_notes = None
+
     return feature_flag_domain.FeatureFlagSpec(
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
+        feature_flag_spec_values[0],
+        feature_flag_spec_values[1],
+        developer_notes,
     )
 
 

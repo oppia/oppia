@@ -32,6 +32,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             {
                 'description': 'for test',
                 'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+                'developer_notes': None,
             }
         )
         self.assertIsInstance(
@@ -42,11 +43,13 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             feature_flag_spec.feature_stage,
             feature_flag_domain.FeatureStages.DEV,
         )
+        self.assertIsNone(feature_flag_spec.developer_notes)
 
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
                 'feature_stage': feature_flag_domain.FeatureStages.TEST.value,
+                'developer_notes': None,
             }
         )
         self.assertIsInstance(
@@ -57,11 +60,13 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             feature_flag_spec.feature_stage,
             feature_flag_domain.FeatureStages.TEST,
         )
+        self.assertIsNone(feature_flag_spec.developer_notes)
 
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
                 'feature_stage': feature_flag_domain.FeatureStages.PROD.value,
+                'developer_notes': 'developer notes',
             }
         )
         self.assertIsInstance(
@@ -72,6 +77,10 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             feature_flag_spec.feature_stage,
             feature_flag_domain.FeatureStages.PROD,
         )
+        self.assertEqual(
+            feature_flag_spec.developer_notes,
+            'developer notes',
+        )
 
     def test_from_dict_raises_error_when_invalid_feature_stage(self) -> None:
         with self.assertRaisesRegex(
@@ -80,19 +89,46 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             'ServerMode.TEST or ServerMode.PROD.',
         ):
             feature_flag_domain.FeatureFlagSpec.from_dict(
-                {'description': 'for test', 'feature_stage': 'invalid'}
+                {
+                    'description': 'for test',
+                    'feature_stage': 'invalid',
+                    'developer_notes': None,
+                }
             )
 
     def test_to_dict_returns_correct_dict(self) -> None:
         feature_flag_spec_dict: feature_flag_domain.FeatureFlagSpecDict = {
             'description': 'for test',
             'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+            'developer_notes': None,
         }
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'for test', feature_flag_domain.FeatureStages.DEV
         )
         self.assertDictEqual(
             feature_flag_spec.to_dict(), feature_flag_spec_dict
+        )
+        self.assertIsNone(feature_flag_spec.developer_notes)
+
+        feature_flag_spec_with_notes_dict: (
+            feature_flag_domain.FeatureFlagSpecDict
+        ) = {
+            'description': 'for test',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+            'developer_notes': 'developer notes',
+        }
+        feature_flag_spec_with_notes = feature_flag_domain.FeatureFlagSpec(
+            'for test',
+            feature_flag_domain.FeatureStages.DEV,
+            'developer notes',
+        )
+        self.assertDictEqual(
+            feature_flag_spec_with_notes.to_dict(),
+            feature_flag_spec_with_notes_dict,
+        )
+        self.assertEqual(
+            feature_flag_spec_with_notes.developer_notes,
+            'developer notes',
         )
 
 
@@ -250,6 +286,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
                 'last_updated': utils.convert_naive_datetime_to_string(
                     current_time
                 ),
+                'developer_notes': None,
             }
         )
 
@@ -267,6 +304,26 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         self.assertEqual(feature_flag.feature_flag_config.user_group_ids, [])
         self.assertEqual(
             feature_flag.feature_flag_config.last_updated, current_time
+        )
+        self.assertIsNone(feature_flag.feature_flag_spec.developer_notes)
+
+        feature_flag_with_notes = feature_flag_domain.FeatureFlag.from_dict(
+            {
+                'name': 'feature_a',
+                'description': 'for test',
+                'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+                'last_updated': utils.convert_naive_datetime_to_string(
+                    current_time
+                ),
+                'developer_notes': 'developer notes',
+            }
+        )
+        self.assertEqual(
+            feature_flag_with_notes.feature_flag_spec.developer_notes,
+            'developer notes',
         )
 
     def test_to_dict_returns_correct_dict(self) -> None:
@@ -287,12 +344,38 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'last_updated': utils.convert_naive_datetime_to_string(
                 current_time
             ),
+            'developer_notes': None,
         }
         feature_flag = feature_flag_domain.FeatureFlag(
             'feature_a', feature_flag_spec, feature_flag_config
         )
         feature_flag.validate()
         self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
+
+        feature_flag_spec_with_notes = feature_flag_domain.FeatureFlagSpec(
+            'for test',
+            feature_flag_domain.FeatureStages.DEV,
+            'developer notes',
+        )
+        feature_flag_with_notes_dict: feature_flag_domain.FeatureFlagDict = {
+            'name': 'feature_a',
+            'description': 'for test',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 0,
+            'user_group_ids': [],
+            'last_updated': utils.convert_naive_datetime_to_string(
+                current_time
+            ),
+            'developer_notes': 'developer notes',
+        }
+        feature_flag_with_notes = feature_flag_domain.FeatureFlag(
+            'feature_a', feature_flag_spec_with_notes, feature_flag_config
+        )
+        feature_flag_with_notes.validate()
+        self.assertDictEqual(
+            feature_flag_with_notes.to_dict(), feature_flag_with_notes_dict
+        )
 
     def test_validate_feature_flag_with_invalid_name_raises_exception(
         self,
