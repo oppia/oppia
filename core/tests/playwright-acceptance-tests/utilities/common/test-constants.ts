@@ -129,7 +129,7 @@ export default {
     TopicEditor: 'http://localhost:8181/topic_editor',
   },
   Dashboard: {
-    MainDashboard: '.oppia-splash-page',
+    MainDashboard: '.e2e-test-splash-page',
     LearnerDashboard: '.oppia-learner-dashboard-main-content',
   },
 
