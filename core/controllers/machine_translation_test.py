@@ -140,7 +140,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'],
                 'You do not have permission to submit translations '
-                'for this language.'
+                'for this language.',
             )
         self.logout()
 
@@ -153,7 +153,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda src, tgt, text: None,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, (
+            domain_swap
+        ):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
@@ -184,7 +186,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             mock_generate,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, (
+            domain_swap
+        ):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
@@ -214,7 +218,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             mock_generate,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, (
+            domain_swap
+        ):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation',
@@ -234,7 +240,9 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda src, tgt, text: ('नमस्ते दुनिया', 'azure'),
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, domain_swap:
+        with self.feature_flag_swap, self.admin_toggle_swap, self.role_swap, (
+            domain_swap
+        ):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 '/generate-translation', self.payload, csrf_token=csrf_token
