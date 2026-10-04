@@ -720,9 +720,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
         suggestion.target_id
       );
-      this.pageContextService.setImageContextNewImageFilenames(
-        suggestion.new_image_filenames || []
-      );
       this._showTranslationSuggestionModal(
         suggestionIdToContribution,
         suggestionId,
