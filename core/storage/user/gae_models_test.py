@@ -3137,6 +3137,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
             'can_review_questions': True,
+            'can_submit_translation_for_language_codes': [],
             'can_submit_questions': False,
         }
         self.assertEqual(user_data, expected_data)
@@ -3156,6 +3157,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
                 'can_review_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_voiceover_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
+                'can_submit_translation_for_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },

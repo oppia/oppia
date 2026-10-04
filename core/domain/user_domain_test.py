@@ -1297,7 +1297,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
-            'user_id', ['hi'], [], True, False
+            'user_id', ['hi'], [], True, [], False
         )
 
     def test_initialization(self) -> None:
@@ -1861,7 +1861,7 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
 
     def test_initialization(self) -> None:
         user_contribution_rights = user_domain.UserContributionRights(
-            'a', ['en', 'es'], ['fr'], True, False
+            'a', ['en', 'es'], ['fr'], True, [], False
         )
 
         self.assertEqual(user_contribution_rights.id, 'a')
@@ -1878,13 +1878,13 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
 
     def test_can_review_at_least_one_item(self) -> None:
         user_contribution_rights = user_domain.UserContributionRights(
-            'a', [], [], True, True
+            'a', [], [], True, [], True
         )
         self.assertTrue(user_contribution_rights.can_review_at_least_one_item())
 
     def test_can_submit_at_least_one_item(self) -> None:
         user_contribution_rights = user_domain.UserContributionRights(
-            'a', [], [], True, False
+            'a', [], [], True, [], False
         )
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
