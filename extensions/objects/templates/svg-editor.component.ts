@@ -108,7 +108,7 @@ type FabricSvgLoadCallback = (
   styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   @Output() discardImage = new EventEmitter();
