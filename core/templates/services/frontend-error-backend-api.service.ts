@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend Api Service for the Collection Player Page
+ * @fileoverview Backend API Service for reporting frontend errors.
  */
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {FetchCollectionSummariesResponse} from '../collection-player-page.component';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CollectionPlayerBackendApiService {
+export class FrontendErrorBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async fetchCollectionSummariesAsync(
-    collectionId: string
-  ): Promise<FetchCollectionSummariesResponse> {
+  async reportErrorAsync(
+    errorMessage: string,
+    userDescription: string
+  ): Promise<void> {
+    const formattedErrorPayload = [
+      'User Description: ' + userDescription,
+      'Technical Error Message: ' + errorMessage,
+      'URL: ' + window.location.href,
+    ].join('\n\n');
+
     return this.http
-      .get<FetchCollectionSummariesResponse>(
-        '/collectionsummarieshandler/data',
-        {
-          params: {
-            stringified_collection_ids: JSON.stringify([collectionId]),
-          },
-        }
-      )
+      .post<void>('/frontend_errors', {
+        error: formattedErrorPayload,
+      })
       .toPromise();
   }
 }

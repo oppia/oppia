@@ -27,14 +27,14 @@ interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
 interface AddContributionReviewer {
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -42,7 +42,7 @@ interface RemoveContributionReviewer {
   method: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -94,13 +94,13 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   isNewUiEnabled: boolean = false;
   isAutoTranslationEnabled: boolean = false;
 
-  USER_FILTER_CRITERION_ROLE: string;
-  USER_FILTER_CRITERION_USERNAME: string;
-  CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
+  USER_FILTER_CRITERION_ROLE: string = '';
+  USER_FILTER_CRITERION_USERNAME: string = '';
+  CD_USER_RIGHTS_CATEGORIES: Record<string, string> = {};
 
   contributionReviewersDataFetched: boolean = false;
   contributionReviewersResult: ContributionReviewersResult = {};
-  translationContributionStatsFetched: boolean;
+  translationContributionStatsFetched: boolean = false;
   translationContributionStatsResults: TranslationContributionStat[] = [];
   languageCodesAndDescriptions: LanguageCodeDescription[] = [];
   formData!: FormData;
@@ -145,6 +145,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           ) {
             return Boolean(this.formData.viewContributionReviewers.username);
           }
+          return false;
         },
       },
       addContributionReviewer: {
@@ -278,7 +279,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        formResponse.category,
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )
@@ -309,7 +312,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     ) {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
-          formResponse.category,
+          // The isValid() check above guarantees category is non-null.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          formResponse.category!,
           formResponse.languageCode
         )
         .then(usersObject => {
@@ -370,7 +375,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.category,
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )
