@@ -581,7 +581,6 @@ class SignupHandler(
         server_can_send_emails = email_services.is_email_sending_allowed()
         self.render_json(
             {
-                'server_can_send_emails': server_can_send_emails,
                 'has_agreed_to_latest_terms': bool(
                     user_settings.last_agreed_to_terms
                     and user_settings.last_agreed_to_terms

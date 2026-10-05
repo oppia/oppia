@@ -364,11 +364,14 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             [
+                'Updated status of email ID %s\'s bulk email preference in the service '
+                'provider\'s db to False. Cannot access API, since this is a dev '
+                'environment.' % self.USER_1_EMAIL,
                 'Email ID %s permanently deleted from bulk email provider\'s db. '
                 'Cannot access API, since this is a dev environment'
-                % self.USER_1_EMAIL
+                % self.USER_1_EMAIL,
             ]
-            + (['Logging project ID for debugging: dev-project-id'] * 6),
+            + (['Logging project ID for debugging: dev-project-id'] * 5),
         )
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
@@ -800,7 +803,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -855,7 +857,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6452,7 +6453,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6501,7 +6501,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6587,9 +6586,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_verification_when_user_is_not_deleted_emails_enabled(self) -> None:
         with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
@@ -6613,7 +6609,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName'),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
@@ -6650,7 +6645,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',

@@ -907,9 +907,7 @@ def get_moderator_unpublish_exploration_email() -> str:
         be sent.
     """
 
-    try:
-        require_moderator_email_prereqs_are_satisfied()
-    except utils.ValidationError:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         return ''
 
     unpublish_exp_email_html_body = platform_parameter_services.get_platform_parameter_value(
@@ -956,7 +954,6 @@ def send_moderator_action_email(
         email_body: str. The email content/message.
     """
 
-    require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
     recipient_username = user_services.get_username(recipient_id)
@@ -1031,6 +1028,10 @@ def send_role_notification_email(
             EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     # Editor role email body and email subject templates.
     email_subject_template = '%s - invitation to collaborate'
 
@@ -1053,9 +1054,6 @@ def send_role_notification_email(
     )
 
     # Return from here is sending editor role email is disabled.
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send editor role emails to users.')
-        return
 
     recipient_username = user_services.get_username(recipient_id)
     inviter_username = user_services.get_username(inviter_id)
@@ -1116,6 +1114,10 @@ def send_emails_to_subscribers(
             has published.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     creator_name = user_services.get_username(creator_id)
     email_subject = '%s has published a new exploration!' % creator_name
     email_body_template = (
@@ -1130,10 +1132,6 @@ def send_emails_to_subscribers(
         '- The Oppia Team<br>'
         '<br>%s'
     )
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send subscription emails to users.')
-        return
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id
@@ -1669,6 +1667,10 @@ def send_feedback_message_email(
                 }
             }
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject_template = (
         'You\'ve received %s new message%s on your explorations'
     )
@@ -1799,6 +1801,10 @@ def send_suggestion_email(
         recipient_list: list(str). The user IDs of the email recipients.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_subject = 'New suggestion for "%s"' % exploration_title
 
     email_body_template = (
@@ -1813,10 +1819,6 @@ def send_suggestion_email(
         '- The Oppia Team<br>'
         '<br>%s'
     )
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
 
     author_username = user_services.get_username(author_id)
     can_users_receive_email = can_users_receive_thread_email(
@@ -1872,6 +1874,10 @@ def send_instant_feedback_message_email(
         exploration_id: str. ID of the exploration the feedback thread is about.
         thread_title: str. The title of the feedback thread.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
 
     email_body_template = (
         'Hi %s,<br><br>'
@@ -1934,6 +1940,10 @@ def send_flag_exploration_email(
         reporter_id: str. The user ID of the reporter.
         report_text: str. The message entered by the reporter.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Exploration flagged by user: "%s"' % exploration_title
 
     email_body_template = (
@@ -1992,6 +2002,10 @@ def send_mail_to_onboard_new_reviewers(
             reviewer.
         category: str. The category that the user is being offered to review.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
 
     email_subject = 'Invitation to review suggestions'
 
@@ -2056,6 +2070,10 @@ def send_mail_to_notify_users_to_review(
             suggestions.
         category: str. The category of the suggestions to review.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
 
     email_subject = 'Notification to review suggestions'
 
@@ -2633,6 +2651,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             suggestions we're notifying reviewers about and will be used to
             compose the email body for each reviewer.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
         'email_subject'
     ]
@@ -2744,6 +2766,10 @@ def send_mail_to_notify_contributor_ranking_achievement(
             email information.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     recipient_username = user_services.get_username(
         contributor_ranking_email_info.contributor_user_id
     )
@@ -2816,6 +2842,10 @@ def send_reminder_mail_to_notify_curriculum_admins(
             of stories having behind-schedule or upcoming chapters to be
             notified.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     if len(curriculum_admin_ids) == 0:
         logging.error('There were no curriculum admins to notify.')
         return
@@ -2921,6 +2951,10 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         user_id: str. The id of the user whose account got deleted.
         user_email: str. The email of the user whose account got deleted.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Account deleted'
 
     email_body_template = (
@@ -2982,6 +3016,10 @@ def send_email_to_new_cd_user(
         Exception. The language_code cannot be None if the
             category is 'translation'.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     if category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
@@ -3096,6 +3134,10 @@ def send_email_to_removed_cd_user(
         Exception. The language_code cannot be None if the review category is
             'translation'.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     if category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
@@ -3189,6 +3231,10 @@ def send_not_mergeable_change_list_to_admin_for_review(
         change_list_dict: dict. Dict of the changes made by the
             user on the frontend, which are not mergeable.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Some changes were rejected due to a conflict'
     email_body_template = (
         'Hi Admin,<br><br>'
