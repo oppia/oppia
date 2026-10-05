@@ -83,6 +83,30 @@ def _is_sender_email_valid(sender_email: str) -> bool:
     return _is_email_valid(email_address[1:-1])
 
 
+def is_email_sending_allowed() -> bool:
+    """Returns whether this server is configured to send emails.
+
+    This is the single authorized reader of the SERVER_CAN_SEND_EMAILS
+    platform parameter outside send_mail(). Use it ONLY to surface the
+    capability to a caller or the frontend, or to gate a side effect
+    that does not go through send_mail() (e.g. a bulk-email-provider
+    write). Do NOT use it to decide whether to generate or send an
+    email — send_mail() owns that decision and no-ops delivery on its
+    own when sending is disabled.
+
+    Returns:
+        bool. Whether the SERVER_CAN_SEND_EMAILS platform parameter is True.
+    """
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    # Ruling out the possibility of any other type for mypy type checking.
+    assert isinstance(server_can_send_emails, bool)
+    return server_can_send_emails
+
+
 def send_mail(
     sender_email: str,
     recipient_email: str,

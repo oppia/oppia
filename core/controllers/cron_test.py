@@ -991,6 +991,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,

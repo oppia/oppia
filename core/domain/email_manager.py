@@ -812,6 +812,9 @@ def send_post_signup_email(
 ) -> None:
     """Sends a post-signup email to the given user.
 
+    Raises an exception if emails are not allowed to be sent to users (i.e.
+    email_services.is_email_sending_allowed() is False).
+
     Args:
         user_id: str. User ID of the user that signed up.
         test_for_duplicate_email: bool. For testing duplicate emails.
@@ -915,6 +918,20 @@ def get_moderator_unpublish_exploration_email() -> str:
     return unpublish_exp_email_html_body
 
 
+def require_moderator_email_prereqs_are_satisfied() -> None:
+    """Raises an exception if, for any reason, moderator emails cannot be sent.
+
+    Raises:
+        ValidationError. Email sending is not allowed.
+    """
+
+    if not email_services.is_email_sending_allowed():
+        raise utils.ValidationError(
+            'For moderator emails to be sent, please ensure that email '
+            'sending is allowed.'
+        )
+
+
 def send_moderator_action_email(
     sender_id: str,
     recipient_id: str,
@@ -924,6 +941,9 @@ def send_moderator_action_email(
 ) -> None:
     """Sends a email immediately following a moderator action (unpublish,
     delete) to the given user.
+
+    Raises an exception if emails are not allowed to be sent to users (i.e.
+    email_services.is_email_sending_allowed() is False).
 
     Args:
         sender_id: str. User ID of the sender.
@@ -1670,6 +1690,10 @@ def send_feedback_message_email(
         '<br>%s'
     )
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send feedback message emails to users.')
+        return
+
     if not feedback_messages:
         return
 
@@ -1866,6 +1890,10 @@ def send_instant_feedback_message_email(
         'The Oppia team<br>'
         '<br>%s'
     )
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send feedback message emails to users.')
+        return
 
     sender_username = user_services.get_username(sender_id)
     recipient_username = user_services.get_username(recipient_id)
@@ -2186,10 +2214,6 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             descending order based on review wait time.
     """
 
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
-
     if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
     ):
@@ -2346,10 +2370,6 @@ def send_reviewer_notifications(
             IDs by language code.
     """
 
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
-
     oppia_site_url = platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
@@ -2440,10 +2460,6 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
 
     if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
@@ -2946,7 +2962,6 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         'Your account was successfully deleted.<br><br>'
         '- The Oppia Team'
     )
-
     email_body = email_body_template % user_email
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(

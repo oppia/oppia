@@ -905,6 +905,46 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
         )
 
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_disabled(
+        self,
+    ) -> None:
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id,
+            exploration_ids=[],
+            collection_ids=[],
+            story_ids=[],
+            learnt_topic_ids=[],
+        ).put()
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
+        )
+
+        with send_email_swap:
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request
+                ),
+                wipeout_domain.USER_VERIFICATION_FAILURE,
+            )
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id)
+        )
+        self.assertIsNotNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.user_1_id)
+        )
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
+        )
+
 
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     test_utils.GenericTestBase
@@ -6428,6 +6468,24 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn('ALREADY DONE', self.email_bodies[1])
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
+    def test_repeated_deletion_is_successful_when_emails_disabled(self) -> None:
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
+        )
+        with send_mail_to_admin_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_no_email_is_sent_when_there_are_no_users_pending_deletion(
         self,
     ) -> None:
@@ -6533,6 +6591,21 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
+
+    def test_verification_when_user_is_not_deleted_emails_disabled(
+        self,
+    ) -> None:
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            # Email generation runs even when sending is disabled; actual
+            # delivery is suppressed downstream by email_services.send_mail().
+            called=True,
+        )
+        with send_mail_to_admin_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertEqual(len(self.email_bodies), 0)
 
     @test_utils.set_platform_parameters(
         [
