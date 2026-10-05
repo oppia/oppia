@@ -123,13 +123,6 @@ class StoryChange(change_domain.BaseChange):
         - 'migrate_schema_to_latest_version' (with from_version and
         to_version)
         - 'create_new' (with title)
-        - 'create_module' (with module_id, title, description, node_ids)
-        - 'delete_module' (with module_id)
-        - 'rename_module' (with module_id, new_title)
-        - 'rearrange_modules' (with module_ids_order)
-        - 'move_node_to_module' (with node_id, to_module_id)
-        - 'update_module_property' (with module_id, property_name, new_value,
-        old_value)
     """
 
     # The allowed list of story properties which can be used in
@@ -310,11 +303,6 @@ class StoryChange(change_domain.BaseChange):
             'deprecated_values': {},
         },
     ]
-
-    # The arc-to-module migration job has rewritten the arc-named commands
-    # stored in existing StoryCommitLogEntryModel records, so the legacy
-    # commands no longer need to be recognised as deprecated.
-    DEPRECATED_COMMANDS: List[str] = []
 
 
 class CreateNewStoryCmd(StoryChange):
@@ -2418,12 +2406,11 @@ class Story:
         """Converts v6 Story Contents schema to the modern v7 schema.
         v7 schema introduces the arcs field for chapter groupings.
 
-        This converter is frozen: it always writes the v7 wire format (the
-        'arcs' key and 'arc_default' IDs), because its output is immediately
-        passed to _convert_story_contents_v7_dict_to_v8_dict, which renames
-        the container key to 'modules'. Renaming it here too would be
-        redundant, and keeping it untouched preserves the historical meaning
-        of each schema version.
+        The 'arcs' key and the 'arc_default' module ID written below belong to
+        the v7 wire format, so they are left as-is even though v8 renames
+        them. Renaming them here would give the same default module different
+        IDs depending on whether a story reached v7 through this converter or
+        was already stored at v7.
 
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
@@ -2433,11 +2420,8 @@ class Story:
             dict. The converted story_contents_dict.
         """
         node_ids = [node['id'] for node in story_contents_dict['nodes']]
-        # Here we use MyPy ignore because the v7 schema wrote the chapter
-        # groupings under the 'arcs' key, which the current StoryContentsDict
-        # no longer declares. This converter is frozen and must keep emitting
-        # the historical v7 format, since its output is consumed by the v7 to
-        # v8 converter below.
+        # Here we use MyPy ignore because 'arcs' is not declared on the
+        # current StoryContentsDict, but v7 stories still store it.
         story_contents_dict['arcs'] = [  # type: ignore[typeddict-item]
             {
                 'id': 'arc_default',
@@ -2456,9 +2440,13 @@ class Story:
 
         v7 schema introduced chapter groupings under the key 'arcs'; v8
         renames that key to 'modules', since "arc" was a misleading name for
-        the concept. Only the container key is renamed: individual module IDs
-        (e.g. 'arc_default') are left untouched, because they are opaque and
-        are referenced by per-learner progress state.
+        the concept.
+
+        Module IDs are left as they are, because they are opaque generated
+        values rather than terminology, and the topic viewer maps each module
+        to its 1-based position, so a stored ID is never shown to a learner.
+        The 'in' guard keeps this converter idempotent, so that re-running a
+        migration over stories that are already at v8 leaves them untouched.
 
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
@@ -2467,15 +2455,9 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        # The 'in' guard keeps this converter idempotent: a story that is
-        # already stored at v8 has no 'arcs' key, so it passes through
-        # untouched. This matters because a job may re-run the conversion
-        # chain over stories that a previous run already upgraded.
         if 'arcs' in story_contents_dict:
-            # Here we use MyPy ignore because the 'arcs' key was removed
-            # from StoryContentsDict when the key was renamed, so MyPy
-            # cannot see it on the TypedDict, even though the persisted v7
-            # dicts that reach this converter still carry it.
+            # Here we use MyPy ignore because 'arcs' is not declared on the
+            # current StoryContentsDict, but v7 stories still store it.
             story_contents_dict['modules'] = story_contents_dict.pop(  # type: ignore[typeddict-item]
                 'arcs'
             )

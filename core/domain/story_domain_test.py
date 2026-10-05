@@ -3019,9 +3019,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             v7_dict
         )
         self.assertNotIn('arcs', result)
-        # The frozen v6 -> v7 converter still mints 'arc_default'; only the
-        # container key is renamed, since module IDs are opaque data that
-        # per-learner progress state refers to.
+        # The v6 -> v7 converter above still mints 'arc_default', and the v7 ->
+        # v8 converter only renames the container key, since module IDs are
+        # opaque values rather than terminology.
         self.assertEqual(result['modules'][0]['id'], 'arc_default')
         self.assertEqual(result['modules'][0]['node_ids'], ['node_1', 'node_2'])
 

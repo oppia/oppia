@@ -406,7 +406,7 @@ const warningTextSelector = '.e2e-test-warnings-text';
 const dragHandleSelector = 'tr.cdk-drag';
 const dragHandlerSelector = '.drag-handler';
 
-// Module (Module) selectors.
+// Module selectors.
 const moduleEditButtonSelector = '.module-edit-button';
 const moduleRemoveButtonSelector = '.module-remove-button';
 const editModuleTitleFieldSelector = '.e2e-test-edit-module-title-field';
