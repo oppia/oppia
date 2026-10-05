@@ -487,9 +487,7 @@ export class LoggedOutUser extends BaseUser {
       // Wait for Angular to be stable before clicking the expand button.
       await this.waitForAngularStability();
 
-      await this.page
-        .locator(mobileSidebarExpandAboutMenuButton)
-        .dispatchEvent('click');
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
 
       // Wait for the About submenu to expand and the About button to be visible.
       await this.expectElementToBeVisible(mobileSidebarAboutButton);
@@ -3031,10 +3029,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.waitForAngularStability();
-    await this.page
-      .locator(mobileNavbarOpenSidebarButton)
-      .dispatchEvent('click');
+    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
     await this.expectElementToBeVisible(mobileSidebarOpenSelector, false);
   }
 
@@ -3296,17 +3291,14 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileNavbarButtonSelector);
       await this.openMobileSidebar();
-      await this.waitForAngularStability();
 
-      await this.page
-        .locator(mobileSidebarExpandAboutMenuButton)
-        .dispatchEvent('click');
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.expectElementToBeVisible(
         mobileSidebarExpandImpactReportSubMenuButton
       );
-      await this.page
-        .locator(mobileSidebarExpandImpactReportSubMenuButton)
-        .dispatchEvent('click');
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandImpactReportSubMenuButton
+      );
 
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
@@ -3326,9 +3318,7 @@ export class LoggedOutUser extends BaseUser {
 
       // Collapse the About menu and close the sidebar, so the next test can
       // open it again.
-      await this.page
-        .locator(mobileSidebarExpandAboutMenuButton)
-        .dispatchEvent('click');
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.closeMobileSidebar();
     } else {
       await this.expectElementToBeVisible(navbarAboutTab);
@@ -3375,12 +3365,13 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} selector - The selector of the element to click.
    */
   private async clickAndWaitForDonatePage(selector: string): Promise<void> {
-    const navigation = this.page.waitForURL(
-      (url: URL) => url.href.startsWith(donateUrl),
-      {waitUntil: 'load', timeout: 60000}
-    );
-    await this.clickOnElementWithSelector(selector);
-    await navigation;
+    await Promise.all([
+      this.page.waitForURL((url: URL) => url.href.startsWith(donateUrl), {
+        waitUntil: 'load',
+        timeout: 60000,
+      }),
+      this.clickOnElementWithSelector(selector),
+    ]);
   }
 
   /**
