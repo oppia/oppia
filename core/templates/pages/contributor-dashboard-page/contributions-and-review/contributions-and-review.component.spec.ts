@@ -948,7 +948,7 @@ describe('Contributions and review component', () => {
         }
       );
 
-      expect(component.languageCode).toBe('');
+      expect(component.languageCode).toBeUndefined();
 
       component.onChangeLanguage('es');
 
