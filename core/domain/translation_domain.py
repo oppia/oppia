@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import enum
 import json
+import re
 
 from core import feconf, utils
 from core.constants import constants
@@ -27,6 +28,7 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
 
+import bs4
 from typing import Any, Dict, Final, List, Optional, TypedDict, Union
 
 
@@ -324,6 +326,42 @@ class BaseTranslatableObject:
             content_collection.content_id_to_translatable_content.keys()
         )
 
+    @staticmethod
+    def _is_digit_only_html(html_str: str) -> bool:
+        """Checks whether the given HTML string contains only digits, decimals,
+        or negative signs enclosed within allowed formatting tags.
+
+        Args:
+            html_str: str. The HTML string to check.
+
+        Returns:
+            bool. True if the text is purely numeric and uses only allowed tags,
+            False otherwise.
+        """
+        if not isinstance(html_str, str) or not html_str.strip():
+            return False
+
+        allowed_tags = {'p', 'br', 'span', 'b', 'i', 'strong', 'em'}
+
+        try:
+            soup = bs4.BeautifulSoup(html_str, 'html.parser')
+        except Exception:
+            return False
+
+        if not soup.find_all(True):
+            return False
+
+        for tag in soup.find_all(True):
+            if tag.name not in allowed_tags:
+                return False
+
+        text_content = soup.get_text().strip()
+        if not text_content:
+            return False
+
+        digit_only_pattern = r'^-?\d+(\.\d+)?$'
+        return bool(re.match(digit_only_pattern, text_content))
+
     def get_all_contents_which_need_translations(
         self,
         entity_translation: Union[EntityTranslation, None] = None,
@@ -358,6 +396,11 @@ class BaseTranslatableObject:
             content_value = translatable_content.content_value
 
             if content_value == '':
+                continue
+
+            if isinstance(content_value, str) and self._is_digit_only_html(
+                content_value
+            ):
                 continue
 
             if (
