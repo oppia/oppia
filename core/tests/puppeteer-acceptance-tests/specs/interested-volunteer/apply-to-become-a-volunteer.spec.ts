@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * IV.VP. Volunteer applies to become a volunteer
+ * IV.VP. Volunteer explores volunteer openings on the Oppia Idealist page
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -29,7 +29,7 @@ describe('Interested Volunteer', function () {
     interestedVolunteer = await UserFactory.createLoggedOutUser();
   });
 
-  it('should be able to apply to become a volunteer', async function () {
+  it('should be able to explore volunteer openings on the Oppia Idealist page', async function () {
     await interestedVolunteer.navigateToSplashPage();
 
     // Navigate to Volunteer Page.
@@ -44,8 +44,8 @@ describe('Interested Volunteer', function () {
       'Volunteer to make a difference'
     );
 
-    // Apply to become a volunteer at top of the page.
-    await interestedVolunteer.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+    // Explore volunteer openings at the top of the page.
+    await interestedVolunteer.clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage();
 
     // "Why Volunteer with Us?" heading.
     await interestedVolunteer.navigateToVolunteerPage();
@@ -59,8 +59,8 @@ describe('Interested Volunteer', function () {
     );
     await interestedVolunteer.expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage();
 
-    // Open Volunteer Form.
-    await interestedVolunteer.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+    // Open Oppia Idealist page.
+    await interestedVolunteer.clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage();
   });
 
   afterAll(async function () {

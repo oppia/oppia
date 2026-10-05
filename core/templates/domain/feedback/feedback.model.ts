@@ -43,6 +43,40 @@ export interface LessonFeedbackBackendDict {
   lesson_metadata: LessonFeedbackMetadataBackendDict;
 }
 
+export interface LessonFeedbackSummary {
+  id: string;
+  feedback_text_preview: string;
+  latest_response_preview: string;
+  status: FeedbackStatus;
+  lesson_title: string;
+  source: string;
+  unread_response_count: number;
+  last_updated_msecs: number;
+}
+
+export interface LessonFeedbackBackendResponse {
+  summaries: LessonFeedbackSummary[];
+  next_cursor: string | null;
+  more: boolean;
+}
+
+export interface LessonFeedbackResponse {
+  response_text: string;
+  responded_by: string;
+  responded_on: number;
+}
+
+export interface LessonFeedbackDetailResponse {
+  id: string;
+  feedback_text: string;
+  status: FeedbackStatus;
+  lesson_metadata: LessonFeedbackMetadataBackendDict;
+  parent_feedback_id: string | null;
+  response_list: LessonFeedbackResponse[];
+  unread_response_count: number;
+  created_on_msecs: number;
+}
+
 export class LessonFeedbackModel {
   constructor(
     public readonly feedbackText: string,
@@ -70,13 +104,29 @@ export class LessonFeedbackModel {
   }
 }
 
-export type ReportAnIssueCategory =
-  | 'typo'
-  | 'broken_layout_or_image'
-  | 'confusing_or_incorrect_answer'
-  | 'other_or_not_sure';
+export enum ReportAnIssueCategory {
+  TYPO = 'typo',
+  BROKEN_LAYOUT_OR_IMAGE = 'broken_layout_or_image',
+  CONFUSING_OR_INCORRECT_ANSWER = 'confusing_or_incorrect_answer',
+  OTHER_OR_NOT_SURE = 'other_or_not_sure',
+}
 
-export type ReportType = 'lesson' | 'app';
+export enum ReportType {
+  LESSON = 'lesson',
+  APP = 'app',
+}
+
+export type DashboardType = 'curriculum' | 'technical';
+
+export enum TechnicalTeamType {
+  TECH_EXTERNAL = 'tech-external',
+  TECH_INTERNAL = 'tech-internal',
+}
+
+export enum CreatorFeedbackType {
+  FEEDBACK = 'feedback',
+  REPORT = 'report',
+}
 
 export interface PlatformFeedbackBackendDict {
   source: ReportType;
@@ -148,12 +198,17 @@ export class PlatformFeedbackModel {
   }
 }
 
-export type FeedbackStatus =
-  | 'open'
-  | 'fixed'
-  | 'compliment'
-  | 'not_actionable'
-  | 'transferred_to_github';
+export enum FeedbackStatus {
+  OPEN = 'open',
+  FIXED = 'fixed',
+  COMPLIMENT = 'compliment',
+  NOT_ACTIONABLE = 'not_actionable',
+  TRANSFERRED_TO_GITHUB = 'transferred_to_github',
+  ALL = 'all',
+  SUBMITTED = 'submitted',
+  REVIEWED_BY_TEAM = 'reviewed_by_team',
+  LESSON_UPDATED = 'lesson_updated',
+}
 
 export interface FeedbackSessionInfo {
   console_logs: {
@@ -201,6 +256,24 @@ export interface FeedbackSubmitResponse {
   id: string;
 }
 
+export interface MyFeedbackUnreadCountResponse {
+  unread_count: number;
+}
+
+export interface FeedbackStatusCounts {
+  open: number;
+  fixed: number;
+  compliment: number;
+  not_actionable: number;
+  transferred_to_github: number;
+  total: number;
+}
+
+export interface FeedbackStatusCountsBackendResponse {
+  lesson_feedback_counts: FeedbackStatusCounts;
+  platform_report_counts: FeedbackStatusCounts;
+}
+
 export interface PlatformFeedbackSummary {
   id: string;
   report_message_preview: string;
@@ -231,3 +304,124 @@ export interface PlatformFeedbackDetailResponse {
   screenshot_entity_id: string | null;
   created_on_msecs: number;
 }
+
+export interface SuccessResponse {
+  success: boolean;
+}
+
+export interface FeedbackFilterState {
+  searchText: string | null;
+  status: FeedbackStatus | null;
+  technicalTeam: TechnicalTeamType;
+  creatorFeedbackType: CreatorFeedbackType;
+  dateRange: {
+    start: Date | null;
+    end: Date | null;
+  };
+}
+
+/** Configuration passed to FeedbackFilterBar to hide/show filters. */
+export interface FeedbackFilterConfig {
+  showTeamFilter: boolean;
+  showCreatorFeedbackTypeFilter: boolean;
+  showDateRangeFilter: boolean;
+  showSearchBar: boolean;
+  statusOptions: FeedbackStatus[];
+}
+
+/** Configuration passed to FeedbackCard to control visibility. */
+export interface FeedbackCardConfig {
+  showCategory: boolean;
+  showLesson: boolean;
+  showResponse: boolean;
+  showScreenshot: boolean;
+  showLessonMetadata: boolean;
+  showSessionInfo: boolean;
+  showNotificationSummary: boolean;
+}
+
+export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: true,
+  showCreatorFeedbackTypeFilter: false,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.OPEN,
+    FeedbackStatus.FIXED,
+    FeedbackStatus.NOT_ACTIONABLE,
+    FeedbackStatus.TRANSFERRED_TO_GITHUB,
+  ],
+};
+
+export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
+  showCategory: true,
+  showLesson: false,
+  showResponse: false,
+  showLessonMetadata: true,
+  showScreenshot: true,
+  showSessionInfo: true,
+  showNotificationSummary: false,
+};
+
+export const CREATOR_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: false,
+  showCreatorFeedbackTypeFilter: true,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.OPEN,
+    FeedbackStatus.FIXED,
+    FeedbackStatus.COMPLIMENT,
+    FeedbackStatus.NOT_ACTIONABLE,
+  ],
+};
+
+export const MY_SUGGESTIONS_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: false,
+  showCreatorFeedbackTypeFilter: false,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+  statusOptions: [
+    FeedbackStatus.ALL,
+    FeedbackStatus.SUBMITTED,
+    FeedbackStatus.REVIEWED_BY_TEAM,
+    FeedbackStatus.LESSON_UPDATED,
+  ],
+};
+
+// Human readable labels for enums.
+export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
+  [FeedbackStatus.OPEN]: 'Open',
+  [FeedbackStatus.FIXED]: 'Fixed',
+  [FeedbackStatus.NOT_ACTIONABLE]: 'Not Actionable',
+  [FeedbackStatus.COMPLIMENT]: 'Compliment',
+  [FeedbackStatus.TRANSFERRED_TO_GITHUB]: 'Transferred to GitHub',
+  [FeedbackStatus.ALL]: 'All',
+  [FeedbackStatus.SUBMITTED]: 'Submitted',
+  [FeedbackStatus.REVIEWED_BY_TEAM]: 'Reviewed by Team',
+  [FeedbackStatus.LESSON_UPDATED]: 'Lesson Updated',
+};
+
+export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {
+  [TechnicalTeamType.TECH_EXTERNAL]: 'LEAP',
+  [TechnicalTeamType.TECH_INTERNAL]: 'CORE',
+};
+
+export const CREATOR_FEEDBACK_TYPE_LABELS: Record<CreatorFeedbackType, string> =
+  {
+    [CreatorFeedbackType.REPORT]: 'Report',
+    [CreatorFeedbackType.FEEDBACK]: 'Feedback',
+  };
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  [ReportAnIssueCategory.TYPO]: 'Typo',
+  [ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE]: 'Broken Layout / Image',
+  [ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER]:
+    'Confusing / Incorrect Answer',
+  [ReportAnIssueCategory.OTHER_OR_NOT_SURE]: 'Other / Not Sure',
+};
+
+export const SOURCE_LABELS: Record<string, string> = {
+  [ReportType.LESSON]: 'Lesson',
+  [ReportType.APP]: 'App',
+};

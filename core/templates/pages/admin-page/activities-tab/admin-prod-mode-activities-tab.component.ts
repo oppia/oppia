@@ -21,6 +21,6 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'oppia-admin-prod-mode-activities-tab',
   templateUrl: './admin-prod-mode-activities-tab.component.html',
-  styleUrls: [],
+  styleUrls: ['./admin-prod-mode-activities-tab.component.css'],
 })
 export class OppiaAdminProdModeActivitiesTabComponent {}

@@ -1,0 +1,27 @@
+.answer-container {
+  vertical-align: text-bottom;
+}
+
+.refresh-container {
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.refresh-container a {
+  font-weight: bold;
+}
+
+.oppia-improvements-overview-header {
+  font-size: 16px;
+}
+
+.oppia-unresolved-answers-card {
+  background-color: #fff;
+  margin: 20px 0;
+  padding: 8px;
+}
+
+.oppia-unresolved-answers {
+  margin: 20px 0;
+  padding: 0;
+}

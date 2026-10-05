@@ -1,0 +1,9 @@
+@media (max-width: 570px) {
+  .oppia-blog-post-editor-back-button {
+    margin-left: -10px;
+  }
+}
+
+.oppia-navbar-back-button {
+  cursor: pointer;
+}

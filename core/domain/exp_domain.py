@@ -431,7 +431,26 @@ class ExplorationChange(change_domain.BaseChange):
                 'translation_html',
                 'data_format',
             ],
-            'optional_attribute_names': [],
+            'optional_attribute_names': [
+                # Auto-generation metadata fields. When a translation
+                # suggestion is created manually (without AI), BaseChange
+                # sets each of these to None upon initialization (since
+                # change_dict.get() returns None for absent keys). As a
+                # result, manual suggestions serialize all three keys with
+                # None values rather than omitting them entirely.
+                #
+                # Contract for downstream consumers
+                # (suggestion_services, backend handlers, frontend models):
+                #   - was_auto_generated is None  → manual suggestion
+                #   - was_auto_generated is True   → AI-generated suggestion
+                #   - was_auto_generated is False  → should not occur;
+                #     treat the same as None (manual) for safety.
+                # auto_generation_provider and was_edited are only
+                # meaningful when was_auto_generated is True.
+                'was_auto_generated',
+                'auto_generation_provider',
+                'was_edited',
+            ],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
@@ -1611,13 +1630,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     translation_domain.TranslatableContentFormat.UNICODE_STRING,
                     self.objective,
                 )
-            if self.category:
-                translatable_contents_collection.add_translatable_field(
-                    feconf.EXPLORATION_CATEGORY_CONTENT_ID,
-                    translation_domain.ContentType.METADATA,
-                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
-                    self.category,
-                )
             for idx, tag in enumerate(self.tags):
                 translatable_contents_collection.add_translatable_field(
                     f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{idx}',
@@ -2428,19 +2440,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def get_content_html(
         self, state_name: str, content_id: str
     ) -> Union[str, List[str]]:
-        """Return the content for a given content id of a state.
+        """Return the content for a given content id of a state or metadata.
 
         Args:
             state_name: str. The name of the state.
             content_id: str. The id of the content.
 
         Returns:
-            str. The html content corresponding to the given content id of a
-            state.
+            str. The html content corresponding to the given content id.
 
         Raises:
             ValueError. The given state_name does not exist.
         """
+        # Content IDs for exploration metadata fields (such as title, objective,
+        # category, and tags) start with the prefix 'exploration_'. Since these
+        # metadata fields do not belong to any specific state, we retrieve them
+        # directly from the exploration's translatable contents collection.
+        if content_id.startswith(feconf.EXPLORATION_METADATA_CONTENT_ID_PREFIX):
+            translatable_contents = self.get_translatable_contents_collection(
+                override_metadata_feature_flag=True
+            )
+            if (
+                content_id
+                in translatable_contents.content_id_to_translatable_content
+            ):
+                return translatable_contents.content_id_to_translatable_content[
+                    content_id
+                ].content_value
+
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
 

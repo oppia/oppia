@@ -67,6 +67,7 @@ export interface InitializeAnswerGroups {
 @Component({
   selector: 'oppia-state-interaction-editor',
   templateUrl: './state-interaction-editor.component.html',
+  styleUrls: ['./state-interaction-editor.component.css'],
 })
 export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @Output() markAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter<
@@ -112,6 +113,10 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
+
+  get isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
 
   getCurrentInteractionName(): string {
     return this.stateInteractionIdService.savedMemento

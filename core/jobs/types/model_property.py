@@ -133,8 +133,7 @@ class ModelProperty:
             )
         value = job_utils.get_model_property(model, self._property_name)
         if self._is_repeated_property():
-            for item in value:
-                yield item
+            yield from value
         else:
             yield value
 

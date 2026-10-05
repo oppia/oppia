@@ -1,2 +1,59 @@
-<!-- TODO(#24717-M2.12): This is a skeleton component created to establish the flow so that other PRs can be developed in parallel. The UI will be implemented in a future PR. -->
-<h1>My Certificates</h1>
+<div class="my-certificates-tab" *ngIf="!isLoading">
+  <p class="my-certificates-empty-state" *ngIf="certificateAttempts.length === 0">
+    {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_EMPTY_STATE' | translate }}
+  </p>
+
+  <ng-container *ngIf="certificateAttempts.length > 0">
+    <div class="my-certificates-filter">
+      <div class="my-certificates-filter-select-container">
+        <label class="visually-hidden" for="certificate-attempt-status-filter">
+          {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_FILTER_LABEL' | translate }}
+        </label>
+        <select id="certificate-attempt-status-filter"
+                class="my-certificates-filter-select"
+                (change)="onFilterChange($event)">
+          <option value="all">{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</option>
+          <option value="passed">
+            {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED' | translate }}
+          </option>
+          <option value="not_passed">
+            {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED' | translate }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <table class="certificates-table">
+      <thead>
+        <tr>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_CERTIFICATE_HEADING' | translate }}</th>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_SUBJECT_HEADING' | translate }}</th>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_ATTEMPT_HEADING' | translate }}</th>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_SCORE_HEADING' | translate }}</th>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_STATUS_HEADING' | translate }}</th>
+          <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_DATE_HEADING' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attempt of filteredAttempts"
+            class="certificates-table-row">
+          <td class="certificate-title-cell">
+            <a class="certificate-title-link"
+               [routerLink]="'/certificate-assessment-result/' + attempt.attempt_id">
+              {{ attempt.title | titlecase }}
+            </a>
+          </td>
+          <td class="subject-cell">{{ getSubjectName(attempt.classroom_id) | titlecase }}</td>
+          <td class="attempt-cell">{{ attempt.attempt_index }}</td>
+          <td class="score-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+            {{ attempt.total_score | number: '1.0-0' }}%
+          </td>
+          <td class="status-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+            {{ getStatusLabel(attempt) | translate }}
+          </td>
+          <td class="date-cell">{{ attempt.started_at | date: 'MMM d, y' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+</div>

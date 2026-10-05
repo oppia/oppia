@@ -29,6 +29,7 @@ export interface ClassroomDataBackendDict {
   classroom_id: string;
   name: string;
   url_fragment: string;
+  feedback_recipient_email: string;
   topic_summary_dicts: CreatorTopicSummaryBackendDict[];
   course_details: string;
   teaser_text: string;
@@ -66,6 +67,7 @@ export interface ClassroomBackendDict {
   classroom_id: string;
   name: string;
   url_fragment: string;
+  feedback_recipient_email: string;
   course_details: string;
   teaser_text: string;
   topic_list_intro: string;
@@ -82,6 +84,7 @@ export interface ClassroomDict {
   classroomId: string;
   name: string;
   urlFragment: string;
+  feedbackRecipientEmail: string;
   courseDetails: string;
   teaserText: string;
   topicListIntro: string;
@@ -111,6 +114,7 @@ export interface TopicClassroomRelationDict {
   topic_id: string;
   classroom_name: string | null;
   classroom_url_fragment: string | null;
+  feedback_recipient_email: string | null;
 }
 
 interface TopicsClassroomRelationBackendDict {
@@ -168,6 +172,7 @@ export class ClassroomBackendApiService {
             response.classroom_id,
             response.name,
             response.url_fragment,
+            response.feedback_recipient_email,
             response.topic_summary_dicts,
             response.course_details,
             response.topic_list_intro,
@@ -240,6 +245,8 @@ export class ClassroomBackendApiService {
                 name: response.classroom_dict.name,
                 urlFragment: response.classroom_dict.url_fragment,
                 courseDetails: response.classroom_dict.course_details,
+                feedbackRecipientEmail:
+                  response.classroom_dict.feedback_recipient_email,
                 teaserText: response.classroom_dict.teaser_text,
                 topicListIntro: response.classroom_dict.topic_list_intro,
                 topicIdToPrerequisiteTopicIds:
@@ -278,6 +285,7 @@ export class ClassroomBackendApiService {
             classroom_id: classroomDict.classroom_id,
             name: classroomDict.name,
             url_fragment: classroomDict.url_fragment,
+            feedback_recipient_email: classroomDict.feedback_recipient_email,
             course_details: classroomDict.course_details,
             topic_list_intro: classroomDict.topic_list_intro,
             topic_id_to_prerequisite_topic_ids:
@@ -322,7 +330,8 @@ export class ClassroomBackendApiService {
 
   async createNewClassroomAsync(
     name: string,
-    urlFragment: string
+    urlFragment: string,
+    feedbackRecipientEmail: string
   ): Promise<NewClassroomBackendDict> {
     return new Promise((resolve, reject) => {
       let newClassroomUrl = ClassroomDomainConstants.NEW_CLASSROOM_HANDLER_URL;
@@ -331,6 +340,7 @@ export class ClassroomBackendApiService {
         .post<NewClassroomBackendDict>(newClassroomUrl, {
           name,
           url_fragment: urlFragment,
+          feedback_recipient_email: feedbackRecipientEmail,
         })
         .toPromise()
         .then(

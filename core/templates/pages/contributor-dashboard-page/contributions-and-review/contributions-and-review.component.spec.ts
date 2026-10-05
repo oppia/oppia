@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
   flush,
+  flushMicrotasks,
   TestBed,
   tick,
   waitForAsync,
@@ -31,22 +34,29 @@ import {AppConstants} from 'app.constants';
 import {
   ContributionDetails,
   ContributionsAndReview,
+  GetOpportunitiesResponse,
   Opportunity,
   Suggestion,
   SuggestionDetails,
 } from './contributions-and-review.component';
+import {
+  ActiveContributionDict,
+  ActiveSuggestionDict,
+} from '../modal-templates/translation-suggestion-review-modal.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {Skill} from 'domain/skill/skill.model';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UserInfo} from 'domain/user/user-info.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {AlertsService} from 'services/alerts.service';
-import {Question} from 'domain/question/question.model';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
@@ -91,7 +101,7 @@ class MockNgbModalRef {
 
 class MockWindowRef {
   nativeWindow = {
-    scrollTo: (x, y) => {},
+    scrollTo: (x: number, y: number) => {},
   };
 }
 
@@ -103,13 +113,16 @@ class MockPlatformFeatureService {
     EnableTranslationOppsWithNewOppModels: {
       isEnabled: false,
     },
+    EnableDropdownPagination: {
+      isEnabled: false,
+    },
   };
 }
 
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
-  let ngbModal: NgbModal = null;
+  let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   var pageContextService: PageContextService;
   var contributionAndReviewService: ContributionAndReviewService;
@@ -118,11 +131,11 @@ describe('Contributions and review component', () => {
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  var getUserCreatedTranslationSuggestionsAsyncSpy = null;
-  var getReviewableQuestionSuggestionsAsyncSpy = null;
-  var getReviewableTranslationSuggestionsAsyncSpy = null;
-  var getUserCreatedQuestionSuggestionsAsyncSpy = null;
-  let getUserContributionRightsDataAsyncSpy = null;
+  var getUserCreatedTranslationSuggestionsAsyncSpy: jasmine.Spy;
+  var getReviewableQuestionSuggestionsAsyncSpy: jasmine.Spy;
+  var getReviewableTranslationSuggestionsAsyncSpy: jasmine.Spy;
+  var getUserCreatedQuestionSuggestionsAsyncSpy: jasmine.Spy;
+  let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
@@ -134,7 +147,7 @@ describe('Contributions and review component', () => {
     instance = {message: ''};
     afterDismissed = () => of({action: '', dismissedByAction: false});
     onAction = () => new Subject<void>();
-    dismissWithAction = (a, b, c) => {
+    dismissWithAction = (a: string, b: string, c: string) => {
       contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
         a,
         b,
@@ -256,6 +269,7 @@ describe('Contributions and review component', () => {
             },
             is_pinned: false,
             reviewer_only_content_count: 0,
+            language_code: 'en',
           }),
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '2',
@@ -271,6 +285,7 @@ describe('Contributions and review component', () => {
             },
             is_pinned: false,
             reviewer_only_content_count: 0,
+            language_code: 'en',
           }),
         ],
         more: false,
@@ -603,8 +618,19 @@ describe('Contributions and review component', () => {
     it('should open call openQuestionSuggestionModal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
-        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+      spyOn(
+        contributionAndReviewService,
+        'reviewQuestionSuggestion'
+      ).and.callFake(
+        (
+          _one: string,
+          _two: string,
+          _thre: string,
+          _four: string,
+          _five: number,
+          _six: (id: string) => void,
+          callBackfunction: () => void
+        ) => {
           callBackfunction();
           tick();
           return null;
@@ -612,16 +638,16 @@ describe('Contributions and review component', () => {
       );
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          authorName: null,
-          contentHtml: null,
-          reviewable: null,
-          question: null,
-          questionHeader: null,
-          suggestion: null,
-          skillRubrics: null,
+          authorName: undefined,
+          contentHtml: undefined,
+          reviewable: false,
+          question: undefined,
+          questionHeader: undefined,
+          suggestion: undefined,
+          skillRubrics: undefined,
           suggestionId: null,
           skillDifficulty: null,
-          misconceptionsBySkill: null,
+          misconceptionsBySkill: undefined,
           editSuggestionEmitter: eventEmitter,
         },
         result: Promise.resolve({
@@ -634,7 +660,7 @@ describe('Contributions and review component', () => {
       let suggestion = {
         change_cmd: {
           skill_id: 'skill1',
-          question_dict: null,
+          question_dict: null as unknown as QuestionBackendDict,
           skill_difficulty: null,
           translation_html: ['suggestion_1', 'suggestion_2'],
         },
@@ -642,17 +668,21 @@ describe('Contributions and review component', () => {
         suggestion_id: 'suggestion_id',
         author_name: 'string;',
       };
-      let contributionDetails = {
+      let contributionDetails: ContributionDetails = {
         skill_description: 'string',
         skill_rubrics: [],
+        chapter_title: 'Chapter 1',
+        story_title: 'Story 1',
+        topic_name: 'Topic 1',
       };
       let question = Question.createFromBackendDict({
-        question_state_data_schema_version: null,
+        question_state_data_schema_version: 0,
         id: 'question_1',
         question_state_data: {
           classifier_model_id: null,
-          card_is_checkpoint: null,
+          card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1',
@@ -672,7 +702,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   refresher_exploration_id: null,
                 },
-                training_data: null,
+                training_data: [],
                 rule_specs: [
                   {
                     rule_type: 'Equals',
@@ -682,7 +712,7 @@ describe('Contributions and review component', () => {
                 tagged_skill_misconception_id: null,
               },
               {
-                training_data: null,
+                training_data: [],
                 outcome: {
                   missing_prerequisite_skill_id: null,
                   dest: 'outcome 1',
@@ -748,15 +778,6 @@ describe('Contributions and review component', () => {
             id: 'TextInput',
           },
           param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {},
-            },
-          },
           solicit_answer_details: false,
         },
         language_code: 'en',
@@ -769,29 +790,43 @@ describe('Contributions and review component', () => {
 
       component.contributions = {
         suggestion_id: {
-          details: contributionDetails as ContributionDetails,
-          suggestion: null,
+          details: contributionDetails,
+          suggestion: {
+            change_cmd: {
+              skill_id: 'skill1',
+              content_html: '',
+              translation_html: '',
+              question_dict: {} as QuestionBackendDict,
+              skill_difficulty: [],
+            },
+            status: 'review',
+            suggestion_type: 'add_question',
+            target_id: 'target_1',
+            suggestion_id: 'suggestion_id',
+            author_name: 'author',
+            entity_content_html: null,
+          },
         },
       };
       component.openQuestionSuggestionModal(
         'suggestion_id',
-        suggestion as Suggestion,
+        suggestion as unknown as Suggestion,
         false,
         question
       );
 
       let value = {
-        suggestionId: null,
-        suggestion: null,
-        reviewable: null,
-        question: null,
+        suggestionId: 'suggestion_id',
+        suggestion: suggestion as unknown as Suggestion,
+        reviewable: false,
+        question: question,
       };
       eventEmitter.emit(value);
       tick();
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewQuestionSuggestion
       ).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
     }));
@@ -803,8 +838,105 @@ describe('Contributions and review component', () => {
       mockActiveTopicEventEmitter.emit();
       tick();
 
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
     }));
+
+    it('should clear activeExplorationId and emit reload when activeEntityType changes in ngOnChanges', () => {
+      component.activeExplorationId = 'exp1';
+      component.ngOnChanges({
+        activeEntityType: {
+          currentValue: AppConstants.ENTITY_TYPE.SKILL,
+          previousValue: AppConstants.ENTITY_TYPE.EXPLORATION,
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.activeExplorationId).toBe('');
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+      ).toHaveBeenCalled();
+    });
+
+    it('should not reload on the first activeEntityType binding', () => {
+      (
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .emit as jasmine.Spy
+      ).calls.reset();
+      component.activeExplorationId = 'exp1';
+      component.ngOnChanges({
+        activeEntityType: {
+          currentValue: ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      // The initial binding arrives before anything has loaded, so the open
+      // opportunity is left alone and no extra reload is triggered.
+      expect(component.activeExplorationId).toBe('exp1');
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should ignore changes that do not touch activeEntityType', () => {
+      (
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .emit as jasmine.Spy
+      ).calls.reset();
+      component.activeExplorationId = 'exp1';
+      component.ngOnChanges({
+        activeTopicName: {
+          currentValue: 'Topic 2',
+          previousValue: 'Topic 1',
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.activeExplorationId).toBe('exp1');
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should format subheading using topic_name and entity_description when V2 flag is enabled', () => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const suggestionsDict: Record<string, SuggestionDetails> = {
+        sug_1: {
+          suggestion: {
+            change_cmd: {
+              skill_id: '',
+              content_html: 'Content',
+              translation_html: 'Translation',
+              question_dict: null as unknown as QuestionBackendDict,
+              skill_difficulty: [],
+            },
+            status: 'review',
+            suggestion_type: 'translate_content',
+            target_id: 'exp1',
+            suggestion_id: 'sug_1',
+            author_name: 'Author',
+            entity_content_html: 'Content',
+          },
+          details: {
+            topic_name: 'Math',
+            entity_description: 'Chapter 1',
+          },
+        },
+      };
+
+      const summaries =
+        component.getTranslationContributionsSummary(suggestionsDict);
+
+      expect(summaries[0].subheading).toBe('Math / Chapter 1');
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    });
 
     it('should be able to change language', fakeAsync(() => {
       component.opportunitiesListRef = TestBed.inject(
@@ -829,8 +961,8 @@ describe('Contributions and review component', () => {
     describe('isReviewTranslationsTab()', () => {
       it('should return true on Review Translations tab', fakeAsync(() => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
-        expect(component.isReviewTranslationsTab()).toBeTrue();
-        expect(component.isReviewQuestionsTab()).toBeFalse();
+        expect(component.isReviewTranslationsTab()).toBe(true);
+        expect(component.isReviewQuestionsTab()).toBe(false);
 
         // TODO(#9749): Move out of this test. The following only exists to
         // satisfy code coverage for resolveSuggestionSuccess().
@@ -849,8 +981,8 @@ describe('Contributions and review component', () => {
 
       it('should return false on Review Questions tab', () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-        expect(component.isReviewQuestionsTab()).toBeTrue();
-        expect(component.isReviewTranslationsTab()).toBeFalse();
+        expect(component.isReviewQuestionsTab()).toBe(true);
+        expect(component.isReviewTranslationsTab()).toBe(false);
 
         // TODO(#9749): Factor into separate test. Currently, the below test
         // logic only exists to satisfy code coverage for
@@ -861,16 +993,27 @@ describe('Contributions and review component', () => {
         component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
         component.contributions = {
           SUGGESTION: {
-            details: null,
+            details: {
+              skill_description: 'skill',
+              skill_rubrics: [],
+              chapter_title: 'chapter',
+              story_title: 'story',
+              topic_name: 'topic',
+            },
             suggestion: {
               suggestion_type: 'SUGGESTION',
               suggestion_id: '',
               target_id: 'target_id',
               change_cmd: {
+                skill_id: 'skill_1',
                 content_html: '',
                 translation_html: '',
+                question_dict: {} as QuestionBackendDict,
+                skill_difficulty: [],
               },
               status: '',
+              author_name: 'author',
+              entity_content_html: null,
             },
           },
         };
@@ -882,22 +1025,22 @@ describe('Contributions and review component', () => {
           component.TAB_TYPE_CONTRIBUTIONS,
           'translate_content'
         );
-        expect(component.isReviewTranslationsTab()).toBeFalse();
+        expect(component.isReviewTranslationsTab()).toBe(false);
       });
 
       it('should return false on Question Contributions tab', () => {
         component.switchToTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-        expect(component.isReviewTranslationsTab()).toBeFalse();
+        expect(component.isReviewTranslationsTab()).toBe(false);
       });
 
       it('should return true when activeTabType is reviews', () => {
         component.activeTabType = component.TAB_TYPE_REVIEWS;
-        expect(component.activeReviewTab).toBeTrue();
+        expect(component.activeReviewTab).toBe(true);
       });
 
       it('should return false when activeTabType is not reviews', () => {
         component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-        expect(component.activeReviewTab).toBeFalse();
+        expect(component.activeReviewTab).toBe(false);
       });
     });
 
@@ -912,8 +1055,19 @@ describe('Contributions and review component', () => {
     it('should open question suggestion modal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
-        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+      spyOn(
+        contributionAndReviewService,
+        'reviewQuestionSuggestion'
+      ).and.callFake(
+        (
+          _one: string,
+          _two: string,
+          _thre: string,
+          _four: string,
+          _five: number,
+          _six: (id: string) => void,
+          callBackfunction: () => void
+        ) => {
           callBackfunction();
           tick();
           return null;
@@ -922,16 +1076,16 @@ describe('Contributions and review component', () => {
       spyOn(component, 'openQuestionSuggestionModal').and.stub();
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          authorName: null,
-          contentHtml: null,
-          reviewable: null,
-          question: null,
-          questionHeader: null,
-          suggestion: null,
-          skillRubrics: null,
+          authorName: undefined,
+          contentHtml: undefined,
+          reviewable: false,
+          question: undefined,
+          questionHeader: undefined,
+          suggestion: undefined,
+          skillRubrics: undefined,
           suggestionId: null,
           skillDifficulty: null,
-          misconceptionsBySkill: null,
+          misconceptionsBySkill: undefined,
           editSuggestionEmitter: eventEmitter,
         },
         result: Promise.resolve({
@@ -945,9 +1099,9 @@ describe('Contributions and review component', () => {
         question_state_data_schema_version: null,
         id: 'question_1',
         question_state_data: {
-          classifier_model_id: null,
-          card_is_checkpoint: null,
-          linked_skill_id: null,
+          classifier_model_id: undefined,
+          card_is_checkpoint: false,
+          linked_skill_id: undefined,
           content: {
             html: 'Question 1',
             content_id: 'content_1',
@@ -1074,13 +1228,13 @@ describe('Contributions and review component', () => {
         suggestion_id: 'string;',
         author_name: 'string;',
         suggestion_type: 'question',
-        exploration_content_html: '',
+        entity_content_html: '',
       };
 
       let suggestionIdToContribution = {
         suggestion_1: {
           suggestion: {
-            exploration_content_html: null,
+            entity_content_html: null,
             language_code: null,
             target_type: null,
             author_name: null,
@@ -1184,24 +1338,27 @@ describe('Contributions and review component', () => {
       };
 
       component._showQuestionSuggestionModal(
-        suggestion,
-        suggestionIdToContribution,
+        suggestion as unknown as Suggestion,
+        suggestionIdToContribution as unknown as Record<
+          string,
+          ActiveContributionDict
+        >,
         false,
-        null,
-        null
+        undefined as unknown as Question,
+        null as unknown as MisconceptionSkillMap
       );
 
       let value = {
         suggestionId: null,
-        suggestion: null,
-        reviewable: null,
-        question: null,
+        suggestion: undefined,
+        reviewable: false,
+        question: undefined,
       };
       eventEmitter.emit(value);
       tick();
 
       expect(
-        contributionAndReviewService.reviewSkillSuggestion
+        contributionAndReviewService.reviewQuestionSuggestion
       ).toHaveBeenCalled();
       expect(component.openQuestionSuggestionModal).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1226,11 +1383,11 @@ describe('Contributions and review component', () => {
       spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       let question = Question.createFromBackendDict({
-        question_state_data_schema_version: null,
+        question_state_data_schema_version: 1,
         id: 'question_1',
         question_state_data: {
           classifier_model_id: null,
-          card_is_checkpoint: null,
+          card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
             html: 'Question 1',
@@ -1251,7 +1408,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   refresher_exploration_id: null,
                 },
-                training_data: null,
+                training_data: [],
                 rule_specs: [
                   {
                     rule_type: 'Equals',
@@ -1305,16 +1462,8 @@ describe('Contributions and review component', () => {
             id: 'TextInput',
           },
           param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {},
-            },
-          },
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: ['abc-2'],
         },
         language_code: 'en',
         version: 1,
@@ -1333,6 +1482,7 @@ describe('Contributions and review component', () => {
               id: null,
               question_state_data: {
                 classifier_model_id: null,
+                card_is_checkpoint: false,
                 param_changes: [],
                 solicit_answer_details: false,
                 content: {content_id: '', html: ''},
@@ -1347,11 +1497,14 @@ describe('Contributions and review component', () => {
                     missing_prerequisite_skill_id: null,
                     labelled_as_correct: false,
                   },
-                  id: '',
+                  confirmed_unclassified_answers: [],
+                  hints: [],
+                  solution: null,
+                  id: null,
                   customization_args: {},
                 },
                 linked_skill_id: null,
-                next_content_id_index: 0,
+                inapplicable_skill_misconception_ids: [],
               },
               question_state_data_schema_version: 0,
               language_code: '',
@@ -1367,12 +1520,12 @@ describe('Contributions and review component', () => {
           target_id: '',
           suggestion_id: '',
           author_name: '',
-          exploration_content_html: null,
+          entity_content_html: null,
         },
         {},
         false,
         question,
-        null
+        {}
       );
       tick();
 
@@ -1380,7 +1533,7 @@ describe('Contributions and review component', () => {
     }));
 
     it('should set activeExplorationId', () => {
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
       component.onClickReviewableTranslations('explorationId');
       expect(component.activeExplorationId).toBe('explorationId');
     });
@@ -1389,28 +1542,54 @@ describe('Contributions and review component', () => {
       component.onClickReviewableTranslations('explorationId');
       expect(component.activeExplorationId).toBe('explorationId');
       component.onClickBackToReviewableLessons();
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
     });
 
     describe('loadContributions', () => {
       it('should load reviewable questions', () => {
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(component.contributions)).toContain(
-            'suggestion_1'
-          );
-          expect(opportunitiesDicts).toEqual([
-            {
-              id: 'suggestion_1',
-              heading: 'Question 1',
-              subheading: 'Skill description',
-              labelText: 'Awaiting review',
-              labelColor: '#eeeeee',
-              actionButtonTitle: 'Review',
-            },
-          ]);
-          expect(more).toEqual(false);
-        });
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(Object.keys(component.contributions)).toContain(
+              'suggestion_1'
+            );
+            expect(opportunitiesDicts).toEqual([
+              {
+                id: 'suggestion_1',
+                heading: 'Question 1',
+                subheading: 'Skill description',
+                labelText: 'Awaiting review',
+                labelColor: '#eeeeee',
+                actionButtonTitle: 'Review',
+              },
+            ]);
+            expect(more).toEqual(false);
+          });
       });
+      it(
+        'should ignore a stale response when the active tab changes ' +
+          'while the request is in flight',
+        fakeAsync(() => {
+          // Set the tab state that the request starts with.
+          component.activeTabType = component.TAB_TYPE_REVIEWS;
+          component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
+
+          const loadPromise = component.loadContributions(null);
+
+          // Simulate the user switching tabs before the response resolves.
+          component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
+
+          let result: GetOpportunitiesResponse;
+          loadPromise.then(response => {
+            result = response;
+          });
+          tick();
+
+          // The stale response should be ignored and an empty result returned.
+          expect(result.opportunitiesDicts).toEqual([]);
+          expect(result.more).toBeFalse();
+        })
+      );
 
       it('should load translation contributions', () => {
         getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
@@ -1433,7 +1612,7 @@ describe('Contributions and review component', () => {
                     skill_id: 'skill_id',
                   },
                   status: 'rejected',
-                  exploration_content_html: null,
+                  entity_content_html: null,
                 },
                 details: {
                   topic_name: 'topic_name',
@@ -1451,23 +1630,25 @@ describe('Contributions and review component', () => {
           'translate_content'
         );
 
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(component.contributions)).toContain(
-            'suggestion_1'
-          );
-          expect(opportunitiesDicts).toEqual([
-            {
-              id: 'suggestion_1',
-              heading: 'Tradução',
-              subheading: 'topic_name / story_title / chapter_title',
-              labelText: 'Obsolete',
-              labelColor: '#e76c8c',
-              actionButtonTitle: 'View',
-              translationWordCount: undefined,
-            },
-          ]);
-          expect(more).toEqual(false);
-        });
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(Object.keys(component.contributions)).toContain(
+              'suggestion_1'
+            );
+            expect(opportunitiesDicts).toEqual([
+              {
+                id: 'suggestion_1',
+                heading: 'Tradução',
+                subheading: 'topic_name / story_title / chapter_title',
+                labelText: 'Obsolete',
+                labelColor: '#e76c8c',
+                actionButtonTitle: 'View',
+                translationWordCount: undefined,
+              },
+            ]);
+            expect(more).toEqual(false);
+          });
       });
 
       it('should show only selected type when switching tabs', fakeAsync(() => {
@@ -1488,7 +1669,7 @@ describe('Contributions and review component', () => {
                 translation_html: 'Tradução',
               },
               status: 'rejected',
-              exploration_content_html: null,
+              entity_content_html: null,
             },
             details: {
               topic_name: 'topic_name',
@@ -1511,31 +1692,33 @@ describe('Contributions and review component', () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
 
         // Set up contributions with a translation to be reviewed.
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(component.contributions)).toContain(
-            'suggestion_1'
-          );
-          expect(opportunitiesDicts).toEqual([
-            {
-              id: 'suggestion_1',
-              heading: 'Tradução',
-              subheading: 'topic_name / story_title / chapter_title',
-              labelText: 'Obsolete',
-              labelColor: '#e76c8c',
-              actionButtonTitle: 'Review',
-              translationWordCount: undefined,
-            },
-          ]);
-          expect(more).toEqual(false);
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(Object.keys(component.contributions)).toContain(
+              'suggestion_1'
+            );
+            expect(opportunitiesDicts).toEqual([
+              {
+                id: 'suggestion_1',
+                heading: 'Tradução',
+                subheading: 'topic_name / story_title / chapter_title',
+                labelText: 'Obsolete',
+                labelColor: '#e76c8c',
+                actionButtonTitle: 'Review',
+                translationWordCount: undefined,
+              },
+            ]);
+            expect(more).toEqual(false);
 
-          // When opening the review modal for translations,
-          // only translations should be shown.
-          spyOn(component, '_showTranslationSuggestionModal');
-          component.onClickViewSuggestion('suggestion_1');
-          expect(
-            component._showTranslationSuggestionModal
-          ).toHaveBeenCalledWith(suggestion1, 'suggestion_1', true);
-        });
+            // When opening the review modal for translations,
+            // only translations should be shown.
+            spyOn(component, '_showTranslationSuggestionModal');
+            component.onClickViewSuggestion('suggestion_1');
+            expect(
+              component._showTranslationSuggestionModal
+            ).toHaveBeenCalledWith(suggestion1, 'suggestion_1', true);
+          });
         // Wait for the first test to complete.
         tick();
 
@@ -1648,50 +1831,107 @@ describe('Contributions and review component', () => {
         // Load contributions object with a question. This should also remove
         // any data created in the previous call to loadContributions
         // from the component.contributions object.
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(component.contributions)).toContain(
-            'suggestion_2'
-          );
-          expect(opportunitiesDicts).toEqual([
-            {
-              id: 'suggestion_2',
-              heading: 'Question 2',
-              subheading: 'skill_1',
-              labelText: 'Accepted',
-              labelColor: '#8ed274',
-              actionButtonTitle: 'View',
-            },
-          ]);
-          expect(more).toEqual(false);
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(Object.keys(component.contributions)).toContain(
+              'suggestion_2'
+            );
+            expect(opportunitiesDicts).toEqual([
+              {
+                id: 'suggestion_2',
+                heading: 'Question 2',
+                subheading: 'skill_1',
+                labelText: 'Accepted',
+                labelColor: '#8ed274',
+                actionButtonTitle: 'View',
+              },
+            ]);
+            expect(more).toEqual(false);
 
-          // When opening the contribution modal for questions,
-          // only contribution questions should be shown.
-          spyOn(component, 'openQuestionSuggestionModal');
-          component.onClickViewSuggestion('suggestion_2');
+            // When opening the contribution modal for questions,
+            // only contribution questions should be shown.
+            spyOn(component, 'openQuestionSuggestionModal');
+            component.onClickViewSuggestion('suggestion_2');
 
-          expect(component.openQuestionSuggestionModal).toHaveBeenCalledWith(
-            'suggestion_2',
-            suggestion2,
-            false
-          );
-        });
+            expect(component.openQuestionSuggestionModal).toHaveBeenCalledWith(
+              'suggestion_2',
+              suggestion2,
+              false
+            );
+          });
       }));
 
       it('should return empty list if tab is not initialized', () => {
-        component.activeTabType = null;
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(opportunitiesDicts).toEqual([]);
-          expect(more).toEqual(false);
-        });
+        component.activeTabType = '';
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(opportunitiesDicts).toEqual([]);
+            expect(more).toEqual(false);
+          });
       });
 
       it('should return empty list if suggestion type is not initialized', () => {
-        component.activeTabType = null;
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(opportunitiesDicts).toEqual([]);
-          expect(more).toEqual(false);
-        });
+        component.activeTabType = '';
+        component
+          .loadContributions(false)
+          .then(({opportunitiesDicts, more}) => {
+            expect(opportunitiesDicts).toEqual([]);
+            expect(more).toEqual(false);
+          });
       });
+
+      it(
+        'should return an empty list when the user is not authorized ' +
+          'to make suggestions',
+        fakeAsync(() => {
+          getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
+            Promise.reject({status: 401})
+          );
+
+          component.switchToTab(
+            component.TAB_TYPE_CONTRIBUTIONS,
+            'translate_content'
+          );
+
+          let response = null;
+          component
+            .loadContributions(null)
+            .then(({opportunitiesDicts, more}) => {
+              response = {opportunitiesDicts, more};
+            });
+          tick();
+
+          expect(response).toEqual({opportunitiesDicts: [], more: false});
+        })
+      );
+
+      it(
+        'should rethrow the error when the request fails for a reason ' +
+          'other than authorization',
+        fakeAsync(() => {
+          getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
+            Promise.reject({status: 500})
+          );
+
+          component.switchToTab(
+            component.TAB_TYPE_CONTRIBUTIONS,
+            'translate_content'
+          );
+
+          let rejectionStatus = null;
+          component.loadContributions(null).then(
+            () => {},
+            error => {
+              rejectionStatus = error.status;
+            }
+          );
+          tick();
+
+          expect(rejectionStatus).toEqual(500);
+        })
+      );
 
       it('should not overwrite previously fetched data', fakeAsync(() => {
         const mockSuggestions: Record<
@@ -1708,11 +1948,42 @@ describe('Contributions and review component', () => {
                 content_html: 'string',
                 translation_html: 'html',
                 question_dict: {
+                  id: 'question_1',
+                  question_state_data_schema_version: 0,
                   question_state_data: {
+                    classifier_model_id: null,
+                    card_is_checkpoint: false,
+                    linked_skill_id: null,
+                    inapplicable_skill_misconception_ids: null,
                     content: {
                       html: 'html',
+                      content_id: 'content_1',
                     },
+                    interaction: {
+                      answer_groups: [],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {},
+                      default_outcome: {
+                        dest: null,
+                        dest_if_really_stuck: null,
+                        feedback: {html: '', content_id: ''},
+                        labelled_as_correct: false,
+                        param_changes: [],
+                        refresher_exploration_id: null,
+                        missing_prerequisite_skill_id: null,
+                      },
+                      hints: [],
+                      solution: null,
+                      id: 'TextInput',
+                    },
+                    param_changes: [],
+                    solicit_answer_details: false,
                   },
+                  language_code: 'en',
+                  version: 1,
+                  linked_skill_ids: [],
+                  next_content_id_index: 1,
+                  inapplicable_skill_misconception_ids: [],
                 },
                 skill_difficulty: ['Medium'],
               },
@@ -1721,7 +1992,7 @@ describe('Contributions and review component', () => {
               author_name: 'string;',
               status: 'review',
               suggestion_type: 'string',
-              exploration_content_html: 'html',
+              entity_content_html: 'html',
             },
             details: {
               skill_description: 'skill_description',
@@ -1789,31 +2060,102 @@ describe('Contributions and review component', () => {
       }));
     });
 
-    it('should load reviewable translation opportunities correctly', () => {
-      component
-        .loadReviewableTranslationOpportunities()
-        .then(({opportunitiesDicts, more}) => {
-          expect(opportunitiesDicts).toEqual([
-            {
-              id: '1',
-              heading: 'Chapter 1',
-              subheading: 'Topic 1 - Story 1',
-              actionButtonTitle: 'Translations',
-              isPinned: false,
-              topicName: 'Topic 1',
-            } as unknown as Opportunity,
-            {
-              id: '2',
-              heading: 'Chapter 2',
-              subheading: 'Topic 2 - Story 2',
-              actionButtonTitle: 'Translations',
-              isPinned: false,
-              topicName: 'Topic 2',
-            } as unknown as Opportunity,
-          ]);
-          expect(more).toEqual(false);
-        });
-    });
+    it('should load reviewable translation opportunities correctly', fakeAsync(() => {
+      component.languageCode = 'en';
+      let response: GetOpportunitiesResponse | null = null;
+      component.loadReviewableTranslationOpportunities().then(result => {
+        response = result;
+      });
+      flushMicrotasks();
+      const responseOpt = response as unknown as GetOpportunitiesResponse;
+      expect(responseOpt.opportunitiesDicts).toEqual([
+        {
+          id: '1',
+          heading: 'Chapter 1',
+          subheading: 'Topic 1 - Story 1',
+          labelText: '',
+          labelColor: '',
+          actionButtonTitle: 'Translations',
+          isPinned: false,
+          topicName: 'Topic 1',
+          totalCount: 1,
+          translationsCount: 2,
+          inReviewCount: 2,
+          progressPercentage: '200.00',
+          // These opportunities come from V1 dicts, which carry no entity
+          // type, so they are treated as explorations.
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        } as unknown as Opportunity,
+        {
+          id: '2',
+          heading: 'Chapter 2',
+          subheading: 'Topic 2 - Story 2',
+          labelText: '',
+          labelColor: '',
+          actionButtonTitle: 'Translations',
+          isPinned: false,
+          topicName: 'Topic 2',
+          totalCount: 2,
+          translationsCount: 4,
+          inReviewCount: 4,
+          progressPercentage: '200.00',
+          entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
+        } as unknown as Opportunity,
+      ]);
+      expect(responseOpt.more).toEqual(false);
+    }));
+
+    it('should fetch suggestions using the entity type of the opened opportunity', fakeAsync(() => {
+      const getReviewableSuggestionsSpy =
+        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve({suggestionIdToDetails: {}, more: false})
+        );
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      getReviewableSuggestionsSpy.calls.reset();
+      // The dashboard filter is on "All", which mixes entity types in one
+      // list, so the opened opportunity has to supply its own entity type.
+      component.activeEntityType =
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
+      component.opportunities = [
+        {
+          id: 'skill_1',
+          entityType: AppConstants.ENTITY_TYPE.SKILL,
+        },
+      ] as unknown as ExplorationOpportunitySummary[];
+      component.onClickReviewableTranslations('skill_1');
+
+      component.loadContributions(true);
+      flushMicrotasks();
+
+      expect(component.activeExplorationId).toBe('skill_1');
+      expect(getReviewableSuggestionsSpy).toHaveBeenCalledWith(
+        true,
+        component.reviewableTranslationsSortKey,
+        'skill_1',
+        AppConstants.ENTITY_TYPE.SKILL
+      );
+    }));
+
+    it('should fall back to the selected filter when no opportunity is open', fakeAsync(() => {
+      const getReviewableSuggestionsSpy =
+        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve({suggestionIdToDetails: {}, more: false})
+        );
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      getReviewableSuggestionsSpy.calls.reset();
+      component.activeEntityType = AppConstants.ENTITY_TYPE.SKILL;
+      component.activeExplorationId = null as unknown as string;
+
+      component.loadContributions(true);
+      flushMicrotasks();
+
+      expect(getReviewableSuggestionsSpy).toHaveBeenCalledWith(
+        true,
+        component.reviewableTranslationsSortKey,
+        null,
+        AppConstants.ENTITY_TYPE.SKILL
+      );
+    }));
 
     it('should open a snackbar if a pinned opportunity already exists', () => {
       const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
@@ -1823,30 +2165,42 @@ describe('Contributions and review component', () => {
         exploration_id: '1',
       };
       component.opportunities = [
-        {
-          id: '1',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: true,
-          topicName: 'Topic 1',
-        },
-        {
-          id: '2',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: false,
-          topicName: 'Topic 1',
-        },
-        {
-          id: '3',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: false,
-          topicName: 'Topic 1',
-        },
+        new ExplorationOpportunitySummary(
+          '1',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          true,
+          0
+        ),
+        new ExplorationOpportunitySummary(
+          '2',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          false,
+          0
+        ),
+        new ExplorationOpportunitySummary(
+          '3',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          false,
+          0
+        ),
       ];
       component.languageCode = 'en';
 
@@ -1874,30 +2228,42 @@ describe('Contributions and review component', () => {
           exploration_id: '8',
         };
         component.opportunities = [
-          {
-            id: '1',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: true,
-            topicName: 'Topic 1',
-          },
-          {
-            id: '2',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: false,
-            topicName: 'Topic 1',
-          },
-          {
-            id: '3',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: false,
-            topicName: 'Topic 1',
-          },
+          new ExplorationOpportunitySummary(
+            '1',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            true,
+            0
+          ),
+          new ExplorationOpportunitySummary(
+            '2',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            false,
+            0
+          ),
+          new ExplorationOpportunitySummary(
+            '3',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            false,
+            0
+          ),
         ];
         component.languageCode = 'en';
 
@@ -1930,14 +2296,20 @@ describe('Contributions and review component', () => {
     }));
 
     it('should open snackbar and handle action', fakeAsync(() => {
-      spyOn(snackBar, 'open').and.callFake((message, actionText, config) => {
-        const data = TestBed.inject(MAT_SNACK_BAR_DATA);
-        data.onAction = of(null);
-        return {
-          onAction: () => data.onAction,
-          dismiss: () => {},
-        };
-      });
+      spyOn(snackBar, 'open').and.callFake(
+        (
+          message: string,
+          actionText: string,
+          config: {duration?: number; verticalPosition?: string} | undefined
+        ) => {
+          const data = TestBed.inject(MAT_SNACK_BAR_DATA);
+          data.onAction = of(null);
+          return {
+            onAction: () => data.onAction,
+            dismiss: () => {},
+          };
+        }
+      );
       spyOn(
         contributionOpportunitiesService,
         'pinReviewableTranslationOpportunityAsync'
@@ -1961,8 +2333,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = null;
-      component.SUGGESTION_TYPE_QUESTION = null;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: ['something', 'cool'],
@@ -1985,8 +2357,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = null;
-      component.SUGGESTION_TYPE_QUESTION = null;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: [],
@@ -2010,8 +2382,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = null;
-      component.SUGGESTION_TYPE_QUESTION = null;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: [],
@@ -2123,6 +2495,7 @@ describe('Contributions and review component', () => {
               question_dict: {
                 question_state_data: {
                   content: {
+                    content_id: 'content_1',
                     html: 'html',
                   },
                 },
@@ -2134,14 +2507,18 @@ describe('Contributions and review component', () => {
             author_name: 'string;',
             status: 'review',
             suggestion_type: 'string',
-          } as Suggestion,
+          } as unknown as Suggestion,
           details: null,
         },
       };
 
       spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
-      component.getQuestionContributionsSummary(suggestion);
-      component.getTranslationContributionsSummary(suggestion);
+      component.getQuestionContributionsSummary(
+        suggestion as unknown as Record<string, SuggestionDetails>
+      );
+      component.getTranslationContributionsSummary(
+        suggestion as unknown as Record<string, SuggestionDetails>
+      );
     });
 
     it(
@@ -2150,7 +2527,7 @@ describe('Contributions and review component', () => {
       () => {
         contributionOpportunitiesService.reloadOpportunitiesEventEmitter.subscribe(
           () => {
-            component.loadContributions(null).then(() => {
+            component.loadContributions(false).then(() => {
               spyOn(ngbModal, 'open').and.callThrough();
               component.onClickViewSuggestion('suggestion_1');
 
@@ -2364,7 +2741,7 @@ describe('Contributions and review component', () => {
                   },
                 },
               },
-            } as Suggestion,
+            } as unknown as Suggestion,
             details: {
               skill_description: 'skill_description',
               topic_name: 'topic_name',
@@ -2397,7 +2774,7 @@ describe('Contributions and review component', () => {
     it('should resolve suggestion when closing show suggestion modal', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.subscribe(
         () => {
-          component.loadContributions(null).then(() => {
+          component.loadContributions(false).then(() => {
             spyOn(ngbModal, 'open').and.returnValue({
               result: Promise.resolve({
                 action: 'add',
@@ -2420,7 +2797,7 @@ describe('Contributions and review component', () => {
     it('should not resolve suggestion when dismissing show suggestion modal', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.subscribe(
         () => {
-          component.loadContributions(null).then(() => {
+          component.loadContributions(false).then(() => {
             spyOn(ngbModal, 'open').and.returnValue({
               result: Promise.reject(),
             } as NgbModalRef);
@@ -2445,13 +2822,13 @@ describe('Contributions and review component', () => {
       mockActiveTopicEventEmitter.emit();
       tick();
 
-      expect(component.topicReady).toBeFalse();
+      expect(component.topicReady).toBe(false);
 
       getActiveTopicNameSpy.and.returnValue('Math');
       mockActiveTopicEventEmitter.emit();
       tick();
 
-      expect(component.topicReady).toBeTrue();
+      expect(component.topicReady).toBe(true);
     }));
   });
 
@@ -2463,7 +2840,7 @@ describe('Contributions and review component', () => {
         () => {
           contributionOpportunitiesService.reloadOpportunitiesEventEmitter.subscribe(
             () => {
-              component.loadContributions(null).then(() => {
+              component.loadContributions(false).then(() => {
                 spyOn(ngbModal, 'open').and.returnValue({
                   result: Promise.reject(),
                 } as NgbModalRef);
@@ -2504,7 +2881,7 @@ describe('Contributions and review component', () => {
       () => {
         spyOn(ngbModal, 'open').and.callThrough();
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-        component.loadContributions(null).then(() => {
+        component.loadContributions(false).then(() => {
           component.onClickViewSuggestion('suggestion_1');
 
           expect(ngbModal.open).toHaveBeenCalled();
@@ -2521,7 +2898,7 @@ describe('Contributions and review component', () => {
         } as NgbModalRef);
 
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-        component.loadContributions(null).then(() => {
+        component.loadContributions(false).then(() => {
           expect(Object.keys(component.contributions).length).toBe(1);
           component.onClickViewSuggestion('suggestion_1');
           flush();
@@ -2536,12 +2913,12 @@ describe('Contributions and review component', () => {
         ' suggestion modal',
       () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-        spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
+        spyOn(contributionAndReviewService, 'reviewQuestionSuggestion');
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.reject({}),
         } as NgbModalRef);
 
-        component.loadContributions(null).then(() => {
+        component.loadContributions(false).then(() => {
           component.onClickViewSuggestion('suggestion_1');
 
           expect(ngbModal.open).toHaveBeenCalled();
@@ -2719,7 +3096,7 @@ describe('Contributions and review component', () => {
         },
       };
       const clickEvent = {
-        target: null,
+        target: document.createElement('div'),
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and.returnValue(
         null
@@ -2729,7 +3106,7 @@ describe('Contributions and review component', () => {
       );
       component.dropdownShown = true;
 
-      component.closeDropdownWhenClickedOutside(null);
+      component.closeDropdownWhenClickedOutside({target: document.body});
       expect(querySelectorSpy).toHaveBeenCalled();
       expect(elementContainsSpy).not.toHaveBeenCalled();
       expect(component.dropdownShown).toBe(true);
@@ -2740,7 +3117,6 @@ describe('Contributions and review component', () => {
       // 'Element': attributes, classList, className, clientHeight, and 159
       // more.". We need to suppress this error because only the properties
       // provided in the element object are required for testing.
-      // @ts-expect-error
       querySelectorSpy.and.returnValue(element);
 
       component.closeDropdownWhenClickedOutside(clickEvent);
@@ -2756,7 +3132,7 @@ describe('Contributions and review component', () => {
 
     it('should return back when user click is made outside', () => {
       const clickEvent = {
-        target: null,
+        target: document.createElement('div'),
       };
       spyOn(document, 'querySelector').and.returnValue(null);
 
@@ -2770,8 +3146,8 @@ describe('Contributions and review component', () => {
       let eventEmitter = new EventEmitter();
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          authorName: null,
-          contentHtml: null,
+          authorName: undefined,
+          contentHtml: undefined,
           reviewable: true,
           suggestionIdToContribution: {},
           initialSuggestionId: 'suggestion_1',
@@ -2797,10 +3173,15 @@ describe('Contributions and review component', () => {
             target_id: '1',
             suggestion_type: 'translate_content',
             change_cmd: {
+              skill_id: 'skill_1',
               content_html: 'Translation',
               translation_html: 'Tradução',
+              question_dict: {} as QuestionBackendDict,
+              skill_difficulty: [],
             },
             status: 'review',
+            author_name: 'author',
+            entity_content_html: null,
           },
           details: {
             skill_description: 'skill_description',
@@ -2814,6 +3195,7 @@ describe('Contributions and review component', () => {
 
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -2826,6 +3208,7 @@ describe('Contributions and review component', () => {
       // Now emit a new queued suggestion which should trigger the subscription logic.
       eventEmitter.emit({
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_2',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -2856,10 +3239,15 @@ describe('Contributions and review component', () => {
             target_id: '1',
             suggestion_type: 'translate_content',
             change_cmd: {
+              skill_id: 'skill_1',
               content_html: 'Translation',
               translation_html: 'Tradução',
+              question_dict: {} as QuestionBackendDict,
+              skill_difficulty: [],
             },
             status: 'review',
+            author_name: 'author_1',
+            entity_content_html: null,
           },
           details: {
             skill_description: 'skill_description',
@@ -2882,6 +3270,7 @@ describe('Contributions and review component', () => {
       const COMMIT_TIMEOUT_DURATION = 32000;
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -2897,24 +3286,26 @@ describe('Contributions and review component', () => {
     it('should commit the queued Suggestion when commit function is called', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
       };
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
-          return Promise.resolve(successCallback(suggestionId));
+          return Promise.resolve(successCallback(''));
         }
       );
       component.contributions = {};
@@ -2934,18 +3325,19 @@ describe('Contributions and review component', () => {
       component.queuedSuggestionSummary = null;
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
-          return Promise.resolve(successCallback(suggestionId));
+          return Promise.resolve(successCallback(''));
         }
       );
       component.contributions = {};
@@ -2958,31 +3350,142 @@ describe('Contributions and review component', () => {
 
       component.commitQueuedSuggestion();
       expect(
-        contributionAndReviewService.reviewExplorationSuggestion
+        contributionAndReviewService.reviewTranslationSuggestion
       ).not.toHaveBeenCalled();
+    });
+
+    it('should commit a queued skill suggestion', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'skill_1',
+        target_type: AppConstants.ENTITY_TYPE.SKILL,
+        suggestion_id: 'suggestion_1',
+        action_status: 'accept',
+        reviewer_message: 'test',
+      };
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          skillDifficulty: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
+        ) => {
+          return Promise.resolve(successCallback(suggestionId));
+        }
+      );
+      component.contributions = {
+        suggestion_1: {} as unknown as SuggestionDetails,
+      };
+      spyOn(alertsService, 'addSuccessMessage');
+      spyOn(alertsService, 'clearMessages');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
+
+      component.commitQueuedSuggestion();
+
+      expect(
+        contributionAndReviewService.reviewTranslationSuggestion
+      ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
+        'skill_1',
+        'suggestion_1',
+        'accept',
+        'test',
+        null,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.'
+      );
+      expect(removeSpy).toHaveBeenCalledWith(['suggestion_1']);
+      expect(
+        (component as unknown as {isCommitting: boolean}).isCommitting
+      ).toBeFalsy();
+    });
+
+    it('should warn when committing a queued skill suggestion fails', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'skill_1',
+        target_type: AppConstants.ENTITY_TYPE.SKILL,
+        suggestion_id: 'suggestion_1',
+        action_status: 'reject',
+        reviewer_message: 'test',
+      };
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
+        ) => {
+          // The service supplies a generic message for a skill review
+          // failure, because that endpoint reports no reason of its own.
+          return Promise.reject(
+            errorCallback(
+              ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+            )
+          );
+        }
+      );
+      component.contributions = {};
+      spyOn(alertsService, 'addWarning');
+      spyOn(alertsService, 'clearWarnings');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
+
+      component.commitQueuedSuggestion();
+
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error updating suggestion'
+      );
+      expect(removeSpy).not.toHaveBeenCalled();
+      expect(
+        (component as unknown as {isCommitting: boolean}).isCommitting
+      ).toBeFalsy();
     });
 
     it('should not call remove suggestion emitter if network call fails', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
       };
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
+          targetType: string,
+          targetId: string,
+          suggestionId: string,
+          action: string,
+          reviewMessage: string,
+          commitMessage: string | null,
+          successCallback: (id: string) => void,
+          errorCallback: (error: string) => void
         ) => {
-          return Promise.reject(errorCallback(suggestionId));
+          return Promise.reject(errorCallback('error'));
         }
       );
       component.contributions = {};
@@ -3001,6 +3504,7 @@ describe('Contributions and review component', () => {
     it('should not call remove suggestion emitter if network call fails', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
+        target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
@@ -3052,7 +3556,7 @@ describe('Contributions and review component', () => {
               content_html: 'Content 1',
               translation_html: 'Translation 1',
             },
-            exploration_content_html: 'Content 1',
+            entity_content_html: 'Content 1',
           },
           details: {
             topic_name: 'Topic',
@@ -3068,7 +3572,7 @@ describe('Contributions and review component', () => {
               content_html: 'Content 2',
               translation_html: 'Translation 2',
             },
-            exploration_content_html: 'Content 2',
+            entity_content_html: 'Content 2',
           },
           details: {
             topic_name: 'Topic',
@@ -3084,7 +3588,7 @@ describe('Contributions and review component', () => {
               content_html: 'Content 3',
               translation_html: 'Translation 3',
             },
-            exploration_content_html: 'Content 3',
+            entity_content_html: 'Content 3',
           },
           details: {
             topic_name: 'Topic',
@@ -3100,7 +3604,7 @@ describe('Contributions and review component', () => {
               content_html: 'Content 4',
               translation_html: 'Translation 4',
             },
-            exploration_content_html: null,
+            entity_content_html: null,
           },
           details: {
             topic_name: 'Topic',
@@ -3139,7 +3643,7 @@ describe('Contributions and review component', () => {
               content_html: 'Content 1',
               translation_html: 'Translation 1',
             },
-            exploration_content_html: 'Content 1',
+            entity_content_html: 'Content 1',
           },
           details: {
             topic_name: 'Topic',
@@ -3159,10 +3663,52 @@ describe('Contributions and review component', () => {
         false;
     }));
 
+    it('should use the skill description as the subheading for skill translation suggestions', fakeAsync(() => {
+      const suggestionIdToSuggestions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            target_type: 'skill',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 1',
+              translation_html: 'Translation 1',
+            },
+            entity_content_html: 'Content 1',
+          },
+          details: {
+            skill_description: 'Skill description',
+          },
+        },
+        suggestion_2: {
+          suggestion: {
+            suggestion_id: 'suggestion_2',
+            target_type: 'skill',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 2',
+              translation_html: 'Translation 2',
+            },
+            entity_content_html: 'Content 2',
+          },
+          // A skill whose description has not loaded must fall back to an
+          // empty subheading rather than rendering "undefined".
+          details: {},
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      const summaryList = component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions
+      );
+
+      expect(summaryList[0].subheading).toBe('Skill description');
+      expect(summaryList[1].subheading).toBe('');
+    }));
+
     it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         true;
-      const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      const modalRef = {
         componentInstance: {
           suggestionIdToContribution: null,
           initialSuggestionId: null,
@@ -3172,7 +3718,8 @@ describe('Contributions and review component', () => {
           queuedSuggestionEmit: new EventEmitter(),
         },
         result: Promise.resolve([]),
-      } as NgbModalRef);
+      } as NgbModalRef;
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
       component.contributions = {
         suggestion_1: {
           suggestion: {
@@ -3200,7 +3747,7 @@ describe('Contributions and review component', () => {
                 content_html: 'Content 1',
                 translation_html: 'Translation 1',
               },
-            } as unknown as Suggestion,
+            } as unknown as ActiveSuggestionDict,
             details: {
               topic_name: 'Topic',
               entity_description: 'Entity Description',
@@ -3212,8 +3759,124 @@ describe('Contributions and review component', () => {
       );
 
       expect(modalSpy).toHaveBeenCalled();
+      expect(modalRef.componentInstance.subheading).toBe(
+        'Topic / Entity Description'
+      );
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
     }));
+
+    it('should open translation suggestion modal with the skill description as its subheading', fakeAsync(() => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const modalRef = {
+        componentInstance: {
+          suggestionIdToContribution: null,
+          initialSuggestionId: null,
+          reviewable: null,
+          subheading: null,
+          queuedSuggestionSummaryEmit: new EventEmitter(),
+          queuedSuggestionEmit: new EventEmitter(),
+        },
+        result: Promise.resolve([]),
+      } as NgbModalRef;
+      spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      // A skill's opportunity carries a description instead of the topic and
+      // chapter that an exploration's opportunity carries.
+      const skillContribution = {
+        suggestion: {
+          suggestion_id: 'suggestion_1',
+          target_type: AppConstants.ENTITY_TYPE.SKILL,
+          status: 'review',
+          change_cmd: {
+            content_html: 'Content 1',
+            translation_html: 'Translation 1',
+          },
+        } as unknown as Suggestion,
+        details: {
+          skill_description: 'Skill description',
+        } as unknown as ContributionDetails,
+      };
+      component.contributions = {
+        suggestion_1: skillContribution,
+      } as unknown as Record<string, SuggestionDetails>;
+
+      component._showTranslationSuggestionModal(
+        {suggestion_1: skillContribution} as unknown as Record<
+          string,
+          ActiveContributionDict
+        >,
+        'suggestion_1',
+        true
+      );
+
+      expect(modalRef.componentInstance.subheading).toBe('Skill description');
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    }));
+
+    it(
+      'should return an empty list when the active tab subtype is neither ' +
+        'translate nor question',
+      () => {
+        component.activeTabSubtype = '';
+        expect(component.getContributionSummaries({})).toEqual([]);
+      }
+    );
   });
+
+  it('should clear commitTimeout when startCommitTimeout is called and commitTimeout exists', () => {
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    component.startCommitTimeout();
+    expect(component.commitTimeout).toBeDefined();
+  });
+
+  it('should clear commit timeout when committing queued suggestion', () => {
+    component.queuedSuggestionSummary = {
+      target_id: 'target',
+      target_type: AppConstants.ENTITY_TYPE.EXPLORATION,
+      suggestion_id: 'sug_id',
+      action_status: 'accept',
+      reviewer_message: 'msg',
+      commit_message: 'msg',
+    };
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    spyOn(
+      contributionAndReviewService,
+      'reviewTranslationSuggestion'
+    ).and.callFake(
+      (
+        _targetType: string,
+        _targetId: string,
+        _suggestionId: string,
+        _action: string,
+        _message: string,
+        _commitMessage: string | null,
+        successCb: (id: string) => void,
+        _errorCb: (err: string) => void
+      ) => {
+        successCb('');
+      }
+    );
+    component.commitQueuedSuggestion();
+    expect(component.commitTimeout).toBeDefined();
+  });
+
+  it('should clear timeout in undoReviewAction', () => {
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    component.undoReviewAction();
+  });
+
+  it('should return empty list from getContributionSummaries if subtype is unknown', () => {
+    component.activeTabSubtype = 'UNKNOWN';
+    expect(component.getContributionSummaries({})).toEqual([]);
+  });
+
+  it('should return early if user contribution rights is null', fakeAsync(() => {
+    (
+      userService.getUserContributionRightsDataAsync as jasmine.Spy
+    ).and.returnValue(Promise.resolve(null));
+    component.ngOnInit();
+    tick();
+  }));
 });

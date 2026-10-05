@@ -61,6 +61,10 @@ export class LocalStorageService {
 
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
+  SKIPPED_MODULES_KEY = 'skipped_modules';
+
+  MASTERED_MODULES_KEY = 'mastered_modules';
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -453,5 +457,123 @@ export class LocalStorageService {
       return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
     }
     return null;
+  }
+
+  /**
+   * Parse the stored skipped modules dict, falling back to an empty dict if
+   * the stored value is not valid JSON.
+   * @returns The stored skipped modules dict, or an empty dict.
+   */
+  private parseSkippedModulesDict(): {[storyId: string]: number[]} {
+    const stringifiedSkippedModules = (this.storage as Storage).getItem(
+      this.SKIPPED_MODULES_KEY
+    );
+    if (!stringifiedSkippedModules) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(stringifiedSkippedModules);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: number[]};
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Save the given skipped module indices for a story to localStorage.
+   * @param storyId The id of the story the skipped modules belong to.
+   * @param skippedModuleIndices The indices of the skipped modules.
+   */
+  updateSkippedModules(storyId: string, skippedModuleIndices: number[]): void {
+    if (this.isStorageAvailable()) {
+      const skippedModulesDict = this.parseSkippedModulesDict();
+      skippedModulesDict[storyId] = skippedModuleIndices;
+      (this.storage as Storage).setItem(
+        this.SKIPPED_MODULES_KEY,
+        JSON.stringify(skippedModulesDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the skipped module indices for a story from localStorage.
+   * @param storyId The id of the story the skipped modules belong to.
+   * @returns The indices of the skipped modules, or an empty array if none
+   *   are stored.
+   */
+  getSkippedModules(storyId: string): number[] {
+    if (this.isStorageAvailable()) {
+      const skippedModules = this.parseSkippedModulesDict()[storyId];
+      if (Array.isArray(skippedModules)) {
+        return skippedModules;
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Parse the stored mastered modules dict, falling back to an empty dict
+   * if the stored value is not valid JSON.
+   * @returns The stored mastered modules dict, or an empty dict.
+   */
+  private parseMasteredModulesDict(): {[storyId: string]: string[]} {
+    const stringifiedMasteredModules = (this.storage as Storage).getItem(
+      this.MASTERED_MODULES_KEY
+    );
+    if (!stringifiedMasteredModules) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(stringifiedMasteredModules);
+      if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed)
+      ) {
+        return parsed as {[storyId: string]: string[]};
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Save the given mastered module arc IDs for a story to localStorage.
+   * @param storyId The id of the story the mastered modules belong to.
+   * @param masteredArcIds The arc IDs of the mastered modules.
+   */
+  updateMasteredModules(storyId: string, masteredArcIds: string[]): void {
+    if (this.isStorageAvailable()) {
+      const masteredModulesDict = this.parseMasteredModulesDict();
+      masteredModulesDict[storyId] = masteredArcIds;
+      (this.storage as Storage).setItem(
+        this.MASTERED_MODULES_KEY,
+        JSON.stringify(masteredModulesDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the mastered module arc IDs for a story from localStorage.
+   * @param storyId The id of the story the mastered modules belong to.
+   * @returns The arc IDs of the mastered modules, or an empty array if none
+   *   are stored.
+   */
+  getMasteredModules(storyId: string): string[] {
+    if (this.isStorageAvailable()) {
+      const masteredModules = this.parseMasteredModulesDict()[storyId];
+      if (Array.isArray(masteredModules)) {
+        return masteredModules;
+      }
+    }
+    return [];
   }
 }

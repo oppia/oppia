@@ -148,4 +148,231 @@ describe('Cloud Task Run', () => {
     expect(cloudTaskRun.getJobStatusMaterialIconCode()).toBe('check_circle');
     expect(cloudTaskRun.getJobStatusMaterialThemeColor()).toBe('primary');
   });
+
+  it('should return the language accents when provided', () => {
+    let cloudTaskRun = new CloudTaskRun(
+      '123',
+      'Test Task',
+      'SUCCEEDED',
+      'function_456',
+      [],
+      0,
+      new Date('2025-01-01T00:00:00Z'),
+      new Date('2025-01-01T00:00:00Z'),
+      {language_accents: 'en-US, es-ES'}
+    );
+
+    expect(cloudTaskRun.getLanguageAccents()).toBe('en-US, es-ES');
+  });
+
+  it(
+    'should return the default message when language accents are not ' +
+      'provided',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'function_456',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z')
+      );
+
+      expect(cloudTaskRun.getLanguageAccents()).toBe(
+        'No language accents available'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name when exploration content is ' +
+      'updated without additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_on_exploration_update',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z')
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe('Exploration content updated');
+    }
+  );
+
+  it(
+    'should return the correct event name when exploration content is ' +
+      'updated with additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_on_exploration_update',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z'),
+        {exploration_title: 'Test Exploration'}
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'Voiceovers regenerated for "Test Exploration" due to content ' +
+          'being updated'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name when exploration is added to ' +
+      'topic without additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_on_exploration_added_to_topic',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z')
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe('Exploration added to topic');
+    }
+  );
+
+  it(
+    'should return the correct event name when exploration is added to ' +
+      'topic with additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_on_exploration_added_to_topic',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z'),
+        {
+          exploration_title: 'Test Exploration',
+          topic_name: 'Test Topic',
+        }
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'All voiceovers generated for "Test Exploration" because it was ' +
+          'added to topic "Test Topic"'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name for regeneration from ' +
+      'voiceover admin page without additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_of_exploration_for_given_language_accent',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z')
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'Regeneration from voiceover admin page'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name for regeneration from ' +
+      'voiceover admin page with additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_of_exploration_for_given_language_accent',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z'),
+        {exploration_title: 'Test Exploration'}
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'All voiceovers regenerated for "Test Exploration" by voiceover ' +
+          'admin'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name for regeneration after ' +
+      'accepting suggestion without additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_after_accepting_suggestion',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z')
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'Regeneration after accepting translation'
+      );
+    }
+  );
+
+  it(
+    'should return the correct event name for regeneration after ' +
+      'accepting suggestion with additional context',
+    () => {
+      let cloudTaskRun = new CloudTaskRun(
+        '123',
+        'Test Task',
+        'SUCCEEDED',
+        'regenerate_voiceovers_after_accepting_suggestion',
+        [],
+        0,
+        new Date('2025-01-01T00:00:00Z'),
+        new Date('2025-01-01T00:00:00Z'),
+        {exploration_title: 'Test Exploration'}
+      );
+
+      expect(cloudTaskRun.getEventName()).toBe(
+        'Voiceover generated for "Test Exploration" because translation ' +
+          'suggestion was accepted'
+      );
+    }
+  );
+
+  it('should return an empty string for an unrecognized function id', () => {
+    let cloudTaskRun = new CloudTaskRun(
+      '123',
+      'Test Task',
+      'SUCCEEDED',
+      'some_unknown_function_id',
+      [],
+      0,
+      new Date('2025-01-01T00:00:00Z'),
+      new Date('2025-01-01T00:00:00Z')
+    );
+
+    expect(cloudTaskRun.getEventName()).toBe('');
+  });
 });

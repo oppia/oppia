@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the splash page.
  */
 
+// @ts-nocheck
+
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';

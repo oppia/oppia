@@ -43,6 +43,7 @@ describe('Classroom admin model', () => {
       'classroomId',
       'math',
       'math',
+      'user@email.com',
       'Curated math foundations course.',
       'Learn math through fun stories!',
       'Start from the basics with our first topic.',
@@ -101,6 +102,7 @@ describe('Classroom admin model', () => {
       classroomId: 'pysicsClassroomId',
       name: 'physics',
       urlFragment: 'physics',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: 'Test course details',
       teaserText: 'Learn physics',
       topicListIntro: 'Test topic intro',
@@ -120,6 +122,7 @@ describe('Classroom admin model', () => {
     expect(classroom.getClassroomId()).toEqual('pysicsClassroomId');
     expect(classroom.getClassroomName()).toEqual('physics');
     expect(classroom.getClassroomUrlFragment()).toEqual('physics');
+    expect(classroom.getFeedbackRecipientEmail()).toEqual('user@email.com');
     expect(classroom.getCourseDetails()).toEqual('Test course details');
     expect(classroom.getTeaserText()).toEqual('Learn physics');
     expect(classroom.getTopicListIntro()).toEqual('Test topic intro');
@@ -140,6 +143,7 @@ describe('Classroom admin model', () => {
       classroomId: 'classroomId',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: 'Curated math foundations course.',
       teaserText: 'Learn math through fun stories!',
       topicListIntro: 'Start from the basics with our first topic.',

@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import model_validation_jobs
@@ -28,7 +26,7 @@ from core.tests import test_utils
 
 class BeamJobTests(test_utils.TestBase):
 
-    NOW = datetime.datetime.utcnow()
+    NOW = utils.get_current_utc_datetime()
 
     def test_usage(self) -> None:
         job = beam_job_domain.BeamJob(
@@ -45,7 +43,7 @@ class BeamJobTests(test_utils.TestBase):
 
 class BeamJobRunTests(test_utils.TestBase):
 
-    NOW = datetime.datetime.utcnow()
+    NOW = utils.get_current_utc_datetime()
 
     def test_usage(self) -> None:
         run = beam_job_domain.BeamJobRun(

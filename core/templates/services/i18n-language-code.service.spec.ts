@@ -202,4 +202,56 @@ describe('I18nLanguageCodeService', () => {
       i18nLanguageCodeService.isClassroomnNameTranslationAvailable('math')
     ).toBeFalse();
   });
+
+  it('should display the hacky translation when no contributor translation exists', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    expect(
+      i18nLanguageCodeService.isHackyTranslationDisplayed('I18N_TEST_KEY')
+    ).toBeTrue();
+  });
+
+  it('should not display the hacky translation when the backend already translated the field', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    expect(
+      i18nLanguageCodeService.isHackyTranslationDisplayed('I18N_TEST_KEY', true)
+    ).toBeFalse();
+  });
+
+  it('should not display the hacky translation when the site language is English', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      true
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    expect(
+      i18nLanguageCodeService.isHackyTranslationDisplayed('I18N_TEST_KEY')
+    ).toBeFalse();
+  });
+
+  it('should not display the hacky translation when no bundle key exists', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(false);
+    expect(
+      i18nLanguageCodeService.isHackyTranslationDisplayed('I18N_TEST_KEY')
+    ).toBeFalse();
+  });
 });

@@ -1,0 +1,231 @@
+.oppia-my-suggestions-tab {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  display: inline-grid;
+  min-height: calc(100vh - 150px);
+  padding: 16px;
+  width: 100%;
+}
+
+.oppia-feedback-table {
+  display: flex;
+  height: 60vh;
+}
+
+.oppia-my-suggestions-detail {
+  display: block;
+}
+
+
+.oppia-my-suggestions-detail-actions {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.oppia-my-suggestions-back {
+  align-items: center;
+  background: #00796b;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 500;
+  gap: 8px;
+  padding: 8px 16px;
+  transition: background .15s ease;
+}
+
+.oppia-my-suggestions-back:hover {
+  background: #00645c;
+}
+
+.oppia-my-suggestions-follow-up-button {
+  background: #00796b;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 36px;
+  min-width: 188px;
+  padding: 8px 16px;
+  transition: background .15s ease;
+}
+
+
+.oppia-my-suggestions-follow-up-button:disabled {
+  background: #9aa0a6;
+  cursor: default;
+}
+
+.oppia-my-suggestions-follow-up-button:hover:not(:disabled) {
+  background: #00645c;
+}
+
+.oppia-my-suggestions-lesson-context {
+  align-items: center;
+  background: rgba(0, 100, 92, 0.05);
+  border-radius: 4px;
+  color: #333;
+  display: flex;
+  font-size: 14px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+}
+
+.oppia-my-suggestions-lesson-context i {
+  color: #00645c;
+  flex: 0 0 auto;
+}
+
+.oppia-my-suggestions-lesson-context a {
+  color: #00645c;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+
+.oppia-my-suggestions-detail-header {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e6e8eb;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+}
+
+.oppia-my-suggestions-meta-item {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.oppia-my-suggestions-meta-item-date {
+  flex-direction: row;
+}
+
+.oppia-my-suggestions-meta-label {
+  color: black;
+  font-size: 13px;
+}
+
+.oppia-my-suggestions-date {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+
+
+.oppia-my-suggestions-row-status {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+
+.oppia-my-suggestions-status-submitted {
+  background: #ffc107;
+  color: #212529;
+}
+
+.oppia-my-suggestions-status-reviewed {
+  background: #f1f3f4;
+  color: #5f6368;
+}
+
+.oppia-my-suggestions-status-fixed {
+  background: rgba(0, 100, 92, 0.14);
+  color: #00645c;
+}
+
+.oppia-my-suggestions-thread {
+  background: #fff;
+  border: 1px solid #e6e8eb;
+  border-radius: 4px;
+  padding: 0 20px;
+}
+
+.oppia-my-suggestions-thread-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.oppia-my-suggestions-thread-item + .oppia-my-suggestions-thread-item {
+  border-top: 1px solid #eef0f1;
+}
+
+.oppia-my-suggestions-avatar {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 600;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.oppia-my-suggestions-avatar-you {
+  background: #f1f3f4;
+  color: #5f6368;
+}
+
+.oppia-my-suggestions-avatar-team {
+  background: rgba(0, 100, 92, 0.1);
+  color: #00645c;
+}
+
+.oppia-my-suggestions-thread-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.oppia-my-suggestions-thread-meta {
+  align-items: baseline;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.oppia-my-suggestions-thread-author {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.oppia-my-suggestions-thread-item-creator .oppia-my-suggestions-thread-author {
+  color: #00645c;
+}
+
+.oppia-my-suggestions-thread-date {
+  color: #5f6368;
+  flex: 0 0 auto;
+  font-size: 14px;
+  line-height: 18px;
+  max-width: 140px;
+}
+
+.oppia-my-suggestions-thread-content p {
+  color: #333;
+  font-size: 16px;
+  line-height: 22px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

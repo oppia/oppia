@@ -24,6 +24,7 @@ import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
+import {PracticeSessionAccessGuard} from 'pages/practice-session-page/practice-session-page-auth.guard';
 import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.component-auth.guard';
 
 // All paths must be defined in constants.ts file.
@@ -146,6 +147,31 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NODE_PRACTICE_SESSION
+      .ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MASTERY_CHALLENGE.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
       .ROUTE,
     loadChildren: () =>
@@ -160,6 +186,14 @@ const routes: Route[] = [
       import(
         'pages/certificate-assessment-player-page/certificate-assessment-player-page.module'
       ).then(m => m.CertificateAssessmentPlayerPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CERTIFICATE_ASSESSMENT_RESULT.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/certificate-assessment-result-page/certificate-assessment-result-page.module'
+      ).then(m => m.CertificateAssessmentResultPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
@@ -187,7 +221,8 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN_PAGE
+      .ROUTE,
     loadChildren: () =>
       import('pages/classroom-admin-page/classroom-admin-page.module').then(
         m => m.ClassroomAdminPageModule
@@ -310,15 +345,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
-    pathMatch: 'full',
-    canActivate: [IsLoggedInGuard],
-    loadChildren: () =>
-      import('pages/feedback-updates-page/feedback-updates-page.module').then(
-        m => m.FeedbackUpdatesPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
     loadChildren: () =>
       import('pages/profile-page/profile-page.module').then(
@@ -335,14 +361,6 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/library-page/library-page.module').then(
-        m => m.LibraryPageModule
-      ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import('pages/library-page/library-page.module').then(
@@ -484,15 +502,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH
-      .ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/blog-home-page/blog-home-page.module').then(
-        m => m.BlogHomePageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE
       .ROUTE,
     pathMatch: 'full',
@@ -553,12 +562,12 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CERTIFICATE_OFFERING_DASHBOARD.ROUTE,
+      .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-dashboard-page/certificate-offering-dashboard-page.module'
-      ).then(m => m.CertificateOfferingDashboardPageModule),
+        'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
+      ).then(m => m.CertificateCreatorDashboardPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -588,6 +597,16 @@ const routes: Route[] = [
       ).then(m => m.TechnicalFeedbackDashboardPageModule),
     canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
   },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TECHNICAL_FEEDBACK_DETAIL
+      .ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module'
+      ).then(m => m.TechnicalFeedbackDashboardPageModule),
+    canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
+  },
 ];
 
 // Register stewards landing pages.
@@ -603,10 +622,12 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
 }
 
 // Register all routes for topic landing page.
-for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
-  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+for (const [key, values] of Object.entries(
+  AppConstants.AVAILABLE_LANDING_PAGES
+)) {
+  for (const value of values) {
     routes.push({
-      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      path: key + '/' + value,
       loadChildren: () =>
         import(
           'pages/landing-pages/topic-landing-page/topic-landing-page.module'

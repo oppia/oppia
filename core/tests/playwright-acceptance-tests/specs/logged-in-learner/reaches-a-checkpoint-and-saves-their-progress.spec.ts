@@ -33,6 +33,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
+  let explorationId: string | null = null;
 
   test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
@@ -92,7 +93,7 @@ test.describe('Logged-in User', function () {
     await explorationEditor.navigateToCard('Introduction');
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra',
@@ -107,14 +108,12 @@ test.describe('Logged-in User', function () {
   });
 
   test('should be able to track the checkpoint progress', async function () {
-    await loggedInUser.navigateToCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
-    await loggedInUser.playLessonFromSearchResults('Positive Numbers');
+    await loggedInUser.playExplorationAsLoggedInUser(explorationId);
 
     // Continue to the next card and submit an answer.
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
     await loggedInUser.submitAnswer('-25');
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     // Verify that the checkpoint modal appears and reload the page.
     await loggedInUser.verifyCheckpointModalAppears();
@@ -126,7 +125,7 @@ test.describe('Logged-in User', function () {
     await loggedInUser.expectProgressReminder(true);
     await loggedInUser.chooseActionInProgressRemainder('Resume');
 
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
     await loggedInUser.expectCardContentToMatch(
       'Lesson completed successfully. We have practiced negative numbers.'
     );
@@ -140,9 +139,9 @@ test.describe('Logged-in User', function () {
     // Continue the exploration from where they left off.
     await loggedInUser.chooseActionInProgressRemainder('Restart');
 
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
     await loggedInUser.submitAnswer('-99');
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
   });
 
   test.afterAll(async function () {

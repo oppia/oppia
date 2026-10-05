@@ -1,0 +1,242 @@
+.oppia-common-scroll-container {
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  overflow-x: auto;
+  width: 100%;
+}
+.oppia-image-review-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  overflow-x: auto;
+  padding: 10px;
+}
+.oppia-exploration-image-container,
+.oppia-suggestion-image-container {
+  max-height: 250px;
+  padding: 8px;
+  width: 49%;
+}
+oppia-rte-output-display oppia-noninteractive-image {
+  max-height: 50px;
+  max-width: 50px;
+}
+.oppia-reviewable-message {
+  border: 1px solid #ccc;
+}
+.oppia-review-message {
+  margin-top: 10px;
+  padding: 10px;
+}
+.oppia-review-buttons {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.modal-footer {
+  display: flex;
+  flex-direction: column;
+}
+.oppia-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  width: 100%;
+}
+.oppia-pagination-button {
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  color: #000;
+  font-size: 18px;
+  font-weight: bold;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+}
+.oppia-pagination-button:hover {
+  border: 2px solid #000;
+  border-radius: 5px;
+}
+.oppia-pagination-button[disabled] {
+  color: #000;
+  opacity: 0.239;
+}
+.oppia-pagination-button[disabled]:hover {
+  border: none;
+}
+.oppia-collapse-content {
+  display: none;
+}
+.modal-body {
+  height: fit-content;
+}
+.oppia-modal-info {
+  display: flex;
+  flex-direction: column;
+}
+.oppia-translation-modal-subheading {
+  display: block;
+  margin: 0;
+}
+.oppia-translation-modal-subheading-lesson {
+  display: none;
+}
+.oppia-translation-modal-author-header {
+  margin-top: 12px;
+}
+.oppia-suggestion-review-panel {
+  border: 1px solid #ccc;
+  height: 88%;
+  max-height: none;
+  padding: 10px;
+  position: relative;
+}
+.oppia-suggestion-review-message {
+  margin-top: 20px;
+}
+.oppia-suggestion-resolve-button {
+  margin-left: 10px;
+  min-width: 130px;
+}
+.oppia-suggestion-review-panel-header-container {
+  height: 12%;
+  text-align: left;
+}
+.oppia-suggestion-review-exploration-change {
+  margin-top: 50px;
+  padding: 0 10px;
+}
+.oppia-suggestion-review-exploration-change-note {
+  margin-top: 18px;
+}
+.oppia-translation-review-edit-buttons {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.oppia-translation-error-section {
+  bottom: 10px;
+  color: red;
+  position: absolute;
+}
+.oppia-close-button-position {
+  font-size: 2.5rem;
+  height: fit-content;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+.oppia-suggestion-review-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.oppia-suggestion-review-panel-container {
+  height: 100%;
+  width: 49%;
+}
+/* From 1023px onwards, the modal text branches to the next line.
+     The use of line height ensures that alternate lines of the
+     heading stay close together.
+  */
+@media only screen and (max-width: 1023px) {
+  .oppia-translation-modal-subheading {
+    line-height: 1.1;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .oppia-exploration-image-container,
+  .oppia-suggestion-image-container {
+    padding: 1px;
+    width: 50%;
+  }
+  .oppia-translation-panel {
+    margin-top: 12px;
+  }
+  .oppia-content-expanded {
+    height: fit-content;
+    max-height: none;
+    overflow-y: hidden;
+  }
+  .oppia-content-collapsed {
+    max-height: 30vh;
+    overflow-y: scroll;
+  }
+  .oppia-cancel-button {
+    display: none;
+  }
+  .oppia-collapse-content {
+    background-color: #016a5d;
+    color: white;
+    cursor: pointer;
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin: auto;
+    padding: 5px 10px;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: -13px;
+    width: 85px;
+  }
+  .modal-body {
+    height: fit-content;
+  }
+
+  .oppia-suggestion-review-panel {
+    margin-top: 10px;
+    overflow-x: hidden;
+    padding-bottom: 16px;
+  }
+  .oppia-suggestion-review-panel-container {
+    margin-bottom: 0;
+    width: 100%;
+  }
+  .modal-header {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+  }
+  .oppia-suggestion-review-container {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    padding: 0;
+  }
+  .oppia-image-review-panel {
+    padding: 0;
+  }
+  .oppia-modal-info-header {
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 18.7px;
+    margin-top: 18.7px;
+  }
+  .oppia-translation-modal-subheading {
+    display: none;
+  }
+  .oppia-translation-modal-subheading-lesson {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .oppia-content {
+    padding-bottom: 6px;
+  }
+}
+@media only screen and (max-width: 450px) {
+  .oppia-suggestion-resolve-button {
+    margin-left: 4px;
+    margin-right: 0;
+    min-width: 40vw;
+  }
+  .oppia-review-buttons {
+    justify-content: center;
+  }
+  .oppia-suggestion-review-message {
+    font-size: 16px;
+  }
+}

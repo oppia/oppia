@@ -34,7 +34,6 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './classroom-page.component.css';
 import {UserService} from 'services/user.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
@@ -65,6 +64,7 @@ export class ClassroomPageComponent implements OnDestroy {
   firstTopicUrl: string = '';
   publicClassroomsCount!: number;
   showPrivateClassroomBanner: boolean = false;
+  isUserLoggedIn: boolean = false;
   classroomThumbnail = '';
   classroomBanner = '';
   classroomTranslationKeys!: ClassroomTranslationKeys;
@@ -178,9 +178,11 @@ export class ClassroomPageComponent implements OnDestroy {
       }
       try {
         const userInfo = await this.userService.getUserInfoAsync();
+        this.isUserLoggedIn = userInfo.isLoggedIn();
         this.showPrivateClassroomBanner =
           userInfo.isCurriculumAdmin() && !this.classroomData.getIsPublished();
       } catch {
+        this.isUserLoggedIn = false;
         this.showPrivateClassroomBanner = false;
       }
       this.loaderService.hideLoadingScreen();

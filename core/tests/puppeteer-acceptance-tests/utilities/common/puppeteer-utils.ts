@@ -32,22 +32,28 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const cookieBannerAcceptButtonSelector =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
 const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const errorModalSelector = '.oppia-error-modal-window';
+const errorModalToggleDetailsSelector = '.e2e-test-error-details-toggle-link';
+const errorModalDetailsContentSelector = '.e2e-test-error-details-content';
+const errorModalCloseButtonSelector = '.e2e-test-close-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.e2e-test-toast-message';
-const warningToastMessageSelector = '.e2e-test-toast-warning-message';
-const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
 const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
+const usernameSelector = 'input.e2e-test-username-input';
+const termsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -99,7 +105,11 @@ export class BaseUser {
      * tests to fail while running in non headless mode (see
      * https://github.com/puppeteer/puppeteer/issues/7050).
      */
-    if (!headless) {
+    const skipSiteIsolationWorkaround = [
+      'logged-out-learner/submit-a-platform-defect-report-from-a-non-lesson-page',
+      'logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue',
+    ].includes(specName ?? '');
+    if (!headless && !skipSiteIsolationWorkaround) {
       args.push('--disable-site-isolation-trials');
     }
 
@@ -377,17 +387,34 @@ export class BaseUser {
   }
 
   /**
+   * This function accepts the cookie banner if it is present on the page.
+   */
+  async acceptCookieBannerIfPresent(): Promise<void> {
+    if (await this.page.$(cookieBannerAcceptButtonSelector)) {
+      await this.clickOnElementWithSelector(cookieBannerAcceptButtonSelector);
+      this.userHasAcceptedCookies = true;
+      await this.page.waitForSelector(cookieBannerAcceptButtonSelector, {
+        hidden: true,
+        timeout: 10000,
+      });
+    }
+  }
+
+  /**
    * This function signs up a new user with the given username and email.
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
+    await this.typeInInputField(usernameSelector, username);
     await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
+      '.e2e-test-email-preferences-radio-no'
     );
+    await this.clickOnElementWithSelector(termsCheckboxSelector);
+
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
+
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
@@ -809,14 +836,44 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
-    await this.page.keyboard.press('Backspace');
+
+    const isTextInput = await element.evaluate(
+      el => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+    );
+
+    if (isTextInput) {
+      // Click the field to move the pointer (so hover-paused toasts dismiss)
+      // and to focus it before clearing, matching the keyboard-only behavior.
+      await element.click();
+
+      // Clear via the native value setter and an input event to update ngModel
+      // deterministically without depending on focus/selection timing. Do not
+      // dispatch 'change' here: change-bound editors (e.g. the URL fragment
+      // editor) would commit an empty value to their model before the user
+      // types; the native 'change' fires on the next blur with the full value.
+      await element.evaluate(el => {
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          el instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        valueSetter?.call(el, '');
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+      });
+    } else {
+      // Rich-text editors (e.g. CKEditor) expose contenteditable divs, which
+      // cannot be cleared by setting their text directly without desyncing the
+      // editor's internal model. Clear them with real keyboard events instead.
+      await element.click();
+      await this.page.keyboard.down('Control');
+      await this.page.keyboard.press('A');
+      await this.page.keyboard.up('Control');
+      await this.page.keyboard.press('Backspace');
+    }
   }
 
   /**
@@ -881,6 +938,19 @@ export class BaseUser {
     await this.waitForElementToStabilize(selector);
 
     await element.type(text);
+  }
+
+  /**
+   * Checks if the value of text input with the given selector is equal to the given value.
+   * @param selector - The selector of the text input.
+   * @param value - The expected value of the text input.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const element = await this.page.$(selector);
+    expect(await element?.evaluate(el => (el as HTMLInputElement).value)).toBe(
+      value
+    );
   }
 
   /**
@@ -975,8 +1045,8 @@ export class BaseUser {
     if (inputUploadHandle === null) {
       throw new Error('No file input found while attempting to upload a file.');
     }
-    let fileToUpload = filePath;
-    inputUploadHandle.uploadFile(fileToUpload);
+    const fileToUpload = filePath;
+    await inputUploadHandle.uploadFile(fileToUpload);
   }
 
   /**
@@ -1341,15 +1411,17 @@ export class BaseUser {
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
    * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
-   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
-   * almost all cases and for the page to fully load.
+   * idle within a certain timeframe.
    *
-   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * The default timeout is intentionally short because this helper is best-effort; on busy CI runners, a long default timeout
+   * can significantly inflate total setup time across many calls.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 5000, idleTime: 500}.
    * @param {Page} page The page to wait for network idle. Defaults to the current page.
    */
   async waitForNetworkIdle(
     options: {timeout?: number; idleTime?: number} = {
-      timeout: 30000,
+      timeout: 5000,
       idleTime: 500,
     },
     page: Page = this.page
@@ -1757,6 +1829,23 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the placeholder attribute of the given input or textarea
+   * element matches the expected value.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {string} expectedPlaceholder - The expected placeholder text.
+   */
+  async expectElementPlaceholderToBe(
+    selector: string,
+    expectedPlaceholder: string
+  ): Promise<void> {
+    const placeholder = await this.page.$eval(
+      selector,
+      el => (el as HTMLInputElement | HTMLTextAreaElement).placeholder
+    );
+    expect(placeholder).toBe(expectedPlaceholder);
+  }
+
+  /**
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
@@ -1796,17 +1885,46 @@ export class BaseUser {
   /**
    * Verifies whether a chapter is clickable or not.
    * @param {string} chapterName - The name of the chapter.
-   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   * @param {boolean} [shouldBeNavigable=true] - Expected navigable state.
    */
-  async expectChapterToBeClickable(
+  async expectChapterToBeNavigable(
     chapterName: string,
-    shouldBeClickable: boolean = true
+    shouldBeNavigable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
+    const currentUrl = this.page.url();
 
-    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
+    if (shouldBeNavigable) {
+      // If it should navigate, wait for navigation concurrently with click to avoid
+      // execution context destroyed errors during page load.
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        chapterElement.click(),
+      ]);
+    } else {
+      await chapterElement.click();
+      await this.page.waitForTimeout(2000); // Wait briefly to verify no navigation happens.
+    }
+
+    const newUrl = this.page.url();
+    const didNavigate = newUrl !== currentUrl;
+
+    if (shouldBeNavigable && !didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" did not navigate but expected to.`
+      );
+    }
+
+    if (!shouldBeNavigable && didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" navigated but expected not to.`
+      );
+    }
+
+    if (didNavigate) {
+      await this.page.goBack({waitUntil: 'networkidle0'});
+    }
   }
-
   /**
    * Helper method to wait for a action progress message to disappear
    * @param {string} progressMessage - The processing message to wait for completion
@@ -2015,6 +2133,55 @@ export class BaseUser {
   }
 
   /**
+   * Performs a long-press on the element matching the given selector. On touch
+   * devices Angular Material tooltips are shown after a long-press instead of
+   * a hover, because the `mouseenter` listener is not bound there.
+   *
+   * Puppeteer has no prebuilt long-press API: its `Touchscreen` class only
+   * exposes `tap`, which dispatches `touchstart` and `touchend` back to back
+   * with no way to hold the touch. Events are therefore dispatched directly
+   * through the Chrome DevTools Protocol, holding the touch for longer than
+   * Material's `LONGPRESS_DELAY` (500 ms).
+   *
+   * The element is scrolled into view before the touch is dispatched: the
+   * touch coordinates are resolved relative to the layout viewport, so an
+   * element that is below the fold would not receive the touch even though it
+   * counts as "visible" for Puppeteer's selector checks.
+   * @param {string} selector - The selector of the element to long-press.
+   */
+  async longPressOnElementWithSelector(selector: string): Promise<void> {
+    const element = await this.page.waitForSelector(selector, {visible: true});
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    // Puppeteer 13 no longer exposes ElementHandle#scrollIntoViewIfNeeded, so
+    // scroll through the native DOM API. 'nearest' scrolls the minimum amount
+    // needed to bring the element fully into view.
+    await element.evaluate(el => {
+      el.scrollIntoView({block: 'nearest', inline: 'nearest'});
+    });
+    const boundingBox = await element.boundingBox();
+    if (!boundingBox) {
+      throw new Error(`Element has no bounding box for selector: ${selector}`);
+    }
+    const x = boundingBox.x + boundingBox.width / 2;
+    const y = boundingBox.y + boundingBox.height / 2;
+
+    const client = await this.page.client();
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{x, y}],
+    });
+    // LONGPRESS_DELAY in Material is 500 ms; wait slightly longer so the
+    // tooltip is shown before lifting the finger.
+    await this.page.waitForTimeout(600);
+    await client.send('Input.dispatchTouchEvent', {
+      type: 'touchEnd',
+      touchPoints: [],
+    });
+  }
+
+  /**
    * Waits until the click function is attached to the given selector.
    * @param {string} selector - The selector of the element.
    */
@@ -2106,6 +2273,34 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the error modal is visible on the screen.
+   */
+  async expectErrorModalToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(errorModalSelector, {visible: true});
+  }
+
+  /**
+   * Toggles the details on the warning modal and checks if the warning message matches expected message.
+   * @param expectedMessage The expected warning message.
+   */
+  async expectErrorModalMessageToBe(expectedMessage: string): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalToggleDetailsSelector);
+    await this.expectElementToBeVisible(errorModalDetailsContentSelector);
+    await this.expectTextContentToContain(
+      errorModalDetailsContentSelector,
+      expectedMessage
+    );
+  }
+
+  /**
+   * Closes the error modal.
+   */
+  async closeErrorModal(): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalCloseButtonSelector);
+    await this.page.waitForSelector(errorModalSelector, {hidden: true});
+  }
+
+  /**
    * Checks if the current mat tab header matches the expected header.
    * @param expectedHeader The expected header of the mat tab.
    */
@@ -2193,7 +2388,10 @@ export class BaseUser {
    * Expects the text content of the toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
-  async expectToastMessage(expectedMessage: string): Promise<void> {
+  async expectToastMessage(
+    expectedMessage: string,
+    timeout?: number
+  ): Promise<void> {
     // The toast message disappears after a few seconds, so we need to process
     // the toastMessageElement as soon as we receive it. Otherwise, the text
     // within it may no longer be showing at the time of evaluation.
@@ -2218,6 +2416,68 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the currently visible toast notification shows the expected
+   * message, has a small manual "X" dismiss button, and auto-fades after the
+   * expected timeout if left untouched.
+   * @param {string} expectedMessage - The expected message of the toast.
+   * @param {number} timeoutMilliseconds - The expected auto-fade duration.
+   */
+  async expectToastMessageWithDismissButtonToAutoDismiss(
+    expectedMessage: string,
+    timeoutMilliseconds: number
+  ): Promise<void> {
+    const toastMessageElement = await this.page.waitForSelector(
+      toastMessageSelector,
+      {visible: true}
+    );
+    const startTimeInMilliseconds = Date.now();
+
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+
+    const hasDismissButton = await this.page.evaluate(
+      (messageSelector: string) => {
+        const messageElement = document.querySelector(messageSelector);
+        const toastElement = messageElement?.closest('.ngx-toastr, .toast');
+        return Boolean(
+          toastElement?.querySelector('button.toast-close-button')
+        );
+      },
+      toastMessageSelector
+    );
+    if (!hasDismissButton) {
+      throw new Error(
+        'Expected the toast notification to have a small "X" dismiss button, ' +
+          'but it was not found.'
+      );
+    }
+
+    await this.page.waitForSelector(toastMessageSelector, {
+      hidden: true,
+      timeout: 10000,
+    });
+    const autoDismissTimeInMilliseconds = Date.now() - startTimeInMilliseconds;
+    if (
+      autoDismissTimeInMilliseconds < timeoutMilliseconds - 1000 ||
+      autoDismissTimeInMilliseconds > timeoutMilliseconds + 5000
+    ) {
+      throw new Error(
+        `Expected the toast notification to auto-fade after ${timeoutMilliseconds} ms, but it lasted ${autoDismissTimeInMilliseconds} ms.`
+      );
+    }
+    showMessage(
+      `Verified that the toast notification auto-fades after ${autoDismissTimeInMilliseconds} ms.`
+    );
+  }
+
+  /**
    * Expects the text content of any toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
@@ -2238,10 +2498,12 @@ export class BaseUser {
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
+   * @param expectModalToClose - Whether to expect the modal to close after clicking the button.
    */
   async clickButtonInModal(
     title: string,
-    action: 'confirm' | 'cancel'
+    action: 'confirm' | 'cancel',
+    expectModalToClose: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToBe(commonModalTitleSelector, title);
@@ -2253,7 +2515,10 @@ export class BaseUser {
     await this.expectElementToBeVisible(currentActionBtnSelector);
     await this.clickOnElementWithSelector(currentActionBtnSelector);
 
-    await this.expectElementToBeVisible(currentActionBtnSelector, false);
+    await this.expectElementToBeVisible(
+      currentActionBtnSelector,
+      !expectModalToClose
+    );
   }
 
   /**
@@ -2286,29 +2551,6 @@ export class BaseUser {
       uploadErrorMessageDivSelector,
       expectedErrorMessage
     );
-  }
-
-  /**
-   * Checks if the toast warning message matches the expected warning message.
-   * @param {string} expectedWarningMessage - The expected warning message.
-   */
-  async expectToastWarningMessageToBe(
-    expectedWarningMessage: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(warningToastMessageSelector);
-    await this.expectTextContentToContain(
-      warningToastMessageSelector,
-      expectedWarningMessage
-    );
-  }
-
-  /**
-   * Clicks on the close button in the toast warning message.
-   */
-  async closeToastWarningMessage(): Promise<void> {
-    await this.expectElementToBeVisible(warningToastCloseButtonSelector);
-    await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
-    await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 
   /**

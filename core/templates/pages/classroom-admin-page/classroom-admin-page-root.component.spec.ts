@@ -43,10 +43,10 @@ describe('ClassroomAdminPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.TITLE
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN_PAGE.TITLE
     );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.META
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN_PAGE.META
     );
   });
 });

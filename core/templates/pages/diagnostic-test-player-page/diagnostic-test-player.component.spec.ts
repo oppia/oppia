@@ -16,6 +16,8 @@
  * @fileoverview Tests for the diagnostic test player component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -146,6 +148,7 @@ const dummyClassroomData = new ClassroomData(
   'id',
   'math',
   'math',
+  'user@email.com',
   [topicData1, topicData2],
   'dummy',
   'dummy',

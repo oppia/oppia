@@ -48,7 +48,6 @@ const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
   'core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts':
     [
       'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
-      'core/tests/test-modules-mappings/acceptance/logged-in-user/save-an-exploration-to-play-later.txt',
       'core/tests/test-modules-mappings/acceptance/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.txt',
     ],
 };

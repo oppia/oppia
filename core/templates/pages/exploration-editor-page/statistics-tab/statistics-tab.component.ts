@@ -32,7 +32,6 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {RouterService} from '../services/router.service';
 import {StateStatsModalComponent} from './templates/state-stats-modal.component';
 
-import './statistics-tab.component.css';
 interface PieChartOptions {
   chartAreaWidth: number;
   colors: string[];
@@ -49,6 +48,7 @@ interface PieChartOptions {
 @Component({
   selector: 'oppia-statistics-tab',
   templateUrl: './statistics-tab.component.html',
+  styleUrls: ['./statistics-tab.component.css'],
 })
 export class StatisticsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

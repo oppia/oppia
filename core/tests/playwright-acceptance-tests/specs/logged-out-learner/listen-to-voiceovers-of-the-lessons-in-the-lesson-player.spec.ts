@@ -122,7 +122,8 @@ test.describe('Logged-Out Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values',
-      'place values'
+      'place values',
+      true
     );
 
     await curriculumAdmin.createAndPublishClassroom(
@@ -219,7 +220,7 @@ test.describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
     // Check audio (voiceover) avaibility in next card.
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectVoiceoverIsPlayable();
 
     // Play Voiceovers.
@@ -230,17 +231,17 @@ test.describe('Logged-Out Learner', function () {
 
   test('should be able to change the audio language', async function () {
     // Play voiceovers in Hindi.
-    await loggedOutLearner.playExploration(explorationId);
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
     await loggedOutLearner.changeLessonLanguage('hi');
 
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectVoiceoverIsPlayable();
   });
 
   test('should be able to skip some parts of audio', async function () {
     await loggedOutLearner.reloadPage();
     await loggedOutLearner.changeLessonLanguage('hi');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedOutLearner.expectVoiceoverIsSkippable();
   });

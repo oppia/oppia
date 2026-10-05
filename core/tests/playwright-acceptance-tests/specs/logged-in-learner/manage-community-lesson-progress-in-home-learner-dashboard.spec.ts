@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- *  CL.4. Select an exploration to “play later” from the community library
+ *  CL.4. Select an exploration from the community library
  * CL.6. Resume Community library lessons from Redesigned Learner Dashboard Tabs
  */
 
@@ -29,8 +29,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {showMessage} from '../../utilities/common/show-message';
-
 const ROLES = testConstants.Roles;
 
 test.describe.configure({mode: 'serial'});
@@ -39,6 +37,7 @@ test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
+  let explorationId1: string | null;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(6000000); // Setup is taking longer than default timeout.
@@ -61,13 +60,19 @@ test.describe('Logged-In Learner', function () {
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
-    for (let i = 0; i < 2; i++) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(
-        `Explore Title ${i + 1}`,
-        'Algebra',
-        3
-      );
+    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 1',
+      'Algebra',
+      3
+    );
+    if (!explorationId1) {
+      throw new Error('Exploration ID is null or undefined.');
     }
+    await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 2',
+      'Algebra',
+      3
+    );
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInLearner = await UserFactory.createNewUser(
@@ -79,15 +84,14 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to see community lessons in In Progress section if not completed fully', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
-    await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
+    await loggedInLearner.playExplorationAsLoggedInUser(explorationId1);
 
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1'
     );
@@ -96,42 +100,6 @@ test.describe('Logged-In Learner', function () {
       ['Explore Title 1'],
       0
     );
-  });
-
-  test('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
-    await loggedInLearner.expectToBeOnCommunityLibraryPage();
-
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
-    await loggedInLearner.addLessonToPlayLater('Explore Title 2', true);
-    await loggedInLearner.expectToastMessage(
-      "Successfully added to your 'Play Later' list."
-    );
-
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection'
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Continue where you left off', 'Learn Something New'],
-      'tabSection'
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Lessons in progress', 'Lesson you saved for later'],
-      'cardDisplay'
-    );
-
-    await loggedInLearner.navigateToLessonByCard(
-      'Lesson you saved for later',
-      'Explore Title 2'
-    );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
-    showMessage('Completed final test');
   });
 
   test.afterAll(async function () {

@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import utils
 from core.domain import blog_domain, blog_services
 from core.platform import models
@@ -636,8 +634,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.svg'
         self.blog_post_summary.tags = ['tag1', 'tag2']
         self.blog_post_summary.url_fragment = 'sample-url'
-        self.blog_post_summary.published_on = datetime.datetime.utcnow()
-        self.blog_post_summary.last_updated = datetime.datetime.utcnow()
+        self.blog_post_summary.published_on = utils.get_current_utc_datetime()
+        self.blog_post_summary.last_updated = utils.get_current_utc_datetime()
 
         expected_dict = {
             'id': self.blog_post_summary.id,

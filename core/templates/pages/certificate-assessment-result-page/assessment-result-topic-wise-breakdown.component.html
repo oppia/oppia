@@ -1,0 +1,18 @@
+<div class="result-card-topics">
+  <p class="result-card-topics-heading">Topic Breakdown</p>
+
+  <div class="topic-row" *ngFor="let topic of topicBreakdown">
+    <span class="topic-row-name">{{ topic.topicName }}</span>
+    <div class="topic-row-bar" role="progressbar"
+         [attr.aria-label]="topic.topicName"
+         [attr.aria-valuenow]="topic.scorePercentage | number: '1.0-0'"
+         aria-valuemin="0"
+         aria-valuemax="100">
+      <div class="topic-row-bar-fill" [style.width.%]="topic.scorePercentage">
+      </div>
+    </div>
+    <span class="topic-row-value">
+      {{ topic.scorePercentage | number: '1.0-0' }}%
+    </span>
+  </div>
+</div>

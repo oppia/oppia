@@ -18,16 +18,46 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 
 describe('CertificateAssessmentConversationSkinComponent', () => {
   let component: CertificateAssessmentConversationSkinComponent;
   let fixture: ComponentFixture<CertificateAssessmentConversationSkinComponent>;
+  let urlInterpolationServiceSpy: jasmine.SpyObj<UrlInterpolationService>;
+  let currentInteractionServiceSpy: jasmine.SpyObj<CurrentInteractionService>;
 
   beforeEach(async () => {
+    urlInterpolationServiceSpy = jasmine.createSpyObj(
+      'UrlInterpolationService',
+      ['getStaticCopyrightedImageUrl']
+    );
+    urlInterpolationServiceSpy.getStaticCopyrightedImageUrl.and.returnValue(
+      '/static/avatar.svg'
+    );
+    currentInteractionServiceSpy = jasmine.createSpyObj(
+      'CurrentInteractionService',
+      ['submitAnswer', 'isSubmitAnswerFnRegistered']
+    );
+
     await TestBed.configureTestingModule({
-      declarations: [CertificateAssessmentConversationSkinComponent],
+      declarations: [
+        CertificateAssessmentConversationSkinComponent,
+        MockTranslatePipe,
+      ],
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useValue: urlInterpolationServiceSpy,
+        },
+        {
+          provide: CurrentInteractionService,
+          useValue: currentInteractionServiceSpy,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
@@ -35,62 +65,92 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
       CertificateAssessmentConversationSkinComponent
     );
     component = fixture.componentInstance;
-    component.currentQuestion = {
-      prompt: 'What is 2 + 2?',
-      choices: ['3', '4', '5'],
-    };
-    fixture.detectChanges();
   });
 
-  it('should default currentQuestionIndex to 0', () => {
-    expect(component.currentQuestionIndex).toBe(0);
+  it('should initialize the avatar URL on init', () => {
+    component.ngOnInit();
+
+    expect(
+      urlInterpolationServiceSpy.getStaticCopyrightedImageUrl
+    ).toHaveBeenCalledWith('/avatar/oppia_avatar_100px.svg');
+    expect(component.OPPIA_AVATAR_IMAGE_URL).toBe('/static/avatar.svg');
   });
 
-  it('should default totalQuestions to 0', () => {
-    expect(component.totalQuestions).toBe(0);
+  it('should emit previousQuestion on onPreviousQuestion', () => {
+    spyOn(component.previousQuestion, 'emit');
+
+    component.onPreviousQuestion();
+
+    expect(component.previousQuestion.emit).toHaveBeenCalled();
   });
 
-  it('should default progressPercentage to 0', () => {
-    expect(component.progressPercentage).toBe(0);
-  });
-
-  it('should default isLastQuestion to false', () => {
-    expect(component.isLastQuestion).toBe(false);
-  });
-
-  it('should accept a provided currentQuestion', () => {
-    expect(component.currentQuestion).toEqual({
-      prompt: 'What is 2 + 2?',
-      choices: ['3', '4', '5'],
-    });
-  });
-
-  it('should accept provided currentQuestionIndex, totalQuestions, progressPercentage and isLastQuestion', () => {
-    component.currentQuestionIndex = 2;
-    component.totalQuestions = 5;
-    component.progressPercentage = 40;
-    component.isLastQuestion = true;
-    fixture.detectChanges();
-
-    expect(component.currentQuestionIndex).toBe(2);
-    expect(component.totalQuestions).toBe(5);
-    expect(component.progressPercentage).toBe(40);
-    expect(component.isLastQuestion).toBe(true);
-  });
-
-  it('should emit nextQuestion when onNextQuestion is called', () => {
+  it('should call submitAnswer and emit nextQuestion on onNextQuestion', () => {
     spyOn(component.nextQuestion, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
 
     component.onNextQuestion();
 
+    expect(currentInteractionServiceSpy.submitAnswer).toHaveBeenCalled();
     expect(component.nextQuestion.emit).toHaveBeenCalled();
   });
 
-  it('should emit submitAssessment when onSubmitAssessment is called', () => {
+  it('should not call submitAnswer when no submit function is registered', () => {
+    spyOn(component.nextQuestion, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      false
+    );
+
+    component.onNextQuestion();
+
+    expect(currentInteractionServiceSpy.submitAnswer).not.toHaveBeenCalled();
+    expect(component.nextQuestion.emit).toHaveBeenCalled();
+  });
+
+  it('should let submitAnswer errors propagate in onNextQuestion', () => {
+    spyOn(component.nextQuestion, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
+    currentInteractionServiceSpy.submitAnswer.and.throwError('submit failed');
+
+    expect(() => component.onNextQuestion()).toThrowError('submit failed');
+    expect(component.nextQuestion.emit).not.toHaveBeenCalled();
+  });
+
+  it('should call submitAnswer and emit submitAssessment on onSubmitAssessment', () => {
     spyOn(component.submitAssessment, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
 
     component.onSubmitAssessment();
 
+    expect(currentInteractionServiceSpy.submitAnswer).toHaveBeenCalled();
     expect(component.submitAssessment.emit).toHaveBeenCalled();
+  });
+
+  it('should not call submitAnswer when no submit function is registered for assessment', () => {
+    spyOn(component.submitAssessment, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      false
+    );
+
+    component.onSubmitAssessment();
+
+    expect(currentInteractionServiceSpy.submitAnswer).not.toHaveBeenCalled();
+    expect(component.submitAssessment.emit).toHaveBeenCalled();
+  });
+
+  it('should let submitAnswer errors propagate in onSubmitAssessment', () => {
+    spyOn(component.submitAssessment, 'emit');
+    currentInteractionServiceSpy.isSubmitAnswerFnRegistered.and.returnValue(
+      true
+    );
+    currentInteractionServiceSpy.submitAnswer.and.throwError('submit failed');
+
+    expect(() => component.onSubmitAssessment()).toThrowError('submit failed');
+    expect(component.submitAssessment.emit).not.toHaveBeenCalled();
   });
 });

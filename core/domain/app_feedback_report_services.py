@@ -190,10 +190,10 @@ def _update_report_stats_model_in_transaction(
             platform, ticket_id, date
         )
     )
-    stats_model = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-            stats_id
-        )
+    stats_model: Optional[
+        app_feedback_report_models.AppFeedbackReportStatsModel
+    ] = app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+        stats_id
     )
 
     stats_parameter_names = app_feedback_report_constants.StatsParameterNames
@@ -751,8 +751,9 @@ def reassign_ticket(
                 )
                 latest_timestamp = report_models[0].submitted_on
                 for index in range(1, len(report_models)):
-                    if report_models[index].submitted_on > (latest_timestamp):
-                        latest_timestamp = report_models[index].submitted_on
+                    latest_timestamp = max(
+                        latest_timestamp, report_models[index].submitted_on
+                    )
                 old_ticket_obj.newest_report_creation_timestamp = (
                     latest_timestamp
                 )

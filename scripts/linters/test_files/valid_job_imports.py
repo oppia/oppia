@@ -22,16 +22,18 @@ from __future__ import annotations
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     blog_author_details_migration_jobs,
-    blog_post_search_indexing_jobs,
     blog_validation_jobs,
+    classroom_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
     delete_duplicate_content_ids_jobs,
     dummy_jobs,
     email_deletion_jobs,
     exp_migration_jobs,
-    exp_search_indexing_jobs,
+    exp_end_state_normalization_jobs,
     exploration_voiceover_sync_jobs,
+    firebase_server_sync_jobs,
+    legacy_feedback_migration_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
     number_with_units_audit_jobs,
@@ -54,6 +56,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     user_validation_jobs,
     cloud_task_run_migration_jobs,
     voiceover_synthesis_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip

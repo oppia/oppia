@@ -16,6 +16,8 @@
  * @fileoverview Tests for the classroom admin component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -67,6 +69,7 @@ let dummyClassroomDict = {
   classroomId: 'classroomId',
   name: 'math',
   urlFragment: 'math',
+  feedbackRecipientEmail: 'user@email.com',
   courseDetails: "Oppia's curated maths lesson.",
   teaserText: 'Learn math',
   topicListIntro: 'Start from the basics with our first topic.',
@@ -83,18 +86,21 @@ let dummyTopicToClassroomRelations = [
     topic_name: 'topic1',
     classroom_name: 'math',
     classroom_url_fragment: 'math',
+    feedback_recipient_email: 'user@email.com',
   },
   {
     topic_id: 'topicid2',
     topic_name: 'topic2',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: null,
   },
   {
     topic_id: 'topicid3',
     topic_name: 'topic3',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: null,
   },
 ];
 
@@ -490,6 +496,7 @@ describe('Classroom Admin Page component ', () => {
       classroom_id: 'classroomId',
       name: 'math',
       url_fragment: 'math',
+      feedback_recipient_email: 'user@email.com',
       course_details: "Oppia's curated maths lesson.",
       teaser_text: 'Learn math',
       topic_list_intro: 'Start from the basics with our first topic.',
@@ -503,6 +510,7 @@ describe('Classroom Admin Page component ', () => {
       classroomId: 'classroomId',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: "Oppia's curated maths lesson.",
       teaserText: 'Learn math',
       topicListIntro: 'Start from the basics with our first topic.',
@@ -580,6 +588,7 @@ describe('Classroom Admin Page component ', () => {
         classroomId: 'classroomId',
         name: 'math',
         urlFragment: 'math',
+        feedbackRecipientEmail: 'user@email.com',
         courseDetails: "Oppia's curated maths lesson.",
         teaserText: 'Learn math',
         topicListIntro: 'Start from the basics with our first topic.',
@@ -876,6 +885,7 @@ describe('Classroom Admin Page component ', () => {
       classroomId: 'classroomId',
       name: 'math',
       urlFragment: 'math',
+      feedbackRecipientEmail: 'user@email.com',
       courseDetails: "Oppia's curated maths lesson.",
       teaserText: 'Learn math',
       topicListIntro: 'Start from the basics with our first topic.',

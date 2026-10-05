@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import topic_domain, topic_services, user_services
 from core.platform import models
@@ -869,7 +869,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 last_started_state_translation_tutorial=(
                     user_settings.last_started_state_translation_tutorial
                 ),
-                last_logged_in=datetime.datetime.today(),
+                last_logged_in=utils.get_current_local_datetime(),
                 last_edited_an_exploration=(
                     user_settings.last_edited_an_exploration
                 ),
@@ -934,9 +934,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -962,9 +962,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -990,9 +990,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -1020,9 +1020,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -1042,9 +1042,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -1063,9 +1063,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -1084,9 +1084,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -1105,9 +1105,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -1124,9 +1124,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -1142,9 +1142,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -1160,9 +1160,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -1178,9 +1178,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -1194,9 +1194,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -1209,9 +1209,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -1224,9 +1224,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -1239,9 +1239,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
             ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_date(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 

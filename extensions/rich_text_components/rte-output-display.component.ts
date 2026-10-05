@@ -268,6 +268,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
+        // Preserve list container structure so ordered list numbering does not
+        // reset for every item after sentence-wrapping traversal.
+        if (currentNodeName === 'OL' || currentNodeName === 'UL') {
+          const listNode = node.cloneNode() as HTMLElement;
+          updatedChildNodes.forEach(child => {
+            listNode.appendChild(child);
+          });
+          return listNode;
+        }
+
         let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
@@ -765,14 +775,23 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     if (node.nodeType === 'component') {
       const portalName = (node.selector.split('oppia-noninteractive-')[1] +
         'TagPortal') as TemplatePortalName;
-      return new TemplatePortal(
-        templatePortals[portalName],
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      if (
+        portalName in templatePortals &&
+        templatePortals[portalName] !== undefined
+      ) {
+        return new TemplatePortal(
+          templatePortals[portalName],
+          this._viewContainerRef,
+          {$implicit: node.attrs}
+        );
+      }
+      return undefined;
     }
     const portalName = (node.selector + 'TagPortal') as TemplatePortalName;
-    if (templatePortals[portalName] !== undefined) {
+    if (
+      portalName in templatePortals &&
+      templatePortals[portalName] !== undefined
+    ) {
       return new TemplatePortal(
         templatePortals[portalName],
         this._viewContainerRef,

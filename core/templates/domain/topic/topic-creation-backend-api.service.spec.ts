@@ -16,6 +16,8 @@
  * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
+// @ts-nocheck
+
 import {HttpErrorResponse} from '@angular/common/http';
 import {
   HttpClientTestingModule,

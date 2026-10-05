@@ -73,7 +73,6 @@ interface LearnerDashboardTopicsAndStoriesDataBackendDict {
 interface LearnerDashboardCollectionsDataBackendDict {
   completed_collections_list: CollectionSummaryBackendDict[];
   incomplete_collections_list: CollectionSummaryBackendDict[];
-  collection_playlist: CollectionSummaryBackendDict[];
   completed_to_incomplete_collections: string[];
   number_of_nonexistent_collections: NonExistentCollectionsBackendDict;
 }
@@ -81,7 +80,6 @@ interface LearnerDashboardCollectionsDataBackendDict {
 export interface LearnerDashboardExplorationsDataBackendDict {
   completed_explorations_list: LearnerExplorationSummaryBackendDict[];
   incomplete_explorations_list: LearnerExplorationSummaryBackendDict[];
-  exploration_playlist: LearnerExplorationSummaryBackendDict[];
   number_of_nonexistent_explorations: NonExistentExplorationsBackendDict;
   subscription_list: CreatorSummaryBackendDict[];
 }
@@ -110,7 +108,6 @@ interface LearnerDashboardTopicsAndStoriesData {
 interface LearnerDashboardCollectionsData {
   completedCollectionsList: CollectionSummary[];
   incompleteCollectionsList: CollectionSummary[];
-  collectionPlaylist: CollectionSummary[];
   completedToIncompleteCollections: string[];
   numberOfNonexistentCollections: NonExistentCollections;
 }
@@ -118,7 +115,6 @@ interface LearnerDashboardCollectionsData {
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
-  explorationPlaylist: LearnerExplorationSummary[];
   numberOfNonexistentExplorations: NonExistentExplorations;
   subscriptionList: ProfileSummary[];
 }
@@ -214,10 +210,6 @@ export class LearnerDashboardBackendApiService {
                   collectionSummary =>
                     CollectionSummary.createFromBackendDict(collectionSummary)
                 ),
-              collectionPlaylist: dashboardData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
               completedToIncompleteCollections:
                 dashboardData.completed_to_incomplete_collections,
               numberOfNonexistentCollections:
@@ -251,10 +243,6 @@ export class LearnerDashboardBackendApiService {
                 dashboardData.incomplete_explorations_list.map(expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
                 ),
-              explorationPlaylist: dashboardData.exploration_playlist.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
               numberOfNonexistentExplorations:
                 NonExistentExplorations.createFromBackendDict(
                   dashboardData.number_of_nonexistent_explorations

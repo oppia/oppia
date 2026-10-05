@@ -45,6 +45,7 @@ interface LanguageCodeToContentTranslations {
 @Component({
   selector: 'oppia-exploration-modify-translations-modal',
   templateUrl: './exploration-modify-translations-modal.component.html',
+  styleUrls: ['./exploration-modify-translations-modal.component.css'],
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
@@ -125,6 +126,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         this.languageIsCheckedStatusDict[languageCode] = true;
       }
     });
+  }
+
+  // A translation can be a string or a list of strings depending on the data
+  // format. The RTE output display only accepts a string, so a list of strings
+  // is rendered as an empty string (it is rendered separately as a list).
+  getTranslationString(translation: string | string[]): string {
+    return typeof translation === 'string' ? translation : '';
   }
 
   confirm(): void {

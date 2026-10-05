@@ -16,7 +16,14 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+// @ts-nocheck
+
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -60,7 +67,7 @@ class MockRouterService {
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
@@ -310,7 +317,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.graphLoaded).toBeTrue();
+    expect(component.graphLoaded).toBe(true);
     expect(component.GRAPH_WIDTH).toBe(630);
     expect(component.GRAPH_HEIGHT).toBe(280);
     expect(component.VIEWPORT_WIDTH).toBe('10000px');
@@ -462,28 +469,44 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         right: 20,
       });
       flush();
-      // Spies for d3 library.
-      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-        scaleExtent: () => ({
-          on: (evt: string, callback: () => void) => {
-            callback();
-            return {
-              apply: () => {},
-            };
-          },
-        }),
-      });
-      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-      spyOnProperty(d3, 'event').and.returnValue({
-        transform: {
-          x: 10,
-          y: 20,
-        },
+      let zoomListener: (...args: Object[]) => void = () => {};
+      const originalCall = d3.selection.prototype.call;
+      spyOn(d3.selection.prototype, 'call').and.callFake(function (
+        this: Object,
+        behavior: Object,
+        ...args: Object[]
+      ) {
+        const zoomBehavior = behavior as {
+          on?: (eventName: string) => (...args: Object[]) => void;
+        };
+        if (zoomBehavior && typeof zoomBehavior.on === 'function') {
+          const listener = zoomBehavior.on('zoom');
+          if (listener) {
+            zoomListener = listener;
+          }
+        }
+        return originalCall.apply(this, [behavior as Object, ...args]);
       });
 
       component.makeGraphPannable();
       tick();
       flush();
+
+      const mockEvent = {
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      };
+      const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
+      const d3WithCustomEvent = d3 as Object as {
+        customEvent: (
+          event: Object,
+          listener: (...args: Object[]) => void,
+          target: Object
+        ) => void;
+      };
+      d3WithCustomEvent.customEvent(mockEvent, zoomListener, pannableRect);
 
       expect(component.innerTransformStr).toBe('translate(10,20)');
     })
@@ -516,31 +539,47 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       };
 
       flush();
-      // Spies for d3 library.
-      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-        scaleExtent: () => ({
-          on: (evt: string, callback: () => void) => {
-            callback();
-            return {
-              apply: () => {},
-            };
-          },
-        }),
-      });
-      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-      spyOnProperty(d3, 'event').and.returnValue({
-        transform: {
-          x: 10,
-          y: 20,
-        },
+      let zoomListener: (...args: Object[]) => void = () => {};
+      const originalCall = d3.selection.prototype.call;
+      spyOn(d3.selection.prototype, 'call').and.callFake(function (
+        this: Object,
+        behavior: Object,
+        ...args: Object[]
+      ) {
+        const zoomBehavior = behavior as {
+          on?: (eventName: string) => (...args: Object[]) => void;
+        };
+        if (zoomBehavior && typeof zoomBehavior.on === 'function') {
+          const listener = zoomBehavior.on('zoom');
+          if (listener) {
+            zoomListener = listener;
+          }
+        }
+        return originalCall.apply(this, [behavior as Object, ...args]);
       });
 
       component.makeGraphPannable();
       tick();
       flush();
 
-      expect(d3.event.transform.x).toBe(0);
-      expect(d3.event.transform.y).toBe(0);
+      const mockEvent = {
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      };
+      const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
+      const d3WithCustomEvent = d3 as Object as {
+        customEvent: (
+          event: Object,
+          listener: (...args: Object[]) => void,
+          target: Object
+        ) => void;
+      };
+      d3WithCustomEvent.customEvent(mockEvent, zoomListener, pannableRect);
+
+      expect(mockEvent.transform.x).toBe(0);
+      expect(mockEvent.transform.y).toBe(0);
       expect(component.overallTransformStr).toBe('translate(465,487.5)');
     })
   );

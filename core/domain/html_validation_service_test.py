@@ -76,12 +76,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ]
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
+            tag = None
             if index == 0:
                 tag = soup.findAll(name='i')[1]
             elif index == 1:
                 tag = soup.find(name='br')
             elif index == 2:
                 tag = soup.find(name='b')
+            assert tag is not None
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 

@@ -250,6 +250,116 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch the opportunities count data', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 42});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(42);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch the opportunities count data with empty topic and language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', '', '')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 10});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(10);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch opportunities count data with specific entityType', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi', 'skill')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should omit entity_type from opportunities count request when entityType is all', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi', 'all')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch the opportunities count data on error', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_name=topic&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Failed to fetch opportunities count data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch opportunities count data.')
+    );
+  }));
+
   it('should fetch skill opportunities with a search query', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
@@ -364,7 +474,7 @@ describe('Contribution Opportunities backend API service', function () {
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
+      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(translationOpportunityResponseV2);
@@ -409,7 +519,7 @@ describe('Contribution Opportunities backend API service', function () {
         )
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
+        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
       );
 
       expect(req.request.method).toEqual('GET');
@@ -430,6 +540,63 @@ describe('Contribution Opportunities backend API service', function () {
       );
     })
   );
+
+  it('should omit entity_type from the request when entityType is all', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync('hi', 'Topic 1', '', 'all')
+      .then(successHandler, failHandler);
+
+    // "all" means "do not filter by entity type", so the parameter is left
+    // off the request entirely rather than being sent as a literal value.
+    const req = httpTestingController.expectOne(
+      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor='
+    );
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.params.has('entity_type')).toBeFalse();
+    req.flush(translationOpportunityResponseV2);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+  }));
+
+  it('should fetch V2 translation opportunities with a specific entityType', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(
+        'hi',
+        'Topic 1',
+        '',
+        AppConstants.ENTITY_TYPE.SKILL
+      )
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor=' +
+        '&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(translationOpportunityResponseV2);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+  }));
 
   it(
     'should fail to fetch the translation opportunities data ' +
@@ -555,8 +722,10 @@ describe('Contribution Opportunities backend API service', function () {
         'hi'
       )
       .then(successHandler, failHandler);
+    // No entity type is supplied, so the parameter is left off and the
+    // handler returns opportunities of every entity type.
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=exploration'
+      '/getreviewableopportunitieshandlerv2?language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -577,6 +746,41 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should fetch V2 reviewable translation opportunities of a single entity type', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync(
+        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        'hi',
+        AppConstants.ENTITY_TYPE.SKILL
+      )
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.params.get('entity_type')).toBe(
+      AppConstants.ENTITY_TYPE.SKILL
+    );
+
+    req.flush({
+      opportunities: [],
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({opportunities: []});
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should fetch V2 reviewable translation opportunities from a topic when feature flag is enabled', fakeAsync(() => {
     spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
       EnableTranslationOppsWithNewOppModels: {
@@ -592,7 +796,7 @@ describe('Contribution Opportunities backend API service', function () {
       .fetchReviewableTranslationOpportunitiesAsync(topicName, 'hi')
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?topic_name=Topic%202&language_code=hi&entity_type=exploration'
+      '/getreviewableopportunitieshandlerv2?topic_name=Topic%202&language_code=hi'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -634,7 +838,7 @@ describe('Contribution Opportunities backend API service', function () {
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=exploration'
+        '/getreviewableopportunitieshandlerv2?language_code=hi'
       );
       expect(req.request.method).toEqual('GET');
 

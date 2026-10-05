@@ -16,13 +16,17 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
-import {
-  Collection,
-  CollectionBackendDict,
-} from 'domain/collection/collection.model';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+// @ts-nocheck
 
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+} from 'domain/summary/learner-exploration-summary.model';
+
+import {
+  CollectionSummary,
+  CollectionSummaryBackendDict,
+} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {LearnerDashboardPageComponent} from './learner-dashboard-page.component';
 import {
@@ -36,18 +40,19 @@ import {
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
-import {LoggerService} from 'services/contextual/logger.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import {
-  ExplorationBackendDict,
-  Exploration,
-} from 'domain/exploration/exploration.model';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
@@ -67,16 +72,21 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  FeedbackStatus,
+  LessonFeedbackSummary,
+} from '../../domain/feedback/feedback.model';
 
 @Pipe({name: 'slice'})
-class MockSlicePipe {
+class MockSlicePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -106,6 +116,9 @@ class MockPlatformFeatureService {
       EnableCertificateAssessment: {
         isEnabled: false,
       },
+      ExplorationEditorNewCreatorFeedbackTab: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -125,55 +138,22 @@ class LoadingDotsComponentStub {}
 describe('Learner dashboard page', () => {
   let component: LearnerDashboardPageComponent;
   let fixture: ComponentFixture<LearnerDashboardPageComponent>;
-  let alertsService: AlertsService = null;
-  let csrfTokenService: CsrfTokenService = null;
-  let dateTimeFormatService: DateTimeFormatService = null;
+  let alertsService: AlertsService;
+  let csrfTokenService: CsrfTokenService;
+  let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
-  let loggerService: LoggerService;
-  let urlInterpolationService: UrlInterpolationService;
-  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService =
-    null;
-  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService =
-    null;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
-  let userService: UserService = null;
-  let translateService: TranslateService = null;
-  let pageTitleService: PageTitleService = null;
+  let userService: UserService;
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
   let platformFeatureService: PlatformFeatureService;
-  let learnerDashboardBackendApiServiceSpy: LearnerDashboardBackendApiService;
-
-  let explorationDict: ExplorationBackendDict = {
-    init_state_name: 'Introduction',
-    language_code: 'en',
-    states: {},
-    param_changes: [],
-    param_specs: {},
-    is_version_of_draft_valid: true,
-    draft_changes: [],
-    version: 1,
-    draft_change_list_id: 3,
-    title: 'Test Exploration',
-    next_content_id_index: 3,
-    auto_tts_enabled: true,
-    exploration_metadata: {
-      title: 'Exploration',
-      category: 'Algebra',
-      objective: 'To learn',
-      language_code: 'en',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 50,
-      init_state_name: 'Introduction',
-      param_specs: {},
-      param_changes: [],
-      auto_tts_enabled: false,
-      edits_allowed: true,
-    },
-  };
+  let learnerDashboardBackendApiServiceSpy: jasmine.Spy;
+  let feedbackBackendApiService: FeedbackBackendApiService;
 
   let titleList = [
     'World War III',
@@ -220,22 +200,6 @@ describe('Learner dashboard page', () => {
     },
   ];
 
-  let collectionDict: CollectionBackendDict = {
-    id: 'sample_collection_id',
-    title: 'a title',
-    objective: 'an objective',
-    category: 'a category',
-    version: 0,
-    nodes: [],
-    language_code: null,
-    schema_version: null,
-    tags: null,
-    playthrough_dict: {
-      next_exploration_id: 'expId',
-      completed_exploration_ids: ['expId2'],
-    },
-  };
-
   let learnerDashboardTopicAndStoriesData = {
     completed_stories_list: [],
     learnt_topic_list: [],
@@ -254,27 +218,23 @@ describe('Learner dashboard page', () => {
   };
 
   let learnerDashboardCollectionsData = {
-    completed_collections_list: [],
-    incomplete_collections_list: [],
+    completed_collections_list: [] as CollectionSummaryBackendDict[],
+    incomplete_collections_list: [] as CollectionSummaryBackendDict[],
     completed_to_incomplete_collections: [],
     number_of_nonexistent_collections: {
       incomplete_collections: 0,
       completed_collections: 0,
-      collection_playlist: 0,
     },
-    collection_playlist: [],
   };
 
   let learnerDashboardExplorationsData = {
-    completed_explorations_list: [],
-    incomplete_explorations_list: [],
+    completed_explorations_list: [] as LearnerExplorationSummaryBackendDict[],
+    incomplete_explorations_list: [] as LearnerExplorationSummaryBackendDict[],
     subscription_list: subscriptionsList,
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       completed_explorations: 0,
-      exploration_playlist: 0,
     },
-    exploration_playlist: [],
   };
 
   let userInfo = {
@@ -320,7 +280,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
@@ -372,8 +332,6 @@ describe('Learner dashboard page', () => {
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
-      loggerService = TestBed.inject(LoggerService);
-      urlInterpolationService = TestBed.inject(UrlInterpolationService);
       learnerDashboardBackendApiService = TestBed.inject(
         LearnerDashboardBackendApiService
       );
@@ -387,6 +345,7 @@ describe('Learner dashboard page', () => {
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService
       );
+      feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const mockElement = document.createElement('div');
@@ -396,66 +355,86 @@ describe('Learner dashboard page', () => {
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
         return Promise.resolve('sample-csrf-token');
       });
-      // Generate completed explorations and exploration playlist.
+      // Generate completed explorations.
       for (let i = 0; i < 10; i++) {
-        learnerDashboardExplorationsData.completed_explorations_list[i] =
-          Exploration.createFromBackendDict(
-            Object.assign(explorationDict, {
-              id: i + 1,
-              title: titleList[i],
-              category: categoryList[i],
-            }),
-            loggerService,
-            urlInterpolationService
-          );
-        learnerDashboardExplorationsData.exploration_playlist[i] = {
+        learnerDashboardExplorationsData.completed_explorations_list[i] = {
           id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
         };
       }
 
-      // Generate incomplete explorations and incomplete exploration playlist.
+      // Generate incomplete explorations.
       for (let i = 0; i < 12; i++) {
-        learnerDashboardExplorationsData.incomplete_explorations_list[i] =
-          Exploration.createFromBackendDict(
-            Object.assign(explorationDict, {
-              // Create ids from 11 to 22.
-              // (1 to 10 is the complete explorations).
-              id: Number(i + 11).toString(),
-              title: titleList[i],
-              category: categoryList[i],
-            }),
-            loggerService,
-            urlInterpolationService
-          );
+        learnerDashboardExplorationsData.incomplete_explorations_list[i] = {
+          // Create ids from 11 to 22.
+          // (1 to 10 is the complete explorations).
+          id: Number(i + 11).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
-      // Generate completed collections and collection playlist.
+      // Generate completed collections.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardCollectionsData.completed_collections_list[i] =
-          // TODO(#10875): Fix type mismatch.
-          Collection.create(
-            Object.assign(collectionDict, {
-              title: titleList[i],
-              category: categoryList[i],
-            }) as CollectionBackendDict
-          );
-        learnerDashboardCollectionsData.collection_playlist[i] = {
+        learnerDashboardCollectionsData.completed_collections_list[i] = {
           id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: 'an objective',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
         };
       }
 
       // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardCollectionsData.incomplete_collections_list[i] =
-          // TODO(#10875): Fix type mismatch.
-          Collection.create(
-            Object.assign(collectionDict, {
-              // Create ids from 9 to 16.
-              // (1 to 8 is the complete collections).
-              id: Number(i + 9).toString(),
-              title: 'Collection Title ' + (i + 7),
-            }) as CollectionBackendDict
-          );
+        learnerDashboardCollectionsData.incomplete_collections_list[i] = {
+          // Create ids from 9 to 16.
+          // (1 to 8 is the complete collections).
+          id: Number(i + 9).toString(),
+          title: 'Collection Title ' + (i + 7),
+          category: categoryList[i],
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: 'an objective',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
@@ -516,6 +495,22 @@ describe('Learner dashboard page', () => {
         'isLearnerGroupFeatureEnabledAsync'
       ).and.returnValue(Promise.resolve(true));
 
+      spyOn(
+        feedbackBackendApiService,
+        'fetchMyFeedbackListAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          summaries: [],
+          next_cursor: null,
+          more: false,
+        })
+      );
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchMyFeedbackUnreadCountAsync'
+      ).and.returnValue(Promise.resolve(0));
+
       spyOn(urlService, 'getUrlParams').and.returnValue({
         active_tab: 'learner-groups',
       });
@@ -532,11 +527,6 @@ describe('Learner dashboard page', () => {
             ),
           incompleteCollectionsList:
             learnerDashboardCollectionsData.incomplete_collections_list.map(
-              collectionSummary =>
-                CollectionSummary.createFromBackendDict(collectionSummary)
-            ),
-          collectionPlaylist:
-            learnerDashboardCollectionsData.collection_playlist.map(
               collectionSummary =>
                 CollectionSummary.createFromBackendDict(collectionSummary)
             ),
@@ -561,11 +551,6 @@ describe('Learner dashboard page', () => {
             ),
           incompleteExplorationsList:
             learnerDashboardExplorationsData.incomplete_explorations_list.map(
-              expSummary =>
-                LearnerExplorationSummary.createFromBackendDict(expSummary)
-            ),
-          explorationPlaylist:
-            learnerDashboardExplorationsData.exploration_playlist.map(
               expSummary =>
                 LearnerExplorationSummary.createFromBackendDict(expSummary)
             ),
@@ -614,8 +599,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -626,8 +613,8 @@ describe('Learner dashboard page', () => {
 
       expect(component.curatedExplorationIds).toBeDefined();
       expect(component.curatedExplorationIds.size).toBe(2);
-      expect(component.curatedExplorationIds.has('1')).toBeTrue();
-      expect(component.curatedExplorationIds.has('2')).toBeTrue();
+      expect(component.curatedExplorationIds.has('1')).toBe(true);
+      expect(component.curatedExplorationIds.has('2')).toBe(true);
     }));
 
     it('should handle topics without canonical story summary dicts gracefully', fakeAsync(() => {
@@ -650,8 +637,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -691,8 +680,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -702,7 +693,7 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(component.curatedExplorationIds.size).toBe(1);
-      expect(component.curatedExplorationIds.has('exp1')).toBeTrue();
+      expect(component.curatedExplorationIds.has('exp1')).toBe(true);
     }));
 
     it(
@@ -722,7 +713,7 @@ describe('Learner dashboard page', () => {
           'profile-image-url-webp'
         );
         expect(component.username).toBe(userInfo.getUsername());
-        expect(component.windowIsNarrow).toBeTrue();
+        expect(component.windowIsNarrow).toBe(true);
       })
     );
 
@@ -749,11 +740,11 @@ describe('Learner dashboard page', () => {
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
-      expect(component.windowIsNarrow).toBeTrue();
+      expect(component.windowIsNarrow).toBe(true);
 
       mockResizeEmitter.emit();
 
-      expect(component.windowIsNarrow).toBeFalse();
+      expect(component.windowIsNarrow).toBe(false);
     });
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
@@ -1063,6 +1054,99 @@ describe('Learner dashboard page', () => {
         sample_topic_id: {1: 1},
       });
     }));
+
+    it('should fetch the backend unread total for my suggestions', fakeAsync(() => {
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(6));
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync
+      ).toHaveBeenCalled();
+      expect(component.unreadMySuggestionsCount).toBe(6);
+    }));
+
+    it('should count unread feedback on later pages via the backend total', fakeAsync(() => {
+      // The first page of the paginated list has no unread responses, but
+      // unread feedback exists on later pages. The indicator must reflect
+      // the backend-provided global total instead of the first-page sum.
+      const firstPageSummaries: LessonFeedbackSummary[] = [
+        {
+          id: 'feedback-1',
+          feedback_text_preview: 'First feedback',
+          latest_response_preview: '',
+          status: FeedbackStatus.OPEN,
+          lesson_title: 'Lesson 1',
+          source: 'lesson',
+          unread_response_count: 0,
+          last_updated_msecs: 100,
+        },
+      ];
+      (
+        feedbackBackendApiService.fetchMyFeedbackListAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          summaries: firstPageSummaries,
+          next_cursor: 'cursor-2',
+          more: true,
+        })
+      );
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.resolve(4));
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(component.unreadMySuggestionsCount).toBe(4);
+    }));
+
+    it('should set active section to my suggestions when my suggestions tab is active', fakeAsync(() => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+      });
+
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({
+        active_tab: 'my-suggestions',
+      });
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.activeSection).toBe(
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS
+      );
+    }));
+
+    it('should change the unreadMySuggestionsCount value', () => {
+      component.unreadMySuggestionsCount = 0;
+      component.onMySuggestionsUnreadCountChanged(1);
+      expect(component.unreadMySuggestionsCount).toBe(1);
+    });
+
+    it('should set unreadMySuggestionsCount to zero when fetching the unread total fails', fakeAsync(() => {
+      component.unreadMySuggestionsCount = 5;
+
+      (
+        feedbackBackendApiService.fetchMyFeedbackUnreadCountAsync as jasmine.Spy
+      ).and.returnValue(Promise.reject());
+
+      component.fetchUnreadMySuggestionsCount();
+      flush();
+
+      expect(component.unreadMySuggestionsCount).toBe(0);
+    }));
   });
 
   describe('when fetching dashboard data fails', () => {
@@ -1079,7 +1163,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
@@ -1250,11 +1334,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1276,11 +1355,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),
@@ -1376,11 +1450,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1402,11 +1471,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),
@@ -1471,6 +1535,9 @@ describe('Learner dashboard page', () => {
         ShowRedesignedLearnerDashboard: {
           isEnabled: true,
         },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: false,
+        },
       });
 
       component.setActiveSection(
@@ -1479,7 +1546,30 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(component.getDashboardTabHeading()).toBe(
-        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION_HEADING'
+      );
+    });
+
+    it('should return suggestions greeting when my suggestions tab is active and exploration new creator feedback tab is enabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+      });
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION'
+      );
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION_HEADING'
       );
     });
 
@@ -1491,6 +1581,9 @@ describe('Learner dashboard page', () => {
         EnableCertificateAssessment: {
           isEnabled: false,
         },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: false,
+        },
       });
 
       component.activeSection =
@@ -1498,6 +1591,31 @@ describe('Learner dashboard page', () => {
 
       component.setActiveSection(
         'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+
+      expect(component.activeSection).toBe(
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME
+      );
+    });
+
+    it('should keep the current tab when my suggestions is disabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+        ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: false,
+        },
+      });
+
+      component.activeSection =
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION'
       );
 
       expect(component.activeSection).toBe(

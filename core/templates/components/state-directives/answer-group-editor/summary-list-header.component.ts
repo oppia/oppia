@@ -26,6 +26,7 @@ interface DeleteSummaryEventData {
 @Component({
   selector: 'oppia-summary-list-header',
   templateUrl: './summary-list-header.component.html',
+  styleUrls: ['./summary-list-header.component.css'],
 })
 export class SummaryListHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks

@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -651,7 +649,6 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
-                assert sort_by is not None
                 translation_coordinator_dicts = contribution_stats_services.get_all_translation_coordinator_stats(
                     sort_by
                 )
@@ -779,9 +776,9 @@ def get_translation_coordinator_frontend_dict(
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
         stats_dict['reviewers_count'] = (  # type: ignore[typeddict-item]
-            community_stats.translation_reviewer_counts_by_lang_code[
-                stats_dict['language_id']
-            ]
+            community_stats.translation_reviewer_counts_by_lang_code.get(
+                stats_dict['language_id'], 0
+            )
         )
 
         for coordinator_id in stats_dict['coordinator_ids']:
@@ -789,7 +786,7 @@ def get_translation_coordinator_frontend_dict(
             assert user_setting.last_logged_in is not None
             last_activity = user_setting.last_logged_in
             last_activity_days = int(
-                (datetime.datetime.today() - last_activity).days
+                (utils.get_current_local_datetime() - last_activity).days
             )
 
             coordinator_activity_list.append(
@@ -833,7 +830,7 @@ def get_question_coordinator_frontend_dict(
 
         last_activity = user_setting.last_logged_in
         last_activity_days = int(
-            (datetime.datetime.today() - last_activity).days
+            (utils.get_current_local_datetime() - last_activity).days
         )
 
         stats.append(

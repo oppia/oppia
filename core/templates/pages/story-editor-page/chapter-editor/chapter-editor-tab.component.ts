@@ -28,14 +28,17 @@ import {StoryNode} from 'domain/story/story-node.model';
 @Component({
   selector: 'oppia-chapter-editor-tab',
   templateUrl: './chapter-editor-tab.component.html',
+  styleUrls: ['./chapter-editor-tab.component.css'],
 })
 export class ChapterEditorTabComponent implements OnInit, OnDestroy {
-  story: Story;
-  storyContents: StoryContents;
-  chapterIndex: number | null;
-  chapterId: string;
-  node: StoryNode;
-  nodes: StoryNode[];
+  // These properties are all set in initEditor(), which is called from the
+  // story editor state service callbacks registered in ngOnInit.
+  story!: Story;
+  storyContents!: StoryContents;
+  chapterIndex: number | null = null;
+  chapterId!: string;
+  node: StoryNode | null = null;
+  nodes!: StoryNode[];
 
   constructor(
     private storyUpdateService: StoryUpdateService,
@@ -60,7 +63,8 @@ export class ChapterEditorTabComponent implements OnInit, OnDestroy {
           }
         });
       }
-      this.node = this.nodes[this.chapterIndex];
+      this.node =
+        this.chapterIndex !== null ? this.nodes[this.chapterIndex] : null;
     }
   }
 

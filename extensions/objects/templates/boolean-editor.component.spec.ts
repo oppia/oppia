@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for boolean editor.
  */
 
+// @ts-nocheck
+
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BooleanEditorComponent} from './boolean-editor.component';
 

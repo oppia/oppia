@@ -16,7 +16,12 @@
  * @fileoverview Unit tests for State Responses Component.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -41,6 +46,7 @@ import {StateInteractionIdService} from '../state-editor-properties-services/sta
 import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolicitAnswerDetailsService} from '../state-editor-properties-services/state-solicit-answer-details.service';
+import {EditabilityService} from 'services/editability.service';
 import {StateResponsesComponent} from './state-responses.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
@@ -50,7 +56,7 @@ import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
-class MockParameterizeRuleDescriptionPipe {
+class MockParameterizeRuleDescriptionPipe implements PipeTransform {
   transform(
     rule: Rule | null,
     interactionId: string | null,
@@ -60,21 +66,21 @@ class MockParameterizeRuleDescriptionPipe {
   }
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
-class MockWrapTextWithEllipsisPipe {
+class MockWrapTextWithEllipsisPipe implements PipeTransform {
   transform(input: string, characterCount: number): string {
     return '';
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
 }
 
 @Pipe({name: 'convertToPlainText'})
-class MockConvertToPlainTextPipe {
+class MockConvertToPlainTextPipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }
@@ -1572,5 +1578,36 @@ describe('State Responses Component', () => {
     expect(component.getUnaddressedMisconceptionNames()).toEqual([
       'Misconception 2',
     ]);
+  });
+
+  it('should expose editability from the editability service', () => {
+    const editabilityService = TestBed.inject(EditabilityService);
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    spyOn(editabilityService, 'isEditableOutsideTutorialMode').and.returnValue(
+      false
+    );
+
+    expect(component.isEditable).toBe(true);
+    expect(component.isEditableOutsideTutorialMode).toBe(false);
+  });
+
+  it('should get and set the solicit answer details displayed value', () => {
+    stateSolicitAnswerDetailsService.displayed = true;
+
+    expect(component.solicitAnswerDetailsDisplayed).toBe(true);
+
+    component.solicitAnswerDetailsDisplayed = false;
+
+    expect(stateSolicitAnswerDetailsService.displayed).toBe(false);
+  });
+
+  it('should set and reset the active edit option', () => {
+    component.setActiveEditOption('skill1-misconception1');
+
+    expect(component.activeEditOption).toBe('skill1-misconception1');
+
+    component.setActiveEditOption(null);
+
+    expect(component.activeEditOption).toBeNull();
   });
 });

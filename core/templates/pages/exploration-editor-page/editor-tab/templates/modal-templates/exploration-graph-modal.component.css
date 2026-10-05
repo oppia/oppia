@@ -1,0 +1,31 @@
+.exploration-graph-modal .oppia-state-graph-visualization-container {
+  overflow-y: hidden;
+  padding-bottom: 0;
+}
+
+.exploration-graph-modal .oppia-state-graph-visualization {
+  height: 300px;
+}
+
+.exploration-graph-modal .oppia-close-button-container {
+  margin-top: 0;
+  text-align: inherit;
+}
+
+@media screen and (max-width: 768px) {
+  .exploration-graph-modal .modal-dialog {
+    border: none;
+    margin: 0;
+    width: 100vw;
+  }
+
+  .exploration-graph-modal .modal-content {
+    border: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+
+  .exploration-graph-modal .modal-header {
+    background: linear-gradient(to bottom, #3cf 0%, #f5eded 100%);
+  }
+}

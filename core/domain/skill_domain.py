@@ -30,7 +30,16 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translation_domain,
 )
 
-from typing import Callable, Dict, Final, List, Literal, Optional, TypedDict
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    TypedDict,
+)
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -804,7 +813,7 @@ class SerializableSkillDict(SkillDict):
     last_updated: str
 
 
-class Skill:
+class Skill(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -877,6 +886,46 @@ class Skill:
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
         self.prerequisite_skill_ids = prerequisite_skill_ids
+
+    def get_translatable_contents_collection(
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields in the skill.
+
+        Returns:
+            TranslatableContentsCollection. An instance of
+            TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection()
+        )
+
+        translatable_contents_collection.add_translatable_field(
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            translation_domain.ContentType.SKILL_DESCRIPTION,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            self.description,
+        )
+
+        translatable_contents_collection.add_translatable_field(
+            self.skill_contents.explanation.content_id,
+            translation_domain.ContentType.SKILL_EXPLANATION,
+            translation_domain.TranslatableContentFormat.HTML,
+            self.skill_contents.explanation.html,
+        )
+
+        for misconception in self.misconceptions:
+            translatable_contents_collection.add_translatable_field(
+                f'misconception_{misconception.id}_feedback',
+                translation_domain.ContentType.MISCONCEPTION_FEEDBACK,
+                translation_domain.TranslatableContentFormat.HTML,
+                misconception.feedback,
+            )
+
+        return translatable_contents_collection
 
     @classmethod
     def require_valid_skill_id(cls, skill_id: str) -> None:

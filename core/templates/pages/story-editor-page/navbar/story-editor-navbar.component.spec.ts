@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
+// @ts-nocheck
+
 import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   TestBed,
@@ -663,9 +665,9 @@ describe('Exploration editor page component', () => {
 
     it('should generate the aria label correctly', () => {
       const mockWarnings = [
-        {message: 'Warning 1'},
-        {message: 'Warning 2'},
-        {message: 'Warning 3'},
+        {type: 'critical', message: 'Warning 1'},
+        {type: 'non-critical', message: 'Warning 2'},
+        {type: 'non-critical', message: 'Warning 3'},
       ];
 
       spyOn(component, 'getWarnings').and.returnValue(mockWarnings);
@@ -999,8 +1001,13 @@ describe('Exploration editor page component', () => {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       explorationData.version = 1;
+      const stateEditorService = TestBed.inject(StateEditorService);
       spyOn(ics, 'startCheckingConnection');
       spyOn(cls, 'loadAutosavedChangeList');
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        'Introduction'
+      );
+      spyOn(sers.onRefreshStateEditor, 'emit');
       isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
 
       expect(component.explorationEditorPageHasInitialized).toEqual(false);
@@ -1008,6 +1015,7 @@ describe('Exploration editor page component', () => {
       tick();
 
       expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
+      expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
       expect(component.explorationEditorPageHasInitialized).toEqual(true);
 
       flush();

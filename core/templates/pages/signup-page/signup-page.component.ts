@@ -34,6 +34,7 @@ import analyticsConstants from 'analytics-constants';
 @Component({
   selector: 'oppia-signup-page',
   templateUrl: './signup-page.component.html',
+  styleUrls: ['./signup-page.component.css'],
 })
 export class SignupPageComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -52,7 +53,6 @@ export class SignupPageComponent {
   emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   hasEverRegistered: boolean = false;
   hasAgreedToLatestTerms: boolean = false;
-  showEmailPreferencesForm: boolean = false;
   hasUsername: boolean = false;
   blurredAtLeastOnce = false;
 
@@ -76,7 +76,6 @@ export class SignupPageComponent {
       this.username = data.username;
       this.hasEverRegistered = data.has_ever_registered;
       this.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-      this.showEmailPreferencesForm = data.server_can_send_emails;
       this.hasUsername = Boolean(this.username);
       this.focusManagerService.setFocus('usernameInputField');
     });
@@ -192,7 +191,7 @@ export class SignupPageComponent {
       username: username,
     };
 
-    if (this.showEmailPreferencesForm && !this.hasUsername) {
+    if (!this.hasUsername) {
       if (canReceiveEmailUpdates === null) {
         this.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
         return;

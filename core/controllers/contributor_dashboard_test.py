@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import unittest.mock
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     opportunity_domain,
     opportunity_services,
+    skill_fetchers,
     state_domain,
     story_domain,
     story_fetchers,
@@ -2839,9 +2840,11 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date = utils.get_current_local_datetime() - datetime.timedelta(
+            days=1
+        )
         from_date_str = from_date.strftime('%Y-%m-%d')
-        to_date = datetime.datetime.today()
+        to_date = utils.get_current_local_datetime()
         to_date_str = to_date.strftime('%Y-%m-%d')
 
         self.login(self.OWNER_EMAIL)
@@ -2867,6 +2870,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 'contribution_word_count': 3,
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi',
+                'certificate_profile_name': self.OWNER_USERNAME,
             },
         )
 
@@ -2875,9 +2879,13 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def test_get_contributor_certificate_raises_invalid_date_exception(
         self,
     ) -> None:
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date = utils.get_current_local_datetime() - datetime.timedelta(
+            days=1
+        )
         from_date_str = from_date.strftime('%Y-%m-%d')
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        to_date = utils.get_current_local_datetime() + datetime.timedelta(
+            days=1
+        )
         to_date_str = to_date.strftime('%Y-%m-%d')
 
         self.login(self.OWNER_EMAIL)
@@ -3281,6 +3289,179 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
         )
         self.assertEqual(response['opportunities'], [])
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_handles_empty_topic_name(self) -> None:
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi'
+        )
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title 1',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-one',
+            )
+        ]
+        self.save_new_topic(
+            'topic_id_1',
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='topic-one',
+            url_fragment='topic-one',
+            subtopics=subtopics,
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic('topic_id_1', self.admin_id)
+        self.save_new_valid_exploration('exp_1', self.admin_id)
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_1',
+            exp.version,
+            suggester_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': exp.get_content_html(
+                    'Introduction', 'content_0'
+                ),
+                'translation_html': '<p>Translation</p>',
+                'data_format': 'html',
+            },
+            'Translation suggestion',
+        )
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_1',
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        # An empty topic name is how the dashboard says "all topics", so the
+        # opportunity is returned even though it belongs to a topic.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_name='
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
+        self.assertEqual(response['opportunities'][0]['topic_name'], 'Topic 1')
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_returns_every_entity_type_when_no_entity_type_is_given(
+        self,
+    ) -> None:
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi'
+        )
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        self.save_new_valid_exploration('exp_1', self.admin_id)
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_1',
+            exp.version,
+            suggester_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': exp.get_content_html(
+                    'Introduction', 'content_0'
+                ),
+                'translation_html': '<p>Translation</p>',
+                'data_format': 'html',
+            },
+            'Translation suggestion',
+        )
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_1',
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        # A skill with a reviewable translation suggestion of its own, so the
+        # response has to span two entity types.
+        skill_id = 'skill_id_1234'
+        self.save_new_skill(skill_id, self.admin_id, description='Skill one')
+        skill = skill_fetchers.get_skill_by_id(skill_id)
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            skill.version,
+            suggester_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                'language_code': 'hi',
+                'content_html': 'Skill one',
+                'translation_html': 'Skill one in Hindi',
+                'data_format': 'html',
+            },
+            'Translation suggestion',
+        )
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=skill_id,
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        response = self.get_json(
+            '%s?language_code=hi' % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+
+        entity_id_to_entity_type = {
+            opportunity['entity_id']: opportunity['entity_type']
+            for opportunity in response['opportunities']
+        }
+        self.assertEqual(
+            entity_id_to_entity_type,
+            {
+                'exp_1': feconf.ENTITY_TYPE_EXPLORATION,
+                skill_id: feconf.ENTITY_TYPE_SKILL,
+            },
+        )
+
+        # Asking for one entity type narrows the same list down to it.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=skill'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['entity_id'], skill_id)
+
 
 class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
     """Unit test for the TranslatableContentsHandlerV2."""
@@ -3356,7 +3537,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
         self.assertEqual(response['version'], 1)
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
         content = response['translatable_contents'][0]
         self.assertEqual(content['content_id'], 'content_0')
@@ -3375,16 +3556,13 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_handler_returns_400_for_skill(self) -> None:
+    def test_handler_returns_200_for_skill(self) -> None:
         response = self.get_json(
             '%s?language_code=hi&entity_type=skill&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.skill_id),
-            expected_status_int=400,
         )
-        self.assertEqual(
-            response['error'],
-            'Translation for entity_type skill is not supported yet.',
-        )
+        self.assertIn('translatable_contents', response)
+        self.assertIn('version', response)
 
     @test_utils.enable_feature_flags(
         [
@@ -3449,7 +3627,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
         # Verify content_0 is in the translatable contents.
         self.assertTrue(
             any(
@@ -3474,7 +3652,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 3)
+        self.assertEqual(len(response['translatable_contents']), 2)
 
     @test_utils.enable_feature_flags(
         [
@@ -3495,7 +3673,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 4)
+        self.assertEqual(len(response['translatable_contents']), 3)
 
         # Add translation.
         translated_content = translation_domain.TranslatedContent(
@@ -3517,7 +3695,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             '%s?language_code=hi&entity_type=exploration&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
         )
-        self.assertEqual(len(response['translatable_contents']), 3)
+        self.assertEqual(len(response['translatable_contents']), 2)
 
     @test_utils.enable_feature_flags(
         [
@@ -3566,3 +3744,123 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
                 % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
             )
             self.assertEqual(len(response['translatable_contents']), 1)
+
+
+class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
+    """Unit tests for the OpportunitiesCountHandler."""
+
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]
+    ) -> None:
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-three',
+            )
+        ]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = uncategorized_skill_ids
+        topic.uncategorized_skill_ids = uncategorized_skill_ids
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        # Create a skill opportunity.
+        self.save_new_skill('skill_1', self.owner_id, description='A skill')
+
+        # Create an exploration for translation opportunity.
+        self.save_new_valid_exploration(
+            'exp_1',
+            self.owner_id,
+            title='title 1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_1')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'topic', 'abbrev', 'description', 'fragm'
+        )
+        self._publish_valid_topic(topic, ['skill_1'])
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_1', 'topic_id_1', 'exp_1'
+        )
+
+        # Add the skill opportunity to a classroom so it shows up in counts.
+        self.classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=self.classroom_id,
+            topic_id_to_prerequisite_topic_ids={'topic_id_1': []},
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_skill_opportunities_count(self) -> None:
+        response = self.get_json('/opportunitiescounthandler/skill')
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_opportunities_count(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/translation?language_code=hi'
+        )
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION,
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+        ]
+    )
+    def test_get_translation_opportunities_count_with_new_models(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/translation?language_code=hi'
+        )
+        # It's 0 because we didn't create a TranslationOpportunityModel in setUp.
+        self.assertEqual(response['total_count'], 0)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_count_missing_language_code(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/translation', expected_status_int=400
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_invalid_opportunity_type(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/invalid_type', expected_status_int=404
+        )
+
+    def test_feature_flag_disabled(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/skill', expected_status_int=404
+        )

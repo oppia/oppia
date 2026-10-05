@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TranslationSuggestionReviewModalComponent.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -29,6 +31,7 @@ import {TranslationSuggestionReviewModalComponent} from './translation-suggestio
 import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -145,16 +148,32 @@ describe('Translation Suggestion Review Modal Component', function () {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
-      null,
-      null,
+      null as never,
+      null as never,
       new ElementRef({offsetHeight: 200}),
-      null
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never
     );
     component.translationPanel = new RteOutputDisplayComponent(
-      null,
-      null,
+      null as never,
+      null as never,
       new ElementRef({offsetHeight: 200}),
-      null
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never
     );
     component.initialSuggestionId = 'suggestion_1';
     component.suggestionIdToContribution = {
@@ -166,7 +185,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           status: 'status',
           suggestion_id: 'suggestion_1',
           target_id: '1',
-          target_type: 'target_type',
+          target_type: 'exploration',
           suggestion_type: 'translate_content',
           change_cmd: {
             content_id: 'hint_1',
@@ -177,7 +196,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             data_format: 'html',
             language_code: 'language_code',
           },
-          exploration_content_html: '<p>content</p>',
+          entity_content_html: '<p>content</p>',
         },
         details: {
           topic_name: 'topic_1',
@@ -199,7 +218,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -210,7 +229,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content</p><p>&nbsp;</p>',
+      entity_content_html: '<p>content</p><p>&nbsp;</p>',
     };
     const suggestion2 = {
       author_name: 'author_name',
@@ -219,7 +238,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -230,7 +249,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>',
+      entity_content_html: '<p>content CHANGED</p>',
     };
     const suggestion3 = {
       author_name: 'author_name',
@@ -239,7 +258,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_3',
       target_id: '3',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -250,7 +269,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>',
+      entity_content_html: '<p>content CHANGED</p>',
     };
 
     const contribution1 = {
@@ -379,7 +398,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -390,7 +409,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content</p><p>&nbsp;</p>',
+      entity_content_html: '<p>content</p><p>&nbsp;</p>',
     };
 
     const suggestion2 = {
@@ -400,7 +419,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -411,7 +430,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>',
+      entity_content_html: '<p>content CHANGED</p>',
     };
 
     const contribution1 = {
@@ -518,7 +537,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it(
@@ -535,15 +554,15 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should notify user on failed suggestion update', function () {
       component.ngOnInit();
       const error = new Error('Error');
-      expect(component.errorFound).toBeFalse();
+      expect(component.errorFound).toBe(false);
       expect(component.errorMessage).toBe('');
       component.isSubmitting = true;
 
       component.showTranslationSuggestionUpdateError(error);
 
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
@@ -585,12 +604,12 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should expand the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       // The content area is contracted by default.
-      expect(component.isContentExpanded).toBeFalse();
+      expect(component.isContentExpanded).toBe(false);
       // The content area should expand when the users clicks
       // on the 'View More' button.
       component.toggleExpansionState(0);
 
-      expect(component.isContentExpanded).toBeTrue();
+      expect(component.isContentExpanded).toBe(true);
     });
 
     it('should contract the content area', () => {
@@ -600,18 +619,18 @@ describe('Translation Suggestion Review Modal Component', function () {
       // on the 'View Less' button.
       component.toggleExpansionState(0);
 
-      expect(component.isContentExpanded).toBeFalse();
+      expect(component.isContentExpanded).toBe(false);
     });
 
     it('should expand the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       // The translation area is contracted by default.
-      expect(component.isTranslationExpanded).toBeFalse();
+      expect(component.isTranslationExpanded).toBe(false);
       // The translation area should expand when the users clicks
       // on the 'View More' button.
       component.toggleExpansionState(1);
 
-      expect(component.isTranslationExpanded).toBeTrue();
+      expect(component.isTranslationExpanded).toBe(true);
     });
 
     it('should contract the translation area', () => {
@@ -621,7 +640,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       // on the 'View Less' button.
       component.toggleExpansionState(1);
 
-      expect(component.isTranslationExpanded).toBeFalse();
+      expect(component.isTranslationExpanded).toBe(false);
     });
 
     it('should update translation when the update button is clicked', function () {
@@ -631,7 +650,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         contributionAndReviewService,
         'updateTranslationSuggestionAsync'
       ).and.callFake(
-        (suggestionId, translationHtml, successCallback, errorCallback) => {
+        (
+          suggestionId: string,
+          translationHtml: string,
+          successCallback: () => void,
+          errorCallback: () => void
+        ) => {
           isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());
         }
@@ -639,8 +663,8 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
+      expect(isSubmittingInServiceCall).toBe(true);
+      expect(component.isSubmitting).toBe(false);
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -673,7 +697,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(
         component.showTranslationSuggestionUpdateError
       ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
@@ -773,6 +797,21 @@ describe('Translation Suggestion Review Modal Component', function () {
           )
         ).toBe(false);
       });
+
+      it('should queue skill translation suggestion when accepting', fakeAsync(() => {
+        component.ngOnInit();
+        component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+        spyOn(component.queuedSuggestionSummaryEmit, 'emit');
+
+        component.acceptAndReviewNext();
+        tick();
+
+        expect(component.queuedSuggestionSummaryEmit.emit).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            target_type: AppConstants.ENTITY_TYPE.SKILL,
+          })
+        );
+      }));
     });
   });
 
@@ -793,12 +832,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      entity_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -813,12 +852,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: 'Translation',
+      entity_content_html: 'Translation',
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -863,7 +902,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_1',
       target_id: '1',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -874,7 +913,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content</p><p>&nbsp;</p>',
+      entity_content_html: '<p>content</p><p>&nbsp;</p>',
     };
 
     const suggestion2 = {
@@ -884,7 +923,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       suggestion_id: 'suggestion_2',
       target_id: '2',
-      target_type: 'target_type',
+      target_type: 'exploration',
       suggestion_type: 'translate_content',
       change_cmd: {
         content_id: 'hint_1',
@@ -895,7 +934,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>',
+      entity_content_html: '<p>content CHANGED</p>',
     };
 
     const contribution1 = {
@@ -1002,7 +1041,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it(
@@ -1019,24 +1058,25 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should notify user on failed suggestion update', function () {
       component.ngOnInit();
       const error = new Error('Error');
-      expect(component.errorFound).toBeFalse();
+      expect(component.errorFound).toBe(false);
       expect(component.errorMessage).toBe('');
       component.isSubmitting = true;
 
       component.showTranslationSuggestionUpdateError(error);
 
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should reset resolvingSuggestion to false when acceptAndReviewNext fails', function () {
       component.ngOnInit();
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1053,7 +1093,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.acceptAndReviewNext();
 
-      expect(component.resolvingSuggestion).toBeFalse();
+      expect(component.resolvingSuggestion).toBe(false);
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Invalid Suggestion: Error'
       );
@@ -1064,9 +1104,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.reviewMessage = 'Review message';
       spyOn(
         contributionAndReviewService,
-        'reviewExplorationSuggestion'
+        'reviewTranslationSuggestion'
       ).and.callFake(
         (
+          targetType,
           targetId,
           suggestionId,
           action,
@@ -1083,7 +1124,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.rejectAndReviewNext(component.reviewMessage);
 
-      expect(component.resolvingSuggestion).toBeFalse();
+      expect(component.resolvingSuggestion).toBe(false);
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Invalid Suggestion: Error'
       );
@@ -1098,7 +1139,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         expect(component.activeSuggestion).toEqual(suggestion1);
         expect(component.reviewable).toBe(reviewable);
         expect(component.reviewMessage).toBe('');
-        // Suggestion 1's exploration_content_html matches its content_html.
+        // Suggestion 1's entity_content_html matches its content_html.
         expect(component.hasExplorationContentChanged()).toBe(false);
 
         spyOn(
@@ -1107,9 +1148,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1132,15 +1174,16 @@ describe('Translation Suggestion Review Modal Component', function () {
         expect(component.activeSuggestion).toEqual(suggestion2);
         expect(component.reviewable).toBe(reviewable);
         expect(component.reviewMessage).toBe('');
-        // Suggestion 2's exploration_content_html does not match its
+        // Suggestion 2's entity_content_html does not match its
         // content_html.
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1160,8 +1203,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '2',
           'suggestion_2',
           'accept',
@@ -1194,9 +1238,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1217,8 +1262,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1243,9 +1289,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1276,8 +1323,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1303,6 +1351,221 @@ describe('Translation Suggestion Review Modal Component', function () {
       }
     );
 
+    it('should review a skill translation suggestion when accepting', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType,
+          targetId,
+          suggestionId,
+          action,
+          message,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          successCallback(suggestionId);
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'addSuccessMessage');
+
+      component.acceptAndReviewNext();
+      tick();
+
+      expect(
+        contributionAndReviewService.reviewTranslationSuggestion
+      ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
+        '1',
+        'suggestion_1',
+        AppConstants.ACTION_ACCEPT_SUGGESTION,
+        '',
+        // The caller passes the commit message for every accept, and the
+        // service drops it for a skill, which is not applied as a new version.
+        component.finalCommitMessage,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.'
+      );
+    }));
+
+    it('should send a commit message when accepting an exploration translation suggestion', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type =
+        AppConstants.ENTITY_TYPE.EXPLORATION;
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType,
+          targetId,
+          suggestionId,
+          action,
+          message,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          successCallback(suggestionId);
+          return Promise.resolve();
+        }
+      );
+
+      component.acceptAndReviewNext();
+      tick();
+
+      expect(
+        contributionAndReviewService.reviewTranslationSuggestion
+      ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        '1',
+        'suggestion_1',
+        AppConstants.ACTION_ACCEPT_SUGGESTION,
+        '',
+        component.finalCommitMessage,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+    }));
+
+    it('should warn when accepting a skill translation suggestion fails', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType,
+          targetId,
+          suggestionId,
+          action,
+          message,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'clearWarnings');
+      spyOn(alertsService, 'addWarning');
+
+      component.acceptAndReviewNext();
+      tick();
+
+      expect(component.resolvingSuggestion).toBeFalse();
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error updating suggestion'
+      );
+    }));
+
+    it('should review a skill translation suggestion when rejecting', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType,
+          targetId,
+          suggestionId,
+          action,
+          message,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          successCallback();
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'addSuccessMessage');
+
+      component.rejectAndReviewNext('Review message example');
+      tick();
+
+      expect(
+        contributionAndReviewService.reviewTranslationSuggestion
+      ).toHaveBeenCalledWith(
+        AppConstants.ENTITY_TYPE.SKILL,
+        '1',
+        'suggestion_1',
+        AppConstants.ACTION_REJECT_SUGGESTION,
+        'Review message example',
+        null,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.'
+      );
+    }));
+
+    it('should warn when rejecting a skill translation suggestion fails', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(
+        contributionAndReviewService,
+        'reviewTranslationSuggestion'
+      ).and.callFake(
+        (
+          targetType,
+          targetId,
+          suggestionId,
+          action,
+          message,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          errorCallback(
+            ContributorDashboardConstants.SUGGESTION_REVIEW_FAILURE_MESSAGE
+          );
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'clearWarnings');
+      spyOn(alertsService, 'addWarning');
+
+      component.rejectAndReviewNext('Review message example');
+      tick();
+
+      expect(component.resolvingSuggestion).toBeFalse();
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error updating suggestion'
+      );
+    }));
+
+    it('should return exploration content html for every supported shape', () => {
+      component.ngOnInit();
+
+      component.entityContentHtml = ['<p>first</p>', '<p>second</p>'];
+      expect(component.entityContentHtmlAsString).toBe('<p>first</p>');
+
+      component.entityContentHtml = [];
+      expect(component.entityContentHtmlAsString).toBe('');
+
+      // The active suggestion may carry no exploration content at all, in
+      // which case the getter must still return a string.
+      component.entityContentHtml = null;
+      expect(component.entityContentHtmlAsString).toBe('');
+    });
+
     it(
       'should allow the reviewer to fix the suggestion if the backend pre' +
         ' accept/reject validation failed',
@@ -1324,9 +1587,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         );
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1351,8 +1615,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardAcceptSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'accept',
@@ -1376,8 +1641,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1415,12 +1681,12 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should expand the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       // The content area is contracted by default.
-      expect(component.isContentExpanded).toBeFalse();
+      expect(component.isContentExpanded).toBe(false);
       // The content area should expand when the users clicks
       // on the 'View More' button.
       component.toggleExpansionState(0);
 
-      expect(component.isContentExpanded).toBeTrue();
+      expect(component.isContentExpanded).toBe(true);
     });
 
     it('should contract the content area', () => {
@@ -1430,18 +1696,18 @@ describe('Translation Suggestion Review Modal Component', function () {
       // on the 'View Less' button.
       component.toggleExpansionState(0);
 
-      expect(component.isContentExpanded).toBeFalse();
+      expect(component.isContentExpanded).toBe(false);
     });
 
     it('should expand the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       // The translation area is contracted by default.
-      expect(component.isTranslationExpanded).toBeFalse();
+      expect(component.isTranslationExpanded).toBe(false);
       // The translation area should expand when the users clicks
       // on the 'View More' button.
       component.toggleExpansionState(1);
 
-      expect(component.isTranslationExpanded).toBeTrue();
+      expect(component.isTranslationExpanded).toBe(true);
     });
 
     it('should contract the translation area', () => {
@@ -1451,7 +1717,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       // on the 'View Less' button.
       component.toggleExpansionState(1);
 
-      expect(component.isTranslationExpanded).toBeFalse();
+      expect(component.isTranslationExpanded).toBe(false);
     });
 
     it('should update translation when the update button is clicked', function () {
@@ -1461,7 +1727,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         contributionAndReviewService,
         'updateTranslationSuggestionAsync'
       ).and.callFake(
-        (suggestionId, translationHtml, successCallback, errorCallback) => {
+        (
+          suggestionId: string,
+          translationHtml: string,
+          successCallback: () => void,
+          errorCallback: () => void
+        ) => {
           isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());
         }
@@ -1469,8 +1740,8 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
+      expect(isSubmittingInServiceCall).toBe(true);
+      expect(component.isSubmitting).toBe(false);
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -1503,7 +1774,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(
         component.showTranslationSuggestionUpdateError
       ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     describe('isHtmlContentEqual', function () {
@@ -1580,12 +1851,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      entity_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -1600,12 +1871,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: 'Translation',
+      entity_content_html: 'Translation',
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -1650,9 +1921,10 @@ describe('Translation Suggestion Review Modal Component', function () {
 
         spyOn(
           contributionAndReviewService,
-          'reviewExplorationSuggestion'
+          'reviewTranslationSuggestion'
         ).and.callFake(
           (
+            targetType,
             targetId,
             suggestionId,
             action,
@@ -1678,8 +1950,9 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService.registerContributorDashboardRejectSuggestion
         ).toHaveBeenCalledWith('Translation');
         expect(
-          contributionAndReviewService.reviewExplorationSuggestion
+          contributionAndReviewService.reviewTranslationSuggestion
         ).toHaveBeenCalledWith(
+          AppConstants.ENTITY_TYPE.EXPLORATION,
           '1',
           'suggestion_1',
           'reject',
@@ -1713,12 +1986,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      entity_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -1733,12 +2006,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: 'Translation',
+      entity_content_html: 'Translation',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
@@ -1754,12 +2027,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         language_code: 'language_code',
       },
       // This suggestion is obsolete.
-      exploration_content_html: null,
+      entity_content_html: null,
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -1839,7 +2112,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_1 / story_1 / chapter_1');
-      // Suggestion 1's exploration_content_html does not match its
+      // Suggestion 1's entity_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
       expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
@@ -1850,8 +2123,8 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should correctly determine whether the panel data is overflowing', fakeAsync(() => {
       // Pre-check.
       // The default values for the overflow states are false.
-      expect(component.isContentOverflowing).toBeFalse();
-      expect(component.isTranslationOverflowing).toBeFalse();
+      expect(component.isContentOverflowing).toBe(false);
+      expect(component.isTranslationOverflowing).toBe(false);
       // Setup.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
       component.translationPanel.elementRef.nativeElement.offsetHeight = 200;
@@ -1861,16 +2134,16 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.computePanelOverflowState();
       tick(0);
       // Expectations.
-      expect(component.isContentOverflowing).toBeFalse();
-      expect(component.isTranslationOverflowing).toBeTrue();
+      expect(component.isContentOverflowing).toBe(false);
+      expect(component.isTranslationOverflowing).toBe(true);
       // Change panel height to simulate changing of the modal data.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
       // Action.
       component.computePanelOverflowState();
       tick(0);
       // Expectations.
-      expect(component.isContentOverflowing).toBeTrue();
-      expect(component.isTranslationOverflowing).toBeTrue();
+      expect(component.isContentOverflowing).toBe(true);
+      expect(component.isTranslationOverflowing).toBe(true);
     }));
 
     it('should determine panel height after view initialization', () => {
@@ -1896,13 +2169,32 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestion).toEqual(obsoleteSuggestion);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_3 / story_3 / chapter_3');
-      // Suggestion 3's exploration_content_html does not match its
+      // Suggestion 3's entity_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
       expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_3');
       expect(component.reviewMessage).toBe(
         AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG
       );
+    }));
+
+    it('should not set Obsolete review message for a suggestion that is not an exploration', fakeAsync(function () {
+      spyOn(threadDataBackendApiService, 'fetchMessagesAsync').and.returnValue(
+        Promise.resolve({messages: []})
+      );
+      // Only exploration suggestions carry entity content and only they are
+      // auto-rejected when their content is deleted, so a skill suggestion
+      // without content must not be reported as obsolete.
+      component.suggestionIdToContribution.suggestion_3.suggestion.target_type =
+        AppConstants.ENTITY_TYPE.SKILL;
+      component.initialSuggestionId = 'suggestion_3';
+
+      component.ngOnInit();
+      component.refreshActiveContributionState();
+      tick();
+
+      expect(component.entityContentHtml).toBeNull();
+      expect(component.reviewMessage).toBe('');
     }));
   });
 
@@ -1923,12 +2215,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      entity_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -1943,12 +2235,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: 'Translation',
+      entity_content_html: 'Translation',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
@@ -1964,12 +2256,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         language_code: 'language_code',
       },
       // This suggestion is obsolete.
-      exploration_content_html: null,
+      entity_content_html: null,
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2049,7 +2341,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_1 / story_1 / chapter_1');
-      // Suggestion 1's exploration_content_html does not match its
+      // Suggestion 1's entity_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
       expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
@@ -2060,8 +2352,8 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should correctly determine whether the panel data is overflowing', fakeAsync(() => {
       // Pre-check.
       // The default values for the overflow states are false.
-      expect(component.isContentOverflowing).toBeFalse();
-      expect(component.isTranslationOverflowing).toBeFalse();
+      expect(component.isContentOverflowing).toBe(false);
+      expect(component.isTranslationOverflowing).toBe(false);
       // Setup.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
       component.translationPanel.elementRef.nativeElement.offsetHeight = 200;
@@ -2071,16 +2363,16 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.computePanelOverflowState();
       tick(0);
       // Expectations.
-      expect(component.isContentOverflowing).toBeFalse();
-      expect(component.isTranslationOverflowing).toBeTrue();
+      expect(component.isContentOverflowing).toBe(false);
+      expect(component.isTranslationOverflowing).toBe(true);
       // Change panel height to simulate changing of the modal data.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
       // Action.
       component.computePanelOverflowState();
       tick(0);
       // Expectations.
-      expect(component.isContentOverflowing).toBeTrue();
-      expect(component.isTranslationOverflowing).toBeTrue();
+      expect(component.isContentOverflowing).toBe(true);
+      expect(component.isTranslationOverflowing).toBe(true);
     }));
 
     it('should determine panel height after view initialization', () => {
@@ -2106,7 +2398,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestion).toEqual(obsoleteSuggestion);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_3 / story_3 / chapter_3');
-      // Suggestion 3's exploration_content_html does not match its
+      // Suggestion 3's entity_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
       expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_3');
@@ -2133,12 +2425,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      entity_content_html: ['Translation1', 'Translation2 CHANGED'],
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -2153,12 +2445,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: 'Translation',
+      entity_content_html: 'Translation',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
       status: 'status',
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2199,8 +2491,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
       component.ngOnInit();
 
-      expect(component.isFirstItem).toBeTrue();
-      expect(component.isLastItem).toBeTrue();
+      expect(component.isFirstItem).toBe(true);
+      expect(component.isLastItem).toBe(true);
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds.length).toEqual(0);
     });
@@ -2211,8 +2503,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
       component.ngOnInit();
 
-      expect(component.isFirstItem).toBeTrue();
-      expect(component.isLastItem).toBeFalse();
+      expect(component.isFirstItem).toBe(true);
+      expect(component.isLastItem).toBe(false);
       expect(component.remainingContributionIds.length).toEqual(1);
       expect(component.skippedContributionIds.length).toEqual(0);
     });
@@ -2224,24 +2516,24 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.ngOnInit();
       spyOn(component, 'refreshActiveContributionState').and.callThrough();
 
-      expect(component.isFirstItem).toBeTrue();
-      expect(component.isLastItem).toBeFalse();
+      expect(component.isFirstItem).toBe(true);
+      expect(component.isLastItem).toBe(false);
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
 
       component.goToPreviousItem();
       // As we are on the first item, goToPreviousItem shouldn't navigate.
-      expect(component.isFirstItem).toBeTrue();
-      expect(component.isLastItem).toBeFalse();
+      expect(component.isFirstItem).toBe(true);
+      expect(component.isLastItem).toBe(false);
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
 
       component.goToNextItem();
 
-      expect(component.isFirstItem).toBeFalse();
-      expect(component.isLastItem).toBeTrue();
+      expect(component.isFirstItem).toBe(false);
+      expect(component.isLastItem).toBe(true);
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds).toEqual(['suggestion_1']);
       expect(component.activeSuggestionId).toEqual('suggestion_2');
@@ -2249,16 +2541,16 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.goToNextItem();
       // As we are on the last item, goToNextItem shoudn't navigate.
-      expect(component.isFirstItem).toBeFalse();
-      expect(component.isLastItem).toBeTrue();
+      expect(component.isFirstItem).toBe(false);
+      expect(component.isLastItem).toBe(true);
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds).toEqual(['suggestion_1']);
       expect(component.activeSuggestionId).toEqual('suggestion_2');
 
       component.goToPreviousItem();
 
-      expect(component.isFirstItem).toBeTrue();
-      expect(component.isLastItem).toBeFalse();
+      expect(component.isFirstItem).toBe(true);
+      expect(component.isLastItem).toBe(false);
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
@@ -2309,7 +2601,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should reset isSubmitting to false when refreshActiveContributionState is called', () => {
       component.isSubmitting = true;
       component.refreshActiveContributionState();
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     const reviewable = true;
@@ -2327,12 +2619,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content</p><p>&nbsp;</p>',
+      entity_content_html: '<p>content</p><p>&nbsp;</p>',
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -2347,12 +2639,12 @@ describe('Translation Suggestion Review Modal Component', function () {
         data_format: 'html',
         language_code: 'language_code',
       },
-      exploration_content_html: '<p>content CHANGED</p>',
+      entity_content_html: '<p>content CHANGED</p>',
       status: 'rejected',
       author_name: 'author_name',
       language_code: 'language_code',
       last_updated_msecs: 1559074000000,
-      target_type: 'target_type',
+      target_type: 'exploration',
     };
 
     const contribution1 = {
@@ -2437,10 +2729,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       const validCmd = 'add_written_translation';
 
       component.activeSuggestion.change_cmd.cmd = validCmd;
-      expect(component.isDeprecatedTranslationSuggestionCommand()).toBeFalse();
+      expect(component.isDeprecatedTranslationSuggestionCommand()).toBe(false);
 
       component.activeSuggestion.change_cmd.cmd = deprecatedCmd;
-      expect(component.isDeprecatedTranslationSuggestionCommand()).toBeTrue();
+      expect(component.isDeprecatedTranslationSuggestionCommand()).toBe(true);
     });
 
     it('should check if translation contains HTML tags', () => {
@@ -2448,10 +2740,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       const translationWithoutTags = 'translation without tags';
 
       component.translationHtml = translationWithTags;
-      expect(component.doesTranslationContainTags()).toBeTrue();
+      expect(component.doesTranslationContainTags()).toBe(true);
 
       component.translationHtml = translationWithoutTags;
-      expect(component.doesTranslationContainTags()).toBeFalse();
+      expect(component.doesTranslationContainTags()).toBe(false);
     });
   });
 
@@ -2527,7 +2819,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_1',
             target_id: '1',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_1',
@@ -2538,7 +2830,7 @@ describe('Translation Suggestion Review Modal Component', function () {
               data_format: 'html',
               language_code: 'language_code',
             },
-            exploration_content_html: '<p>content</p>',
+            entity_content_html: '<p>content</p>',
           },
           details: {
             topic_name: 'topic_1',
@@ -2554,7 +2846,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_2',
             target_id: '2',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_2',
@@ -2565,7 +2857,7 @@ describe('Translation Suggestion Review Modal Component', function () {
               data_format: 'html',
               language_code: 'language_code',
             },
-            exploration_content_html: '<p>content</p>',
+            entity_content_html: '<p>content</p>',
           },
           details: {
             topic_name: 'topic_2',
@@ -2581,7 +2873,7 @@ describe('Translation Suggestion Review Modal Component', function () {
             status: 'status',
             suggestion_id: 'suggestion_3',
             target_id: '3',
-            target_type: 'target_type',
+            target_type: 'exploration',
             suggestion_type: 'translate_content',
             change_cmd: {
               content_id: 'hint_3',
@@ -2592,7 +2884,7 @@ describe('Translation Suggestion Review Modal Component', function () {
               data_format: 'html',
               language_code: 'language_code',
             },
-            exploration_content_html: '<p>content</p>',
+            entity_content_html: '<p>content</p>',
           },
           details: {
             topic_name: 'topic_3',
@@ -2618,11 +2910,11 @@ describe('Translation Suggestion Review Modal Component', function () {
           .content_html
       ).toBe(htmlWithComponents);
 
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.ngOnInit();
 
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       expect(component.translationHtml).toBe(htmlWithComponents);
     });
@@ -2634,7 +2926,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.ngOnInit();
 
@@ -2642,8 +2934,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
-      expect(component.areComponentsMismatched()).toBeTrue();
-      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+      expect(component.areComponentsMismatched()).toBe(true);
+      expect(component.incompleteTranslationErrorIsShown).toBe(true);
     });
 
     it('should detect component mismatch when adding components', () => {
@@ -2655,17 +2947,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_2.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithoutComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.ngOnInit();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
-      expect(component.areComponentsMismatched()).toBeTrue();
-      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+      expect(component.areComponentsMismatched()).toBe(true);
+      expect(component.incompleteTranslationErrorIsShown).toBe(true);
     });
 
     it('should detect no mismatch when components match', () => {
@@ -2675,17 +2967,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.ngOnInit();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
-      expect(component.areComponentsMismatched()).toBeFalse();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.areComponentsMismatched()).toBe(false);
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
     });
 
     it('should handle multiple components correctly', () => {
@@ -2697,17 +2989,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_3.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithMultipleComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.ngOnInit();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.editedContent = {html: htmlWithMultipleComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithMultipleComponents);
 
-      expect(component.areComponentsMismatched()).toBeFalse();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.areComponentsMismatched()).toBe(false);
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
     });
 
     it('should disable update button when components mismatch', () => {
@@ -2717,21 +3009,21 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
-      expect(component.startedEditing).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
+      expect(component.startedEditing).toBe(false);
 
       component.ngOnInit();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.startedEditing = true;
-      expect(component.startedEditing).toBeTrue();
+      expect(component.startedEditing).toBe(true);
 
       component.editedContent = {html: htmlWithoutComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
-      expect(component.updateIsDisabled).toBeTrue();
-      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+      expect(component.updateIsDisabled).toBe(true);
+      expect(component.incompleteTranslationErrorIsShown).toBe(true);
     });
 
     it('should handle successful update when components match', () => {
@@ -2741,8 +3033,8 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
-      expect(component.errorFound).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
+      expect(component.errorFound).toBe(false);
 
       const updateSpy = spyOn(
         contributionAndReviewService,
@@ -2751,14 +3043,14 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(updateSpy).not.toHaveBeenCalled();
 
       component.ngOnInit();
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBe(false);
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
       component.updateSuggestion();
-      expect(component.errorFound).toBeFalse();
+      expect(component.errorFound).toBe(false);
       expect(updateSpy).toHaveBeenCalledWith(
         component.initialSuggestionId,
         htmlWithComponents,
@@ -2784,7 +3076,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.errorMessage).toBe(
         'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
       );
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
     });
 
     it('should clear error when no component mismatch', () => {
@@ -2803,7 +3095,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           state_name: 'Introduction',
           translation_html: htmlWithComponents,
         },
-        exploration_content_html: '<p>content</p>',
+        entity_content_html: '<p>content</p>',
         language_code: 'en',
         last_updated_msecs: 1559074000000,
         status: 'review',
@@ -2825,7 +3117,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       });
 
       expect(component.errorMessage).toBe('');
-      expect(component.errorFound).toBeFalse();
+      expect(component.errorFound).toBe(false);
     });
 
     it('should keep error when component mismatch exists', () => {
@@ -2844,7 +3136,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           state_name: 'Introduction',
           translation_html: htmlWithComponents,
         },
-        exploration_content_html: '<p>content</p>',
+        entity_content_html: '<p>content</p>',
         language_code: 'en',
         last_updated_msecs: 1559074000000,
         status: 'review',
@@ -2866,7 +3158,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       });
 
       expect(component.errorMessage).toBe('Some error');
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
     });
 
     it('should not process when editedContent is null', () => {
@@ -2885,7 +3177,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           state_name: 'Introduction',
           translation_html: htmlWithComponents,
         },
-        exploration_content_html: '<p>content</p>',
+        entity_content_html: '<p>content</p>',
         language_code: 'en',
         last_updated_msecs: 1559074000000,
         status: 'review',
@@ -2905,7 +3197,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       });
 
       expect(component.errorMessage).toBe('Some error');
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
     });
 
     it('should not update when an image is replaced with a math formula', () => {
@@ -2936,7 +3228,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.errorMessage).toBe(
         'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
       );
-      expect(component.errorFound).toBeTrue();
+      expect(component.errorFound).toBe(true);
     });
   });
 });

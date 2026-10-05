@@ -32,11 +32,11 @@ import {
   CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES,
   CERTIFICATE_OFFERING_SECTION_TITLES,
 } from './certificate-offering-section.model';
-import './certificate-offering-progress.component.css';
 
 @Component({
   selector: 'oppia-certificate-offering-progress',
   templateUrl: './certificate-offering-progress.component.html',
+  styleUrls: ['./certificate-offering-progress.component.css'],
 })
 export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
   @Input() pageTitle: string = '';

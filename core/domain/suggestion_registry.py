@@ -30,6 +30,7 @@ from core.domain import (
     exp_services,
     fs_services,
     html_cleaner,
+    opportunity_services,
     platform_parameter_list,
     platform_parameter_services,
     question_domain,
@@ -458,6 +459,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_EXPLORATION,
     ) -> None:
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
@@ -465,7 +467,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
-        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -691,6 +693,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_EXPLORATION,
     ) -> None:
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
@@ -698,7 +701,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -774,6 +777,21 @@ class SuggestionTranslateContent(BaseSuggestion):
                 % (self.change_cmd.language_code, self.language_code)
             )
 
+        # Length validation for metadata translations.
+        if (
+            self.change_cmd.content_id == feconf.EXPLORATION_TITLE_CONTENT_ID
+            and isinstance(self.change_cmd.translation_html, str)
+            and (
+                len(self.change_cmd.translation_html)
+                > feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
+        ):
+            raise utils.ValidationError(
+                'Translation exceeds the allowed character limit. The translation '
+                'for the above content must be %s characters or fewer.'
+                % feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
+
     def pre_update_validate(
         self, change_cmd: exp_domain.ExplorationChange
     ) -> None:
@@ -812,16 +830,52 @@ class SuggestionTranslateContent(BaseSuggestion):
         before accepting the suggestion.
         """
         self.validate()
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if self.change_cmd.state_name not in exploration.states:
+        entity = opportunity_services.get_entity_by_type_and_id(
+            self.target_type, self.target_id
+        )
+        if not isinstance(entity, translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
-                'Expected %s to be a valid state name'
-                % self.change_cmd.state_name
+                'Expected entity to be a translatable object'
             )
+
+        translates_metadata = (
+            self.change_cmd.state_name
+            == constants.DEFAULT_SUGGESTION_STATE_NAME
+        )
+        # Only explorations organise their translatable content into states, so
+        # every other entity type uses the default state name as a sentinel.
+        if not translates_metadata:
+            if not isinstance(entity, exp_domain.Exploration) or (
+                self.change_cmd.state_name not in entity.states
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be a valid state name'
+                    % self.change_cmd.state_name
+                )
+
+        # A valid state name does not guarantee a valid content ID, so the
+        # content ID is checked against the entity's translatable contents for
+        # every entity type.
+        translatable_contents = entity.get_translatable_contents_collection(
+            override_metadata_feature_flag=True
+        )
+        if (
+            self.change_cmd.content_id
+            not in translatable_contents.content_id_to_translatable_content
+        ):
+            msg = (
+                'Expected %s to be a valid metadata content ID'
+                if translates_metadata
+                and self.target_type == feconf.ENTITY_TYPE_EXPLORATION
+                else 'Expected %s to be a valid content ID'
+            )
+            raise utils.ValidationError(msg % self.change_cmd.content_id)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        entity = opportunity_services.get_entity_by_type_and_id(
+            self.target_type, self.target_id
+        )
 
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
@@ -832,9 +886,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
 
         translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
+            feconf.TranslatableEntityType(self.target_type),
             self.target_id,
-            exploration.version,
+            entity.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,
@@ -943,6 +997,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_SKILL,
     ) -> None:
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
@@ -950,7 +1005,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
-        self.target_type = feconf.ENTITY_TYPE_SKILL
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -1984,6 +2039,7 @@ class ContributorCertificateInfoDict(TypedDict):
     contribution_hours: str
     contribution_word_count: int
     language: Optional[str]
+    certificate_profile_name: str
 
 
 class ContributorCertificateInfo:
@@ -1999,6 +2055,7 @@ class ContributorCertificateInfo:
         contribution_hours: str,
         contribution_word_count: int,
         language: Optional[str],
+        certificate_profile_name: str,
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
@@ -2006,6 +2063,7 @@ class ContributorCertificateInfo:
         self.contribution_hours = contribution_hours
         self.contribution_word_count = contribution_word_count
         self.language = language
+        self.certificate_profile_name = certificate_profile_name
 
     def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
@@ -2022,6 +2080,7 @@ class ContributorCertificateInfo:
             'contribution_hours': self.contribution_hours,
             'contribution_word_count': self.contribution_word_count,
             'language': self.language,
+            'certificate_profile_name': self.certificate_profile_name,
         }
 
 

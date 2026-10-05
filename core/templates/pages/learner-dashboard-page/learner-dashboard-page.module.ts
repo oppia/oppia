@@ -20,7 +20,7 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {LessonCardModule} from 'components/summary-tile/lesson-card.module';
 import {CardDisplayComponent} from './card-display/card-display.component';
 import {ClassroomButtonComponent} from './classroom-button/classroom-button.component';
@@ -47,14 +47,20 @@ import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {NgCircleProgressModule} from 'ng-circle-progress';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
+import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
+import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
+
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
+    FeedbackSharedModule,
     LessonCardModule,
     MatDialogModule,
+    MatBottomSheetModule,
     SkillCardModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
@@ -98,6 +104,8 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
+    AddAFollowUpNoteModalComponent,
   ],
   entryComponents: [
     AddGoalsModalComponent,
@@ -120,6 +128,8 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
+    AddAFollowUpNoteModalComponent,
   ],
   providers: [LearnerDashboardActivityBackendApiService],
 })

@@ -22,7 +22,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable
+from typing import Any, Iterable
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -89,22 +89,22 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
     ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from an exploration."""
         for state_dict in model.states.values():
-            for unit in self._extract_units_from_state_dict(state_dict):
-                yield unit
+            yield from self._extract_units_from_state_dict(state_dict)
 
     def _extract_units_from_question(
         self, model: question_models.QuestionModel
     ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a question."""
         state_dict = model.question_state_data
-        for unit in self._extract_units_from_state_dict(state_dict):
-            yield unit
+        yield from self._extract_units_from_state_dict(state_dict)
 
     def _extract_units_from_state_dict(
         self, state_dict: state_domain.StateDict
     ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a state dict."""
-        interaction_dict = state_dict.get('interaction')
+        # Here we use type Any because interaction data can be malformed
+        # at runtime and must be validated by the checks below.
+        interaction_dict: Any = state_dict.get('interaction')
         if not isinstance(interaction_dict, dict):
             return
 

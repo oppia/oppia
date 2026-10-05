@@ -13,10 +13,10 @@
 
   <div class="data-container">
     <div class="data-type-title">
-      <span>Function ID:</span>
+      <span>Event: </span>
     </div>
     <div class="messages-container">
-      {{getFunctionIdText(cloudTaskRun.functionId)}}
+      {{cloudTaskRun.getEventName()}}
     </div>
   </div>
 
@@ -47,14 +47,11 @@
     </div>
   </div>
 
-  <div>
+  <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
     <div class="data-type-title">
       <span>Error messages:</span>
     </div>
-    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="error-messages-container">
-      <i>No error messages.</i>
-    </div>
-    <div class="content-container" *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
+    <div class="content-container">
       <mat-tab-group>
         <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
           <div class="error-messages-container">
@@ -73,38 +70,3 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
 </div>
-
-<style>
-  .data-type-title {
-    font-weight: bold;
-    padding: 1%;
-    width: 50%;
-  }
-  .data-container {
-    display: flex;
-  }
-  .content-container {
-    width: 100%;
-  }
-  .messages-container {
-    overflow: auto;
-    padding: 1%;
-    white-space: pre-wrap;
-    width: 190%;
-  }
-  .error-messages-container {
-    background-color: rgba(0, 0, 0, 0.06);
-    font-family: monospace;
-    height: 250px;
-    overflow: scroll;
-    padding: 2%;
-    white-space: pre-wrap;
-  }
-  .copy-to-clipboard-button {
-    background-color: inherit;
-    border: 0;
-    cursor: pointer;
-    float: right;
-    margin-right: 10px;
-  }
-</style>

@@ -57,8 +57,26 @@
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
   <schema-based-editor [schema]="HTML_SCHEMA"
-                       [(localValue)]="stateContentService.displayed._html">
+                     [localValue]="stateContentService.displayed._html"
+                     (localValueChange)="updateContentHtml($event)">
   </schema-based-editor>
+  <div *ngIf="isFormulaAsText(stateContentService.displayed._html)"
+       class="alert alert-warning e2e-test-formula-as-text-warning mt-2 d-flex justify-content-between"
+       [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
+    <div *ngIf="!mathWarningIsMinimized">
+      <i class="fas fa-exclamation-triangle mr-1"></i>
+      <span [innerHTML]="'I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION' | translate"></span>
+    </div>
+    <div *ngIf="mathWarningIsMinimized">
+      <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
+      <span [innerHTML]="'I18N_WARNING_MATH_EXPRESSION_MINIMIZED' | translate"></span>
+    </div>
+    <i class="fas"
+       [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"
+       (click)="toggleMathWarning()"
+       [title]="mathWarningIsMinimized ? 'Expand warning' : 'Minimize warning'">
+    </i>
+  </div>
   <div *ngIf="cardHeightLimitReached && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning e2e-test-card-height-limit-warning mt-2">
     <i class="fas fa-exclamation-triangle oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()"></i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
@@ -78,53 +96,3 @@
     <div class="oppia-clear"></div>
   </div>
 </div>
-
-<style>
-  .oppia-hide-card-height-warning-icon {
-    color: #827127;
-    font-size: 18px;
-    line-height: 1;
-    vertical-align: middle;
-  }
-  .oppia-hide-card-content-error-icon {
-    color: #d1180a;
-    font-size: 18px;
-    line-height: 1;
-    vertical-align: middle;
-  }
-  .oppia-card-height-limit-warning {
-    background: #fff5c8;
-    border: 0.0625rem solid #827127;
-    border-radius: 0.25rem;
-    color: #333;
-    padding-left: 0.25rem;
-  }
-  .oppia-card-content-limit-error {
-    background: #ea4a1757;
-    border: 0.0625rem solid #827127;
-    border-radius: 0.25rem;
-    color: #333;
-    padding-left: 0.25rem;
-  }
-  .oppia-shadow-preview-card {
-    left: -30000px;
-    max-width: 560px;
-    position: fixed;
-    top: -30000px;
-  }
-  .oppia-editor-edit-icon-position {
-    border: 0;
-    padding: 4px 4px;
-    position: absolute;
-    top: 9px;
-  }
-  .oppia-editor-edit-icon {
-     display: block;
-    }
-  @media screen and (max-width: 700px) {
-    .oppia-editor-edit-icon-position {
-      right: -20px;
-      top: 20px;
-    }
-  }
-</style>

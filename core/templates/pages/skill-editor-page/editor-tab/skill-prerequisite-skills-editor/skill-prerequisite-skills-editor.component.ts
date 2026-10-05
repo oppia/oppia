@@ -38,6 +38,7 @@ import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
   templateUrl: './skill-prerequisite-skills-editor.component.html',
+  styleUrls: ['./skill-prerequisite-skills-editor.component.css'],
 })
 export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

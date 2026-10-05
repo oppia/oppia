@@ -71,7 +71,8 @@ test.describe('Logged-in Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values',
-      'Place Values'
+      'Place Values',
+      true
     );
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
     await curriculumAdmin.publishClassroom('Math');
@@ -116,7 +117,7 @@ test.describe('Logged-in Learner', function () {
   });
 
   test('should display empty progress message when no lessons are in progress', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
       'Home'
     );
@@ -129,13 +130,13 @@ test.describe('Logged-in Learner', function () {
   });
 
   test('should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
       true
     );
     await loggedInLearner.navigateThroughClassroomButtonOnRLD();
-    await loggedInLearner.expectToBeOnPage('/learn/math');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser('/learn/math');
   });
 
   test('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
@@ -144,9 +145,9 @@ test.describe('Logged-in Learner', function () {
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(
@@ -171,13 +172,13 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectScreenshotToMatch(
       'ProgressSectionInProgressWithOnlyChapter02'
@@ -185,7 +186,7 @@ test.describe('Logged-in Learner', function () {
   });
 
   test("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -199,13 +200,13 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
@@ -218,13 +219,13 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(

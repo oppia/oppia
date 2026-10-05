@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import pathlib
 import tempfile
@@ -27,7 +26,9 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     change_domain,
+    classroom_config_services,
     email_services,
+    general_feedback_domain,
     html_cleaner,
     platform_parameter_list,
     platform_parameter_registry,
@@ -37,6 +38,7 @@ from core.domain import (
     subscription_services,
     suggestion_registry,
     taskqueue_services,
+    topic_services,
     user_services,
 )
 from core.platform import models
@@ -475,6 +477,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
+    feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID
+    ),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
@@ -559,6 +564,39 @@ def require_sender_id_is_valid(intent: str, sender_id: str) -> None:
         raise Exception(
             'Invalid sender_id for email with intent \'%s\'' % intent
         )
+
+
+def get_rendered_email_footer() -> str:
+    """Returns the email footer with its preferences-page URL resolved.
+
+    EMAIL_FOOTER may contain
+    feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER as a placeholder
+    for the preferences-page URL. A footer without the placeholder is
+    returned unchanged.
+
+    Returns:
+        str. The rendered email footer.
+    """
+    email_footer = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value
+    )
+    assert isinstance(email_footer, str)
+
+    if feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER not in email_footer:
+        return email_footer
+
+    oppia_site_url_for_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+        )
+    )
+    assert isinstance(oppia_site_url_for_emails, str)
+
+    preferences_url = oppia_site_url_for_emails + feconf.PREFERENCES_URL
+    return email_footer.replace(
+        feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER,
+        preferences_url,
+    )
 
 
 def _send_email(
@@ -683,6 +721,7 @@ def _send_email(
             taskqueue_services.enqueue_task(
                 feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
             )
+            return
 
         email_models.SentEmailModel.create(
             recipient_id,
@@ -692,7 +731,7 @@ def _send_email(
             intent,
             email_subject,
             cleaned_html_body,
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
         )
 
     _send_email_transactional()
@@ -773,9 +812,6 @@ def send_post_signup_email(
 ) -> None:
     """Sends a post-signup email to the given user.
 
-    Raises an exception if emails are not allowed to be sent to users (i.e.
-    SERVER_CAN_SEND_EMAILS platform parameter is False).
-
     Args:
         user_id: str. User ID of the user that signed up.
         test_for_duplicate_email: bool. For testing duplicate emails.
@@ -834,9 +870,7 @@ def send_post_signup_email(
             return
 
     recipient_username = user_services.get_username(user_id)
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username,
         email_body_content,
@@ -870,9 +904,7 @@ def get_moderator_unpublish_exploration_email() -> str:
         be sent.
     """
 
-    try:
-        require_moderator_email_prereqs_are_satisfied()
-    except utils.ValidationError:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         return ''
 
     unpublish_exp_email_html_body = platform_parameter_services.get_platform_parameter_value(
@@ -881,25 +913,6 @@ def get_moderator_unpublish_exploration_email() -> str:
     # Ruling out the possibility of Any for mypy type checking.
     assert isinstance(unpublish_exp_email_html_body, str)
     return unpublish_exp_email_html_body
-
-
-def require_moderator_email_prereqs_are_satisfied() -> None:
-    """Raises an exception if, for any reason, moderator emails cannot be sent.
-
-    Raises:
-        ValidationError. The SERVER_CAN_SEND_EMAILS platform parameter is False.
-    """
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        raise utils.ValidationError(
-            'For moderator emails to be sent, please ensure that '
-            'SERVER_CAN_SEND_EMAILS is set to True.'
-        )
 
 
 def send_moderator_action_email(
@@ -912,9 +925,6 @@ def send_moderator_action_email(
     """Sends a email immediately following a moderator action (unpublish,
     delete) to the given user.
 
-    Raises an exception if emails are not allowed to be sent to users (i.e.
-    SERVER_CAN_SEND_EMAILS platform parameter is False).
-
     Args:
         sender_id: str. User ID of the sender.
         recipient_id: str. User ID of the recipient.
@@ -924,7 +934,6 @@ def send_moderator_action_email(
         email_body: str. The email content/message.
     """
 
-    require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
     recipient_username = user_services.get_username(recipient_id)
@@ -946,9 +955,7 @@ def send_moderator_action_email(
     # called.
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
     full_email_content = '%s<br><br>%s<br><br>%s<br><br>%s' % (
         email_salutation_html,
         email_body,
@@ -1001,6 +1008,10 @@ def send_role_notification_email(
             EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     # Editor role email body and email subject templates.
     email_subject_template = '%s - invitation to collaborate'
 
@@ -1022,20 +1033,7 @@ def send_role_notification_email(
         '<br>%s'
     )
 
-    # Return from here if sending email is turned off.
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
     # Return from here is sending editor role email is disabled.
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send editor role emails to users.')
-        return
 
     recipient_username = user_services.get_username(recipient_id)
     inviter_username = user_services.get_username(inviter_id)
@@ -1052,9 +1050,7 @@ def send_role_notification_email(
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
     email_body = email_body_template % (
         recipient_username,
         inviter_username,
@@ -1098,6 +1094,10 @@ def send_emails_to_subscribers(
             has published.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     creator_name = user_services.get_username(creator_id)
     email_subject = '%s has published a new exploration!' % creator_name
     email_body_template = (
@@ -1112,19 +1112,6 @@ def send_emails_to_subscribers(
         '- The Oppia Team<br>'
         '<br>%s'
     )
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send subscription emails to users.')
-        return
 
     recipient_list = subscription_services.get_all_subscribers_of_creator(
         creator_id
@@ -1143,11 +1130,7 @@ def send_emails_to_subscribers(
     assert isinstance(noreply_email_address, str)
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
-            email_footer = (
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.EMAIL_FOOTER.value
-                )
-            )
+            email_footer = get_rendered_email_footer()
             email_body = email_body_template % (
                 username,
                 creator_name,
@@ -1163,6 +1146,489 @@ def send_emails_to_subscribers(
                 email_body,
                 noreply_email_address,
             )
+
+
+def _get_oppia_site_url_for_feedback_emails() -> str:
+    """Returns the Oppia site URL used for feedback email links.
+
+    Returns:
+        str. The Oppia site URL configured for email notifications.
+    """
+    oppia_site_url_for_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+        )
+    )
+    assert isinstance(oppia_site_url_for_emails, str)
+    return oppia_site_url_for_emails
+
+
+def _get_technical_feedback_url(
+    feedback: general_feedback_domain.PlatformFeedback,
+) -> str:
+    """Returns the URL for a technical feedback report.
+
+    Args:
+        feedback: PlatformFeedback. The platform feedback report.
+
+    Returns:
+        str. The URL to the specific technical feedback report.
+    """
+    return '%s/technical-feedback-dashboard/%s/%s' % (
+        _get_oppia_site_url_for_feedback_emails(),
+        feedback.destination_dashboard,
+        feedback.id,
+    )
+
+
+def _get_curriculum_feedback_url(
+    feedback: Union[
+        general_feedback_domain.LessonFeedback,
+        general_feedback_domain.PlatformFeedback,
+    ],
+) -> str:
+    """Returns the URL for a curriculum feedback report.
+
+    Args:
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson or curriculum platform feedback.
+
+    Returns:
+        str. The URL to the specific feedback report in the
+        Exploration Editor Feedback Tab.
+    """
+    assert feedback.lesson_metadata is not None
+
+    feedback_type = (
+        'lesson_feedback'
+        if isinstance(feedback, general_feedback_domain.LessonFeedback)
+        else 'lesson_issue'
+    )
+
+    return '%s/create/%s#/feedback/%s/%s' % (
+        _get_oppia_site_url_for_feedback_emails(),
+        feedback.lesson_metadata['exploration_id'],
+        feedback_type,
+        feedback.id,
+    )
+
+
+def _get_my_suggestions_tab_url(
+    feedback: general_feedback_domain.LessonFeedback,
+) -> str:
+    """Returns the URL for a curriculum feedback report on the My Suggestions Tab.
+
+    Args:
+        feedback: LessonFeedback. The submitted lesson feedback.
+
+    Returns:
+        str. The URL to the specific feedback report in the
+        My Suggestions Tab.
+    """
+    return '%s/learner-dashboard?active_tab=my-suggestions&feedback_id=%s' % (
+        _get_oppia_site_url_for_feedback_emails(),
+        feedback.id,
+    )
+
+
+def _get_classroom_feedback_recipient_email(
+    exploration_id: str,
+) -> str:
+    """Returns the feedback recipient email for an exploration's classroom.
+
+    Args:
+        exploration_id: str. The ID of the exploration associated with the
+            feedback.
+
+    Returns:
+        str. The email address configured to receive feedback for the
+        corresponding classroom.
+    """
+    topic_ids = topic_services.get_topic_ids_for_exploration_id(exploration_id)
+
+    for topic_id in topic_ids:
+        classroom = classroom_config_services.get_classroom_by_topic_id(
+            topic_id
+        )
+        if classroom is not None:
+            return classroom.feedback_recipient_email
+
+    return feconf.DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL
+
+
+def _get_curriculum_feedback_submission_email_body(
+    feedback: Union[
+        general_feedback_domain.LessonFeedback,
+        general_feedback_domain.PlatformFeedback,
+    ],
+    feedback_url: str,
+) -> str:
+    """Returns the email body for curriculum feedback submission.
+
+    Args:
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson or curriculum platform feedback.
+        feedback_url: str. URL to the specific feedback entry.
+
+    Returns:
+        str. The rendered HTML email body.
+    """
+    feedback_text = (
+        feedback.feedback_text
+        if isinstance(feedback, general_feedback_domain.LessonFeedback)
+        else feedback.report_message
+    )
+
+    assert feedback.lesson_metadata is not None
+    exp_id = feedback.lesson_metadata['exploration_id']
+
+    category_text = ''
+    if (
+        isinstance(feedback, general_feedback_domain.PlatformFeedback)
+        and feedback.category
+    ):
+        category_text = '<b>Category:</b> %s<br><br>' % feedback.category
+
+    return (
+        'Hi Lessons Team!<br><br>'
+        'A new feedback report has been submitted for exploration '
+        '<b>%s</b> on Oppia.<br><br>'
+        '<b>Feedback:</b><br>'
+        '%s<br><br>'
+        '%s'
+        'You can review and respond to this feedback using the '
+        '<a href="%s">Exploration Editor Feedback Tab</a>.<br><br>'
+        'Thanks for taking the time to review this feedback!<br>'
+        '- The Oppia Exploration Feedback Team'
+        % (
+            exp_id,
+            feedback_text,
+            category_text,
+            feedback_url,
+        )
+    )
+
+
+def _get_technical_feedback_submission_email_body(
+    feedback: general_feedback_domain.PlatformFeedback,
+    feedback_url: str,
+    team_name: str,
+) -> str:
+    """Returns the email body for technical-external and technical-internal feedback submission.
+
+    Args:
+        feedback: PlatformFeedback. The submitted platform feedback routed to the
+            technical-external dashboard.
+        feedback_url: str. URL to the specific feedback entry.
+        team_name: str. Name of the team responsible for the destination dashboard.
+
+    Returns:
+        str. The rendered HTML email body.
+    """
+    category_text = ''
+    if feedback.category and feedback.lesson_metadata:
+        category_text = (
+            'The feedback was categorized as <b>%s</b> for this exploration '
+            '<b>%s</b>.<br><br>'
+            % (
+                feedback.category,
+                feedback.lesson_metadata['exploration_id'],
+            )
+        )
+    return (
+        'Hi %s Team!<br><br>'
+        'A new technical feedback report has been submitted on Oppia.<br><br>'
+        '<b>Feedback:</b><br>'
+        '%s<br><br>'
+        '%s'
+        '<b>Page:</b> <a href="%s">%s</a><br><br>'
+        'You can review and, if found buggy, transfer this report to '
+        'GitHub using the <a href="%s">Technical Feedback Dashboard</a>.'
+        '<br><br>'
+        'Thanks for taking the time to review this feedback!<br>'
+        '- The Oppia Technical Feedback Dashboard Team'
+        % (
+            team_name,
+            feedback.report_message,
+            category_text,
+            feedback.page_url,
+            feedback.page_url,
+            feedback_url,
+        )
+    )
+
+
+def _get_feedback_status_change_email_body(
+    feedback: general_feedback_domain.LessonFeedback,
+    feedback_url: str,
+    author_id: str,
+) -> str:
+    """Returns the email body for a lesson feedback status change.
+
+    Args:
+        feedback: LessonFeedback. The lesson feedback whose status was changed.
+        feedback_url: str. URL to the specific feedback entry.
+        author_id: str. The ID of the user who submitted the feedback.
+
+    Returns:
+        str. The rendered HTML email body.
+    """
+    assert feedback.lesson_metadata is not None
+    exploration_id = feedback.lesson_metadata['exploration_id']
+    recipient_username = user_services.get_username(author_id)
+    return (
+        'Hi <b>%s</b>!<br><br>'
+        'The status of your feedback suggestion for exploration '
+        '<b>%s</b> has been updated to <b>%s</b>.<br><br>'
+        '<b>Your Feedback:</b><br>'
+        '%s<br><br>'
+        'You can view the feedback and its current status using the '
+        '<a href="%s">My Suggestions Tab</a>.<br><br>'
+        'Thanks for taking the time to share your feedback with us!<br>'
+        '- The Oppia Team'
+        % (
+            recipient_username,
+            exploration_id,
+            feedback.status,
+            feedback.feedback_text,
+            feedback_url,
+        )
+    )
+
+
+def _get_feedback_reply_email_body(
+    feedback: general_feedback_domain.LessonFeedback,
+    reply: str,
+    feedback_url: str,
+    author_id: str,
+) -> str:
+    """Returns the email body for a reply to lesson feedback.
+
+    Args:
+        feedback: LessonFeedback. The lesson feedback that received a reply.
+        reply: str. The reply message from the creator.
+        feedback_url: str. URL to the feedback in the My Suggestions Tab.
+        author_id: str. ID of the user who submitted the feedback.
+
+    Returns:
+        str. The rendered HTML email body.
+    """
+    assert feedback.lesson_metadata is not None
+    exploration_id = feedback.lesson_metadata['exploration_id']
+    recipient_username = user_services.get_username(author_id)
+
+    return (
+        'Hi <b>%s</b>!<br><br>'
+        'A creator has responded to your feedback suggestion for '
+        'exploration <b>%s</b> on Oppia.<br><br>'
+        '<b>Your Feedback:</b><br>'
+        '%s<br><br>'
+        '<b>Creator Response:</b><br>'
+        '%s<br><br>'
+        'You can view the full feedback thread and reply using the '
+        '<a href="%s">My Suggestions Tab</a>.<br><br>'
+        'Thanks for taking the time to help improve Oppia!<br>'
+        '- The Oppia Team'
+        % (
+            recipient_username,
+            exploration_id,
+            feedback.feedback_text,
+            reply,
+            feedback_url,
+        )
+    )
+
+
+def send_feedback_submission_email(
+    feedback: Union[
+        general_feedback_domain.LessonFeedback,
+        general_feedback_domain.PlatformFeedback,
+    ],
+) -> None:
+    """Sends an email notification when feedback is submitted.
+
+    For lesson feedback and platform feedback routed to the curriculum
+    dashboard, the email is sent to the feedback email recipients configured
+    for the corresponding classroom.
+
+    For platform feedback routed to the technical dashboards, the email is
+    sent to the team responsible for the destination dashboard. Feedback
+    routed to the technical-internal dashboard is sent to the CORE team,
+    while feedback routed to the technical-external dashboard is sent to
+    the LEAP team.
+
+    Args:
+        feedback: Union[LessonFeedback, PlatformFeedback]. The submitted lesson feedback or platform feedback for
+            which the notification should be sent.
+    """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send feedback message emails to users.')
+        return
+
+    if isinstance(feedback, general_feedback_domain.LessonFeedback):
+        email_subject = (
+            'New Lesson Feedback Suggestion submitted for %s on Oppia'
+            % (feedback.lesson_metadata['exploration_id'])
+        )
+        recipient_id = 'lesson-creation-team'
+        recipient_email = _get_classroom_feedback_recipient_email(
+            feedback.lesson_metadata['exploration_id']
+        )
+        email_body = _get_curriculum_feedback_submission_email_body(
+            feedback,
+            feedback_url=_get_curriculum_feedback_url(feedback),
+        )
+
+    elif feedback.destination_dashboard == feconf.DESTINATION_CURRICULUM:
+        assert feedback.lesson_metadata is not None
+        recipient_id = 'lesson-creation-team'
+        email_subject = (
+            'New Lesson Feedback Report submitted for %s on Oppia'
+            % (feedback.lesson_metadata['exploration_id'])
+        )
+        recipient_email = _get_classroom_feedback_recipient_email(
+            feedback.lesson_metadata['exploration_id']
+        )
+        email_body = _get_curriculum_feedback_submission_email_body(
+            feedback,
+            feedback_url=_get_curriculum_feedback_url(feedback),
+        )
+
+    elif (
+        feedback.destination_dashboard
+        == feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+    ):
+        email_subject = 'New Technical Feedback Report submitted for Oppia'
+        recipient_id = 'web-leap-leads'
+        recipient_email = feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM_EMAIL
+        email_body = _get_technical_feedback_submission_email_body(
+            feedback,
+            feedback_url=_get_technical_feedback_url(feedback),
+            team_name='LEAP',
+        )
+
+    elif (
+        feedback.destination_dashboard
+        == feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM
+    ):
+        email_subject = 'New Technical Feedback Report submitted for Oppia'
+        recipient_id = 'web-core-leads'
+        recipient_email = feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM_EMAIL
+        email_body = _get_technical_feedback_submission_email_body(
+            feedback,
+            feedback_url=_get_technical_feedback_url(feedback),
+            team_name='CORE',
+        )
+
+    else:
+        raise utils.InvalidInputException(
+            'Invalid destination dashboard: %s' % feedback.destination_dashboard
+        )
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(system_email_address, str)
+
+    _send_email(
+        recipient_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject,
+        email_body,
+        system_email_address,
+        recipient_email=recipient_email,
+    )
+
+
+def send_feedback_status_change_email(
+    feedback: general_feedback_domain.LessonFeedback, author_id: str
+) -> None:
+    """Sends an email notification when the status of lesson feedback
+    changes.
+
+    Args:
+        feedback: LessonFeedback. The lesson feedback whose status was changed.
+        author_id: str. The ID of the user who submitted the feedback.
+    """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send feedback message emails to users.')
+        return
+
+    email_subject = (
+        'Your Lesson Feedback Status Has Been Updated for %s on Oppia'
+        % feedback.lesson_metadata['exploration_id']
+    )
+
+    email_body = _get_feedback_status_change_email_body(
+        feedback,
+        feedback_url=_get_my_suggestions_tab_url(feedback),
+        author_id=author_id,
+    )
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(system_email_address, str)
+
+    _send_email(
+        author_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject,
+        email_body,
+        system_email_address,
+    )
+
+
+def send_feedback_reply_email(
+    feedback: general_feedback_domain.LessonFeedback, reply: str, author_id: str
+) -> None:
+    """Sends an email notification when a feedback thread receives
+    a reply.
+
+    Args:
+        feedback: LessonFeedback. The lesson feedback that received a reply.
+        reply: str. The reply message from the creator.
+        author_id: str. The ID of the user who submitted the feedback.
+    """
+    assert feedback.lesson_metadata is not None
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send feedback message emails to users.')
+        return
+
+    email_subject = (
+        'A Creator Has Responded to Your Feedback on %s'
+        % feedback.lesson_metadata['exploration_id']
+    )
+
+    email_body = _get_feedback_reply_email_body(
+        feedback,
+        reply,
+        feedback_url=_get_my_suggestions_tab_url(feedback),
+        author_id=author_id,
+    )
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        )
+    )
+    assert isinstance(system_email_address, str)
+
+    _send_email(
+        author_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject,
+        email_body,
+        system_email_address,
+    )
 
 
 def send_feedback_message_email(
@@ -1181,6 +1647,10 @@ def send_feedback_message_email(
                 }
             }
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject_template = (
         'You\'ve received %s new message%s on your explorations'
     )
@@ -1199,19 +1669,6 @@ def send_feedback_message_email(
         'The Oppia Team<br>'
         '<br>%s'
     )
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
 
     if not feedback_messages:
         return
@@ -1234,9 +1691,7 @@ def send_feedback_message_email(
         (count_messages, 's') if count_messages > 1 else ('a', '')
     )
 
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
 
     email_body = email_body_template % (
         recipient_username,
@@ -1322,6 +1777,10 @@ def send_suggestion_email(
         recipient_list: list(str). The user IDs of the email recipients.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_subject = 'New suggestion for "%s"' % exploration_title
 
     email_body_template = (
@@ -1337,26 +1796,11 @@ def send_suggestion_email(
         '<br>%s'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
-
     author_username = user_services.get_username(author_id)
     can_users_receive_email = can_users_receive_thread_email(
         recipient_list, exploration_id, True
     )
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
@@ -1407,6 +1851,10 @@ def send_instant_feedback_message_email(
         thread_title: str. The title of the feedback thread.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
@@ -1419,27 +1867,12 @@ def send_instant_feedback_message_email(
         '<br>%s'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
-        logging.error('This app cannot send feedback message emails to users.')
-        return
-
     sender_username = user_services.get_username(sender_id)
     recipient_username = user_services.get_username(recipient_id)
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
-        email_footer = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        )
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             thread_title,
@@ -1479,6 +1912,10 @@ def send_flag_exploration_email(
         reporter_id: str. The user ID of the reporter.
         report_text: str. The message entered by the reporter.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Exploration flagged by user: "%s"' % exploration_title
 
     email_body_template = (
@@ -1494,20 +1931,9 @@ def send_flag_exploration_email(
         '<br>%s'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
     reporter_username = user_services.get_username(reporter_id)
 
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
 
     email_body = email_body_template % (
         reporter_username,
@@ -1549,6 +1975,10 @@ def send_mail_to_onboard_new_reviewers(
         category: str. The category that the user is being offered to review.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_subject = 'Invitation to review suggestions'
 
     email_body_template = (
@@ -1571,15 +2001,6 @@ def send_mail_to_onboard_new_reviewers(
         '<br>%s'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
     recipient_username = user_services.get_username(recipient_id)
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id
@@ -1587,9 +2008,7 @@ def send_mail_to_onboard_new_reviewers(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        )
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             category,
@@ -1624,6 +2043,10 @@ def send_mail_to_notify_users_to_review(
         category: str. The category of the suggestions to review.
     """
 
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_subject = 'Notification to review suggestions'
 
     email_body_template = (
@@ -1639,15 +2062,6 @@ def send_mail_to_notify_users_to_review(
         '<br>%s'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
     recipient_username = user_services.get_username(recipient_id)
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id
@@ -1655,9 +2069,7 @@ def send_mail_to_notify_users_to_review(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        )
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             category,
@@ -1703,7 +2115,7 @@ def _create_html_for_reviewable_suggestion_email_info(
         reviewable_suggestion_email_info.language_code
     )
     # Calculate how long the suggestion has been waiting for review.
-    suggestion_review_wait_time = datetime.datetime.utcnow() - (
+    suggestion_review_wait_time = utils.get_current_utc_datetime() - (
         reviewable_suggestion_email_info.submission_datetime
     )
     # Get a string composed of the largest time unit that has a
@@ -1773,12 +2185,8 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             content and review submission date. The objects are sorted in
             descending order based on review wait time.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1937,12 +2345,8 @@ def send_reviewer_notifications(
         reviewer_ids_by_language: dict. A dictionary that organizes reviewer
             IDs by language code.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2036,12 +2440,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2235,6 +2635,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             suggestions we're notifying reviewers about and will be used to
             compose the email body for each reviewer.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
         'email_subject'
     ]
@@ -2243,15 +2647,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             'email_body_template'
         ]
     )
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -2284,9 +2679,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         )
     )
 
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
+    email_footer = get_rendered_email_footer()
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
@@ -2356,12 +2749,8 @@ def send_mail_to_notify_contributor_ranking_achievement(
             ContributorMilestoneEmailInfo. An object with contributor ranking
             email information.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2437,12 +2826,8 @@ def send_reminder_mail_to_notify_curriculum_admins(
             of stories having behind-schedule or upcoming chapters to be
             notified.
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
     if len(curriculum_admin_ids) == 0:
@@ -2550,6 +2935,10 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         user_id: str. The id of the user whose account got deleted.
         user_email: str. The email of the user whose account got deleted.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Account deleted'
 
     email_body_template = (
@@ -2557,15 +2946,6 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         'Your account was successfully deleted.<br><br>'
         '- The Oppia Team'
     )
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     email_body = email_body_template % user_email
     noreply_email_address = (
@@ -2621,6 +3001,10 @@ def send_email_to_new_cd_user(
         Exception. The language_code cannot be None if the
             category is 'translation'.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     if category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
@@ -2651,15 +3035,7 @@ def send_email_to_new_cd_user(
         category_description = category_data['description']
         rights_message = category_data['rights_message']
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
-
+    email_body = ''
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
     if category in [
@@ -2743,6 +3119,10 @@ def send_email_to_removed_cd_user(
         Exception. The language_code cannot be None if the review category is
             'translation'.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     if category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
@@ -2785,15 +3165,6 @@ def send_email_to_removed_cd_user(
         'Best wishes,<br>'
         'The Oppia Community'
     )
-
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        logging.error('This app cannot send emails to users.')
-        return
 
     recipient_username = user_services.get_username(user_id)
     can_user_receive_email = user_services.get_email_preferences(
@@ -2845,6 +3216,10 @@ def send_not_mergeable_change_list_to_admin_for_review(
         change_list_dict: dict. Dict of the changes made by the
             user on the frontend, which are not mergeable.
     """
+
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
     email_subject = 'Some changes were rejected due to a conflict'
     email_body_template = (
         'Hi Admin,<br><br>'
@@ -2857,19 +3232,13 @@ def send_not_mergeable_change_list_to_admin_for_review(
         'Thanks!'
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
+    email_body = email_body_template % (
+        exp_id,
+        change_list_dict,
+        frontend_version,
+        backend_version,
     )
-    if server_can_send_emails:
-        email_body = email_body_template % (
-            exp_id,
-            change_list_dict,
-            frontend_version,
-            backend_version,
-        )
-        send_mail_to_admin(email_subject, email_body)
+    send_mail_to_admin(email_subject, email_body)
 
 
 def verify_mailchimp_secret(secret: str) -> bool:
@@ -3121,3 +3490,77 @@ def send_emails_to_voiceover_tech_leads(
     )
 
     _delete_voiceover_error_attachments(filename_to_path)
+
+
+# Central registry of supported machine translation providers.
+# To add a new provider: add one entry here — no other code changes needed.
+# To remove a provider: delete its entry — the function will fall back to
+# generic troubleshooting guidance automatically.
+MACHINE_TRANSLATION_PROVIDERS = {
+    'azure': {
+        'display_name': 'Azure Translator',
+        'documentation_link': (
+            'https://learn.microsoft.com/en-us/azure/ai-services/'
+            'translator/reference/v3-0-reference#errors'
+        ),
+    },
+    'gcp': {
+        'display_name': 'Google Cloud',
+        'documentation_link': (
+            'https://docs.cloud.google.com/translate/troubleshooting'
+        ),
+    },
+}
+
+
+def send_machine_translation_failure_email(
+    provider_id: str, error_message: str
+) -> None:
+    """Sends an email to the translation tech support team when the machine
+    translation API fails (e.g., due to quota exhaustion or timeouts).
+
+    Args:
+        provider_id: str. The ID of the provider that failed (e.g., 'azure').
+        error_message: str. The exception message or error details.
+    """
+    provider_config = MACHINE_TRANSLATION_PROVIDERS.get(provider_id.lower(), {})
+    display_name = provider_config.get('display_name', provider_id.capitalize())
+    documentation_link = provider_config.get('documentation_link')
+
+    email_subject = (
+        '[Action Required]: Automatic Translation Failed: %s' % display_name
+    )
+
+    if documentation_link:
+        documentation_line = (
+            '- Refer to the provider\'s documentation for a full list of '
+            'possible errors: %s\n' % documentation_link
+        )
+    else:
+        documentation_line = (
+            '- No documentation link is available for this provider. '
+            'Please check the provider\'s official documentation for '
+            'troubleshooting guidance.\n'
+        )
+
+    email_body = (
+        'The machine translation API for provider "%s" has failed.\n\n'
+        'How to resolve this:\n'
+        '- Check the cloud console to ensure quotas have not been '
+        'exhausted.\n'
+        '- Verify that the billing account is active and in good '
+        'standing.\n'
+        '%s'
+        '- If the above steps do not resolve the issue, please forward '
+        'this email to the engineering team for technical support.\n\n'
+        'Error Details for Engineering:\n'
+        '%s\n'
+    ) % (display_name, documentation_line, error_message)
+
+    email_services.send_mail(
+        feconf.SYSTEM_EMAIL_ADDRESS,
+        feconf.TRANSLATION_TECH_SUPPORT_EMAIL,
+        email_subject,
+        email_body,
+        email_body.replace('\n', '<br/>'),
+    )

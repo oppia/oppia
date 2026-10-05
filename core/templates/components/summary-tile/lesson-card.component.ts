@@ -32,6 +32,7 @@ import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.ser
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
+  styleUrls: ['./lesson-card.component.css'],
 })
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;

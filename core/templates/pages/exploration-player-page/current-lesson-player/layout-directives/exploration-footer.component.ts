@@ -17,12 +17,7 @@
  * in exploration player.
  */
 
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
@@ -48,7 +43,6 @@ import {ProgressReminderModalComponent} from 'pages/exploration-player-page/curr
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import './exploration-footer.component.css';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from '../../../../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -58,7 +52,6 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
   selector: 'oppia-exploration-footer',
   templateUrl: './exploration-footer.component.html',
   styleUrls: ['./exploration-footer.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationFooterComponent {
   directiveSubscriptions = new Subscription();

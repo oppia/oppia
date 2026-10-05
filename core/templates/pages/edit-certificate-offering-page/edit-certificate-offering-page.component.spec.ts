@@ -29,7 +29,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
@@ -154,7 +154,6 @@ describe('Edit Certificate Offering Page Component', () => {
       'loaded_classroom',
       {topic_1: 1},
       3,
-      15,
       [],
       'Available',
       1
@@ -184,7 +183,7 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(alertsSpy).toHaveBeenCalledWith(
       'The certificate offering could not be loaded.'
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should correctly evaluate active sections', () => {
@@ -248,7 +247,7 @@ describe('Edit Certificate Offering Page Component', () => {
 
     component.navigateBackToDashboard();
 
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   });
 
   it('should update certificate offering successfully and navigate away', fakeAsync(() => {
@@ -274,6 +273,9 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(modalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
+    expect(modalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       jasmine.objectContaining({
@@ -281,7 +283,7 @@ describe('Edit Certificate Offering Page Component', () => {
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should open the post-result modal for updated certificates and navigate after dismissal', fakeAsync(() => {
@@ -313,6 +315,9 @@ describe('Edit Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(firstModalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       jasmine.objectContaining({
@@ -323,7 +328,7 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(secondModalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should save certificate offering as not ready and navigate away', fakeAsync(() => {
@@ -350,7 +355,7 @@ describe('Edit Certificate Offering Page Component', () => {
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should not navigate or show alert if certificate update returns falsy value', fakeAsync(() => {

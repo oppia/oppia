@@ -245,11 +245,81 @@ class UtilsTests(test_utils.GenericTestBase):
                 )
             )
 
+    def test_are_datetimes_close_with_aware_utc_datetimes(self) -> None:
+        initial_time = datetime.datetime(
+            2016, 12, 1, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 1, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 3, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+
+    def test_are_datetimes_close_with_naive_and_aware_datetimes(self) -> None:
+        initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 1, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 0, 0, 3, tzinfo=datetime.timezone.utc
+                    ),
+                    initial_time,
+                )
+            )
+
+    def test_are_datetimes_close_with_non_utc_aware_datetime(self) -> None:
+        ist_timezone = datetime.timezone(
+            datetime.timedelta(hours=5, minutes=30)
+        )
+        initial_time = datetime.datetime(
+            2016, 12, 1, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+
+        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 5, 30, 1, tzinfo=ist_timezone
+                    ),
+                    initial_time,
+                )
+            )
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(
+                        2016, 12, 1, 5, 30, 3, tzinfo=ist_timezone
+                    ),
+                    initial_time,
+                )
+            )
+
     def test_conversion_between_string_and_naive_datetime_object(self) -> None:
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_utc_datetime()
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
                 utils.convert_naive_datetime_to_string(now)
@@ -914,12 +984,17 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_human_readable_time_string(-1.42)
 
     def test_get_number_of_days_since_date(self) -> None:
-        self.assertEqual(
-            90,
-            utils.get_number_of_days_since_date(
-                datetime.date.today() - datetime.timedelta(days=90)
-            ),
-        )
+        mock_current_date = datetime.date(2025, 1, 1)
+
+        with self.swap(
+            utils, 'get_current_utc_date', lambda: mock_current_date
+        ):
+            self.assertEqual(
+                90,
+                utils.get_number_of_days_since_date(
+                    mock_current_date - datetime.timedelta(days=90)
+                ),
+            )
 
     def test_generate_new_session_id(self) -> None:
         test_string = utils.generate_new_session_id()
@@ -1063,6 +1138,12 @@ class UtilsTests(test_utils.GenericTestBase):
                 ),
             ),
         )
+
+    def test_get_current_utc_datetime_returns_naive_utc_datetime(self) -> None:
+        # TODO(#26624): This will be updated to assertIsNotNone after
+        # AwareDateTimeProperty is implemented in PR 3.
+        current_time = utils.get_current_utc_datetime()
+        self.assertIsNone(current_time.tzinfo)
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:
         time_instance1 = utils.get_current_time_in_millisecs()

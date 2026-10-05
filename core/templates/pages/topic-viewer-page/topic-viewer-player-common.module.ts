@@ -26,27 +26,58 @@ import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-sto
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
 import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
-import {TopicPracticeCardComponent} from './topic-story-section/topic-practice-card/topic-practice-card.component';
+import {ModuleEndTestCardComponent} from './topic-story-section/module-end-test-card.component';
+import {ModuleCircleBadgeComponent} from './topic-story-section/module-circle-badge.component';
+import {ModuleNavigationComponent} from './topic-story-section/module-navigation.component';
+import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
+import {MasteryChallengeLockedModalComponent} from './topic-story-section/mastery-challenge-locked-modal.component';
+import {ModuleSkipConfirmationModalComponent} from './topic-story-section/module-skip-confirmation-modal.component';
+import {ModuleMasteredModalComponent} from './topic-story-section/module-mastered-modal.component';
+import {TopicHeaderComponent} from './topic-header/topic-header.component';
+import {TopicViewerContentComponent} from './topic-viewer-content/topic-viewer-content.component';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, MatCardModule, SharedComponentsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatBottomSheetModule,
+    MatCardModule,
+    SharedComponentsModule,
+  ],
   declarations: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    TopicPracticeCardComponent,
+    ModuleEndTestCardComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
+    MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
   entryComponents: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
-    TopicPracticeCardComponent,
+    ModuleEndTestCardComponent,
     LanguageSelectorComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
+    MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
   exports: [
     StoriesListComponent,
@@ -54,7 +85,15 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     LanguageSelectorComponent,
-    TopicPracticeCardComponent,
+    ModuleEndTestCardComponent,
+    ModuleCircleBadgeComponent,
+    ModuleNavigationComponent,
+    MasteryChallengeCardComponent,
+    MasteryChallengeLockedModalComponent,
+    ModuleSkipConfirmationModalComponent,
+    ModuleMasteredModalComponent,
+    TopicHeaderComponent,
+    TopicViewerContentComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

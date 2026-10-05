@@ -17,10 +17,23 @@
  * dismiss.
  */
 
+import {Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 export class ConfirmOrCancelModal {
-  constructor(protected modalInstance: NgbActiveModal) {}
+  constructor(
+    @Optional() protected modalInstance: NgbActiveModal,
+    @Optional() protected bottomSheetRef?: MatBottomSheetRef
+  ) {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.bottomSheetRef?.dismiss();
+        }
+      });
+    }
+  }
 
   /**
    * Function called upon an affirmative user action.
@@ -29,10 +42,18 @@ export class ConfirmOrCancelModal {
    * optional.
    */
   confirm<T>(value?: T): void {
-    this.modalInstance.close(value);
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss(value);
+    } else {
+      this.modalInstance.close(value);
+    }
   }
 
   cancel<T>(value: T | 'cancel' = 'cancel'): void {
-    this.modalInstance.dismiss(value);
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss(value);
+    } else {
+      this.modalInstance.dismiss(value);
+    }
   }
 }

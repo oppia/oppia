@@ -59,6 +59,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/controllers/firebase*.py',
     '/core/domain/android*.py',
     '/core/domain/html*.py',
+    '/core/domain/html_translation_services*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
@@ -119,8 +120,7 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
             if (not self._is_path_ignored(dir_path + '/')) and (
                 dir_path not in exclude_dirs
             ):
-                for x in self._walk_with_gitignore(dir_path, exclude_dirs):
-                    yield x
+                yield from self._walk_with_gitignore(dir_path, exclude_dirs)
 
     def _is_path_ignored(self, path_to_check: str) -> bool:
         """Checks whether the given path is ignored by git.

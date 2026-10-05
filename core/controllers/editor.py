@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feature_flag_list, feconf, utils
@@ -36,7 +35,6 @@ from core.domain import (
     question_services,
     rights_domain,
     rights_manager,
-    search_services,
     state_domain,
     stats_domain,
     stats_services,
@@ -674,7 +672,6 @@ class ExplorationStatusHandler(
         exp_services.publish_exploration_and_update_user_profiles(
             self.user, exploration_id
         )
-        exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id: str) -> None:
@@ -748,11 +745,9 @@ class ExplorationModeratorRightsHandler(
             raise self.InvalidInputException(
                 'Moderator actions should include an email to the recipient.'
             )
-        email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
-        search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
         # Send an email to the all owners of the exploration notifying them
@@ -1518,7 +1513,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                 )
             elif can_voiceover:
                 exp_services.create_or_update_draft(
@@ -1526,7 +1521,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    datetime.datetime.utcnow(),
+                    utils.get_current_utc_datetime(),
                     is_by_voice_artist=True,
                 )
         except utils.ValidationError as e:
@@ -1784,6 +1779,7 @@ class LearnerAnswerInfoHandler(
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
+        state_reference = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
             if not state_name:
@@ -1797,6 +1793,11 @@ class LearnerAnswerInfoHandler(
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )
+        # NOTE: URL_PATH_ARGS_SCHEMAS handles entity_type validation via raising
+        # exceptions, so this assertion is purely for satisfying mypy; adding an
+        # else branch here would only introduce unreachable code.
+        assert state_reference is not None
+
         learner_answer_info_id = self.normalized_request[
             'learner_answer_info_id'
         ]

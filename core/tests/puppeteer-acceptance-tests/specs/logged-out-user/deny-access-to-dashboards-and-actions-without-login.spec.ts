@@ -36,15 +36,6 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should not be able to add an exploration to "play later" from the community library page.',
-    async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage(false);
-      await loggedOutUser.expectCannotAddExplorationToPlayLater();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should not be able to visit the learner dashboard.',
     async function () {
       await loggedOutUser.navigateToLearnerDashboard(false);

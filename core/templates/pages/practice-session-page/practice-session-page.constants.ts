@@ -24,9 +24,32 @@ export const PracticeSessionPageConstants = {
     '<topic_url_fragment>?selected_subtopic_ids=' +
     '<stringified_subtopic_ids>',
 
+  LESSON_PRACTICE_DATA_URL:
+    '/practice_session/data/<classroom_url_fragment>/' +
+    '<topic_url_fragment>/<node_id>',
+
+  ARC_PRACTICE_DATA_URL:
+    '/practice_session/data/<classroom_url_fragment>/' +
+    '<topic_url_fragment>/arc/<arc_id>',
+
+  MASTERY_CHALLENGE_DATA_URL:
+    '/practice_session/data/<classroom_url_fragment>/' + '<topic_url_fragment>',
+
   TOPIC_VIEWER_PAGE: '/learn/<classroom_url_fragment>/<topic_url_fragment>',
 
   PRACTICE_SESSIONS_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
     'session?selected_subtopic_ids=<stringified_subtopic_ids>',
+
+  LESSON_PRACTICE_URL:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
+    '<node_id>',
+
+  END_OF_ARC_URL:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/test/arc/' +
+    '<arc_id>',
+
+  MASTERY_CHALLENGE_URL:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/' +
+    'mastery-challenge',
 } as const;

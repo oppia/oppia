@@ -26,7 +26,7 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'login-required-message',
   templateUrl: './login-required-message.component.html',
-  styleUrls: [],
+  styleUrls: ['./login-required-message.component.css'],
 })
 export class LoginRequiredMessageComponent {
   // These properties are initialized using Angular lifecycle hooks

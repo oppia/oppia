@@ -44,6 +44,7 @@ interface CopierCustomizationArgs {
 @Component({
   selector: 'param-changes-editor',
   templateUrl: './param-changes-editor.component.html',
+  styleUrls: ['./param-changes-editor.component.css'],
 })
 export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   @Input() paramChangesServiceName!:

@@ -24,7 +24,7 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingTopicData,
-} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
@@ -37,11 +37,11 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
-import './edit-certificate-offering-page.component.css';
 
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
   templateUrl: './edit-certificate-offering-page.component.html',
+  styleUrls: ['./edit-certificate-offering-page.component.css'],
 })
 export class EditCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
@@ -49,6 +49,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   isCertificateValid: boolean = true;
+  isLoadingCertificateOffering: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -76,7 +77,9 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       this.alertsService.addWarning(
         'The certificate offering could not be loaded.'
       );
-      this.router.navigate(['/certificate-offering-dashboard']);
+      this.router.navigate(['/certificate-creator-dashboard']);
+    } finally {
+      this.isLoadingCertificateOffering = false;
     }
   }
 
@@ -128,6 +131,8 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
@@ -148,8 +153,6 @@ export class EditCertificateOfferingPageComponent implements OnInit {
           topic_data: this.certificateAssessmentOffering.topicData,
           demonstrates: this.certificateAssessmentOffering.demonstrates,
           total_questions: this.certificateAssessmentOffering.totalQuestions,
-          time_limit_in_minutes:
-            this.certificateAssessmentOffering.timeLimitInMinutes,
           async_status:
             action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
               ? 'Not_Ready'
@@ -199,6 +202,6 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }

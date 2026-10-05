@@ -76,7 +76,7 @@ class FrontendSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
 
 class FrontendBaseSuggestionDict(TypedDict):
     """Dictionary representing the frontend BaseSuggestion object
-    with additional 'exploration_content_html' key.
+    with additional 'entity_content_html' key.
     """
 
     suggestion_id: str
@@ -92,7 +92,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: Optional[Union[str, List[str]]]
+    entity_content_html: Optional[Union[str, List[str]]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -251,9 +251,7 @@ class SuggestionHandler(
             assert isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             )
-            self._copy_images_from_target_exploration_content_to_translation(
-                suggestion
-            )
+            self._copy_images_from_target_content_to_translation(suggestion)
 
             files = self.normalized_payload.get('files')
             new_image_filenames = (
@@ -301,19 +299,19 @@ class SuggestionHandler(
                 image_is_compressible,
             )
 
-    def _copy_images_from_target_exploration_content_to_translation(
+    def _copy_images_from_target_content_to_translation(
         self, suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
-        """Creates copies of images from the suggestion's target exploration
+        """Creates copies of images from the suggestion's target content
         for the translation suggestion to use.
 
         Args:
             suggestion: SuggestionTranslateContent. The translation suggestion
-                to copy its target exploration's images to.
+                to copy its target content's images to.
 
         Raises:
-            Exception. An image in the target exploration's content is not a
-                saved asset belonging to the target exploration.
+            Exception. An image in the target entity's content is not a
+                saved asset belonging to the target entity.
         """
         target_image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -646,22 +644,32 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-            target_entity_html_list = (
-                suggestion.get_target_entity_html_strings()
-            )
-            target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list
+            # Only question suggestions copy images at this point, because they
+            # are stored under the question suggestion image context. Images in
+            # a translation suggestion are copied at submission time instead,
+            # by _copy_images_from_target_content_to_translation, which handles
+            # every target type. This mirrors the exploration action handler,
+            # which does not copy images on accept either.
+            if (
+                suggestion.suggestion_type
+                == feconf.SUGGESTION_TYPE_ADD_QUESTION
+            ):
+                target_entity_html_list = (
+                    suggestion.get_target_entity_html_strings()
                 )
-            )
+                target_image_filenames = (
+                    html_cleaner.get_image_filenames_from_html_strings(
+                        target_entity_html_list
+                    )
+                )
 
-            fs_services.copy_images(
-                suggestion.target_type,
-                suggestion.target_id,
-                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-                suggestion.target_id,
-                target_image_filenames,
-            )
+                fs_services.copy_images(
+                    suggestion.target_type,
+                    suggestion.target_id,
+                    feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+                    suggestion.target_id,
+                    target_image_filenames,
+                )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
@@ -673,6 +681,10 @@ class SuggestionToSkillActionHandler(
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestion_services.update_question_review_stats(suggestion)
+        elif suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
@@ -704,7 +716,7 @@ class SuggestionsProviderHandler(
             InvalidInputException. If the given target_type of suggestion_type
                 are invalid.
         """
-        if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
+        if target_type not in feconf.SUGGESTION_LIST_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
                 'Invalid target_type: %s' % target_type
             )
@@ -713,6 +725,32 @@ class SuggestionsProviderHandler(
             raise self.InvalidInputException(
                 'Invalid suggestion_type: %s' % suggestion_type
             )
+
+        # Only translation suggestions span several entity types, so they are
+        # the only ones that can be listed without a target type. A question
+        # suggestion always targets a skill.
+        if (
+            target_type == feconf.SUGGESTION_TARGET_TYPE_SENTINEL_ALL
+            and suggestion_type != feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            raise self.InvalidInputException(
+                'Invalid target_type: %s is only supported for %s suggestions'
+                % (target_type, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            )
+
+    def _get_target_type_filter(self, target_type: str) -> Optional[str]:
+        """Returns the target type to filter suggestions by.
+
+        Args:
+            target_type: str. The target type supplied in the URL.
+
+        Returns:
+            str|None. The target type to filter by, or None when the sentinel
+            asking for every target type was supplied.
+        """
+        if target_type == feconf.SUGGESTION_TARGET_TYPE_SENTINEL_ALL:
+            return None
+        return target_type
 
     def _render_suggestions(
         self,
@@ -728,32 +766,65 @@ class SuggestionsProviderHandler(
             next_offset: int. The number of results to skip from the beginning
                 of all results matching the original query.
         """
-        if target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            target_id_to_exp_opportunity_dict = (
-                _get_target_id_to_exploration_opportunity_dict(suggestions)
-            )
-            self.render_json(
-                {
-                    'suggestions': _construct_exploration_suggestions(
-                        suggestions
-                    ),
-                    'target_id_to_opportunity_dict': target_id_to_exp_opportunity_dict,
-                    'next_offset': next_offset,
-                }
-            )
-        elif target_type == feconf.ENTITY_TYPE_SKILL:
-            target_id_to_skill_opportunity_dict = (
-                _get_target_id_to_skill_opportunity_dict(suggestions)
-            )
-            self.render_json(
-                {
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_id_to_opportunity_dict': target_id_to_skill_opportunity_dict,
-                    'next_offset': next_offset,
-                }
-            )
-        else:
+        if target_type not in (
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_SKILL,
+            feconf.SUGGESTION_TARGET_TYPE_SENTINEL_ALL,
+        ):
             self.render_json({})
+            return
+
+        # Each suggestion is rendered according to its own target type rather
+        # than the requested one, so that a response can mix entity types when
+        # the caller asked for every target type.
+        exploration_suggestions = [
+            suggestion
+            for suggestion in suggestions
+            if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        ]
+        skill_suggestions = [
+            suggestion
+            for suggestion in suggestions
+            if suggestion.target_type == feconf.ENTITY_TYPE_SKILL
+        ]
+        suggestion_id_to_exploration_dict = {
+            suggestion_dict['suggestion_id']: suggestion_dict
+            for suggestion_dict in _construct_exploration_suggestions(
+                exploration_suggestions
+            )
+        }
+        target_id_to_opportunity_dict: Dict[
+            str,
+            Optional[
+                Union[
+                    opportunity_domain.PartialExplorationOpportunitySummaryDict,
+                    opportunity_domain.TranslationOpportunityCardInfoDict,
+                    FrontendSkillOpportunityDict,
+                ]
+            ],
+        ] = {
+            **_get_target_id_to_exploration_opportunity_dict(
+                exploration_suggestions
+            ),
+            **_get_target_id_to_skill_opportunity_dict(skill_suggestions),
+        }
+        self.render_json(
+            {
+                'suggestions': [
+                    (
+                        suggestion_id_to_exploration_dict[
+                            suggestion.suggestion_id
+                        ]
+                        if suggestion.target_type
+                        == feconf.ENTITY_TYPE_EXPLORATION
+                        else suggestion.to_dict()
+                    )
+                    for suggestion in suggestions
+                ],
+                'target_id_to_opportunity_dict': target_id_to_opportunity_dict,
+                'next_offset': next_offset,
+            }
+        )
 
 
 class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
@@ -764,7 +835,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     limit: Optional[int]
     offset: int
     sort_key: str
-    exploration_id: Optional[str]
+    entity_id: Optional[str]
     topic_name: Optional[str]
 
 
@@ -782,7 +853,7 @@ class ReviewableSuggestionsHandler(
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
+            'choices': feconf.SUGGESTION_LIST_TARGET_TYPE_CHOICES,
         },
         'suggestion_type': {
             'schema': {
@@ -810,7 +881,7 @@ class ReviewableSuggestionsHandler(
                 'schema': {'type': 'basestring'},
                 'choices': feconf.SUGGESTIONS_SORT_KEYS,
             },
-            'exploration_id': {
+            'entity_id': {
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
@@ -859,8 +930,11 @@ class ReviewableSuggestionsHandler(
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
-        exploration_id = self.normalized_request.get('exploration_id')
-        exp_ids = [exploration_id] if exploration_id else []
+        # A single entity's suggestions can be requested for any translatable
+        # entity type, so this argument carries the entity's ID rather than an
+        # exploration ID.
+        entity_id = self.normalized_request.get('entity_id')
+        entity_ids = [entity_id] if entity_id else None
         user_settings = user_services.get_user_settings(self.user_id)
         # User_settings.preferred_translation_language_code is the language
         # selected by user in language filter of contributor dashboard.
@@ -873,20 +947,29 @@ class ReviewableSuggestionsHandler(
             reviewable_suggestions: List[
                 suggestion_registry.SuggestionTranslateContent
             ] = []
-            if exp_ids and len(exp_ids) == 1 and language_code_to_filter_by:
+            if (
+                entity_ids
+                and len(entity_ids) == 1
+                and language_code_to_filter_by
+            ):
                 reviewable_suggestions, next_offset = (
-                    suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
-                        self.user_id, exp_ids[0], language_code_to_filter_by
+                    suggestion_services.get_reviewable_translation_suggestions_for_single_entity(
+                        self.user_id, entity_ids[0], language_code_to_filter_by
                     )
                 )
             else:
                 # TODO(#18745): Deprecate the
                 # get_reviewable_translation_suggestions_by_offset method
                 # as its limit is unbounded and it can be given an
-                # unlimited number of exp_ids.
+                # unlimited number of entity ids.
                 reviewable_suggestions, next_offset = (
                     suggestion_services.get_reviewable_translation_suggestions_by_offset(
-                        self.user_id, exp_ids, limit, offset, sort_key
+                        self.user_id,
+                        entity_ids,
+                        limit,
+                        offset,
+                        sort_key,
+                        target_type=self._get_target_type_filter(target_type),
                     )
                 )
             suggestions = (
@@ -934,7 +1017,7 @@ class UserSubmittedSuggestionsHandler(
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
+            'choices': feconf.SUGGESTION_LIST_TARGET_TYPE_CHOICES,
         },
         'suggestion_type': {
             'schema': {
@@ -982,7 +1065,12 @@ class UserSubmittedSuggestionsHandler(
         sort_key = self.normalized_request['sort_key']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset, sort_key
+                self.user_id,
+                suggestion_type,
+                limit,
+                offset,
+                sort_key,
+                target_type=self._get_target_type_filter(target_type),
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -1015,6 +1103,7 @@ class UserSubmittedSuggestionsHandler(
                         limit,
                         next_offset,
                         sort_key,
+                        target_type=self._get_target_type_filter(target_type),
                     )
                 )
                 suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
@@ -1337,7 +1426,7 @@ def _construct_exploration_suggestions(
 
     Returns:
         list(dict). List of suggestion dicts with an additional
-        exploration_content_html field representing the target
+        entity_content_html field representing the target
         exploration's current content.
 
     Raises:
@@ -1374,7 +1463,7 @@ def _construct_exploration_suggestions(
             'language_code': suggestion_dict['language_code'],
             'last_updated': suggestion_dict['last_updated'],
             'edited_by_reviewer': suggestion_dict['edited_by_reviewer'],
-            'exploration_content_html': content_html,
+            'entity_content_html': content_html,
         }
         suggestion_dicts.append(updated_suggestion_dict)
     return suggestion_dicts

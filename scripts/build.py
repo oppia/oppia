@@ -78,9 +78,8 @@ UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
-# not be served in production. (This includes webdriverio.js
-# files in /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'webdriverio.js')
+# not be served in production.
+JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js',)
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
@@ -281,6 +280,10 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     content = content.replace(
         'static_dir: dist/oppia-angular/assets/mathjax',
         'static_dir: build/assets/mathjax',
+    )
+    content = content.replace(
+        'static_dir: dist/oppia-angular/assets/third_party_static',
+        'static_dir: build/assets/third_party_static',
     )
     content = content.replace(
         'static_files: extensions/', 'static_files: build/extensions/'

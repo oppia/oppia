@@ -43,9 +43,6 @@ class FeatureNames(enum.Enum):
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
-    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown'
-    )
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -111,6 +108,7 @@ class FeatureNames(enum.Enum):
         'technical_feedback_dashboard_enabled'
     )
     STORY_EDITOR_ARCS = 'story_editor_arcs'
+    ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -133,15 +131,10 @@ class FeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
-    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
-    FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -153,13 +146,14 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
-    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
+    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.STORY_EDITOR_ARCS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -173,6 +167,10 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -227,13 +225,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV,
         )
     ),
-    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
-        (
-            'This flag is to show feedback updates in the '
-            'profile pic drop-down menu.',
-            feature_flag_domain.ServerMode.DEV,
-        )
-    ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
         (
             'This flag is to show new contributor admin dashboard.',
@@ -283,14 +274,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
         (
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
@@ -319,7 +310,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK.value: (
@@ -327,14 +318,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the highlighting of sentences during the '
             'automatic voiceover playback in the exploration player and '
             'editor pages.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
         (
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
@@ -357,9 +348,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value: (
         (
-            'Enables automatic AI-generated translation suggestions in the.'
+            'Enables automatic AI-generated translation suggestions in the '
             'Contributor Dashboard to assist translators.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
@@ -378,7 +369,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
@@ -386,13 +377,21 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.STORY_EDITOR_ARCS.value: (
         (
             'This flag enables arc-based chapter groupings in the story editor, '
             'allowing creators to organize chapters into named arcs.',
+            feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
+        (
+            'This flag enables dropdown-based page navigation on the '
+            'Contributor Dashboard, replacing the simple Previous/Next '
+            'pagination buttons with a page selector dropdown.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),

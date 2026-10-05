@@ -47,6 +47,7 @@ interface DeleteValue {
 @Component({
   selector: 'oppia-state-solution-editor',
   templateUrl: './state-solution-editor.component.html',
+  styleUrls: ['./state-solution-editor.component.css'],
 })
 export class StateSolutionEditorComponent implements OnInit {
   // The state property is null until a solution is specified or removed.

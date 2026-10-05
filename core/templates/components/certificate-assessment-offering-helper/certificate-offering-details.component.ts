@@ -30,15 +30,13 @@ import {
   ClassroomBackendApiService,
   ClassroomSummaryDict,
 } from 'domain/classroom/classroom-backend-api.service';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
-import './certificate-offering-details.component.css';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 
 interface CertificateOfferingDetailsFormData {
   title: string;
   description: string;
   classroomId: string;
   classroomName: string;
-  timeLimitInMinutes: number;
   totalQuestions: number;
   demonstrates: string[];
 }
@@ -46,13 +44,14 @@ interface CertificateOfferingDetailsFormData {
 @Component({
   selector: 'oppia-certificate-offering-details',
   templateUrl: './certificate-offering-details.component.html',
+  styleUrls: ['./certificate-offering-details.component.css'],
 })
 export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
-  readonly TITLE_MAX_LENGTH = 80;
-  readonly DESCRIPTION_MAX_LENGTH = 500;
-  readonly TIME_LIMIT_MAX_VALUE = 60;
-  readonly TOTAL_QUESTIONS_MAX_VALUE = 50;
-  readonly DEMONSTRATES_MAX_LENGTH = 200;
+  readonly MAX_TITLE_LENGTH = 80;
+  readonly MAX_DESCRIPTION_LENGTH = 500;
+  readonly MIN_TOTAL_QUESTIONS = 3;
+  readonly MAX_TOTAL_QUESTIONS = 50;
+  readonly MAX_DEMONSTRATES_LENGTH = 200;
 
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
@@ -69,7 +68,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   classroomId: string = '';
   classroomOptions: ClassroomSummaryDict[] = [];
   classroomLoadErrorMessage: string = '';
-  timeLimitInMinutes: number | null = null;
+  isLoadingClassrooms: boolean = false;
   totalQuestions: number | null = null;
   demonstratesList: string[] = [''];
 
@@ -90,6 +89,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   }
 
   async loadClassrooms(): Promise<void> {
+    this.isLoadingClassrooms = true;
     try {
       this.classroomOptions =
         await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
@@ -99,6 +99,8 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       this.classroomOptions = [];
       this.classroomLoadErrorMessage =
         'Unable to load classrooms. Please try again.';
+    } finally {
+      this.isLoadingClassrooms = false;
     }
   }
 
@@ -107,7 +109,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       this.title = this.initialValues.title;
       this.description = this.initialValues.description;
       this.classroomId = this.initialValues.classroomId;
-      this.timeLimitInMinutes = this.initialValues.timeLimitInMinutes;
       this.totalQuestions = this.initialValues.totalQuestions;
       this.demonstratesList = this.initialValues.demonstrates.length
         ? [...this.initialValues.demonstrates]
@@ -118,8 +119,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     this.title = this.certificateAssessmentOffering.title;
     this.description = this.certificateAssessmentOffering.description;
     this.classroomId = this.certificateAssessmentOffering.classroomId;
-    this.timeLimitInMinutes =
-      this.certificateAssessmentOffering.timeLimitInMinutes || null;
     this.totalQuestions =
       this.certificateAssessmentOffering.totalQuestions || null;
     this.demonstratesList = this.certificateAssessmentOffering.demonstrates
@@ -152,18 +151,15 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     const normalizedDemonstrates = this.getNormalizedDemonstrates();
     return Boolean(
       this.title.trim() &&
-        this.title.length <= this.TITLE_MAX_LENGTH &&
+        this.title.length <= this.MAX_TITLE_LENGTH &&
         this.description.trim() &&
-        this.description.length <= this.DESCRIPTION_MAX_LENGTH &&
+        this.description.length <= this.MAX_DESCRIPTION_LENGTH &&
         this.classroomId &&
-        this.timeLimitInMinutes &&
-        this.timeLimitInMinutes > 0 &&
-        this.timeLimitInMinutes <= this.TIME_LIMIT_MAX_VALUE &&
         this.totalQuestions &&
-        this.totalQuestions > 0 &&
-        this.totalQuestions <= this.TOTAL_QUESTIONS_MAX_VALUE &&
+        this.totalQuestions >= this.MIN_TOTAL_QUESTIONS &&
+        this.totalQuestions <= this.MAX_TOTAL_QUESTIONS &&
         normalizedDemonstrates.length > 0 &&
-        normalizedDemonstrates.join('\n').length <= this.DEMONSTRATES_MAX_LENGTH
+        normalizedDemonstrates.join('\n').length <= this.MAX_DEMONSTRATES_LENGTH
     );
   }
 
@@ -175,15 +171,15 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   }
 
   getTitleValidationError(): string {
-    if (this.title.length > this.TITLE_MAX_LENGTH) {
-      return `Certificate title should contain at most ${this.TITLE_MAX_LENGTH} characters.`;
+    if (this.title.length > this.MAX_TITLE_LENGTH) {
+      return `Certificate title should contain at most ${this.MAX_TITLE_LENGTH} characters.`;
     }
     return '';
   }
 
   getDescriptionValidationError(): string {
-    if (this.description.length > this.DESCRIPTION_MAX_LENGTH) {
-      return `Certificate description should contain at most ${this.DESCRIPTION_MAX_LENGTH} characters.`;
+    if (this.description.length > this.MAX_DESCRIPTION_LENGTH) {
+      return `Certificate description should contain at most ${this.MAX_DESCRIPTION_LENGTH} characters.`;
     }
     return '';
   }
@@ -202,52 +198,39 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     return '';
   }
 
-  getTimeLimitValidationError(): string {
-    if (
-      this.timeLimitInMinutes !== null &&
-      this.timeLimitInMinutes !== undefined &&
-      this.timeLimitInMinutes > this.TIME_LIMIT_MAX_VALUE
-    ) {
-      return `Time limit should be at most ${this.TIME_LIMIT_MAX_VALUE} minutes.`;
-    }
-    return '';
-  }
-
   getTotalQuestionsValidationError(): string {
     if (
       this.totalQuestions !== null &&
       this.totalQuestions !== undefined &&
-      this.totalQuestions > this.TOTAL_QUESTIONS_MAX_VALUE
+      this.totalQuestions < this.MIN_TOTAL_QUESTIONS
     ) {
-      return `Total number of questions should be at most ${this.TOTAL_QUESTIONS_MAX_VALUE}.`;
+      return `Total number of questions should be at least ${this.MIN_TOTAL_QUESTIONS}.`;
+    }
+    if (
+      this.totalQuestions !== null &&
+      this.totalQuestions !== undefined &&
+      this.totalQuestions > this.MAX_TOTAL_QUESTIONS
+    ) {
+      return `Total number of questions should be at most ${this.MAX_TOTAL_QUESTIONS}.`;
     }
     return '';
-  }
-
-  isTimeLimitInvalid(): boolean {
-    return (
-      this.timeLimitInMinutes === null ||
-      this.timeLimitInMinutes === undefined ||
-      this.timeLimitInMinutes <= 0 ||
-      this.timeLimitInMinutes > this.TIME_LIMIT_MAX_VALUE
-    );
   }
 
   isTotalQuestionsInvalid(): boolean {
     return (
       this.totalQuestions === null ||
       this.totalQuestions === undefined ||
-      this.totalQuestions <= 0 ||
-      this.totalQuestions > this.TOTAL_QUESTIONS_MAX_VALUE
+      this.totalQuestions < this.MIN_TOTAL_QUESTIONS ||
+      this.totalQuestions > this.MAX_TOTAL_QUESTIONS
     );
   }
 
   getDemonstratesValidationError(): string {
     if (
       this.getNormalizedDemonstrates().join('\n').length >
-      this.DEMONSTRATES_MAX_LENGTH
+      this.MAX_DEMONSTRATES_LENGTH
     ) {
-      return `Learning outcomes should contain at most ${this.DEMONSTRATES_MAX_LENGTH} characters.`;
+      return `Learning outcomes should contain at most ${this.MAX_DEMONSTRATES_LENGTH} characters.`;
     }
     return '';
   }
@@ -259,7 +242,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       description: this.description.trim(),
       classroomId: this.classroomId,
       classroomName: this.getSelectedClassroomName(),
-      timeLimitInMinutes: this.timeLimitInMinutes || 0,
       totalQuestions: this.totalQuestions || 0,
       demonstrates: normalizedDemonstrates,
     };
@@ -274,8 +256,6 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     this.certificateAssessmentOffering.title = formData.title;
     this.certificateAssessmentOffering.description = formData.description;
     this.certificateAssessmentOffering.classroomId = formData.classroomId;
-    this.certificateAssessmentOffering.timeLimitInMinutes =
-      formData.timeLimitInMinutes;
     this.certificateAssessmentOffering.totalQuestions = formData.totalQuestions;
     this.certificateAssessmentOffering.demonstrates = [
       ...formData.demonstrates,

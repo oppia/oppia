@@ -2581,3 +2581,171 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             'exp_1'
         )
         self.assertNotIn('hi', model.incomplete_translation_language_codes)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_remove_topic_from_translation_opportunities_updates_multi_topics(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1', 'topic_id_2'],
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1', 'topic_id_2'])
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_2'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_remove_topic_from_translation_opportunities_retains_model_when_empty(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1'],
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        updated_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id
+        )
+        assert updated_model is not None
+        self.assertEqual(updated_model.topic_ids, [])
+
+    def test_get_skill_opportunities_count(self) -> None:
+        # One skill opportunity is created in setUp.
+        self.assertEqual(
+            opportunity_services.get_skill_opportunities_count(), 1
+        )
+
+        opportunity_models.SkillOpportunityModel(
+            id='opportunity_id1',
+            skill_description='A skill description',
+            question_count=20,
+        ).put()
+
+        self.assertEqual(
+            opportunity_services.get_skill_opportunities_count(), 2
+        )
+
+    def test_get_translation_opportunities_count(self) -> None:
+        # One translation opportunity is created in setUp for 'hi'.
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count(
+                'hi', None
+            ),
+            1,
+        )
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_2',
+            topic_id='topic_id_1',
+            topic_name='Topic 1',
+            story_id='story_id_1',
+            story_title='Story 1',
+            chapter_title='Chapter 2',
+            content_count=10,
+            incomplete_translation_language_codes=['hi', 'en'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['hi', 'en'],
+            language_codes_with_assigned_voice_artists=[],
+        ).put()
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count(
+                'hi', None
+            ),
+            2,
+        )
+        # Only exp_2 has 'en' in its incomplete_translation_language_codes.
+        # The setUp-created exp_1 does not include 'en' because the
+        # exploration's own language (English) is excluded.
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count(
+                'en', None
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count(
+                'hi', 'Topic 1'
+            ),
+            2,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count(
+                'hi', 'nonexistent'
+            ),
+            0,
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_get_translation_opportunities_count_with_new_models(self) -> None:
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', 'Topic 1'
+            ),
+            0,
+        )
+
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp_1',
+            topic_ids=['topic_id_1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', 'Topic 1'
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', None
+            ),
+            1,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'en', 'Topic 1'
+            ),
+            0,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_SKILL, 'hi', 'Topic 1'
+            ),
+            0,
+        )
+        self.assertEqual(
+            opportunity_services.get_translation_opportunities_count_with_new_models(
+                feconf.ENTITY_TYPE_EXPLORATION, 'hi', 'invalid_topic'
+            ),
+            0,
+        )

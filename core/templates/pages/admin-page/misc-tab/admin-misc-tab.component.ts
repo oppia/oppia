@@ -26,6 +26,7 @@ import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 @Component({
   selector: 'oppia-admin-misc-tab',
   templateUrl: './admin-misc-tab.component.html',
+  styleUrls: ['./admin-misc-tab.component.css'],
 })
 export class AdminMiscTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
@@ -75,29 +76,6 @@ export class AdminMiscTabComponent implements OnInit {
         this.voiceoverAutogenerationIsEnabled =
           voiceoverAutogenerationIsEnabled;
       });
-  }
-
-  clearSearchIndex(): void {
-    if (
-      this.adminTaskManagerService.isTaskRunning() ||
-      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
-    ) {
-      return;
-    }
-
-    this.setStatusMessage.emit('Clearing search index...');
-
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.clearSearchIndexAsync().then(
-      () => {
-        this.setStatusMessage.emit('Index successfully cleared.');
-        this.adminTaskManagerService.finishTask();
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-        this.adminTaskManagerService.finishTask();
-      }
-    );
   }
 
   regenerateOpportunitiesRelatedToTopic(): void {

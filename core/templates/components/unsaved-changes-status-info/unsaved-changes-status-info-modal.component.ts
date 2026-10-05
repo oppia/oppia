@@ -21,6 +21,7 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'oppia-unsaved-changes-status-info-modal',
   templateUrl: './unsaved-changes-status-info-modal.component.html',
+  styleUrls: ['./unsaved-changes-status-info-modal.component.css'],
 })
 export class UnsavedChangesStatusInfoModalComponent {
   // These properties are initialized using Angular lifecycle hooks

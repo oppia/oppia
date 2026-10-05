@@ -19,8 +19,20 @@
  * based on the provided feedback modal type.
  */
 
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+  Optional,
+  Inject,
+} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {FeedbackScreenshotStagingService} from 'domain/feedback/feedback-screenshot-staging.service';
@@ -34,15 +46,17 @@ import {
   LessonFeedbackModel,
   FeedbackModalType,
   LessonFeedbackMetadata,
+  ReportType,
 } from 'domain/feedback/feedback.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
-import './feedback-modal.component.css';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 interface TurnstileApi {
   render: (
@@ -61,18 +75,23 @@ interface TurnstileWindow extends Window {
   turnstile?: TurnstileApi;
 }
 
+interface FeedbackModalData {
+  feedbackModalType: FeedbackModalType;
+}
+
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
-  styleUrls: ['feedback-modal.component.css'],
+  styleUrls: ['./feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
+  readonly ReportAnIssueCategory = ReportAnIssueCategory;
   @Input() feedbackModalType!: FeedbackModalType;
   readonly MAX_REPORT_MESSAGE_LENGTH = 2500;
   @ViewChild('turnstileContainer')
   turnstileContainer!: ElementRef<HTMLDivElement>;
   turnstileWidgetId: string | null = null;
-  isUserLoggedIn: boolean = false;
+  isUserLoggedIn: boolean | null = null;
   feedbackText: string = '';
   formError: string | null = null;
   category: ReportAnIssueCategory | null = null;
@@ -88,6 +107,8 @@ export class FeedbackModalComponent implements OnInit {
   captchaSiteKey: string | null = null;
   captchaLoadError: string | null = null;
   captchaSubmitError: string | null = null;
+  isSubmittingFeedback: boolean = false;
+  feedbackTextareaFocusLabel!: string;
 
   constructor(
     private userService: UserService,
@@ -101,7 +122,14 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal
+    private siteAnalyticsService: SiteAnalyticsService,
+    private focusManagerService: FocusManagerService,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private feedbackBottomSheetRef?: MatBottomSheetRef<FeedbackModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data?: FeedbackModalData
   ) {}
 
   get isLessonFeedbackMode(): boolean {
@@ -174,7 +202,37 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.data) {
+      this.feedbackModalType = this.data.feedbackModalType;
+    }
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.feedbackBottomSheetRef?.dismiss();
+        }
+      });
+    }
+    this.feedbackTextareaFocusLabel =
+      this.focusManagerService.generateFocusLabel();
     this.showTechnicalLogsCheckbox = true;
+
+    switch (this.feedbackModalType) {
+      case FeedbackModalType.LESSON_FEEDBACK:
+        this.siteAnalyticsService.registerLessonFeedbackModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.LESSON_ISSUE:
+        this.siteAnalyticsService.registerLessonIssueModalOpenEvent(
+          this.pageContextService.getExplorationId()
+        );
+        break;
+
+      case FeedbackModalType.SITE_ISSUE:
+        this.siteAnalyticsService.registerWebsiteIssueModalOpenEvent();
+        break;
+    }
 
     try {
       const userInfo = await this.userService.getUserInfoAsync();
@@ -185,6 +243,9 @@ export class FeedbackModalComponent implements OnInit {
 
     if (!this.isLessonFeedbackMode) {
       await this.initializeCaptchaIfRequired();
+    }
+    if (this.isLessonIssueMode) {
+      this.focusManagerService.setFocus(this.feedbackTextareaFocusLabel);
     }
   }
 
@@ -211,7 +272,8 @@ export class FeedbackModalComponent implements OnInit {
     this.category = category;
 
     this.showTechnicalLogsCheckbox =
-      category === 'broken_layout_or_image' || category === 'other_or_not_sure';
+      category === ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE ||
+      category === ReportAnIssueCategory.OTHER_OR_NOT_SURE;
   }
 
   onScreenshotFileReceived(file: File): void {
@@ -249,6 +311,7 @@ export class FeedbackModalComponent implements OnInit {
       this.formError = this.translateService.instant(
         'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED'
       );
+      this.focusManagerService.setFocus(this.feedbackTextareaFocusLabel);
       return false;
     }
 
@@ -280,6 +343,7 @@ export class FeedbackModalComponent implements OnInit {
     if (!this.isFormValid()) {
       return;
     }
+    this.isSubmittingFeedback = true;
     switch (this.feedbackModalType) {
       case FeedbackModalType.LESSON_FEEDBACK:
         await this.submitLessonFeedback();
@@ -293,6 +357,7 @@ export class FeedbackModalComponent implements OnInit {
         await this.submitSiteIssue();
         break;
     }
+    this.isSubmittingFeedback = false;
   }
 
   private getLessonFeedbackMetadata(): LessonFeedbackMetadata {
@@ -313,7 +378,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: this.feedbackText,
       explorationContext: {
         explorationId: lessonFeedbackMetadata.explorationId,
@@ -330,9 +395,14 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonIssueSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         this.category === 'broken_layout_or_image' ||
@@ -368,9 +438,14 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitLessonFeedbackAsync(
-        feedbackPayload,
-        this.captchaToken
+      const response =
+        await this.feedbackBackendApiService.submitLessonFeedbackAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerLessonFeedbackSubmittedEvent(
+        lessonFeedbackMetadata.explorationId,
+        response.id
       );
       const successMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_SUCCESS'
@@ -394,7 +469,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'app',
+      source: ReportType.APP,
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,
@@ -405,10 +480,12 @@ export class FeedbackModalComponent implements OnInit {
     });
 
     try {
-      await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
-        feedbackPayload,
-        this.captchaToken
-      );
+      const response =
+        await this.feedbackBackendApiService.submitSiteAndLessonIssueReportAsync(
+          feedbackPayload,
+          this.captchaToken
+        );
+      this.siteAnalyticsService.registerWebsiteIssueSubmittedEvent(response.id);
       const successMessage = this.translateService.instant(
         'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
       );
@@ -493,7 +570,12 @@ export class FeedbackModalComponent implements OnInit {
     this.formError = null;
     this.captchaToken = '';
     this.captchaSubmitError = null;
+    this.isSubmittingFeedback = false;
     this.removeScreenshot();
-    this.ngbActiveModal.dismiss();
+    if (this.feedbackBottomSheetRef) {
+      this.feedbackBottomSheetRef.dismiss();
+    } else {
+      this.ngbActiveModal.dismiss();
+    }
   }
 }

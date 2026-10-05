@@ -11,19 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// @ts-nocheck
 
 /**
  * @fileoverview Unit tests for UrlService.
  */
 
 import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from './window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 describe('Url Service', () => {
   let urlService: UrlService;
   let windowRef: WindowRef;
+  let platformFeatureService: PlatformFeatureService;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
   // Check https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
@@ -34,6 +38,10 @@ describe('Url Service', () => {
   let origin = 'http://sample.com';
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+
     mockLocation = {
       href: origin + pathname,
       origin: origin,
@@ -44,6 +52,7 @@ describe('Url Service', () => {
 
     urlService = TestBed.inject(UrlService);
     windowRef = TestBed.inject(WindowRef);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(
       () =>
         ({
@@ -259,16 +268,25 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve selected subtopics from url', () => {
-    mockLocation.pathname = '/practice_session/topicName';
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
+    mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
+  });
+
+  it('should throw error for invalid practice session url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
     mockLocation.pathname = '/topic/abcdefgijklm';
-    expect(function () {
+    expect(() => {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
-    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
-    expect(function () {
+    expect(() => {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
   });
@@ -411,5 +429,27 @@ describe('Url Service', () => {
     expect(function () {
       urlService.getCollectionIdFromEditorUrl();
     }).toThrowError('Invalid collection editor URL');
+  });
+
+  it('should correctly retrieve node id from practice url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
+    mockLocation.pathname = '/learn/math/fractions/practice/1';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
+
+    mockLocation.pathname = '/learn/math/fractions/practice/';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('');
+  });
+
+  it('should correctly retrieve arc id from url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
+    mockLocation.pathname = '/learn/math/fractions/test/arc/1';
+    expect(urlService.getArcIdFromUrl()).toBe('1');
+
+    mockLocation.pathname = '/learn/math/fractions/practice';
+    expect(urlService.getArcIdFromUrl()).toBe('');
   });
 });

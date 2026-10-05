@@ -20,6 +20,7 @@
 import {Component, Output, OnInit, EventEmitter} from '@angular/core';
 
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {ClassroomSummary} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
@@ -30,6 +31,7 @@ import {Story} from 'domain/story/story.model';
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
+  styleUrls: ['./admin-dev-mode-activities-tab.component.css'],
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
@@ -41,6 +43,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyStoriesToGenerate: number = 0;
   topicList: CreatorTopicSummary[] = [];
   numDummyChaptersToGenerate: number = 0;
+  numDummyClassroomsToGenerate: number = 0;
+  numDummyDefaultClassroomsToGenerate: number = 0;
+  numDummyTopicsToGenerate: number = 0;
+  classroomList: ClassroomSummary[] = [];
+  selectedClassroomId: string = '';
   storyList: Story[] = [];
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
@@ -235,6 +242,22 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  onSkillSelectionChange(event: Event): void {
+    this.selectedOption = (event.target as HTMLSelectElement).value;
+  }
+
+  onTopicSelectionChange(event: Event): void {
+    this.selectedTopicForStory = (event.target as HTMLSelectElement).value;
+  }
+
+  onStorySelectionChange(event: Event): void {
+    this.selectedStoryForChapter = (event.target as HTMLSelectElement).value;
+  }
+
+  onClassroomSelectionChange(event: Event): void {
+    this.selectedClassroomId = (event.target as HTMLSelectElement).value;
+  }
+
   generateDummySuggestionQuestions(selectedOption: string): void {
     // Generate dummy suggestion question for the selected skill.
     const selectedIndex = Number(selectedOption);
@@ -321,17 +344,64 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    this.adminBackendApiService.generateDummyClassroomDataAsync().then(
-      () => {
-        this.getDataAsync();
-        this.setStatusMessage.emit(
-          'Dummy new classroom generated successfully.'
-        );
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      }
-    );
+    this.adminBackendApiService
+      .generateDummyClassroomDataAsync(this.numDummyClassroomsToGenerate)
+      .then(
+        () => {
+          this.getDataAsync();
+          this.setStatusMessage.emit(
+            'Dummy new classroom generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateNewDefaultClassrooms(): void {
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+
+    this.adminBackendApiService
+      .generateDummyDefaultClassroomsAsync(
+        this.numDummyDefaultClassroomsToGenerate
+      )
+      .then(
+        () => {
+          this.getDataAsync();
+          this.setStatusMessage.emit(
+            'Dummy default classrooms generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateNewTopics(): void {
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+
+    this.adminBackendApiService
+      .generateDummyTopicsAsync(
+        this.numDummyTopicsToGenerate,
+        this.selectedClassroomId
+      )
+      .then(
+        () => {
+          this.getDataAsync();
+          this.setStatusMessage.emit(
+            'Dummy new topics generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -372,6 +442,10 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.skillList = adminDataObject.skillList;
     this.topicList = adminDataObject.topicSummaries;
     this.storyList = adminDataObject.storyList;
+    this.classroomList = adminDataObject.classroomList;
+    if (this.classroomList.length > 0) {
+      this.selectedClassroomId = this.classroomList[0].classroomId;
+    }
   }
 
   ngOnInit(): void {

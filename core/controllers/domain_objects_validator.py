@@ -43,7 +43,17 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping
+from typing import Any, Dict, Mapping
+
+# The required fields of a certificate assessment answer. These are
+# immutable because the answer schema never changes at runtime.
+REQUIRED_CERTIFICATE_ASSESSMENT_ANSWER_KEYS = frozenset(
+    {'question_id', 'is_correct'}
+)
+# The optional field of a certificate assessment answer. When it is not
+# provided, the selected_answer defaults to None, which represents an
+# unanswered question.
+OPTIONAL_CERTIFICATE_ASSESSMENT_ANSWER_KEYS = frozenset({'selected_answer'})
 
 
 def validate_suggestion_change(
@@ -221,6 +231,61 @@ def validate_change_dict_for_blog_post(
     # to any domain class so we are validating the fields of change_dict
     # as a part of schema validation.
     return change_dict
+
+
+def validate_certificate_assessment_answer(
+    # Here we use type Any because the answer dict is raw JSON payload data,
+    # so its values can be int, float, str, dict, list, or None.
+    answer_dict: Mapping[str, Any],
+    # Here we use type Any because the returned dict mirrors the raw answer
+    # dict, whose selected_answer value can be any of the accepted types.
+) -> Dict[str, Any]:
+    """Validates a single answer submitted for a certificate assessment.
+
+    The answer dict does not correspond to any domain class, so the fields
+    are validated here as a part of schema validation. The selected_answer
+    key is optional and, when omitted, defaults to None, which represents an
+    unanswered question.
+
+    Args:
+        answer_dict: dict. The raw answer dict submitted by the client.
+
+    Returns:
+        dict. The normalized answer dict containing question_id,
+        selected_answer, and is_correct.
+
+    Raises:
+        Exception. The answer dict is not valid.
+    """
+    if not isinstance(answer_dict, dict):
+        raise Exception('Expected dict, received %s' % answer_dict)
+
+    expected_keys = REQUIRED_CERTIFICATE_ASSESSMENT_ANSWER_KEYS
+    missing_keys = expected_keys - set(answer_dict.keys())
+    extra_keys = (
+        set(answer_dict.keys())
+        - expected_keys
+        - OPTIONAL_CERTIFICATE_ASSESSMENT_ANSWER_KEYS
+    )
+    if missing_keys or extra_keys:
+        raise Exception(
+            'Missing keys: %s, Extra keys: %s'
+            % (sorted(missing_keys), sorted(extra_keys))
+        )
+
+    question_id = answer_dict['question_id']
+    if not isinstance(question_id, str) or not question_id:
+        raise Exception('question_id must be a non-empty string.')
+    is_correct = answer_dict['is_correct']
+    if not isinstance(is_correct, bool):
+        raise Exception('is_correct must be a boolean.')
+    selected_answer = answer_dict.get('selected_answer')
+
+    return {
+        'question_id': question_id,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+    }
 
 
 def validate_state_dict(

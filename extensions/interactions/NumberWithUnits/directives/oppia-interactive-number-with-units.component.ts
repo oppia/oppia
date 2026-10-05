@@ -36,13 +36,14 @@ import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 @Component({
   selector: 'oppia-interactive-number-with-units',
   templateUrl: './number-with-units-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./number-with-units-interaction.component.css'],
 })
 export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() labelForFocusTarget!: string;
+  @Input() lastAnswer!: NumberWithUnitsAnswer | null;
   @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
@@ -81,7 +82,9 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.savedSolution !== undefined) {
+    if (this.lastAnswer !== null && this.lastAnswer !== undefined) {
+      this.answer = NumberWithUnits.fromDict(this.lastAnswer).toString();
+    } else if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
       savedSolution = NumberWithUnits.fromDict(
         savedSolution as NumberWithUnitsAnswer

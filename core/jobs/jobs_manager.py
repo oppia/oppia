@@ -26,6 +26,7 @@ import traceback
 from core import feconf
 from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
+from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
@@ -124,6 +125,7 @@ def run_job(
         job.
 
     Raises:
+        ValueError. The parameterized_args defines service_account_email.
         RuntimeError. Failed to deploy given job to the Dataflow service.
     """
     job_name = job_class.__name__
@@ -140,7 +142,21 @@ def run_job(
         }
 
     if parameterized_args:
+        if 'service_account_email' in parameterized_args:
+            raise ValueError(
+                'SENSITIVE: service_account_email cannot be passed as an '
+                'option (choose_service_account_id_for_job() is responsible '
+                'for assigning the correct account)'
+            )
         additional_options.update(parameterized_args)
+
+    if service_account_id := choose_service_account_id_for_job(job_class):
+        additional_options['service_account_email'] = (
+            feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
+                service_account_id=service_account_id,
+                app_id=app_identity_services.get_application_id(),
+            )
+        )
 
     if pipeline is None:
         pipeline = beam.Pipeline(
@@ -336,3 +352,36 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
         'VoiceoverSynthesisForTestingJob',
     ]
     return job_name in jobs_requiring_limiting_workers
+
+
+def choose_service_account_id_for_job(
+    job_class: type[base_jobs.JobBase],
+) -> str | None:
+    """Returns the service account ID that should be used to run the given job.
+
+    Service accounts are used to grant an Apache Beam worker access to external
+    resources. As of 2026-06, the only external resources that Oppia interacts
+    with from Apache Beam jobs are from the Firebase Authentication server.
+
+    Args:
+        job_class: type[base_jobs.JobBase]. The job's class.
+
+    Returns:
+        str|None. The service account ID that should be used to run the given
+        job, or None if no custom service account is required.
+    """
+    match job_class:
+        case firebase_server_sync_jobs.FirebaseServerSyncJob:
+            return feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID
+        case firebase_server_sync_jobs.AuditFirebaseServerSyncJob:
+            return feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID
+        case _:
+            message = (
+                f'{job_class.__name__} does not need a custom service account, '
+                'so the Compute Engine default service account will be assumed'
+            )
+            email = (
+                app_identity_services.get_compute_engine_default_service_account_email()
+            )
+            logging.info('%s: %s' % (message, email) if email else message)
+            return None

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import cleanup_duplicate_translation_suggestions_jobs
 from core.jobs.types import job_run_result
@@ -169,9 +169,13 @@ class CleanupDuplicateTranslationSuggestionsJobTests(
 
     def test_duplicates_are_cleaned_up(self) -> None:
         # Created 1 hour ago.
-        created_on_1 = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+        created_on_1 = utils.get_current_utc_datetime() - datetime.timedelta(
+            hours=1
+        )
         # Created 2 hours ago (oldest).
-        created_on_2 = datetime.datetime.utcnow() - datetime.timedelta(hours=2)
+        created_on_2 = utils.get_current_utc_datetime() - datetime.timedelta(
+            hours=2
+        )
 
         suggestion1 = self.create_model(
             suggestion_models.GeneralSuggestionModel,

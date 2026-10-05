@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * @fileoverview Acceptance test for IP.1. Learn about the organization - interested-parent
+ * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=888982708#gid=888982708
  *
- * IP.PJ. Parent learns about the organization
+ * IP.1. Learn about the organization
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -29,13 +29,15 @@ describe('Interested Parent', function () {
     parentUser = await UserFactory.createLoggedOutUser();
   });
 
-  it('should be able to learn about the organization', async function () {
+  it('should learn about the organization', async function () {
     // Visit splash page.
     await parentUser.navigateToSplashPage();
+    await parentUser.acceptCookieBannerIfPresent();
+    await parentUser.waitForPageToFullyLoad();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
-    // Visit the About Page.
-    await parentUser.navigateToAboutPage();
+    // Visit the About Oppia page from navbar.
+    await parentUser.clickAboutButtonInAboutMenuOnNavbar();
     await parentUser.expectAboutUsPageHeadingToBe(
       ' Empowering learners around the globe '
     );
@@ -73,10 +75,16 @@ describe('Interested Parent', function () {
 
     // View Report Button should be visible.
     await parentUser.expectViewReportButtonInAboutPageToBeVisible();
-  });
 
-  it('should visit for parents / teachers page', async function () {
+    // Verify footer version matches expected pattern.
+    await parentUser.expectFooterVersionToMatchPattern(
+      /Version: [^\s]* \(\w*\)/
+    );
+
+    // Visit the For Parents / Teachers page from navbar.
     await parentUser.clickTeachButtonInAboutMenuOnNavbar();
+    await parentUser.acceptCookieBannerIfPresent();
+    await parentUser.waitForPageToFullyLoad();
     await parentUser.expectScreenshotToMatch(
       'parentsOrTeachersPage',
       __dirname

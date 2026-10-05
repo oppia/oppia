@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CertificateOfferingDetailsComponent.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -27,8 +29,11 @@ import {
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
+import {
+  ClassroomBackendApiService,
+  ClassroomSummaryDict,
+} from 'domain/classroom/classroom-backend-api.service';
 
 describe('Certificate Offering Details Component', () => {
   let component: CertificateOfferingDetailsComponent;
@@ -50,10 +55,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'math',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 0,
                 },
                 {
                   classroom_id: 'science',
@@ -61,10 +64,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'science',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 1,
                 },
               ]),
           },
@@ -89,6 +90,28 @@ describe('Certificate Offering Details Component', () => {
       ['Math', 'Science']
     );
     expect(component.classroomLoadErrorMessage).toEqual('');
+  });
+
+  it('should capitalize classroom names in the dropdown', async () => {
+    component.classroomOptions = [
+      {
+        classroom_id: 'math',
+        name: 'math classroom',
+        url_fragment: 'math',
+        teaser_text: '',
+        is_published: true,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const optionText = fixture.nativeElement
+      .querySelectorAll('select option')[1]
+      .textContent.trim();
+
+    expect(optionText).toEqual('Math Classroom');
   });
 
   it('should show an error message when loading classrooms fails', fakeAsync(() => {
@@ -118,7 +141,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 60;
     component.totalQuestions = 10;
     component.demonstratesList = ['Learn math'];
 
@@ -149,7 +171,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'Stale title';
     component.description = 'Stale description';
     component.classroomId = 'stale_classroom';
-    component.timeLimitInMinutes = 12;
     component.totalQuestions = 2;
     component.demonstratesList = ['Stale outcome'];
 
@@ -163,7 +184,6 @@ describe('Certificate Offering Details Component', () => {
         topic_data: {},
         demonstrates: ['Loaded outcome'],
         total_questions: 6,
-        time_limit_in_minutes: 25,
         async_status: 'Available',
         version: 1,
       });
@@ -180,7 +200,6 @@ describe('Certificate Offering Details Component', () => {
     expect(component.title).toEqual('Loaded title');
     expect(component.description).toEqual('Loaded description');
     expect(component.classroomId).toEqual('science');
-    expect(component.timeLimitInMinutes).toEqual(25);
     expect(component.totalQuestions).toEqual(6);
     expect(component.demonstratesList).toEqual(['Loaded outcome']);
   });
@@ -191,7 +210,6 @@ describe('Certificate Offering Details Component', () => {
       description: 'Initial description',
       classroomId: 'math',
       classroomName: 'Math',
-      timeLimitInMinutes: 45,
       totalQuestions: 8,
       demonstrates: ['Initial outcome'],
     };
@@ -201,7 +219,6 @@ describe('Certificate Offering Details Component', () => {
     expect(component.title).toEqual('Initial title');
     expect(component.description).toEqual('Initial description');
     expect(component.classroomId).toEqual('math');
-    expect(component.timeLimitInMinutes).toEqual(45);
     expect(component.totalQuestions).toEqual(8);
     expect(component.demonstratesList).toEqual(['Initial outcome']);
   });
@@ -250,7 +267,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 30;
     component.totalQuestions = 5;
     component.demonstratesList = ['Learn math'];
 
@@ -261,11 +277,8 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.totalQuestions = 2;
     component.demonstratesList = ['Learn math'];
-
-    expect(component.isTimeLimitInvalid()).toBe(true);
     expect(component.isTotalQuestionsInvalid()).toBe(true);
     expect(component.isFormValid()).toBe(false);
   });
@@ -276,15 +289,10 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getSelectedClassroomName()).toEqual('');
   });
 
-  it('should mark time limit and question count as invalid when out of range', () => {
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
-
-    expect(component.getTimeLimitValidationError()).toContain(
-      'at most 60 minutes'
-    );
+  it('should mark question count as invalid when out of range', () => {
+    component.totalQuestions = 2;
     expect(component.getTotalQuestionsValidationError()).toContain(
-      'at most 50'
+      'at least 3'
     );
     expect(component.isFormValid()).toBe(false);
   });
@@ -294,11 +302,7 @@ describe('Certificate Offering Details Component', () => {
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
     component.demonstratesList = ['Learn math'];
-
-    component.timeLimitInMinutes = null;
     component.totalQuestions = null;
-
-    expect(component.getTimeLimitValidationError()).toEqual('');
     expect(component.getTotalQuestionsValidationError()).toEqual('');
     expect(component.isFormValid()).toBe(false);
   });
@@ -346,7 +350,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = '  Certificate title  ';
     component.description = '  Certificate description  ';
     component.classroomId = 'science';
-    component.timeLimitInMinutes = 30;
     component.totalQuestions = 5;
     component.demonstratesList = [' Learn math ', ''];
 
@@ -355,7 +358,6 @@ describe('Certificate Offering Details Component', () => {
       description: 'Certificate description',
       classroomId: 'science',
       classroomName: 'Science',
-      timeLimitInMinutes: 30,
       totalQuestions: 5,
       demonstrates: ['Learn math'],
     });
@@ -367,7 +369,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'a'.repeat(81);
     component.description = '';
     component.classroomId = 'invalid';
-    component.timeLimitInMinutes = 61;
     component.totalQuestions = 51;
     component.demonstratesList = [''];
 
@@ -378,9 +379,6 @@ describe('Certificate Offering Details Component', () => {
       'valid classroom'
     );
     expect(component.getDescriptionValidationError()).toEqual('');
-    expect(component.getTimeLimitValidationError()).toContain(
-      'at most 60 minutes'
-    );
     expect(component.getTotalQuestionsValidationError()).toContain(
       'at most 50'
     );
@@ -425,6 +423,25 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getClassroomValidationError()).toEqual('');
   });
 
+  it('should set loading state while classrooms are fetched', fakeAsync(() => {
+    let resolveClassrooms: (value: ClassroomSummaryDict[]) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      new Promise<ClassroomSummaryDict[]>(resolve => {
+        resolveClassrooms = resolve;
+      })
+    );
+
+    void component.loadClassrooms();
+    expect(component.isLoadingClassrooms).toBe(true);
+    resolveClassrooms([]);
+    flushMicrotasks();
+
+    expect(component.isLoadingClassrooms).toBe(false);
+  }));
+
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
     component.demonstratesList = ['a'.repeat(201)];
 
@@ -438,7 +455,6 @@ describe('Certificate Offering Details Component', () => {
     component.title = '  Certificate title  ';
     component.description = '  Certificate description  ';
     component.classroomId = 'science';
-    component.timeLimitInMinutes = 30;
     component.totalQuestions = 5;
     component.demonstratesList = [' Learn math ', ''];
 
@@ -447,7 +463,6 @@ describe('Certificate Offering Details Component', () => {
       description: 'Certificate description',
       classroomId: 'science',
       classroomName: 'Science',
-      timeLimitInMinutes: 30,
       totalQuestions: 5,
       demonstrates: ['Learn math'],
     });

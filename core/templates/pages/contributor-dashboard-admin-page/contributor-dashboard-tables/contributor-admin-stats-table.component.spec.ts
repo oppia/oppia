@@ -29,6 +29,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ContributorAdminStatsTable} from './contributor-admin-stats-table.component';
 import {
   ContributorDashboardAdminStatsBackendApiService,
+  QuestionCoordinatorStatsData,
   QuestionReviewerStatsData,
   QuestionSubmitterStatsData,
   TranslationReviewerStatsData,
@@ -42,11 +43,14 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {
+  QuestionCoordinatorStats,
   QuestionReviewerStats,
   QuestionSubmitterStats,
+  TranslationCoordinatorStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
-} from '../contributor-dashboard-admin-summary.model';
+} from '../../../domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
+import {AppConstants} from 'app.constants';
 
 describe('Contributor stats component', () => {
   const createQuestionReviewerStats = function createQuestionReviewerStats(
@@ -906,6 +910,150 @@ describe('Contributor stats component', () => {
     it('should convert the items per page dropdown back into numbers', fakeAsync(() => {
       component.onItemsPerPageChange('05');
       expect(component.itemsPerPage).toEqual(5);
+    }));
+
+    it('should return the translation coordinator stats attributes correctly', fakeAsync(() => {
+      const translationCoordinatorStats = new TranslationCoordinatorStats(
+        'user1',
+        'en',
+        5,
+        3,
+        10
+      );
+      expect(
+        component.getFormattedContributorAttributes(translationCoordinatorStats)
+      ).toEqual([
+        {key: 'Translators', displayText: '5'},
+        {key: 'Reviewers', displayText: '3'},
+      ]);
+    }));
+
+    it('should return no attributes for question coordinators', fakeAsync(() => {
+      const questionCoordinatorStats = new QuestionCoordinatorStats('user1', 5);
+      expect(
+        component.getFormattedContributorAttributes(questionCoordinatorStats)
+      ).toEqual([]);
+    }));
+  });
+
+  describe('when user navigates to coordinator tabs', () => {
+    beforeEach(waitForAsync(() => {
+      spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(900);
+    }));
+
+    it('should append the chevron column on mobile', () => {
+      spyOn(component, 'isMobileView').and.returnValue(true);
+      component.updateColumns(
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      );
+      expect(component.columnsToDisplay).toEqual([
+        'contributorName',
+        'lastContributedInDays',
+        'chevron',
+      ]);
+    });
+
+    it('should map coordinator tabs to the coordinate subtype', () => {
+      expect(
+        component.getContributionType(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        )
+      ).toEqual(AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION);
+      expect(
+        component.getContributionType(component.TAB_NAME_QUESTION_COORDINATOR)
+      ).toEqual(AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION);
+      expect(
+        component.getContributionSubType(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        )
+      ).toEqual(AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE);
+      expect(
+        component.getContributionSubType(
+          component.TAB_NAME_QUESTION_COORDINATOR
+        )
+      ).toEqual(AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE);
+    });
+
+    it('should label the last-activity column as "Last Active"', () => {
+      expect(
+        component.getLastContributedType(
+          component.TAB_NAME_TRANSLATION_COORDINATOR
+        )
+      ).toEqual('Last Active');
+      expect(
+        component.getLastContributedType(
+          component.TAB_NAME_QUESTION_COORDINATOR
+        )
+      ).toEqual('Last Active');
+    });
+
+    it('should only display name and last-active columns', () => {
+      component.updateColumns(
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      );
+      expect(component.columnsToDisplay).toEqual([
+        'chevron',
+        'contributorName',
+        'lastContributedInDays',
+      ]);
+    });
+
+    it('should show question coordinator stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [new QuestionCoordinatorStats('user1', 3)],
+          nextOffset: 0,
+          more: false,
+        } as QuestionCoordinatorStatsData)
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_COORDINATOR,
+          previousValue: component.TAB_NAME_QUESTION_REVIEWER,
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_COORDINATOR;
+      component.ngOnChanges(changes);
+      component.displayContributorAdminStats();
+      tick();
+      expect(component.allStats.length).toEqual(1);
+      expect(component.columnsToDisplay).toEqual([
+        'chevron',
+        'contributorName',
+        'lastContributedInDays',
+      ]);
+      expect(component.noDataMessage).toEqual('');
+    }));
+
+    it('should show empty-state message when no coordinator stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [],
+          nextOffset: 0,
+          more: false,
+        } as QuestionCoordinatorStatsData)
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_COORDINATOR,
+          previousValue: component.TAB_NAME_QUESTION_REVIEWER,
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_COORDINATOR;
+      component.ngOnChanges(changes);
+      component.displayContributorAdminStats();
+      tick();
+      expect(component.noDataMessage).toEqual('No statistics to display');
     }));
   });
 

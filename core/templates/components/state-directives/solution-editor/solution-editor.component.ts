@@ -32,6 +32,7 @@ interface ExplanationFormSchema {
 @Component({
   selector: 'oppia-solution-editor',
   templateUrl: './solution-editor.component.html',
+  styleUrls: ['./solution-editor.component.css'],
 })
 export class SolutionEditor implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();

@@ -32,15 +32,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
     aria-label="audio-slider"
   >
   </mat-slider>`,
-  styles: [
-    `
-      .mat-accent /deep/ .mat-slider-track-fill,
-      .mat-accent /deep/ .mat-slider-thumb,
-      .mat-accent /deep/ .mat-slider-thumb-label {
-        background: #ff4081;
-      }
-    `,
-  ],
+  styleUrls: ['./audio-slider.component.css'],
 })
 export class AudioSliderComponent {
   // These properties are initialized using component interactions

@@ -430,6 +430,108 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         )
 
 
+class ValidateCertificateAssessmentAnswerTests(test_utils.GenericTestBase):
+    """Tests to validate answer dicts submitted for a certificate
+    assessment."""
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_non_dict_answer_raises_exception(self) -> None:
+        with self.assertRaisesRegex(Exception, 'Expected dict, received'):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                42  # type: ignore[arg-type]
+            )
+
+    def test_missing_required_keys_raises_exception(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Missing keys: \\[\'is_correct\'\\]'
+        ):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {'question_id': 'q1'}
+            )
+
+    def test_extra_keys_raise_exception(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Extra keys: \\[\'unexpected\'\\]'
+        ):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': 'q1',
+                    'is_correct': True,
+                    'unexpected': 'value',
+                }
+            )
+
+    def test_non_string_question_id_raises_exception(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'question_id must be a non-empty string.'
+        ):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': 42,
+                    'is_correct': True,
+                }
+            )
+
+    def test_empty_question_id_raises_exception(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'question_id must be a non-empty string.'
+        ):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': '',
+                    'is_correct': True,
+                }
+            )
+
+    def test_non_bool_is_correct_raises_exception(self) -> None:
+        with self.assertRaisesRegex(Exception, 'is_correct must be a boolean.'):
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': 'q1',
+                    'is_correct': 'yes',
+                }
+            )
+
+    def test_omitted_selected_answer_defaults_to_none(self) -> None:
+        answer = (
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': 'q1',
+                    'is_correct': True,
+                }
+            )
+        )
+        self.assertEqual(
+            answer,
+            {
+                'question_id': 'q1',
+                'selected_answer': None,
+                'is_correct': True,
+            },
+        )
+
+    def test_selected_answer_is_preserved(self) -> None:
+        answer = (
+            domain_objects_validator.validate_certificate_assessment_answer(
+                {
+                    'question_id': 'q1',
+                    'selected_answer': 42,
+                    'is_correct': False,
+                }
+            )
+        )
+        self.assertEqual(
+            answer,
+            {
+                'question_id': 'q1',
+                'selected_answer': 42,
+                'is_correct': False,
+            },
+        )
+
+
 class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
     """Tests to validate state_dict of StateYamlHandler."""
 

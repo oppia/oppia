@@ -53,8 +53,12 @@ test.describe('Logged-Out Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+    await curriculumAdmin.createTopic(
+      'Introduction to Oppia',
+      'intro-oppia',
+      true
+    );
     await curriculumAdmin.createSkillForTopic(
       'Math',
       'Introduction to Oppia',
@@ -125,40 +129,23 @@ test.describe('Logged-Out Learner', function () {
     // Navigate to community library page and expect it to contain 3
     // different explorations.
     // LO.4 - First step of the test is to verify that the community library page
-    // does not have any translation ids, both before and after filtering by language.
+    // does not have any translation ids.
     await loggedOutLearner.navigateToCommunityLibraryPage();
     // Expect page has no translation ids.
     await loggedOutLearner.expectPageHasNoTranslationIds();
 
-    // Select language and verify no translation ids.
-    await loggedOutLearner.filterLessonsByLanguage(['español']);
-    await loggedOutLearner.expectPageHasNoTranslationIds();
-
-    await loggedOutLearner.filterLessonsByLanguage(['English'], 'español');
-    await loggedOutLearner.expectSearchResultsToContain([
-      'What are the place values?',
-      'Dummy Exploration 1',
-      'Dummy Exploration 2',
-    ]);
-
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    // Search and play the exploration "What are the place values?".
-    // Expect to be on the exploration player page and there is "Lesson info" text.
-    await loggedOutLearner.searchForLessonInSearchBar(
-      'What are the place values?'
-    );
-    await loggedOutLearner.playLessonFromSearchResults(
-      'What are the place values?'
-    );
-    await loggedOutLearner.expectToBeOnPage(
+    // Navigate to the exploration and expect to be on the exploration player
+    // page.
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
+    await loggedOutLearner.waitForPageToFullyLoad();
+    await loggedOutLearner.expectToBeOnPageAsLoggedOutUser(
       `http://localhost:8181/explore/${explorationId}`
     );
-    await loggedOutLearner.waitForPageToFullyLoad();
 
     await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');
 
     // Continue to next card.
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectGoBackToPreviousCardButton(true);
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
 

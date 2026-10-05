@@ -70,7 +70,8 @@ test.describe('Logged-In Learner - Manage Goals', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values',
-      'Place Values'
+      'Place Values',
+      true
     );
 
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
@@ -127,7 +128,7 @@ test.describe('Logged-In Learner - Manage Goals', function () {
   });
 
   test('should display empty Goals tab with title and Add Goals button', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectLearnerGreetingsToBe("loggedInUser1's Goals");
@@ -222,7 +223,7 @@ test.describe('Logged-In Learner - Manage Goals', function () {
   });
 
   test('should show goal card with 0% and Start button after adding goal', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.addGoalInRedesignedLearnerDashboard('Place Values');
@@ -252,7 +253,7 @@ test.describe('Logged-In Learner - Manage Goals', function () {
   });
 
   test('should highlight Goals tab in sidebar', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardAsLoggedInUser();
 
     await loggedInUser.expectGoalsTabButtonToBeVisible();
     await loggedInUser.navigateToGoalsSection();

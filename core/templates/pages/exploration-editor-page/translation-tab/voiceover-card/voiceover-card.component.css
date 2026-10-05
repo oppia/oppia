@@ -1,0 +1,143 @@
+.voiceover-action-buttons {
+  display: flex;
+  margin-left: 10px;
+}
+.voiceover-type-heading {
+  font-weight: bold;
+  margin: 2%;
+}
+.rotating {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.automatic-voiceover-enable-instruction {
+  color: #d14836;
+  margin: 0 4%;
+}
+.warning-icon {
+  margin-bottom: 4px;
+}
+.needs-update-button-icon {
+  background-color: #e9b330;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  height: 40px;
+  width: 40px;
+}
+.does-not-needs-update-button-icon {
+  background-color: #009688;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  height: 40px;
+  width: 40px;
+}
+.language-accent-selector {
+  width: 350px;
+}
+.voiceover-timer {
+  text-align: center;
+}
+.audio-button {
+  background-color: #009688;
+  border-radius: 20px;
+  color: #fff;
+  margin: 10px;
+}
+.audio-button-space {
+  background-color: transparent;
+  border-radius: 20px;
+  color: transparent;
+  margin: 10px;
+  visibility: hidden;
+}
+.voiceover-progress {
+  margin: 10px;
+  width: 50%;
+}
+.voiceover-progress-loading {
+  margin: 10px;
+  margin-left: 10%;
+  width: 50%;
+}
+.voiceovers-component {
+  align-items: center;
+  background: #e8e7e3;
+  border-radius: 10px;
+  display: flex;
+  height: 50px;
+  margin: 0 4%;
+}
+.add-voiceover-button-container {
+  align-items: center;
+  color: #009688;
+  display: flex;
+  margin: 0 4%;
+  text-align: center;
+}
+.add-manual-voiceover-button {
+  background: #e8e7e3;
+  border: 0;
+  border-radius: 10px;
+  color: #009688;
+  height: 50px;
+  width: 100%;
+}
+.add-manual-voiceover-button:disabled {
+  color: #a1c5c3;
+}
+.add-automatic-voiceover-button {
+  background: #e8e7e3;
+  border: 0;
+  border-radius: 10px;
+  color: #009688;
+  height: 50px;
+  width: 100%;
+}
+.add-automatic-voiceover-button:disabled {
+  color: #a1c5c3;
+}
+.delete-manual-voiceover-icon {
+  background-color: #d14836;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  height: 40px;
+  width: 40px;
+}
+.regenerate-voiceover-button {
+  background-color: #009688;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  height: 40px;
+  width: 40px;
+}
+.regenerate-voiceover-button:disabled {
+  background-color: #a1c5c3;
+}
+.stale-manual-voiceover-warning {
+  color: #d14836;
+  margin: 0 4%;
+}
+.unsupported-language-warning {
+  color: #d14836;
+  margin: 0 2%;
+}
+.content-unavailable-warning {
+  color: #d14836;
+  margin: 0 2%;
+}
+.automatic-voiceover-disable-reason {
+  color: #d14836;
+  margin: 0 4%;
+}

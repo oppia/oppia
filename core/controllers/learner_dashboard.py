@@ -219,12 +219,6 @@ class LearnerDashboardCollectionsProgressHandler(
             )
         )
 
-        collection_playlist_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.collection_playlist_summaries
-            )
-        )
-
         # Completed collections have all nodes done.
         for summary_dict in completed_collection_summary_dicts:
             summary_dict['completed_node_count'] = summary_dict[
@@ -250,7 +244,6 @@ class LearnerDashboardCollectionsProgressHandler(
             {
                 'completed_collections_list': completed_collection_summary_dicts,
                 'incomplete_collections_list': incomplete_collection_summary_dicts,
-                'collection_playlist': collection_playlist_summary_dicts,
                 'number_of_nonexistent_collections': (
                     number_of_nonexistent_collections
                 ),
@@ -291,18 +284,10 @@ class LearnerDashboardExplorationsProgressHandler(
             )
         )
 
-        exploration_playlist_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts(
-                learner_progress.exploration_playlist_summaries
-            )
-        )
-
         seen_exploration_ids: set[str] = set()
         exploration_ids_for_progress: list[str] = []
         for summary_dict in (
-            incomplete_exp_summary_dicts
-            + completed_exp_summary_dicts
-            + exploration_playlist_summary_dicts
+            incomplete_exp_summary_dicts + completed_exp_summary_dicts
         ):
             exploration_id = summary_dict['id']
             if exploration_id not in seen_exploration_ids:
@@ -345,17 +330,6 @@ class LearnerDashboardExplorationsProgressHandler(
                 'total_checkpoints_count'
             ]
 
-        for summary_dict in exploration_playlist_summary_dicts:
-            progress_data = progress_by_exp_id.get(
-                summary_dict['id'], default_progress_data
-            )
-            summary_dict['visited_checkpoints_count'] = progress_data[
-                'visited_checkpoints_count'
-            ]
-            summary_dict['total_checkpoints_count'] = progress_data[
-                'total_checkpoints_count'
-            ]
-
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id)
         )
@@ -380,7 +354,6 @@ class LearnerDashboardExplorationsProgressHandler(
             {
                 'completed_explorations_list': completed_exp_summary_dicts,
                 'incomplete_explorations_list': incomplete_exp_summary_dicts,
-                'exploration_playlist': exploration_playlist_summary_dicts,
                 'number_of_nonexistent_explorations': (
                     number_of_nonexistent_explorations
                 ),
@@ -396,8 +369,7 @@ class LearnerDashboardIdsHandler(
     """Gets the progress of the learner.
 
     Gets the ids of all explorations, collections, topics and stories
-    completed by the user, the activities currently being pursued,
-    and the activities present in the playlist.
+    completed by the user and the activities currently being pursued.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -378,12 +378,15 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.EMAIL_FOOTER,
-    'The footer to append to all outgoing emails. (This should '
-    'be written in HTML and include an unsubscribe link.)',
+    'The footer to append to all outgoing emails. This should be '
+    'written in HTML and include an unsubscribe link. The '
+    'LINK_TO_PREFERENCES_PAGE placeholder is replaced with the '
+    'preferences page URL before sending.',
     platform_parameter_domain.DataTypes.STRING,
     default=(
         'You can change your email preferences via the '
-        '<a href="LINK_TO_PREFERENCES_PAGE">Preferences</a> page.'
+        '<a href="%s">Preferences</a> page.'
+        % feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER
     ),
 )
 
@@ -501,20 +504,6 @@ Registry.create_platform_parameter(
     default=0.2,
 )
 
-# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
-# correspond to owners of the app before setting this to True. If
-# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent. If True then emails can be sent to any user.
-Registry.create_platform_parameter(
-    ParamName.SERVER_CAN_SEND_EMAILS,
-    (
-        'Whether the application can send emails.'
-        'Change this value to True for production environments using the '
-        'platform parameter dashboard.'
-    ),
-    platform_parameter_domain.DataTypes.BOOL,
-    default=False,
-)
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
@@ -561,20 +550,6 @@ Registry.create_platform_parameter(
 Registry.create_platform_parameter(
     ParamName.MAILGUN_DOMAIN_NAME,
     'Domain name for Mailgun email API.',
-    platform_parameter_domain.DataTypes.STRING,
-    default='',
-)
-
-Registry.create_platform_parameter(
-    ParamName.ES_CLOUD_ID,
-    'ID for elastic search service.',
-    platform_parameter_domain.DataTypes.STRING,
-    default='',
-)
-
-Registry.create_platform_parameter(
-    ParamName.ES_USERNAME,
-    'Username for elastic search service.',
     platform_parameter_domain.DataTypes.STRING,
     default='',
 )

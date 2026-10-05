@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,

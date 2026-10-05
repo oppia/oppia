@@ -98,7 +98,6 @@ EXCLUDED_PATHS: Final = (
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
-    'core/templates/google-analytics.initializer.ts',
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
@@ -109,8 +108,6 @@ EXCLUDED_PATHS: Final = (
 GENERATED_FILE_PATHS: Final = ('core/templates/expressions/parser.js',)
 
 CONFIG_FILE_PATHS: Final = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/wdio.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
@@ -390,9 +387,24 @@ def check_bad_pattern_in_file(
                 stripped_line = line[:-1]
             else:
                 stripped_line = line
+
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
-            if regexp.search(stripped_line):
+
+            # Check if the current pattern is specifically the TODO check.
+            is_todo_check = pattern['regexp'].pattern.startswith('TODO')
+
+            if is_todo_check:
+                # Remove string literals to avoid false positives for TODOs in strings.
+                line_to_check = re.sub(
+                    r'("[^"\\]*(?:\\.[^"\\]*)*")|(\'[^\'\\]*(?:\\.[^\'\\]*)*\')|(`[^`\\]*(?:\\.[^`\\]*)*`)',
+                    '',
+                    stripped_line,
+                )
+            else:
+                line_to_check = stripped_line
+
+            if regexp.search(line_to_check):
                 error_message = '%s --> Line %s: %s' % (
                     filepath,
                     line_num,
@@ -692,7 +704,6 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 filepath.endswith(('.js'))
                 and filepath.startswith(('core/templates', 'extensions'))
                 and (filepath not in build.JS_FILEPATHS_NOT_TO_BUILD)
-                and not filepath.endswith('webdriverio.js')
             ):
                 error_message = '%s  --> Found extra .js file' % filepath
                 error_messages.append(error_message)

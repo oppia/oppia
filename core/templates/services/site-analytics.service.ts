@@ -17,7 +17,8 @@
  * the learner and editor views.
  */
 
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
@@ -43,12 +44,13 @@ export class SiteAnalyticsService {
   constructor(
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private userService: UserService
+    private userService: UserService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
       // service is used.
-      initializeGoogleAnalytics();
+      initializeGoogleAnalytics(this.document);
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
@@ -431,18 +433,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerSaveRecordedAudioEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('save_recorded_audio', {
-      exploration_id: explorationId,
-    });
-  }
-
-  registerStartAudioRecordingEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('start_audio_recording', {
-      exploration_id: explorationId,
-    });
-  }
-
   registerUploadAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics('upload_recorded_audio', {
       exploration_id: explorationId,
@@ -760,5 +750,50 @@ export class SiteAnalyticsService {
         topic_id: topicId,
       }
     );
+  }
+
+  registerLessonFeedbackModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerLessonIssueModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerWebsiteIssueModalOpenEvent(): void {
+    this._sendEventToGoogleAnalytics('website_issue_modal_open', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerLessonFeedbackSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerLessonIssueSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerWebsiteIssueSubmittedEvent(feedbackId: string): void {
+    this._sendEventToGoogleAnalytics('website_issue_submitted', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      feedbackId: feedbackId,
+    });
   }
 }

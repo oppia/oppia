@@ -64,7 +64,6 @@ export default {
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
-    FeedbackUpdates: 'http://localhost:8181/feedback-updates',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     ImpactReport2022Url:
@@ -98,9 +97,6 @@ export default {
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
-    VolunteerForm:
-      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-    VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
       'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
@@ -121,8 +117,6 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
-    TeacherStoryTaggedBlogsLink:
-      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:

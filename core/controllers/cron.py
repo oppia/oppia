@@ -33,11 +33,10 @@ from core.domain import (
     user_services,
 )
 from core.jobs.batch_jobs import (
-    blog_post_search_indexing_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
-    exp_search_indexing_jobs,
     user_stats_computation_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from typing import DefaultDict, Dict, List
@@ -127,15 +126,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
-        # Only execute this job if it's possible to send the emails and there
-        # are reviewers to notify.
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
@@ -171,13 +161,6 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to alert the admins that specific suggestions have been waiting too long
         to get reviewed.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN
@@ -235,14 +218,6 @@ class CronMailReviewerNewSuggestionsHandler(
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
-
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
@@ -349,40 +324,6 @@ class CronExplorationRecommendationsHandler(
         )
 
 
-class CronActivitySearchRankHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler for computing activity search ranks."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:
-        """Handles GET requests."""
-        beam_job_services.run_beam_job(
-            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob
-        )
-
-
-class CronBlogPostSearchRankHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler for indexing blog post in search handler."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:
-        """Handles GET requests."""
-        beam_job_services.run_beam_job(
-            job_class=blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
-        )
-
-
 class CronMailChapterPublicationsNotificationsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -401,13 +342,6 @@ class CronMailChapterPublicationsNotificationsHandler(
         and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS days)
         chapter launches.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN
@@ -452,4 +386,40 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandler(
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
+        )
+
+
+class CronLessonFeedbackCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for cleaning Feedback text of expired LessonFeedbackModel entries."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=web_feedback_cleanup_jobs.LessonFeedbackCleanupJob
+        )
+
+
+class CronPlatformFeedbackCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for deleting expired PlatformFeedbackModel entries
+    together with their associated FeedbackSessionLogModel
+    entries and uploaded screenshots."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob
         )

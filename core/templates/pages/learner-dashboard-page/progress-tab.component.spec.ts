@@ -31,7 +31,12 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProgressTabComponent} from './progress-tab.component';
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
@@ -46,7 +51,7 @@ class MockRemoveActivityNgbModalRef {
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -321,8 +326,6 @@ describe('Progress Tab Component', () => {
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
     component.completedCollectionsList = [];
-    component.explorationPlaylist = [];
-    component.collectionPlaylist = [];
     component.subscriptionsList = [];
     component.completedToIncompleteCollections = [];
     component.totalCompletedLessonsList = [];
@@ -359,14 +362,11 @@ describe('Progress Tab Component', () => {
 
     expect(component.windowIsNarrow).toBeFalse();
     expect(component.noCommunityLessonActivity).toEqual(true);
-    expect(component.noPlaylistActivity).toEqual(true);
     expect(component.totalIncompleteLessonsList).toEqual([]);
     expect(component.totalCompletedLessonsList).toEqual([]);
-    expect(component.totalLessonsInPlaylist).toEqual([]);
     expect(component.allCommunityLessons).toEqual([]);
     expect(component.displayIncompleteLessonsList).toEqual([]);
     expect(component.displayCompletedLessonsList).toEqual([]);
-    expect(component.displayLessonsInPlaylist).toEqual([]);
     expect(component.displayInCommunityLessons).toEqual([]);
     expect(component.selectedSection).toEqual('All');
     expect(component.dropdownEnabled).toEqual(false);
@@ -374,19 +374,11 @@ describe('Progress Tab Component', () => {
 
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.displayLessonsInPlaylist).toEqual([]);
     expect(component.windowIsNarrow).toBeTrue();
 
     mockResizeEmitter.emit();
 
     expect(component.windowIsNarrow).toBeFalse();
-    expect(component.displayLessonsInPlaylist).toEqual([]);
-  });
-
-  it('should initilize values on init for mobile view', () => {
-    component.ngOnInit();
-
-    expect(component.displayLessonsInPlaylist).toEqual([]);
   });
 
   it('should sanitize given png base64 data and generate url', () => {
@@ -636,20 +628,6 @@ describe('Progress Tab Component', () => {
     expect(component.displayCompletedLessonsList).toEqual(
       component.totalCompletedLessonsList.slice(0, 3)
     );
-
-    component.totalLessonsInPlaylist = [summary1, summary2, summary3, summary4];
-    component.totalCompletedLessonsList = [];
-    component.handleShowMore('playlist');
-    expect(component.showMoreInSection.playlist).toEqual(true);
-    expect(component.displayLessonsInPlaylist).toEqual(
-      component.totalLessonsInPlaylist
-    );
-
-    component.showMoreInSection.playlist = true;
-    component.handleShowMore('playlist');
-    expect(component.showMoreInSection.playlist).toEqual(false);
-    expect(component.startIndexInPlaylist).toEqual(0);
-    expect(component.endIndexInPlaylist).toEqual(3);
   });
 
   it('should get the correct tile type', () => {
@@ -816,114 +794,7 @@ describe('Progress Tab Component', () => {
     component.pageNumberInCommunityLessons = 2;
     component.changePageByOne('MOVE_TO_PREV_PAGE', 'communityLessons');
     expect(component.pageNumberInCommunityLessons).toEqual(1);
-
-    component.displayInCommunityLessons = [];
-    component.displayLessonsInPlaylist = [
-      summary1,
-      summary2,
-      summary3,
-      summary4,
-    ];
-    component.changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist');
-    expect(component.pageNumberInPlaylist).toEqual(2);
-
-    component.pageNumberInPlaylist = 2;
-    component.changePageByOne('MOVE_TO_PREV_PAGE', 'playlist');
-    expect(component.pageNumberInPlaylist).toEqual(1);
   });
-
-  it('should open a modal to remove an exploration from playlist', fakeAsync(() => {
-    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-      .toBeUndefined;
-
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockRemoveActivityNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
-    const exp1 = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cc4b00',
-      created_on_msec: 1591296635736.666,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-      },
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'Test Title',
-    };
-    let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
-    component.explorationPlaylist = [summary1];
-    component.totalLessonsInPlaylist = [summary1];
-    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-
-    component.openRemoveActivityModal(
-      sectionNameI18nId,
-      subsectionName,
-      summary1
-    );
-    fixture.detectChanges();
-
-    expect(modalSpy).toHaveBeenCalled();
-  }));
-
-  it('should open a modal to remove a collection from playlist', fakeAsync(() => {
-    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-      .toBeUndefined;
-
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockRemoveActivityNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
-
-    const collection = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      language_code: 'en',
-      thumbnail_bg_color: '#cc4b00',
-      created_on: 1591296635736.666,
-      status: 'public',
-      category: 'Algebra',
-      title: 'Test Title',
-      node_count: 0,
-    };
-    let collectionSummary = CollectionSummary.createFromBackendDict(collection);
-    component.collectionPlaylist = [collectionSummary];
-    component.totalLessonsInPlaylist = [collectionSummary];
-    component.showMoreInSection.playlist = true;
-    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-
-    component.openRemoveActivityModal(
-      sectionNameI18nId,
-      subsectionName,
-      collectionSummary
-    );
-    fixture.detectChanges();
-
-    expect(modalSpy).toHaveBeenCalled();
-  }));
 
   it('should open a modal to remove an exploration from incomplete list', fakeAsync(() => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)

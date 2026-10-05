@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'url-fragment-editor-component',
   templateUrl: './url-fragment-editor.component.html',
+  styleUrls: ['./url-fragment-editor.component.css'],
 })
 export class UrlFragmentEditorComponent {
   // The heading of the input box.

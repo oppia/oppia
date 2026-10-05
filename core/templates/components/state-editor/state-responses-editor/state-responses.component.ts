@@ -63,6 +63,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 @Component({
   selector: 'oppia-state-responses',
   templateUrl: './state-responses.component.html',
+  styleUrls: ['./state-responses.component.css'],
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -94,7 +95,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   >();
 
   directiveSubscriptions = new Subscription();
-  activeEditOption: boolean = false;
+  activeEditOption: string | null = null;
   answerGroups: AnswerGroup[] = [];
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean = false;
   responseCardIsShown: boolean = false;
@@ -120,6 +121,24 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private editabilityService: EditabilityService,
     private platformFeatureService: PlatformFeatureService
   ) {}
+
+  // These getters are used by the component template to access the service
+  // properties while keeping the injected services private.
+  get isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
+  get isEditableOutsideTutorialMode(): boolean {
+    return this.editabilityService.isEditableOutsideTutorialMode();
+  }
+
+  get solicitAnswerDetailsDisplayed(): boolean {
+    return this.stateSolicitAnswerDetailsService.displayed;
+  }
+
+  set solicitAnswerDetailsDisplayed(value: boolean) {
+    this.stateSolicitAnswerDetailsService.displayed = value;
+  }
 
   sendOnSaveNextContentIdIndex(event: number): void {
     this.onSaveNextContentIdIndex.emit(event);
@@ -665,10 +684,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.onSaveInapplicableSkillMisconceptionIds.emit(
       this.inapplicableSkillMisconceptionIds
     );
-    this.setActiveEditOption(false);
+    this.setActiveEditOption(null);
   }
 
-  setActiveEditOption(activeEditOption: boolean): void {
+  setActiveEditOption(activeEditOption: string | null): void {
     this.activeEditOption = activeEditOption;
   }
 
@@ -838,7 +857,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateEditorService.updateStateResponsesInitialised();
     this.inapplicableSkillMisconceptionIds =
       this.stateEditorService.getInapplicableSkillMisconceptionIds();
-    this.activeEditOption = false;
+    this.activeEditOption = null;
   }
 
   ngOnDestroy(): void {

@@ -80,7 +80,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -197,7 +196,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -223,7 +221,12 @@ class TasksTests(test_utils.EmailTestBase):
 
         user_id = self.user_id_a
         user_services.update_email_preferences(
-            user_id, True, False, False, False
+            user_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         payload = {
@@ -264,7 +267,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -317,7 +319,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -364,7 +365,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -414,7 +414,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -455,7 +454,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -524,7 +522,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -591,7 +588,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -743,7 +739,11 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_should_handle_voiceover_deferred_tasks_successfully(self) -> None:
         exploration_id = 'exploration_id'
-        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        self.save_new_valid_exploration(
+            exploration_id,
+            self.owner_id,
+            content_html='Hello world',
+        )
         rights_manager.publish_exploration(self.owner, exploration_id)
 
         url = feconf.TASK_URL_DEFERRED
@@ -790,7 +790,7 @@ class TasksTests(test_utils.EmailTestBase):
             taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
         )
         assert cloud_task_run_model_obj is not None
-        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
+        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'RUNNING')
 
     def test_should_handle_failure_case_for_voiceover_deferred_tasks(
         self,
@@ -1240,7 +1240,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (

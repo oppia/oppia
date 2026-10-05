@@ -1,0 +1,72 @@
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+.oppia-close-button {
+  font-size: 2.5rem;
+  position: absolute;
+  right: 20px;
+  top: 12px;
+}
+.oppia-question-editor-section {
+  padding: 0 100px;
+}
+
+.oppia-question-suggestion-editor-modal {
+  padding: 0;
+}
+
+.oppia-question-suggestion-editor-modal>.modal-header {
+  padding-bottom: 0;
+}
+
+.select-difficulty-icon.oppia-editor-edit-icon {
+  font-size: 12px;
+  position: unset
+}
+
+.select-difficulty-icon.oppia-editor-edit-icon:hover {
+  opacity: 0.8;
+}
+
+@media only screen and (max-width: 1023px) {
+  .oppia-question-editor-section {
+    padding: 0 75px;
+  }
+}
+@media only screen and (max-width: 700px) {
+  .oppia-question-editor-section {
+    padding: 0;
+  }
+}
+@media only screen and (max-width: 500px) {
+  .oppia-question-editor-section {
+    padding: 0;
+  }
+  .oppia-question-suggestion-editor-modal {
+    padding: 0;
+  }
+  h3 {
+    font-size: 20px;
+  }
+  .oppia-question-editor-section h3 {
+    font-size: 18px;
+  }
+  .oppia-explanation {
+    font-size: 16px;
+  }
+}
+@media only screen and (max-width: 350px) {
+  .modal-footer, .oppia-buttons-right {
+    display: flex;
+    flex-direction: column;
+  }
+  .oppia-buttons-right {
+    align-items: center;
+    width: 100%;
+  }
+  .modal-footer .btn {
+    margin-bottom: 10px;
+    width: 50%;
+  }
+}

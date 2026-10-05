@@ -33,15 +33,20 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
-interface ExplanationFormSchema {
-  type: string;
+export interface ExplanationFormSchema {
+  type: 'html';
   ui_config: object;
 }
 
 @Component({
   selector: 'oppia-solution-explanation-editor',
   templateUrl: './solution-explanation-editor.component.html',
+  styleUrls: ['./solution-explanation-editor.component.css'],
 })
 export class SolutionExplanationEditor implements OnDestroy, OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
@@ -62,14 +67,25 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
     private htmlLengthService: HtmlLengthService
   ) {}
 
-  updateExplanationHtml(newHtmlString: string): void {
+  // These getters are used by the component template to access the solution
+  // properties while keeping the injected service private.
+  get displayedSolution(): Solution | null {
+    return this.stateSolutionService.displayed;
+  }
+
+  get solutionSavedMemento(): Solution | null {
+    return this.stateSolutionService.savedMemento;
+  }
+
+  updateExplanationHtml(value: SchemaDefaultValue): void {
     if (this.stateSolutionService.displayed === null) {
       throw new Error('Solution is undefined');
     }
-    this.stateSolutionService.displayed.explanation._html = newHtmlString;
+    this.stateSolutionService.displayed.explanation._html =
+      typeof value === 'string' ? value : '';
   }
 
-  getSchema(): object {
+  getSchema(): Schema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 

@@ -42,7 +42,7 @@ from typing import Final, List, Optional, Type
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
 #
-#   https://docs.python.org/3.10/library/sys.html#sys.path
+#   https://docs.python.org/3.12/library/sys.html#sys.path
 #
 # However, when git executes pre_push_hook.py from its symlink in
 # /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
@@ -263,12 +263,9 @@ def does_diff_include_ci_config_or_test_files(diff_files: List[bytes]) -> bool:
     """
 
     for file_path in diff_files:
-        if (
-            re.search(rb'ci-test-suite-configs/.*\.json', file_path)
-            or re.search(rb'wdio\.conf\.js', file_path)
-            or re.search(rb'webdriverio', file_path)
-            or re.search(rb'puppeteer-acceptance-tests', file_path)
-        ):
+        if re.search(
+            rb'ci-test-suite-configs/.*\.json', file_path
+        ) or re.search(rb'puppeteer-acceptance-tests', file_path):
             return True
     return False
 

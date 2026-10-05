@@ -13,27 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service related to the learner playlist.
+ * @fileoverview Service related to the learner dashboard activities.
  */
 
 import {Injectable} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {HttpClient} from '@angular/common/http';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import {RemoveActivityModalComponent} from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
-
-interface LearnerPlaylistResponseObject {
-  belongs_to_completed_or_incomplete_list: boolean;
-  belongs_to_subscribed_activities: boolean;
-  is_super_admin: boolean;
-  playlist_limit_exceeded: boolean;
-  user_email: string;
-  username: string;
-}
 
 interface LearnerGoalsResponseObject {
   belongs_to_learnt_list: boolean;
@@ -50,7 +39,6 @@ export class LearnerDashboardActivityBackendApiService {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  addToLearnerPlaylistUrl!: string;
   addToLearnerGoalsUrl!: string;
   removeActivityModalStatus!: string;
   successfullyAdded: boolean = false;
@@ -61,67 +49,6 @@ export class LearnerDashboardActivityBackendApiService {
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService
   ) {}
-
-  async addToLearnerPlaylist(
-    activityId: string,
-    activityType: string
-  ): Promise<boolean> {
-    this.successfullyAdded = true;
-    this.addToLearnerPlaylistUrl = this.urlInterpolationService.interpolateUrl(
-      '/learnerplaylistactivityhandler/<activityType>/<activityId>',
-      {
-        activityType: activityType,
-        activityId: activityId,
-      }
-    );
-    let response = await this.http
-      .post<LearnerPlaylistResponseObject>(this.addToLearnerPlaylistUrl, {})
-      .toPromise();
-    if (response.belongs_to_completed_or_incomplete_list) {
-      this.successfullyAdded = false;
-      this.alertsService.addInfoMessage(
-        'You have already completed or are completing this ' + 'activity.'
-      );
-    }
-    if (response.belongs_to_subscribed_activities) {
-      this.successfullyAdded = false;
-      this.alertsService.addInfoMessage(
-        'This is present in your creator dashboard'
-      );
-    }
-    if (response.playlist_limit_exceeded) {
-      this.successfullyAdded = false;
-      this.alertsService.addInfoMessage(
-        "Your 'Play Later' list is full!  Either you can " +
-          'complete some or you can head to the learner dashboard ' +
-          'and remove some.'
-      );
-    }
-    if (this.successfullyAdded) {
-      this.alertsService.addSuccessMessage(
-        "Successfully added to your 'Play Later' list."
-      );
-    }
-    return this.successfullyAdded;
-  }
-
-  removeFromLearnerPlaylist(
-    activityId: string,
-    activityType: string,
-    learnerDashboardActivityIds: LearnerDashboardActivityIds,
-    playlistUrl: string
-  ): void {
-    this.http.delete<void>(playlistUrl).toPromise();
-    if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
-      learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-        activityId
-      );
-    } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
-      learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-        activityId
-      );
-    }
-  }
 
   async addToLearnerGoals(
     activityId: string,
@@ -160,9 +87,8 @@ export class LearnerDashboardActivityBackendApiService {
   }
 
   // This function will open a modal to remove an exploration
-  // from the given list either 'Play Later' or 'In Progress'
-  // or remove a topic from the 'Current Goals' or 'In Progress'
-  // in Learner Dashboard Page.
+  // from the given list or remove a topic from the 'Current
+  // Goals' or 'In Progress' in Learner Dashboard Page.
   async removeActivityModalAsync(
     sectionNameI18nId: string,
     subsectionName: string,
@@ -177,8 +103,8 @@ export class LearnerDashboardActivityBackendApiService {
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     await modelRef.result.then(
-      playlistUrl => {
-        this.http.delete<void>(playlistUrl).toPromise();
+      activityUrl => {
+        this.http.delete<void>(activityUrl).toPromise();
         this.removeActivityModalStatus = 'removed';
       },
       () => {

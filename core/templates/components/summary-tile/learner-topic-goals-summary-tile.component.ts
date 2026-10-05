@@ -30,6 +30,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
   templateUrl: './learner-topic-goals-summary-tile.component.html',
+  styleUrls: ['./learner-topic-goals-summary-tile.component.css'],
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -54,6 +55,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   cardIsHovered: boolean = false;
   openInNewWindow: boolean = false;
   statusIsPublished!: boolean;
+  storyCompleted: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -156,6 +158,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyProgress = Math.floor(
         (completedNodesCount / totalStoryNodesCount) * 100
       );
+      this.storyCompleted = this.storyProgress === 100;
     }
   }
 

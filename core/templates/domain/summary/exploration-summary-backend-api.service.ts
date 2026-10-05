@@ -23,6 +23,7 @@ import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
+import {TranslatableExplorationMetadataField} from 'domain/summary/learner-exploration-summary.model';
 import {ValidatorsService} from 'services/validators.service';
 
 export interface ExplorationSummaryBackendDict {
@@ -42,6 +43,7 @@ export interface ExplorationSummaryDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
+  translated_metadata_fields?: TranslatableExplorationMetadataField[];
 }
 
 @Injectable({

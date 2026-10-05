@@ -31,10 +31,15 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Cropper from 'cropperjs';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',
   templateUrl: './upload-blog-post-thumbnail.component.html',
+  styleUrls: ['./upload-blog-post-thumbnail.component.css'],
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -50,14 +55,15 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
-  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,
     private svgSanitizerService: SvgSanitizerService,
-    private windowDimensionService: WindowDimensionsService
+    private windowDimensionService: WindowDimensionsService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   initializeCropper(): void {
@@ -127,6 +133,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     };
   }
 
+  getInvalidSvgIssueUrl(): string {
+    return this.svgSanitizerService.getIssueURL(this.invalidTagsAndAttributes);
+  }
+
   onInvalidImageLoaded(): void {
     this.reset();
     this.invalidImageWarningIsShown = true;
@@ -158,6 +168,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CROPPER);
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: [],

@@ -556,9 +556,42 @@ describe('Question player engine service', () => {
       initErrorCb
     );
 
+    const firstQuestionId = multipleQuestionsObjects[0].getId();
+    if (firstQuestionId === null) {
+      throw new Error('First question ID is null.');
+    }
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
       multipleQuestionsObjects[0].getId() ?? ''
     );
+
+    // Simulate the question returning a null ID to trigger the null guard.
+    spyOn(multipleQuestionsObjects[0], 'getId').and.returnValue(null);
+
+    expect(() => {
+      questionPlayerEngineService.getCurrentQuestionId();
+    }).toThrowError('Current question ID is null.');
+  });
+
+  it('should throw an error in loadInitialQuestion if first question id is null', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
+
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    // Spy on all question objects so that regardless of how init() shuffles the
+    // array, every question returns a null ID, triggering the null guard inside
+    // loadInitialQuestion.
+    for (const q of multipleQuestionsObjects) {
+      spyOn(q, 'getId').and.returnValue(null);
+    }
+
+    expect(() => {
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+    }).toThrowError('First question ID is null.');
   });
 
   it('should init question player', fakeAsync(() => {
@@ -982,5 +1015,150 @@ describe('Question player engine service', () => {
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
       }
     );
+
+    it('should call error callback if initial content id is null', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+
+      const originalContentId =
+        singleQuestionBackendDict.question_state_data.content.content_id;
+      singleQuestionBackendDict.question_state_data.content.content_id = null;
+
+      try {
+        questionPlayerEngineService.init(
+          [Question.createFromBackendDict(singleQuestionBackendDict)],
+          initSuccessCb,
+          initErrorCb
+        );
+      } finally {
+        singleQuestionBackendDict.question_state_data.content.content_id =
+          originalContentId;
+      }
+
+      expect(initErrorCb).toHaveBeenCalled();
+    });
+
+    it('should call error callback if next content id is null', () => {
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', '', '', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
+        (html, envs) => html
+      );
+      spyOn(Math, 'random').and.returnValue(0.999);
+
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalContentId =
+        nextQuestionBackendDict.question_state_data.content.content_id;
+      nextQuestionBackendDict.question_state_data.content.content_id = null;
+
+      multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+        function (questionDict) {
+          return Question.createFromBackendDict(questionDict);
+        }
+      );
+
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+
+      try {
+        questionPlayerEngineService.submitAnswer(
+          answer,
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      } finally {
+        nextQuestionBackendDict.question_state_data.content.content_id =
+          originalContentId;
+        multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+          function (questionDict) {
+            return Question.createFromBackendDict(questionDict);
+          }
+        );
+      }
+    });
+
+    it('should return empty string if next interaction id is null', () => {
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', '', '', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      let createNewCardSpy = spyOn(
+        StateCard,
+        'createNewCard'
+      ).and.callThrough();
+      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
+        (html, envs) => html
+      );
+      spyOn(Math, 'random').and.returnValue(0.999);
+
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalInteractionId =
+        nextQuestionBackendDict.question_state_data.interaction.id;
+      nextQuestionBackendDict.question_state_data.interaction.id = null;
+
+      multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+        function (questionDict) {
+          return Question.createFromBackendDict(questionDict);
+        }
+      );
+
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+
+      try {
+        questionPlayerEngineService.submitAnswer(
+          answer,
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      } finally {
+        nextQuestionBackendDict.question_state_data.interaction.id =
+          originalInteractionId;
+        multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+          function (questionDict) {
+            return Question.createFromBackendDict(questionDict);
+          }
+        );
+      }
+
+      expect(createNewCardSpy).toHaveBeenCalledTimes(2);
+      expect(createNewCardSpy.calls.argsFor(1)[0]).toBe('true');
+      expect(createNewCardSpy.calls.argsFor(1)[2].trim()).toBe('');
+    });
   });
 });

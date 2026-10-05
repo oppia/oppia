@@ -52,6 +52,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'math_classroom_id',
             'name': 'math',
             'url_fragment': 'math',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated math foundations course.',
             'teaser_text': 'Teaser test for math classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -73,6 +74,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.classroom_id,
             self.math_classroom.name,
             self.math_classroom.url_fragment,
+            self.math_classroom.feedback_recipient_email,
             self.math_classroom.course_details,
             self.math_classroom.teaser_text,
             self.math_classroom.topic_list_intro,
@@ -92,6 +94,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'physics_classroom_id',
             'name': 'physics',
             'url_fragment': 'physics',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated physics foundations course.',
             'teaser_text': 'Teaser test for physics classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -113,6 +116,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.classroom_id,
             self.physics_classroom.name,
             self.physics_classroom.url_fragment,
+            self.physics_classroom.feedback_recipient_email,
             self.physics_classroom.course_details,
             self.physics_classroom.teaser_text,
             self.physics_classroom.topic_list_intro,
@@ -161,6 +165,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'chem_classroom_id',
             'name': 'chem',
             'url_fragment': 'chem',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated Chemistry foundations course.',
             'teaser_text': 'Teaser test for chemistry classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -178,6 +183,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.classroom_id,
             chemistry_classroom.name,
             chemistry_classroom.url_fragment,
+            chemistry_classroom.feedback_recipient_email,
             chemistry_classroom.course_details,
             chemistry_classroom.teaser_text,
             chemistry_classroom.topic_list_intro,
@@ -228,6 +234,56 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             classroom_name, constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS
         )
 
+    def test_get_classroom_by_topic_id(self) -> None:
+        chemistry_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'chem_classroom_id',
+            'name': 'chem',
+            'url_fragment': 'chem',
+            'feedback_recipient_email': 'user@email.com',
+            'course_details': 'Curated Chemistry foundations course.',
+            'teaser_text': 'Teaser test for chemistry classroom',
+            'topic_list_intro': 'Start from the basics with our first topic.',
+            'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
+            'is_published': True,
+            'diagnostic_test_is_enabled': False,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict(),
+            'index': 2,
+        }
+        chemistry_classroom = classroom_config_domain.Classroom.from_dict(
+            chemistry_classroom_dict
+        )
+        classroom_models.ClassroomModel.create(
+            chemistry_classroom.classroom_id,
+            chemistry_classroom.name,
+            chemistry_classroom.url_fragment,
+            chemistry_classroom.feedback_recipient_email,
+            chemistry_classroom.course_details,
+            chemistry_classroom.teaser_text,
+            chemistry_classroom.topic_list_intro,
+            chemistry_classroom.topic_id_to_prerequisite_topic_ids,
+            chemistry_classroom.is_published,
+            chemistry_classroom.diagnostic_test_is_enabled,
+            chemistry_classroom.thumbnail_data.filename,
+            chemistry_classroom.thumbnail_data.bg_color,
+            chemistry_classroom.thumbnail_data.size_in_bytes,
+            chemistry_classroom.banner_data.filename,
+            chemistry_classroom.banner_data.bg_color,
+            chemistry_classroom.banner_data.size_in_bytes,
+            chemistry_classroom.index,
+        )
+        classroom = classroom_config_services.get_classroom_by_topic_id(
+            'topic_id_chem'
+        )
+        assert classroom is not None
+        self.assertEqual(classroom.to_dict(), chemistry_classroom.to_dict())
+
+    def test_get_classroom_by_topic_id_for_non_existing_topic(self) -> None:
+        classroom = classroom_config_services.get_classroom_by_topic_id(
+            'non_existing_topic_id'
+        )
+        self.assertIsNone(classroom)
+
     def test_get_all_classrooms(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()
         classroom_dicts = [classroom.to_dict() for classroom in classrooms]
@@ -258,6 +314,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             new_classroom_id,
             'chemistry',
             'chemistry',
+            'user@email.com',
             'Curated chemistry foundations course.',
             'Teaser test for chemistry classroom',
             'Start from the basics with our first topic.',
@@ -374,7 +431,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         classroom_id = classroom_config_services.get_new_classroom_id()
         history_classroom = (
             classroom_config_services.create_new_default_classroom(
-                classroom_id, 'history', 'history'
+                classroom_id, 'history', 'history', 'user@email.com'
             )
         )
         history_classroom_data = classroom_config_services.get_classroom_by_id(

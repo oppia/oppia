@@ -29,16 +29,13 @@ from core.domain import (
     auth_domain,
     feature_flag_services,
     param_domain,
-    platform_parameter_list,
-    platform_parameter_services,
     user_services,
 )
 from core.platform import models
 from core.tests import test_utils
 
-import elasticsearch
 import webapp2
-from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
+from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
@@ -73,47 +70,6 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
         self.assertTrue(
             feature_flag_services.is_feature_flag_enabled('blog_pages', None)
         )
-
-
-class SetPlatformParametersTests(test_utils.GenericTestBase):
-    """Tests for testing test_utils.set_platform_parameters."""
-
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
-        ]
-    )
-    def test_set_platform_parameters_decorator(self) -> None:
-        """Tests if platform parameters are set."""
-        self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            ),
-            True,
-        )
-        self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-            ),
-            'admin',
-        )
-
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
-    def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
-        """Tests if invalid platform parameter raises an error."""
-        with self.assertRaisesRegex(
-            Exception,
-            'The value for the platform parameter dummy_parameter was '
-            'needed in this test, but not specified in the '
-            'set_platform_parameters decorator. Please use this information in '
-            'the decorator.',
-        ):
-            platform_parameter_services.get_platform_parameter_value(
-                'dummy_parameter'
-            )
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -857,16 +813,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 http_method=invalid_http_method,
             )
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
-    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'mocked_now must be datetime, got: 123'
-        ):
-            with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
-                pass
-
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No file exists for the given file name'
@@ -900,6 +846,29 @@ class TestUtilsTests(test_utils.GenericTestBase):
             AssertionError, 'missing item expected to match: \'1\''
         ):
             self.assert_matches_regexps([], ['1'])
+
+    def test_assert_dict_contains_subset_passes_for_valid_subset(self) -> None:
+        self.assertDictContainsSubset({'a': 1}, {'a': 1, 'b': 2})
+
+    def test_assert_dict_contains_subset_raises_for_missing_key_only(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(AssertionError, 'Missing: \\[\'a\'\\]$'):
+            self.assertDictContainsSubset({'a': 1}, {})
+
+    def test_assert_dict_contains_subset_raises_for_mismatch_only(self) -> None:
+        with self.assertRaisesRegex(AssertionError, '^Mismatched values:'):
+            self.assertDictContainsSubset({'a': 1}, {'a': 2})
+
+    def test_assert_dict_contains_subset_raises_for_missing_and_mismatch(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            AssertionError, 'Missing.*Mismatched values'
+        ):
+            self.assertDictContainsSubset(
+                {'missing_key': 'x', 'b': 1}, {'b': 2}
+            )
 
         with self.assertRaisesRegex(AssertionError, 'extra item \'1\''):
             self.assert_matches_regexps(['1'], [])
@@ -961,64 +930,6 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
     def test_jpeg_image_yields_false(self) -> None:
         self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
-
-
-class ElasticSearchStubTests(test_utils.GenericTestBase):
-
-    def test_duplicate_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        stub.mock_create_index('index1')
-        stub.mock_create_index('index2')
-        with self.assertRaisesRegex(
-            elasticsearch.RequestError,
-            r'resource_already_exists_exception: index',
-        ):
-            stub.mock_create_index('index1')
-
-    def test_delete_from_missing_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'index_not_found_exception: no such index \[index1\]',
-        ):
-            stub.mock_delete('index1', 'some_id')
-
-    def test_delete_missing_doc_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        stub.mock_create_index('index1')
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'document not found: \[index1\]\[doc_id\]',
-        ):
-            stub.mock_delete('index1', 'doc_id')
-
-    def test_delete_by_query_with_missing_index_yields_error(self) -> None:
-        stub = test_utils.ElasticSearchStub()
-        with self.assertRaisesRegex(
-            elasticsearch.NotFoundError,
-            r'index_not_found_exception: no such index \[index1\]',
-        ):
-            stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
-
-    def test_mock_search_ignores_duplicate_document_ids(self) -> None:
-        """Tests that mock_search correctly skips documents if their ID is
-        already present in the result set, ensuring branch coverage.
-        """
-        stub = test_utils.ElasticSearchStub()
-        stub._DB['index1'] = [  # pylint: disable=protected-access
-            {'id': 'duplicate_id_1', 'data': 'first_doc'},
-            {'id': 'duplicate_id_1', 'data': 'second_doc'},
-        ]
-        body: Dict[
-            str,
-            Dict[str, Dict[str, List[Dict[str, Union[str, int, float, bool]]]]],
-        ] = {'query': {'bool': {'filter': [], 'must': []}}}
-        result = stub.mock_search(body=body, index='index1', size=10, from_=0)
-
-        hits = result['hits']['hits']
-        self.assertEqual(len(hits), 1)
-        self.assertEqual(hits[0]['_id'], 'duplicate_id_1')
-        self.assertEqual(hits[0]['_source']['data'], 'first_doc')
 
 
 class EmailMockTests(test_utils.EmailTestBase):

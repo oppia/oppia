@@ -32,7 +32,7 @@ import {ServicesConstants} from 'services/services.constants';
 @Component({
   selector: 'oppia-interactive-end-exploration',
   templateUrl: './end-exploration-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./end-exploration-interaction.component.css'],
 })
 export class InteractiveEndExplorationComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

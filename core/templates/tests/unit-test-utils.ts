@@ -23,10 +23,11 @@ import {
   Input,
   NgModule,
   Pipe,
+  PipeTransform,
 } from '@angular/core';
 
 @Pipe({name: 'translate'})
-export class MockTranslatePipe {
+export class MockTranslatePipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }

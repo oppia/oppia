@@ -488,6 +488,15 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             deferred_task_function(*payload['args'], **payload['kwargs'])
 
+            # If the deferred task is for voiceover regeneration, do not update
+            # its status immediately. Instead, wait until all child processes
+            # have completed. The final status will be set at the end of the
+            # parent task.
+            if (
+                cloud_task_run_domain_instance.is_voiceover_regeneration_parent_task()
+            ):
+                return
+
             updated_cloud_task_run_domain_instance = (
                 taskqueue_services.get_cloud_task_run_by_model_id(
                     cloud_task_model_id

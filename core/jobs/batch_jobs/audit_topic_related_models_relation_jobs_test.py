@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_topic_related_models_relation_jobs
 from core.jobs.types import base_validation_errors, model_property
@@ -81,8 +79,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,
@@ -127,8 +125,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,
@@ -233,8 +231,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,
@@ -281,8 +279,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,
@@ -343,8 +341,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,
@@ -384,8 +382,8 @@ class ValidateTopicModelsJobTests(
             language_code='en',
             description='this is description',
             url_fragment='url-fragment',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
+            topic_model_last_updated=utils.get_current_utc_datetime(),
+            topic_model_created_on=utils.get_current_utc_datetime(),
             canonical_story_count=5,
             additional_story_count=2,
             total_skill_count=10,

@@ -128,6 +128,77 @@ describe('Concept card backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should send the language code when a non-English language is requested', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    conceptCardBackendApiService
+      .loadConceptCardsAsync(['1'], 'es')
+      .then(successHandler, failHandler);
+    var req = httpTestingController.expectOne(
+      '/concept_card_handler/' +
+        encodeURIComponent('["1"]') +
+        '?language_code=es'
+    );
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.params.get('language_code')).toEqual('es');
+    req.flush(sampleResponse1);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(conceptCardSampleResponse1);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should not send a language code when English is requested', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    conceptCardBackendApiService
+      .loadConceptCardsAsync(['1'], 'en')
+      .then(successHandler, failHandler);
+    var req = httpTestingController.expectOne(
+      '/concept_card_handler/' + encodeURIComponent('["1"]')
+    );
+    expect(req.request.params.has('language_code')).toBeFalse();
+    req.flush(sampleResponse1);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(conceptCardSampleResponse1);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should not reuse a cached concept card across languages', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    conceptCardBackendApiService
+      .loadConceptCardsAsync(['1'])
+      .then(successHandler, failHandler);
+    var englishReq = httpTestingController.expectOne(
+      '/concept_card_handler/' + encodeURIComponent('["1"]')
+    );
+    englishReq.flush(sampleResponse1);
+    flushMicrotasks();
+
+    // The same skill in a different language must be fetched again rather
+    // than served from the English cache.
+    conceptCardBackendApiService
+      .loadConceptCardsAsync(['1'], 'es')
+      .then(successHandler, failHandler);
+    var spanishReq = httpTestingController.expectOne(
+      '/concept_card_handler/' +
+        encodeURIComponent('["1"]') +
+        '?language_code=es'
+    );
+    expect(spanishReq.request.method).toEqual('GET');
+    spanishReq.flush(sampleResponse1);
+    flushMicrotasks();
+
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should succesfully fetch multiple concept cards from the backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');

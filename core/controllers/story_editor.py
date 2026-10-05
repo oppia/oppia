@@ -136,6 +136,7 @@ class EditableStoryDataHandler(
             )
         )
 
+        story_is_published = False
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_is_published = story_reference.story_is_published
@@ -251,7 +252,10 @@ class StoryPublishHandler(
             story_publication_action
             == topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
         ):
-            topic_services.publish_story(topic_id, story_id, self.user_id)
+            try:
+                topic_services.publish_story(topic_id, story_id, self.user_id)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e) from e
         else:
             topic_services.unpublish_story(
                 topic_id,

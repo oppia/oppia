@@ -31,6 +31,7 @@ interface DeleteValue {
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html',
+  styleUrls: ['./response-header.component.css'],
 })
 export class ResponseHeaderComponent {
   @Output() delete = new EventEmitter<DeleteValue>();

@@ -31,10 +31,9 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingTopicData,
-} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
-import './certificate-offering-add-topic-items.component.css';
 export interface TopicOption {
   id: string;
   title: string;
@@ -64,6 +63,7 @@ export class CertificateOfferingAddTopicItemsComponent
   availableTopics: TopicOption[] = [];
   classroomName: string = '';
   classroomLoadErrorMessage: string = '';
+  isLoadingTopics: boolean = false;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
@@ -84,11 +84,13 @@ export class CertificateOfferingAddTopicItemsComponent
   }
 
   private async loadTopicsForClassroom(): Promise<void> {
+    this.isLoadingTopics = true;
     if (!this.classroomId) {
       this.availableTopics = [];
       this.classroomName = '';
       this.classroomLoadErrorMessage = '';
       this.syncSelectedFromOffering();
+      this.isLoadingTopics = false;
       return;
     }
 
@@ -127,6 +129,8 @@ export class CertificateOfferingAddTopicItemsComponent
       this.classroomName = '';
       this.classroomLoadErrorMessage =
         'Unable to load topics for this classroom.';
+    } finally {
+      this.isLoadingTopics = false;
     }
 
     this.syncSelectedFromOffering();

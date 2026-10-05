@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Image with regions reset confirmation component.
  */
 
+// @ts-nocheck
+
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';

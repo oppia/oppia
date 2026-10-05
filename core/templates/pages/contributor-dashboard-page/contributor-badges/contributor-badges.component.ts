@@ -46,7 +46,7 @@ export enum MobileBadgeType {
 @Component({
   selector: 'contributor-badges',
   templateUrl: './contributor-badges.component.html',
-  styleUrls: [],
+  styleUrls: ['./contributor-badges.component.css'],
 })
 export class ContributorBadgesComponent {
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;

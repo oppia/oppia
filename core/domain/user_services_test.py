@@ -34,6 +34,7 @@ from core.domain import (
     exp_services,
     platform_parameter_list,
     rights_manager,
+    role_services,
     state_domain,
     suggestion_services,
     user_domain,
@@ -43,7 +44,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import requests_mock
-from typing import Dict, Final, List
+from typing import Dict, Final, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -617,13 +618,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_VOICEOVER_ADMIN,
         ]
 
-        less_than_time = datetime.datetime.utcnow()
+        less_than_time = utils.get_current_utc_datetime()
 
         users_settings = user_services.get_users_settings(user_ids)
         self.assertEqual(len(users_settings), 1)
         admin_settings = users_settings[0]
 
-        greater_than_time = datetime.datetime.utcnow()
+        greater_than_time = utils.get_current_utc_datetime()
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
@@ -794,7 +795,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -837,6 +837,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
             )
 
         self.assertItemsEqual(
@@ -864,25 +865,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             _mock_add_or_update_user_status,
         )
         with bulk_email_swap:
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    user_id,
-                    True,
-                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
-                )
-            )
-            self.assertTrue(bulk_email_signup_message_should_be_shown)
-
-        bulk_email_signup_message_should_be_shown = (
-            user_services.update_email_preferences(
+            bulk_email_signup_message_should_be_shown = user_services.update_email_preferences(
                 user_id,
                 True,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
             )
+            self.assertTrue(bulk_email_signup_message_should_be_shown)
+
+        bulk_email_signup_message_should_be_shown = user_services.update_email_preferences(
+            user_id,
+            True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         self.assertFalse(bulk_email_signup_message_should_be_shown)
 
@@ -902,6 +901,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             False,
             False,
             False,
+            can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         email_preferences = user_services.get_email_preferences(user_id)
@@ -912,7 +912,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -949,6 +948,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                     feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                     feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                    can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
                 )
             except Exception:
                 email_preferences = user_services.get_email_preferences(user_id)
@@ -962,6 +962,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertTrue(email_preferences.can_receive_email_updates)
@@ -1185,7 +1186,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'EDIT_ANY_SUBTOPIC_PAGE',
                 'VISIT_ANY_QUESTION_EDITOR_PAGE',
                 'ACCESS_LEARNER_DASHBOARD',
-                'ACCESS_FEEDBACK_UPDATES',
                 'EDIT_ANY_ACTIVITY',
                 'VISIT_ANY_TOPIC_EDITOR_PAGE',
                 'SUGGEST_CHANGES',
@@ -2167,6 +2167,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 ['user1', 'user2', 'user5', 'user6'],
             )
 
+    def test_update_user_group_with_different_username_casing_succeeds(
+        self,
+    ) -> None:
+        self._signup_test_users_and_create_user_groups()
+        self.signup('mixedcase@email.com', 'TestUser1')
+        user_groups_data = user_services.get_all_user_groups()
+
+        self.assertNotIn('TestUser1', user_groups_data[0].member_usernames)
+        user_services.update_user_group(
+            user_groups_data[0].user_group_id, 'USERGROUP1', ['testuser1']
+        )
+
+        updated_user_groups_data = user_services.get_all_user_groups()
+        self.assertIn('TestUser1', updated_user_groups_data[0].member_usernames)
+
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(
         self,
     ) -> None:
@@ -2466,6 +2481,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.add_user_role(user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.assertTrue(user_services.is_topic_manager(user_id))
+
+    def test_get_user_roles_and_actions(self) -> None:
+        auth_id = 'someUser'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+
+        roles, actions, user_settings = (
+            user_services.get_user_roles_and_actions(user_id)
+        )
+        expected_actions = role_services.get_all_actions(
+            [feconf.ROLE_ID_FULL_USER]
+        )
+        self.assertEqual(roles, [feconf.ROLE_ID_FULL_USER])
+        self.assertEqual(actions, expected_actions)
+        assert user_settings is not None
+        self.assertEqual(user_settings.user_id, user_id)
+
+        user_services.add_user_role(user_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        roles, actions, _ = user_services.get_user_roles_and_actions(user_id)
+        expected_roles = [
+            feconf.ROLE_ID_FULL_USER,
+            feconf.ROLE_ID_CURRICULUM_ADMIN,
+        ]
+        expected_actions = role_services.get_all_actions(expected_roles)
+        self.assertEqual(roles, expected_roles)
+        self.assertEqual(actions, expected_actions)
+
+    def test_get_user_roles_and_actions_for_non_existent_user(self) -> None:
+        roles, actions, user_settings = (
+            user_services.get_user_roles_and_actions('nonExistentUser')
+        )
+        self.assertEqual(roles, [feconf.ROLE_ID_GUEST])
+        self.assertEqual(
+            actions,
+            role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
+        )
+        self.assertIsNone(user_settings)
 
     def test_create_login_url(self) -> None:
         return_url = 'sample_url'
@@ -3712,9 +3765,11 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.utcnow()
-        mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        current_datetime = utils.get_current_utc_datetime()
+        mocked_current_time = current_datetime - datetime.timedelta(days=1)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             user_services.record_user_logged_in(self.viewer_id)
 
         user_settings = user_services.get_user_settings(self.viewer_id)
@@ -3743,10 +3798,12 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = utils.get_current_utc_datetime()
 
-        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        mocked_current_time = current_datetime + datetime.timedelta(hours=11)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -3755,8 +3812,10 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             )
             self.logout()
 
-        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        mocked_current_time = current_datetime + datetime.timedelta(hours=13)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
 
@@ -3833,11 +3892,13 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.editor_id)
         # Ruling out the possibility of None for mypy type checking.
         assert user_settings.last_edited_an_exploration is not None
-        mocked_datetime_utcnow = (
+        mocked_current_time = (
             user_settings.last_edited_an_exploration
             - datetime.timedelta(hours=13)
         )
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             user_settings.record_user_edited_an_exploration()
             user_services.save_user_settings(user_settings)
 
@@ -3910,9 +3971,13 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         # Ruling out the possibility of None for mypy type checking.
         assert user_settings.last_created_an_exploration is not None
-        with self.mock_datetime_utcnow(
-            user_settings.last_created_an_exploration
-            - datetime.timedelta(hours=13)
+        with self.swap(
+            utils,
+            'get_current_utc_datetime',
+            lambda: (
+                user_settings.last_created_an_exploration
+                - datetime.timedelta(hours=13)
+            ),
         ):
             user_services.record_user_created_an_exploration(self.owner_id)
 
@@ -4601,6 +4666,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=True,
         )
         user_services.update_email_preferences(
             self.translator_id,
@@ -4608,6 +4674,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=True,
         )
 
         reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify()
@@ -4635,6 +4702,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=False,
         )
         user_services.update_email_preferences(
             self.translator_id,
@@ -4642,6 +4710,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=False,
         )
 
         reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify()
@@ -4811,6 +4880,224 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_id
         )
         self.assertFalse(user_contribution_rights.can_submit_questions)
+
+    def _put_email_preferences_model(
+        self,
+        user_id: str,
+        contributor_dashboard_notifications: Optional[bool] = None,
+        site_updates: Optional[bool] = None,
+    ) -> None:
+        """Puts a model with the given optional email preference values."""
+        email_preferences_model = user_models.UserEmailPreferencesModel(
+            id=user_id,
+            editor_role_notifications=True,
+            feedback_message_notifications=True,
+            subscription_notifications=True,
+        )
+
+        if contributor_dashboard_notifications is not None:
+            email_preferences_model.contributor_dashboard_notifications = (
+                contributor_dashboard_notifications
+            )
+
+        if site_updates is not None:
+            email_preferences_model.site_updates = site_updates
+
+        email_preferences_model.update_timestamps()
+        email_preferences_model.put()
+
+    def test_explicit_contributor_dashboard_false_overrides_site_updates_true(
+        self,
+    ) -> None:
+        """Tests that an explicit Contributor Dashboard value takes priority."""
+        self._put_email_preferences_model(
+            self.question_reviewer_id,
+            contributor_dashboard_notifications=False,
+            site_updates=True,
+        )
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+
+        self.assertFalse(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+    def test_explicit_contributor_dashboard_true_overrides_site_updates_false(
+        self,
+    ) -> None:
+        """Tests that an explicit Contributor Dashboard value takes priority."""
+        self._put_email_preferences_model(
+            self.question_reviewer_id,
+            contributor_dashboard_notifications=True,
+            site_updates=False,
+        )
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+
+        self.assertTrue(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+    def test_missing_contributor_dashboard_field_falls_back_to_site_updates_false(
+        self,
+    ) -> None:
+        """Tests fallback to a disabled legacy site-updates preference."""
+        self._put_email_preferences_model(
+            self.question_reviewer_id,
+            site_updates=False,
+        )
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+
+        self.assertFalse(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+    def test_missing_contributor_dashboard_field_falls_back_to_site_updates_true(
+        self,
+    ) -> None:
+        """Tests fallback to an enabled legacy site-updates preference."""
+        self._put_email_preferences_model(
+            self.question_reviewer_id,
+            site_updates=True,
+        )
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+
+        self.assertTrue(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+    def test_missing_preferences_fall_back_to_feconf_default(self) -> None:
+        """Tests fallback when neither stored preference is available."""
+        self._put_email_preferences_model(self.question_reviewer_id)
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+
+        self.assertEqual(
+            email_preferences.can_receive_contributor_dashboard_email,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
+        )
+
+    def test_legacy_disabled_site_updates_excludes_reviewer(self) -> None:
+        """Tests reviewer filtering uses the legacy bulk-read fallback."""
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        self._put_email_preferences_model(
+            self.question_reviewer_id,
+            site_updates=False,
+        )
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify()
+
+        self.assertNotIn(
+            self.question_reviewer_id,
+            reviewer_ids_to_notify,
+        )
+
+    def test_reviewer_with_disabled_contributor_dashboard_emails_is_excluded(
+        self,
+    ) -> None:
+        """Tests that the marketing preference does not enable reviewer emails."""
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.update_email_preferences(
+            self.question_reviewer_id,
+            True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=False,
+        )
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify()
+
+        self.assertNotIn(self.question_reviewer_id, reviewer_ids_to_notify)
+
+    def test_reviewer_with_enabled_contributor_dashboard_emails_is_included(
+        self,
+    ) -> None:
+        """Tests that the marketing preference does not disable reviewer emails."""
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.update_email_preferences(
+            self.question_reviewer_id,
+            False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=True,
+        )
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify()
+
+        self.assertIn(self.question_reviewer_id, reviewer_ids_to_notify)
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+        ]
+    )
+    def test_contributor_dashboard_preference_is_not_forwarded_to_provider(
+        self,
+    ) -> None:
+        """Tests that only marketing preference is sent to the provider."""
+        observed_marketing_preferences: List[bool] = []
+
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            unused_merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool,
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            observed_marketing_preferences.append(can_receive_email_updates)
+            return True
+
+        bulk_email_swap = self.swap(
+            bulk_email_services,
+            'add_or_update_user_status',
+            _mock_add_or_update_user_status,
+        )
+
+        with bulk_email_swap:
+            user_services.update_email_preferences(
+                self.question_reviewer_id,
+                True,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                can_receive_contributor_dashboard_email=True,
+            )
+            user_services.update_email_preferences(
+                self.question_reviewer_id,
+                True,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                can_receive_contributor_dashboard_email=False,
+            )
+
+        self.assertEqual(observed_marketing_preferences, [True, True])
+
+        email_preferences = user_services.get_email_preferences(
+            self.question_reviewer_id
+        )
+        self.assertTrue(email_preferences.can_receive_email_updates)
+        self.assertFalse(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
 
 
 class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):

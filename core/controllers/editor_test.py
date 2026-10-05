@@ -2943,7 +2943,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -2954,7 +2953,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             ),
         ]
     )
-    def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
+    def test_error_cases_when_unpublishing_exploration(self) -> None:
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
 
@@ -2996,7 +2995,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
             (
                 platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
@@ -3012,7 +3010,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             ),
         ]
     )
-    def test_error_cases_when_can_send_emails_param_is_true(self) -> None:
+    def test_success_case_when_unpublishing_exploration(self) -> None:
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
 
@@ -3038,7 +3036,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
@@ -3130,7 +3127,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
@@ -3510,7 +3506,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
     EXP_ID2: Final = '2'
     EXP_ID3: Final = '3'
     # 30 days into the future.
-    NEWER_DATETIME: Final = datetime.datetime.utcnow() + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_current_utc_datetime() + datetime.timedelta(30)
+    )
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST: Final = [

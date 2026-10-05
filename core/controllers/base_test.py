@@ -2851,53 +2851,63 @@ Handler class name: BaseHandler
         )
 
     def test_unauthorized_user_exception_logs_warning(self) -> None:
-        """Ensures UnauthorizedUserException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        """Ensures UnauthorizedUserException logs a warning with the correct
+        format.
+        """
+        with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.UnauthorizedUserException('Unauthorized User'),
                 False,
             )
+
         expected_log_message = f"""
 
-UnauthorizedUserException: Exception raised
-
-Stack Trace: 
-NoneType: None
+UnauthorizedUserException: Unauthorized user
 
 URL requested: {self.handler.request.uri}
 Request method: POST
 Handler class name: BaseHandler
 """
+
         self.assertIn(
             expected_log_message,
-            self.logged_exceptions,
+            self.logged_warnings,
             msg='UnauthorizedUserException message not match',
+        )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='UnauthorizedUserException should not log a stack trace.',
         )
 
     def test_invalid_input_exception_logs_warning(self) -> None:
-        """Ensures InvalidInputException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        """Ensures InvalidInputException logs a warning with the correct
+        format.
+        """
+        with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.InvalidInputException('Invalid Input'), False
             )
+
         expected_log_message = f"""
 
-InvalidInputException: Exception raised
-
-Stack Trace: 
-NoneType: None
+InvalidInputException: Invalid input
 
 URL requested: {self.handler.request.uri}
 Request method: POST
 Handler class name: BaseHandler
 """
+
         self.assertIn(
             expected_log_message,
-            self.logged_exceptions,
+            self.logged_warnings,
             msg='InvalidInputException message not match',
         )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='InvalidInputException should not log a stack trace.',
+        )
 
-    def test_internal_error_exception_logs_warning(self) -> None:
+    def test_internal_error_exception_logs_exception(self) -> None:
         """Ensures InternalErrorException logs an exception with the correct format."""
         with self.swap(logging, 'exception', self.mock_logging_exception):
             self.handler.handle_exception(
@@ -2905,7 +2915,7 @@ Handler class name: BaseHandler
             )
         expected_log_message = f"""
 
-InternalErrorException: Exception raised
+InternalErrorException: Internal error raised
 
 Stack Trace: 
 NoneType: None
@@ -2918,6 +2928,28 @@ Handler class name: BaseHandler
             expected_log_message,
             self.logged_exceptions,
             msg='InternalErrorException message not match',
+        )
+
+    def test_type_error_logs_exception(self) -> None:
+        """Ensures TypeError logs an exception and returns a 405 response."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(TypeError('Invalid method'), False)
+
+        expected_log_message = f"""
+
+TypeError: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='TypeError exception message does not match.',
         )
 
     def test_invalid_log_type_raises_exception(self) -> None:

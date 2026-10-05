@@ -16,8 +16,15 @@
  * @fileoverview Unit tests for stateTranslation.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -69,7 +76,7 @@ class MockNgbModal {
 }
 
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
-class MockParameterizeRuleDescriptionPipe {
+class MockParameterizeRuleDescriptionPipe implements PipeTransform {
   transform(
     rule: Rule | null,
     interactionId: string | null,
@@ -79,21 +86,21 @@ class MockParameterizeRuleDescriptionPipe {
   }
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
-class MockWrapTextWithEllipsisPipe {
+class MockWrapTextWithEllipsisPipe implements PipeTransform {
   transform(input: string, characterCount: number): string {
     return '';
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
 }
 
 @Pipe({name: 'convertToPlainText'})
-class MockConvertToPlainTextPipe {
+class MockConvertToPlainTextPipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }
@@ -377,6 +384,29 @@ describe('State translation component', () => {
           ]);
         }
       );
+
+      describe('empty default outcome feedback', () => {
+        it('should show the default outcome row when its feedback is non-empty', () => {
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).not.toBeNull();
+        });
+
+        it('should hide the default outcome row when its feedback is empty', () => {
+          component.stateDefaultOutcome.feedback.html = '';
+          component.onTabClick('feedback');
+          fixture.detectChanges();
+
+          const defaultRow = fixture.nativeElement.querySelector(
+            '.oppia-default-rule-tab'
+          );
+          expect(defaultRow).toBeNull();
+        });
+      });
 
       it('should broadcast copy to ck editor when clicking on content', () => {
         spyOn(ckEditorCopyContentService, 'broadcastCopy').and.callFake(

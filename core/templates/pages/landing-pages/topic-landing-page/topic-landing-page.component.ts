@@ -53,7 +53,7 @@ interface TopicData {
 @Component({
   selector: 'topic-landing-page',
   templateUrl: './topic-landing-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./topic-landing-page.component.css'],
 })
 export class TopicLandingPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

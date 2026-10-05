@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import collection_domain, collection_services
@@ -311,6 +309,31 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_title_validation(self) -> None:
         self.collection.title = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected title to be a string')
+
+        self.collection.title = 'Mosin_es_testing'
+        self.collection.validate()
+
+        self.collection.title = 'A' * 51
+        self._assert_validation_error(
+            'The length of the collection title should be between 1 and 50 '
+            'characters'
+        )
+
+        self.collection.title = ' Leading whitespace'
+        self._assert_validation_error(
+            'The collection title should not start or end with whitespace.'
+        )
+
+        self.collection.title = 'Trailing whitespace '
+        self._assert_validation_error(
+            'The collection title should not start or end with whitespace.'
+        )
+
+        self.collection.title = 'Adjacent  whitespace'
+        self._assert_validation_error(
+            'Adjacent whitespace in the collection title should '
+            'be collapsed.'
+        )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -1141,7 +1164,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         self.collection_summary_dict = {
             'category': 'category',
             'status': constants.ACTIVITY_STATUS_PRIVATE,
@@ -1188,6 +1211,28 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_passes_with_valid_properties(self) -> None:
         self.collection_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_title_validation(self) -> None:
+        self.collection_summary.title = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected the collection title to be a string',
+        ):
+            self.collection_summary.validate()
+
+        self.collection_summary.title = 'Mosin_es_testing'
+        self.collection_summary.validate()
+
+        self.collection_summary.title = 'A' * 51
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'The length of the collection title should be between 1 and 50 '
+            'characters',
+        ):
+            self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.collection_summary.language_code = 'invalid'
@@ -1267,8 +1312,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_private())
 
@@ -1291,8 +1336,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
@@ -1319,8 +1364,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')
@@ -1352,8 +1397,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')

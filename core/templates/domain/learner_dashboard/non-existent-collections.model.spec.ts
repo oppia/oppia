@@ -23,13 +23,11 @@ describe('Non existent collections model', () => {
     let backendDict = {
       incomplete_collections: 1,
       completed_collections: 2,
-      collection_playlist: 3,
     };
 
     let object = NonExistentCollections.createFromBackendDict(backendDict);
 
     expect(object.incompleteCollections).toEqual(1);
     expect(object.completedCollections).toEqual(2);
-    expect(object.collectionPlaylist).toEqual(3);
   });
 });

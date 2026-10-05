@@ -105,9 +105,10 @@ type FabricSvgLoadCallback = (
 @Component({
   selector: 'svg-editor',
   templateUrl: './svg-editor.component.html',
+  styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   @Output() discardImage = new EventEmitter();
@@ -183,6 +184,9 @@ export class SvgEditorComponent implements OnInit {
   // The canvasId is used to identify the fabric js
   // canvas element in the editor.
   canvasID = 'canvas' + this.randomId;
+  // The canvasContainerId is used to identify the div wrapping the fabric js
+  // canvas element in the editor.
+  canvasContainerId = 'fabric-canvas-container-' + this.randomId;
   // The following picker variables are used to store the objects returned
   // from the vanilla color picker.
   fillPicker: SvgColorPicker | null = null;
@@ -600,26 +604,27 @@ export class SvgEditorComponent implements OnInit {
     const childNodes = Array.from(element.childNodes);
     let value = '';
     const coloredTextIndex: ColoredTextIndex[] = [];
+    const tspanNodes = childNodes.filter(el => el.nodeName === 'tspan');
     // Extracts the text from the tspan tags and appends
     // with a \n tag to ensure that the texts are subsequent lines.
-    childNodes.forEach((el, index) => {
-      if (el.nodeName === 'tspan') {
-        const tspanElement = el as SVGTSpanElement;
-        const textNodeValue = tspanElement.childNodes[0]?.nodeValue || '';
-        value += textNodeValue;
-        if (tspanElement.style.fill !== '') {
-          // Fetches the position of the coloured text so
-          // it can be given color after the text is rendered.
-          coloredTextIndex.push({
-            startIndex: value.length - textNodeValue.length,
-            endIndex: value.length,
-            fill: tspanElement.style.fill,
-            stroke: tspanElement.style.stroke,
-            strokeWidth: tspanElement.style.strokeWidth,
-          });
-        } else if (index < childNodes.length - 1) {
-          value += '\n';
-        }
+    tspanNodes.forEach((el, index) => {
+      const tspanElement = el as SVGTSpanElement;
+      const textNodeValue = tspanElement.childNodes[0]?.nodeValue || '';
+      value += textNodeValue;
+      if (tspanElement.style.fill !== '') {
+        // Fetches the position of the coloured text so
+        // it can be given color after the text is rendered.
+        coloredTextIndex.push({
+          startIndex: value.length - textNodeValue.length,
+          endIndex: value.length,
+          fill: tspanElement.style.fill,
+          stroke: tspanElement.style.stroke,
+          strokeWidth: tspanElement.style.strokeWidth,
+        });
+      }
+      // Newline between tspans regardless of fill color.
+      if (index < tspanNodes.length - 1) {
+        value += '\n';
       }
     });
 
@@ -630,6 +635,7 @@ export class SvgEditorComponent implements OnInit {
 
     // Use a new Textbox for editability, but copy properties from the loaded object.
     const textOptions = (obj as fabric.Object).toObject();
+    delete textOptions.text;
     const text = new fabric.Textbox(value, {
       ...textOptions,
       width: textOptions.width || this.diagramWidth,
@@ -742,13 +748,16 @@ export class SvgEditorComponent implements OnInit {
       this.canvas.getObjects(),
       {canvas: this.canvas}
     );
-    // Only scale wide images to fit the canvas width. Tall/narrow images
-    // should not be scaled to width as this causes them to exceed the
-    // canvas height and get clipped.
+    // Scale down the selection only if it exceeds canvas dimensions to prevent clipping.
     const selectionWidth = temporarySelection.width ?? 0;
     const selectionHeight = temporarySelection.height ?? 0;
-    if (selectionWidth > selectionHeight) {
-      temporarySelection.scaleToWidth(this.canvas.getWidth());
+    const canvasWidth = this.canvas.getWidth();
+    const canvasHeight = this.canvas.getHeight();
+    if (selectionWidth > canvasWidth || selectionHeight > canvasHeight) {
+      const widthRatio = canvasWidth / (selectionWidth || 1);
+      const heightRatio = canvasHeight / (selectionHeight || 1);
+      const scaleRatio = Math.min(widthRatio, heightRatio);
+      temporarySelection.scale(scaleRatio);
     }
     temporarySelection.center();
     this.canvas.setActiveObject(temporarySelection);
@@ -1331,7 +1340,7 @@ export class SvgEditorComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onFileChanged(file: File, filename: string): void {
+  onFileChanged(file: File, filename?: string): void {
     this.setUploadedFile(file);
   }
 

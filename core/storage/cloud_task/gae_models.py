@@ -140,6 +140,13 @@ class CloudTaskRunModel(base_models.BaseModel):
         required=True, indexed=True, default=0
     )
 
+    # This property stores additional contextual information related to the cloud
+    # task run—such as exploration title, topic name, or language accent. It is
+    # not used for querying and is intended solely for display purposes in the UI.
+    additional_contextual_information = datastore_services.JsonProperty(
+        required=False, indexed=False, default={}
+    )
+
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user.
@@ -176,6 +183,9 @@ class CloudTaskRunModel(base_models.BaseModel):
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
                 'current_retry_attempt': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'additional_contextual_information': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
             },
         )
 

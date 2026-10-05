@@ -51,6 +51,7 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html',
+  styleUrls: ['./state-editor.component.css'],
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveHints = new EventEmitter<Hint[]>();
@@ -134,8 +135,12 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveInteractionDefaultOutcome.emit($event);
   }
 
-  sendOnSaveInteractionAnswerGroups($event: AnswerGroup[]): void {
-    this.onSaveInteractionAnswerGroups.emit($event);
+  sendOnSaveInteractionAnswerGroups($event: AnswerGroup[] | AnswerGroup): void {
+    // The answer groups may be emitted either as a single group or as an
+    // array, depending on the emitting component.
+    this.onSaveInteractionAnswerGroups.emit(
+      Array.isArray($event) ? $event : [$event]
+    );
   }
 
   sendOnSaveInapplicableSkillMisconceptionIds($event: string[]): void {

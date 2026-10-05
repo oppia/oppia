@@ -30,6 +30,8 @@ import {StateSolutionService} from 'components/state-editor/state-editor-propert
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -56,6 +58,7 @@ interface SolutionInterface {
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
   templateUrl: './add-or-update-solution-modal.component.html',
+  styleUrls: ['./add-or-update-solution-modal.component.css'],
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal
@@ -128,6 +131,10 @@ export class AddOrUpdateSolutionModalComponent
 
   onAnswerChange(): void {
     this.data.answerIsExclusive = this.tempAnsOption === this.ansOptions[0];
+  }
+
+  updateExplanationHtml(value: SchemaDefaultValue): void {
+    this.data.explanationHtml = typeof value === 'string' ? value : '';
   }
 
   isSubmitButtonDisabled(): boolean {

@@ -13,8 +13,7 @@ mypy==1.0.1
 Pillow==10.1.0
 psutil==7.0.0
 pycodestyle==2.14.0
-pylint==2.17.7
-pylint-quotes==0.2.3
+pylint==4.0.7
 pytest==8.4.2
 pytest-cov==4.1.0
 pytest-timeout==2.2.0

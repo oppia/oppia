@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import feature_flag_domain
@@ -102,7 +100,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
     """Tests for FeatureFlagConfig."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict(
             {
                 'force_enable_for_all_users': False,
@@ -123,7 +121,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         self.assertEqual(feature_flag_config.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         feature_flag_config_dict: feature_flag_domain.FeatureFlagConfigDict = {
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
@@ -141,9 +139,9 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_set_object_values_correctly(self) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         feature_flag_config.set_force_enable_for_all_users(True)
         feature_flag_config.set_rollout_percentage(50)
         feature_flag_config.set_user_group_ids(['user_group_1', 'user_group_2'])
@@ -160,7 +158,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
         feature_flag_config.validate(feature_flag_domain.ServerMode.DEV)
 
@@ -168,7 +166,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, -1, [], datetime.datetime.utcnow()
+            False, -1, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -181,7 +179,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 101, [], datetime.datetime.utcnow()
+            False, 101, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -192,7 +190,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
@@ -207,7 +205,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -222,7 +220,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_test_feature_for_prod_env_raises_exception(self) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -240,7 +238,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
     """Tests for FeatureFlag."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         feature_flag = feature_flag_domain.FeatureFlag.from_dict(
             {
                 'name': 'feature_a',
@@ -272,7 +270,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         )
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], current_time
         )
@@ -300,7 +298,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 0, [], datetime.datetime.utcnow()
+            False, 0, [], utils.get_current_utc_datetime()
         )
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'for test', feature_flag_domain.FeatureStages.DEV
@@ -318,7 +316,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-            False, 101, [], datetime.datetime.utcnow()
+            False, 101, [], utils.get_current_utc_datetime()
         )
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'Feature Description', feature_flag_domain.ServerMode.DEV

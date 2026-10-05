@@ -2,6 +2,7 @@
   <div *ngFor="let choice of choices"
        dir="auto" class="multiple-choice-option-container e2e-test-multiple-choice-option-container">
     <button class="multiple-choice-option"
+            [class.selected]="isSelectedChoice(choice)"
             (click)="selectAnswer($event, choice.originalIndex)">
       <div class="multiple-choice-radio-button-container">
         <span class="multiple-choice-outer-radio-button">

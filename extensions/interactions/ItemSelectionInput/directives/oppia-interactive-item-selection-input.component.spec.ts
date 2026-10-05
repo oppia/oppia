@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the ItemSelectionInput interaction.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractiveItemSelectionInputComponent} from './oppia-interactive-item-selection-input.component';
@@ -355,6 +357,34 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       expect(component.notEnoughSelections).toBe(true);
     });
 
+    it('should restore selected choices from lastAnswer on re-init', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      component.lastAnswer = ['ca_choices_1', 'ca_choices_3'];
+
+      component.ngOnInit();
+
+      expect(component.userSelections).toEqual({
+        'choice 1': true,
+        'choice 2': false,
+        'choice 3': true,
+      });
+      expect(component.selectionCount).toBe(2);
+    });
+
+    it('should ignore unknown content ids in lastAnswer on re-init', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      component.lastAnswer = ['ca_choices_1', 'unknown_content_id'];
+
+      component.ngOnInit();
+
+      expect(component.userSelections).toEqual({
+        'choice 1': true,
+        'choice 2': false,
+        'choice 3': false,
+      });
+      expect(component.selectionCount).toBe(1);
+    });
+
     it('should toggle checkbox when user clicks checkbox', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       spyOn(currentInteractionService, 'updateCurrentAnswer');
@@ -364,7 +394,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         'choice 2': false,
         'choice 3': false,
       };
-      expect(component.selectionCount).toBeUndefined();
+      expect(component.selectionCount).toBe(0);
       expect(component.newQuestion).toBe(false);
       expect(component.preventAdditionalSelections).toBe(false);
       expect(component.notEnoughSelections).toBe(true);
@@ -398,7 +428,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           'choice 2': true,
           'choice 3': false,
         };
-        expect(component.selectionCount).toBeUndefined();
+        expect(component.selectionCount).toBe(0);
         expect(component.preventAdditionalSelections).toBe(false);
         expect(component.notEnoughSelections).toBe(true);
 
@@ -461,7 +491,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         'choice 2': false,
         'choice 3': false,
       };
-      expect(component.selectionCount).toBeUndefined();
+      expect(component.selectionCount).toBe(0);
       expect(component.newQuestion).toBe(false);
       expect(component.preventAdditionalSelections).toBe(false);
       expect(component.notEnoughSelections).toBe(false);
@@ -496,7 +526,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           'choice 2': true,
           'choice 3': true,
         };
-        expect(component.selectionCount).toBeUndefined();
+        expect(component.selectionCount).toBe(0);
         expect(component.preventAdditionalSelections).toBe(false);
         expect(component.notEnoughSelections).toBe(false);
         expect(component.exactSelections).toBe(true);

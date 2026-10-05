@@ -779,7 +779,7 @@ describe('Home tab Component Loader visibility tests', () => {
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     component.allCardsLoaded = false;
@@ -821,7 +821,7 @@ describe('Home tab Component Loader visibility tests', () => {
     ];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     component.allCardsLoaded = false;
@@ -864,7 +864,7 @@ describe('Home tab Component Loader visibility tests', () => {
     ];
     component.incompleteCollectionsList = [];
     component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
+
     component.untrackedTopics = {};
     component.username = 'testuser';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');

@@ -279,50 +279,6 @@ def managed_firebase_auth_emulator(
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
-    """Returns a context manager for ElasticSearch server for running tests
-    in development mode and running a local dev server. This is only required
-    in a development environment.
-
-    Yields:
-        psutil.Process. The ElasticSearch server process.
-    """
-    # Clear previous data stored in the local cluster.
-    if os.path.exists(common.ES_PATH_DATA_DIR):
-        shutil.rmtree(common.ES_PATH_DATA_DIR)
-
-    es_args = [
-        '%s/bin/elasticsearch' % common.ES_PATH,
-        # -q is the quiet flag.
-        '-q',
-        '-E',
-        # Disable security for the local ElasticSearch server.
-        'xpack.security.enabled=false',
-        # Disable the disk threshold checks. These checks can cause issues on
-        # machines with low disk space.
-        '-E',
-        'cluster.routing.allocation.disk.threshold_enabled=false',
-    ]
-    # Override the default path to ElasticSearch config files.
-    es_env = {
-        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
-        # Set the minimum heap size to 100 MB and maximum to 500 MB.
-        'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-    }
-    # OK to use shell=True here because we are passing string literals and
-    # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(
-        es_args,
-        human_readable_name='ElasticSearch Server',
-        env=es_env,
-        shell=True,
-    )
-    with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
-        yield proc
-
-
-@contextlib.contextmanager
 def managed_cloud_datastore_emulator(
     clear_datastore: bool = False,
 ) -> Iterator[psutil.Process]:
@@ -637,8 +593,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 proc.send_signal(signal.SIGINT)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
-                # can just return immediately.
-                return  # pylint: disable=lost-exception
+                # can just ignore and exit normally.
+                pass
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
@@ -650,94 +606,6 @@ def managed_portserver() -> Iterator[psutil.Process]:
                     logging.error(
                         'Portserver failed to shut down after 10 seconds.'
                     )
-
-
-@contextlib.contextmanager
-def managed_webdriverio_server(
-    suite_name: str = 'full',
-    dev_mode: bool = True,
-    debug_mode: bool = False,
-    sharding_instances: int = 1,
-    chrome_version: Optional[str] = None,
-    mobile: bool = False,
-    stdout: int = subprocess.PIPE,
-) -> Iterator[psutil.Process]:
-    """Returns context manager to start/stop the WebdriverIO server gracefully.
-
-    Args:
-        suite_name: str. The suite name whose tests should be run. If the value
-            is `full`, all tests will run.
-        dev_mode: bool. Whether the test is running on dev_mode.
-        debug_mode: bool. Whether to run the webdriverio tests in debugging
-            mode. Read the following instructions to learn how to run e2e
-            tests in debugging mode:
-            https://webdriver.io/docs/debugging/#the-debug-command.
-        sharding_instances: int. How many sharding instances to be running.
-        chrome_version: str|None. The version of Google Chrome to run the tests
-            on. If None, then the currently-installed version of Google Chrome
-            is used instead.
-        stdout: int. This parameter specifies the executed program's standard
-            output file handle.
-        mobile: bool. Whether to run the webdriverio tests in mobile mode.
-
-    Yields:
-        psutil.Process. The webdriverio process.
-
-    Raises:
-        ValueError. Number of sharding instances are less than 0.
-    """
-    if sharding_instances <= 0:
-        raise ValueError('Sharding instance should be larger than 0')
-
-    if chrome_version is None:
-        chrome_version = get_chromedriver_version()
-
-    if mobile:
-        os.environ['MOBILE'] = 'true'
-    else:
-        os.environ['MOBILE'] = 'false'
-
-    webdriverio_args = [
-        common.NPX_BIN_PATH,
-        # This flag ensures tests fail if the `waitFor()` calls time out.
-        '--unhandled-rejections=strict',
-        common.NODEMODULES_WDIO_BIN_PATH,
-        common.WEBDRIVERIO_CONFIG_FILE_PATH,
-        '--suite',
-        suite_name,
-        chrome_version,
-        '--params.devMode=%s' % dev_mode,
-    ]
-
-    # Capabilities in wdio.conf.js are added as an array of object,
-    # so in order to set the value of maxmium instances of chrome
-    # in wdio.conf.js, we need to provide the index of the capability
-    # at which chrome is present, i.e. 0.
-    if sharding_instances > 1:
-        webdriverio_args.extend(
-            [
-                '--capabilities[0].maxInstances=%d' % sharding_instances,
-            ]
-        )
-
-    if debug_mode:
-        webdriverio_args.insert(0, 'DEBUG=true')
-
-    # OK to use shell=True here because we are passing string literals and
-    # constants, so there is no risk of a shell-injection attack.
-    managed_webdriverio_proc = managed_process(
-        webdriverio_args,
-        human_readable_name='WebdriverIO Server',
-        shell=True,
-        raise_on_nonzero_exit=False,
-        stdout=stdout,
-    )
-
-    try:
-        with managed_webdriverio_proc as proc:
-            yield proc
-    finally:
-        del os.environ['MOBILE']
 
 
 @contextlib.contextmanager

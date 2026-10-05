@@ -26,17 +26,27 @@ from core.domain import (
     collection_domain,
     collection_services,
     exp_domain,
+    exp_fetchers,
     exp_services,
     exp_services_test,
     rating_services,
     rights_domain,
     rights_manager,
     summary_services,
+    translation_domain,
+    translation_services,
     user_services,
 )
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import collection_models
+
+(collection_models,) = models.Registry.import_models([models.Names.COLLECTION])
 
 
 class ExplorationDisplayableSummariesTest(
@@ -266,6 +276,7 @@ class ExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#cc4b00',
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'title': 'Exploration 2 Albert title',
+            'translated_metadata_fields': [],
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(
@@ -281,6 +292,138 @@ class ExplorationDisplayableSummariesTest(
             )
         )
         self.assertEqual(displayable_summaries, [])
+
+    def test_get_displayable_exp_summary_dicts_with_translated_metadata(
+        self,
+    ) -> None:
+        exp_summary_1 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_1
+        )
+        exp_summary_2 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_2
+        )
+        exp_summary_2.tags = ['tag', 'math']
+
+        translated_title = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_objective = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Objective',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_0 = translation_domain.TranslatedContent(
+            'Hindi Tag 1',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_1_outdated = translation_domain.TranslatedContent(
+            'Outdated Tag 2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=True,
+        )
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
+            translated_objective,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0',
+            translated_tag_0,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_1',
+            translated_tag_1_outdated,
+        )
+
+        # Querying with exp_summary_1 (no translations) and exp_summary_2 (has translations).
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts(
+                [exp_summary_1, exp_summary_2], display_in_language_code='hi'
+            )
+        )
+        self.assertEqual(len(displayable_summaries), 2)
+
+        # exp_summary_1 keeps untranslated default metadata.
+        exp1_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_1
+        )
+        self.assertEqual(exp1_summary['title'], 'Exploration 1 title')
+        self.assertEqual(exp1_summary['translated_metadata_fields'], [])
+
+        # exp_summary_2 receives translated title, objective, category, and tag 0.
+        exp2_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_2
+        )
+        self.assertEqual(exp2_summary['title'], 'Exploration 2 Hindi Title')
+        self.assertEqual(
+            exp2_summary['objective'], 'Exploration 2 Hindi Objective'
+        )
+        self.assertEqual(exp2_summary['category'], 'Algebra')
+        self.assertEqual(exp2_summary['tags'], ['Hindi Tag 1', 'math'])
+        self.assertEqual(
+            exp2_summary['translated_metadata_fields'],
+            ['title', 'objective', 'tags'],
+        )
+
+    def test_get_displayable_exp_summary_dicts_with_partially_translated_metadata(
+        self,
+    ) -> None:
+        exp_summary_2 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_2
+        )
+        exp_summary_2.tags = ['tag1']
+
+        translated_title = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Title Only',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts(
+                [exp_summary_2], display_in_language_code='hi'
+            )
+        )
+        self.assertEqual(len(displayable_summaries), 1)
+        self.assertEqual(
+            displayable_summaries[0]['translated_metadata_fields'], ['title']
+        )
+        self.assertEqual(
+            displayable_summaries[0]['title'], 'Exploration 2 Hindi Title Only'
+        )
+        self.assertEqual(displayable_summaries[0]['tags'], ['tag1'])
 
     def test_get_public_and_filtered_private_summary_dicts_for_creator(
         self,
@@ -392,6 +535,45 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             expected_exploration_summary_dict, (actual_exploration_summary_dict)
         )
+
+    def test_get_library_groups_excludes_deleted_collections(self) -> None:
+        """A public collection in a group category should be returned by
+        get_library_groups(), but a soft-deleted collection should not.
+        """
+        collection = self.save_new_valid_collection(
+            'collection_id',
+            self.owner_id,
+            title='Mathematics Collection',
+            category='Algebra',
+            objective='A collection introducing basic Algebra.',
+        )
+        self.publish_collection(self.owner_id, collection.id)
+
+        library_groups = summary_services.get_library_groups([])
+        self.assertEqual(len(library_groups), 1)
+        collection_id_present = any(
+            summary_dict['id'] == collection.id
+            for summary_dict in library_groups[0]['activity_summary_dicts']
+        )
+        self.assertTrue(collection_id_present)
+
+        # Soft-delete the collection summary and verify it is excluded from the
+        # library groups.
+        collection_summary_model = collection_models.CollectionSummaryModel.get(
+            collection.id
+        )
+        collection_summary_model.deleted = (
+            True  # pylint: disable=singleton-comparison
+        )
+        collection_summary_model.update_timestamps()
+        collection_summary_model.put()
+
+        library_groups = summary_services.get_library_groups([])
+        collection_id_present = any(
+            summary_dict['id'] == collection.id
+            for summary_dict in library_groups[0]['activity_summary_dicts']
+        )
+        self.assertFalse(collection_id_present)
 
 
 class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
@@ -1078,6 +1260,40 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             test_summary_3, recently_published_exploration_summaries[0]
         )
 
+    def test_get_recently_published_exp_summary_dicts_with_display_in_language_code(
+        self,
+    ) -> None:
+        exp_summary_1 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_1
+        )
+        translated_title = translation_domain.TranslatedContent(
+            'Recently Published Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_1,
+            exp_summary_1.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        recently_published_summaries = (
+            summary_services.get_recently_published_exp_summary_dicts(
+                feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE,
+                display_in_language_code='hi',
+            )
+        )
+        exp1_summary = next(
+            s for s in recently_published_summaries if s['id'] == self.EXP_ID_1
+        )
+        self.assertEqual(
+            exp1_summary['title'], 'Recently Published Hindi Title'
+        )
+        self.assertEqual(exp1_summary['translated_metadata_fields'], ['title'])
+
 
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     """Tests for checking id validity of activities
@@ -1250,10 +1466,6 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
-        exp_services.index_explorations_given_ids(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3, self.EXP_ID4]
-        )
-
     def test_get_exploration_metadata_dicts(self) -> None:
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert
@@ -1343,22 +1555,6 @@ class CollectionNodeMetadataDictsTest(
                 'objective': 'An objective 4',
                 'title': 'Exploration 4 Bob title',
             },
-        ]
-        self.assertEqual(expected_metadata_dicts, metadata_dicts)
-
-    def test_exp_metadata_dicts_matching_query(self) -> None:
-        metadata_dicts, _ = (
-            summary_services.get_exp_metadata_dicts_matching_query(
-                'Exploration 1', None, self.albert
-            )
-        )
-
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID1,
-                'objective': 'An objective 1',
-                'title': 'Exploration 1 Albert title',
-            }
         ]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 

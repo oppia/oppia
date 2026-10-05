@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import copy
-import datetime
 import itertools
 import logging
 
@@ -1501,7 +1500,7 @@ def record_learner_answer_info(
         learner_answer_info_id,
         answer,
         answer_details,
-        datetime.datetime.utcnow(),
+        utils.get_current_utc_datetime(),
     )
     learner_answer_details.add_learner_answer_info(learner_answer_info)
     save_learner_answer_details(

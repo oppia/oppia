@@ -31,7 +31,7 @@ import {
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',
   templateUrl: './subtopic-viewer-navbar-breadcrumb.component.html',
-  styleUrls: [],
+  styleUrls: ['./subtopic-viewer-navbar-breadcrumb.component.css'],
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

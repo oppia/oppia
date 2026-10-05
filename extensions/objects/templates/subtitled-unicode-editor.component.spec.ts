@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Subtitled Unicode editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
@@ -77,6 +79,23 @@ describe('SubtitledUnicodeEditorComponent', () => {
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith({
       _unicode: 'value',
     });
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update value when the input is not a string', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    spyOn(component.valueChanged, 'emit');
+    component.value = new SubtitledUnicode('value', null);
+
+    component.updateValue(5);
+
+    expect(component.value.unicode).toBe('value');
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 });

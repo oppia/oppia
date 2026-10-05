@@ -22,9 +22,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 
-import './certificate-offering-review-and-availability.component.css';
 // Shape of one difficulty bucket returned by the validation API.
 // Matches /validate_certificate_assessment_offering_handler response.
 export interface DifficultyValidation {
@@ -56,6 +55,7 @@ export interface TopicReadinessRow {
   mediumRequired: number;
   hardRequired: number;
   totalQuestions: number;
+  totalRequiredQuestions: number;
   isReady: boolean;
   easySufficient: boolean;
   mediumSufficient: boolean;
@@ -83,6 +83,7 @@ export interface ValidationResponse {
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
+  styleUrls: ['./certificate-offering-review-and-availability.component.css'],
 })
 export class CertificateOfferingReviewAndAvailabilityComponent
   implements OnInit
@@ -103,6 +104,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   validationMessage: string = '';
   topicReadinessRows: TopicReadinessRow[] = [];
   errorMessages: ReadinessErrorMessage[] = [];
+  isLoadingValidation: boolean = false;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
@@ -121,7 +123,12 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     await this._loadValidationState();
   }
 
+  async refreshValidationState(): Promise<void> {
+    await this._loadValidationState();
+  }
+
   private async _loadValidationState(): Promise<void> {
+    this.isLoadingValidation = true;
     try {
       const classroomSummaries =
         await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
@@ -167,6 +174,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
           : 'Unable to validate this certificate.';
       this._buildDisplayData();
       this.isCertificateValidChange.emit(this.isValid);
+    } finally {
+      this.isLoadingValidation = false;
     }
   }
 
@@ -186,6 +195,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
 
       const totalQuestions =
         result.easy.available + result.medium.available + result.hard.available;
+      const totalRequiredQuestions =
+        result.easy.required + result.medium.required + result.hard.required;
 
       this.topicReadinessRows.push({
         topicId,
@@ -197,6 +208,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
         mediumRequired: result.medium.required,
         hardRequired: result.hard.required,
         totalQuestions,
+        totalRequiredQuestions,
         isReady,
         easySufficient,
         mediumSufficient,
@@ -228,10 +240,6 @@ export class CertificateOfferingReviewAndAvailabilityComponent
       return `${error.topicName}: No ${error.difficulty.toLowerCase()} difficulty questions available`;
     }
     return `${error.topicName}: Only ${error.available} ${error.difficulty.toLowerCase()} questions (minimum ${error.required} required)`;
-  }
-
-  getSaveButtonText(): string {
-    return this.isEditMode ? 'Update Certificate' : 'Save Certificate';
   }
 
   onSaveClicked(): void {

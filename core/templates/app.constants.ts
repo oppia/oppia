@@ -25,7 +25,6 @@ export const AppConstants = {
     I18N_LIBRARY_LOADING: 'Loading',
     I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
     I18N_SIGNUP_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Oppia',
-    I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
     I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
     I18N_LIBRARY_LANGUAGES_EN: 'English',
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
@@ -196,6 +195,7 @@ export const AppConstants = {
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
     CLASSROOM: 'classroom',
+    FEEDBACK: 'feedback',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
@@ -219,6 +219,7 @@ export const AppConstants = {
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
   CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
+  CONTRIBUTION_STATS_SUBTYPE_COORDINATE: 'coordinate',
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
@@ -324,8 +325,8 @@ export const AppConstants = {
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
     SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
   },
-  VOLUNTEER_FORM_LINK:
-    'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+  VOLUNTEER_IDEALIST_LINK:
+    'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
   IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
   IMPACT_REPORT_LINK_2023:
@@ -334,8 +335,7 @@ export const AppConstants = {
     'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
-  TEACHER_STORY_TAGGED_BLOGS_LINK:
-    '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+  TEACHER_STORY_TAGGED_BLOGS_LINK: '/blog',
   VOLUNTEER_EXPECTATIONS: [
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',

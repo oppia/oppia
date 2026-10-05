@@ -1,0 +1,53 @@
+<div class="oppia-add-a-follow-up-note-modal">
+  <div class="modal-header">
+    <h3 class="modal-title e2e-test-modal-header">
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_TITLE'| translate }}
+    </h3>
+  </div>
+  <div class="modal-body">
+    <p class="oppia-follow-up-modal-helper  e2e-test-modal-subHeader">
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_INFO'| translate }}
+    </p>
+
+    <div class="oppia-follow-up-modal-original">
+      <span class="oppia-follow-up-modal-original-label">
+        {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_ORIGINAL_LABEL'| translate }}
+      </span>
+      <p class="oppia-follow-up-modal-original-text">
+        {{ detailFeedback.feedback_text }}
+      </p>
+    </div>
+
+    <label for="mySuggestionsFollowUp"
+           class="oppia-follow-up-modal-label">
+      {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_ORIGINAL_NOTE'| translate }}
+    </label>
+    <textarea id="mySuggestionsFollowUp"
+              name="mySuggestionsFollowUp"
+              class="oppia-my-suggestions-textarea e2e-test-feedback-modal-textarea"
+              rows="4"
+              maxlength="2500"
+              placeholder="E.g. Thanks, that fixed it! or it's still happening on question 3."
+              [(ngModel)]="followUpText">
+    </textarea>
+
+    <div class="oppia-follow-up-modal-char-count e2e-test-feedback-text-count">
+      {{ followUpText.length }} / 2500
+    </div>
+
+    <div class="modal-footer">
+      <button type="button"
+              class="btn btn-secondary e2e-test-cancel-action-button"
+              [disabled]="isSubmittingFollowUp"
+              (click)="closemodal()">
+        {{ 'I18N_MODAL_CANCEL_BUTTON'| translate }}
+      </button>
+      <button type="submit"
+              class="btn btn-success e2e-test-confirm-action-button"
+              (click)="submit()"
+              [disabled]="isSubmittingFollowUp || !followUpText.trim()">
+        {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_SUBMIT_BUTTON'| translate }}
+      </button>
+    </div>
+  </div>
+</div>

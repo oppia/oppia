@@ -22,14 +22,17 @@ export interface NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
+  _feedbackRecipientEmail: string;
   _classroomDataIsValid: boolean;
   getClassroomId: () => string;
   getClassroomName: () => string;
   getClassroomUrlFragment: () => string;
+  getFeedbackRecipientEmail: () => string;
   setClassroomName: (classroomName: string) => void;
   setUrlFragment: (urlFragment: string) => void;
   getClassroomNameValidationErrors: () => string;
   getClassroomUrlValidationErrors: () => string;
+  getFeedbackRecipientEmailValidationErrors: () => string;
   isClassroomDataValid: () => boolean;
   setClassroomValidityFlag: (classroomDataIsValid: boolean) => void;
 }
@@ -38,12 +41,19 @@ export class NewClassroomData implements NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
+  _feedbackRecipientEmail: string;
   _classroomDataIsValid!: boolean;
 
-  constructor(classroomId: string, name: string, urlFragment: string) {
+  constructor(
+    classroomId: string,
+    name: string,
+    urlFragment: string,
+    feedbackRecipientEmail: string
+  ) {
     this._classroomId = classroomId;
     this._name = name;
     this._urlFragment = urlFragment;
+    this._feedbackRecipientEmail = feedbackRecipientEmail;
   }
 
   isClassroomDataValid(): boolean {
@@ -66,12 +76,20 @@ export class NewClassroomData implements NewClassroom {
     return this._urlFragment;
   }
 
+  getFeedbackRecipientEmail(): string {
+    return this._feedbackRecipientEmail;
+  }
+
   setClassroomName(classroomName: string): void {
     this._name = classroomName;
   }
 
   setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
+  }
+
+  setFeedbackEmail(feedbackEmail: string): void {
+    this._feedbackRecipientEmail = feedbackEmail;
   }
 
   getClassroomNameValidationErrors(): string {
@@ -104,5 +122,19 @@ export class NewClassroomData implements NewClassroom {
         'letters separated by hyphens.';
     }
     return errorMsg;
+  }
+
+  getFeedbackRecipientEmailValidationErrors(): string {
+    if (this._feedbackRecipientEmail.trim() === '') {
+      return 'The feedback recipient email should not be empty.';
+    }
+
+    const emailRegex = new RegExp(AppConstants.EMAIL_REGEX);
+
+    if (!emailRegex.test(this._feedbackRecipientEmail.trim())) {
+      return 'Please enter a valid email address.';
+    }
+
+    return '';
   }
 }

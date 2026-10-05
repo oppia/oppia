@@ -26,6 +26,7 @@ import {ClassroomAdminDataService} from '../services/classroom-admin-data.servic
 @Component({
   selector: 'oppia-create-new-classroom-modal',
   templateUrl: './create-new-classroom-modal.component.html',
+  styleUrls: ['./create-new-classroom-modal.component.css'],
 })
 export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   constructor(
@@ -44,6 +45,10 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
     return this.classroomAdminDataService.urlValidationError;
   }
 
+  get feedbackRecipientEmailValidationError(): string {
+    return this.classroomAdminDataService.feedbackRecipientEmailValidationError;
+  }
+
   validateClassroom(
     tempClassroom: NewClassroomData,
     classroom: NewClassroomData
@@ -59,8 +64,8 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   newClassroomCreationInProgress: boolean = false;
 
   ngOnInit(): void {
-    this.tempClassroom = new NewClassroomData('', '', '');
-    this.classroom = new NewClassroomData('', '', '');
+    this.tempClassroom = new NewClassroomData('', '', '', '');
+    this.classroom = new NewClassroomData('', '', '', '');
 
     this.classroomAdminDataService.existingClassroomNames =
       this.existingClassroomNames;
@@ -73,14 +78,17 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
     this.classroomBackendApiService;
     const name = this.tempClassroom.getClassroomName();
     const urlFragment = this.tempClassroom.getClassroomUrlFragment();
+    const feedbackRecipientEmail =
+      this.tempClassroom.getFeedbackRecipientEmail();
 
     this.classroomBackendApiService
-      .createNewClassroomAsync(name, urlFragment)
+      .createNewClassroomAsync(name, urlFragment, feedbackRecipientEmail)
       .then(res => {
         this.ngbActiveModal.close({
           classroom_id: res.new_classroom_id,
           name: name,
           url_fragment: urlFragment,
+          feedback_recipient_email: feedbackRecipientEmail,
         });
         this.newClassroomCreationInProgress = false;
       });

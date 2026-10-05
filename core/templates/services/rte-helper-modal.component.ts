@@ -16,9 +16,13 @@
  * @fileoverview Component for RteHelperModal.
  */
 
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild, Optional, Inject} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
@@ -28,9 +32,11 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, AbstractControl} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -103,21 +109,29 @@ export type RteComponentId = {
   [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['frontend_id'];
 }[keyof ComponentSpecsType];
 
+interface RteHelperModalData {
+  componentId: RteComponentId;
+  customizationArgSpecs: CustomizationArgsSpecsType;
+  attrsCustomizationArgsDict: CustomizationArgsForRteType;
+  componentIsNewlyCreated: boolean;
+}
+
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
+  styleUrls: ['./rte-helper-modal.component.css'],
 })
 export class RteHelperModalComponent {
-  @Input() componentId: RteComponentId;
-  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated: boolean;
+  @Input() componentId!: RteComponentId;
+  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage: string;
+  errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
-  customizationArgsFormSubscription: Subscription;
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -142,7 +156,6 @@ export class RteHelperModalComponent {
   };
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
     private externalRteSaveService: ExternalRteSaveService,
     private alertsService: AlertsService,
     private fb: FormBuilder,
@@ -150,10 +163,51 @@ export class RteHelperModalComponent {
     private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private htmlLengthService: HtmlLengthService
+    private htmlLengthService: HtmlLengthService,
+    private translationLanguageService: TranslationLanguageService,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional()
+    private rteHelperBottomSheetRef?: MatBottomSheetRef<RteHelperModalComponent>,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data?: RteHelperModalData
   ) {}
 
   ngOnInit(): void {
+    if (this.data) {
+      this.componentId = this.data.componentId;
+      this.customizationArgSpecs = this.data.customizationArgSpecs;
+      this.attrsCustomizationArgsDict = this.data.attrsCustomizationArgsDict;
+      this.componentIsNewlyCreated = this.data.componentIsNewlyCreated;
+    }
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.keydownEvents().subscribe(event => {
+        if (event.key === 'Escape') {
+          this.rteHelperBottomSheetRef?.dismiss();
+        }
+      });
+    }
+    const activeLanguageCode =
+      this.translationLanguageService.getActiveLanguageCode();
+    const activeLanguageDirection = activeLanguageCode
+      ? this.translationLanguageService.getActiveLanguageDirection()
+      : 'auto';
+
+    this.customizationArgSpecs.forEach(
+      (spec: CustomizationArgsSpecsType[number]) => {
+        if (spec.schema) {
+          const schema = (
+            (spec.schema.type as string) === 'list'
+              ? (spec.schema as unknown as ListSchema).items
+              : spec.schema
+          ) as UnicodeSchema;
+          if (!schema.ui_config) {
+            schema.ui_config = {};
+          }
+          schema.ui_config.languageDirection = activeLanguageDirection;
+        }
+      }
+    );
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
@@ -210,8 +264,10 @@ export class RteHelperModalComponent {
       }
     }
 
-    const formGroupControls = {};
-    this.customizationArgSpecs.forEach((_, index) => {
+    const formGroupControls: {
+      [key: string]: AbstractControl;
+    } = {};
+    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
@@ -230,25 +286,35 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
-    if (this.componentIsNewlyCreated) {
-      this.ngbActiveModal.dismiss(true);
+    const dismissValue = this.componentIsNewlyCreated ? true : false;
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss(dismissValue);
     } else {
-      this.ngbActiveModal.dismiss(false);
+      this.ngbActiveModal.dismiss(dismissValue);
     }
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
   delete(): void {
-    this.ngbActiveModal.dismiss(true);
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss(true);
+    } else {
+      this.ngbActiveModal.dismiss(true);
+    }
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: {
+    [key: number]: CustomizationArgsNameAndValueArray[number]['value'];
+  }): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = value[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        value[0].mathExpressionSvgIsBeingProcessed;
+      let rawLatex: string = (value[0] as {raw_latex: string}).raw_latex;
+      let mathExpressionSvgIsBeingProcessed: boolean = (
+        value[0] as {
+          mathExpressionSvgIsBeingProcessed: boolean;
+        }
+      ).mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -256,8 +322,8 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1];
-      let end: number = value[2];
+      let start: number = value[1] as number;
+      let end: number = value[2] as number;
       if (value[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
@@ -273,15 +339,16 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      const tabsArray = value[0] as readonly {title: string; content: string}[];
+      for (let tabIndex = 0; tabIndex < tabsArray.length; tabIndex++) {
+        if (tabsArray[tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if (tabsArray[tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -292,7 +359,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              tabsArray[tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -305,7 +372,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              tabsArray[tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -319,8 +386,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      let url: string = value[0] as string;
+      let text: string = value[1] as string;
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -374,7 +441,7 @@ export class RteHelperModalComponent {
       if (
         value[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          value[0] as string,
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -387,7 +454,7 @@ export class RteHelperModalComponent {
       if (
         value[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          value[1] as string,
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -399,7 +466,10 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[0] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -413,7 +483,10 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[1] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -452,7 +525,10 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
+    return (
+      (this.CHARACTER_LIMITS as Record<string, number>)[componentId] ||
+      this.CHARACTER_LIMITS.default
+    );
   }
 
   isErrorMessageNonempty(): boolean {
@@ -472,7 +548,7 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value =
+      this.tmpCustomizationArgs[Number(index)].value =
         this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
@@ -504,11 +580,26 @@ export class RteHelperModalComponent {
           'The rawLatex or svgFileName for a Math expression should not ' +
             'be empty.'
         );
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
+        return;
+      }
+      if (!svgFile) {
+        this.alertsService.addWarning('SVG file is missing.');
         this.ngbActiveModal.dismiss('cancel');
         return;
       }
       const resampledFile =
         this.imageUploadHelperService.convertImageDataToImageFile(svgFile);
+
+      if (!resampledFile) {
+        this.alertsService.addWarning('Failed to process SVG file.');
+        this.ngbActiveModal.dismiss('cancel');
+        return;
+      }
 
       let maxAllowedFileSize;
       if (
@@ -529,29 +620,48 @@ export class RteHelperModalComponent {
             "and '+ z^2'",
           5000
         );
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
       if (
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile);
+        if (svgFileName && svgFile) {
+          this.imageLocalStorageService.saveImage(svgFileName, svgFile);
+        }
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
           svg_filename: svgFileName,
         };
         const caName = tmpCustomizationArgs[0].name;
         customizationArgsDict[caName] = mathContentDict;
-        this.ngbActiveModal.close(customizationArgsDict);
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+        } else {
+          this.ngbActiveModal.close(customizationArgsDict);
+        }
+        return;
+      }
+      const entityType = this.pageContextService.getEntityType();
+      const entityId = this.pageContextService.getEntityId();
+      if (!entityType || !entityId) {
+        this.alertsService.addWarning(
+          'Error: Could not retrieve entity type or entity ID.'
+        );
+        this.ngbActiveModal.dismiss('cancel');
         return;
       }
       this.assetsBackendApiService
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.pageContextService.getEntityType(),
-          this.pageContextService.getEntityId()
+          entityType,
+          entityId
         )
         .then(
           response => {
@@ -561,13 +671,21 @@ export class RteHelperModalComponent {
             };
             const caName = tmpCustomizationArgs[0].name;
             customizationArgsDict[caName] = mathContentDict;
-            this.ngbActiveModal.close(customizationArgsDict);
+            if (this.rteHelperBottomSheetRef) {
+              this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+            } else {
+              this.ngbActiveModal.close(customizationArgsDict);
+            }
           },
           errorResponse => {
             this.alertsService.addWarning(
               errorResponse.error || 'Error communicating with server.'
             );
-            this.ngbActiveModal.dismiss('cancel');
+            if (this.rteHelperBottomSheetRef) {
+              this.rteHelperBottomSheetRef.dismiss('cancel');
+            } else {
+              this.ngbActiveModal.dismiss('cancel');
+            }
           }
         );
     } else {
@@ -587,7 +705,11 @@ export class RteHelperModalComponent {
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
       }
-      this.ngbActiveModal.close(customizationArgsDict);
+      if (this.rteHelperBottomSheetRef) {
+        this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+      } else {
+        this.ngbActiveModal.close(customizationArgsDict);
+      }
       this.customizationArgsFormSubscription.unsubscribe();
     }
   }

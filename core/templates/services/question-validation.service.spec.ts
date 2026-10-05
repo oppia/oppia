@@ -350,5 +350,122 @@ describe('Question Validation Service', () => {
         'Please enter a question.'
       );
     });
+
+    it(
+      'should return error message if correct feedback matches the ' +
+        'default outcome feedback',
+      () => {
+        const interaction = mockQuestionDict.question_state_data.interaction;
+        interaction.answer_groups[0].outcome.feedback.html = 'ok';
+        if (interaction.default_outcome === null) {
+          throw new Error('Expected default outcome to be initialized.');
+        }
+        interaction.default_outcome.feedback.html = 'ok';
+        const question = Question.createFromBackendDict(mockQuestionDict);
+
+        expect(qvs.getValidationErrorMessage(question)).toEqual(
+          'Feedback for correct and incorrect answers must be different.'
+        );
+      }
+    );
+
+    it(
+      'should return null if correct and incorrect feedback are ' + 'different',
+      () => {
+        const interaction = mockQuestionDict.question_state_data.interaction;
+        interaction.answer_groups[0].outcome.feedback.html =
+          'Correct answer feedback';
+        if (interaction.default_outcome === null) {
+          throw new Error('Expected default outcome to be initialized.');
+        }
+        interaction.default_outcome.feedback.html = 'Try again';
+        const question = Question.createFromBackendDict(mockQuestionDict);
+
+        expect(qvs.getValidationErrorMessage(question)).toBeNull();
+      }
+    );
+
+    it(
+      'should treat feedback differing only in whitespace as ' + 'duplicate',
+      () => {
+        const interaction = mockQuestionDict.question_state_data.interaction;
+        interaction.answer_groups[0].outcome.feedback.html = 'ok';
+        if (interaction.default_outcome === null) {
+          throw new Error('Expected default outcome to be initialized.');
+        }
+        interaction.default_outcome.feedback.html = ' ok ';
+        const question = Question.createFromBackendDict(mockQuestionDict);
+
+        expect(qvs.getValidationErrorMessage(question)).toEqual(
+          'Feedback for correct and incorrect answers must be different.'
+        );
+      }
+    );
+
+    it('should treat feedback differing only in case as duplicate', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.answer_groups[0].outcome.feedback.html = 'OK';
+      if (interaction.default_outcome === null) {
+        throw new Error('Expected default outcome to be initialized.');
+      }
+      interaction.default_outcome.feedback.html = '<p>ok</p>';
+      const question = Question.createFromBackendDict(mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'Feedback for correct and incorrect answers must be different.'
+      );
+    });
+
+    it(
+      'should return error message if correct feedback matches an ' +
+        'incorrect answer group feedback',
+      () => {
+        const interaction = mockQuestionDict.question_state_data.interaction;
+        interaction.answer_groups[0].outcome.feedback.html = 'Same feedback';
+        interaction.answer_groups[1].outcome.feedback.html = 'Same feedback';
+
+        if (interaction.default_outcome === null) {
+          throw new Error('Expected default outcome to be initialized.');
+        }
+        interaction.default_outcome.feedback.html = 'Different feedback';
+
+        const question = Question.createFromBackendDict(mockQuestionDict);
+
+        expect(qvs.getValidationErrorMessage(question)).toEqual(
+          'Feedback for correct and incorrect answers must be different.'
+        );
+      }
+    );
+
+    it(
+      'should return null if two incorrect outcomes have the same ' +
+        'feedback',
+      () => {
+        const interaction = mockQuestionDict.question_state_data.interaction;
+        interaction.answer_groups[0].outcome.feedback.html = 'Well done';
+        interaction.answer_groups[1].outcome.feedback.html = 'Try again';
+        if (interaction.default_outcome === null) {
+          throw new Error('Expected default outcome to be initialized.');
+        }
+        interaction.default_outcome.feedback.html = 'Try again';
+        const question = Question.createFromBackendDict(mockQuestionDict);
+
+        expect(qvs.getValidationErrorMessage(question)).toBeNull();
+      }
+    );
+
+    it('should treat feedback with paragraph wrappers as duplicate', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.answer_groups[0].outcome.feedback.html = '<p>ok</p>';
+      if (interaction.default_outcome === null) {
+        throw new Error('Expected default outcome to be initialized.');
+      }
+      interaction.default_outcome.feedback.html = '<p> ok </p>';
+      const question = Question.createFromBackendDict(mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'Feedback for correct and incorrect answers must be different.'
+      );
+    });
   });
 });

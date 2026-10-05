@@ -1,41 +1,4 @@
-<style>
-  .oppia-outcome-container {
-    display: flex;
-  }
 
-  .oppia-confusing-outcome-warning-text {
-    color: rgb(200, 0, 0);
-    font-style: italic;
-  }
-
-  .oppia-nothing-text {
-    color: #888;
-  }
-
-  .oppia-non-empty-feedback-text {
-    word-wrap: break-word;
-  }
-
-  .oppia-prerequisite-skill-text {
-    margin-top: 1em;
-  }
-
-  .oppia-correct-text {
-    color: rgb(20, 180, 15);
-  }
-
-  .oppia-incorrect-text {
-    color: rgb(243, 13, 13);
-  }
-
-  /* The value used for this breakpoint should be equal to */
-  /* 'mobileBreakpoint' defined in outcome-editor.component.ts */
-  @media screen and (max-width: 500px) {
-    .oppia-outcome-heading {
-      font-size: 18px;
-    }
-  }
-</style>
 
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
      title="{{ isEditable ? 'Edit feedback' : '' }}"
@@ -106,7 +69,7 @@
       <button type="button"
               class="btn btn-success e2e-test-save-outcome-feedback"
               [disabled]="invalidStateAfterFeedbackSave() || isFeedbackLengthExceeded()"
-              (click)="saveThisFeedback(true)">
+              (click)="saveThisFeedback()">
         Save Feedback
       </button>
     </div>
@@ -242,13 +205,6 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-details-header">
-        <div class="oppia-click-to-start-editing"
-             *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
-          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-end"
-             title="Edit Correctness setting">&#xE254;
-          </i>
-        </div>
-
         <strong class="oppia-outcome-heading">The answers falling under this group are
           <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
             correct
