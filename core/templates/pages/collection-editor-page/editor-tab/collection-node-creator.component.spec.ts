@@ -28,7 +28,6 @@ import {
 import {ExplorationCreationBackendApiService} from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 import {Collection} from 'domain/collection/collection.model';
-import {SearchExplorationsBackendApiService} from 'domain/collection/search-explorations-backend-api.service';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {AlertsService} from 'services/alerts.service';
@@ -73,7 +72,6 @@ describe('Collection node creator component', () => {
         CollectionLinearizerService,
         ExplorationCreationBackendApiService,
         ExplorationSummaryBackendApiService,
-        SearchExplorationsBackendApiService,
         SiteAnalyticsService,
         ValidatorsService,
         NormalizeWhitespacePipe,

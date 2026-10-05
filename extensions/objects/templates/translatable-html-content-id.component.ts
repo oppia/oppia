@@ -25,7 +25,7 @@ import {
   Output,
 } from '@angular/core';
 
-type TranslatableHtmlContentIdEditorChoices = {val: string}[];
+type TranslatableHtmlContentIdEditorChoices = {val: string; id: string}[];
 
 @Component({
   selector: 'translatable-html-content-id-editor',

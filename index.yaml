@@ -469,11 +469,6 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
-- kind: SearchRankerRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
 - kind: SentEmailModel
   properties:
   - name: email_hash
@@ -734,6 +729,24 @@ indexes:
   - name: exploration_id
   - name: status
   - name: created_on
+    direction: desc
+
+- kind: CollectionSummaryModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: collection_model_last_updated
+    direction: desc
+
+- kind: ExpSummaryModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: scaled_average_rating
     direction: desc
 
 - kind: LessonFeedbackModel
