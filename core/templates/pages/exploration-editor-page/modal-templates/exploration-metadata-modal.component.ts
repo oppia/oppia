@@ -81,6 +81,32 @@ export class ExplorationMetadataModalComponent
     super(ngbActiveModal);
   }
 
+  // The category and language selects bind directly to these getters because
+  // the underlying services are kept private and cannot be referenced from the
+  // template under the strict template type check.
+  get selectedExplorationCategory(): string {
+    return this.explorationCategoryService.displayed as string;
+  }
+
+  set selectedExplorationCategory(category: string) {
+    this.explorationCategoryService.displayed = category;
+  }
+
+  get selectedExplorationLanguageCode(): string {
+    return this.explorationLanguageCodeService.displayed as string;
+  }
+
+  set selectedExplorationLanguageCode(languageCode: string) {
+    this.explorationLanguageCodeService.displayed = languageCode;
+  }
+
+  getSupportedContentLanguages(): readonly {
+    code: string;
+    description: string;
+  }[] {
+    return this.explorationLanguageCodeService.getSupportedContentLanguages();
+  }
+
   updateCategoryListWithUserData(): void {
     if (this.newCategory) {
       this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
