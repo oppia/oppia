@@ -217,6 +217,24 @@ describe('Contribution Opportunities Service', () => {
     })
   );
 
+  it('should return skill opportunities count when calling getSkillOpportunitiesCountAsync', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const getSkillOpportunitiesCountSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(42));
+
+    contributionOpportunitiesService
+      .getSkillOpportunitiesCountAsync()
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getSkillOpportunitiesCountSpy).toHaveBeenCalledWith('skill', '');
+    expect(successHandler).toHaveBeenCalledWith(42);
+  }));
+
   it(
     'should return translation opportunities when calling ' +
       "'getTranslationOpportunitiesAsync'",
@@ -282,6 +300,29 @@ describe('Contribution Opportunities Service', () => {
       expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
     })
   );
+
+  it('should return translation opportunities count when calling getTranslationOpportunitiesCountAsync', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const getTranslationOpportunitiesCountSpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'fetchOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(42));
+
+    contributionOpportunitiesService
+      .getTranslationOpportunitiesCountAsync('hi', 'Topic')
+      .then(successHandler, failHandler);
+    tick();
+
+    expect(getTranslationOpportunitiesCountSpy).toHaveBeenCalledWith(
+      'translation',
+      'Topic',
+      'hi',
+      undefined
+    );
+    expect(successHandler).toHaveBeenCalledWith(42);
+  }));
 
   it(
     'should return reviewable translation opportunities when calling ' +

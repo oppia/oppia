@@ -36,9 +36,10 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface HintFormSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -72,8 +73,8 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     return this.HINT_FORM_SCHEMA;
   }
 
-  updateHintContentHtml(value: string): void {
-    this.hint.hintContent._html = value;
+  updateHintContentHtml(value: SchemaDefaultValue): void {
+    this.hint.hintContent._html = typeof value === 'string' ? value : '';
   }
 
   openHintEditor(): void {

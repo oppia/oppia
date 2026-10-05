@@ -541,6 +541,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/auto-translate-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/auto-translate-feature.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language.spec.ts",
       "framework": "puppeteer"

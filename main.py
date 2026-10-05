@@ -490,6 +490,10 @@ URLS = [
         contributor_dashboard.ContributionOpportunitiesHandlerV2,
     ),
     get_redirect_route(
+        r'%s' % feconf.OPPORTUNITIES_COUNT_URL,
+        contributor_dashboard.OpportunitiesCountHandler,
+    ),
+    get_redirect_route(
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler,
     ),

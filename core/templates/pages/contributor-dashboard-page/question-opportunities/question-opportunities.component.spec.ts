@@ -160,6 +160,25 @@ describe('Question opportunities component', () => {
     });
   });
 
+  it('should load opportunities count', fakeAsync(() => {
+    spyOn(
+      contributionOpportunitiesService,
+      'getSkillOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(5));
+
+    let resolvedCount = null;
+    component.loadOpportunitiesCount('query').then(count => {
+      resolvedCount = count;
+    });
+
+    tick();
+
+    expect(
+      contributionOpportunitiesService.getSkillOpportunitiesCountAsync
+    ).toHaveBeenCalledWith('query');
+    expect(resolvedCount).toEqual(5);
+  }));
+
   it(
     'should register Contributor Dashboard suggest event when clicking on' +
       ' suggest question button',

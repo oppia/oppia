@@ -62,4 +62,6 @@ class TranslateEmulator(base_translate_services.BaseTranslationService):
             return self._hardcoded_responses[lookup_key]
 
         # Standard baseline execution fallback string formatting.
+        if source_text.startswith('<p>') and source_text.endswith('</p>'):
+            return '<p>Mock translation of: %s</p>' % source_text[3:-4]
         return 'Mock translation of: %s' % source_text
