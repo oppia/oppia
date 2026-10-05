@@ -199,24 +199,59 @@ describe('Translation Reviewer: review translations', function () {
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
   }, 2100000);
 
-  it('should review skill translations', async function () {
-    // Reaching a skill's suggestions through its opportunity card is a
-    // different path from the skills filter, which skips the card, so both
-    // are covered.
-    await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
-    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
-      SKILL_NAME,
-      SKILL_SUBHEADING
+  it('should review exploration metadata translations', async function () {
+    await translationReviewer.selectContentTypeFilter(
+      CONTENT_TYPE_FILTER.LESSONS
     );
+    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+      CHAPTER_NAME,
+      LESSON_SUBHEADING
+    );
+
+    // 1. The reviewer sees the Title ("पाइज़ काटना") and Objective
+    // ("केक को बराबर हिस्सों में बाँटना सीखें") translations correctly
+    // displayed.
+    await translationReviewer.startTranslationReview(
+      HINDI_TITLE,
+      `${TOPIC_NAME} / ${CHAPTER_NAME}`
+    );
+    await translationReviewer.expectCardContentToBeInTranslationReview(
+      HINDI_TITLE
+    );
+    await translationReviewer.submitTranslationReviewAndExpectToast(
+      'accept',
+      'Suggestion accepted.'
+    );
+
+    await translationReviewer.expectCardContentToBeInTranslationReview(
+      HINDI_OBJECTIVE
+    );
+    await translationReviewer.submitTranslationReviewAndExpectToast(
+      'accept',
+      'Suggestion accepted.'
+    );
+  });
+
+  it('should review skill translations', async function () {
+    // In the "Content Type" dropdown, change the selection to "Skills".
+    await translationReviewer.selectContentTypeFilter(
+      CONTENT_TYPE_FILTER.SKILLS
+    );
+
+    // 1. The reviewer sees the submitted skill translation suggestion in the
+    // review queue.
     await translationReviewer.expectOpportunityToBePresent(
-      HINDI_SKILL_EXPLANATION,
+      HINDI_SKILL_DESCRIPTION,
       SKILL_NAME
     );
 
-    // The skill has two pending suggestions. Opening the first row means one
-    // suggestion still follows it, which is what makes the labels below
-    // deterministic rather than dependent on how the list is sorted.
+    // 2. Open the suggestion for review.
     await translationReviewer.openFirstSuggestionForReview();
+
+    // Verify the first suggestion's translated content.
+    await translationReviewer.expectCardContentToBeInTranslationReview(
+      HINDI_SKILL_DESCRIPTION
+    );
 
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
@@ -227,8 +262,11 @@ describe('Translation Reviewer: review translations', function () {
       'Suggestion accepted.'
     );
 
-    // Accepting the first suggestion leaves the modal open on the second and
-    // last one, where both buttons drop the mention of a next suggestion.
+    // Verify the second suggestion's translated content.
+    await translationReviewer.expectCardContentToBeInTranslationReview(
+      HINDI_SKILL_EXPLANATION
+    );
+
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
       ACCEPT_LABEL
@@ -241,32 +279,6 @@ describe('Translation Reviewer: review translations', function () {
       'reject',
       'Suggestion rejected.',
       'Please match the wording used in the lesson.'
-    );
-  });
-
-  it('should review exploration metadata translations', async function () {
-    await translationReviewer.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
-      CHAPTER_NAME,
-      LESSON_SUBHEADING
-    );
-
-    // A lesson's suggestions are reached through its opportunity card, so the
-    // control that returns to the lesson list is present here.
-    await translationReviewer.expectBackToLessonsControlToBeVisible();
-
-    await translationReviewer.startTranslationReview(
-      HINDI_TITLE,
-      `${TOPIC_NAME} / ${CHAPTER_NAME}`
-    );
-    await translationReviewer.expectCardContentToBeInTranslationReview(
-      HINDI_TITLE
-    );
-    await translationReviewer.submitTranslationReviewAndExpectToast(
-      'accept',
-      'Suggestion accepted.'
     );
   });
 

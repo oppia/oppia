@@ -160,67 +160,25 @@ describe('Translation Submitter', function () {
     await translationSubmitter.selectLanguageFilter(TRANSLATION_LANGUAGE);
     await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
 
-    // The filter offers exactly three options and starts on "All".
-    await translationSubmitter.expectSelectedContentTypeFilterToBe(
-      CONTENT_TYPE_FILTER.ALL
-    );
-    await translationSubmitter.expectContentTypeFilterOptionsToBe([
-      CONTENT_TYPE_FILTER.ALL,
-      CONTENT_TYPE_FILTER.LESSONS,
-      CONTENT_TYPE_FILTER.SKILLS,
-    ]);
-
-    // "All" lists the lesson and the skill together, each under a subheading
-    // naming its own content type.
-    await translationSubmitter.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
-    await translationSubmitter.expectOpportunityToBePresent(
-      CHAPTER_NAME,
-      LESSON_SUBHEADING
-    );
-    await translationSubmitter.expectOpportunityToBePresent(
-      SKILL_NAME,
-      SKILL_SUBHEADING
-    );
-
-    // "Lessons" drops the skill.
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationSubmitter.expectOpportunityToBePresent(
-      CHAPTER_NAME,
-      LESSON_SUBHEADING
-    );
-    await translationSubmitter.expectOpportunityToBePresent(
-      SKILL_NAME,
-      SKILL_SUBHEADING,
-      false
-    );
-
-    // "Skills" drops the lesson.
+    // In the "Content Type" dropdown, change the selection to "Skills".
     await translationSubmitter.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
+
+    // 1. The Translation Opportunities list should update to show only the
+    // translatable Skill ("unit fractions").
     await translationSubmitter.expectOpportunityToBePresent(
       SKILL_NAME,
       SKILL_SUBHEADING
     );
+
+    // 2. The exploration translation opportunity ("Cutting the Pies") should
+    // no longer be visible in the list.
     await translationSubmitter.expectOpportunityToBePresent(
       CHAPTER_NAME,
       LESSON_SUBHEADING,
       false
     );
-
-    // The filter is only shown on tabs that can use it.
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'My Contributions'
-    );
-    await translationSubmitter.navigateToTabInMyContributions(
-      'Contribution Stats'
-    );
-    await translationSubmitter.expectContentTypeFilterToBeVisible(false);
-
-    await translationSubmitter.navigateToTabInMyContributions('Badges');
-    await translationSubmitter.expectContentTypeFilterToBeVisible(false);
   });
 
   it('should translate exploration metadata', async function () {

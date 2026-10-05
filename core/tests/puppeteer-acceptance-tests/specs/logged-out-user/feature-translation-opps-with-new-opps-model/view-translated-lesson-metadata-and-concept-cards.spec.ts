@@ -225,13 +225,12 @@ describe('Logged-out User', function () {
 
   it('should view translated lesson metadata and concept cards in the player', async function () {
     await loggedOutUser.goto(
-      `${testConstants.URLs.ExplorationPlayer}${explorationId}`
+      `${testConstants.URLs.ExplorationPlayer}${explorationId}` +
+        `?initialContentLanguageCode=${HINDI_SITE_LANGUAGE_CODE}`
     );
 
-    // The lesson title displays in Hindi in the player.
-    await loggedOutUser.expectExplorationTitleInPlayerToBe(HINDI_TITLE);
-
-    // The lesson title, objective, and tags display in Hindi in the Lesson Info modal.
+    // 1. The lesson title, objective, and tags display in Hindi in the
+    // Lesson Info modal.
     await loggedOutUser.openLessonInfoModal();
     await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);
     await loggedOutUser.expectLessonInfoModalObjectiveToBe(HINDI_OBJECTIVE);

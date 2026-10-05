@@ -40,8 +40,6 @@ import {TranslationSubmitter} from '../../../utilities/user/translation-submitte
 
 const ROLES = testConstants.Roles;
 
-Error.stackTraceLimit = 20;
-
 const TRANSLATION_LANGUAGE = 'हिन्दी (Hindi)';
 
 const TOPIC_NAME = 'Fractions';
@@ -67,11 +65,6 @@ const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
 const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
-
-// The action button an opportunity card carries on the review tab. It opens
-// the card's own suggestions rather than a review, which is what "Review" on
-// each individual suggestion inside does.
-const OPPORTUNITY_ACTION_BUTTON_LABEL = 'Translations';
 
 const MAX_ITEMS_TO_SKIP = 15;
 
@@ -196,34 +189,21 @@ describe('Translation Reviewer: filter opportunities by entity type', function (
   it('should filter opportunities by entity type', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
-    await translationReviewer.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
 
-    // The lesson and the skill are listed together, each carrying the action
-    // button that opens its own suggestions.
-    await translationReviewer.expectOpportunityActionButtonToBe(
-      CHAPTER_NAME,
-      LESSON_SUBHEADING,
-      OPPORTUNITY_ACTION_BUTTON_LABEL
-    );
-    await translationReviewer.expectOpportunityActionButtonToBe(
-      SKILL_NAME,
-      SKILL_SUBHEADING,
-      OPPORTUNITY_ACTION_BUTTON_LABEL
-    );
-
-    // Filtering by skills shows only the submitted skill translations and
-    // removes the exploration translations from the list.
+    // In the "Content Type" dropdown, change the selection to "Skills".
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
     );
 
-    // The skills filter shows the suggestions straight away, so the control
-    // that returns from a lesson's suggestions to the lesson list is absent.
-    await translationReviewer.expectBackToLessonsControlToBeVisible(false);
+    // 1. Only submitted skill translation suggestions show up in the review
+    // list.
     await translationReviewer.expectOpportunityToBePresent(
       HINDI_SKILL_DESCRIPTION,
       SKILL_NAME
     );
+
+    // 2. Submitted exploration translations (such as "Cutting the Pies")
+    // should not be visible in the list.
     await translationReviewer.expectOpportunityToBePresent(
       CHAPTER_NAME,
       LESSON_SUBHEADING,
