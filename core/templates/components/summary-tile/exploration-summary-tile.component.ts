@@ -67,15 +67,18 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() objective!: string;
   @Input() category!: string;
   // An exploration that nobody has rated yet has all-zero rating counts,
-  // which is what the backend sends in that case.
-  @Input() ratings: ExplorationRatings = {...NO_RATINGS};
+  // which is what the backend sends in that case. Callers that have no
+  // ratings at all (for example collections) pass null instead, so this
+  // input accepts null and 'getAverageRating()' falls back to the all-zero
+  // map.
+  @Input() ratings: ExplorationRatings | null = {...NO_RATINGS};
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
-  @Input() parentExplorationIds!: string;
+  @Input() parentExplorationIds!: string[];
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the
@@ -203,7 +206,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   // Function will return null when the exploration has no ratings.
   getAverageRating(): number | null {
-    return this.ratingComputationService.computeAverageRating(this.ratings);
+    return this.ratingComputationService.computeAverageRating(
+      this.ratings ?? NO_RATINGS
+    );
   }
 
   // Function will return null when the property 'lastUpdatedMsecs' is null

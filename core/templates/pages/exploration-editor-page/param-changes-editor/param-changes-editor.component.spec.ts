@@ -128,6 +128,15 @@ describe('Param Changes Editor Component', () => {
     expect(component.paramNameChoices).toEqual([]);
   });
 
+  it('should return the displayed and saved param changes', () => {
+    const paramChange = ParamChange.createDefault('x');
+    component.paramChangesService.displayed = [paramChange];
+    component.paramChangesService.savedMemento = [paramChange];
+
+    expect(component.displayedParamChanges).toEqual([paramChange]);
+    expect(component.savedParamChanges).toEqual([paramChange]);
+  });
+
   it(
     'should reset customization args from param change when changing ' +
       'generator type',
@@ -147,6 +156,32 @@ describe('Param Changes Editor Component', () => {
       });
     }
   );
+
+  it('should return the customization args and human readable args for a param change', () => {
+    const copierParamChange = ParamChange.createFromBackendDict({
+      customization_args: {
+        value: '5',
+      },
+      generator_id: 'Copier',
+      name: 'a',
+    });
+    const randomSelectorParamChange = ParamChange.createFromBackendDict({
+      customization_args: {
+        list_of_values: ['first value', 'second value'],
+      },
+      generator_id: 'RandomSelector',
+      name: 'b',
+    });
+
+    expect(component.getHumanReadableArgs(copierParamChange)).toBe('to 5');
+    // Mutating the returned object must update the param change's args in
+    // place, since the value generator binds to its args by reference.
+    component.getCustomizationArgs(copierParamChange).value = 'updated';
+    expect(copierParamChange.customizationArgs.value).toBe('updated');
+    expect(component.getHumanReadableArgs(randomSelectorParamChange)).toBe(
+      'to one of [first value, second value] at random'
+    );
+  });
 
   it('should get complete image path corresponding to a given relative path', () => {
     expect(component.getStaticImageUrl('/path/to/image.png')).toBe(
