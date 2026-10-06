@@ -3299,24 +3299,20 @@ export class TopicManager extends BaseUser {
       'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-
-    // Wait for the backend to finish saving the story before returning,
-    // otherwise subsequent actions might fetch an outdated version of the story.
-    // Must be done in Promise.all so we start waiting BEFORE clicking.
-    await Promise.all([
-      this.page.waitForResponse(
-        response =>
-          response.url().includes('/story_editor_handler/data/') &&
-          response.request().method() === 'PUT'
-      ),
-      this.clickOnElementWithJsFallback(closeSaveModalButton),
-    ]);
-
+    await this.clickOnElementWithJsFallback(closeSaveModalButton);
     const modalHidden = await this.isElementVisible(modalDiv, false, 30000);
     if (!modalHidden) {
       await this.page.keyboard.press('Escape');
       await this.isElementVisible(modalDiv, false, 10000);
     }
+
+    // Wait for the backend to finish saving the story before returning,
+    // otherwise subsequent actions might fetch an outdated version of the story.
+    await this.page.waitForResponse(
+      response =>
+        response.url().includes('/story_editor_handler/data/') &&
+        response.request().method() === 'PUT'
+    );
   }
 
   /**
