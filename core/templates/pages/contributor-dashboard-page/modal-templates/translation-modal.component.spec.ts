@@ -289,7 +289,21 @@ describe('Translation Modal Component', () => {
     );
   });
 
-  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', () => {
+  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
+    spyOn(component['rteHelperService'], 'openCustomizationModal');
+    component.ngOnInit();
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletexthandler?exp_id=1&language_code=es'
+    );
+    req.flush({
+      state_names_to_content_id_mapping: {
+        stateName1: {contentId1: {content_value: 'text1', data_format: 'html'}},
+      },
+      version: 1,
+    });
+    tick();
+
     // Check initial state
     expect(component.hasAltTextModalBeenOpened).toBeFalse();
 
@@ -307,7 +321,7 @@ describe('Translation Modal Component', () => {
       {}
     );
     expect(component.hasAltTextModalBeenOpened).toBeTrue();
-  });
+  }));
 
   it('should wrap text with ellipsis when text is too long', () => {
     expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
