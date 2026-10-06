@@ -32,7 +32,7 @@ const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 // Photo Upload Modal.
 const chapterPhotoBoxButton = '.e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal, oppia-image-uploader-modal';
+const photoUploadModal = 'edit-thumbnail-modal';
 
 // Topic and Skills Dashboard Page.
 const topicsTab = 'a.e2e-test-topics-tab';
@@ -3305,14 +3305,6 @@ export class TopicManager extends BaseUser {
       await this.page.keyboard.press('Escape');
       await this.isElementVisible(modalDiv, false, 10000);
     }
-
-    // Wait for the backend to finish saving the story before returning,
-    // otherwise subsequent actions might fetch an outdated version of the story.
-    await this.page.waitForResponse(
-      response =>
-        response.url().includes('/story_editor_handler/data/') &&
-        response.request().method() === 'PUT'
-    );
   }
 
   /**
@@ -5585,15 +5577,11 @@ export class TopicManager extends BaseUser {
    * @param chapterName - The name of the chapter to be marked as ready to publish.
    * @param storyName - The name of the story containing the chapter.
    * @param topicName - The name of the topic under which the story exists.
-   * @param skillName - The name of the skill to add as an acquired skill. This
-   *   must be a skill that exists in the topic. Defaults to the skill used by
-   *   the Place Values acceptance-test topic.
    */
   async readyToPublish(
     chapterName: string,
     storyName: string,
-    topicName: string,
-    skillName: string = 'Place Values skills'
+    topicName: string
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
     await this.waitForPageToFullyLoad();
@@ -5645,7 +5633,7 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(outlineEditorInput, 'This is an outline.');
     await this.clickOnElementWithSelector(saveOutlineButton);
     await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
-    await this.addAcquiredSkill(skillName);
+    await this.addAcquiredSkill('Place Values skills');
 
     await this.saveStoryDraft();
     await this.clickReadyToPublishButton();

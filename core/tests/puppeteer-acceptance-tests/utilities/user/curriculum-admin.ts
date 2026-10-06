@@ -42,7 +42,7 @@ const photoBoxButton = 'div.e2e-test-photo-button';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal, oppia-image-uploader-modal';
+const photoUploadModal = 'edit-thumbnail-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
 
@@ -1908,14 +1908,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOnElementWithSelector(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    // Wait for the backend to finish saving the story before returning,
-    // otherwise subsequent actions might fetch an outdated version of the story.
-    await this.page.waitForResponse(
-      response =>
-        response.url().includes('/story_editor_handler/data/') &&
-        response.request().method() === 'PUT'
-    );
   }
 
   /**
@@ -2131,7 +2123,6 @@ export class CurriculumAdmin extends TopicManager {
           });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
@@ -2147,7 +2138,6 @@ export class CurriculumAdmin extends TopicManager {
             throw new Error('Delete button not found');
           }
 
-          await this.waitForElementToStabilize(confirmSkillDeletionButton);
           const confirmButton = await this.page.$(confirmSkillDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
