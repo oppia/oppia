@@ -28,7 +28,6 @@ const WikiPrivilegesToFirebaseAccount =
 const baseUrl = testConstants.URLs.BaseURL;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
-const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
@@ -55,7 +54,7 @@ const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
-const invalidUsernameErrorContainer = '.oppia-warning-text';
+const invalidUsernameErrorContainer = '.e2e-test-username-warning';
 const optionText = '.mat-option-text';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
@@ -105,8 +104,6 @@ const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
-const feedbackThreadSelector = '.e2e-test-feedback-thread';
-const feedbackMessageSelector = '.e2e-test-feedback-message';
 const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
 const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
@@ -308,10 +305,6 @@ const profileContainerSelector = '.e2e-test-profile-container';
 // Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
   '.e2e-test-exploration-flagged-success-message';
-
-// Feedback updates page.
-const feedbackUpdatesMainContentContainer =
-  '.e2e-test-feedback-updates-main-content-container';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =
@@ -903,13 +896,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the feedback updates page.
-   */
-  async navigateToFeedbackUpdatesPage(): Promise<void> {
-    await this.goto(feedbackUpdatesUrl);
-  }
-
-  /**
    * Checks whether the exploration with the given title is authored by the creator.
    */
   async expectExplorationToBePresentInProfilePageWithTitle(
@@ -1139,12 +1125,24 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
-    const invalidUsernameErrorContainerElement = await this.page.$(
+    const isUsernameErrorVisible = await this.page.evaluate(
+      (selector: string) => {
+        const el = document.querySelector(selector);
+        return (
+          el !== null &&
+          window.getComputedStyle(el).display !== 'none' &&
+          window.getComputedStyle(el).visibility !== 'hidden' &&
+          el.textContent !== ''
+        );
+      },
       invalidUsernameErrorContainer
     );
-    if (!invalidUsernameErrorContainerElement) {
+    if (!isUsernameErrorVisible) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
+      await this.clickOnElementWithSelector(
+        '.e2e-test-email-preferences-radio-no'
+      );
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle0'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
@@ -1856,62 +1854,6 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       hidden: true,
     });
-  }
-
-  /**
-   * Views a feedback update thread.
-   * @param {number} threadNumber - The 0-indexed position of the thread.
-   */
-  async viewFeedbackUpdateThread(threadNumber: number): Promise<void> {
-    await this.page.waitForSelector(feedbackThreadSelector);
-    const feedbackThreads = await this.page.$$(feedbackThreadSelector);
-
-    if (threadNumber >= 0 && threadNumber <= feedbackThreads.length) {
-      await feedbackThreads[threadNumber - 1].click();
-    } else {
-      throw new Error(`Thread not found: ${threadNumber}`);
-    }
-
-    await this.page.waitForSelector(feedbackUpdatesMainContentContainer);
-  }
-
-  /**
-   * Checks if the feedback and response match the expected values.
-   * @param {string} expectedFeedback - The expected feedback.
-   * @param {string} expectedResponse - The expected response.
-   */
-
-  async expectFeedbackAndResponseToMatch(
-    expectedFeedback: string,
-    expectedResponse: string
-  ): Promise<void> {
-    await this.page.waitForSelector(feedbackMessageSelector);
-    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
-
-    if (feedbackMessages.length < 2) {
-      throw new Error('Not enough feedback messages found.');
-    }
-
-    const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
-      el.textContent?.trim()
-    );
-
-    // Fetch the text content of the second feedbackMessageSelector.
-    const actualResponse = await this.page.$$eval(
-      feedbackMessageSelector,
-      elements => elements[1]?.textContent?.trim()
-    );
-
-    if (actualFeedback !== expectedFeedback) {
-      throw new Error(
-        `Feedback does not match the expected value. Expected: ${expectedFeedback}, Found: ${actualFeedback}`
-      );
-    }
-    if (actualResponse !== expectedResponse) {
-      throw new Error(
-        `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
-      );
-    }
   }
 
   /**
