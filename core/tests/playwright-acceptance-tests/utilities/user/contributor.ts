@@ -16,7 +16,7 @@
  * @fileoverview Utility class for contributor actions.
  */
 
-import {ElementHandle, Page} from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditor} from './exploration-editor';
 
@@ -44,6 +44,13 @@ const topicOptionSelector = '.e2e-test-topic-selector-option';
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
 const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
+const mobileStatsRowSelector = '.e2e-test-mobile-stats-row';
+const mobileStatsCellSelector = '.e2e-test-mobile-stats-cell';
+const desktopStatsRowSelector = 'tr';
+const desktopStatsCellSelector = 'td';
+
+const exactText = (value: string): RegExp =>
+  new RegExp(`^\\s*${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`);
 
 export class Contributor extends ExplorationEditor {
   /**
@@ -56,77 +63,28 @@ export class Contributor extends ExplorationEditor {
     heading: string,
     subheading: string,
     visible: boolean = true
-  ): Promise<ElementHandle<Element> | null> {
+  ): Promise<Locator | null> {
     await this.waitForNetworkIdle();
-
-    const opportunitiesPresent = await this.isElementVisible(
-      opportunityItemSelector
-    );
-
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-
-    // Wait for the async opportunity list refresh to settle before reading it.
-    do {
-      await this.page.waitForTimeout(200);
-
-      const currentElementIds = await this.page.evaluate((selector: string) => {
-        const elements = document.querySelectorAll(selector);
-        return Array.from(elements).map((el, index) => {
-          return el.textContent?.trim() || `element-${index}`;
-        });
-      }, opportunityItemSelector);
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
-
-    if (!opportunitiesPresent) {
-      if (visible) {
-        throw new Error(
-          `Opportunity for ${heading} in ${subheading} not found.`
-        );
-      }
-      showMessage(
-        `Success: Opportunity for ${heading} in ${subheading} not found.`
-      );
-      return null;
-    }
-
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
-      );
-
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
-        if (!visible) {
-          throw new Error(
-            `Failure: Opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-          );
-        }
-        return opportunityItemElement;
-      }
-    }
+    const opportunityItems = this.page
+      .locator(opportunityItemSelector)
+      .filter({
+        has: this.page
+          .locator(opportunityItemHeadingSelector)
+          .filter({hasText: exactText(heading)}),
+      })
+      .filter({
+        has: this.page
+          .locator(opportunitySubHeadingSelector)
+          .filter({hasText: subheading}),
+      });
 
     if (visible) {
-      throw new Error(`Opportunity for ${heading} in ${subheading} not found.`);
+      const opportunityItem = opportunityItems.first();
+      await expect(opportunityItem).toBeVisible();
+      return opportunityItem;
     }
+
+    await expect(opportunityItems).toHaveCount(0);
     showMessage(
       `Success: Opportunity for ${heading} in ${subheading} not found.`
     );
@@ -185,53 +143,37 @@ export class Contributor extends ExplorationEditor {
       : `${desktopBadgeContainerSelector} ${badgeSelector}`;
     await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
-    const badges = await this.page.$$(viewBasedBadgeSelector);
-    for (const badge of badges) {
-      const badgeValue = await badge.evaluate(
-        (element: Element, selector: string) =>
-          element.querySelector(selector)?.textContent?.trim(),
-        badgeValueSelector
-      );
-      const badgeCaption = await badge.evaluate(
-        (element: Element, selector: string) =>
-          element.querySelector(selector)?.textContent?.trim(),
-        badgeCaptionSelector
-      );
+    let matchingBadges = this.page
+      .locator(viewBasedBadgeSelector)
+      .filter({
+        has: this.page
+          .locator(badgeValueSelector)
+          .filter({hasText: exactText(expectedBadgeValue)}),
+      })
+      .filter({
+        has: this.page
+          .locator(badgeCaptionSelector)
+          .filter({hasText: exactText(expectedBadgeCaption)}),
+      });
 
-      if (
-        badgeValue !== expectedBadgeValue ||
-        badgeCaption !== expectedBadgeCaption
-      ) {
-        continue;
-      }
-
-      if (expectedBadgeLanguage !== null) {
-        const badgeLanguage = await badge.evaluate(
-          (element: Element, selector: string) =>
-            element.querySelector(selector)?.textContent?.trim(),
-          badgeLanguageSelector
-        );
-        if (badgeLanguage !== expectedBadgeLanguage) {
-          continue;
-        }
-      }
-      return;
+    if (expectedBadgeLanguage !== null) {
+      matchingBadges = matchingBadges.filter({
+        has: this.page
+          .locator(badgeLanguageSelector)
+          .filter({hasText: exactText(expectedBadgeLanguage)}),
+      });
     }
 
-    throw new Error(
-      `Badge with value "${expectedBadgeValue}" and caption ` +
-        `"${expectedBadgeCaption}" not found.`
-    );
+    await expect(matchingBadges.first()).toBeVisible();
   }
 
   /**
-   * Selects the badge type in the mobile contribution dashboard.
+   * Selects the badge type in the contribution dashboard.
    * @param badgeType - The badge type to select.
    */
-  async selectBadgeTypeInMobileView(
-    badgeType: 'Translation' | 'Question'
-  ): Promise<void> {
+  async selectBadgeType(badgeType: 'Translation' | 'Question'): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
+      // Desktop requires no action since both badge types are displayed.
       return;
     }
 
@@ -263,27 +205,12 @@ export class Contributor extends ExplorationEditor {
     await this.clickOnElementWithSelector(selectedOptionSelector);
     await this.expectElementToBeVisible(topicOptionSelector);
 
-    const options = await this.page.$$(topicOptionSelector);
-    const foundOptions: string[] = [];
-    for (const option of options) {
-      const optionText = await option.evaluate(element =>
-        element.textContent?.trim()
-      );
-      foundOptions.push(optionText ?? '');
-      if (optionText === contributionType) {
-        await this.clickOnElement(option);
-        await this.expectTextContentToBe(
-          selectedOptionSelector,
-          contributionType
-        );
-        return;
-      }
-    }
-
-    throw new Error(
-      `Option "${contributionType}" not found. Found options: ` +
-        `"${foundOptions.join('", "')}".`
-    );
+    const option = this.page
+      .locator(topicOptionSelector)
+      .filter({hasText: exactText(contributionType)})
+      .first();
+    await option.click();
+    await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
 
   /**
@@ -316,41 +243,51 @@ export class Contributor extends ExplorationEditor {
     rowValues: (string | null)[]
   ): Promise<void> {
     const rowSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-row'
-      : 'tr';
+      ? mobileStatsRowSelector
+      : desktopStatsRowSelector;
     const cellSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-cell'
-      : 'td';
+      ? mobileStatsCellSelector
+      : desktopStatsCellSelector;
     await this.expectElementToBeVisible(rowSelector);
 
-    const tableRows = await this.page.$$(rowSelector);
-    for (const row of tableRows) {
-      const rowCells = await row.$$(cellSelector);
-      if (rowValues.length !== rowCells.length) {
-        continue;
-      }
+    const tableRows = this.page.locator(rowSelector);
+    await expect
+      .poll(
+        async () => {
+          for (
+            let rowIndex = 0;
+            rowIndex < (await tableRows.count());
+            rowIndex++
+          ) {
+            const rowCells = tableRows.nth(rowIndex).locator(cellSelector);
+            if (rowValues.length !== (await rowCells.count())) {
+              continue;
+            }
 
-      let rowMatches = true;
-      for (let index = 0; index < rowValues.length; index++) {
-        const expectedValue = rowValues[index];
-        if (expectedValue === null) {
-          continue;
-        }
-        const cellValue = await rowCells[index].evaluate(element =>
-          element.textContent?.trim()
-        );
-        if (cellValue !== expectedValue) {
-          rowMatches = false;
-          break;
-        }
-      }
+            let rowMatches = true;
+            for (let cellIndex = 0; cellIndex < rowValues.length; cellIndex++) {
+              const expectedValue = rowValues[cellIndex];
+              if (expectedValue === null) {
+                continue;
+              }
+              const cellValue = (
+                await rowCells.nth(cellIndex).textContent()
+              )?.trim();
+              if (cellValue !== expectedValue) {
+                rowMatches = false;
+                break;
+              }
+            }
 
-      if (rowMatches) {
-        return;
-      }
-    }
-
-    throw new Error('Expected row not found in the contribution table.');
+            if (rowMatches) {
+              return true;
+            }
+          }
+          return false;
+        },
+        {message: 'Expected row not found in the contribution table.'}
+      )
+      .toBe(true);
   }
 
   /**

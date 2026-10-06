@@ -191,7 +191,7 @@ test.describe('Practice Question Reviewer Stats & Badges', function () {
 
   test('should be able to check badges earned', async function () {
     await questionReviewer.navigateToTabInMyContributions('Badges');
-    await questionReviewer.selectBadgeTypeInMobileView('Question');
+    await questionReviewer.selectBadgeType('Question');
     await questionReviewer.expectBadgesToContain('1', 'Review');
     await questionReviewer.expectBadgesToContain('1', 'Correction');
   });
