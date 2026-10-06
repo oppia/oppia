@@ -504,7 +504,7 @@ export class TranslationStatusService {
     return this._getExplorationContentNotAvailableCount();
   }
 
-  getAllStateStatusColors(): object {
+  getAllStateStatusColors(): Record<string, string> {
     return this.stateWiseStatusColor;
   }
 

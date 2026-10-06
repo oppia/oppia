@@ -120,7 +120,8 @@ test.describe('Logged-Out Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values',
-      'place values'
+      'place values',
+      true
     );
 
     await curriculumAdmin.createAndPublishClassroom(

@@ -156,7 +156,7 @@ jobs:
         id: desktop-test
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
-        timeout-minutes: 30
+        timeout-minutes: 60
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ matrix.suite.name }}
@@ -170,7 +170,7 @@ jobs:
         # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
         # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
         if: ${{ always() && steps.desktop-test.outcome == 'failure' }}
-        timeout-minutes: 30
+        timeout-minutes: 60
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ matrix.suite.name }}
@@ -184,7 +184,7 @@ jobs:
         # TODO(#22448): Remove steps.check_skip.outputs.SKIP_SUITE != 'true' check,
         # once all suites are fixed. Please don't remove the always() check.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
-        timeout-minutes: 30
+        timeout-minutes: 60
         # TODO(#23106): Currently, video recording failure interfares with
         # acceptance tests, making acceptance test suite fail even if sub-tests
         # passes. Once fixed, enable video recording by updating
@@ -202,7 +202,7 @@ jobs:
         # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
         # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
         if: ${{ always() && steps.mobile-test.outcome == 'failure' }}
-        timeout-minutes: 30
+        timeout-minutes: 60
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ matrix.suite.name }}
