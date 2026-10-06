@@ -1009,6 +1009,9 @@ describe('State translation component', () => {
           ' index provided is equal to answer groups length',
         () => {
           component.onTabClick('feedback');
+          // onTabClick() already selects the default outcome (the only
+          // nonempty feedback card), so a second call with that same
+          // index would be a no-op. Move to another card first.
           component.changeActiveAnswerGroupIndex(1);
 
           spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -2219,14 +2222,8 @@ describe('State translation component', () => {
     }
   );
 
-  it('should treat an unset exploration language as the original language', () => {
-    TestBed.inject(ExplorationLanguageCodeService).displayed = null;
-
-    expect(component.isVoiceoveringOriginalLanguage()).toBe(true);
-  });
-
   it('should treat an empty exploration language as the original language', () => {
-    TestBed.inject(ExplorationLanguageCodeService).displayed = '';
+    TestBed.inject(ExplorationLanguageCodeService).init('');
 
     expect(component.isVoiceoveringOriginalLanguage()).toBe(true);
   });

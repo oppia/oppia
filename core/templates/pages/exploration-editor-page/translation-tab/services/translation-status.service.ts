@@ -212,14 +212,15 @@ export class TranslationStatusService {
         );
         // Voiceovers can only be recorded for text that exists in the active
         // language. Apply this filter only in voiceover mode so translation
-        // progress counts stay unchanged.
-        voiceoverableContentIds = this._getVoiceoverContentIdsRequiringAudio(
-          voiceoverableContentIds
-        );
+        // progress counts stay unchanged. Graph colors still use the
+        // unfiltered list so untranslated cards stay gray instead of
+        // disappearing from the state graph.
+        const voiceoverRequiredContentIds =
+          this._getVoiceoverContentIdsRequiringAudio(voiceoverableContentIds);
         this.explorationVoiceoverContentRequiredCount +=
-          voiceoverableContentIds.length;
+          voiceoverRequiredContentIds.length;
         if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
-          allContentIds = voiceoverableContentIds;
+          allContentIds = voiceoverRequiredContentIds;
         }
 
         allContentIds.forEach(contentId => {
@@ -284,7 +285,7 @@ export class TranslationStatusService {
         if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
           this.stateWiseStatusColor[stateName] =
             this.getStateGraphColorInVoiceoverMode(
-              allContentIds,
+              voiceoverableContentIds,
               voiceoverContentIds
             );
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
@@ -307,21 +308,42 @@ export class TranslationStatusService {
     stateContentIdsNeedingVoiceover: string[],
     explorationContentIdsWithVoiceover: string[]
   ): string {
-    let color = this.NO_ASSETS_AVAILABLE_COLOR;
-    let allContentsHaveVoiceover: boolean = true;
-    for (let contentId of stateContentIdsNeedingVoiceover) {
-      if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
-        color = this.FEW_ASSETS_AVAILABLE_COLOR;
-      } else {
-        allContentsHaveVoiceover = false;
-      }
+    const uniqueColors = new Set<string>();
+    for (const contentId of stateContentIdsNeedingVoiceover) {
+      uniqueColors.add(
+        this._getVoiceoverGraphContentIdStatusColor(
+          contentId,
+          explorationContentIdsWithVoiceover
+        )
+      );
     }
+    return this._getColorFromUniqueStatusColors(uniqueColors);
+  }
 
-    if (allContentsHaveVoiceover) {
-      color = this.ALL_ASSETS_AVAILABLE_COLOR;
+  _getVoiceoverGraphContentIdStatusColor(
+    contentId: string,
+    explorationContentIdsWithVoiceover: string[]
+  ): string {
+    if (
+      !this.isVoiceoveringOriginalLanguage() &&
+      !this._hasNonemptyWrittenTranslation(contentId)
+    ) {
+      return this.PLACEHOLDER_STATUS_COLOR;
     }
+    if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+    return this.NO_ASSETS_AVAILABLE_COLOR;
+  }
 
-    return color;
+  _getColorFromUniqueStatusColors(uniqueColors: Set<string>): string {
+    if (uniqueColors.size === 0) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+    if (uniqueColors.size === 1) {
+      return Array.from(uniqueColors)[0];
+    }
+    return this.FEW_ASSETS_AVAILABLE_COLOR;
   }
 
   _getContentIdListRelatedToComponent(
@@ -346,33 +368,24 @@ export class TranslationStatusService {
       componentName,
       this._getAvailableContentIds()
     );
-    let availableAudioCount = 0;
-
-    contentIdList.forEach(contentId => {
-      let availabilityStatus =
-        this._getActiveStateContentAvailabilityStatus(contentId);
-      if (availabilityStatus.available) {
-        availableAudioCount++;
-      }
-    });
-    if (contentIdList.length === availableAudioCount) {
-      return this.ALL_ASSETS_AVAILABLE_COLOR;
-    } else if (availableAudioCount === 0) {
-      return this.NO_ASSETS_AVAILABLE_COLOR;
-    } else {
-      return this.FEW_ASSETS_AVAILABLE_COLOR;
-    }
+    const uniqueColors = new Set(
+      contentIdList.map(contentId =>
+        this._getActiveStateContentIdStatusColor(contentId)
+      )
+    );
+    return this._getColorFromUniqueStatusColors(uniqueColors);
   }
 
   _getAvailableContentIds(): string[] {
     let stateName = this.stateEditorService.getActiveStateName();
     // Empty source cards are hidden in both translation and voiceover
     // modes, so status colors omit those content IDs in both modes.
-    let contentIds =
-      this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
-        stateName as string
-      ) as string[];
-    return this._getVoiceoverContentIdsRequiringAudio(contentIds);
+    // Untranslated cards stay visible as gray placeholders in voiceover
+    // mode, so they remain in this list and keep tab colors in sync with
+    // the cards.
+    return this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
+      stateName as string
+    ) as string[];
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {
@@ -413,7 +426,7 @@ export class TranslationStatusService {
 
   isVoiceoveringOriginalLanguage(): boolean {
     const originalLanguageCode = this.explorationLanguageCodeService.displayed;
-    if (typeof originalLanguageCode !== 'string' || !originalLanguageCode) {
+    if (!originalLanguageCode) {
       return true;
     }
     return (

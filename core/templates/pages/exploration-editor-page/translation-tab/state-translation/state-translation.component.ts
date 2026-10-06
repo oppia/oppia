@@ -284,9 +284,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       ) {
         activeContentId = this.stateDefaultOutcome.feedback.contentId;
       } else {
-        activeContentId =
-          this.stateAnswerGroups[this.activeAnswerGroupIndex as number].outcome
-            .feedback.contentId;
+        const activeAnswerGroupIndex = this.activeAnswerGroupIndex;
+        if (activeAnswerGroupIndex !== null) {
+          activeContentId =
+            this.stateAnswerGroups[activeAnswerGroupIndex].outcome.feedback
+              .contentId;
+        }
       }
     } else if (tabId === this.TAB_ID_HINTS) {
       const firstNonEmptyHintIndex = this.stateHints.findIndex(
@@ -309,8 +312,11 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       } else {
         this.activeHintIndex = fallbackHintIndex;
       }
-      activeContentId =
-        this.stateHints[this.activeHintIndex as number].hintContent.contentId;
+      const activeHintIndex = this.activeHintIndex;
+      if (activeHintIndex !== null) {
+        activeContentId =
+          this.stateHints[activeHintIndex].hintContent.contentId;
+      }
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
