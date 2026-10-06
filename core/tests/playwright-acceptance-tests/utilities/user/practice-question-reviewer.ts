@@ -156,7 +156,7 @@ export class PracticeQuestionReviewer extends Contributor {
 
     await this.removeInteraction();
 
-    await this.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await this.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
 
     // Add responses to the number input interaction.
     await this.addResponsesToTheInteraction(
