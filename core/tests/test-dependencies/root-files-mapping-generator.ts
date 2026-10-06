@@ -49,6 +49,7 @@ interface AngularComponentInformation extends BaseAngularInformation {
   type: 'component';
   selector?: string;
   templateFilePath?: string;
+  styleUrlsFilePaths?: string[];
 }
 
 interface AngularDirectiveOrPipeInformation extends BaseAngularInformation {
@@ -283,6 +284,18 @@ const getAngularInformationsFromSourceFile = (
           .getLiteralValue()
       : undefined;
 
+    const styleUrlsProperty = objectArgument.getProperty('styleUrls');
+    const styleUrls = styleUrlsProperty
+      ? styleUrlsProperty
+          .asKindOrThrow(ts.SyntaxKind.PropertyAssignment)
+          .getInitializerOrThrow()
+          .asKindOrThrow(ts.SyntaxKind.ArrayLiteralExpression)
+          .getElements()
+          .map(element =>
+            element.asKindOrThrow(ts.SyntaxKind.StringLiteral).getLiteralValue()
+          )
+      : [];
+
     return {
       type,
       className,
@@ -290,6 +303,9 @@ const getAngularInformationsFromSourceFile = (
       templateFilePath: templateUrl
         ? resolveModuleRelativeToRoot(templateUrl, sourceFile.getFilePath())
         : undefined,
+      styleUrlsFilePaths: styleUrls.map(styleUrl =>
+        resolveModuleRelativeToRoot(styleUrl, sourceFile.getFilePath())
+      ),
     };
   });
 };
@@ -471,6 +487,15 @@ const getDependenciesFromTypeScriptOrJavaScriptFile = (
       angularInformation.templateFilePath
     ) {
       dependencies.push(angularInformation.templateFilePath);
+    }
+    // If the file is a component and has styleUrls file paths, we add them as
+    // dependencies so that the corresponding CSS files are associated with
+    // their component and trace up to the same root file.
+    if (
+      angularInformation.type === 'component' &&
+      angularInformation.styleUrlsFilePaths
+    ) {
+      dependencies.push(...angularInformation.styleUrlsFilePaths);
     }
   });
 
