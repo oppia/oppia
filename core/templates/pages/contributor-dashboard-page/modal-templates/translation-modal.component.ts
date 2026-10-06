@@ -61,7 +61,11 @@ import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-pa
 import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {RteComponentId} from 'services/rte-helper-modal.component';
+import {
+  RteComponentId,
+  CustomizationArgsForRteType,
+  CustomizationArgsSpecsType,
+} from 'services/rte-helper-modal.component';
 import {RteHelperService} from 'services/rte-helper.service';
 
 import './translation-modal.component.css';
@@ -137,6 +141,8 @@ export class TranslationModalComponent {
   mathWarningIsMinimized: boolean = false;
   activeContentType!: string;
   activeRuleDescription!: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  originalOpenCustomizationModal!: Function;
   uploadingTranslation: boolean = false;
   subheading!: string;
   heading!: string;
@@ -251,13 +257,13 @@ export class TranslationModalComponent {
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
 
-    const originalOpenCustomizationModal =
+    this.originalOpenCustomizationModal =
       this.rteHelperService.openCustomizationModal.bind(this.rteHelperService);
     this.rteHelperService.openCustomizationModal = (
       componentIsNewlyCreated: boolean,
       componentId: RteComponentId,
-      customizationArgSpecs: Record<string, unknown>[],
-      attrsCustomizationArgsDict: Record<string, unknown>,
+      customizationArgSpecs: CustomizationArgsSpecsType,
+      attrsCustomizationArgsDict: CustomizationArgsForRteType,
       onSubmitCallback?: (arg0: unknown) => void,
       onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
     ) => {
@@ -265,7 +271,7 @@ export class TranslationModalComponent {
         this.hasAltTextModalBeenOpened = true;
         this.changeDetectorRef.detectChanges();
       }
-      return originalOpenCustomizationModal(
+      return this.originalOpenCustomizationModal(
         componentIsNewlyCreated,
         componentId,
         customizationArgSpecs,
@@ -943,6 +949,18 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
+    // Restore the globally mocked openCustomizationModal function to avoid leaking it to other tests or sessions.
+    if (this.originalOpenCustomizationModal) {
+      this.rteHelperService.openCustomizationModal = this
+        .originalOpenCustomizationModal as (
+        componentIsNewlyCreated: boolean,
+        componentId: RteComponentId,
+        customizationArgSpecs: CustomizationArgsSpecsType,
+        attrsCustomizationArgsDict: CustomizationArgsForRteType,
+        onSubmitCallback?: (arg0: unknown) => void,
+        onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
+      ) => void;
+    }
     this.pageContextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.removeEventListener(
       'beforeunload',
