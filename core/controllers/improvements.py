@@ -16,17 +16,17 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     exp_fetchers,
-    feature_flag_services,
     improvements_domain,
     improvements_services,
     platform_parameter_list,
     platform_parameter_services,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import Dict, List, Optional, TypedDict
@@ -247,8 +247,8 @@ class ExplorationImprovementsConfigHandler(
                     exp_fetchers.get_exploration_by_id(exploration_id).version
                 ),
                 'is_improvements_tab_enabled': (
-                    feature_flag_services.is_feature_flag_enabled(
-                        feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value,
+                    web_feature_flag_services.is_feature_flag_enabled(
+                        web_feature_flag_list.WebFeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value,
                         self.user_id,
                     )
                 ),

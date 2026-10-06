@@ -209,3 +209,80 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         feature_flag_entity.update_timestamps()
         feature_flag_entity.put()
         return feature_flag_entity
+
+
+class WebFeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
+    """A class that represents named dynamic web-feature-flag.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the web-feature-flag.
+    """
+
+    # Whether the web feature flag is force enabled for all the users.
+    force_enable_for_all_users = datastore_services.BooleanProperty(
+        default=False, indexed=True
+    )
+    # The percentage of logged-in users for which the web feature flag will
+    # be enabled. The value of this field should be between 0 and 100.
+    rollout_percentage = datastore_services.IntegerProperty(
+        default=0, indexed=True
+    )
+    # A list of IDs of user groups for which the web feature flag will be enabled.
+    user_group_ids = datastore_services.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """WebFeatureFlagConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'force_enable_for_all_users': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create(
+        cls,
+        web_feature_flag_name: str,
+        force_enable_for_all_users: bool,
+        rollout_percentage: int,
+        user_group_ids: List[str],
+    ) -> WebFeatureFlagConfigModel:
+        """Creates WebFeatureFlagConfigModel instance.
+
+        Args:
+            web_feature_flag_name: str. The name of the web-feature-flag.
+            force_enable_for_all_users: bool. Whether to force-enable the
+                feature-flag for all the users.
+            rollout_percentage: int. The defined percentage of logged-in
+                users for which the feature should be enabled.
+            user_group_ids: List[str]. The list of ids of UserGroup objects.
+
+        Returns:
+            WebFeatureFlagConfigModel. The created WebFeatureFlagConfigModel instance.
+        """
+        web_feature_flag_entity = cls(
+            id=web_feature_flag_name,
+            force_enable_for_all_users=force_enable_for_all_users,
+            rollout_percentage=rollout_percentage,
+            user_group_ids=user_group_ids,
+        )
+        web_feature_flag_entity.update_timestamps()
+        web_feature_flag_entity.put()
+        return web_feature_flag_entity
