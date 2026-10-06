@@ -290,6 +290,7 @@ describe('Translation Modal Component', () => {
   });
 
   it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
+    // eslint-disable-next-line dot-notation
     spyOn(component['rteHelperService'], 'openCustomizationModal');
     component.ngOnInit();
 
@@ -304,15 +305,15 @@ describe('Translation Modal Component', () => {
     });
     tick();
 
-    // Check initial state
+    // Check initial state.
     expect(component.hasAltTextModalBeenOpened).toBeFalse();
 
-    // Call the intercepted function with a non-image component
+    // Call the intercepted function with a non-image component.
     // eslint-disable-next-line dot-notation
     component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
     expect(component.hasAltTextModalBeenOpened).toBeFalse();
 
-    // Call the intercepted function with the 'image' component
+    // Call the intercepted function with the 'image' component.
     // eslint-disable-next-line dot-notation
     component['rteHelperService'].openCustomizationModal(
       false,
@@ -1738,6 +1739,14 @@ describe('Translation Modal Component', () => {
       expect(component.hasLengthValidationError).toBe(false);
       expect(component.lengthValidationErrorMessage).toBe('');
       expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+  });
+
+  describe('when checking for validation errors with auto-translated images', () => {
+    it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
+      component.hasImageInAutoTranslation = true;
+      component.hasAltTextModalBeenOpened = false;
+      expect(component.hasSubmitValidationErrors()).toBe(true);
     });
   });
 

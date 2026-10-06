@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.platform.translate import base_translate_services
 
 import bs4
-
 from typing import Dict, Tuple
 
 

@@ -61,6 +61,7 @@ import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-pa
 import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {RteComponentId} from 'services/rte-helper-modal.component';
 import {RteHelperService} from 'services/rte-helper.service';
 
 import './translation-modal.component.css';
@@ -254,7 +255,7 @@ export class TranslationModalComponent {
       this.rteHelperService.openCustomizationModal.bind(this.rteHelperService);
     this.rteHelperService.openCustomizationModal = (
       componentIsNewlyCreated: boolean,
-      componentId: string,
+      componentId: RteComponentId,
       customizationArgSpecs: Record<string, unknown>[],
       attrsCustomizationArgsDict: Record<string, unknown>,
       onSubmitCallback?: (arg0: unknown) => void,
