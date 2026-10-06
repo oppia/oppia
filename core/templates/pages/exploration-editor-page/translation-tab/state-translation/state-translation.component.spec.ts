@@ -1009,8 +1009,8 @@ describe('State translation component', () => {
           ' index provided is equal to answer groups length',
         () => {
           component.onTabClick('feedback');
-          // onTabClick() already selects the default outcome (the only
-          // nonempty feedback card), so a second call with that same
+          // The onTabClick() call already selects the default outcome (the
+          // only nonempty feedback card), so a second call with that same
           // index would be a no-op. Move to another card first.
           component.changeActiveAnswerGroupIndex(1);
 

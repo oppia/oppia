@@ -870,14 +870,15 @@ describe('Translation status service', () => {
       stateEditorService.setActiveStateName('First');
       tss.refresh();
 
-      // content_0 has no Hindi translation, so the content tab matches
-      // the gray placeholder card.
+      // The content_0 card has no Hindi translation, so the content tab
+      // matches the gray placeholder card.
       expect(tss.getActiveStateComponentStatusColor('content')).toBe(
         PLACEHOLDER_STATUS_COLOR
       );
-      // feedback_3 has a Hindi translation and a voiceover; feedback_2
-      // does not, so the tab is yellow. The fixture still uses English
-      // en-US voiceovers for that remaining feedback item.
+      // The feedback_3 card has a Hindi translation and a voiceover,
+      // while feedback_2 does not, so the tab is yellow.
+      // The fixture still uses English en-US voiceovers for that
+      // remaining feedback item.
       expect(tss.getActiveStateComponentStatusColor('feedback')).toBe(
         FEW_ASSETS_AVAILABLE_COLOR
       );
