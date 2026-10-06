@@ -255,18 +255,22 @@ export class TranslationModalComponent {
     this.rteHelperService.openCustomizationModal = (
       componentIsNewlyCreated: boolean,
       componentId: string,
-      ...args: unknown[]
+      customizationArgSpecs: Record<string, unknown>[],
+      attrsCustomizationArgsDict: Record<string, unknown>,
+      onSubmitCallback?: (arg0: unknown) => void,
+      onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
     ) => {
       if (componentId === 'image') {
         this.hasAltTextModalBeenOpened = true;
         this.changeDetectorRef.detectChanges();
       }
-      // This throws "Expected 3 arguments, but got 2 or more". We need to suppress this error because we are passing all arguments dynamically.
-      // @ts-ignore
       return originalOpenCustomizationModal(
         componentIsNewlyCreated,
         componentId,
-        ...args
+        customizationArgSpecs,
+        attrsCustomizationArgsDict,
+        onSubmitCallback,
+        onDismissCallback
       );
     };
 

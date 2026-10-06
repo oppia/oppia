@@ -20,9 +20,9 @@ from __future__ import annotations
 
 from core.platform.translate import base_translate_services
 
-from typing import Dict, Tuple
-
 import bs4
+
+from typing import Dict, Tuple
 
 
 class TranslateEmulator(base_translate_services.BaseTranslationService):

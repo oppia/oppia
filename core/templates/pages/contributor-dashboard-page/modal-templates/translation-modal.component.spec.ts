@@ -289,6 +289,26 @@ describe('Translation Modal Component', () => {
     );
   });
 
+  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', () => {
+    // Check initial state
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with a non-image component
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with the 'image' component
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(
+      false,
+      'image',
+      [],
+      {}
+    );
+    expect(component.hasAltTextModalBeenOpened).toBeTrue();
+  });
+
   it('should wrap text with ellipsis when text is too long', () => {
     expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
   });
