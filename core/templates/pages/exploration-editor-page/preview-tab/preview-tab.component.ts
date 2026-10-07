@@ -59,7 +59,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
 
   previewWarning!: string;
   isExplorationPopulated!: boolean;
-  allParams: ExplorationParams | object = {};
+  allParams: ExplorationParams = {};
   voiceoversAreLoaded: boolean = false;
 
   constructor(
