@@ -718,6 +718,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected version to be an integer'
         )
 
+        self.question.version = -1
+        self._assert_question_domain_validation_error(
+            'Expected version to be non-negative'
+        )
+
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
@@ -2355,6 +2360,310 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(test_value['state_schema_version'], 53)
+
+    def test_question_state_dict_conversion_noop_branches(self) -> None:
+        conversion_versions = [
+            31,
+            32,
+            34,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            48,
+            49,
+            53,
+        ]
+
+        for state_schema_version in conversion_versions:
+            question_state_dict = copy.deepcopy(self.question_state_dict)
+            question_state_dict['interaction']['id'] = 'EndExploration'
+            test_value: question_domain.VersionedQuestionStateDict = {
+                'state': question_state_dict,
+                'state_schema_version': state_schema_version,
+            }
+
+            question_domain.Question.update_state_from_model(
+                test_value, state_schema_version
+            )
+
+            self.assertEqual(
+                test_value['state_schema_version'], state_schema_version + 1
+            )
+
+    def test_question_state_dict_conversion_from_v34_with_edge_cases(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'MathExpressionInput'
+        question_state_dict['interaction']['solution'] = None
+        question_state_dict['interaction']['answer_groups'] = [
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'inputs': {'x': 'x+1', 'y': None}, 'rule_type': None}
+                ],
+                'outcome': {'feedback': {'content_id': 'algebraic_feedback'}},
+            },
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'inputs': {'x': '1', 'y': None}, 'rule_type': None}
+                ],
+                'outcome': {'feedback': {'content_id': 'numeric_feedback'}},
+            },
+        ]
+        # These fields belong to the old state schema handled by this migration.
+        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': {}
+        }
+        question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+            'translations_mapping': {}
+        }
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 34,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 34)
+
+        self.assertEqual(
+            test_value['state']['interaction']['id'], 'AlgebraicExpressionInput'
+        )
+        self.assertEqual(
+            len(test_value['state']['interaction']['answer_groups']), 1
+        )
+        self.assertIsNone(test_value['state']['interaction']['solution'])
+
+        invalid_state_dict = copy.deepcopy(question_state_dict)
+        invalid_state_dict['interaction']['id'] = 'MathExpressionInput'
+        invalid_state_dict['interaction']['answer_groups'] = [
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'inputs': {'x': '@', 'y': None}, 'rule_type': None}
+                ],
+                'outcome': {'feedback': {'content_id': 'invalid_feedback'}},
+            }
+        ]
+        invalid_test_value: question_domain.VersionedQuestionStateDict = {
+            'state': invalid_state_dict,
+            'state_schema_version': 34,
+        }
+
+        question_domain.Question.update_state_from_model(invalid_test_value, 34)
+
+        self.assertEqual(
+            invalid_test_value['state']['interaction']['id'],
+            'MathExpressionInput',
+        )
+
+    def test_question_state_dict_conversion_from_v35_with_default_cust_arg(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'TextInput'
+        question_state_dict['interaction']['customization_args'] = {}
+        question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+            'translations_mapping': {'default_outcome': {}}
+        }
+        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': {}
+        }
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 35,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 35)
+
+        self.assertIn(
+            'placeholder',
+            test_value['state']['interaction']['customization_args'],
+        )
+
+    def test_question_state_dict_conversion_from_v36_with_unchanged_rule(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'TextInput'
+        question_state_dict['interaction']['answer_groups'] = [
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': ''}}]
+            }
+        ]
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 36,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 36)
+
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'
+            ][0]['rule_type'],
+            'Equals',
+        )
+
+    def test_question_state_dict_conversion_from_v40_for_set_input(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'SetInput'
+        question_state_dict['interaction']['answer_groups'] = [
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'rule_type': 'Equals', 'inputs': {'x': ['a', 'b']}}
+                ]
+            }
+        ]
+        question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+            'translations_mapping': {}
+        }
+        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': {}
+        }
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 40,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 40)
+
+        self.assertEqual(
+            test_value['state']['interaction']['answer_groups'][0][
+                'rule_specs'
+            ][0]['inputs']['x'],
+            {'contentId': 'rule_input_0', 'unicodeStrSet': ['a', 'b']},
+        )
+
+    def test_question_state_dict_conversion_from_v41_without_solutions(
+        self,
+    ) -> None:
+        choices = [{'html': 'choice', 'content_id': 'choice_1'}]
+        for interaction_id in ['ItemSelectionInput', 'DragAndDropSortInput']:
+            question_state_dict = copy.deepcopy(self.question_state_dict)
+            question_state_dict['interaction']['id'] = interaction_id
+            question_state_dict['interaction']['solution'] = None
+            question_state_dict['interaction']['customization_args'] = {
+                'choices': {'value': choices}
+            }
+            question_state_dict['interaction']['answer_groups'] = []
+            if interaction_id == 'DragAndDropSortInput':
+                question_state_dict['interaction']['answer_groups'] = [
+                    {  # type: ignore[typeddict-item]
+                        'rule_specs': [
+                            {'rule_type': 'UnchangedRule', 'inputs': {}}
+                        ]
+                    }
+                ]
+            test_value: question_domain.VersionedQuestionStateDict = {
+                'state': question_state_dict,
+                'state_schema_version': 41,
+            }
+
+            question_domain.Question.update_state_from_model(test_value, 41)
+
+            self.assertIsNone(test_value['state']['interaction']['solution'])
+
+    def test_question_state_dict_conversion_from_v49_with_empty_group(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'NumericExpressionInput'
+        question_state_dict['interaction']['answer_groups'] = [
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'rule_type': 'MatchesExactlyWith', 'inputs': {'x': '1'}}
+                ]
+            },
+            {  # type: ignore[typeddict-item]
+                'rule_specs': [
+                    {'rule_type': 'ContainsSomeOf', 'inputs': {'x': '1'}}
+                ]
+            },
+        ]
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 49,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 49)
+
+        self.assertEqual(
+            len(test_value['state']['interaction']['answer_groups']), 1
+        )
+
+    def test_question_state_dict_conversion_from_v50_without_default_outcome(
+        self,
+    ) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['default_outcome'] = None
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 50,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 50)
+
+        self.assertIsNone(test_value['state']['interaction']['default_outcome'])
+
+    def test_question_state_dict_conversions_from_v53_to_v57(self) -> None:
+        question_state_dict = copy.deepcopy(self.question_state_dict)
+        question_state_dict['interaction']['id'] = 'TextInput'
+        question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
+            'translations_mapping': {}
+        }
+        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': {}
+        }
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_state_dict,
+            'state_schema_version': 53,
+        }
+
+        question_domain.Question.update_state_from_model(test_value, 53)
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'][
+                'catchMisspellings'
+            ],
+            {'value': False},
+        )
+
+        test_value['state']['interaction']['id'] = None
+        old_voiceovers_mapping = {}
+        for (
+            content,
+            content_type,
+            _,
+        ) in state_domain.State.traverse_v54_state_dict_for_contents(
+            test_value['state']
+        ):
+            if content_type == translation_domain.ContentType.RULE:
+                old_content_id = content['contentId']  # type: ignore[typeddict-item]
+            else:
+                old_content_id = content['content_id']
+            old_voiceovers_mapping[old_content_id] = {}
+        test_value['state']['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+            'voiceovers_mapping': old_voiceovers_mapping
+        }
+
+        next_content_id_index = (
+            question_domain.Question.update_state_from_model(test_value, 54)
+        )
+        self.assertIsInstance(next_content_id_index, int)
+        self.assertNotIn('written_translations', test_value['state'])
+
+        question_domain.Question.update_state_from_model(test_value, 55)
+        self.assertEqual(
+            test_value['state']['inapplicable_skill_misconception_ids'], []
+        )
+
+        question_domain.Question.update_state_from_model(test_value, 56)
+        self.assertNotIn('recorded_voiceovers', test_value['state'])
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
