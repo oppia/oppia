@@ -240,6 +240,26 @@ describe('Contributor stats component', () => {
       })
     );
 
+    it(
+      'should open the combined certificate modal from the translation ' +
+        'review card',
+      fakeAsync(() => {
+        component.openCertificateDownloadModal('translate_content', 'es');
+        tick();
+        expect(modalService.open).toHaveBeenCalled();
+      })
+    );
+
+    it(
+      'should open the combined certificate modal from the question ' +
+        'review card',
+      fakeAsync(() => {
+        component.openCertificateDownloadModal('add_question', null);
+        tick();
+        expect(modalService.open).toHaveBeenCalled();
+      })
+    );
+
     it('should be able to page stats', fakeAsync(() => {
       const pagedStats = {
         currentPageStartIndex: 0,

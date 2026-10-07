@@ -278,6 +278,75 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 1)
 
+    def test_get_translation_suggestions_reviewed_for_given_date_range(
+        self,
+    ) -> None:
+        # 'test_reviewer' reviewed one accepted and one rejected translation.
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            self.target_version_at_submission,
+            suggestion_models.STATUS_ACCEPTED,
+            'author_1',
+            'test_reviewer',
+            self.change_cmd,
+            self.score_category,
+            'exploration.exp1.thread_7',
+            'hi',
+        )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED,
+            'author_2',
+            'test_reviewer',
+            self.change_cmd,
+            self.score_category,
+            'exploration.exp1.thread_8',
+            'hi',
+        )
+        to_date = datetime.datetime.now(datetime.timezone.utc).replace(
+            tzinfo=None
+        )
+        from_date = to_date - datetime.timedelta(days=1)
+
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_reviewed_within_given_dates(
+            from_date, to_date, 'test_reviewer', 'hi'
+        )
+
+        # Both accepted and rejected reviews are returned.
+        self.assertEqual(len(suggestions), 2)
+
+    def test_get_question_suggestions_reviewed_for_given_date_range(
+        self,
+    ) -> None:
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED,
+            'author_1',
+            'test_reviewer',
+            self.change_cmd,
+            self.score_category,
+            'exploration.exp1.thread_9',
+            'hi',
+        )
+        to_date = datetime.datetime.now(datetime.timezone.utc).replace(
+            tzinfo=None
+        )
+        from_date = to_date - datetime.timedelta(days=1)
+
+        suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_reviewed_within_given_dates(
+            from_date, to_date, 'test_reviewer'
+        )
+
+        self.assertEqual(len(suggestions), 1)
+
     def test_get_question_suggestions_submitted_for_given_date_range(
         self,
     ) -> None:

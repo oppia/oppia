@@ -43,6 +43,8 @@ export interface ContributorCertificateInfo {
   team_lead: string;
   language: string | null;
   certificate_profile_name: string;
+  translated_word_count?: number;
+  reviewed_word_count?: number;
 }
 
 interface ReviewExplorationSuggestionRequestBody {
