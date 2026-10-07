@@ -45,6 +45,7 @@ const topicOptionSelector = '.e2e-test-topic-selector-option';
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
+const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class Contributor extends ExplorationEditor {
@@ -463,6 +464,17 @@ export class Contributor extends ExplorationEditor {
       expectedStatus,
       opportunityItem
     );
+  }
+
+  /**
+   * Fills the review comment textarea with the given comment.
+   * @param {string} comment - The comment to fill the textarea with.
+   */
+  async fillReviewComment(comment: string): Promise<void> {
+    await this.expectElementToBeVisible(reviewCommentTextareaSelector);
+    await this.typeInInputField(reviewCommentTextareaSelector, comment);
+
+    await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
   }
 
   /**
