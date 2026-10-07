@@ -86,7 +86,7 @@ export class UrlService {
    * @return {string} the current path name.
    */
   getPathname(): string {
-    return this.getCurrentLocation().pathname;
+    return this.getCurrentLocation()?.pathname ?? '';
   }
 
   /**

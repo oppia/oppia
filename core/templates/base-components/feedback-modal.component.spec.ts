@@ -71,6 +71,7 @@ class MockImageReceiverComponent {
 class MockWindowRef {
   nativeWindow: {
     location: {
+      pathname?: string;
       href: string;
       reload: jasmine.Spy;
     };
@@ -84,6 +85,7 @@ class MockWindowRef {
     };
   } = {
     location: {
+      pathname: '/learn/math',
       href: 'https://www.oppia.org/learn/math',
       reload: jasmine.createSpy('reload'),
     },

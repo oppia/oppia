@@ -111,6 +111,12 @@ describe('Url Service', () => {
     expect(urlService.isIframed()).toBe(false);
   });
 
+  it('should return empty string if pathname is not defined', () => {
+    // @ts-ignore
+    mockLocation.pathname = undefined;
+    expect(urlService.getPathname()).toBe('');
+  });
+
   it('should correctly return hash value of window.location', () => {
     expect(urlService.getHash()).toBe(sampleHash);
   });
