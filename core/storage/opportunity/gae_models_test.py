@@ -586,6 +586,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={'hi': []},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='exploration',
@@ -594,6 +595,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={'hi': []},
         ).put()
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type='skill',
@@ -602,6 +604,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={'hi': []},
         ).put()
 
         self.assertEqual(

@@ -2723,6 +2723,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={'hi': []},
         ).put()
 
         self.assertEqual(
