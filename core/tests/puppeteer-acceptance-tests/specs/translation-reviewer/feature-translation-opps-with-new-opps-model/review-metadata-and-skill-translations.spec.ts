@@ -208,23 +208,40 @@ describe('Translation Reviewer: review translations', function () {
       LESSON_SUBHEADING
     );
 
-    // 1. The reviewer sees the Title ("पाइज़ काटना") and Objective
-    // ("केक को बराबर हिस्सों में बाँटना सीखें") translations correctly
-    // displayed.
-    await translationReviewer.startTranslationReview(
+    // Reviewable suggestions are returned ordered by descending creation date
+    // (GeneralSuggestionModel.get_reviewable_translation_suggestions).
+    // Because the objective translation was submitted after the title,
+    // the objective suggestion appears first in the review queue and modal.
+    // The objective heading exceeds the 30-character limit and is truncated
+    // in the card list, so only the title ("पाई काटना") is verified in the
+    // queue, while both translations are verified inside the review modal.
+    await translationReviewer.expectOpportunityToBePresent(
       HINDI_TITLE,
       `${TOPIC_NAME} / ${CHAPTER_NAME}`
     );
+
+    await translationReviewer.openFirstSuggestionForReview();
+
+    // Verify the first suggestion's translated content (objective).
     await translationReviewer.expectCardContentToBeInTranslationReview(
-      HINDI_TITLE
+      HINDI_OBJECTIVE
+    );
+    await translationReviewer.expectReviewButtonLabelToBe(
+      'accept',
+      ACCEPT_AND_REVIEW_NEXT_LABEL
     );
     await translationReviewer.submitTranslationReviewAndExpectToast(
       'accept',
       'Suggestion accepted.'
     );
 
+    // Verify the second suggestion's translated content (title).
     await translationReviewer.expectCardContentToBeInTranslationReview(
-      HINDI_OBJECTIVE
+      HINDI_TITLE
+    );
+    await translationReviewer.expectReviewButtonLabelToBe(
+      'accept',
+      ACCEPT_LABEL
     );
     await translationReviewer.submitTranslationReviewAndExpectToast(
       'accept',
@@ -238,21 +255,26 @@ describe('Translation Reviewer: review translations', function () {
       CONTENT_TYPE_FILTER.SKILLS
     );
 
-    // 1. The reviewer sees the submitted skill translation suggestion in the
-    // review queue.
+    // Reviewable suggestions are returned ordered by descending creation date
+    // (GeneralSuggestionModel.get_reviewable_translation_suggestions).
+    // Because the skill explanation was submitted after the skill description,
+    // the explanation appears first in the review queue and modal.
+    await translationReviewer.expectOpportunityToBePresent(
+      HINDI_SKILL_EXPLANATION,
+      SKILL_NAME
+    );
     await translationReviewer.expectOpportunityToBePresent(
       HINDI_SKILL_DESCRIPTION,
       SKILL_NAME
     );
 
-    // 2. Open the suggestion for review.
+    // Open the first suggestion for review (explanation).
     await translationReviewer.openFirstSuggestionForReview();
 
-    // Verify the first suggestion's translated content.
+    // Verify the first suggestion's translated content (skill explanation).
     await translationReviewer.expectCardContentToBeInTranslationReview(
-      HINDI_SKILL_DESCRIPTION
+      HINDI_SKILL_EXPLANATION
     );
-
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
       ACCEPT_AND_REVIEW_NEXT_LABEL
@@ -262,11 +284,10 @@ describe('Translation Reviewer: review translations', function () {
       'Suggestion accepted.'
     );
 
-    // Verify the second suggestion's translated content.
+    // Verify the second suggestion's translated content (skill description).
     await translationReviewer.expectCardContentToBeInTranslationReview(
-      HINDI_SKILL_EXPLANATION
+      HINDI_SKILL_DESCRIPTION
     );
-
     await translationReviewer.expectReviewButtonLabelToBe(
       'accept',
       ACCEPT_LABEL
