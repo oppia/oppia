@@ -169,6 +169,7 @@ const totalPlaysCardSelector = '.total-plays';
 const openFeedbackCardSelector = '.total-open-feedback';
 const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationDashboardCardSelector = '.e2e-test-exploration-dashboard-card';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
@@ -216,6 +217,8 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
+
+const addTitleBar = 'input#explorationTitle';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -1735,6 +1738,57 @@ export class ExplorationEditor extends BaseUser {
           `but found ${totalUsers} instead.`
       );
     }
+  }
+
+  /**
+   * Opens the exploration editor for the exploration with the given name from the creator dashboard.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
+    const title = await this.getTextContent(
+      explorationSummaryTileTitleSelector
+    );
+
+    if (title === explorationName) {
+      await this.clickOnElementWithSelector(explorationDashboardCardSelector);
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible(
+      explorationSummaryTileTitleSelector,
+      false
+    );
+  }
+
+  /**
+   * Updates the exploration title in the settings tab.
+   * @param {string} title - The new title of the exploration.
+   */
+  async updateTitleTo(title: string): Promise<void> {
+    await this.expectElementToBeVisible(addTitleBar);
+    await this.clearAllTextFrom(addTitleBar);
+    await this.typeInInputField(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+
+    const newTitle = await this.page.$eval(addTitleBar, el =>
+      (el as HTMLInputElement).value?.trim()
+    );
+
+    // Compare first 36 characters of title.
+    if (newTitle !== title.slice(0, 36)) {
+      throw new Error(
+        `Failed to update title. Expected: ${title}, but got: ${newTitle}`
+      );
+    }
+
+    showMessage(`Title has been updated to ${newTitle}`);
   }
 }
 
