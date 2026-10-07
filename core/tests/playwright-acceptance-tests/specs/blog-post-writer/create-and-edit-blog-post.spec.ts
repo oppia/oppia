@@ -102,16 +102,17 @@ test.describe('Blog Post Writer', function () {
       licensePage
     );
     await licensePage.bringToFront();
+    await blogPostWriter.expectScreenshotToMatch('licensePage', licensePage);
 
-    const ccLink = licensePage.locator('a:has-text("CC-BY-SA 4.0")');
-    await expect(ccLink).toHaveAttribute(
-      'href',
-      'https://creativecommons.org/licenses/by-sa/4.0/legalcode'
+    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+      'CC-BY-SA 4.0',
+      'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      licensePage
     );
-    const apacheLink = licensePage.locator('a:has-text("Apache 2.0")');
-    await expect(apacheLink).toHaveAttribute(
-      'href',
-      expect.stringContaining('apache.org/licenses')
+    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+      'Apache 2.0',
+      'https://www.apache.org/licenses/',
+      licensePage
     );
 
     await licensePage.close();
@@ -138,6 +139,7 @@ test.describe('Blog Post Writer', function () {
     // Preview the blog post.
     await blogPostWriter.scrollToTopOfPage();
     await blogPostWriter.previewBlogPost();
+    await blogPostWriter.expectScreenshotToMatch('blogPostPreview');
 
     // Verify link in blog preview modal.
     await blogPostWriter.clickAndVerifyAnchorWithInnerText(
@@ -206,6 +208,7 @@ test.describe('Blog Post Writer', function () {
     // Click on publish button.
     await blogPostWriter.selectTag('News');
     await blogPostWriter.clickOnElementWithText(LABELS.PUBLISH_BUTTON);
+    await blogPostWriter.expectScreenshotToMatch('blogPostPublish');
     await blogPostWriter.clickOnElementWithText(LABELS.CONFIRM_PUBLISH_BUTTON);
     await blogPostWriter.navigateToBlogPage();
     await blogPostWriter.expectBlogPostToBePresent('Test Blog Post Title');
