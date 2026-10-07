@@ -6868,7 +6868,7 @@ export default {
     },
     "COLLECTION_PLAYER": {
       "ROUTE": "collection/:collection_id",
-      "TITLE": "",
+      "TITLE": "I18N_COLLECTION_PLAYER_PAGE_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
