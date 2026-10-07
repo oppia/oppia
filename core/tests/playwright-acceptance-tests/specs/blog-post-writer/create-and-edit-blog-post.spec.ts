@@ -19,7 +19,7 @@
  * BW. Create and edit blog post.
  */
 
-import {test, expect} from '@playwright/test';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
