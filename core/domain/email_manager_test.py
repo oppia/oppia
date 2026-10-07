@@ -46,6 +46,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
+    Any,
     Callable,
     DefaultDict,
     Dict,
@@ -8969,7 +8970,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         enqueued_tasks = []
 
         def mock_enqueue_task(
-            url: str, payload: dict[str, str], _delay: int
+            url: str, payload: Dict[str, Any], _delay: int
         ) -> None:
             enqueued_tasks.append((url, payload))
 
@@ -8993,3 +8994,46 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
             enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+
+    def test_failed_send_mail_enqueues_retry_task_with_cc_bcc_and_attachments(
+        self,
+    ) -> None:
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
+            raise Exception('Simulated email failure')
+
+        enqueued_tasks = []
+
+        def mock_enqueue_task(
+            url: str, payload: Dict[str, Any], _delay: int
+        ) -> None:
+            enqueued_tasks.append((url, payload))
+
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
+        enqueue_task_swap = self.swap(
+            taskqueue_services, 'enqueue_task', mock_enqueue_task
+        )
+
+        with send_mail_swap, enqueue_task_swap:
+            email_manager._send_email(  # pylint: disable=protected-access
+                self.user_a_id,
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP,
+                'Subject',
+                'Body',
+                'sender@example.com',
+                bcc_admin=True,
+                cc_emails=['cc@example.com'],
+                attachments=[{'filename': 'doc.txt', 'path': '/doc.txt'}],
+            )
+
+        self.assertEqual(len(enqueued_tasks), 1)
+        self.assertEqual(
+            enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
+        )
+        self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+        self.assertEqual(enqueued_tasks[0][1]['cc_emails'], ['cc@example.com'])
+        self.assertTrue(enqueued_tasks[0][1]['bcc_admin'])
+        self.assertEqual(
+            enqueued_tasks[0][1]['attachments'],
+            [{'filename': 'doc.txt', 'path': '/doc.txt'}],
+        )

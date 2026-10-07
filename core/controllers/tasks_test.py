@@ -39,7 +39,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Tuple
+from typing import Any, Dict, Final, List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1399,3 +1399,56 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
             )
 
         self.assertEqual(response.status_int, 200)
+
+    def test_retried_email_forwards_cc_bcc_and_attachments(self) -> None:
+        captured_kwargs: Dict[str, Any] = {}
+
+        def mock_send_mail(
+            sender_email: str,
+            recipient_email: str,
+            subject: str,
+            plaintext_body: str,
+            html_body: str,
+            cc_emails: Optional[List[str]] = None,
+            bcc_admin: bool = False,
+            attachments: Optional[List[Dict[str, str]]] = None,
+        ) -> None:
+            captured_kwargs['sender_email'] = sender_email
+            captured_kwargs['recipient_email'] = recipient_email
+            captured_kwargs['subject'] = subject
+            captured_kwargs['plaintext_body'] = plaintext_body
+            captured_kwargs['html_body'] = html_body
+            captured_kwargs['cc_emails'] = cc_emails
+            captured_kwargs['bcc_admin'] = bcc_admin
+            captured_kwargs['attachments'] = attachments
+
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
+
+        payload_with_extras = {
+            'sender_email': 'sender@example.com',
+            'recipient_id': 'recipient@example.com',
+            'subject': 'Test Subject',
+            'html_body': '<html>Test Body</html>',
+            'text_body': 'Test Body',
+            'cc_emails': ['cc@example.com'],
+            'bcc_admin': True,
+            'attachments': [{'filename': 'test.pdf', 'path': '/path/to/test.pdf'}],
+        }
+
+        with send_mail_swap:
+            response = self.post_task(
+                self.url,
+                payload_with_extras,
+                self.headers,
+                csrf_token=self.csrf_token,
+                expect_errors=False,
+                expected_status_int=200,
+            )
+
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(captured_kwargs['cc_emails'], ['cc@example.com'])
+        self.assertTrue(captured_kwargs['bcc_admin'])
+        self.assertEqual(
+            captured_kwargs['attachments'],
+            [{'filename': 'test.pdf', 'path': '/path/to/test.pdf'}],
+        )

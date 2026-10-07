@@ -678,6 +678,9 @@ def _send_email(
                 'subject': email_subject,
                 'html_body': cleaned_html_body,
                 'text_body': cleaned_plaintext_body,
+                'cc_emails': cc_emails,
+                'bcc_admin': bcc_admin,
+                'attachments': attachments,
             }
 
             taskqueue_services.enqueue_task(

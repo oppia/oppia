@@ -299,6 +299,36 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'cc_emails': {
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'basestring'},
+                },
+                'default_value': None,
+            },
+            'bcc_admin': {
+                'schema': {'type': 'bool'},
+                'default_value': False,
+            },
+            'attachments': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'filename',
+                                'schema': {'type': 'basestring'},
+                            },
+                            {
+                                'name': 'path',
+                                'schema': {'type': 'basestring'},
+                            },
+                        ],
+                    },
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -315,6 +345,9 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         subject = payload.get('subject')
         html_body = payload.get('html_body')
         text_body = payload.get('text_body')
+        cc_emails = payload.get('cc_emails')
+        bcc_admin = payload.get('bcc_admin', False)
+        attachments = payload.get('attachments')
 
         num_of_attempts_of_retry_made = int(
             self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
@@ -343,7 +376,14 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         try:
             email_services.send_mail(
-                sender_email, recipient_id, subject, text_body, html_body
+                sender_email,
+                recipient_id,
+                subject,
+                text_body,
+                html_body,
+                cc_emails=cc_emails,
+                bcc_admin=bcc_admin,
+                attachments=attachments,
             )
         except email_services.PermanentEmailSendingError as e:
             logging.error(
