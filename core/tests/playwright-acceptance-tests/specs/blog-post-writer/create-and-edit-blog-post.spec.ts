@@ -118,8 +118,8 @@ test.describe('Blog Post Writer', function () {
     await licensePage.close();
     await blogPostWriter.page.bringToFront();
 
-    // Close the thumbnail image upload modal. On mobile the modal is
-    // embedded in the page and has no Cancel button.
+    // Close the thumbnail image upload modal. If the viewport is mobile, the
+    // cancel button isn't visible as the modal is embedded in page itself.
     if (!blogPostWriter.isViewportAtMobileWidth()) {
       await blogPostWriter.clickOnElementWithText('Cancel');
     }
