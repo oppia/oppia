@@ -137,7 +137,7 @@ test.describe('Blog Post Writer', function () {
     await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
 
     // Preview the blog post.
-    await blogPostWriter.scrollToTopOfPage();
+    await blogPostWriter.scrollToTopOfPage(); // Scroll to top of the page so the background in screenshot matches.
     await blogPostWriter.previewBlogPost();
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview');
 
@@ -160,7 +160,7 @@ test.describe('Blog Post Writer', function () {
     await blogPostWriter.navigateToBlogDashboardPage();
     await blogPostWriter.expectCurrentMatTabHeaderToBe('DRAFTS (1)');
 
-    // Verify grid view and list view buttons are present (desktop only).
+    // Verify grid view and list view buttons are present (only present in desktop).
     if (!blogPostWriter.isViewportAtMobileWidth()) {
       await blogPostWriter.expectTilesViewAndListViewButtonsArePresent();
       await blogPostWriter.changeBlogPostViewTo('list');
