@@ -45,7 +45,6 @@ const topicOptionSelector = '.e2e-test-topic-selector-option';
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
-const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class Contributor extends ExplorationEditor {
@@ -178,8 +177,7 @@ export class Contributor extends ExplorationEditor {
       if (!optionElement) {
         throw new Error(`Option ${tabName} not found.`);
       }
-      await this.waitForElementToStabilize(optionElement);
-      await optionElement.click();
+      await this.clickOnElement(optionElement);
 
       await this.expectTextContentToBe(viewDropdownSelector, tabName);
     } else {
@@ -191,7 +189,7 @@ export class Contributor extends ExplorationEditor {
       if (!tabElement) {
         throw new Error(`Tab ${tabName} not found in the contributions tab.`);
       }
-      await tabElement.click();
+      await this.clickOnElement(tabElement);
 
       // Verify that the tab is active. The review tabs don't have the
       // e2e-test-active class, so we also accept the active navbar class.
@@ -293,7 +291,7 @@ export class Contributor extends ExplorationEditor {
     if (!badgeOption) {
       throw new Error(`Badge type ${badgeType} not found.`);
     }
-    await badgeOption.click();
+    await this.clickOnElement(badgeOption);
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, badgeType);
@@ -340,7 +338,7 @@ export class Contributor extends ExplorationEditor {
       );
     }
 
-    await optionElement.click();
+    await this.clickOnElement(optionElement);
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedOptionSelector, contributionType);
@@ -465,17 +463,6 @@ export class Contributor extends ExplorationEditor {
       expectedStatus,
       opportunityItem
     );
-  }
-
-  /**
-   * Fills the review comment textarea with the given comment.
-   * @param {string} comment - The comment to fill the textarea with.
-   */
-  async fillReviewComment(comment: string): Promise<void> {
-    await this.expectElementToBeVisible(reviewCommentTextareaSelector);
-    await this.typeInInputField(reviewCommentTextareaSelector, comment);
-
-    await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
   }
 
   /**

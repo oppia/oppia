@@ -183,13 +183,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.expectElementToBeVisible(stateContentInputField);
     await this.clickOnElementWithSelector(stateContentInputField);
 
-    // The CKEditor toolbar buttons are not always clickable by mouse, so we
-    // trigger the click through the DOM.
-    const insertMathExpressionButton =
-      await this.expectElementToBeAttachedInDOM(mathButtonSelector);
-    await insertMathExpressionButton?.evaluate(button =>
-      (button as HTMLElement).click()
-    );
+    await this.clickOnElementWithSelector(mathButtonSelector);
 
     await this.expectElementToBeVisible(mathExpressionInputSelector);
     await this.typeInInputField(mathExpressionInputSelector, '\\frac{1}{2}');
@@ -209,13 +203,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.expectElementToBeVisible(stateContentInputField);
 
-    // The CKEditor toolbar buttons are not always clickable by mouse, so we
-    // trigger the click through the DOM.
-    const insertImageButton =
-      await this.expectElementToBeAttachedInDOM(imageButtonSelector);
-    await insertImageButton?.evaluate(button =>
-      (button as HTMLElement).click()
-    );
+    await this.clickOnElementWithSelector(imageButtonSelector);
 
     await this.expectElementToBeVisible(uploadImageButton);
     await this.clickOnElementWithSelector(uploadImageButton);

@@ -88,7 +88,8 @@ test.describe('Practice Question Submitter', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition and Subtraction',
-      'Addition'
+      'Addition',
+      true
     );
     // The story editor is opened after the story is created.
     await curriculumAdmin.addStoryToTopic(

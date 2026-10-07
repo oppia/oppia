@@ -43,7 +43,7 @@ test.describe('Question Submitter', function () {
 
     // Create a skill and link it to a Topic.
     await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one', true);
     await curriculumAdmin.createSkillForTopic(
       'Test Skill 1',
       'Test Topic 1',

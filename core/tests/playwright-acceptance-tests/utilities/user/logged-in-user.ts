@@ -1254,9 +1254,10 @@ export class LoggedInUser extends BaseUser {
     // The link always triggers a full page load (even if the user is already
     // on the contributor dashboard), so we wait for the new page to load
     // before checking its contents.
-    const pageLoadPromise = this.page.waitForEvent('load');
-    await this.clickOnElementWithSelector(contributorDashboardMenuLink);
-    await pageLoadPromise;
+    await Promise.all([
+      this.page.waitForEvent('load'),
+      this.clickOnElementWithSelector(contributorDashboardMenuLink),
+    ]);
 
     await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
