@@ -35,6 +35,7 @@ import {
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -48,6 +49,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
  * Mapping of user roles to their respective factory functions.
  */
 const USER_ROLE_MAPPING = {
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
