@@ -64,7 +64,6 @@ export default {
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
-    FeedbackUpdates: 'http://localhost:8181/feedback-updates',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     ImpactReport2022Url:
@@ -124,8 +123,7 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
-    TeacherStoryTaggedBlogsLink:
-      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    BlogPage: '/blog',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:
@@ -134,8 +132,11 @@ export default {
     UserDocumentation: 'https://oppia.github.io/#/',
     BaseExplorationPlayer: 'http://localhost:8181/explore',
     ExplorationPlayer: 'http://localhost:8181/explore/',
+    LessonPlayer: 'http://localhost:8181/lesson/',
     SkillEditor: 'http://localhost:8181/skill_editor',
     TopicEditor: 'http://localhost:8181/topic_editor',
+    TechnicalFeedbackDashboard:
+      'http://localhost:8181/technical-feedback-dashboard',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -161,6 +162,7 @@ export default {
     COLLECTION_EDITOR: 'collection editor',
     TRANSLATION_REVIEWER: 'translation reviewer',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
+    TECH_TEAM_LEAD: 'tech team lead',
   } as const,
 
   ViewportWidthBreakpoints: {
@@ -185,6 +187,7 @@ export default {
       __dirname,
       '../../data/intro-content-hi.mp3'
     ),
+    oppiaPage: path.resolve(__dirname, '../../data/oppia-page.png'),
     ContinueInteractionVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/continue-interaction-hi.mp3'
@@ -302,6 +305,7 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile-1920.png'
   ),
+  SAMPLE_TEST_PDF: path.resolve(__dirname, '../../data/sample_test.pdf'),
   BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
   BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
   BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),

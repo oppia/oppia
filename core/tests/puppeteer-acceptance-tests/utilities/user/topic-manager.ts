@@ -32,7 +32,7 @@ const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 // Photo Upload Modal.
 const chapterPhotoBoxButton = '.e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal';
+const photoUploadModal = 'edit-thumbnail-modal, oppia-image-uploader-modal';
 
 // Topic and Skills Dashboard Page.
 const topicsTab = 'a.e2e-test-topics-tab';
@@ -72,6 +72,7 @@ const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = '.e2e-test-chapter-title-field';
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
+('input.e2e-test-url-fragment-field');
 const subtopicUrlFragmentField =
   '.e2e-test-subtopic-url-fragment-field .e2e-test-url-fragment-field';
 const richTextAreaField = 'div.e2e-test-rte';
@@ -94,8 +95,6 @@ const chapterEditorBreadcrumbChapterNameSelector =
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
-const toastWarningContainerSelector = '.e2e-test-toast-warning';
-const closeToastMessageButtonSelector = 'button.e2e-test-close-toast-warning';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButtonSelector =
@@ -634,24 +633,6 @@ export class TopicManager extends BaseUser {
           `Expected message: "${expectedMessage}"\n`
       );
     }
-  }
-
-  /**
-   * Closes the currently visible toast warning.
-   */
-  async closeToastMessage(): Promise<void> {
-    const toastVisible = await this.isElementVisible(
-      toastWarningContainerSelector,
-      true,
-      3000
-    );
-    if (!toastVisible) {
-      showMessage('No toast warning is visible to close.');
-      return;
-    }
-
-    await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
-    await this.expectElementToBeVisible(toastWarningContainerSelector, false);
   }
 
   /**
@@ -5576,11 +5557,15 @@ export class TopicManager extends BaseUser {
    * @param chapterName - The name of the chapter to be marked as ready to publish.
    * @param storyName - The name of the story containing the chapter.
    * @param topicName - The name of the topic under which the story exists.
+   * @param skillName - The name of the skill to add as an acquired skill. This
+   *   must be a skill that exists in the topic. Defaults to the skill used by
+   *   the Place Values acceptance-test topic.
    */
   async readyToPublish(
     chapterName: string,
     storyName: string,
-    topicName: string
+    topicName: string,
+    skillName: string = 'Place Values skills'
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
     await this.waitForPageToFullyLoad();
@@ -5632,7 +5617,7 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(outlineEditorInput, 'This is an outline.');
     await this.clickOnElementWithSelector(saveOutlineButton);
     await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
-    await this.addAcquiredSkill('Place Values skills');
+    await this.addAcquiredSkill(skillName);
 
     await this.saveStoryDraft();
     await this.clickReadyToPublishButton();
