@@ -190,10 +190,10 @@ def _update_report_stats_model_in_transaction(
             platform, ticket_id, date
         )
     )
-    stats_model = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-            stats_id
-        )
+    stats_model: Optional[
+        app_feedback_report_models.AppFeedbackReportStatsModel
+    ] = app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+        stats_id
     )
 
     stats_parameter_names = app_feedback_report_constants.StatsParameterNames
