@@ -1288,9 +1288,9 @@ export class ExplorationEditor extends BaseUser {
     feedbackSubject: string
   ): Promise<void> {
     await this.expectElementToBeVisible(feedbackSubjectSelector);
-    const feedbackSubjects = await this.page.$$eval(
-      feedbackSubjectSelector,
-      subjects => subjects.map(subject => subject.textContent)
+    const feedbackSubjectElements = await this.page.$$(feedbackSubjectSelector);
+    const feedbackSubjects = await Promise.all(
+      feedbackSubjectElements.map(element => this.getTextContent(element))
     );
 
     if (!feedbackSubjects.includes(feedbackSubject)) {
@@ -1397,9 +1397,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Feedback author not found.');
     }
 
-    const authorText = await feedbackAuthors[0].evaluate(el =>
-      el.textContent?.trim()
-    );
+    const authorText = await this.getTextContent(feedbackAuthors[0]);
 
     if (authorText !== expectedAuthor) {
       throw new Error(
