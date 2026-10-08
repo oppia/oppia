@@ -42,7 +42,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import './collapsible.component.css';
 
 @Component({
   selector: 'oppia-noninteractive-collapsible',

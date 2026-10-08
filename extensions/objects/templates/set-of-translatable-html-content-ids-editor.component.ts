@@ -24,10 +24,10 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import './set-of-translatable-html-content-ids-editor.component.css';
 
 interface Choice {
   val: string;
+  id: string;
 }
 
 @Component({

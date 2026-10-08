@@ -45,7 +45,6 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {ImageClickInputRulesService} from './image-click-input-rules.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import './image-click-input-interaction.component.css';
 
 interface RectangleRegion extends ImagePoint {
   height: number;

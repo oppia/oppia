@@ -20,7 +20,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Fraction} from 'domain/objects/fraction.model';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {FractionAnswer} from 'interactions/answer-defs';
-import './fraction-editor.component.css';
 
 @Component({
   selector: 'fraction-editor',

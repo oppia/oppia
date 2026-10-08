@@ -68,7 +68,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 import {GifFramesService} from 'third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './image-editor.component.css';
+
 const gifshot = require('gifshot');
 
 // We attach GifFrames to the window and use it in our codebase and the
@@ -185,7 +185,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   // Define the cursors for the crop area.
   CROP_CURSORS: Record<number, string> = {};
   imageContainerStyle: Record<string, string> = {};
-  allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
+  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
   ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
   imageResizeRatio: number = 1;
@@ -240,6 +240,13 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private windowRef: WindowRef,
     private gifFramesService: GifFramesService
   ) {}
+
+  // Public wrapper for the SVG sanitizer service's getIssueURL method.
+  // This is needed because Angular strict template checking does not
+  // allow direct access to private class members from templates.
+  getIssueURL(invalidTagsAndAttributes: InvalidSvgTagsAndAttributes): string {
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
+  }
 
   ngOnInit(): void {
     this.validityChange.emit({empty: false});

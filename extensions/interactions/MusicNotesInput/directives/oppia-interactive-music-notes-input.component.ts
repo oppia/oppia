@@ -44,7 +44,6 @@ import {AlertsService} from 'services/alerts.service';
 import {MusicNotesInputRulesService} from './music-notes-input-rules.service';
 import {MusicPhrasePlayerService} from './music-phrase-player.service';
 import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
-import './music-notes-input-interaction.component.css';
 
 interface MusicNote {
   baseNoteMidiNumber: number;

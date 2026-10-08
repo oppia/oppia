@@ -34,7 +34,6 @@ import {
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
 import {Subscription} from 'rxjs';
-import './pencil-code-editor-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-pencil-code-editor',

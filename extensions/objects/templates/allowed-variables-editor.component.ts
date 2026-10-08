@@ -24,7 +24,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
-import './allowed-variables-editor.component.css';
 
 @Component({
   selector: 'allowed-variables-editor',

@@ -24,7 +24,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import './filepath-editor.component.css';
 
 @Component({
   selector: 'filepath-editor',

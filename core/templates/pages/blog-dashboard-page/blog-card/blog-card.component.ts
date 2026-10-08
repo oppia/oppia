@@ -26,7 +26,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import dayjs from 'dayjs';
 import {UserService} from 'services/user.service';
-import './blog-card.component.css';
 
 @Component({
   selector: 'oppia-blog-card',

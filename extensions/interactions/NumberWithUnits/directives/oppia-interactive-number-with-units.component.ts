@@ -32,7 +32,6 @@ import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-
 import {NumberConversionService} from 'services/number-conversion.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
-import './number-with-units-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-number-with-units',

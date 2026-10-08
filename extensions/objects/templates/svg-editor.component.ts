@@ -38,7 +38,6 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Picker from 'vanilla-picker';
 import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
 import {SvgEditorConstants} from './svg-editor.constants';
-import './svg-editor.component.css';
 
 export interface Dimensions {
   height: number;
@@ -109,7 +108,7 @@ type FabricSvgLoadCallback = (
   styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   @Output() discardImage = new EventEmitter();
@@ -185,6 +184,9 @@ export class SvgEditorComponent implements OnInit {
   // The canvasId is used to identify the fabric js
   // canvas element in the editor.
   canvasID = 'canvas' + this.randomId;
+  // The canvasContainerId is used to identify the div wrapping the fabric js
+  // canvas element in the editor.
+  canvasContainerId = 'fabric-canvas-container-' + this.randomId;
   // The following picker variables are used to store the objects returned
   // from the vanilla color picker.
   fillPicker: SvgColorPicker | null = null;
@@ -1338,7 +1340,7 @@ export class SvgEditorComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onFileChanged(file: File, filename: string): void {
+  onFileChanged(file: File, filename?: string): void {
     this.setUploadedFile(file);
   }
 

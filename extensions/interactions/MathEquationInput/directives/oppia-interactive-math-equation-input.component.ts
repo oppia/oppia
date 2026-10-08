@@ -141,6 +141,8 @@ export class InteractiveMathEquationInput implements OnInit {
       ) as string[]
     );
 
+    this.guppyInitializationService.activate();
+
     Guppy.event('change', this.onAnswerChange.bind(this));
 
     Guppy.event('done', this.submitAnswer.bind(this));
