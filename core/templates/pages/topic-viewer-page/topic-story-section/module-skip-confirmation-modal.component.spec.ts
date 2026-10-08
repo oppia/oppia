@@ -100,7 +100,6 @@ describe('ModuleSkipConfirmationModalComponent', () => {
       TestBed.configureTestingModule({
         declarations: [ModuleSkipConfirmationModalComponent, MockTranslatePipe],
         providers: [
-          {provide: NgbActiveModal, useValue: ngbActiveModal},
           {provide: MatBottomSheetRef, useValue: bottomSheetRef},
           {
             provide: MAT_BOTTOM_SHEET_DATA,

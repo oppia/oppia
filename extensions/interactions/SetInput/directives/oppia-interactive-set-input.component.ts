@@ -39,6 +39,7 @@ export class InteractiveSetInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() buttonTextWithValue!: string;
   @Input() savedSolution!: SetInputAnswer;
+  @Input() labelForFocusTarget!: string;
   errorMessage!: string;
   answer!: SetInputAnswer;
   schema!: {
@@ -87,6 +88,10 @@ export class InteractiveSetInputComponent implements OnInit {
 
   getSchema(): Schema {
     return this.schema as Schema;
+  }
+
+  getLabelForFocusTarget(): string {
+    return this.labelForFocusTarget;
   }
 
   ngOnInit(): void {
