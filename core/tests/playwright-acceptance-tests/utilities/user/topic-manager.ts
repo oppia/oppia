@@ -710,7 +710,7 @@ export class TopicManager extends BaseUser {
       TopicSelectorElement = await this.expectElementToBeAttachedInDOM(
         desktopTopicSelector,
         this.page,
-        10000
+        30000 // Increased from 10000 to 30000 for slower CI servers.
       );
     } catch {
       // Element didn't appear in 10 seconds — treat as not present.
