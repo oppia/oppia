@@ -80,7 +80,7 @@ export class NavigationService {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.activeMenuName = menuName;
   }

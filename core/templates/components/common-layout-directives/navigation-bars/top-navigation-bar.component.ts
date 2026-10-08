@@ -34,7 +34,6 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
-import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
@@ -47,12 +46,9 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
@@ -149,8 +145,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
-  unreadThreadsCount: number = 0;
-  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   isWebFeedbackModalEnabled: boolean = false;
 
   // The 'username', 'profilePageUrl' properties
@@ -193,7 +187,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ];
 
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
-  FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg'
   );
@@ -206,8 +199,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
-    private alertsService: AlertsService,
-    private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
@@ -267,9 +258,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.urlService.getPathname().includes(path)
     );
 
-    this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
-      this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
-
     this.isWebFeedbackModalEnabled =
       this.isWebFeedbackModalFeatureFlagEnabled();
 
@@ -298,27 +286,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.isBlogPostEditor = userInfo.isBlogPostEditor();
         this.userIsLoggedIn = userInfo.isLoggedIn();
         let usernameFromUserInfo = userInfo.getUsername();
-        if (this.userIsLoggedIn) {
-          let feedbackUpdatesDataPromise =
-            this.feedbackUpdatesBackendApiService.fetchFeedbackUpdatesDataAsync(
-              this.paginatedThreadsList
-            );
-          feedbackUpdatesDataPromise.then(
-            responseData => {
-              this.unreadThreadsCount = responseData.numberOfUnreadThreads;
-            },
-            errorResponseStatus => {
-              if (
-                AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !==
-                -1
-              ) {
-                this.alertsService.addWarning(
-                  'Failed to get number of unread thread of feedback updates'
-                );
-              }
-            }
-          );
-        }
         if (usernameFromUserInfo) {
           this.username = usernameFromUserInfo;
           this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
@@ -688,11 +655,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       NavbarAndFooterGATrackingPages.BLOG
     );
     this.windowRef.nativeWindow.location.href = '/blog';
-  }
-
-  isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
-    return this.platformFeatureService.status
-      .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
   }
 
   isWebFeedbackModalFeatureFlagEnabled(): boolean {
