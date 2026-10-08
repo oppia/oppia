@@ -2961,14 +2961,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the blog page via the About menu in the navbar.
+   * Navigates to the blog page via the navbar (About > Blog).
    */
   async navigateToBlogPageViaNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       // On mobile, navigate directly to blog URL since there's no blog button
       // in sidebar.
-      // Todo(#25094): Add blog button to mobile sidebar and remove this direct
-      // navigation.
+      // Todo(#25094): Add blog button to mobile sidebar and remove this
+      // direct navigation.
       await this.navigateToBlogPage();
     } else {
       await this.expectElementToBeVisible(navbarAboutTab);
@@ -2981,7 +2981,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check the welcome message on the blog page.
+   * Expects the blog welcome message to be visible.
    * @param {string} expectedText - The expected welcome message.
    */
   async expectBlogWelcomeMessageToBeVisible(
@@ -2991,7 +2991,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check the number of blog posts on the current blog page.
+   * Expects the number of blog posts on the current page to be equal to the
+   * given number.
    * @param {number} number - The expected number of blog posts.
    */
   async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
@@ -3003,8 +3004,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check that a blog post with the given title is present.
-   * @param {string} title - The title of the blog post.
+   * Expects a blog post with the given title to be present on the page.
+   * @param {string} title - The title of the blog post to check for.
    */
   async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
     await this.expectTextContentToContain(blogPostListSelector, title);
@@ -3012,7 +3013,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the next page of blog posts.
+   * Clicks the next button in the blog pagination controls.
    */
   async clickNextBlogPage(): Promise<void> {
     await this.expectElementToBeVisible(blogPostTitleSelector);
@@ -3029,8 +3030,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check that the blog page has all the required layout
-   * elements.
+   * Expects the blog page layout to be correct with all required elements.
    */
   async expectBlogPageLayoutToBeCorrect(): Promise<void> {
     await this.expectElementToBeVisible(postsDisplayHeadingSelector);
@@ -3047,7 +3047,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to open the first blog post on the blog page.
+   * Clicks on the first blog post in the list.
    */
   async clickOnFirstBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(blogPostTitleSelector);
@@ -3057,50 +3057,49 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check that the blog post title is visible.
+   * Expects blog post title to be visible.
    */
   async expectBlogPostTitleToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogPostTitleContainerSelector);
   }
 
   /**
-   * Function to check that the blog post author is visible.
+   * Expects blog post author name to be visible.
    */
   async expectBlogPostAuthorToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogAuthorNameSelector);
   }
 
   /**
-   * Function to check that the blog post publish date is visible.
+   * Expects blog post publish date to be visible.
    */
   async expectBlogPostPublishDateToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogPostPublishDateSelector);
   }
 
   /**
-   * Function to check that the blog post content is visible.
+   * Expects blog post content to be visible.
    */
   async expectBlogPostContentToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogPostContentSelector);
   }
 
   /**
-   * Function to check that the blog post tags are visible.
+   * Expects blog post tags to be visible.
    */
   async expectBlogPostTagsToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogCardTagContainerSelector);
   }
 
   /**
-   * Function to check that the blog post share button is visible.
+   * Expects blog share button to be visible.
    */
   async expectBlogShareButtonToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogShareButtonSelector);
   }
 
   /**
-   * Function to check that the suggested blog posts section is visible,
-   * if present.
+   * Expects suggested posts section to be visible (if present).
    */
   async expectSuggestedBlogPostsSectionToBeVisible(): Promise<void> {
     if (
