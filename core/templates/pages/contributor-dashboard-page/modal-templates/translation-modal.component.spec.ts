@@ -53,7 +53,7 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {TranslateTextBackendApiService} from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
-// @ts-ignore
+// @ts-ignore This throws "Type null is not assignable to type". We need to suppress this error because we are testing the null case.
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
@@ -265,15 +265,18 @@ describe('Translation Modal Component', () => {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
-      // This throws "Argument of type 'null' is not assignable to parameter of
-      // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations. This is because the component is not
-      // strictly typed yet.
-      // @ts-ignore
-      null,
-      null,
+      null as never,
+      null as never,
       new ElementRef({offsetHeight: 200}),
-      null
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never
     );
     getUserContributionRightsDataAsyncSpy = spyOn(
       userService,
@@ -288,6 +291,41 @@ describe('Translation Modal Component', () => {
       })
     );
   });
+
+  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
+    // eslint-disable-next-line dot-notation
+    spyOn(component['rteHelperService'], 'openCustomizationModal');
+    component.ngOnInit();
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletexthandler?exp_id=1&language_code=es'
+    );
+    req.flush({
+      state_names_to_content_id_mapping: {
+        stateName1: {contentId1: {content_value: 'text1', data_format: 'html'}},
+      },
+      version: 1,
+    });
+    tick();
+
+    // Check initial state.
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with a non-image component.
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with the 'image' component.
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(
+      false,
+      'image',
+      [],
+      {}
+    );
+    expect(component.hasAltTextModalBeenOpened).toBeTrue();
+  }));
 
   it('should wrap text with ellipsis when text is too long', () => {
     expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
@@ -1704,6 +1742,14 @@ describe('Translation Modal Component', () => {
       expect(component.hasLengthValidationError).toBe(false);
       expect(component.lengthValidationErrorMessage).toBe('');
       expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+  });
+
+  describe('when checking for validation errors with auto-translated images', () => {
+    it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
+      component.hasImageInAutoTranslation = true;
+      component.hasAltTextModalBeenOpened = false;
+      expect(component.hasSubmitValidationErrors()).toBe(true);
     });
   });
 
