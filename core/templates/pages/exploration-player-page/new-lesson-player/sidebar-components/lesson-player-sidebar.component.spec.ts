@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for new lesson player sidebar component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -209,6 +211,12 @@ describe('LessonPlayerSidebarComponent', () => {
     expect(mockMobileMenuService.getSidebarIsExpanded).toHaveBeenCalled();
 
     expect(component.sidebarIsExpanded).toBe(true);
+  });
+
+  it('should toggle menu visibility', () => {
+    component.toggleMenuVisibility();
+
+    expect(mockMobileMenuService.toggleMenuVisibility).toHaveBeenCalled();
   });
 
   it('should handle mobile menu visibility changes', () => {

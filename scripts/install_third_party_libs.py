@@ -94,8 +94,8 @@ def test_python_version() -> None:
         Exception. The Python version does not match the expected prefix.
     """
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.10.16':
-        print('Please use Python 3.10.16. Exiting...')
+    if running_python_version != '3.12.13':
+        print('Please use Python 3.12.13. Exiting...')
         raise Exception('No suitable python version found.')
 
 
@@ -109,9 +109,14 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """
     common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
-    # TODO(#21906): Add parameter filter = 'data'
-    # after updating to Python 3.12.
-    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+    # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
+    # doesn't yet know about the filter parameter added in 3.12.
+    # TODO(#15913): Remove this ignore pragma and comment once MyPy is
+    # upgraded.
+    tar.extractall(  # type: ignore[call-arg]
+        path=common.OPPIA_TOOLS_DIR, filter='data'
+    )
     tar.close()
     rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
     os.remove(filename)
@@ -253,12 +258,16 @@ def install_gcloud_sdk() -> None:
 
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
-        # TODO(#21906): Add parameter filter = 'data'
-        # after updating to Python 3.12.
-        tar.extractall(
+        # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+        # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
+        # doesn't yet know about the filter parameter added in 3.12.
+        # TODO(#15913): Remove this ignore pragma and comment once MyPy is
+        # upgraded.
+        tar.extractall(  # type: ignore[call-arg]
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'
-            )
+            ),
+            filter='data',
         )
         tar.close()
 
@@ -358,9 +367,15 @@ def download_and_untar_files(
         with contextlib.closing(
             tarfile.open(name=TMP_UNZIP_PATH, mode='r:gz')
         ) as tfile:
-            # TODO(#21906): Add parameter filter = 'data'
-            # after updating to Python 3.12.
-            tfile.extractall(target_parent_dir)
+            # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
+            # Python 3.12 and its bundled typeshed stub for
+            # TarFile.extractall() doesn't yet know about the filter
+            # parameter added in 3.12.
+            # TODO(#15913): Remove this ignore pragma and comment once MyPy
+            # is upgraded.
+            tfile.extractall(  # type: ignore[call-arg]
+                target_parent_dir, filter='data'
+            )
         os.remove(TMP_UNZIP_PATH)
 
         # Rename the target directory.
@@ -430,40 +445,6 @@ def install_redis_cli() -> None:
         print('Redis-cli installed successfully.')
 
 
-def install_elasticsearch_dev_server() -> None:
-    """This installs a local ElasticSearch server to the oppia_tools
-    directory to be used by development servers and backend tests.
-    """
-    try:
-        subprocess.call(
-            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            # Set the minimum heap size to 100 MB and maximum to 500 MB.
-            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'},
-        )
-        print('ElasticSearch is already installed.')
-        return
-    except OSError:
-        print('Installing ElasticSearch...')
-
-    if common.is_mac_os() or common.is_linux_os():
-        download_and_untar_files(
-            'https://artifacts.elastic.co/downloads/elasticsearch/'
-            + 'elasticsearch-%s-%s-x86_64.tar.gz'
-            % (common.ELASTICSEARCH_VERSION, common.OS_NAME.lower()),
-            common.OPPIA_TOOLS_DIR,
-            'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-            'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-        )
-
-    else:
-        raise Exception('Unrecognized or unsupported operating system.')
-
-    print('ElasticSearch installed successfully.')
-
-
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
@@ -494,7 +475,6 @@ def main() -> None:
     install_playwright_node()
     install_yarn()
     install_redis_cli()
-    install_elasticsearch_dev_server()
 
     # Install pre-commit and pre-push scripts.
     common.print_each_string_after_two_new_lines(
@@ -536,7 +516,25 @@ def main() -> None:
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n',
     )
-    subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+    # The install runs under the same Node 20 installation that is used for
+    # the Lighthouse and Playwright acceptance tests (see
+    # LIGHTHOUSE_NODE_PATH in common.py). This satisfies the engines
+    # requirement of Lighthouse 12 (Node 18.20 or newer), so no
+    # --ignore-engines flag is needed.
+    # TODO(#26264): Simplify this install step by using the default Node
+    # version once it is upgraded to 20.
+    install_env = {
+        **os.environ,
+        'PATH': os.pathsep.join(
+            [
+                os.path.join(common.LIGHTHOUSE_NODE_PATH, 'bin'),
+                os.environ['PATH'],
+            ]
+        ),
+    }
+    subprocess.check_call(
+        ['yarn', 'install', '--pure-lockfile'], env=install_env
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

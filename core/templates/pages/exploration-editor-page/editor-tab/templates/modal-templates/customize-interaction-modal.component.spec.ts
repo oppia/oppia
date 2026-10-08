@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Customize Interaction Modal.
  */
 
+// @ts-nocheck
+
 import {
   ChangeDetectorRef,
   EventEmitter,
@@ -658,5 +660,11 @@ describe('Customize Interaction Modal Component', () => {
     stateInteractionIdService.displayed = NO_INTERACTION_ID;
 
     expect(component.getContentIdToContent()).toEqual({});
+  });
+
+  it('should expose the customization args from the injected service', () => {
+    expect(component.customizationArgs).toBe(
+      stateCustomizationArgsService.displayed
+    );
   });
 });

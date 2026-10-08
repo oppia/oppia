@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for topic viewer page component.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

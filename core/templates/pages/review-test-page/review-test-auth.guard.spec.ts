@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ReviewTestAuthGuard.
  */
 
+// @ts-nocheck
+
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {

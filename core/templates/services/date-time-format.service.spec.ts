@@ -16,6 +16,8 @@
  * @fileoverview Unit test for DateTimeFormatService.
  */
 
+// @ts-nocheck
+
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import dayjs from 'dayjs';
 

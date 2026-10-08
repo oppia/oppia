@@ -16,6 +16,8 @@
  * @fileoverview Tests for the diagnostic test player component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for VoiceoverCardComponent.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,

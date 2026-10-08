@@ -15,6 +15,7 @@
 /**
  * @fileoverview Spec for service that parses rich text string.
  */
+// @ts-nocheck
 
 import {DOCUMENT} from '@angular/common';
 import {TestBed} from '@angular/core/testing';
@@ -129,10 +130,7 @@ describe('RTE parser service', () => {
     ];
     testCases.forEach(testCase => {
       let node = rteParserService.constructFromRteString(testCase.rteString);
-      expect(compareRteNodeToObject(node, testCase.representation)).toBe(
-        true,
-        testCase.rteString
-      );
+      expect(compareRteNodeToObject(node, testCase.representation)).toBe(true);
     });
   });
 

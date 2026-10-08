@@ -35,7 +35,6 @@ import {
   TECHNICAL_DASHBOARD_FILTER_CONFIG,
   TechnicalTeamType,
 } from 'domain/feedback/feedback.model';
-import './technical-feedback-dashboard-page.component.css';
 
 @Component({
   selector: 'oppia-technical-feedback-dashboard-page',

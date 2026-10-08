@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the image editor.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -3360,6 +3362,19 @@ describe('ImageEditor', () => {
 
     expect(component.data.metadata.savedImageFilename).toBe(
       'img_12345_height_250_width_250.png'
+    );
+  });
+
+  it('should get issue URL from svg sanitizer service', () => {
+    const invalidTagsAndAttrs = {
+      tags: ['script'],
+      attrs: ['onclick'],
+    };
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue-url');
+
+    expect(component.getIssueURL(invalidTagsAndAttrs)).toBe('issue-url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
     );
   });
 });

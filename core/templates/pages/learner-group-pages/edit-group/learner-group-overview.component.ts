@@ -24,8 +24,6 @@ import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {UserService} from 'services/user.service';
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
-import './learner-group-overview.component.css';
-
 @Component({
   selector: 'oppia-learner-group-overview',
   templateUrl: './learner-group-overview.component.html',

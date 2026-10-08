@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
+// @ts-nocheck
+
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,

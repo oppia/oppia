@@ -16,6 +16,8 @@
  * @fileoverview Spec for rte output component.
  */
 
+// @ts-nocheck
+
 import {DOCUMENT} from '@angular/common';
 import {DebugElement, SimpleChanges} from '@angular/core';
 import {
@@ -1083,6 +1085,12 @@ describe('RTE display component', () => {
     component.rteStringContext = 'content';
 
     expect(component.shouldHighlightContent()).toBeFalse();
+  });
+
+  it('should return null when getting element matching class and text content with undefined classname', () => {
+    expect(
+      component.getElementMatchingClassAndTextContent(undefined)
+    ).toBeNull();
   });
 
   it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {

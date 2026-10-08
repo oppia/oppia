@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for fraction editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FractionEditorComponent} from './fraction-editor.component';

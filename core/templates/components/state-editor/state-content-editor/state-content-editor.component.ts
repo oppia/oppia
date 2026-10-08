@@ -28,6 +28,7 @@ import {
 import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import {MathFormulaDetectionService} from 'services/math-formula-detection.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -35,10 +36,10 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
-import './state-content-editor.component.css';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: {
     rte_component_config_id: 'ALL_COMPONENTS';
     hide_complex_extensions: boolean;
@@ -57,6 +58,7 @@ export class StateContentEditorComponent implements OnInit {
   @Input() stateContentPlaceholder!: string;
   @Input() stateContentSaveButtonPlaceholder!: string;
   cardHeightLimitWarningIsShown!: boolean;
+  mathWarningIsMinimized: boolean = false;
   contentId!: string | null;
   contentEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
@@ -70,6 +72,7 @@ export class StateContentEditorComponent implements OnInit {
     private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
+    private mathFormulaDetectionService: MathFormulaDetectionService,
     private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
@@ -141,6 +144,14 @@ export class StateContentEditorComponent implements OnInit {
     this.contentEditorIsOpen = true;
   }
 
+  isFormulaAsText(htmlString: string | string[]): boolean {
+    return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
+  }
+
+  toggleMathWarning(): void {
+    this.mathWarningIsMinimized = !this.mathWarningIsMinimized;
+  }
+
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
     this.externalRteSaveService.onExternalRteSave.emit();
@@ -154,6 +165,11 @@ export class StateContentEditorComponent implements OnInit {
 
   isContentEditable(): boolean {
     return this.editabilityService.isEditable();
+  }
+
+  updateContentHtml(contentHtml: SchemaDefaultValue): void {
+    this.stateContentService.displayed._html =
+      typeof contentHtml === 'string' ? contentHtml : '';
   }
 
   ngOnDestroy(): void {

@@ -26,8 +26,7 @@ body:
       options:
         - Frontend
         - Backend
-        - Lighthouse CI performance
-        - Lighthouse CI accessibility
+        - Lighthouse CI
         - Other
     validations:
       required: true

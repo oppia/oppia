@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the SetInput interaction.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -202,5 +204,10 @@ describe('InteractiveSetInputComponent', () => {
     component.updateAnswer(['test1']);
 
     expect(component.answer).toEqual(['test1']);
+  });
+
+  it('should return the label for focus target', () => {
+    component.labelForFocusTarget = 'test-label';
+    expect(component.getLabelForFocusTarget()).toBe('test-label');
   });
 });

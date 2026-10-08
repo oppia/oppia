@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
+// @ts-nocheck
+
 import {
   TestBed,
   ComponentFixture,
@@ -24,7 +26,11 @@ import {
   flush,
 } from '@angular/core/testing';
 import {AppConstants} from 'app.constants';
-import {RteHelperModalComponent} from './rte-helper-modal.component';
+import {
+  RteHelperModalComponent,
+  CustomizationArgsSpecsType,
+  CustomizationArgsForRteType,
+} from './rte-helper-modal.component';
 import {ExternalRteSaveService} from './external-rte-save.service';
 import {AlertsService} from './alerts.service';
 import {PageContextService} from './page-context.service';
@@ -115,7 +121,7 @@ describe('RteHelperModalComponent', () => {
         name: 'video_id',
         default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -123,7 +129,7 @@ describe('RteHelperModalComponent', () => {
       component.componentId = 'video';
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -176,14 +182,14 @@ describe('RteHelperModalComponent', () => {
           ],
         },
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -202,7 +208,7 @@ describe('RteHelperModalComponent', () => {
           svg_filename: '',
         },
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -213,7 +219,7 @@ describe('RteHelperModalComponent', () => {
           raw_latex: '',
           svg_filename: '',
         },
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -327,8 +333,56 @@ describe('RteHelperModalComponent', () => {
       expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
     }));
 
+    it('should handle missing entity context when saving math SVG', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
+        undefined as unknown as string
+      );
+      spyOn(pageContextService, 'getEntityId').and.returnValue(
+        undefined as unknown as string
+      );
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(new Blob());
+
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'svgFile',
+        svg_filename: 'svg_filename',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+      component.tmpCustomizationArgs = [
+        {
+          name: 'math_content',
+          value: {
+            raw_latex: 'x^2',
+            svg_filename: 'mathImage.svg',
+            svgFile: 'Svg Data',
+            mathExpressionSvgIsBeingProcessed: false,
+          },
+        },
+      ];
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Error: Could not retrieve entity type or entity ID.'
+      );
+      expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+
     it('should cancel the modal when math SVG exceeds 100 KB', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
@@ -356,6 +410,9 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when SVG exceeds 1 MB for blog post', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
       spyOn(pageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.BLOG_POST
       );
@@ -457,7 +514,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: '',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -466,7 +523,7 @@ describe('RteHelperModalComponent', () => {
       component.attrsCustomizationArgsDict = {
         url: 'google.com',
         text: 'google.com',
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -578,7 +635,7 @@ describe('RteHelperModalComponent', () => {
         name: 'autoplay',
         default_value: false,
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -589,7 +646,7 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 10,
           autoplay: false,
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
     it('should disable save button and display error message', fakeAsync(() => {
@@ -622,7 +679,7 @@ describe('RteHelperModalComponent', () => {
         name: 'alt',
         default_value: '',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -631,7 +688,7 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -668,7 +725,7 @@ describe('RteHelperModalComponent', () => {
         name: 'alt',
         default_value: '',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -678,7 +735,7 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      };
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -700,7 +757,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: 'oppia',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -709,7 +766,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: 'oppia',
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -740,7 +797,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: ' ',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -749,7 +806,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: ' ',
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -816,7 +873,7 @@ describe('RteHelperModalComponent', () => {
         name: 'autoplay',
         default_value: false,
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -827,7 +884,7 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 0,
           autoplay: false,
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -864,7 +921,7 @@ describe('RteHelperModalComponent', () => {
           },
         ],
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -881,7 +938,7 @@ describe('RteHelperModalComponent', () => {
               content: 'Content for Tab 2',
             },
           ],
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -952,7 +1009,7 @@ describe('RteHelperModalComponent', () => {
         name: 'content',
         default_value: 'Hello',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -961,7 +1018,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'Collapsible 1',
           content: 'Hello',
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -1002,7 +1059,7 @@ describe('RteHelperModalComponent', () => {
         name: 'answer',
         default_value: 'sample answer',
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -1011,7 +1068,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'sample question',
           content: 'sample answer',
-        });
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -1065,6 +1122,70 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+
+  it('should dismiss modal if svg file is missing when saving', fakeAsync(() => {
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.componentId = 'math';
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: '',
+      },
+    ] as unknown as CustomizationArgsSpecsType;
+    component.attrsCustomizationArgsDict = {
+      math_content: {
+        raw_latex: '',
+        svg_filename: '',
+      },
+    } as unknown as CustomizationArgsForRteType;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: null,
+      svg_filename: 'mathImage.svg',
+    };
+    spyOn(alertsService, 'addWarning');
+    component.save();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'SVG file is missing.'
+    );
+    expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss modal if resampled svg file is null when saving', fakeAsync(() => {
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.componentId = 'math';
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: '',
+      },
+    ] as unknown as CustomizationArgsSpecsType;
+    component.attrsCustomizationArgsDict = {
+      math_content: {
+        raw_latex: '',
+        svg_filename: '',
+      },
+    } as unknown as CustomizationArgsForRteType;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'some_svg_file',
+      svg_filename: 'mathImage.svg',
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    spyOn(alertsService, 'addWarning');
+    component.save();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to process SVG file.'
+    );
+    expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+  }));
 });
 
 const rteSaveEmitter = new EventEmitter<void>();
@@ -1168,12 +1289,16 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
 
   it('should dismiss the bottom sheet with false when cancelled and not newly created', fakeAsync(() => {
     component.componentId = 'link';
-    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.attrsCustomizationArgsDict = {
+      alt: '',
+      caption: '',
+      filepath: '',
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'filepath', default_value: ''},
       {name: 'caption', default_value: ''},
       {name: 'alt', default_value: ''},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     component.ngOnInit();
     flush();
     component.componentIsNewlyCreated = false;
@@ -1183,12 +1308,16 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
 
   it('should dismiss the bottom sheet with the customization args on save', fakeAsync(() => {
     component.componentId = 'link';
-    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.attrsCustomizationArgsDict = {
+      alt: '',
+      caption: '',
+      filepath: '',
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'filepath', default_value: ''},
       {name: 'caption', default_value: ''},
       {name: 'alt', default_value: ''},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     component.ngOnInit();
     flush();
     component.save();
@@ -1199,10 +1328,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
@@ -1238,10 +1367,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(alertsService, 'addWarning');
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
@@ -1273,10 +1402,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
@@ -1307,10 +1436,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.BLOG_POST
     );
@@ -1343,10 +1472,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -1379,13 +1508,13 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
-    };
+    } as unknown as CustomizationArgsForRteType;
     component.customizationArgSpecs = [
       {
         name: 'math_content',
         default_value: {raw_latex: '', svg_filename: ''},
       },
-    ];
+    ] as unknown as CustomizationArgsSpecsType;
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;

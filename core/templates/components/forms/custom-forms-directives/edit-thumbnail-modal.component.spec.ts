@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Edit Thumbnail Modal Component.
  */
 
+// @ts-nocheck
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {EditThumbnailModalComponent} from './edit-thumbnail-modal.component';

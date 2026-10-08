@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for YamlService.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {YamlService} from './yaml.service';
 

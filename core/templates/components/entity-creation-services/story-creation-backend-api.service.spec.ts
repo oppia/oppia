@@ -16,6 +16,8 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

@@ -1,0 +1,95 @@
+.mastery-challenge-locked-modal-header {
+  border-bottom: 0;
+  display: block;
+  padding: 20px 24px 10px;
+}
+
+.mastery-challenge-locked-modal-title {
+  color: #222f42;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  text-align: center;
+}
+
+.mastery-challenge-locked-modal-body {
+  color: #4e596b;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  padding: 0 24px 16px;
+  text-align: center;
+}
+
+.mastery-challenge-locked-modal-body p {
+  margin: 0 auto;
+  max-width: 440px;
+}
+
+.mastery-challenge-locked-modal-footer {
+  border-top: 1px solid #e6e9ef;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 14px 24px 16px;
+}
+
+.mastery-challenge-locked-modal-footer > button {
+  border-radius: 5px;
+  flex: 1;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  max-width: 240px;
+  min-height: 52px;
+  padding: 10px 16px;
+}
+
+.mastery-challenge-locked-modal-cancel-button {
+  background: #fff;
+  border: 2px solid #727d90;
+  color: #2f3d4d;
+}
+
+.mastery-challenge-locked-modal-view-button {
+  background: #00645c;
+  border: 2px solid #00645c;
+  color: #fff;
+}
+
+.mastery-challenge-locked-modal-cancel-button:focus-visible,
+.mastery-challenge-locked-modal-view-button:focus-visible {
+  outline: 2px solid #1a3c5e;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .mastery-challenge-locked-modal-header {
+    padding: 20px 16px 10px;
+  }
+
+  .mastery-challenge-locked-modal-title {
+    font-size: 26px;
+  }
+
+  .mastery-challenge-locked-modal-body {
+    font-size: 14px;
+    padding: 0 16px 18px;
+  }
+
+  .mastery-challenge-locked-modal-footer {
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 16px;
+  }
+
+  .mastery-challenge-locked-modal-footer > button {
+    font-size: 14px;
+    max-width: none;
+    min-height: 48px;
+    width: 100%;
+  }
+}
