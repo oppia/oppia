@@ -19,7 +19,7 @@
  */
 
 import {Browser} from '@playwright/test';
-import testConstants from './test-constants';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
@@ -35,6 +35,7 @@ import {
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 
@@ -88,7 +89,10 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin & BlogAdmin) | null = null;
+// The blog admin role is only given to the super admin when a spec needs a
+// blog post editor, so that other specs don't pay for the extra setup.
+let superAdminIsBlogAdmin = false;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -168,6 +172,26 @@ export class UserFactory {
       }
 
       switch (role) {
+        case ROLES.BLOG_POST_EDITOR:
+          // The blog post editor role cannot be assigned from the admin
+          // page, so it is assigned from the blog admin page instead.
+          if (!superAdminIsBlogAdmin) {
+            await superAdminInstance.assignRoleToUser(
+              superAdminInstance.username,
+              ROLES.BLOG_ADMIN
+            );
+            await superAdminInstance.expectUserToHaveRole(
+              superAdminInstance.username,
+              ROLES.BLOG_ADMIN
+            );
+            superAdminIsBlogAdmin = true;
+          }
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
         case ROLES.TOPIC_MANAGER:
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');
@@ -279,7 +303,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -293,6 +317,7 @@ export class UserFactory {
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
+      BlogAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');
