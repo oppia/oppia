@@ -11,7 +11,7 @@
               [attr.aria-label]="'Translation language selector'"
               (change)="changeTranslationLanguage()"
               [(ngModel)]="languageCode">
-        <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
+        <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id">
           {{ language.description }}
         </option>
       </select>
