@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
-import './feedback-empty-state.component.css';
 
 @Component({
   selector: 'oppia-feedback-empty-state',

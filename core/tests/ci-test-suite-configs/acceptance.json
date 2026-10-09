@@ -1,6 +1,21 @@
 {
   "suites": [
     {
+      "name": "tech-team-lead/manages-lesson-and-site-reports",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/tech-team-lead/manages-lesson-and-site-reports.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "lesson-creator/view-and-answer-feedback-and-reports-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-and-answer-feedback-and-reports-of-the-lesson.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/give-lesson-feedback-and-engage-with-lesson-creators.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/submit-anonymous-feedback-or-a-report-a-lesson-issue.spec.ts",
       "framework": "puppeteer"
@@ -187,8 +202,8 @@
     },
     {
       "name": "logged-in-user/edit-avatar-and-view-exploration-from-profile-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-avatar-and-view-exploration-from-profile-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/edit-avatar-and-view-exploration-from-profile-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/manage-classroom-progress-in-learner-dashboard",
@@ -296,8 +311,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-out-user/view-and-search-blog-posts",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-and-search-blog-posts.spec.ts",
+      "name": "logged-out-user/view-blog-posts",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-blog-posts.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -386,8 +401,8 @@
       "framework": "playwright"
     },
     {
-      "name": "logged-out-learner/search-for-a-specific-exploration",
-      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
+      "name": "logged-out-learner/browse-and-verify-lessons-in-the-community-library",
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/browse-and-verify-lessons-in-the-community-library.spec.ts",
       "framework": "playwright"
     },
     {
@@ -523,6 +538,11 @@
     {
       "name": "translation-submitter/translate-exploration-in-target-language",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-submitter/auto-translate-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/auto-translate-feature.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -736,6 +756,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "contributor-dashboard-admin/manage-auto-translation-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "collection-creator/create-a-collection",
       "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts",
       "framework": "puppeteer"
@@ -743,6 +768,11 @@
     {
       "name": "logged-in-learner/view-a-collection",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "logged-in-learner/check-out-the-topic-and-see-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/check-out-the-topic-and-see-what-to-do-next.spec.ts",
       "framework": "puppeteer"
     }
   ]

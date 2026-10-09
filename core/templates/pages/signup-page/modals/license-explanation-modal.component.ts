@@ -20,7 +20,6 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './license-explanation-modal.component.css';
 
 @Component({
   selector: 'oppia-license-explanation-modal',

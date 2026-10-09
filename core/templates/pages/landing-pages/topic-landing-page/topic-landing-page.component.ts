@@ -28,7 +28,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PageTitleService} from 'services/page-title.service';
-import './topic-landing-page.component.css';
 
 type TopicLandingPageDataKey =
   keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA;

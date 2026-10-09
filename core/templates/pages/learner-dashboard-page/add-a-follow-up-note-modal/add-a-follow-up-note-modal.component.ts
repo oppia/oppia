@@ -24,7 +24,6 @@ import {AlertsService} from 'services/alerts.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {LessonFeedbackDetailResponse} from 'domain/feedback/feedback.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './add-a-follow-up-note-modal.component.css';
 
 @Component({
   selector: 'oppia-add-a-follow-up-note-modal',

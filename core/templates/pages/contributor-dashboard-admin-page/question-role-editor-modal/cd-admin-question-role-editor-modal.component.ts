@@ -18,7 +18,6 @@
 
 import {Component, OnInit, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './cd-admin-question-role-editor-modal.component.css';
 
 export interface QuestionRights {
   isQuestionSubmitter: boolean;
