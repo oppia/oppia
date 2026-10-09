@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/jobs/transforms/validation/base_validation.py',
     'core/storage/base_model/gae_models_test.py',
     'core/domain/question_fetchers_test.py',
-    'core/controllers/reader_test.py',
-    'core/domain/event_services_test.py',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
