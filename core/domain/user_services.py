@@ -65,7 +65,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(auth_models, user_models, audit_models, suggestion_models) = (
+auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
         [
             models.Names.AUTH,
@@ -2669,6 +2669,51 @@ def remove_translation_review_rights_in_language(
     user_contribution_rights.can_review_translation_for_language_codes = [
         lang_code
         for lang_code in user_contribution_rights.can_review_translation_for_language_codes
+        if lang_code != language_code_to_remove
+    ]
+    _update_user_contribution_rights(user_contribution_rights)
+
+
+def allow_user_to_submit_translation_in_language(
+    user_id: str, language_code: str
+) -> None:
+    """Allows the user with the given user id to submit translation in the given
+    language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language. Callers should ensure that
+            the user does not have rights to submit translations in the given
+            language code.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    allowed_language_codes = set(
+        user_contribution_rights.can_submit_translation_for_language_codes
+    )
+    if language_code is not None:
+        allowed_language_codes.add(language_code)
+    user_contribution_rights.can_submit_translation_for_language_codes = sorted(
+        list(allowed_language_codes)
+    )
+    _save_user_contribution_rights(user_contribution_rights)
+
+
+def remove_translation_submit_rights_in_language(
+    user_id: str, language_code_to_remove: str
+) -> None:
+    """Removes the user's submit rights to translation suggestions in the given
+    language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code_to_remove: str. The code of the language. Callers should
+            ensure that the user already has rights to submit translations in
+            the given language code.
+    """
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_submit_translation_for_language_codes = [
+        lang_code
+        for lang_code in user_contribution_rights.can_submit_translation_for_language_codes
         if lang_code != language_code_to_remove
     ]
     _update_user_contribution_rights(user_contribution_rights)
