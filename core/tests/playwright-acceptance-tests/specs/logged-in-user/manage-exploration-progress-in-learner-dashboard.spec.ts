@@ -53,7 +53,6 @@ test.describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
-    await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     const explorationTitles = [
       'Exploration 1',
@@ -69,14 +68,12 @@ test.describe('Logged-in User', function () {
         index === 0
       );
     }
-    await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com',
       browser
     );
-    await UserFactory.closeSuperAdminBrowser();
   });
 
   /**
