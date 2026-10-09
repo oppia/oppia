@@ -181,7 +181,7 @@ class DraftUpgradeUtil:
                     # SubtitledHtmlDict] type, and this is done because here
                     # we are accessing 'choices' keys over customization_args
                     # and every customization arg that has a 'choices' key will
-                    # contain values of type List[SubtitledHtmlDict].
+                    # contain values of type List[Union[SubtitledHtmlDict, str]].
                     subtitled_html_new_value_dicts = cast(
                         List[Union[state_domain.SubtitledHtmlDict, str]],
                         new_value['choices']['value'],
