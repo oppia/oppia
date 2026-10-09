@@ -19,7 +19,7 @@
 
 import {Component, Input, ViewChild} from '@angular/core';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
@@ -39,7 +39,6 @@ import {AppConstants} from 'app.constants';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import './ratings-and-recommendations.component.css';
 
 interface ResultActionButton {
   type: string;
@@ -71,7 +70,7 @@ export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
-  @Input() collectionSummary!: CollectionSummary;
+  @Input() collectionSummary!: CollectionSummaryBackendDict | string | null;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
 
   // TODO(#22780): Remove these variable and related code.

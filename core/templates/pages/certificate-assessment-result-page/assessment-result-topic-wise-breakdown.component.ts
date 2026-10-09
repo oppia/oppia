@@ -19,7 +19,6 @@
 
 import {Component, Input} from '@angular/core';
 import {AssessmentResultTopicWiseBreakdown} from 'domain/certificate-assessment/certificate-assessment.model';
-import './assessment-result-topic-wise-breakdown.component.css';
 
 @Component({
   selector: 'oppia-assessment-result-topic-wise-breakdown',

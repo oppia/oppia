@@ -23,6 +23,10 @@ import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {AppConstants} from 'app.constants';
+import {
+  TranslationAdminConfig,
+  TranslationAdminConfigBackendDict,
+} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
@@ -245,5 +249,43 @@ export class ContributorDashboardAdminBackendApiService {
         );
       }
     }
+  }
+
+  async fetchTranslationConfigurationAsync(): Promise<TranslationAdminConfig> {
+    return this.http
+      .get<TranslationAdminConfigBackendDict>('/translation-provider-mapping')
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
+  }
+
+  async updateTranslationConfigurationAsync(
+    mapping: Record<string, string>,
+    isEnabled: boolean
+  ): Promise<TranslationAdminConfig> {
+    const payload = {
+      provider_mapping: mapping,
+      automatic_translation_is_enabled: isEnabled,
+    };
+    return this.http
+      .put<TranslationAdminConfigBackendDict>(
+        '/translation-provider-mapping',
+        payload
+      )
+      .toPromise()
+      .then(
+        response => {
+          return TranslationAdminConfig.createFromBackendDict(response);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }

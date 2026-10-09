@@ -20,7 +20,6 @@ import {Component, Input, OnInit} from '@angular/core';
 
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './roles-and-actions-visualizer.component.css';
 
 @Component({
   selector: 'oppia-roles-and-actions-visualizer',

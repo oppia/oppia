@@ -16,7 +16,7 @@
  * @fileoverview Component for classroom navigation links.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {
   ClassroomBackendApiService,
@@ -27,14 +27,13 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './classroom-navigation-links.component.css';
-
 @Component({
   selector: 'oppia-classroom-navigation-links',
   templateUrl: './classroom-navigation-links.component.html',
   styleUrls: ['./classroom-navigation-links.component.css'],
 })
 export class ClassroomNavigationLinksComponent implements OnInit {
+  @Output() classroomCountChange = new EventEmitter<number>();
   classroomSummaries: ClassroomSummaryDict[] = [];
   isLoading: boolean = true;
   currentUrl!: string;
@@ -89,6 +88,7 @@ export class ClassroomNavigationLinksComponent implements OnInit {
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach(classroom => this.classroomSummaries.push(classroom));
           this.isLoading = false;
+          this.classroomCountChange.emit(this.getClassroomCount());
         });
     }
   }

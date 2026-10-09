@@ -22,7 +22,6 @@ import {Subscription} from 'rxjs';
 
 import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
-import './collection-local-nav.component.css';
 
 @Component({
   selector: 'collection-local-nav',

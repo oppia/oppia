@@ -26,7 +26,11 @@ import {
 } from '@angular/core';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {PageContextService} from 'services/page-context.service';
-import './outcome-feedback-editor.component.css';
+
+interface HtmlSchema {
+  type: 'html';
+  ui_config: object;
+}
 
 @Component({
   selector: 'oppia-outcome-feedback-editor',
@@ -39,7 +43,7 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() outcome!: Outcome;
   @Output() outcomeChange: EventEmitter<Outcome> = new EventEmitter();
-  OUTCOME_FEEDBACK_SCHEMA!: object;
+  OUTCOME_FEEDBACK_SCHEMA!: HtmlSchema;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
     private pageContextService: PageContextService

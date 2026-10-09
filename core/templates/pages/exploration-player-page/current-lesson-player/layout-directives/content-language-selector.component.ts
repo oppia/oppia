@@ -91,6 +91,13 @@ export class ContentLanguageSelectorComponent implements OnInit {
         );
         this.selectedLanguageCode =
           this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+        // The initial content language is resolved here instead of being
+        // picked by the learner, so the transcript is still in the
+        // exploration's own language and its translations have to be
+        // requested explicitly.
+        this.contentTranslationManagerService.displayTranslations(
+          this.selectedLanguageCode
+        );
         break;
       }
     }
