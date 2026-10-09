@@ -80,9 +80,11 @@
       </oppia-state-solution-editor>
     </div>
     <div *ngIf="explorationIsLinkedToStory">
-      <state-skill-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
-                          (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
+      <state-skill-editor (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
       </state-skill-editor>
     </div>
+  </div>
+  <div class="oppia-tour-empty-state-placeholder" *ngIf="!interactionIdIsSet || currentStateIsTerminal" tabindex="0">
+    Once you add an interaction, learner response options will appear here.
   </div>
 </div>

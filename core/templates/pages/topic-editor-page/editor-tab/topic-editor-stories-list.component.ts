@@ -30,7 +30,6 @@ import {DeleteStoryModalComponent} from '../modal-templates/delete-story-modal.c
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './topic-editor-stories-list.component.css';
 
 @Component({
   selector: 'oppia-topic-editor-stories-list',

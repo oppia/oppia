@@ -360,7 +360,7 @@ describe('Progress Tab Component', () => {
 
     component.ngOnInit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
     expect(component.noCommunityLessonActivity).toEqual(true);
     expect(component.totalIncompleteLessonsList).toEqual([]);
     expect(component.totalCompletedLessonsList).toEqual([]);
@@ -374,11 +374,11 @@ describe('Progress Tab Component', () => {
 
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
 
     mockResizeEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
   });
 
   it('should sanitize given png base64 data and generate url', () => {
@@ -681,6 +681,204 @@ describe('Progress Tab Component', () => {
     expect(result).toEqual('collection');
   });
 
+  it('should get the ratings for a summary tile based on its type', () => {
+    const exploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 1,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 5,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    const collection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0,
+    };
+    const explorationSummary =
+      LearnerExplorationSummary.createFromBackendDict(exploration);
+    const collectionSummary =
+      CollectionSummary.createFromBackendDict(collection);
+
+    expect(component.getRatingsForSummaryTile(explorationSummary)).toEqual({
+      1: 1,
+      2: 2,
+      3: 3,
+      4: 4,
+      5: 5,
+    });
+    expect(component.getRatingsForSummaryTile(collectionSummary)).toBeNull();
+  });
+
+  it('should get the number of views for a summary tile based on its type', () => {
+    const exploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 7,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    const collection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0,
+    };
+    const explorationSummary =
+      LearnerExplorationSummary.createFromBackendDict(exploration);
+    const collectionSummary =
+      CollectionSummary.createFromBackendDict(collection);
+
+    expect(component.getNumViewsForSummaryTile(explorationSummary)).toBe(7);
+    expect(component.getNumViewsForSummaryTile(collectionSummary)).toBe(0);
+  });
+
+  it('should get the node count for a summary tile based on its type', () => {
+    const exploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    const collection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 13,
+    };
+    const explorationSummary =
+      LearnerExplorationSummary.createFromBackendDict(exploration);
+    const collectionSummary =
+      CollectionSummary.createFromBackendDict(collection);
+
+    expect(component.getNodeCountForSummaryTile(collectionSummary)).toBe('13');
+    expect(component.getNodeCountForSummaryTile(explorationSummary)).toBe('0');
+  });
+
+  it('should toggle the summary tile based on object identity', () => {
+    const explorationA = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: 'tile-A',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    const explorationB = {
+      ...explorationA,
+      id: 'tile-B',
+    };
+    const tileA = LearnerExplorationSummary.createFromBackendDict(explorationA);
+    const tileAWithSameId =
+      LearnerExplorationSummary.createFromBackendDict(explorationA);
+    const tileB = LearnerExplorationSummary.createFromBackendDict(explorationB);
+
+    expect(component.getSummaryTileToggleState(tileA)).toBe(false);
+
+    component.toggleSummaryTile(tileA);
+    expect(component.getSummaryTileToggleState(tileA)).toBe(true);
+    expect(component.getSummaryTileToggleState(tileB)).toBe(false);
+
+    component.toggleSummaryTile(tileA);
+    expect(component.getSummaryTileToggleState(tileA)).toBe(false);
+
+    component.toggleSummaryTile(tileA);
+    expect(component.getSummaryTileToggleState(tileA)).toBe(true);
+    expect(component.getSummaryTileToggleState(tileAWithSameId)).toBe(false);
+  });
+
   it('should change page by one', () => {
     const exp1 = {
       last_updated_msec: 1591296737470.528,
@@ -800,12 +998,10 @@ describe('Progress Tab Component', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockRemoveActivityNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockRemoveActivityNgbModalRef,
+      result: Promise.resolve('success'),
+    } as NgbModalRef);
     const exp1 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -850,12 +1046,10 @@ describe('Progress Tab Component', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockRemoveActivityNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockRemoveActivityNgbModalRef,
+      result: Promise.resolve('success'),
+    } as NgbModalRef);
 
     const collection = {
       last_updated_msec: 1591296737470.528,
@@ -894,21 +1088,21 @@ describe('Progress Tab Component', () => {
 
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeTrue();
+    expect(component.isLearnerStateEmpty()).toBe(true);
   });
 
   it('should return false when there are in-progress lessons', () => {
     component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed lessons', () => {
     component.totalCompletedLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed and in-progress lessons', () => {
@@ -916,7 +1110,7 @@ describe('Progress Tab Component', () => {
     component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are in-progress skills', () => {
@@ -924,7 +1118,7 @@ describe('Progress Tab Component', () => {
     component.totalIncompleteLessonsList = [];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed skills', () => {
@@ -933,7 +1127,7 @@ describe('Progress Tab Component', () => {
     component.partiallyLearntTopicsList = [];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it("should correctly set a topic and its subtopics' masteries on ngOnInit", () => {

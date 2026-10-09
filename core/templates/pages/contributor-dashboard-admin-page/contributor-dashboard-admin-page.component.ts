@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,20 +22,19 @@ import {UserService} from 'services/user.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {AppConstants} from 'app.constants';
-import './contributor-dashboard-admin-page.component.css';
 
 interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
 interface AddContributionReviewer {
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -43,7 +42,7 @@ interface RemoveContributionReviewer {
   method: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -93,14 +92,15 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   statusMessage: string = '';
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
+  isAutoTranslationEnabled: boolean = false;
 
-  USER_FILTER_CRITERION_ROLE: string;
-  USER_FILTER_CRITERION_USERNAME: string;
-  CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
+  USER_FILTER_CRITERION_ROLE: string = '';
+  USER_FILTER_CRITERION_USERNAME: string = '';
+  CD_USER_RIGHTS_CATEGORIES: Record<string, string> = {};
 
   contributionReviewersDataFetched: boolean = false;
   contributionReviewersResult: ContributionReviewersResult = {};
-  translationContributionStatsFetched: boolean;
+  translationContributionStatsFetched: boolean = false;
   translationContributionStatsResults: TranslationContributionStat[] = [];
   languageCodesAndDescriptions: LanguageCodeDescription[] = [];
   formData!: FormData;
@@ -145,6 +145,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           ) {
             return Boolean(this.formData.viewContributionReviewers.username);
           }
+          return false;
         },
       },
       addContributionReviewer: {
@@ -207,6 +208,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   ngOnInit(): void {
     this.isNewUiEnabled =
       this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled;
+    this.isAutoTranslationEnabled =
+      this.platformFeatureService.status.EnableAutomaticTranslationSuggestions.isEnabled;
     this.userService.getUserInfoAsync().then(userInfo => {
       let translationCategories = {};
       let questionCategories = {};
@@ -276,7 +279,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        formResponse.category,
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )
@@ -307,7 +312,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     ) {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
-          formResponse.category,
+          // The isValid() check above guarantees category is non-null.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          formResponse.category!,
           formResponse.languageCode
         )
         .then(usersObject => {
@@ -368,7 +375,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.category,
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )

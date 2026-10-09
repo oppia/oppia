@@ -20,7 +20,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import './blog-post-editor-pre-logo-action.component.css';
 
 @Component({
   selector: 'oppia-blog-post-editor-pre-logo-action',

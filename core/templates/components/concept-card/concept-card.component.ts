@@ -22,8 +22,6 @@ import {ConceptCard} from 'domain/skill/concept-card.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 
-import './concept-card.component.css';
-
 @Component({
   selector: 'oppia-concept-card',
   templateUrl: './concept-card.component.html',

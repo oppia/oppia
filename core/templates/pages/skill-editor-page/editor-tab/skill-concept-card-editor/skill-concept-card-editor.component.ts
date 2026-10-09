@@ -28,7 +28,6 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {SkillPreviewModalComponent} from '../skill-preview-modal.component';
 import {Skill} from 'domain/skill/skill.model.ts';
-import './skill-concept-card-editor.component.css';
 
 interface BindableFieldDict {
   displayedConceptCardExplanation: string;
