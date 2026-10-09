@@ -60,8 +60,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/html_validation_service.py',
     'core/domain/story_domain.py',
     'core/domain/draft_upgrade_services.py',
-    'core/domain/email_services.py',
-    'core/domain/user_services.py',
     'core/domain/topic_services.py',
     'core/domain/suggestion_services.py',
     'core/domain/suggestion_registry.py',
@@ -70,10 +68,7 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/question_services.py',
     'core/jobs/transforms/validation/base_validation.py',
     'core/storage/base_model/gae_models_test.py',
-    'core/domain/user_services_test.py',
-    'core/domain/takeout_service_test.py',
     'core/domain/question_fetchers_test.py',
-    'core/domain/event_services_test.py',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
