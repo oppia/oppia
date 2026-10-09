@@ -27,7 +27,6 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {PageContextService} from 'services/page-context.service';
 import {ContinueRulesService} from './continue-rules.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import './continue-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-continue',

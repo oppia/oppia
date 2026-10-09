@@ -29,7 +29,6 @@ import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-pa
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import './questions-opportunities-select-difficulty-modal.component.css';
 
 @Component({
   selector: 'oppia-questions-opportunities-select-difficulty-modal',

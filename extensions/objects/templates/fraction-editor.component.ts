@@ -24,7 +24,7 @@ import {FractionAnswer} from 'interactions/answer-defs';
 @Component({
   selector: 'fraction-editor',
   templateUrl: './fraction-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./fraction-editor.component.css'],
 })
 export class FractionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

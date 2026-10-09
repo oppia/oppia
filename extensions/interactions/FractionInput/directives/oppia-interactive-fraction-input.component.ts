@@ -29,7 +29,6 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {FractionInputRulesService} from './fraction-input-rules.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
-import './fraction-input-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-fraction-input',

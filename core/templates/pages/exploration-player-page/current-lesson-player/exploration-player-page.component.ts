@@ -31,7 +31,10 @@ import {UrlService} from 'services/contextual/url.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import './exploration-player-page.component.css';
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 
 require('interactions/interactionsRequires.ts');
 
@@ -57,10 +60,12 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private entityVoiceoversService: EntityVoiceoversService,
     private urlService: UrlService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {}
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.GUPPY);
     let explorationId = this.pageContextService.getExplorationId();
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(explorationId, null)

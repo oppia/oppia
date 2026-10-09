@@ -27,7 +27,6 @@ import {StatsReportingService} from 'pages/exploration-player-page/services/stat
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
-import './hint-solution-and-concept-card-display.component.css';
 import {ConceptCardManagerService} from 'pages/exploration-player-page/services/concept-card-manager.service';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 

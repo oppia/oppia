@@ -25,7 +25,6 @@ import {
   HtmlLengthService,
 } from 'services/html-length.service';
 import {AppConstants} from 'app.constants';
-import './study-guide-section-editor.component.css';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
