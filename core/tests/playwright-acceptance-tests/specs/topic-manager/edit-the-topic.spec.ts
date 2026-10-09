@@ -78,7 +78,8 @@ test.describe('Topic Manager', () => {
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
-      'Addition'
+      'Addition',
+      true
     );
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
