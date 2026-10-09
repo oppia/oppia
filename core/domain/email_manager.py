@@ -711,12 +711,20 @@ def _send_email(
             )
 
             payload = {
+                'recipient_id': recipient_id,
+    
+                'recipient_email': recipient_email_address,
+                'sender_id': sender_id,
                 'sender_email': sender_name_email,
-                'recipient_id': recipient_email_address,
+                'intent': intent,
                 'subject': email_subject,
                 'html_body': cleaned_html_body,
                 'text_body': cleaned_plaintext_body,
+                'cc_emails': cc_emails,
+                'bcc_admin': bcc_admin,
+                'attachments': _encode_attachments_for_retry(attachments),
             }
+
 
             taskqueue_services.enqueue_task(
                 feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
