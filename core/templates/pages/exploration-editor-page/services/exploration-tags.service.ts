@@ -41,8 +41,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
    *(white spaces removed and '+' replaced with ' ')
    *@return {string} -normalized array
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _normalize(value: string[]) {
+  _normalize(value: string[]): string[] {
     for (let i = 0; i < value.length; i++) {
       value[i] = value[i].trim().replace(/\s+/g, ' ');
     }
@@ -54,8 +53,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
    *@param {string[]} value -tag array to be matched with TAG_REGEX
    *@return {boolean} -whether or not all tags match TAG_REGEX
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value: string[]) {
+  _isValid(value: string[]): boolean {
     // Every tag should match the TAG_REGEX.
     for (let i = 0; i < value.length; i++) {
       let tagRegex = new RegExp(AppConstants.TAG_REGEX);
