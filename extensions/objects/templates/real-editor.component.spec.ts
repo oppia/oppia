@@ -145,4 +145,21 @@ describe('RealEditorComponent', () => {
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith(0.0);
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
+
+  it('should not update value when the input is not a number or string', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
+    spyOn(component.valueChanged, 'emit');
+    component.value = 3;
+
+    component.updateValue(['invalid']);
+
+    expect(component.value).toBe(3);
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
+    expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
 });

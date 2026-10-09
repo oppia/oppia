@@ -585,7 +585,7 @@ CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
     '{service_account_id}@{app_id}.iam.gserviceaccount.com'
 )
 
-OPPIA_VERSION = '3.5.2'
+OPPIA_VERSION = '3.5.3'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -982,9 +982,6 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_UPDATES_DATA_URL = '/feedbackupdateshandler/data'
-FEEDBACK_UPDATES_URL = '/feedbackupdates'
-FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
@@ -1055,6 +1052,7 @@ REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
+OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'
 TRANSLATABLE_CONTENTS_V2_URL = '/gettranslatablecontentshandlerv2'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
