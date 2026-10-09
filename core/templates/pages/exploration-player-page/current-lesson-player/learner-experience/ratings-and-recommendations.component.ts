@@ -19,7 +19,7 @@
 
 import {Component, Input, ViewChild} from '@angular/core';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
@@ -70,7 +70,7 @@ export class RatingsAndRecommendationsComponent {
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
-  @Input() collectionSummary!: CollectionSummary;
+  @Input() collectionSummary!: CollectionSummaryBackendDict | string | null;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
 
   // TODO(#22780): Remove these variable and related code.
