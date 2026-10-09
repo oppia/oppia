@@ -575,10 +575,8 @@ class _Validators:
         """
         return obj <= max_value
 
-    # Here we use object because this validator intentionally handles
-    # runtime values that may not be strings.
     @staticmethod
-    def does_not_contain_email(obj: object) -> bool:
+    def does_not_contain_email(obj: str) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
@@ -587,9 +585,7 @@ class _Validators:
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        if isinstance(obj, str):
-            return not bool(re.search(EMAIL_REGEX, obj))
-        return True
+        return not bool(re.search(EMAIL_REGEX, obj))
 
     @staticmethod
     def is_valid_user_id(obj: str) -> bool:
