@@ -27,7 +27,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -37,7 +36,6 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-in Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let releaseCoordinator: ReleaseCoordinator;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(6000000); // Setup taking longer than default timeout.
@@ -47,18 +45,6 @@ test.describe('Logged-in Learner', function () {
       browser,
       [ROLES.CURRICULUM_ADMIN]
     );
-
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      browser,
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-    await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
