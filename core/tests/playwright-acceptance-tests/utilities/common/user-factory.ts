@@ -176,6 +176,9 @@ export class UserFactory {
           // The blog post editor role cannot be assigned from the admin
           // page, so it is assigned from the blog admin page instead.
           if (!superAdminIsBlogAdmin) {
+            if (!superAdminInstance.username) {
+              throw new Error('Super admin username is null.');
+            }
             await superAdminInstance.assignRoleToUser(
               superAdminInstance.username,
               ROLES.BLOG_ADMIN
