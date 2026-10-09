@@ -867,7 +867,7 @@ export class BaseUser {
       await this.page.waitForSelector(`${selector}.cke_focus`);
       await this.page.keyboard.down('ControlLeft');
       await this.page.keyboard.press('A');
-      await this.page.keyboard.up('ControlLeft');
+      await this.page.keyboard.up('Control');
       await this.page.keyboard.press('Backspace');
     }
   }
