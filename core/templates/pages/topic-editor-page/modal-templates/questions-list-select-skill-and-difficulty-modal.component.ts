@@ -59,6 +59,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
   MODE_SELECT_DIFFICULTY!: string;
   MODE_SELECT_SKILL!: string;
   skillsToShow: SkillSummaryBackendDict[] = [];
+  skillFilterText: string = '';
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

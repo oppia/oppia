@@ -71,4 +71,14 @@ describe('DragAndDropPositiveIntEditorComponent', () => {
     expect(component.value).toBe(2);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(2);
   });
+
+  it('should update value from the select change event', () => {
+    spyOn(component.valueChanged, 'emit');
+    component.value = 1;
+
+    component.onSelectionChange({target: {value: '3'}} as Event);
+
+    expect(component.value).toBe(3);
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(3);
+  });
 });

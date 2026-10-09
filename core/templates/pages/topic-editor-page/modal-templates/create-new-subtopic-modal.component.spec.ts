@@ -259,6 +259,22 @@ describe('create new subtopic modal', function () {
     expect(component.sectionContentHtml).toBe('section content');
   });
 
+  it('should reset htmlData to empty string for a non-string value', () => {
+    component.htmlData = 'old data';
+
+    component.localValueChange(null);
+
+    expect(component.htmlData).toBe('');
+  });
+
+  it('should reset section content to empty string for a non-string value', () => {
+    component.sectionContentHtml = 'old content';
+
+    component.localContentValueChange(null);
+
+    expect(component.sectionContentHtml).toBe('');
+  });
+
   it(
     'should show Schema editor when user clicks' +
       'on "Give a description or explanation of the subtopic." button',

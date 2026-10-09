@@ -13,9 +13,7 @@
            class="note-choice"
            [ngClass]="getNoteClass(noteType)"
            cdkDrag
-           [cdkDragData]="{ noteType: noteType, isPalette: true }"
-           (cdkDragStarted)="onDragStart()"
-           (cdkDragEnded)="onDragEnd()">
+           [cdkDragData]="{ noteType: noteType, isPalette: true }">
       </div>
     </div>
     <div class="oppia-music-input-staff"

@@ -28,9 +28,12 @@ import {NumericInputCustomizationArgs} from 'interactions/customization-args-def
 import {NumericInputRulesService} from './numeric-input-rules.service';
 import {NumericInputValidationService} from './numeric-input-validation.service';
 import type {NumericInputAnswer} from 'interactions/answer-defs';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface NumericInputFormSchema {
-  type: string;
+  // The object literal in ngOnInit assigns 'float', so the type is fixed to
+  // the literal to keep the schema assignable to the Schema type.
+  type: 'float';
   ui_config: {};
 }
 
@@ -101,7 +104,12 @@ export class InteractiveNumericInput implements OnInit {
     };
   }
 
-  onAnswerChange(answer: number | string): void {
+  onAnswerChange(answer: SchemaDefaultValue): void {
+    // The schema editor may emit non-string/non-number values (e.g. null) in
+    // some edge cases; only numbers and strings are valid numeric answers.
+    if (typeof answer !== 'number' && typeof answer !== 'string') {
+      return;
+    }
     if (this.answer === answer) {
       return;
     }

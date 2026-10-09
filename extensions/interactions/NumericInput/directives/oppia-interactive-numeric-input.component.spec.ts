@@ -218,6 +218,18 @@ describe('InteractiveNumericInput', () => {
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 
+  it('should ignore a non-number/non-string update from the schema editor', () => {
+    component.answer = 20;
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
+
+    component.onAnswerChange(null);
+
+    expect(component.answer).toBe(20);
+    expect(
+      currentInteractionService.updateAnswerIsValid
+    ).not.toHaveBeenCalled();
+  });
+
   it('should set an error when user submits with no response', () => {
     spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
       true

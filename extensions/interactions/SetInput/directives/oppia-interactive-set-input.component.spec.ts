@@ -113,6 +113,25 @@ describe('InteractiveSetInputComponent', () => {
     expect(component.errorMessage).toBe('');
   });
 
+  it('should ignore a non-array update from the schema editor', () => {
+    component.answer = ['unique1'];
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+
+    component.updateAnswer(null);
+
+    expect(component.answer).toEqual(['unique1']);
+    expect(component.errorMessage).toBe(
+      'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR'
+    );
+  });
+
+  it('should keep only string elements from the schema editor update', () => {
+    component.updateAnswer(['unique1', 2, 'unique2']);
+
+    expect(component.answer).toEqual(['unique1', 'unique2']);
+    expect(component.errorMessage).toBe('');
+  });
+
   it('should initialise component when user adds interaction', () => {
     spyOn(
       currentInteractionService,
