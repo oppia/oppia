@@ -1288,9 +1288,9 @@ export class ExplorationEditor extends BaseUser {
     feedbackSubject: string
   ): Promise<void> {
     await this.expectElementToBeVisible(feedbackSubjectSelector);
-    const feedbackSubjectElements = await this.page.$$(feedbackSubjectSelector);
-    const feedbackSubjects = await Promise.all(
-      feedbackSubjectElements.map(element => this.getTextContent(element))
+    const feedbackSubjects = await this.page.$$eval(
+      feedbackSubjectSelector,
+      subjects => subjects.map(subject => subject.textContent)
     );
 
     if (!feedbackSubjects.includes(feedbackSubject)) {
