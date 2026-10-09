@@ -27,8 +27,6 @@ import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group
 import {FacilitatorDashboardBackendApiService} from 'domain/learner_group/facilitator-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-import './facilitator-dashboard-page.component.css';
-
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
   templateUrl: './facilitator-dashboard-page.component.html',
