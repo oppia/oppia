@@ -40,6 +40,7 @@ describe('Exploration opportunity summary model', () => {
         translation_in_review_counts: {
           hi: 20,
         },
+        translation_missing_reasons: {},
         language_code: 'hi',
         is_pinned: false,
         reviewer_only_content_count: 5,
@@ -114,6 +115,7 @@ describe('Exploration opportunity summary model', () => {
           content_count: 0,
           translation_counts: {},
           translation_in_review_counts: {},
+          translation_missing_reasons: {},
           language_code: 'en',
           is_pinned: false,
           reviewer_only_content_count: 0,
@@ -156,6 +158,9 @@ describe('Exploration opportunity summary model', () => {
         translation_in_review_counts: {
           hi: 20,
         },
+        translation_missing_reasons: {
+          hi: ['new'],
+        },
       };
 
       const summary =
@@ -170,6 +175,7 @@ describe('Exploration opportunity summary model', () => {
       expect(summary.getTranslationsCount('hi')).toEqual(15);
       expect(summary.getTranslationsInReviewCount('hi')).toEqual(20);
       expect(summary.getTranslationProgressPercentage('hi')).toEqual(15);
+      expect(summary.translationMissingReasons).toEqual({hi: ['new']});
     });
 
     it('should map optional V2 fields correctly if provided', () => {
@@ -189,6 +195,7 @@ describe('Exploration opportunity summary model', () => {
         translation_in_review_counts: {
           hi: 20,
         },
+        translation_missing_reasons: {},
         story_title: 'Story',
         language_code: 'hi',
         reviewer_only_content_count: 5,

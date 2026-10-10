@@ -105,6 +105,7 @@ export interface TranslationOpportunity {
   translationsCount: number;
   reviewerOnlyContentCount: number;
   entityType: string;
+  translationMissingReasons?: string[];
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -140,6 +141,7 @@ export class TranslationModalComponent {
   activeWrittenTranslation: string | string[] = '';
   mathWarningIsMinimized: boolean = false;
   activeContentType!: string;
+  activeTranslationStatus?: string;
   activeRuleDescription!: string;
   // eslint-disable-next-line @typescript-eslint/ban-types
   originalOpenCustomizationModal!: Function;
@@ -532,6 +534,7 @@ export class TranslationModalComponent {
       more: this.moreAvailable,
       status: this.activeStatus,
       translation: this.activeWrittenTranslation,
+      translationStatus: this.activeTranslationStatus,
     } = translatableItem);
     this.activeDataFormat = translatableItem.dataFormat || '';
     const {contentType, ruleType, interactionId} = translatableItem;

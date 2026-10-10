@@ -22,6 +22,10 @@ export interface TranslationCountsDict {
   [languageCode: string]: number;
 }
 
+export interface TranslationMissingReasonsDict {
+  [languageCode: string]: string[];
+}
+
 export interface ExplorationOpportunitySummaryBackendDict {
   id: string;
   topic_name: string;
@@ -29,6 +33,7 @@ export interface ExplorationOpportunitySummaryBackendDict {
   chapter_title: string;
   content_count: number;
   translation_counts: TranslationCountsDict;
+  translation_missing_reasons: TranslationMissingReasonsDict;
   translation_in_review_counts: TranslationCountsDict;
   language_code: string;
   is_pinned: boolean;
@@ -41,6 +46,7 @@ export interface TranslationOpportunityCardInfoBackendDict {
   content_count: number;
   incomplete_translation_language_codes: string[];
   translation_counts: TranslationCountsDict;
+  translation_missing_reasons: TranslationMissingReasonsDict;
   entity_type: string;
   topic_name: string;
   entity_description: string;
@@ -59,6 +65,7 @@ export class ExplorationOpportunitySummary {
   chapterTitle: string;
   contentCount: number;
   translationCounts: TranslationCountsDict;
+  translationMissingReasons: TranslationMissingReasonsDict;
   translationInReviewCount: TranslationCountsDict;
   languageCode: string;
   isPinned: boolean;
@@ -72,6 +79,7 @@ export class ExplorationOpportunitySummary {
     chapterTitle: string,
     contentCount: number,
     translationCounts: TranslationCountsDict,
+    translationMissingReasons: TranslationMissingReasonsDict,
     translationInReviewCount: TranslationCountsDict,
     languageCode: string,
     isPinned: boolean,
@@ -84,6 +92,7 @@ export class ExplorationOpportunitySummary {
     this.chapterTitle = chapterTitle;
     this.contentCount = contentCount;
     this.translationCounts = translationCounts;
+    this.translationMissingReasons = translationMissingReasons;
     this.translationInReviewCount = translationInReviewCount;
     this.languageCode = languageCode;
     this.isPinned = isPinned;
@@ -101,6 +110,7 @@ export class ExplorationOpportunitySummary {
       backendDict.chapter_title,
       backendDict.content_count,
       backendDict.translation_counts,
+      backendDict.translation_missing_reasons,
       backendDict.translation_in_review_counts,
       backendDict.language_code,
       backendDict.is_pinned,
@@ -118,6 +128,7 @@ export class ExplorationOpportunitySummary {
       backendDict.entity_description,
       backendDict.content_count,
       backendDict.translation_counts,
+      backendDict.translation_missing_reasons,
       backendDict.translation_in_review_counts,
       backendDict.language_code || AppConstants.DEFAULT_LANGUAGE_CODE,
       backendDict.is_pinned,
