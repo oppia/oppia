@@ -98,7 +98,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=10),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=10),
         )
         self.put_multi([abandoned_attempt])
 
@@ -127,7 +128,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=6),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=6),
         )
         self.put_multi([active_attempt])
 
@@ -150,7 +152,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(minutes=5),
         )
         self.put_multi([active_attempt])
 
@@ -173,7 +176,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_submitted',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=30),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=30),
             is_submitted=True,
         )
         self.put_multi([submitted_attempt])
@@ -199,19 +203,22 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=10),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=10),
         )
         active_attempt = _create_attempt_model(
             self,
             'attempt_active',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=5),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(minutes=5),
         )
         submitted_attempt = _create_attempt_model(
             self,
             'attempt_submitted',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=30),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=30),
             is_submitted=True,
         )
         self.put_multi(
@@ -255,7 +262,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsJobTests(
             self,
             'attempt_orphaned',
             'cert_missing',
-            datetime.datetime.utcnow() - datetime.timedelta(days=10),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=10),
         )
         self.put_multi([orphaned_attempt])
 
@@ -305,7 +313,8 @@ class DeleteAbandonedCertificateAssessmentAttemptsAuditJobTests(
             self,
             'attempt_abandoned',
             'cert_1',
-            datetime.datetime.utcnow() - datetime.timedelta(days=10),
+            datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+            - datetime.timedelta(days=10),
         )
         self.put_multi([abandoned_attempt])
 
