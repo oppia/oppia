@@ -42,6 +42,7 @@ describe('FeatureFlagBackendApiService', () => {
         rollout_percentage: 0,
         user_group_ids: [],
         last_updated: null,
+        developer_notes: 'Dummy developer note',
       },
     ],
     server_stage: 'dev',

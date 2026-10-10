@@ -22,7 +22,7 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import List
+from typing import Dict, List, Optional, Tuple, Union
 
 
 class FeatureNames(enum.Enum):
@@ -191,11 +191,22 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
+FeatureFlagSpecTuple = Union[
+    Tuple[str, feature_flag_domain.ServerMode],
+    Tuple[str, feature_flag_domain.ServerMode, Optional[str]],
+]
+
+# A mapping from feature flag name to a tuple specifying the feature flag spec.
+# Each entry is a tuple of (description, feature_stage) or
+# (description, feature_stage, developer_notes).
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
+    str, FeatureFlagSpecTuple
+] = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
         (
             'This is a dummy feature flag for the e2e tests.',
             feature_flag_domain.ServerMode.PROD,
+            'This flag does nothing and is only used for e2e tests.',
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
