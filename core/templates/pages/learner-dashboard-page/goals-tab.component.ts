@@ -19,23 +19,18 @@
 import {AppConstants} from 'app.constants';
 import {
   Component,
-  ElementRef,
   HostListener,
   Input,
   OnInit,
-  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
-import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 
@@ -49,9 +44,7 @@ export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
-    private deviceInfoService: DeviceInfoService,
     private dialog: MatDialog
   ) {}
 
@@ -65,17 +58,12 @@ export class GoalsTabComponent implements OnInit {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
   @Input() learnerDashboardRedesignFeatureFlag!: boolean;
-  // Child dropdown is undefined because initially it is in closed state using
-  // the following property: {'static' = false}.
-  @ViewChild('dropdown', {static: false}) dropdownRef: ElementRef | undefined;
-  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
   showThreeDotsDropdown!: boolean[];
   pawImageUrl: string = '';
   bookImageUrl: string = '';
   starImageUrl: string = '';
-  topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
   topicIdsInEditGoals: string[] = [];
@@ -89,7 +77,6 @@ export class GoalsTabComponent implements OnInit {
   };
 
   indexOfSelectedTopic: number = -1;
-  activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
