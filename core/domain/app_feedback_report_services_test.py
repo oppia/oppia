@@ -49,7 +49,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
-    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(
+        1615519337, datetime.timezone.utc
+    )
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TIMESTAMP_AT_MAX_DAYS = utils.get_current_utc_datetime() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN
@@ -57,7 +59,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     TIMESTAMP_OVER_MAX_DAYS = utils.get_current_utc_datetime() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN + datetime.timedelta(days=2)
     )
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(
+        1616173836, tz=datetime.timezone.utc
+    )
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
     )
@@ -1947,7 +1951,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def _add_current_report(
         self,
         submitted_on: datetime.datetime = datetime.datetime.fromtimestamp(
-            1615519337
+            1615519337, tz=datetime.timezone.utc
         ),
         assign_ticket: bool = True,
     ) -> str:

@@ -812,13 +812,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = datastore_services.DateTimeProperty(
+    question_model_last_updated = datastore_services.AwareDateTimeProperty(
         indexed=True, required=True
     )
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = datastore_services.DateTimeProperty(
+    question_model_created_on = datastore_services.AwareDateTimeProperty(
         indexed=True, required=True
     )
     # The html content for the question.

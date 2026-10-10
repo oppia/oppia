@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -205,11 +205,11 @@ class AutomaticVoiceoverRegenerationRecordHandler(
         end_date: str = self.normalized_request.get('end_date', '')
 
         # Convert start_date and end_date to datetime objects.
-        start_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
-            start_date.replace('Z', '+00:00')
+        start_date_obj: datetime.datetime = utils.normalize_datetime_to_utc(
+            datetime.datetime.fromisoformat(start_date.replace('Z', '+00:00'))
         )
-        end_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
-            end_date.replace('Z', '+00:00')
+        end_date_obj: datetime.datetime = utils.normalize_datetime_to_utc(
+            datetime.datetime.fromisoformat(end_date.replace('Z', '+00:00'))
         )
 
         # Fetch only those records that are related to voiceover regeneration

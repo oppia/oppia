@@ -618,15 +618,19 @@ class Collection:
         collection_dict = json.loads(json_string)
 
         created_on = (
-            utils.convert_string_to_naive_datetime_object(
-                collection_dict['created_on']
+            utils.normalize_datetime_to_utc(
+                utils.convert_string_to_naive_datetime_object(
+                    collection_dict['created_on']
+                )
             )
             if 'created_on' in collection_dict
             else None
         )
         last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                collection_dict['last_updated']
+            utils.normalize_datetime_to_utc(
+                utils.convert_string_to_naive_datetime_object(
+                    collection_dict['last_updated']
+                )
             )
             if 'last_updated' in collection_dict
             else None
