@@ -525,9 +525,10 @@ export class ConversationFlowService {
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
 
-    // If the exploration is embedded, use the url language code
-    // as site language. If the url language code is not supported
-    // as site language, English is used as default.
+    // If the exploration is embedded and a supported language is specified
+    // in the URL, use that language code. Otherwise, retain the language
+    // resolved by the i18n service so user preferences or cached language
+    // are not inadvertently overridden.
     let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map(language => {
       return language.id;
     }) as string[];
@@ -535,8 +536,6 @@ export class ConversationFlowService {
       let urlLanguageCode = this.urlService.getUrlParams().lang;
       if (urlLanguageCode && langCodes.indexOf(urlLanguageCode) !== -1) {
         this.i18nLanguageCodeService.setI18nLanguageCode(urlLanguageCode);
-      } else {
-        this.i18nLanguageCodeService.setI18nLanguageCode('en');
       }
     }
     this.cardAnimationService.adjustPageHeight();
