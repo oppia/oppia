@@ -118,6 +118,9 @@ var generateExplorationsPublishInput = '#label-target-explorations-to-publish';
 var reloadExplorationButton = '.e2e-test-reload-exploration-button';
 var reloadExplorationRow = '.e2e-test-reload-exploration-row';
 var reloadExplorationTitle = '.e2e-test-reload-exploration-title';
+var reloadCollectionButton = '.e2e-test-reload-collection-button';
+var reloadCollectionRow = '.e2e-test-reload-collection-row';
+var reloadCollectionTitle = '.e2e-test-reload-collection-title';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
@@ -805,6 +808,72 @@ const reloadAllInteractionsExploration = async function (browser, page) {
   }
 };
 
+const reloadDemoCollection = async function (browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
+
+    // The reload button is guarded by a native confirm dialog. Without a
+    // dialog handler the page can block indefinitely waiting for it to be
+    // answered, so accept any dialog that appears before clicking.
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+
+    // Locate the reload button for the welcome_to_collections demo collection
+    // so that the collection editor and player pages have real content to
+    // render. The title in each reload row shows the demo collection file
+    // name, matching the data served by reloadDemoCollection.
+    await page.waitForSelector(reloadCollectionRow, {timeout: 60000});
+    const reloadButtons = await page.$$(reloadCollectionButton);
+    let reloadStarted = false;
+    for (let i = 0; i < reloadButtons.length; i++) {
+      const title = await page.evaluate(
+        (el, sel, titleSelector) =>
+          el.closest(sel).querySelector(titleSelector).textContent.trim(),
+        reloadButtons[i],
+        reloadCollectionRow,
+        reloadCollectionTitle
+      );
+      if (title === 'welcome_to_collections.yaml') {
+        await reloadButtons[i].click();
+        reloadStarted = true;
+        break;
+      }
+    }
+    if (!reloadStarted) {
+      throw new Error(
+        'The welcome_to_collections.yaml demo collection reload button was ' +
+          'not found.'
+      );
+    }
+
+    // The admin activities page shows a status message when the reload
+    // finishes. waitForFunction polls the message until it matches and throws
+    // on timeout, which replaces a manual retry loop with the same behavior.
+    await page.waitForFunction(
+      () => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return (
+          statusMessageElement &&
+          statusMessageElement.textContent.trim() ===
+            'Data reloaded successfully.'
+        );
+      },
+      {polling: 1000, timeout: 120000}
+    );
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -994,6 +1063,11 @@ const shard3Setup = async function (browser, page) {
   );
   await logStep('loading all-interactions exploration', () =>
     reloadAllInteractionsExploration(browser, page)
+  );
+  // The demo collection backs the collection editor and collection player
+  // pages.
+  await logStep('reloading demo collection', () =>
+    reloadDemoCollection(browser, page)
   );
   // Bare classrooms populate the /learn (classrooms) listing page.
   await logStep('generating bare classrooms', () =>

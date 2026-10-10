@@ -13,7 +13,10 @@
     "teach",
     "terms",
     "thanks",
-    "volunteer"
+    "volunteer",
+    "error",
+    "error-iframed",
+    "maintenance"
   ],
   "2": [
     "admin",
@@ -27,7 +30,12 @@
     "moderator",
     "preferences",
     "profile",
-    "contributor-admin-dashboard"
+    "contributor-admin-dashboard",
+    "blog-author-profile",
+    "facilitator-dashboard",
+    "technical-feedback-dashboard",
+    "technical-feedback-detail",
+    "learner-group-creator"
   ],
   "3": [
     "classroom-admin",
@@ -39,7 +47,12 @@
     "exploration-player",
     "community-library",
     "pending-account-deletion",
-    "voiceover-admin"
+    "voiceover-admin",
+    "new-lesson-player",
+    "lesson-player-embed",
+    "collection-editor",
+    "collection-player",
+    "certificate-offering-available"
   ],
   "4": [
     "topics-and-skills-dashboard",
@@ -51,6 +64,14 @@
     "learner-dashboard",
     "diagnostic-test-player",
     "practice-session",
-    "subtopic-viewer"
+    "subtopic-viewer",
+    "review-test",
+    "certificate-creator-dashboard",
+    "create-certificate-offering",
+    "edit-certificate-offering",
+    "certificate-assessment-player",
+    "certificate-assessment-result",
+    "learner-group-editor",
+    "learner-group-viewer"
   ]
 }
