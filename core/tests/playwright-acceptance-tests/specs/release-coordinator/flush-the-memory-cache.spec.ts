@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,26 @@
  * RC.MC Flush the memory cache.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-describe('Release Coordinator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'releaseCoordinator@example.com',
+      browser,
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
   });
 
-  it('should be able to flush the memory cache', async function () {
+  test('should be able to flush the memory cache', async function () {
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
     await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.getMemoryCacheProfile();
@@ -53,7 +57,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectTotalKeysStoredToBeInRange(100, undefined); // Max value is 5.
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
