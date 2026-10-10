@@ -30,6 +30,23 @@ const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 
+const partnershipsUrl = testConstants.URLs.Partnerships;
+
+const partnerWithUsButtonAtTheTopOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
+const brochureButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-brochure-button';
+const readMoreStoriesButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-stories-button';
+const partnershipHeadingSelector = '.e2e-test-partnership-heading';
+const partneringWithOppiaImageSelector =
+  '.e2e-test-partnering-with-oppia-image';
+const learnerStoriesCarouselSelector =
+  '.e2e-test-learner-stories-coursal-container';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabPartnershipsButton =
+  'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
+
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
@@ -2926,6 +2943,117 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Navigates to the Partnerships page.
+   */
+  async navigateToPartnershipsPage(): Promise<void> {
+    await this.goto(partnershipsUrl);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Clicks the Partnerships button in the Get Involved menu on the navbar.
+   */
+  async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(
+        navbarGetInvolvedTabPartnershipsButton
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(
+        navbarGetInvolvedTabPartnershipsButton
+      );
+    }
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Checks if the main partnership heading text matches expected heading.
+   */
+  async expectPartnershipHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentToBe(partnershipHeadingSelector, heading);
+  }
+
+  /**
+   * Checks if the partner with us button is visible at the top of the page.
+   */
+  async expectPartnerWithUsButtonIsVisible(): Promise<void> {
+    await this.expectElementToBeVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+  }
+
+  /**
+   * Checks if subheadings in the partnerships page contain the given subheading text.
+   */
+  async expectSubheadingsInPartnershipPageToContain(
+    subheading: string
+  ): Promise<void> {
+    const locator = this.page
+      .locator('.oppia-partnerships-h3')
+      .filter({hasText: subheading});
+    await expect(locator.first()).toBeVisible();
+  }
+
+  /**
+   * Checks if the partnering with oppia image is visible.
+   */
+  async expectPartneringWithUsImageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(partneringWithOppiaImageSelector);
+  }
+
+  /**
+   * Verifies the download brochure button is visible.
+   */
+  async verifyDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    await this.expectElementToBeVisible(brochureButtonInPartnershipsPage);
+  }
+
+  /**
+   * Checks if the YouTube video iframe with given video ID is visible.
+   */
+  async expectYouTubeVideoInPartnershipWithVideoID(
+    videoID: string
+  ): Promise<void> {
+    const iframeLocator = this.page.locator(`iframe[src*="${videoID}"]`);
+    await expect(iframeLocator.first()).toBeVisible();
+  }
+
+  /**
+   * Clicks the Read More Stories button in the partnerships page.
+   */
+  async clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation(): Promise<void> {
+    await this.expectElementToBeVisible(
+      readMoreStoriesButtonInPartnershipsPage
+    );
+    await this.clickOnElementWithSelector(
+      readMoreStoriesButtonInPartnershipsPage
+    );
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Verifies the learner stories carousel is visible and functional.
+   */
+  async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
+    await this.expectElementToBeVisible(learnerStoriesCarouselSelector);
+  }
+
+  /**
+   * Clicks the Partner With Us button in the Partnerships page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.expectElementToBeVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+    await this.clickOnElementWithSelector(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
   }
 }
 
