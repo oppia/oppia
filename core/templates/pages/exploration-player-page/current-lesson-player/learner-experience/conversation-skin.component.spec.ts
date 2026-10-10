@@ -2455,7 +2455,7 @@ describe('Conversation skin component', () => {
       // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
       getRedirectSpy.and.returnValue(false);
       getHasInteractedSpy.and.returnValue(true);
-      componentInstance._editorPreviewMode = false;
+      componentInstance.editorPreviewMode = false;
       const mockStateCard = jasmine.createSpyObj('StateCard', ['isTerminal']);
       mockStateCard.isTerminal.and.returnValue(false);
       getDisplayedCardSpy.and.returnValue(mockStateCard);
@@ -2465,11 +2465,11 @@ describe('Conversation skin component', () => {
       expect(recordEventSpy).toHaveBeenCalled();
 
       // Case 3: Editor preview mode -> should return false.
-      componentInstance._editorPreviewMode = true;
+      componentInstance.editorPreviewMode = true;
       expect(capturedCallback()).toBe(false);
 
       // Case 4: Terminal state -> should return false.
-      componentInstance._editorPreviewMode = false;
+      componentInstance.editorPreviewMode = false;
       mockStateCard.isTerminal.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
 
