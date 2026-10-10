@@ -282,6 +282,59 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             list_of_contents_which_need_translataion,
         )
 
+    def test_get_all_contents_which_need_translations_filters_digit_only_html(
+        self,
+    ) -> None:
+        digit_only_cases = [
+            '<p>123</p>',
+            '<p>1.23</p>',
+            '<b>-4</b>',
+            '<b>-4.5</b>',
+            '<span>  789  </span>',
+            '<br>0</br>',
+            '<strong><em>1000.50</em></strong>',
+            '<i>-0.001</i>',
+            '<em>99</em>',
+        ]
+        for html_content in digit_only_cases:
+            translatable_object = DummyTranslatableObjectWithSingleParam(
+                html_content
+            )
+            contents_which_need_translation = (
+                translatable_object.get_all_contents_which_need_translations().values()
+            )
+            list_of_contents = [
+                tc.content_value for tc in contents_which_need_translation
+            ]
+            self.assertNotIn(html_content, list_of_contents)
+
+    def test_get_all_contents_which_need_translations_keeps_non_digit_html(
+        self,
+    ) -> None:
+        non_digit_cases = [
+            '<p>1+2</p>',
+            '<b>Hello 123</b>',
+            '<span>123 apples</span>',
+            '<p></p>',
+            '<div>123</div>',
+            '<img src="123.png"/>',
+            '<oppia-noninteractive-image></oppia-noninteractive-image>',
+            '<oppia-noninteractive-math raw_latex="123"></oppia-noninteractive-math>',
+            '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>',
+            '123',
+        ]
+        for html_content in non_digit_cases:
+            translatable_object = DummyTranslatableObjectWithSingleParam(
+                html_content
+            )
+            contents_which_need_translation = (
+                translatable_object.get_all_contents_which_need_translations().values()
+            )
+            list_of_contents = [
+                tc.content_value for tc in contents_which_need_translation
+            ]
+            self.assertIn(html_content, list_of_contents)
+
     def test_get_translatable_content_ids(self) -> None:
         translatable_object = DummyTranslatableObjectWithFourParams(
             'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', ''
