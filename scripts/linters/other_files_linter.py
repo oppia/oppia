@@ -38,7 +38,6 @@ class ThirdPartyLibDict(TypedDict):
 
     name: str
     dependency_key: str
-    dependency_source: str
     type_defs_filename_prefix: str
 
 
@@ -114,7 +113,6 @@ def _extract_top_level_route_objects(content: str) -> List[str]:
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
-_DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
@@ -124,25 +122,21 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
         'name': 'Guppy',
         'dependency_key': 'guppy-dev',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'guppy-defs-',
     },
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'skulpt-defs-',
     },
     {
         'name': 'MIDI',
         'dependency_key': 'midi',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'midi-defs-',
     },
     {
         'name': 'Nerdamer',
         'dependency_key': 'nerdamer',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'nerdamer-defs-',
     },
 ]
@@ -323,24 +317,19 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), 'typings'))
 
         for third_party_lib in THIRD_PARTY_LIBS:
-            lib_dependency_source = third_party_lib['dependency_source']
+            lib_version = package[third_party_lib['dependency_key']]
 
-            if lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
-                lib_version = package[third_party_lib['dependency_key']]
-
-                if lib_version[0] == '^':
-                    lib_version = lib_version[1:]
+            if lib_version[0] == '^':
+                lib_version = lib_version[1:]
+            else:
                 # In cases where the version is in the form of git commit hashes
                 # such as 'git+https://github.com/username/repo#commit-hash',
                 # we extract the commit hash and use it as the version.
-                elif re.search(GIT_COMMIT_HASH_REGEX, lib_version):
-                    match = re.search(GIT_COMMIT_HASH_REGEX, lib_version)
-                    # We must verify that the match is not None because
-                    # re.search() returns None when no match is found. Although
-                    # we already check this in the elif statement, the mypy type
-                    # check fails, so we need to include this check here.
-                    if match:
-                        lib_version = match.group(1)
+                commit_hash_match = re.search(
+                    GIT_COMMIT_HASH_REGEX, lib_version
+                )
+                if commit_hash_match:
+                    lib_version = commit_hash_match.group(1)
 
             prefix_name = third_party_lib['type_defs_filename_prefix']
 
