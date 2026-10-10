@@ -52,4 +52,16 @@ describe('BooleanEditorComponent', () => {
 
     expect(component.value).toBeFalse();
   });
+
+  it('should set value from the checkbox change event', () => {
+    spyOn(component.valueChanged, 'emit');
+    component.value = false;
+
+    component.onValueChange({
+      target: {checked: true},
+    } as Event);
+
+    expect(component.value).toBeTrue();
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(true);
+  });
 });

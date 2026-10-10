@@ -26,6 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
+import {AugmentedSkillSummary} from 'domain/skill/augmented-skill-summary.model';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -192,7 +193,17 @@ describe('Topics and skills dashboard page component', () => {
   it('should check whether next skill page is present', () => {
     for (let i = 0; i < 10; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        AugmentedSkillSummary.createFromBackendDict({
+          id: '',
+          description: '',
+          language_code: '',
+          version: 1,
+          misconception_count: 2,
+          skill_model_created_on: 3,
+          skill_model_last_updated: 4,
+          topic_names: [],
+          classroom_names: [],
+        })
       );
     }
     componentInstance.skillPageNumber = 0;
@@ -288,7 +299,17 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.activeTab = componentInstance.TAB_NAME_SKILLS;
     for (let i = 0; i < 10; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        AugmentedSkillSummary.createFromBackendDict({
+          id: '',
+          description: '',
+          language_code: '',
+          version: 1,
+          misconception_count: 2,
+          skill_model_created_on: 3,
+          skill_model_last_updated: 4,
+          topic_names: [],
+          classroom_names: [],
+        })
       );
     }
     componentInstance.pageNumber = 1;
@@ -331,7 +352,17 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.moreSkillsPresent = false;
     for (let i = 0; i < 5; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        AugmentedSkillSummary.createFromBackendDict({
+          id: '',
+          description: '',
+          language_code: '',
+          version: 1,
+          misconception_count: 2,
+          skill_model_created_on: 3,
+          skill_model_last_updated: 4,
+          topic_names: [],
+          classroom_names: [],
+        })
       );
     }
     componentInstance.fetchSkills();
@@ -356,6 +387,28 @@ describe('Topics and skills dashboard page component', () => {
     spyOn(componentInstance, 'goToPageNumber');
     componentInstance.applyFilters();
     expect(componentInstance.goToPageNumber).toHaveBeenCalledWith(0);
+  });
+
+  it('should update the status filter when the status dropdown changes', () => {
+    componentInstance.filterObject =
+      TopicsAndSkillsDashboardFilter.createDefault();
+    spyOn(componentInstance, 'applyFilters');
+
+    componentInstance.onStatusFilterChanged('Published');
+
+    expect(componentInstance.filterObject.status).toBe('Published');
+    expect(componentInstance.applyFilters).toHaveBeenCalled();
+  });
+
+  it('should update the sort filter when the sort dropdown changes', () => {
+    componentInstance.filterObject =
+      TopicsAndSkillsDashboardFilter.createDefault();
+    spyOn(componentInstance, 'applyFilters');
+
+    componentInstance.onSortFilterChanged('Most Recently Updated');
+
+    expect(componentInstance.filterObject.sort).toBe('Most Recently Updated');
+    expect(componentInstance.applyFilters).toHaveBeenCalled();
   });
 
   it('should reset filters', () => {
@@ -413,7 +466,17 @@ describe('Topics and skills dashboard page component', () => {
   it('should get total count value for skills', () => {
     componentInstance.totalSkillCount = 32;
     componentInstance.skillSummaries = [
-      new SkillSummary('', '', '', 2, 3, 4, 6),
+      AugmentedSkillSummary.createFromBackendDict({
+        id: '',
+        description: '',
+        language_code: '',
+        version: 2,
+        misconception_count: 3,
+        skill_model_created_on: 4,
+        skill_model_last_updated: 6,
+        topic_names: [],
+        classroom_names: [],
+      }),
     ];
     componentInstance.itemsPerPage = 0;
     expect(componentInstance.getTotalCountValueForSkills()).toEqual(32);

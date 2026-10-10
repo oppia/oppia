@@ -18,6 +18,19 @@
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 
+// Topics passed to this component are CreatorTopicSummary objects from the
+// topics-and-skills dashboard, augmented with the isSelected flag that tracks
+// the user's selection. Exporting the interface lets the assign-skill-to-topic
+// modal type its input and the skills-list parent construct the augmented
+// summaries before opening the modal.
+export interface SelectableTopicSummary {
+  id: string;
+  name: string;
+  isSelected: boolean;
+  isPublished: boolean;
+  uncategorizedSkillCount: number;
+}
+
 @Component({
   selector: 'oppia-select-topics',
   templateUrl: './select-topics.component.html',
@@ -27,14 +40,14 @@ export class SelectTopicsComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() topicSummaries!: {id: string; name: string; isSelected: boolean}[];
+  @Input() topicSummaries!: SelectableTopicSummary[];
 
   @Input() selectedTopicIds!: string[];
   @Output() selectedTopicIdsChange: EventEmitter<string[]> = new EventEmitter();
 
   topicsSelected: string[] = [];
   topicFilterText: string = '';
-  filteredTopics: {id: string; name: string; isSelected: boolean}[] = [];
+  filteredTopics: SelectableTopicSummary[] = [];
 
   selectOrDeselectTopic(topicId: string): void {
     let topic = this.topicSummaries.find(topic => topic.id === topicId);
@@ -58,9 +71,7 @@ export class SelectTopicsComponent {
     this.selectedTopicIdsChange.emit(this.selectedTopicIds);
   }
 
-  searchInTopics(
-    searchText: string
-  ): {id: string; name: string; isSelected: boolean}[] {
+  searchInTopics(searchText: string): SelectableTopicSummary[] {
     this.filteredTopics = this.topicSummaries.filter(
       topic => topic.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     );

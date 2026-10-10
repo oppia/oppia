@@ -60,12 +60,15 @@ type ConvertStringLiteralsToString<T> = T extends string
 // each component in ComponentSpecsType.
 // It uses mapped types to iterate over each key K in ComponentSpecsType, and
 // then indexes into the object using [number] to represent any index in the
-// array.
+// array. The spec elements are collected into a single array (instead of a
+// union of per-component arrays) so that *ngFor over the specs infers the
+// union of spec element types; iterating over a union of arrays would infer a
+// single component's spec type and break the template type checks.
 export type CustomizationArgsSpecsType = {
-  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number][];
-  // Finally, use [keyof ComponentSpecsType] to create a union of all the array
-  // types.
-}[keyof ComponentSpecsType];
+  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number];
+  // Finally, use [keyof ComponentSpecsType] to create a union of all the spec
+  // element types.
+}[keyof ComponentSpecsType][];
 // CustomizationArgsForRteType maps the customization_arg_specs array to an
 // object with keys as 'name' and values as the 'default_value'.
 // It uses mapped types and Extract to achieve this.

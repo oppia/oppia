@@ -119,13 +119,14 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     );
   }
 
-  selectAnswer(event: MouseEvent, answer: string | null): void {
+  selectAnswer(event: MouseEvent, answer: number | null): void {
     event.preventDefault();
     if (answer === null) {
       return;
     }
     this.errorMessageI18nKey = '';
-    this.answer = parseInt(answer, 10);
+    // The choice's originalIndex is already a number, so no parsing is needed.
+    this.answer = answer;
     this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 

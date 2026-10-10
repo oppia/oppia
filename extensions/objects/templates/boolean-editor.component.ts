@@ -32,4 +32,10 @@ export class BooleanEditorComponent {
     this.value = e;
     this.valueChanged.emit(e);
   }
+
+  // The checkbox change event emits an Event object, so the checked state is
+  // read from the input element before delegating to setValue.
+  onValueChange(e: Event): void {
+    this.setValue((e.target as HTMLInputElement).checked);
+  }
 }

@@ -217,6 +217,22 @@ describe('Study Guide Section editor component', () => {
     expect(component.container.sectionContentHtml).toEqual('new con');
   });
 
+  it('should reset heading to empty string for a non-string value', () => {
+    component.container.sectionHeadingPlaintext = 'head';
+
+    component.updateLocalHeading(null);
+
+    expect(component.container.sectionHeadingPlaintext).toEqual('');
+  });
+
+  it('should reset content to empty string for a non-string value', () => {
+    component.container.sectionContentHtml = 'con';
+
+    component.updateLocalContent(null);
+
+    expect(component.container.sectionContentHtml).toEqual('');
+  });
+
   it('should check if section content length is exceeded', () => {
     component.container.sectionContentHtml = 'short content';
 

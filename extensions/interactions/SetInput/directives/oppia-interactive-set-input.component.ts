@@ -26,7 +26,10 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {SetInputRulesService} from './set-input-rules.service';
 import eq from 'lodash/eq';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Schema} from 'services/schema-default-value.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import type {SetInputAnswer} from 'interactions/answer-defs';
 
 @Component({
@@ -79,9 +82,17 @@ export class InteractiveSetInputComponent implements OnInit {
     });
   }
 
-  updateAnswer(answer: SetInputAnswer): void {
-    this.answer = answer;
-    this.errorMessage = this.hasDuplicates(answer)
+  updateAnswer(answer: SchemaDefaultValue): void {
+    // The schema editor may emit non-array values (e.g. null) in some edge
+    // cases, so only array values are used as the set answer, and each element
+    // is narrowed to a string as the editor produces string elements.
+    if (!Array.isArray(answer)) {
+      return;
+    }
+    this.answer = answer.filter(
+      (element): element is string => typeof element === 'string'
+    );
+    this.errorMessage = this.hasDuplicates(this.answer)
       ? 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR'
       : '';
   }
