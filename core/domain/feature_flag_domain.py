@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import datetime
 import enum
+import hashlib
 import re
 
 from core import feconf, utils
 from core.constants import constants
 
-from typing import Final, List, Optional, TypedDict
+from typing import Final, List, Optional, Set, TypedDict
 
 
 class ServerMode(enum.Enum):
@@ -113,6 +114,64 @@ class FeatureFlag:
         self._feature_flag_config.validate(
             self._feature_flag_spec.feature_stage
         )
+
+    def is_enabled(
+        self, user_id: Optional[str], user_group_ids_of_user: Set[str]
+    ) -> bool:
+        """Returns whether the feature flag is enabled for the given user.
+
+        This method only evaluates the feature flag's config. It does not
+        read from the datastore, so the caller is responsible for fetching
+        the ids of the user groups that the user belongs to.
+
+        Args:
+            user_id: str|None. The id of the user, or None if the user is
+                logged out.
+            user_group_ids_of_user: set(str). The ids of the user groups
+                that the user belongs to. This is ignored if user_id is
+                None.
+
+        Returns:
+            bool. True if the feature flag is enabled for the given user,
+            else False.
+        """
+        current_server = get_server_mode()
+        feature_stage = self._feature_flag_spec.feature_stage
+
+        if (
+            current_server == ServerMode.TEST
+            and feature_stage == ServerMode.DEV
+        ):
+            return False
+
+        if current_server == ServerMode.PROD and feature_stage in (
+            ServerMode.DEV,
+            ServerMode.TEST,
+        ):
+            return False
+
+        if self._feature_flag_config.force_enable_for_all_users:
+            return True
+
+        if user_id is None:
+            return False
+
+        if any(
+            user_group_id in user_group_ids_of_user
+            for user_group_id in self._feature_flag_config.user_group_ids
+        ):
+            return True
+
+        # The feature flag name is used as a salt so that the users who are
+        # in the rollout differ from one feature flag to another. For a given
+        # user, the result is stable across calls.
+        salt = self._name.encode('utf-8')
+        hashed_user_id = hashlib.sha256(
+            user_id.encode('utf-8') + salt
+        ).hexdigest()
+        mod_result = int(hashed_user_id, 16) % 1000
+        threshold = (self._feature_flag_config.rollout_percentage / 100) * 1000
+        return bool(mod_result < threshold)
 
     def to_dict(self) -> FeatureFlagDict:
         """Returns a dict representation of the FeatureFlag domain object.
