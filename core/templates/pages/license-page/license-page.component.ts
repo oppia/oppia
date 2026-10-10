@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import './license-page.component.css';
 
 @Component({
   selector: 'oppia-license-page',

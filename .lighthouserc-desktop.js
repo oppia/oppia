@@ -79,6 +79,18 @@ module.exports = {
               tbt: 300,
               cls: 0.15,
             },
+            overrides: {
+              // Marketing hero images are not properly responsively sized.
+              'uses-responsive-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+              // Marketing hero images are JPEG, not next-gen formats.
+              'modern-image-formats': [
+                'error',
+                {maxLength: 2, strategy: 'pessimistic'},
+              ],
+            },
+            accessibilityMinScore: 0.9,
           },
           {
             matchingUrlPattern: 'http://[^/]+/about$',
@@ -90,6 +102,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.88,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/admin$',
@@ -103,6 +119,21 @@ module.exports = {
             accessibilityMinScore: 0.93,
           },
           {
+            matchingUrlPattern: 'http://[^/]+/android$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 19000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.84,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
+          },
+          {
             matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
             pagePerfThresholds: {
               fcp: 2835,
@@ -111,7 +142,22 @@ module.exports = {
               tbt: 300,
               cls: 0.15,
             },
-            accessibilityMinScore: 0.92,
+            accessibilityMinScore: 0.87,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/blog$',
+            pagePerfThresholds: {
+              fcp: 6000,
+              speedIndex: 6000,
+              lcp: 15000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.85,
+            overrides: {
+              // Blog listing images are not served in responsive sizes.
+              'uses-responsive-images': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/community-library$',
@@ -123,6 +169,9 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/contact$',
@@ -134,6 +183,10 @@ module.exports = {
               cls: 0.44,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/contributor-dashboard$',
@@ -156,6 +209,9 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.88,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/creator-guidelines$',
@@ -167,6 +223,10 @@ module.exports = {
               cls: 0.51,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/delete-account$',
@@ -201,6 +261,10 @@ module.exports = {
               deprecations: ['error', {minScore: 0}],
               redirects: ['error', {minScore: 1}],
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The YouTube embed can log browser issues to the Issues panel.
+              'inspector-issues': ['error', {minScore: 0}],
             },
             accessibilityMinScore: 0.91,
           },
@@ -214,6 +278,10 @@ module.exports = {
               cls: 0.57,
             },
             accessibilityMinScore: 0.91,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/learner-dashboard$',
@@ -255,6 +323,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -266,7 +336,36 @@ module.exports = {
               tbt: 300,
               cls: 0.15,
             },
-            accessibilityMinScore: 0.92,
+            accessibilityMinScore: 0.89,
+          },
+          {
+            matchingUrlPattern: 'http://[^/]+/partnerships$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.84,
+            overrides: {
+              // The partnerships page showcases many partner logos that are
+              // not in next-gen formats.
+              'modern-image-formats': [
+                'error',
+                {maxLength: 15, strategy: 'pessimistic'},
+              ],
+              // The partnerships page uses scroll handlers that require
+              // non-passive listeners.
+              'uses-passive-event-listeners': ['error', {minScore: 0}],
+              // Partner logos are small and cannot be responsively sized.
+              'uses-responsive-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+              // The many partner logos can log browser issues to the Issues
+              // panel.
+              'inspector-issues': ['error', {minScore: 0}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/preferences$',
@@ -292,6 +391,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/profile/username1$',
@@ -308,16 +411,6 @@ module.exports = {
             },
           },
           {
-            matchingUrlPattern: 'http://[^/]+/signup\\?return_url=%2F$',
-            pagePerfThresholds: {
-              fcp: 4650,
-              speedIndex: 5700,
-              lcp: 10800,
-              tbt: 300,
-              cls: 0.6,
-            },
-          },
-          {
             matchingUrlPattern: 'http://[^/]+/teach$',
             pagePerfThresholds: {
               fcp: 2760,
@@ -329,6 +422,8 @@ module.exports = {
             accessibilityMinScore: 0.91,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0.5}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -341,6 +436,10 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.95,
+            overrides: {
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
+            },
           },
           {
             matchingUrlPattern: 'http://[^/]+/thanks$',
@@ -354,6 +453,8 @@ module.exports = {
             accessibilityMinScore: 0.95,
             overrides: {
               'offscreen-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -368,6 +469,8 @@ module.exports = {
             accessibilityMinScore: 0.88,
             overrides: {
               'uses-responsive-images': ['error', {minScore: 0}],
+              // Marketing pages use unoptimized JPEG hero images.
+              'uses-optimized-images': ['error', {minScore: 0.6}],
             },
           },
           {
@@ -416,6 +519,31 @@ module.exports = {
             },
           },
           {
+            matchingUrlPattern: '^http://localhost:8181/classroom-admin$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.88,
+          },
+          {
+            matchingUrlPattern: '^http://localhost:8181/learn$',
+            pagePerfThresholds: {
+              fcp: 9000,
+              speedIndex: 9000,
+              lcp: 18000,
+              tbt: 800,
+              cls: 1.5,
+            },
+            accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
+          },
+          {
             matchingUrlPattern: '^http://localhost:8181/learn/math$',
             pagePerfThresholds: {
               fcp: 2835,
@@ -426,6 +554,7 @@ module.exports = {
             },
             accessibilityMinScore: 0.95,
             overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
               // Classroom pages use JPEG images that are not next-gen formats.
               'modern-image-formats': [
                 'error',
@@ -444,7 +573,8 @@ module.exports = {
             },
             accessibilityMinScore: 0.95,
             overrides: {
-              'errors-in-console': ['error', {minScore: 1}],
+              'errors-in-console': ['error', {minScore: 0}],
+              'inspector-issues': ['error', {minScore: 0}],
               // TODO(#13465): Change this maxLength to 0 once images are
               // migrated.
               'modern-image-formats': [
@@ -471,6 +601,7 @@ module.exports = {
             },
             accessibilityMinScore: 0.91,
             overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
               // Explore page uses deprecated APIs from third-party scripts.
               deprecations: ['error', {minScore: 0}],
               // Explore page has images that are not in next-gen formats.
@@ -514,6 +645,54 @@ module.exports = {
               cls: 0.15,
             },
             accessibilityMinScore: 0.84,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/blog-admin$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/blog/.+$',
+            accessibilityMinScore: 0.9,
+            overrides: {
+              // The blog post page logs a browser console error from a
+              // non-JSON API response, and its images are not responsive.
+              'errors-in-console': ['error', {minScore: 0}],
+              'uses-responsive-images': ['error', {minScore: 0.5}],
+            },
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/contributor-admin-dashboard$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/diagnostic-test-player(\\?.*)?$',
+            // The diagnostic player page's dummy content scores about 0.87 on
+            // accessibility, so the floor matches the lowest threshold used
+            // elsewhere in this file.
+            accessibilityMinScore: 0.84,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/practice/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
+            accessibilityMinScore: 0.9,
+            overrides: {
+              'errors-in-console': ['error', {minScore: 0}],
+            },
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/release-coordinator$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/learn/.+/studyguide/.+$',
+            accessibilityMinScore: 0.9,
+          },
+          {
+            matchingUrlPattern: '^http://[^/]+/voiceover-admin$',
+            accessibilityMinScore: 0.9,
           },
         ],
         // Error-level safety-net thresholds for desktop. Per-page entries

@@ -23,8 +23,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
-import './playbook.component.css';
-
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',

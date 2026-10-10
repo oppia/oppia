@@ -36,7 +36,6 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import './outcome-editor.component.css';
 
 interface AddOutcomeModalResponse {
   outcome: Outcome;
@@ -64,7 +63,6 @@ export class OutcomeEditorComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean = false;
-  correctnessLabelEditorIsOpen: boolean = false;
   destinationEditorIsOpen: boolean = false;
   destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
@@ -299,7 +297,6 @@ export class OutcomeEditorComponent implements OnInit {
       this.stateEditorService.isExplorationCurated();
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
-    this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
 
     this.onMobile =
