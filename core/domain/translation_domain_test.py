@@ -1137,3 +1137,107 @@ class MachineTranslationProviderMappingTests(test_utils.GenericTestBase):
                 'Provider aws does not support language hi.',
             ):
                 mapping_obj.validate()
+
+
+class FeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
+    """Tests for the FeaturedTranslationLanguages domain object."""
+
+    def test_valid_list_passes_validation(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            [{'language_code': 'hi', 'explanation': 'High demand'}]
+        )
+        featured_languages.validate()
+
+    def test_empty_list_passes_validation(self) -> None:
+        translation_domain.FeaturedTranslationLanguages([]).validate()
+
+    def test_invalid_language_code_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            [{'language_code': 'invalid-code', 'explanation': 'x'}]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language code: invalid-code'
+        ):
+            featured_languages.validate()
+
+    def test_duplicate_language_code_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            [
+                {'language_code': 'hi', 'explanation': 'a'},
+                {'language_code': 'hi', 'explanation': 'b'},
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Duplicate language code: hi'
+        ):
+            featured_languages.validate()
+
+    def test_empty_explanation_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            [{'language_code': 'hi', 'explanation': ''}]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'non-empty explanation for language hi'
+        ):
+            featured_languages.validate()
+
+    def test_whitespace_only_explanation_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            [{'language_code': 'hi', 'explanation': '   '}]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'non-empty explanation for language hi'
+        ):
+            featured_languages.validate()
+
+    def test_missing_keys_raise_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            # Here we use MyPy ignore because we are intentionally passing an
+            # invalid list element type in order to verify runtime validation.
+            [{'language_code': 'hi'}]  # type: ignore[typeddict-item]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'must contain \'language_code\' and \'explanation\'',
+        ):
+            featured_languages.validate()
+
+    def test_non_dict_entry_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are testing a wrong input type
+        # that we can normally catch by typing. The list literal is the correct
+        # container but has a wrong element type, so the error code is
+        # 'list-item' (cf. WrittenTranslations.validate([123]) elsewhere in this
+        # file), not 'arg-type' (which is for a wrong container type).
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            ['hindi']  # type: ignore[list-item]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each featured language to be a dict',
+        ):
+            featured_languages.validate()
+
+    def test_non_list_value_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are intentionally passing a wrong
+        # container type (a dict instead of a list) to verify runtime
+        # validation; the error code is 'arg-type' (a wrong container type),
+        # unlike the 'list-item' case above which uses the correct container
+        # with a wrong element type.
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            {'language_code': 'hi', 'explanation': 'x'}  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected featured_translation_languages to be a list',
+        ):
+            featured_languages.validate()
+
+    def test_non_string_language_code_raises_error(self) -> None:
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            # Here we use MyPy ignore because we intentionally pass a non-string language_code to test runtime validation.
+            [{'language_code': 123, 'explanation': 'x'}]  # type: ignore[typeddict-item]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected language_code to be a string'
+        ):
+            featured_languages.validate()

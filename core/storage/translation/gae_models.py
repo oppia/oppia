@@ -239,6 +239,7 @@ class EntityTranslationsModel(base_models.BaseModel):
 
 
 MACHINE_TRANSLATION_POLICY_ID = 'machine_translation_policy'
+FEATURED_TRANSLATION_LANGUAGES_MODEL_ID = 'featured_translation_languages'
 
 
 class MachineTranslationModel(base_models.BaseModel):
@@ -449,6 +450,130 @@ class MachineTranslationPolicyModel(base_models.BaseModel):
                 ),
             },
         )
+
+
+class FeaturedTranslationLanguagesModel(base_models.BaseModel):
+    """Singleton model storing the featured ('Most needed') translation
+    languages shown on the Contributor Dashboard translation tab.
+
+    There should be exactly one instance of this model, identified by
+    FEATURED_TRANSLATION_LANGUAGES_MODEL_ID.
+    """
+
+    # A list of dicts, each of the form:
+    #   {'language_code': str, 'explanation': str}.
+    # List order is significant: it is the display order of the featured
+    # ('Most needed') languages on the Contributor Dashboard.
+    featured_translation_languages = datastore_services.JsonProperty(
+        required=True, default=[]
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'featured_translation_languages': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+    # Here we use MyPy ignore because we intentionally drop the entity_id
+    # argument of the base method: this is a singleton, whose id is always
+    # FEATURED_TRANSLATION_LANGUAGES_MODEL_ID.
+    @classmethod
+    def get(  # type: ignore[override]
+        cls, strict: bool = True
+    ) -> Optional[FeaturedTranslationLanguagesModel]:
+        """Retrieves the singleton featured translation languages model.
+
+        Args:
+            strict: bool. Whether to fail noisily if no model exists.
+
+        Returns:
+            FeaturedTranslationLanguagesModel|None. The singleton instance, or
+            None if it does not exist and strict is False.
+        """
+        return super().get(
+            FEATURED_TRANSLATION_LANGUAGES_MODEL_ID, strict=strict
+        )
+
+    @classmethod
+    def create(
+        cls, featured_translation_languages: List[Dict[str, str]]
+    ) -> FeaturedTranslationLanguagesModel:
+        """Creates the singleton instance.
+
+        Args:
+            featured_translation_languages: list(dict). The ordered list of
+                featured translation languages, each a dict with keys
+                'language_code' and 'explanation'.
+
+        Returns:
+            FeaturedTranslationLanguagesModel. The newly created instance.
+
+        Raises:
+            Exception. The singleton instance already exists.
+        """
+        if cls.get(strict=False) is not None:
+            raise Exception(
+                'The featured translation languages model already exists.'
+            )
+        entity = cls(
+            id=FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+            featured_translation_languages=featured_translation_languages,
+        )
+        entity.update_timestamps()
+        entity.put()
+        return entity
+
+    @classmethod
+    def upsert(
+        cls, featured_translation_languages: List[Dict[str, str]]
+    ) -> FeaturedTranslationLanguagesModel:
+        """Creates the singleton instance if it does not yet exist, otherwise
+        updates the existing instance's featured translation languages.
+
+        Args:
+            featured_translation_languages: list(dict). The ordered list of
+                featured translation languages, each a dict with keys
+                'language_code' and 'explanation'.
+
+        Returns:
+            FeaturedTranslationLanguagesModel. The created or updated instance.
+        """
+        model = cls.get(strict=False)
+        if model is None:
+            model = cls(id=FEATURED_TRANSLATION_LANGUAGES_MODEL_ID)
+        model.featured_translation_languages = featured_translation_languages
+        model.update_timestamps()
+        model.put()
+        return model
+
+    # Here we use MyPy ignore because we constrain the base put() to enforce
+    # that this model can only ever be stored under the fixed singleton id.
+    def put(self) -> None:  # type: ignore[override]
+        """Saves the singleton instance, enforcing the fixed id."""
+        if self.id != FEATURED_TRANSLATION_LANGUAGES_MODEL_ID:
+            raise Exception(
+                'The featured translation languages model id must be \'%s\'.'
+                % FEATURED_TRANSLATION_LANGUAGES_MODEL_ID
+            )
+        super().put()
 
 
 class AutoTranslationCacheModel(base_models.BaseModel):
