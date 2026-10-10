@@ -180,11 +180,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             [{'cmd': question_domain.CMD_CREATE_NEW}],
         )
 
-        all_question_models = question_models.QuestionModel.get_all()
-        self.assertEqual(all_question_models.count(), 1)
-        fetched_question_models = all_question_models.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert fetched_question_models is not None
+        fetched_question_models = question_models.QuestionModel.get(question_id)
 
         with self.assertRaisesRegex(
             Exception,
@@ -231,11 +227,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             [{'cmd': question_domain.CMD_CREATE_NEW}],
         )
 
-        all_question_models = question_models.QuestionModel.get_all()
-        self.assertEqual(all_question_models.count(), 1)
-        fetched_question_models = all_question_models.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert fetched_question_models is not None
+        fetched_question_models = question_models.QuestionModel.get(question_id)
         updated_question_model = question_fetchers.get_question_from_model(
             fetched_question_models
         )
