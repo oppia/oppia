@@ -84,8 +84,7 @@
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
             aria-hidden="false"
             class="nav-item  dropdown oppia-navbar-clickable-dropdown e2e-test-classroom-oppia-list-item">
-          <a ngbDropdownAnchor
-             (click)="learnDropdown.toggle()"
+          <a ngbDropdownToggle
              (keydown.enter)="learnDropdown.toggle()"
              class="nav-link oppia-navbar-tab dropdown-toggle learn-tab e2e-test-navbar-learn-menu"
              aria-hidden="false"
@@ -162,11 +161,9 @@
             #aboutDropdown="ngbDropdown"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_ABOUT"
             class="nav-item dropdown oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
-          <a ngbDropdownAnchor
-             (click)="aboutDropdown.toggle()"
+          <a ngbDropdownToggle
              (keydown.enter)="aboutDropdown.toggle()"
              class="nav-link oppia-navbar-tab dropdown-toggle e2e-test-navbar-about-menu"
-             aria-expanded="true"
              role="button"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
@@ -235,10 +232,8 @@
             (openChange)="updateGetInvolvedMenuOffset()"
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
-          <a ngbDropdownAnchor
+          <a ngbDropdownToggle
              class="nav-link oppia-navbar-tab dropdown-toggle get-involved e2e-test-navbar-get-involved-menu"
-             aria-expanded="true"
-             (click)="getInvolvedDropdown.toggle()"
              (keydown.enter)="getInvolvedDropdown.toggle()"
              tabindex="0"
              role="button"
@@ -379,6 +374,7 @@
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
          (keydown.enter)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
+         (keydown.shift.tab)="profileDropdown.close()"
          class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
          aria-label="User Menu"
          tabindex="0"
