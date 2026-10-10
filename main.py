@@ -65,7 +65,6 @@ from core.controllers import (
     recent_commits,
     release_coordinator,
     resources,
-    review_tests,
     skill_editor,
     skill_mastery,
     story_editor,
@@ -574,17 +573,6 @@ URLS = [
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/arc/<arc_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler,
-    ),
-    get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
-        review_tests.ReviewTestsPageDataHandler,
-    ),
-    get_redirect_route(
-        r'%s/can_access_review_tests_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/<story_url_fragment>'
-        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.ReviewTestsPageAccessValidationHandler,
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
