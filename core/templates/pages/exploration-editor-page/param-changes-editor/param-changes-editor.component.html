@@ -3,10 +3,10 @@
   <div cdkDropList
        (cdkDropListDropped)="drop($event)"
        class="oppia-param-change-draggable-area">
-    <div *ngFor="let paramChange of paramChangesService.displayed; let index = index"
+    <div *ngFor="let paramChange of displayedParamChanges; let index = index"
          cdkDrag
          class="oppia-param-editor-row e2e-test-param-changes-list">
-      <span class="oppia-param-change-sort-handle" *ngIf="paramChangesService.displayed.length > 1">
+      <span class="oppia-param-change-sort-handle" *ngIf="displayedParamChanges.length > 1">
         <picture>
           <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
           <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
@@ -22,7 +22,7 @@
         </select>
         <br>
         <oppia-value-generator-editor [generatorId]="paramChange.generatorId"
-                                      [customizationArgs]="paramChange.customizationArgs"
+                                      [customizationArgs]="getCustomizationArgs(paramChange)"
                                       [objType]="'UnicodeString'">
         </oppia-value-generator-editor>
       </span>
@@ -63,12 +63,12 @@
   <div class="oppia-param-changes-display oppia-card-parameter oppia-transition-200"
        [ngClass]="{'oppia-prevent-selection': editabilityService.isEditable()}"
        title="Card Parameter Changes">
-    <span *ngIf="paramChangesService.savedMemento && paramChangesService.savedMemento.length === 0">
+    <span *ngIf="savedParamChanges && savedParamChanges.length === 0">
       <em>No parameter changes.</em>
     </span>
-    <div class="oppia-param-display-row" *ngFor="let paramChange of paramChangesService.savedMemento; index as index">
+    <div class="oppia-param-display-row" *ngFor="let paramChange of savedParamChanges; index as index">
       {{ index + 1 }}. Change <span class="badge text-bg-info">{{ paramChange.name }}</span>
-      {{ HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs) }}
+      {{ getHumanReadableArgs(paramChange) }}
     </div>
   </div>
 </div>

@@ -148,10 +148,20 @@ export class SplashPageComponent implements OnInit {
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then(userInfo => {
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.loaderService.hideLoadingScreen();
-    });
+    this.userService
+      .getUserInfoAsync()
+      .then(userInfo => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+        this.loaderService.hideLoadingScreen();
+      })
+      .catch(() => {
+        // This page only needs to know whether the user is logged in, so any
+        // failure is treated as a logged-out user. A rejection handler is
+        // required here: without it, a failed request would leave the loading
+        // screen shown above visible indefinitely.
+        this.userIsLoggedIn = false;
+        this.loaderService.hideLoadingScreen();
+      });
     this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
