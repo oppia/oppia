@@ -381,7 +381,10 @@ class ContributionRightsDataHandler(
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes
-                )
+                ),
+                'can_submit_translation_for_language_codes': (
+                    user_rights.can_submit_translation_for_language_codes
+                ),
             }
         if (
             feconf.ROLE_ID_QUESTION_ADMIN in self.roles

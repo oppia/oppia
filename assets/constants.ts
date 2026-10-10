@@ -6229,6 +6229,7 @@ export default {
   "CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION": "submit_question",
   "CD_USER_RIGHTS_CATEGORIES": [
     "translation",
+    "submit_translation",
     "question",
     "voiceover",
     "submit_question"
