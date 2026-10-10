@@ -23,7 +23,7 @@ import {TestBed} from '@angular/core/testing';
 
 import {Story} from 'domain/story/story.model';
 import {StoryUpdateService} from 'domain/story/story-update.service';
-import {ArcModel} from 'domain/story/story-contents-object.model';
+import {ModuleModel} from 'domain/story/story-contents-object.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -34,7 +34,7 @@ class MockPlatformFeatureService {
     SerialChapterLaunchCurriculumAdminView: {
       isEnabled: false,
     },
-    StoryEditorArcs: {
+    StoryEditorModules: {
       isEnabled: false,
     },
   };
@@ -123,7 +123,7 @@ describe('Story update service', () => {
       'emit'
     ).and.stub();
 
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
     _sampleStory = Story.createFromBackendDict(sampleStoryBackendObject);
   });
 
@@ -538,23 +538,23 @@ describe('Story update service', () => {
     ]);
   });
 
-  it('should create default arc when adding first chapter with arcs enabled', () => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+  it('should create default module when adding first chapter with modules enabled', () => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
 
     _sampleStory.getStoryContents()._nodes = [];
-    _sampleStory.getStoryContents()._arcs = [];
+    _sampleStory.getStoryContents()._modules = [];
     _sampleStory.getStoryContents()._initialNodeId = null;
     _sampleStory.getStoryContents()._nextNodeId = 'node_1';
 
     storyUpdateService.addStoryNode(_sampleStory, 'Title 1');
 
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe(
-      'arc_default'
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_default'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-    ]);
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1']);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'add_story_node',
@@ -562,8 +562,8 @@ describe('Story update service', () => {
         title: 'Title 1',
       },
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_default',
+        cmd: 'create_module',
+        module_id: 'module_default',
         title: 'All Chapters',
         description: '',
         node_ids: ['node_1'],
@@ -571,19 +571,19 @@ describe('Story update service', () => {
     ]);
   });
 
-  it('should move new chapter to last arc when arcs enabled', () => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
+  it('should move new chapter to last module when modules enabled', () => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
     _sampleStory
       .getStoryContents()
-      .addArc(ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2']));
+      .addModule(
+        ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
+      );
 
     storyUpdateService.addStoryNode(_sampleStory, 'Title 3');
 
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-      'node_2',
-      'node_3',
-    ]);
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1', 'node_2', 'node_3']);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'add_story_node',
@@ -591,9 +591,9 @@ describe('Story update service', () => {
         title: 'Title 3',
       },
       {
-        cmd: 'move_node_to_arc',
+        cmd: 'move_node_to_module',
         node_id: 'node_3',
-        to_arc_id: 'arc_1',
+        to_module_id: 'module_1',
       },
     ]);
   });
@@ -1308,443 +1308,465 @@ describe('Story update service', () => {
     );
   });
 
-  it('should create/delete an arc in the story', () => {
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
-    storyUpdateService.createArc(
+  it('should create/delete a module in the story', () => {
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(0);
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_1'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
-      'Description 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-    ]);
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getDescription()
+    ).toBe('Description 1');
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1']);
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(0);
   });
 
-  it('should create a proper backend change dict for creating an arc', () => {
-    storyUpdateService.createArc(
+  it('should create a proper backend change dict for creating a module', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_1',
-        title: 'Adventure 1',
+        cmd: 'create_module',
+        module_id: 'module_1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: ['node_1'],
       },
     ]);
   });
 
-  it('should restore a deleted arc on undo', () => {
-    storyUpdateService.createArc(
+  it('should restore a deleted module on undo', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       ['node_1']
     );
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(1);
 
-    storyUpdateService.deleteArc(_sampleStory, 'arc_1');
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
+    storyUpdateService.deleteModule(_sampleStory, 'module_1');
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(0);
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_1'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
-      'Description 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getDescription()
+    ).toBe('Description 1');
   });
 
-  it('should create a proper backend change dict for deleting an arc', () => {
-    storyUpdateService.createArc(
+  it('should create a proper backend change dict for deleting a module', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    storyUpdateService.deleteArc(_sampleStory, 'arc_1');
+    storyUpdateService.deleteModule(_sampleStory, 'module_1');
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_1',
-        title: 'Adventure 1',
+        cmd: 'create_module',
+        module_id: 'module_1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
-        cmd: 'delete_arc',
-        arc_id: 'arc_1',
+        cmd: 'delete_module',
+        module_id: 'module_1',
       },
     ]);
   });
 
-  it('should rename an arc in the story', () => {
-    storyUpdateService.createArc(
+  it('should rename a module in the story', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
 
-    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Adventure Title');
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'New Adventure Title'
+    storyUpdateService.renameModule(
+      _sampleStory,
+      'module_1',
+      'New Module Title'
+    );
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'New Module Title'
     );
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
   });
 
-  it('should create a proper backend change dict for renaming an arc', () => {
-    storyUpdateService.createArc(
+  it('should create a proper backend change dict for renaming a module', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Adventure Title');
+    storyUpdateService.renameModule(
+      _sampleStory,
+      'module_1',
+      'New Module Title'
+    );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_1',
-        title: 'Adventure 1',
+        cmd: 'create_module',
+        module_id: 'module_1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
-        cmd: 'rename_arc',
-        arc_id: 'arc_1',
-        new_title: 'New Adventure Title',
+        cmd: 'rename_module',
+        module_id: 'module_1',
+        new_title: 'New Module Title',
       },
     ]);
   });
 
-  it('should update arc title property', () => {
-    storyUpdateService.createArc(
+  it('should update module title property', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
 
-    storyUpdateService.updateArcProperty(
+    storyUpdateService.updateModuleProperty(
       _sampleStory,
-      'arc_1',
+      'module_1',
       'title',
-      'Adventure 1',
+      'Module 1',
       'New Title'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
       'New Title'
     );
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Adventure 1'
+    expect(_sampleStory.getStoryContents().getModules()[0].getTitle()).toBe(
+      'Module 1'
     );
   });
 
-  it('should update arc description property', () => {
-    storyUpdateService.createArc(
+  it('should update module description property', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
-      'Description 1'
-    );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getDescription()
+    ).toBe('Description 1');
 
-    storyUpdateService.updateArcProperty(
+    storyUpdateService.updateModuleProperty(
       _sampleStory,
-      'arc_1',
+      'module_1',
       'description',
       'Description 1',
       'New Description'
     );
-    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
-      'New Description'
-    );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getDescription()
+    ).toBe('New Description');
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
-      'Description 1'
-    );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getDescription()
+    ).toBe('Description 1');
   });
 
   it(
-    'should create a proper backend change dict for updating an arc ' +
+    'should create a proper backend change dict for updating a module ' +
       'property',
     () => {
-      storyUpdateService.createArc(
+      storyUpdateService.createModule(
         _sampleStory,
-        'arc_1',
-        'Adventure 1',
+        'module_1',
+        'Module 1',
         'Description 1',
         []
       );
-      storyUpdateService.updateArcProperty(
+      storyUpdateService.updateModuleProperty(
         _sampleStory,
-        'arc_1',
+        'module_1',
         'title',
-        'Adventure 1',
+        'Module 1',
         'New Title'
       );
       expect(undoRedoService.getCommittableChangeList()).toEqual([
         {
-          cmd: 'create_arc',
-          arc_id: 'arc_1',
-          title: 'Adventure 1',
+          cmd: 'create_module',
+          module_id: 'module_1',
+          title: 'Module 1',
           description: 'Description 1',
           node_ids: [],
         },
         {
-          cmd: 'update_arc_property',
-          arc_id: 'arc_1',
+          cmd: 'update_module_property',
+          module_id: 'module_1',
           property_name: 'title',
-          old_value: 'Adventure 1',
+          old_value: 'Module 1',
           new_value: 'New Title',
         },
       ]);
     }
   );
 
-  it('should throw error when updating property of non-existent arc', () => {
+  it('should throw error when updating property of non-existent module', () => {
     expect(() => {
-      storyUpdateService.updateArcProperty(
+      storyUpdateService.updateModuleProperty(
         _sampleStory,
         'non_existent',
         'title',
         'old',
         'new'
       );
-    }).toThrowError("The given arc doesn't exist");
+    }).toThrowError("The given module doesn't exist");
   });
 
-  it('should throw error when updating arc with invalid property name', () => {
-    storyUpdateService.createArc(
+  it('should throw error when updating module with invalid property name', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
 
     expect(() => {
-      storyUpdateService.updateArcProperty(
+      storyUpdateService.updateModuleProperty(
         _sampleStory,
-        'arc_1',
+        'module_1',
         'invalid_prop',
         'old',
         'new'
       );
-    }).toThrowError('Invalid arc property');
+    }).toThrowError('Invalid module property');
   });
 
-  it('should rearrange arcs in the story', () => {
-    storyUpdateService.createArc(
+  it('should rearrange modules in the story', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    storyUpdateService.createArc(
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_2',
-      'Adventure 2',
+      'module_2',
+      'Module 2',
       'Description 2',
       []
     );
 
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
-    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_2');
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_1'
+    );
+    expect(_sampleStory.getStoryContents().getModules()[1].getId()).toBe(
+      'module_2'
+    );
 
-    storyUpdateService.rearrangeArcs(_sampleStory, ['arc_2', 'arc_1']);
+    storyUpdateService.rearrangeModules(_sampleStory, ['module_2', 'module_1']);
 
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_2');
-    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_2'
+    );
+    expect(_sampleStory.getStoryContents().getModules()[1].getId()).toBe(
+      'module_1'
+    );
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
-    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_2');
+    expect(_sampleStory.getStoryContents().getModules()[0].getId()).toBe(
+      'module_1'
+    );
+    expect(_sampleStory.getStoryContents().getModules()[1].getId()).toBe(
+      'module_2'
+    );
   });
 
-  it('should create a proper backend change dict for rearranging arcs', () => {
-    storyUpdateService.createArc(
+  it('should create a proper backend change dict for rearranging modules', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       []
     );
-    storyUpdateService.createArc(
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_2',
-      'Adventure 2',
+      'module_2',
+      'Module 2',
       'Description 2',
       []
     );
-    storyUpdateService.rearrangeArcs(_sampleStory, ['arc_2', 'arc_1']);
+    storyUpdateService.rearrangeModules(_sampleStory, ['module_2', 'module_1']);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_1',
-        title: 'Adventure 1',
+        cmd: 'create_module',
+        module_id: 'module_1',
+        title: 'Module 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
-        cmd: 'create_arc',
-        arc_id: 'arc_2',
-        title: 'Adventure 2',
+        cmd: 'create_module',
+        module_id: 'module_2',
+        title: 'Module 2',
         description: 'Description 2',
         node_ids: [],
       },
       {
-        cmd: 'rearrange_arcs',
-        arc_ids_order: ['arc_2', 'arc_1'],
+        cmd: 'rearrange_modules',
+        module_ids_order: ['module_2', 'module_1'],
       },
     ]);
   });
 
-  it('should move a node to a different arc', () => {
-    storyUpdateService.createArc(
+  it('should move a node to a different module', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Description 1',
       ['node_1', 'node_2']
     );
-    storyUpdateService.createArc(
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_2',
-      'Adventure 2',
+      'module_2',
+      'Module 2',
       'Description 2',
       []
     );
 
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-      'node_2',
-    ]);
-    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
-      []
-    );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1', 'node_2']);
+    expect(
+      _sampleStory.getStoryContents().getModules()[1].getNodeIds()
+    ).toEqual([]);
 
-    storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_2');
+    storyUpdateService.moveNodeToModule(_sampleStory, 'node_1', 'module_2');
 
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_2',
-    ]);
-    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual([
-      'node_1',
-    ]);
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_2']);
+    expect(
+      _sampleStory.getStoryContents().getModules()[1].getNodeIds()
+    ).toEqual(['node_1']);
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-      'node_2',
-    ]);
-    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
-      []
-    );
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1', 'node_2']);
+    expect(
+      _sampleStory.getStoryContents().getModules()[1].getNodeIds()
+    ).toEqual([]);
   });
 
   it(
     'should create a proper backend change dict for moving a node to an ' +
-      'arc',
+      'module',
     () => {
-      storyUpdateService.createArc(
+      storyUpdateService.createModule(
         _sampleStory,
-        'arc_1',
-        'Adventure 1',
+        'module_1',
+        'Module 1',
         'Description 1',
         ['node_1', 'node_2']
       );
-      storyUpdateService.createArc(
+      storyUpdateService.createModule(
         _sampleStory,
-        'arc_2',
-        'Adventure 2',
+        'module_2',
+        'Module 2',
         'Description 2',
         []
       );
-      storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_2');
+      storyUpdateService.moveNodeToModule(_sampleStory, 'node_1', 'module_2');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
         {
-          cmd: 'create_arc',
-          arc_id: 'arc_1',
-          title: 'Adventure 1',
+          cmd: 'create_module',
+          module_id: 'module_1',
+          title: 'Module 1',
           description: 'Description 1',
           node_ids: ['node_1', 'node_2'],
         },
         {
-          cmd: 'create_arc',
-          arc_id: 'arc_2',
-          title: 'Adventure 2',
+          cmd: 'create_module',
+          module_id: 'module_2',
+          title: 'Module 2',
           description: 'Description 2',
           node_ids: [],
         },
         {
-          cmd: 'move_node_to_arc',
+          cmd: 'move_node_to_module',
           node_id: 'node_1',
-          to_arc_id: 'arc_2',
+          to_module_id: 'module_2',
         },
       ]);
     }
   );
 
-  it('should keep node in target arc on undo when old arc is missing', () => {
-    storyUpdateService.createArc(
+  it('should keep node in target module on undo when old module is missing', () => {
+    storyUpdateService.createModule(
       _sampleStory,
-      'arc_1',
-      'Adventure 1',
+      'module_1',
+      'Module 1',
       'Desc',
       []
     );
 
-    storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_1');
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-    ]);
+    storyUpdateService.moveNodeToModule(_sampleStory, 'node_1', 'module_1');
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1']);
 
     undoRedoService.undoChange(_sampleStory);
-    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
-    ]);
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1']);
   });
 });

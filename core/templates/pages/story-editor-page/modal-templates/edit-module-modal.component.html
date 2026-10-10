@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <h3 [innerHTML]="'I18N_STORY_EDITOR_EDIT_MODULE' | translate"></h3>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <div class="module-input">
+    <label for="moduleTitle" class="module-input-label">Title*</label>
+    <input id="moduleTitle"
+           class="form-control e2e-test-edit-module-title-field"
+            [(ngModel)]="moduleTitle"
+           [ngModelOptions]="{standalone: true}"
+           autofocus>
+  </div>
+  <div class="module-input">
+    <label for="moduleDescription" class="module-input-label">Description</label>
+    <textarea id="moduleDescription"
+              class="form-control e2e-test-edit-module-description-field"
+               [(ngModel)]="moduleDescription"
+              [ngModelOptions]="{standalone: true}"
+              rows="3">
+    </textarea>
+  </div>
+  <div *ngIf="errorMessage" class="module-error-message">{{ errorMessage }}</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary e2e-test-cancel-edit-module-button" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate">
+  </button>
+  <button type="button" class="btn btn-success e2e-test-save-edit-module-button" (click)="save()" [innerHTML]="'I18N_STORY_EDITOR_SAVE_MODULE' | translate">
+  </button>
+</div>
