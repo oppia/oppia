@@ -34,6 +34,7 @@ import {
   AnswerChoice,
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -99,7 +100,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   activeTranslatedContent!: TranslatedContent;
   activeTab!: string;
   initActiveContentId!: string | null;
-  initActiveIndex!: number;
+  initActiveIndex!: number | null;
   interactionRuleTranslatableContents!: {
     rule: Rule;
     inputName: string;
@@ -115,6 +116,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private explorationStatesService: ExplorationStatesService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
@@ -136,6 +138,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
+  isVoiceoveringOriginalLanguage(): boolean {
+    return this.translationStatusService.isVoiceoveringOriginalLanguage();
+  }
+
   getRequiredHtml(
     subtitledHtml: SubtitledHtml | SubtitledUnicode | null
   ): string {
@@ -147,28 +153,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledHtml.html;
     }
 
-    let langCode = this.translationLanguageService.getActiveLanguageCode();
-    if (
-      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
-        langCode
-      )
-    ) {
-      return subtitledHtml.html;
-    }
-
-    if (!subtitledHtml.contentId) {
-      return subtitledHtml.html;
-    }
-
-    let translationContent =
-      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-        langCode
-      ].getWrittenTranslation(subtitledHtml.contentId);
-    if (!translationContent) {
-      return subtitledHtml.html;
-    }
-
-    return translationContent.translation as string;
+    return this._getVoiceoverDisplayText(
+      subtitledHtml.contentId,
+      subtitledHtml.html
+    );
   }
 
   getHtmlOrNull(content: SubtitledHtml | SubtitledUnicode): string | null {
@@ -196,30 +184,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledUnicode.unicode;
     }
 
-    let langCode = this.translationLanguageService.getActiveLanguageCode();
-
-    if (
-      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
-        langCode
-      )
-    ) {
-      return subtitledUnicode.unicode;
-    }
-
-    if (!subtitledUnicode.contentId) {
-      return subtitledUnicode.unicode;
-    }
-
-    let translationContent =
-      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-        langCode
-      ].getWrittenTranslation(subtitledUnicode.contentId);
-
-    if (!translationContent) {
-      return subtitledUnicode.unicode;
-    }
-
-    return translationContent.translation as string;
+    return this._getVoiceoverDisplayText(
+      subtitledUnicode.contentId,
+      subtitledUnicode.unicode
+    );
   }
 
   getEmptyContentMessage(): string {
@@ -231,6 +199,45 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     } else {
       return 'There is no text available to translate.';
     }
+  }
+
+  private _getVoiceoverDisplayText(
+    contentId: string | null,
+    sourceText: string
+  ): string {
+    // Empty original-language content is not offered for voiceover.
+    if (!sourceText) {
+      return '';
+    }
+    // Voiceovers for the original exploration language use the source text.
+    if (this.isVoiceoveringOriginalLanguage()) {
+      return sourceText;
+    }
+
+    // Voiceovers for other languages must use the written translation, not
+    // the original-language fallback.
+    if (!contentId) {
+      return '';
+    }
+
+    const langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+        langCode
+      )
+    ) {
+      return '';
+    }
+
+    const translationContent =
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+        langCode
+      ].getWrittenTranslation(contentId);
+    if (!translationContent || translationContent.translation === '') {
+      return '';
+    }
+
+    return translationContent.translation as string;
   }
 
   isActive(tabId: string): boolean {
@@ -269,21 +276,108 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (tabId === this.TAB_ID_CONTENT) {
       activeContentId = this.stateContent.contentId;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
-      this.activeAnswerGroupIndex = this.initActiveIndex;
-      if (this.stateAnswerGroups.length > 0) {
-        activeContentId = this.stateAnswerGroups[0].outcome.feedback.contentId;
+      const firstNonEmptyAnswerGroupIndex = this.stateAnswerGroups.findIndex(
+        answerGroup => !answerGroup.outcome.feedback.isEmpty()
+      );
+      const fallbackAnswerGroupIndex =
+        firstNonEmptyAnswerGroupIndex === -1
+          ? this.stateAnswerGroups.length
+          : firstNonEmptyAnswerGroupIndex;
+      if (this.initActiveContentId) {
+        const initActiveIndex = this.initActiveIndex;
+        if (
+          typeof initActiveIndex === 'number' &&
+          initActiveIndex >= 0 &&
+          initActiveIndex < this.stateAnswerGroups.length &&
+          !this.stateAnswerGroups[initActiveIndex].outcome.feedback.isEmpty()
+        ) {
+          this.activeAnswerGroupIndex = initActiveIndex;
+        } else if (
+          !(
+            typeof initActiveIndex === 'number' &&
+            initActiveIndex >= 0 &&
+            initActiveIndex < this.stateAnswerGroups.length
+          ) &&
+          !this.stateDefaultOutcome.feedback.isEmpty()
+        ) {
+          // Default outcome is not an answer group, so getIndexOfActiveCard()
+          // returns -1. Keep that slot only when its feedback is nonempty.
+          this.activeAnswerGroupIndex = this.stateAnswerGroups.length;
+        } else {
+          this.activeAnswerGroupIndex = fallbackAnswerGroupIndex;
+        }
       } else {
+        this.activeAnswerGroupIndex = fallbackAnswerGroupIndex;
+      }
+      if (
+        this.stateAnswerGroups.length === 0 ||
+        this.activeAnswerGroupIndex === this.stateAnswerGroups.length
+      ) {
         activeContentId = this.stateDefaultOutcome.feedback.contentId;
+      } else {
+        const activeAnswerGroupIndex = this.activeAnswerGroupIndex;
+        if (activeAnswerGroupIndex !== null) {
+          activeContentId =
+            this.stateAnswerGroups[activeAnswerGroupIndex].outcome.feedback
+              .contentId;
+        }
       }
     } else if (tabId === this.TAB_ID_HINTS) {
-      this.activeHintIndex = this.initActiveIndex;
-      activeContentId = this.stateHints[0].hintContent.contentId;
+      const firstNonEmptyHintIndex = this.stateHints.findIndex(
+        hint => !hint.hintContent.isEmpty()
+      );
+      const fallbackHintIndex =
+        firstNonEmptyHintIndex === -1 ? 0 : firstNonEmptyHintIndex;
+      if (this.initActiveContentId) {
+        const initActiveIndex = this.initActiveIndex;
+        if (
+          typeof initActiveIndex === 'number' &&
+          initActiveIndex >= 0 &&
+          initActiveIndex < this.stateHints.length &&
+          !this.stateHints[initActiveIndex].hintContent.isEmpty()
+        ) {
+          this.activeHintIndex = initActiveIndex;
+        } else {
+          this.activeHintIndex = fallbackHintIndex;
+        }
+      } else {
+        this.activeHintIndex = fallbackHintIndex;
+      }
+      const activeHintIndex = this.activeHintIndex;
+      if (activeHintIndex !== null) {
+        activeContentId =
+          this.stateHints[activeHintIndex].hintContent.contentId;
+      }
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      this.activeCustomizationArgContentIndex = this.initActiveIndex;
+      const customizationArgs =
+        this.interactionCustomizationArgTranslatableContent;
+      const firstNonEmptyCustomizationArgIndex = customizationArgs.findIndex(
+        caContent => !caContent.content.isEmpty()
+      );
+      const fallbackCustomizationArgIndex =
+        firstNonEmptyCustomizationArgIndex === -1
+          ? 0
+          : firstNonEmptyCustomizationArgIndex;
+      if (this.initActiveContentId) {
+        const initActiveIndex = this.initActiveIndex;
+        if (
+          typeof initActiveIndex === 'number' &&
+          initActiveIndex >= 0 &&
+          initActiveIndex < customizationArgs.length &&
+          !customizationArgs[initActiveIndex].content.isEmpty()
+        ) {
+          this.activeCustomizationArgContentIndex = initActiveIndex;
+        } else {
+          this.activeCustomizationArgContentIndex =
+            fallbackCustomizationArgIndex;
+        }
+      } else {
+        this.activeCustomizationArgContentIndex = fallbackCustomizationArgIndex;
+      }
       const activeContent =
-        this.interactionCustomizationArgTranslatableContent[0].content;
+        customizationArgs[this.activeCustomizationArgContentIndex].content;
       activeContentId = activeContent.contentId;
       if (activeContent instanceof SubtitledUnicode) {
         activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
@@ -474,17 +568,16 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     ) {
       return true;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
-      if (!this.stateDefaultOutcome) {
-        return true;
-      } else {
-        return false;
-      }
+      // Disable the tab when no feedback card would be visible.
+      return (
+        !this.stateDefaultOutcome ||
+        (this.stateDefaultOutcome.feedback.isEmpty() &&
+          !this.stateAnswerGroups.some(
+            answerGroup => !answerGroup.outcome.feedback.isEmpty()
+          ))
+      );
     } else if (tabId === this.TAB_ID_HINTS) {
-      if (this.stateHints.length <= 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return !this.stateHints.some(hint => !hint.hintContent.isEmpty());
     } else if (tabId === this.TAB_ID_SOLUTION) {
       if (!this.stateSolution) {
         return true;
@@ -492,7 +585,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         return false;
       }
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      return this.interactionCustomizationArgTranslatableContent.length === 0;
+      return !this.interactionCustomizationArgTranslatableContent.some(
+        caContent => !caContent.content.isEmpty()
+      );
     } else if (tabId === this.TAB_ID_RULE_INPUTS) {
       return this.interactionRuleTranslatableContents.length === 0;
     }
