@@ -104,6 +104,9 @@ test.describe('Blog Post Writer', function () {
     await licensePage.bringToFront();
     await blogPostWriter.expectScreenshotToMatch('licensePage', licensePage);
 
+    const originalPage = blogPostWriter.page;
+    blogPostWriter.page = licensePage;
+
     await blogPostWriter.clickAndVerifyAnchorWithInnerText(
       'CC-BY-SA 4.0',
       'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
@@ -114,6 +117,8 @@ test.describe('Blog Post Writer', function () {
       'https://www.apache.org/licenses/',
       licensePage
     );
+
+    blogPostWriter.page = originalPage;
 
     await licensePage.close();
     await blogPostWriter.page.bringToFront();
