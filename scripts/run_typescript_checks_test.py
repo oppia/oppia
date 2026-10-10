@@ -722,19 +722,21 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             'compile_and_check_typescript',
             mock_compile_and_check_typescript,
         )
+
+        def mock_compile_and_check_angular_templates(_config_path: str) -> None:
+            self.fail(
+                'Template strict checks should not run without --strict_checks.'
+            )
+
         compile_and_check_angular_templates_swap = self.swap(
             run_typescript_checks,
             'compile_and_check_angular_templates',
-            lambda _config_path: self.fail(
-                'Template strict checks should not run without --strict_checks.'
-            ),
+            mock_compile_and_check_angular_templates,
         )
 
-        with (
-            compile_and_check_typescript_swap,
-            compile_and_check_angular_templates_swap,
-        ):
-            run_typescript_checks.main(args=[])
+        with compile_and_check_typescript_swap:
+            with compile_and_check_angular_templates_swap:
+                run_typescript_checks.main(args=[])
 
     def test_config_path_when_strict_checks_arg_is_used(self) -> None:
         """Test if the config path is correct when strict checks arg is used."""
