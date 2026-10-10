@@ -171,7 +171,8 @@ export class BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
-    await this.clickAndWaitForNavigation('Sign In');
+    await this.clickOnElementWithText('Sign In');
+    await this.expectElementToBeVisible(usernameInputSelector);
   }
 
   /**
