@@ -69,7 +69,6 @@ import {NonExistentExplorations} from 'domain/learner_dashboard/non-existent-exp
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
@@ -119,6 +118,9 @@ class MockPlatformFeatureService {
       ExplorationEditorNewCreatorFeedbackTab: {
         isEnabled: false,
       },
+      LearnerGroupsAreEnabled: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -149,7 +151,6 @@ describe('Learner dashboard page', () => {
   let userService: UserService;
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
-  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiServiceSpy: jasmine.Spy;
@@ -342,9 +343,6 @@ describe('Learner dashboard page', () => {
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
       urlService = TestBed.inject(UrlService);
-      learnerGroupBackendApiService = TestBed.inject(
-        LearnerGroupBackendApiService
-      );
       feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
@@ -489,11 +487,6 @@ describe('Learner dashboard page', () => {
       )
         .withArgs([])
         .and.returnValue(Promise.resolve({}));
-
-      spyOn(
-        learnerGroupBackendApiService,
-        'isLearnerGroupFeatureEnabledAsync'
-      ).and.returnValue(Promise.resolve(true));
 
       spyOn(
         feedbackBackendApiService,
@@ -890,6 +883,9 @@ describe('Learner dashboard page', () => {
         ShowRedesignedLearnerDashboard: {
           isEnabled: false,
         },
+        LearnerGroupsAreEnabled: {
+          isEnabled: true,
+        },
       });
     });
     it('should correctly get subtopic masteries', fakeAsync(() => {
@@ -1113,6 +1109,9 @@ describe('Learner dashboard page', () => {
           isEnabled: false,
         },
         ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+        LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
       });
@@ -1538,6 +1537,9 @@ describe('Learner dashboard page', () => {
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: false,
         },
+        LearnerGroupsAreEnabled: {
+          isEnabled: true,
+        },
       });
 
       component.setActiveSection(
@@ -1559,6 +1561,9 @@ describe('Learner dashboard page', () => {
           isEnabled: true,
         },
         ExplorationEditorNewCreatorFeedbackTab: {
+          isEnabled: true,
+        },
+        LearnerGroupsAreEnabled: {
           isEnabled: true,
         },
       });
@@ -1584,6 +1589,9 @@ describe('Learner dashboard page', () => {
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: false,
         },
+        LearnerGroupsAreEnabled: {
+          isEnabled: true,
+        },
       });
 
       component.activeSection =
@@ -1608,6 +1616,9 @@ describe('Learner dashboard page', () => {
         },
         ExplorationEditorNewCreatorFeedbackTab: {
           isEnabled: false,
+        },
+        LearnerGroupsAreEnabled: {
+          isEnabled: true,
         },
       });
 
