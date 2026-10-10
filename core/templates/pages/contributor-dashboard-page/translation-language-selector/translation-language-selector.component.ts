@@ -40,6 +40,9 @@ interface Options {
   description: string;
 }
 
+const ALL_LANGUAGES_OPTION_ID = '';
+const ALL_LANGUAGES_OPTION_DESCRIPTION = 'All languages';
+
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html',
@@ -50,6 +53,10 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeLanguageCode!: string | null;
+  // When true, prepends an "All languages" option. Used by the submitted
+  // translations filter so translators can view cards in every language
+  // without writing that sentinel into TranslationLanguageService.
+  @Input() includeAllOption: boolean = false;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
   @ViewChild('filterDiv') filterDivRef!: ElementRef;
@@ -73,13 +80,15 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
-      this.languageSelection =
-        this.languageIdToDescription[
-          this.translationLanguageService.getActiveLanguageCode()
-        ];
-    });
-    this.filteredOptions = this.options = this.languageUtilService
+    if (!this.includeAllOption) {
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
+        this.languageSelection =
+          this.languageIdToDescription[
+            this.translationLanguageService.getActiveLanguageCode()
+          ];
+      });
+    }
+    const languageOptions = this.languageUtilService
       .getAllVoiceoverLanguageCodes()
       .map(languageCode => {
         const description =
@@ -87,6 +96,17 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.languageIdToDescription[languageCode] = description;
         return {id: languageCode, description};
       });
+    this.languageIdToDescription[ALL_LANGUAGES_OPTION_ID] =
+      ALL_LANGUAGES_OPTION_DESCRIPTION;
+    this.filteredOptions = this.options = this.includeAllOption
+      ? [
+          {
+            id: ALL_LANGUAGES_OPTION_ID,
+            description: ALL_LANGUAGES_OPTION_DESCRIPTION,
+          },
+          ...languageOptions,
+        ]
+      : languageOptions;
 
     this.contributionOpportunitiesBackendApiService
       .fetchFeaturedTranslationLanguagesAsync()
@@ -94,9 +114,15 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.featuredLanguages = featuredLanguages;
       });
 
-    this.languageSelection = this.activeLanguageCode
-      ? this.languageIdToDescription[this.activeLanguageCode]
-      : 'Language';
+    this.languageSelection = this.getLanguageSelectionLabel(
+      this.activeLanguageCode
+    );
+
+    // Preferred-language auto-select would override "All" on the submitted
+    // translations tab, and would also write into Translate Text state.
+    if (this.includeAllOption) {
+      return;
+    }
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
@@ -105,6 +131,15 @@ export class TranslationLanguageSelectorComponent implements OnInit {
           this.populateLanguageSelection(preferredLanguageCode);
         }
       });
+  }
+
+  private getLanguageSelectionLabel(languageCode: string | null): string {
+    if (this.includeAllOption && !languageCode) {
+      return ALL_LANGUAGES_OPTION_DESCRIPTION;
+    }
+    return languageCode
+      ? this.languageIdToDescription[languageCode]
+      : 'Language';
   }
 
   toggleDropdown(): void {
@@ -120,12 +155,17 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
   populateLanguageSelection(languageCode: string): void {
     this.setActiveLanguageCode.emit(languageCode);
-    this.languageSelection = this.languageIdToDescription[languageCode];
+    this.languageSelection = this.getLanguageSelectionLabel(languageCode);
   }
 
   selectOption(activeLanguageCode: string): void {
     this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
+    // Do not persist the submitted-translations filter; "All" is not a
+    // real language, and a real code here would leak into Translate Text.
+    if (this.includeAllOption || !activeLanguageCode) {
+      return;
+    }
     this.contributionOpportunitiesBackendApiService.savePreferredTranslationLanguageAsync(
       activeLanguageCode
     );

@@ -3109,6 +3109,20 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW,
         )
 
+        hi_suggestions, hi_offset = (
+            suggestion_services.get_submitted_suggestions_by_offset(
+                user_id=self.author_id_1,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                offset=0,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                language_code='hi',
+            )
+        )
+        self.assertEqual(len(hi_suggestions), 1)
+        self.assertEqual(hi_offset, 1)
+        self.assertEqual(hi_suggestions[0].language_code, 'hi')
+
         # Fetch submitted question suggestions.
         question_suggestions, offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
