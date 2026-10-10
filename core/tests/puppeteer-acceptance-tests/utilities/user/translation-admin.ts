@@ -24,6 +24,7 @@ const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 
 const translationRightValue = 'translation';
+const translationSubmitRightValue = 'submit_translation';
 const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
@@ -79,6 +80,30 @@ export class TranslationAdmin extends BaseUser {
     await this.select(
       addContributonRightsCategorySelect,
       translationRightValue
+    );
+    await this.select(addContributonRightsLanguageDropdown, languageCode);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Success.',
+      'Adding contribution rights'
+    );
+  }
+
+  /**
+   * Function for adding a translation submit right to a user.
+   * @param username - The username of the user.
+   * @param languageCode - The language code of the language.
+   */
+  async addTranslationSubmitRights(
+    username: string,
+    languageCode: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addContributorUsernameInput);
+    await this.typeInInputField(addContributorUsernameInput, username);
+    await this.select(
+      addContributonRightsCategorySelect,
+      translationSubmitRightValue
     );
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOnElementWithSelector(addContributionRightsSubmitButton);

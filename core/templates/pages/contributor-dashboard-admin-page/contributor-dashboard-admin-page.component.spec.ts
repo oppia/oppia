@@ -274,6 +274,7 @@ describe('ContributorDashboardAdminPageComponent', () => {
         };
         const viewContributorsResponse = {
           can_review_questions: true,
+          can_submit_translation_for_language_codes: [],
           can_review_translation_for_language_codes: ['en', 'es'],
           can_review_voiceover_for_language_codes: ['en', 'es'],
           can_submit_questions: true,
