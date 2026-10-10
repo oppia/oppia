@@ -1399,6 +1399,77 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
         )
 
+    def test_get_topic_id_to_translation_completeness_computes_percentage(
+        self,
+    ) -> None:
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_a',
+            topic_id='topic_a',
+            topic_name='topic_a_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_b',
+            topic_id='topic_a',
+            topic_name='topic_a_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 3},
+        ).put()
+
+        # Aggregated: hi = (5 + 3) / (10 + 10) * 100 = 40.
+        result = opportunity_services.get_topic_id_to_translation_completeness(
+            'hi'
+        )
+
+        self.assertEqual(result['topic_a'], 40.0)
+
+    def test_get_topic_id_to_translation_completeness_is_zero_for_absent_language(
+        self,
+    ) -> None:
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_a',
+            topic_id='topic_a',
+            topic_name='topic_a_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 5},
+        ).put()
+
+        result = opportunity_services.get_topic_id_to_translation_completeness(
+            'fr'
+        )
+
+        self.assertEqual(result['topic_a'], 0)
+
+    def test_get_topic_id_to_translation_completeness_is_zero_for_no_content(
+        self,
+    ) -> None:
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_empty',
+            topic_id='topic_empty',
+            topic_name='topic_empty_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=0,
+            translation_counts={},
+        ).put()
+
+        result = opportunity_services.get_topic_id_to_translation_completeness(
+            'hi'
+        )
+
+        self.assertEqual(result['topic_empty'], 0)
+
     def test_regenerate_opportunities_related_to_topic_when_story_deleted(
         self,
     ) -> None:
