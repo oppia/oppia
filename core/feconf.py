@@ -110,12 +110,6 @@ FRONTEND_TEMPLATES_DIR = (
     if constants.DEV_MODE
     else os.path.join('build')
 )
-# To know more about AOT visit https://angular.io/guide/glossary#aot
-FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular')
-    if constants.DEV_MODE
-    else os.path.join('build')
-)
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
 )
@@ -982,9 +976,6 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_UPDATES_DATA_URL = '/feedbackupdateshandler/data'
-FEEDBACK_UPDATES_URL = '/feedbackupdates'
-FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
@@ -1055,6 +1046,7 @@ REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
+OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'
 TRANSLATABLE_CONTENTS_V2_URL = '/gettranslatablecontentshandlerv2'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'

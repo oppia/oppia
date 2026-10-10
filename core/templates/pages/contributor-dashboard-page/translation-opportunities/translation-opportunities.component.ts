@@ -231,6 +231,14 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
+  async loadOpportunitiesCountAsync(): Promise<number> {
+    return this.contributionOpportunitiesService.getTranslationOpportunitiesCountAsync(
+      this.translationLanguageService.getActiveLanguageCode(),
+      this.translationTopicService.getActiveTopicName(),
+      this.activeEntityType
+    );
+  }
+
   async loadOpportunitiesAsync(): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;

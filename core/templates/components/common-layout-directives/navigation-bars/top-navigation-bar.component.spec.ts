@@ -23,7 +23,6 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
-  flush,
   TestBed,
   tick,
   waitForAsync,
@@ -36,19 +35,15 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
-import {AlertsService} from 'services/alerts.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {MockI18nService, MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopNavigationBarComponent} from './top-navigation-bar.component';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UserInfo} from 'domain/user/user-info.model';
-import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
 import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -59,9 +54,6 @@ import {FeedbackModalComponent} from '../../../base-components/feedback-modal.co
 
 class MockPlatformFeatureService {
   status = {
-    ShowFeedbackUpdatesInProfilePicDropdownMenu: {
-      isEnabled: false,
-    },
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
@@ -69,6 +61,9 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
     EnableCertificateAssessment: {
+      isEnabled: false,
+    },
+    LearnerGroupsAreEnabled: {
       isEnabled: false,
     },
   };
@@ -124,55 +119,16 @@ describe('TopNavigationBarComponent', () => {
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let userService: UserService;
-  let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
   let sidebarStatusService: SidebarStatusService;
-  let feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService;
   let contentTranslationManagerService: ContentTranslationManagerService;
-  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
-  let threadSummaryList = [
-    {
-      status: 'open',
-      original_author_id: '1',
-      last_updated_msecs: 1000,
-      last_message_text: 'Last Message',
-      total_message_count: 5,
-      last_message_is_read: false,
-      second_last_message_is_read: true,
-      author_last_message: '2',
-      author_second_last_message: 'Last Message',
-      exploration_title: 'Biology',
-      exploration_id: 'exp1',
-      thread_id: 'thread_1',
-    },
-    {
-      status: 'open',
-      original_author_id: '2',
-      last_updated_msecs: 1001,
-      last_message_text: 'Last Message',
-      total_message_count: 5,
-      last_message_is_read: false,
-      second_last_message_is_read: true,
-      author_last_message: '2',
-      author_second_last_message: 'Last Message',
-      exploration_title: 'Algebra',
-      exploration_id: 'exp1',
-      thread_id: 'thread_1',
-    },
-  ];
-
-  let FeedbackUpdatesData = {
-    thread_summaries: threadSummaryList,
-    number_of_unread_threads: 10,
-  };
-
   let mockResizeEmitter: EventEmitter<void>;
 
   beforeEach(waitForAsync(() => {
@@ -184,8 +140,6 @@ describe('TopNavigationBarComponent', () => {
       providers: [
         NavigationService,
         CookieService,
-        AlertsService,
-        FeedbackUpdatesBackendApiService,
         UserService,
         {
           provide: I18nService,
@@ -234,13 +188,6 @@ describe('TopNavigationBarComponent', () => {
     urlService = TestBed.inject(UrlService);
     contentTranslationManagerService = TestBed.inject(
       ContentTranslationManagerService
-    );
-    feedbackUpdatesBackendApiService = TestBed.inject(
-      FeedbackUpdatesBackendApiService
-    );
-    alertsService = TestBed.inject(AlertsService);
-    learnerGroupBackendApiService = TestBed.inject(
-      LearnerGroupBackendApiService
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -612,10 +559,7 @@ describe('TopNavigationBarComponent', () => {
 
   it('should check if learner groups feature is enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(
-      learnerGroupBackendApiService,
-      'isLearnerGroupFeatureEnabledAsync'
-    ).and.resolveTo(true);
+    mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = true;
 
     component.ngOnInit();
     tick();
@@ -759,84 +703,6 @@ describe('TopNavigationBarComponent', () => {
       )
     );
   }));
-
-  it(
-    'should fetch the number of unread feedback' + 'when user is logged In',
-    fakeAsync(() => {
-      let userInfo = new UserInfo(
-        ['USER_ROLE'],
-        true,
-        false,
-        false,
-        false,
-        true,
-        'en',
-        'username1',
-        'tester@example.com',
-        true
-      );
-
-      spyOn(component, 'truncateNavbar').and.stub();
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-      const fetchDataSpy = spyOn(
-        feedbackUpdatesBackendApiService,
-        'fetchFeedbackUpdatesDataAsync'
-      ).and.returnValue(
-        Promise.resolve({
-          numberOfUnreadThreads: FeedbackUpdatesData.number_of_unread_threads,
-          threadSummaries: FeedbackUpdatesData.thread_summaries.map(
-            threadSummary =>
-              FeedbackThreadSummary.createFromBackendDict(threadSummary)
-          ),
-          paginatedThreadsList: [],
-        })
-      );
-      component.userIsLoggedIn = true;
-
-      component.ngOnInit();
-      tick();
-
-      expect(component.unreadThreadsCount).toBe(10);
-      expect(fetchDataSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should show an alert when fails to' + 'get the feedback updates data',
-    fakeAsync(() => {
-      let userInfo = new UserInfo(
-        ['USER_ROLE'],
-        true,
-        false,
-        false,
-        false,
-        true,
-        'en',
-        'username1',
-        'tester@example.com',
-        true
-      );
-
-      spyOn(component, 'truncateNavbar').and.stub();
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-      const fetchDataSpy = spyOn(
-        feedbackUpdatesBackendApiService,
-        'fetchFeedbackUpdatesDataAsync'
-      ).and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-
-      component.userIsLoggedIn = true;
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
-
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'Failed to get number of unread thread of feedback updates'
-      );
-      expect(fetchDataSpy).toHaveBeenCalled();
-      flush();
-    })
-  );
 
   it('should return proper offset for dropdown', () => {
     var dummyLearnTab = document.createElement('div');
@@ -1013,23 +879,6 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it(
-    'should return correct value for show feedback updates' +
-      'in profile pic drop down menu feature flag',
-    () => {
-      expect(
-        component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBe(false);
-
-      mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
-        true;
-
-      expect(
-        component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBe(true);
-    }
-  );
-
-  it(
     'should return correct value for show technical feedback dashboard page' +
       'in profile pic drop down menu feature flag',
     () => {
@@ -1071,18 +920,14 @@ describe('TopNavigationBarComponent', () => {
     });
   });
 
-  it('should not check learner groups feature on signup page', fakeAsync(() => {
+  it('should not enable learner groups feature on signup page', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
-    const learnerGroupSpy = spyOn(
-      learnerGroupBackendApiService,
-      'isLearnerGroupFeatureEnabledAsync'
-    );
+    mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = false;
 
     mockWindowRef.nativeWindow.location.pathname = '/signup';
     component.ngOnInit();
     tick();
 
-    expect(learnerGroupSpy).not.toHaveBeenCalled();
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(false);
   }));
 
