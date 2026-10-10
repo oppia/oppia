@@ -44,7 +44,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
 import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -62,6 +61,9 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
     EnableCertificateAssessment: {
+      isEnabled: false,
+    },
+    LearnerGroupsAreEnabled: {
       isEnabled: false,
     },
   };
@@ -122,7 +124,6 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let sidebarStatusService: SidebarStatusService;
   let contentTranslationManagerService: ContentTranslationManagerService;
-  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -187,9 +188,6 @@ describe('TopNavigationBarComponent', () => {
     urlService = TestBed.inject(UrlService);
     contentTranslationManagerService = TestBed.inject(
       ContentTranslationManagerService
-    );
-    learnerGroupBackendApiService = TestBed.inject(
-      LearnerGroupBackendApiService
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -561,10 +559,7 @@ describe('TopNavigationBarComponent', () => {
 
   it('should check if learner groups feature is enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(
-      learnerGroupBackendApiService,
-      'isLearnerGroupFeatureEnabledAsync'
-    ).and.resolveTo(true);
+    mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = true;
 
     component.ngOnInit();
     tick();
@@ -925,18 +920,14 @@ describe('TopNavigationBarComponent', () => {
     });
   });
 
-  it('should not check learner groups feature on signup page', fakeAsync(() => {
+  it('should not enable learner groups feature on signup page', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
-    const learnerGroupSpy = spyOn(
-      learnerGroupBackendApiService,
-      'isLearnerGroupFeatureEnabledAsync'
-    );
+    mockPlatformFeatureService.status.LearnerGroupsAreEnabled.isEnabled = false;
 
     mockWindowRef.nativeWindow.location.pathname = '/signup';
     component.ngOnInit();
     tick();
 
-    expect(learnerGroupSpy).not.toHaveBeenCalled();
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(false);
   }));
 
