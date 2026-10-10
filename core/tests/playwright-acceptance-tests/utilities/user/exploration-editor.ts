@@ -31,6 +31,8 @@ const baseUrl = testConstants.URLs.BaseURL;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
+const explorationDashboardLinkSelector = (explorationId: string): string =>
+  `a[href="/create/${explorationId}"]`;
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
@@ -120,6 +122,9 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const improvementsTabButton = '.e2e-test-improvements-tab';
+const mobileImprovementsTabItem =
+  '.oppia-exploration-editor-tabs-dropdown-item:has-text("Improvements")';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
@@ -1149,6 +1154,58 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
+  }
+
+  /**
+   * Opens an existing exploration from the Creator Dashboard.
+   * @param {string} explorationId - The ID of the exploration to reopen.
+   */
+  async openExplorationFromCreatorDashboard(
+    explorationId: string
+  ): Promise<void> {
+    // List view contains several links to the same exploration, so the first
+    // matching link is sufficient in both list and card views.
+    const explorationLink = this.page
+      .locator(explorationDashboardLinkSelector(explorationId))
+      .first();
+    await explorationLink.waitFor({state: 'visible'});
+    await explorationLink.click();
+    await this.page.waitForURL(
+      url => url.pathname === `/create/${explorationId}`
+    );
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
+   * Verifies Improvements tab visibility after the main editor has loaded.
+   * The mobile Options dropdown must initially be closed and is left closed.
+   * @param {boolean} present - Whether the Improvements tab should be visible.
+   */
+  async expectImprovementsTabToBePresent(present: boolean): Promise<void> {
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.page.locator(mobileNavbarDropdown).isVisible())) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      // A closed or empty menu would make the absence assertion pass without
+      // checking whether Improvements is actually available.
+      await this.expectElementToBeVisible(mobileMainTabButton);
+      await this.expectElementToBeVisible(mobileImprovementsTabItem, present);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeVisible(improvementsTabButton, present);
+    }
   }
 
   /**
