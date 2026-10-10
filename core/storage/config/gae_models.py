@@ -27,6 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     # Here, we are importing 'platform_parameter_domain' only for type checking.
     from core.domain import (  # pylint: disable=invalid-import
+        android_platform_parameter_domain,
         platform_parameter_domain,
     )
     from mypy_imports import base_models, datastore_services
@@ -124,6 +125,110 @@ class PlatformParameterModel(base_models.VersionedModel):
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
+            instance.
+        """
+        return cls(
+            id=param_name,
+            rules=rule_dicts,
+            rule_schema_version=rule_schema_version,
+            default_value=default_value,
+        )
+
+
+class AndroidPlatformParameterSnapshotMetadataModel(
+    base_models.BaseSnapshotMetadataModel
+):
+    """Storage model for metadata of an Android parameter snapshot."""
+
+    pass
+
+
+class AndroidPlatformParameterSnapshotContentModel(
+    base_models.BaseSnapshotContentModel
+):
+    """Storage model for content of an Android parameter snapshot."""
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class AndroidPlatformParameterConfigModel(
+    base_models.BasePlatformParameterConfigModel
+):
+    """A class that represents a named dynamic android platform parameter.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the parameter.
+    """
+
+    SNAPSHOT_METADATA_CLASS = AndroidPlatformParameterSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = AndroidPlatformParameterSnapshotContentModel
+
+    rules = datastore_services.JsonProperty(repeated=True)
+    rule_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
+    default_value = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Android platform parameter configs are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Android platform parameter configs contain no user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create(
+        cls,
+        param_name: str,
+        rule_dicts: List[
+            android_platform_parameter_domain.AndroidPlatformParameterRuleDict
+        ],
+        rule_schema_version: int,
+        default_value: android_platform_parameter_domain.AndroidPlatformParameterDataTypes,
+    ) -> AndroidPlatformParameterConfigModel:
+        """Creates a AndroidPlatformParameterConfigModel instance.
+
+        Args:
+            param_name: str. The name of the parameter, which is immutable.
+            rule_dicts: list(dict). List of dict representation of
+                AndroidPlatformParameterRule objects, which have the following
+                structure:
+                    - value_when_matched: *. The result of the rule when it's
+                        matched.
+                    - filters: list(dict). List of dict representation of
+                        AndroidPlatformParameterFilter objects, having the following
+                        structure:
+                            - type: str. The type of the filter.
+                            - conditions: list((str, str)). Each element of the
+                                list is a 2-tuple (op, value), where op is the
+                                operator for comparison and value is the value
+                                used for comparison.
+            rule_schema_version: int. The schema version for the rule dicts.
+            default_value: AndroidPlatformParameterDataTypes. The default value of the platform
+                parameter.
+
+        Returns:
+            AndroidPlatformParameterConfigModel. The created AndroidPlatformParameterConfigModel
             instance.
         """
         return cls(

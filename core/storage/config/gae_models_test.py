@@ -27,7 +27,10 @@ from typing import List
 MYPY = False
 if MYPY:  # pragma: no cover
     # Here, we are importing 'platform_parameter_domain' only for type checking.
-    from core.domain import platform_parameter_domain
+    from core.domain import (
+        android_platform_parameter_domain,
+        platform_parameter_domain,
+    )
     from mypy_imports import base_models, config_models
 
 (base_models, config_models) = models.Registry.import_models(
@@ -198,6 +201,156 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
             expected_export_policy_dict,
+        )
+
+
+class AndroidPlatformParameterSnapshotContentModelTests(
+    test_utils.GenericTestBase
+):
+    """Tests for Android platform parameter snapshot models."""
+
+    def test_content_model_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.AndroidPlatformParameterSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_android_config_uses_android_snapshot_models(self) -> None:
+        self.assertIs(
+            config_models.AndroidPlatformParameterConfigModel.SNAPSHOT_METADATA_CLASS,
+            config_models.AndroidPlatformParameterSnapshotMetadataModel,
+        )
+        self.assertIs(
+            config_models.AndroidPlatformParameterConfigModel.SNAPSHOT_CONTENT_CLASS,
+            config_models.AndroidPlatformParameterSnapshotContentModel,
+        )
+
+
+class AndroidPlatformParameterConfigModelTests(test_utils.GenericTestBase):
+    """Tests for AndroidPlatformParameterConfigModel."""
+
+    def test_policies(self) -> None:
+        self.assertEqual(
+            config_models.AndroidPlatformParameterConfigModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+        self.assertEqual(
+            config_models.AndroidPlatformParameterConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_create_model(self) -> None:
+        model = config_models.AndroidPlatformParameterConfigModel.create(
+            param_name='android_parameter',
+            rule_dicts=[
+                {
+                    'filters': [
+                        {
+                            'type': 'app_version',
+                            'conditions': [['>=', '1.2.3']],
+                        }
+                    ],
+                    'value_when_matched': True,
+                }
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
+        )
+
+        self.assertEqual(model.id, 'android_parameter')
+        self.assertEqual(model.rules[0]['value_when_matched'], True)
+        self.assertEqual(
+            model.rule_schema_version,
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+        )
+        self.assertFalse(model.default_value)
+
+    def test_commit_persists_android_config(self) -> None:
+        rules: List[
+            android_platform_parameter_domain.AndroidPlatformParameterRuleDict
+        ] = [
+            {
+                'filters': [
+                    {
+                        'type': 'app_version',
+                        'conditions': [['>=', '1.2.3']],
+                    }
+                ],
+                'value_when_matched': True,
+            }
+        ]
+        model = config_models.AndroidPlatformParameterConfigModel.create(
+            param_name='android_parameter',
+            rule_dicts=rules,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
+        )
+
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+
+        retrieved_model = (
+            config_models.AndroidPlatformParameterConfigModel.get_version(
+                'android_parameter', 1
+            )
+        )
+        assert retrieved_model is not None
+        self.assertEqual(retrieved_model.rules, rules)
+        self.assertFalse(retrieved_model.default_value)
+
+        updated_rules: List[
+            android_platform_parameter_domain.AndroidPlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
+        retrieved_model.rules = updated_rules
+        retrieved_model.default_value = True
+        retrieved_model.commit(feconf.SYSTEM_COMMITTER_ID, 'updated config', [])
+
+        retrieved_model_v1 = (
+            config_models.AndroidPlatformParameterConfigModel.get_version(
+                'android_parameter', 1
+            )
+        )
+        retrieved_model_v2 = (
+            config_models.AndroidPlatformParameterConfigModel.get_version(
+                'android_parameter', 2
+            )
+        )
+        assert retrieved_model_v1 is not None
+        assert retrieved_model_v2 is not None
+        self.assertEqual(retrieved_model_v1.rules, rules)
+        self.assertFalse(retrieved_model_v1.default_value)
+        self.assertEqual(retrieved_model_v2.rules, updated_rules)
+        self.assertTrue(retrieved_model_v2.default_value)
+
+    def test_commit_without_default_value_raises_exception(self) -> None:
+        model = config_models.AndroidPlatformParameterConfigModel(
+            id='android_parameter',
+            rules=[],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+        )
+
+        with self.assertRaisesRegex(Exception, 'default_value'):
+            model.commit(feconf.SYSTEM_COMMITTER_ID, 'missing default', [])
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            config_models.AndroidPlatformParameterConfigModel.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rule_schema_version': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
         )
 
 
