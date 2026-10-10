@@ -291,6 +291,73 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
     });
 
+    it('should render enabled dashboard tabs as focusable buttons', fakeAsync(() => {
+      component.tabsDetails.submitQuestionTab.enabled = true;
+      spyOn(focusManagerService, 'setFocusWithoutScroll');
+      fixture.detectChanges();
+
+      const tabButtons = fixture.nativeElement.querySelectorAll(
+        '.oppia-opportunities-tabs-button'
+      ) as NodeListOf<HTMLButtonElement>;
+      expect(tabButtons.length).toBe(3);
+
+      tabButtons.forEach(tabButton => {
+        expect(tabButton.tagName).toBe('BUTTON');
+        expect(tabButton.type).toBe('button');
+        expect(tabButton.hasAttribute('href')).toBe(false);
+        expect(tabButton.tabIndex).toBe(0);
+      });
+
+      const tabNames = [
+        'myContributionTab',
+        'submitQuestionTab',
+        'translateTextTab',
+      ];
+      const initialHash = window.location.hash;
+
+      tabButtons.forEach((tabButton, index) => {
+        tabButton.click();
+        fixture.detectChanges();
+
+        expect(component.activeTabName).toBe(tabNames[index]);
+        expect(
+          fixture.nativeElement
+            .querySelector('.e2e-test-active-tab')
+            .contains(tabButton)
+        ).toBe(true);
+        expect(window.location.hash).toBe(initialHash);
+      });
+      flush();
+    }));
+
+    it('should hide question submission without contribution rights', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve({
+          ...userContributionRights,
+          can_suggest_questions: false,
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-submitQuestionTab')
+      ).toBeNull();
+      expect(
+        fixture.nativeElement.querySelectorAll(
+          '.oppia-opportunities-tabs-button'
+        ).length
+      ).toBe(2);
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-myContributionTab')
+      ).not.toBeNull();
+      expect(
+        fixture.nativeElement.querySelector('.e2e-test-translateTextTab')
+      ).not.toBeNull();
+    }));
+
     it('should change active language when clicking on language selector', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
