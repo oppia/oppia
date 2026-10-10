@@ -458,38 +458,6 @@ def get_learner_group_syllabus_story_summaries(
     ]
 
 
-def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
-    """Returns the ids of the completed nodes that come latest in the story.
-
-    Args:
-        user_id: str. ID of the given user.
-        story_id: str. ID of the story.
-
-    Returns:
-        list(str). List of the completed node ids that come latest in the story.
-        If length is larger than 3, return the last three of them. If length is
-        smaller or equal to 3, return all of them.
-    """
-    progress_model = user_models.StoryProgressModel.get(
-        user_id, story_id, strict=False
-    )
-
-    if not progress_model:
-        return []
-
-    num_of_nodes = min(len(progress_model.completed_node_ids), 3)
-    story = get_story_by_id(story_id, strict=True)
-    ordered_node_ids = [
-        node.id for node in story.story_contents.get_ordered_nodes()
-    ]
-    ordered_completed_node_ids = [
-        node_id
-        for node_id in ordered_node_ids
-        if node_id in progress_model.completed_node_ids
-    ]
-    return ordered_completed_node_ids[-num_of_nodes:]
-
-
 def get_completed_nodes_in_story(
     user_id: str, story_id: str
 ) -> List[story_domain.StoryNode]:

@@ -2025,7 +2025,6 @@ describe('New Conversation skin component', () => {
       'recordChapterCompletionAsync'
     ).and.returnValue(
       Promise.resolve({
-        readyForReviewTest: true,
         nextNodeId: '',
         summaries: [],
       })

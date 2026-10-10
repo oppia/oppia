@@ -838,18 +838,6 @@ describe('Question player engine service', () => {
       }
     );
 
-    it('should initialize pretest services', () => {
-      spyOn(questionPlayerEngineService, 'init');
-      let pretestQuestionObjects: Question[] = [];
-      let callback = () => {};
-
-      questionPlayerEngineService.initializePretestServices(
-        pretestQuestionObjects,
-        callback
-      );
-      expect(questionPlayerEngineService.init).toHaveBeenCalled();
-    });
-
     it(
       'should show warning message if the feedback ' + 'content is empty',
       () => {
