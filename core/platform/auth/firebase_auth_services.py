@@ -59,8 +59,8 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     auth_domain,
-    platform_parameter_list,
-    platform_parameter_services,
+    web_platform_parameter_list,
+    web_platform_parameter_services,
 )
 from core.platform import models
 
@@ -666,8 +666,8 @@ def _create_auth_claims(
     assigned_role = firebase_claims.get('role')
     role_is_super_admin = (
         primary_email
-        == platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        == web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
         or assigned_role == feconf.FIREBASE_ROLE_SUPER_ADMIN
     )

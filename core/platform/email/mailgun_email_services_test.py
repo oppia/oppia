@@ -22,7 +22,7 @@ import os
 import textwrap
 from unittest import mock
 
-from core.domain import email_services, platform_parameter_list
+from core.domain import email_services, web_platform_parameter_list
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -53,7 +53,7 @@ class EmailTests(test_utils.GenericTestBase):
         )
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_without_bcc_reply_to_and_recipients(
@@ -100,7 +100,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertTrue(resp)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_file_attachments(
@@ -146,7 +146,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(kwargs['files'][0][1][0], 'test_file.txt')
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipient(
@@ -205,7 +205,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertTrue(resp)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipients(
@@ -264,7 +264,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertTrue(resp)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_batch_send_to_mailgun(self, mock_post: mock.Mock) -> None:
@@ -399,7 +399,7 @@ class EmailTests(test_utils.GenericTestBase):
                 )
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_invalid_status_code_returns_false(
@@ -444,7 +444,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertFalse(resp)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+        [(web_platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
     )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_raises_exception_for_permanent_4xx_error(

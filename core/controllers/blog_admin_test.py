@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import platform_parameter_list
+from core.domain import web_platform_parameter_list
 from core.tests import test_utils
 
 
@@ -119,7 +119,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                 'value': 10,
             },
             response_platform_parameters[
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
         )
 
@@ -127,7 +127,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                    web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             },
         }
@@ -140,7 +140,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                 'value': new_platform_parameter_value,
             },
             response_platform_parameters[
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
         )
 
@@ -158,7 +158,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                 'value': 10,
             },
             response_platform_parameters[
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
         )
 
@@ -166,7 +166,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                    web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             },
         }
@@ -222,7 +222,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                 'value': 10,
             },
             response_platform_parameters[
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
         )
 
@@ -230,7 +230,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                    web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             },
         }
@@ -261,7 +261,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                 'value': 10,
             },
             response_platform_parameters[
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
         )
 
@@ -269,7 +269,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+                    web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             },
         }
