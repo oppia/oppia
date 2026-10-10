@@ -89,6 +89,13 @@ export class ClassroomNavigationLinksComponent implements OnInit {
             .forEach(classroom => this.classroomSummaries.push(classroom));
           this.isLoading = false;
           this.classroomCountChange.emit(this.getClassroomCount());
+        })
+        .catch(() => {
+          // The template shows a skeleton loader while 'isLoading' is true.
+          // Without this handler, a failed request would leave that
+          // placeholder visible indefinitely, since this component is
+          // rendered in the navigation bar on every page.
+          this.isLoading = false;
         });
     }
   }
