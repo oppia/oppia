@@ -212,7 +212,7 @@ describe('Skill Misconceptions Editor Component', () => {
       spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
 
       component.ngOnInit();
-      component.openDeleteMisconceptionModal(1, '1');
+      component.openDeleteMisconceptionModal(1, new Event('click'));
       tick();
 
       expect(ngbModal.open).toHaveBeenCalledWith(
@@ -236,7 +236,7 @@ describe('Skill Misconceptions Editor Component', () => {
       spyOn(skillUpdateService, 'deleteMisconception').and.callThrough();
 
       component.ngOnInit();
-      component.openDeleteMisconceptionModal(1, '1');
+      component.openDeleteMisconceptionModal(1, new Event('click'));
       tick();
 
       expect(ngbModal.open).toHaveBeenCalledWith(

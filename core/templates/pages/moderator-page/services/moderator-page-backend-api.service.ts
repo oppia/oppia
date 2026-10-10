@@ -40,6 +40,9 @@ export interface ExplorationDict {
 export interface ActivityIdTypeDict {
   id: string;
   type: string;
+  // Every ActivityIdTypeDict is a string-keyed dict, so an array of them is
+  // assignable to SchemaDefaultValue, letting the schema-based editor edit it.
+  [key: string]: string;
 }
 
 export interface RecentCommitResponse {
