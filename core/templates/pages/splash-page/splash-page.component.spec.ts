@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-// @ts-nocheck
-
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
@@ -196,7 +194,7 @@ describe('Splash Page', () => {
 
   it('should get testimonials correctly', function () {
     component.ngOnInit();
-    expect(component.getTestimonials().length).toBe(component.testimonialCount);
+    expect(component.testimonialCount).toBe(component.getTestimonials().length);
   });
 
   it('should evaluate if user is logged in', fakeAsync(() => {
@@ -239,6 +237,17 @@ describe('Splash Page', () => {
     component.ngOnInit();
     flushMicrotasks();
     expect(component.userIsLoggedIn).toBe(false);
+  }));
+
+  it('should treat the user as logged out when fetching user info fails', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.reject(new Error('Failed to fetch user info.'))
+    );
+    spyOn(loaderService, 'hideLoadingScreen');
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(false);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
   it('should check if loader screen is working', fakeAsync(() => {
