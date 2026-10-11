@@ -21,6 +21,16 @@
 const LOGIN_URL = 'http://localhost:8181/login';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
+// The wrapper rendered whenever a page fails to load its content (a 400, 401,
+// 404 or 500 response). This class is shared by both the generic error page
+// (<error-page>) and the 404 page (<oppia-error-404-page>), so it covers every
+// audited page. Lighthouse must never accept an audit result for a page that
+// rendered this element, because the error page is cheap and would otherwise
+// produce misleadingly good scores.
+const ERROR_PAGE_SELECTOR = '.oppia-error-page-main-content';
+// The /error routes are themselves error pages, so the absence check below is
+// skipped for them.
+const ERROR_ROUTE_PREFIX = '/error';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -59,7 +69,51 @@ module.exports = async (browser, context) => {
     await setRole(page, 'BLOG_ADMIN');
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
+  if (!isErrorRoute(context.url)) {
+    await assertErrorPageIsAbsent(page, context.url);
+  }
   await page.close();
+};
+
+/**
+ * Whether the given audited URL is one of the /error routes, which render the
+ * error page on purpose.
+ *
+ * @param {string} url - The URL being audited.
+ * @returns {boolean} True if the URL points at an intentional error route.
+ */
+const isErrorRoute = function (url) {
+  const {pathname} = new URL(url);
+  return (
+    pathname === ERROR_ROUTE_PREFIX ||
+    pathname.startsWith(ERROR_ROUTE_PREFIX + '/')
+  );
+};
+
+/**
+ * Asserts that the page at the given URL did not render the Oppia error page.
+ *
+ * LHCI invokes this script once per audited URL before Lighthouse collects it,
+ * so throwing here stops the run before any audit result is accepted. Without
+ * this check a page that silently rendered the error page (for example because
+ * a request failed) would still be scored.
+ *
+ * @param {puppeteer.Page} page - The page to navigate and inspect.
+ * @param {string} url - The audited URL to check.
+ */
+const assertErrorPageIsAbsent = async function (page, url) {
+  await page.goto(url, {waitUntil: networkIdle});
+  const errorPageIsPresent = await page.evaluate(
+    selector => document.querySelector(selector) !== null,
+    ERROR_PAGE_SELECTOR
+  );
+  if (errorPageIsPresent) {
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the ${ERROR_PAGE_SELECTOR} element is ` +
+        'present in the DOM, which means the page rendered the Oppia error ' +
+        'page instead of its content.'
+    );
+  }
 };
 
 const seedBlankPagesForLighthouseRuns = async function (

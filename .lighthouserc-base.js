@@ -129,8 +129,36 @@ function buildPageAssertions(
 }
 
 /**
- * Builds the full assert matrix by prepending the audit catch-all entry and
- * then appending one entry per page.
+ * Builds a matchingUrlPattern that matches every URL that is not already
+ * claimed by one of the given page patterns.
+ *
+ * The ideal-default entry must not also bind to pages that have their own
+ * entry: LHCI evaluates every matching assertMatrix entry for a URL (see
+ * getAllAssertionResults in node_modules/@lhci/utils/src/assertions.js), so if
+ * it matched a page that carries a looser override, the ideal thresholds would
+ * win and silently defeat that override. The exclusion is a negative lookahead
+ * over the page patterns; each is wrapped in a non-capturing group so that any
+ * alternation within a page pattern stays scoped. The leading `.*` lets an
+ * unanchored page pattern match at any position, mirroring how LHCI matches
+ * (`new RegExp(pattern).test(finalUrl)`).
+ *
+ * @param {Array} pageConfigs - Array of objects, each with a
+ *   matchingUrlPattern {string}.
+ * @returns {string} A regex matching every URL not claimed by a page entry.
+ */
+function buildUnclaimedUrlPattern(pageConfigs) {
+  if (!pageConfigs.length) {
+    return '.*';
+  }
+  const claimedPatterns = pageConfigs
+    .map(({matchingUrlPattern}) => `(?:${matchingUrlPattern})`)
+    .join('|');
+  return `^(?!.*(?:${claimedPatterns})).*$`;
+}
+
+/**
+ * Builds the full assert matrix by prepending the audit catch-all entry, then
+ * the ideal-default entry for unclaimed URLs, and then one entry per page.
  *
  * @param {Array} pageConfigs - Array of objects, each with:
  *   - matchingUrlPattern {string}: Regex pattern for the URL.
@@ -145,11 +173,22 @@ function buildAssertMatrix(pageConfigs) {
   // LHCI evaluates every matching assertMatrix entry for a given URL; there is
   // no first-match-wins behavior (see getAllAssertionResults in
   // node_modules/@lhci/utils/src/assertions.js, which iterates all entries per
-  // URL group). The audit catch-all '.*' entry is therefore a safety net for
-  // any unlisted page, while each page entry applies the ideal performance
+  // URL group). The audit catch-all '.*' entry supplies the shared non-perf
+  // audits to every URL, and each page entry applies the ideal performance
   // baseline, or a tighter/looser per-page override. Ordering is cosmetic.
+  //
+  // The ideal-default entry holds any URL not claimed by a page entry to the
+  // same full assertion set (base audits, the ideal performance baseline,
+  // accessibility and seo) that a page entry without overrides receives. It
+  // excludes every page URL so it cannot bind an ideal threshold to a page that
+  // legitimately carries a looser override; consequently a page whose override
+  // is later removed still falls back to ideal through its own entry.
   return [
     buildAuditCatchAll(),
+    {
+      matchingUrlPattern: buildUnclaimedUrlPattern(pageConfigs),
+      assertions: buildPageAssertions(),
+    },
     ...pageConfigs.map(
       ({
         matchingUrlPattern,

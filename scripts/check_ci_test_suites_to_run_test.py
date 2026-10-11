@@ -710,6 +710,194 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     {page['name'] for page in LIGHTHOUSE_PAGES},
                 )
 
+    def test_get_lighthouse_test_suites_rejects_dev_feature_gated_pages(
+        self,
+    ) -> None:
+        pages_config = dict(LIGHTHOUSE_PAGES_CONFIG)
+        pages_config['certificate-page'] = {
+            'url': 'http://localhost:8181/certificate-assessment/1',
+            'page_module': (
+                'core/templates/pages/certificate-assessment-player-page/'
+                'certificate-assessment-player-page.module.ts'
+            ),
+        }
+        pages_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-pages-with-dev-gated-page.json'
+        )
+        with open(pages_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(pages_config))
+        lighthouse_pages_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_PAGES_CONFIG_FILE_PATH',
+            pages_config_file,
+        )
+        shards_config = {
+            name: list(pages)
+            for name, pages in LIGHTHOUSE_PAGES_FOR_SUITES.items()
+        }
+        shards_config['1'].append('certificate-page')
+        shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards-with-dev-gated-page.json'
+        )
+        with open(shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(shards_config))
+        lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            shards_config_file,
+        )
+        with (
+            lighthouse_pages_config_file_path_swap,
+            lighthouse_shards_config_file_path_swap,
+        ):
+            with self.assertRaisesRegex(
+                ValueError, 'certificate-page.*enable_certificate_assessment'
+            ):
+                configured_page_names = {
+                    page['name']
+                    for page in check_ci_test_suites_to_run.get_lighthouse_pages_from_config()
+                }
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', configured_page_names
+                )
+
+    def test_get_lighthouse_test_suites_allows_missing_dev_feature_gated_pages(
+        self,
+    ) -> None:
+        pages_config = dict(LIGHTHOUSE_PAGES_CONFIG)
+        pages_config['certificate-page'] = {
+            'url': 'http://localhost:8181/certificate-assessment/1',
+            'page_module': (
+                'core/templates/pages/certificate-assessment-player-page/'
+                'certificate-assessment-player-page.module.ts'
+            ),
+        }
+        pages_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-pages-with-dev-gated-page.json'
+        )
+        with open(pages_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(pages_config))
+        lighthouse_pages_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_PAGES_CONFIG_FILE_PATH',
+            pages_config_file,
+        )
+        shards_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-shards-without-dev-gated-page.json'
+        )
+        with open(shards_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(LIGHTHOUSE_PAGES_FOR_SUITES))
+        lighthouse_shards_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH',
+            shards_config_file,
+        )
+        with (
+            lighthouse_pages_config_file_path_swap,
+            lighthouse_shards_config_file_path_swap,
+        ):
+            configured_page_names = {
+                page['name']
+                for page in check_ci_test_suites_to_run.get_lighthouse_pages_from_config()
+            }
+            self.assertEqual(
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', configured_page_names
+                ),
+                [
+                    {
+                        'name': '1',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
+                    },
+                    {
+                        'name': '2',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
+                    },
+                ],
+            )
+
+    def test_get_lighthouse_test_suites_rejects_pages_without_standalone_pages(
+        self,
+    ) -> None:
+        pages_config = dict(LIGHTHOUSE_PAGES_CONFIG)
+        pages_config['login'] = {
+            'url': LIGHTHOUSE_PAGES_CONFIG['login']['url'],
+            'page_module': (
+                'core/templates/pages/login-page/login-page.module.ts'
+            ),
+        }
+        pages_config_file = os.path.join(
+            self.tempdir.name, 'lighthouse-pages-with-login-module.json'
+        )
+        with open(pages_config_file, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(pages_config))
+        lighthouse_pages_config_file_path_swap = self.swap(
+            check_ci_test_suites_to_run,
+            'LIGHTHOUSE_PAGES_CONFIG_FILE_PATH',
+            pages_config_file,
+        )
+        with (
+            lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):
+            with self.assertRaisesRegex(ValueError, 'login.*shard 1'):
+                configured_page_names = {
+                    page['name']
+                    for page in check_ci_test_suites_to_run.get_lighthouse_pages_from_config()
+                }
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', configured_page_names
+                )
+
+    def test_get_lighthouse_test_suites_allows_pages_without_standalone_pages(
+        self,
+    ) -> None:
+        configured_page_names = {page['name'] for page in LIGHTHOUSE_PAGES}
+        with (
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):
+            self.assertEqual(
+                check_ci_test_suites_to_run.get_lighthouse_test_suites(
+                    '.lighthouserc.js', configured_page_names
+                ),
+                [
+                    {
+                        'name': '1',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
+                    },
+                    {
+                        'name': '2',
+                        'module': '.lighthouserc.js',
+                        'environment': 'python',
+                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
+                    },
+                ],
+            )
+
+    def test_get_routes_without_standalone_pages(self) -> None:
+        content_with_array = (
+            'export const ROUTES_WITH_NO_STANDALONE_PAGE =\n'
+            '  [\'LOGIN\', \'LOGOUT\'];\n'
+        )
+        get_routes_without_standalone_pages = (
+            check_ci_test_suites_to_run._get_routes_without_standalone_pages  # pylint: disable=protected-access,line-too-long
+        )
+        self.assertEqual(
+            get_routes_without_standalone_pages(content_with_array),
+            {'LOGIN', 'LOGOUT'},
+        )
+        self.assertEqual(
+            get_routes_without_standalone_pages('const routes: Route[] = [];'),
+            set(),
+        )
+
     def test_check_ci_test_suites_to_run_with_output_all_suites(self) -> None:
         with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long

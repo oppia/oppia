@@ -23,7 +23,7 @@ import os
 import re
 
 import yaml
-from typing import Any, Dict, Final, List, Tuple, TypedDict
+from typing import Any, Dict, Final, List, Set, Tuple, TypedDict
 
 from .. import concurrent_task_utils
 from . import linter_utils
@@ -78,6 +78,12 @@ ROUTE_KEY_REGEX: Final = (
 )
 
 MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
+ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
+    r'ROUTES_WITH_NO_STANDALONE_PAGE\s*=\s*\[([^\]]*)\]'
+)
+QUOTED_STRING_REGEX: Final = (
+    r"'([^']+)'"  # pylint: disable=invalid-string-quote
+)
 
 
 def _extract_top_level_route_objects(content: str) -> List[str]:
@@ -110,6 +116,29 @@ def _extract_top_level_route_objects(content: str) -> List[str]:
                 route_objects.append(content[start_index : index + 1])
                 start_index = -1
     return route_objects
+
+
+def _get_routes_without_standalone_pages(normalized_content: str) -> Set[str]:
+    """Gets the route keys that have no standalone Lighthouse page.
+
+    The routing module lists the keys of routes that are pure redirect handlers
+    (for example login and logout) in ROUTES_WITH_NO_STANDALONE_PAGE, so that
+    the coverage check can skip them without an inline hardcoded list.
+
+    Args:
+        normalized_content: str. The routing module source with single-line
+            comments removed and string-concatenated imports joined.
+
+    Returns:
+        set(str). The route keys listed in ROUTES_WITH_NO_STANDALONE_PAGE,
+        or an empty set if the array is not present.
+    """
+    array_match = re.search(
+        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, normalized_content
+    )
+    if not array_match:
+        return set()
+    return set(re.findall(QUOTED_STRING_REGEX, array_match.group(1)))
 
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
@@ -473,12 +502,16 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 key_to_modules.setdefault(key, []).extend(import_matches)
 
         # Find routes that have no corresponding Lighthouse page entry.
+        routes_without_standalone_pages = _get_routes_without_standalone_pages(
+            normalized
+        )
         uncovered_keys = []
         for key, modules in sorted(key_to_modules.items()):
-            # The login and logout routes are pure redirect handlers without
-            # a dedicated page to audit, so they cannot have a Lighthouse
-            # page entry and are not part of the coverage check.
-            if key in ('LOGIN', 'LOGOUT'):
+            # Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE (for example
+            # login and logout) are pure redirect handlers without a dedicated
+            # page to audit, so they cannot have a Lighthouse page entry and
+            # are not part of the coverage check.
+            if key in routes_without_standalone_pages:
                 continue
             covered = any(os.path.normpath(m) in lh_modules for m in modules)
             if not covered:

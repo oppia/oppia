@@ -59,20 +59,13 @@
     "learner-dashboard",
     "diagnostic-test-player",
     "practice-session",
-    "subtopic-viewer",
-    "review-test"
+    "subtopic-viewer"
   ],
   "5": [
     "facilitator-dashboard",
     "technical-feedback-dashboard",
     "technical-feedback-detail",
     "learner-group-creator",
-    "certificate-offering-available",
-    "certificate-creator-dashboard",
-    "create-certificate-offering",
-    "edit-certificate-offering",
-    "certificate-assessment-player",
-    "certificate-assessment-result",
     "learner-group-editor",
     "learner-group-viewer"
   ]
