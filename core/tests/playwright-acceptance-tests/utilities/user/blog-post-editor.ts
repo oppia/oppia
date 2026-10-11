@@ -42,10 +42,16 @@ export class BlogPostEditor extends BaseUser {
     super(page);
   }
 
+  /**
+   * Navigates to the blog dashboard page.
+   */
   async navigateToBlogDashboardPage(): Promise<void> {
     await this.goto(blogDashboardUrl);
   }
 
+  /**
+   * Adds the default user bio in the blog dashboard if the bio form is visible.
+   */
   async addUserBioInBlogDashboard(): Promise<void> {
     const inputBar = await this.isElementVisible(blogAuthorBioField);
     if (inputBar) {
@@ -59,6 +65,10 @@ export class BlogPostEditor extends BaseUser {
     }
   }
 
+  /**
+   * Verifies that the expected number of blog posts are visible on the dashboard.
+   * @param {number} number - The expected number of blog posts.
+   */
   async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
     const allBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
     if (allBlogPosts.length !== number) {
@@ -67,6 +77,10 @@ export class BlogPostEditor extends BaseUser {
     showMessage(`Number of blog posts is equal to ${number}`);
   }
 
+  /**
+   * Updates the blog post title with the given text.
+   * @param {string} newBlogPostTitle - The new title for the blog post.
+   */
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(blogTitleInput);
     await this.clearAllTextFrom(blogTitleInput);
@@ -74,6 +88,10 @@ export class BlogPostEditor extends BaseUser {
     await this.page.keyboard.press('Tab');
   }
 
+  /**
+   * Updates the blog post body with the given text.
+   * @param {string} newBodyText - The new body text for the blog post.
+   */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
     const bodyVisible = await this.isElementVisible(blogBodyInput);
     if (!bodyVisible) {
@@ -85,6 +103,10 @@ export class BlogPostEditor extends BaseUser {
     await this.typeInInputField(blogBodyInput, newBodyText);
   }
 
+  /**
+   * Creates a draft blog post with the given title and opens its body editor.
+   * @param {string} draftBlogPostTitle - The title for the draft blog post.
+   */
   async createDraftBlogPostWithTitleAndOpenBodyRte(
     draftBlogPostTitle: string
   ): Promise<void> {
@@ -94,6 +116,10 @@ export class BlogPostEditor extends BaseUser {
     await this.updateBodyTextTo('test blog post body content');
   }
 
+  /**
+   * Writes the given HTML to the page clipboard.
+   * @param {string} html - The HTML content to write to the clipboard.
+   */
   async setClipboardContent(html: string): Promise<void> {
     await this.page
       .context()
@@ -108,11 +134,13 @@ export class BlogPostEditor extends BaseUser {
     }, html);
   }
 
+  /**
+   * Pastes clipboard content into the blog post content editor.
+   */
   async pasteContentInBlogPostContentRte(): Promise<void> {
     await this.page
       .context()
       .grantPermissions(['clipboard-read', 'clipboard-write']);
-    const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileBlogBodyInputWithText);
       await this.page.click(mobileBlogBodyInputWithText);
@@ -120,17 +148,22 @@ export class BlogPostEditor extends BaseUser {
       await this.expectElementToBeVisible(blogBodyInput);
       await this.page.click(blogBodyInput);
     }
-    await this.page.keyboard.down(modifier);
-    await this.page.keyboard.press('KeyV');
-    await this.page.keyboard.up(modifier);
+    await this.page.keyboard.press('ControlOrMeta+KeyV');
   }
 
+  /**
+   * Dismisses the paste error box without keeping pasted content.
+   */
   async clickOnDismissPasteErrorButton(): Promise<void> {
     await this.expectElementToBeVisible(pasteErrorBox);
     await this.clickOnElementWithSelector(dismissPasteErrorButton);
     await this.expectElementToBeVisible(pasteErrorBox, false);
   }
 
+  /**
+   * Accepts the valid portion of pasted content and verifies it appears.
+   * @param {string} textPasted - The text expected to be present after pasting.
+   */
   async clickOnPasteValidComponentsButton(textPasted: string): Promise<void> {
     await this.expectElementToBeVisible(pasteErrorBox);
     await this.clickOnElementWithSelector(pasteValidComponentsButton);
@@ -143,12 +176,18 @@ export class BlogPostEditor extends BaseUser {
     }
   }
 
+  /**
+   * Cancels the paste flow from the paste error box.
+   */
   async clickOnCancelPasteButton(): Promise<void> {
     await this.expectElementToBeVisible(pasteErrorBox);
     await this.clickOnElementWithSelector(cancelPasteButton);
     await this.expectElementToBeVisible(pasteErrorBox, false);
   }
 
+  /**
+   * Types in the editor to dismiss the paste error box.
+   */
   async typeInRteToDismissError(): Promise<void> {
     await this.expectElementToBeVisible(pasteErrorBox);
     await this.expectElementToBeVisible(blogBodyInput);

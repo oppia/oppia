@@ -2062,6 +2062,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Expect to be on classroom page.
+   * @param {string} classroomName - The classroom name.
+   */
   async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
     await this.expectElementToBeVisible(classroomNameHeading);
 

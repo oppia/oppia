@@ -517,6 +517,10 @@ export class CurriculumAdmin extends TopicManager {
     throw new Error(`Classroom ${classroomName} not found.`);
   }
 
+  /**
+   * Expect classroom tile to be present.
+   * @param {string} classroomName - The classroom name.
+   */
   async expectClassroomTileToBePresent(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.expectElementToBeVisible(classroomTileNameSpan);
@@ -533,6 +537,15 @@ export class CurriculumAdmin extends TopicManager {
     throw new Error(`Classroom ${classroomName} not found.`);
   }
 
+  /**
+   * Expect classroom details to be.
+   * @param {string} classroomName - The classroom name.
+   * @param {string} classroomURL - The classroom URL.
+   * @param {string} classroomTeaser - The classroom teaser.
+   * @param {string} classroomTopicListIntro - The classroom topic list intro.
+   * @param {string} classroomCourseDetails - The classroom course details.
+   * @param {string} classroomFeedbackRecipientEmail - The classroom feedback recipient email.
+   */
   async expectClassroomDetailsToBe(
     classroomName: string,
     classroomURL: string,
@@ -560,6 +573,11 @@ export class CurriculumAdmin extends TopicManager {
     );
   }
 
+  /**
+   * Expect topic to contain prerequisite topic.
+   * @param {string} topicName - The topic name.
+   * @param {string | null} prerequisiteTopic - The prerequisite topic.
+   */
   async expectTopicToContainPrerequisiteTopic(
     topicName: string,
     prerequisiteTopic: string | null
@@ -587,6 +605,10 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Move classroom in order.
+   * @param {string[]} classroomNames - The classroom names.
+   */
   async moveClassroomInOrder(classroomNames: string[]): Promise<void> {
     await this.expectElementToBeVisible(movableClassroomTileSelector);
     let requiredIndex = 0;
@@ -643,6 +665,10 @@ export class CurriculumAdmin extends TopicManager {
     expect(classroomTexts).toEqual(classroomNames);
   }
 
+  /**
+   * Expect classrooms in order.
+   * @param {string[]} classroomNames - The classroom names.
+   */
   async expectClassroomsInOrder(classroomNames: string[]): Promise<void> {
     await this.page.waitForFunction(
       ({
@@ -667,6 +693,10 @@ export class CurriculumAdmin extends TopicManager {
     );
   }
 
+  /**
+   * Expect number of classrooms to be.
+   * @param {number} classroomsCount - The classrooms count.
+   */
   async expectNumberOfClassroomsToBe(classroomsCount: number): Promise<void> {
     await this.navigateToClassroomAdminPage();
     if (classroomsCount > 0) {
@@ -683,6 +713,10 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Delete classroom.
+   * @param {string} classroomName - The classroom name.
+   */
   async deleteClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.expectElementToBeVisible(classroomTileSelector);
@@ -717,6 +751,10 @@ export class CurriculumAdmin extends TopicManager {
     throw new Error(`${classroomName} classroom does not exist.`);
   }
 
+  /**
+   * Expect to be in topic editor.
+   * @param {string} topicName - The topic name.
+   */
   async expectToBeInTopicEditor(topicName?: string): Promise<void> {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
     if (topicName) {
@@ -724,10 +762,20 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Expect to be in topic and skills dashboard page.
+   */
   async expectToBeInTopicAndSkillsDashboardPage(): Promise<void> {
     await this.expectElementToBeVisible(topicAndSkillsDashboardSelector);
   }
 
+  /**
+   * Expect topic to be published in topics and skills dashboard.
+   * @param {string} topicName - The topic name.
+   * @param {number} expectedPublishedStoryCount - The expected published story count.
+   * @param {number} expectedSubtopicCount - The expected subtopic count.
+   * @param {number} expectedSkillsCount - The expected skills count.
+   */
   async expectTopicToBePublishedInTopicsAndSkillsDashboard(
     topicName: string,
     expectedPublishedStoryCount: number,
@@ -806,6 +854,9 @@ export class CurriculumAdmin extends TopicManager {
     showMessage('Topic has been published successfully!');
   }
 
+  /**
+   * Expect unpublish topic button to be visible.
+   */
   async expectUnpublishTopicButtonToBeVisible(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileOptionsSelector);
@@ -818,6 +869,9 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Navigate to skills tab.
+   */
   async navigateToSkillsTab(): Promise<void> {
     await this.expectElementToBeVisible(skillsTab);
     await this.clickOnElementWithSelector(skillsTab);
@@ -833,6 +887,9 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Click on create new skill button in skill dashboard.
+   */
   async clickOnCreateNewSkillButtonInSkillDashboard(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileCreateSkillButton);
@@ -850,6 +907,11 @@ export class CurriculumAdmin extends TopicManager {
     );
   }
 
+  /**
+   * Fill skill details in new skill modal.
+   * @param {string} description - The description.
+   * @param {string} reviewMaterial - The review material.
+   */
   async fillSkillDetailsInNewSkillModal(
     description: string,
     reviewMaterial: string
@@ -862,6 +924,11 @@ export class CurriculumAdmin extends TopicManager {
     await this.typeInInputField(richTextAreaField, reviewMaterial);
   }
 
+  /**
+   * Click on element and get new page.
+   * @param {string} text - The text.
+   * @returns {Page} The result.
+   */
   async clickOnElementAndGetNewPage(text: string): Promise<Page> {
     const newPagePromise = this.page.context().waitForEvent('page');
     await this.clickOnElementWithText(text);
@@ -870,11 +937,19 @@ export class CurriculumAdmin extends TopicManager {
     return newPage;
   }
 
+  /**
+   * Expect to be in skill editor page.
+   * @param {Page} page - The page.
+   */
   async expectToBeInSkillEditorPage(page: Page = this.page): Promise<void> {
     await page.waitForSelector(skillEditorSelector, {state: 'visible'});
     showMessage('Navigated to skill editor page successfully.');
   }
 
+  /**
+   * Unpublish topic.
+   * @param {string} topicName - The topic name.
+   */
   async unpublishTopic(topicName: string): Promise<void> {
     await this.openTopicEditorInCurriculumAdminPage(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -899,6 +974,10 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Topic "${topicName}" has been unpublished.`);
   }
 
+  /**
+   * Delete topic.
+   * @param {string} topicName - The topic name.
+   */
   async deleteTopic(topicName: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(topicsTab);
@@ -966,6 +1045,10 @@ export class CurriculumAdmin extends TopicManager {
     throw new Error(`Topic "${topicName}" not found in dashboard.`);
   }
 
+  /**
+   * Expect topic not in topics and skill dashboard.
+   * @param {string} topicName - The topic name.
+   */
   async expectTopicNotInTopicsAndSkillDashboard(
     topicName: string
   ): Promise<void> {
@@ -987,6 +1070,10 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Topic "${topicName}" is not present as expected.`);
   }
 
+  /**
+   * Delete skill.
+   * @param {string} skillName - The skill name.
+   */
   async deleteSkill(skillName: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
@@ -1070,6 +1157,10 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Expect skill not in topics and skills dashboard.
+   * @param {string} skillName - The skill name.
+   */
   async expectSkillNotInTopicsAndSkillsDashboard(
     skillName: string
   ): Promise<void> {
@@ -1091,6 +1182,10 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Skill "${skillName}" is not present as expected.`);
   }
 
+  /**
+   * Remove all questions from the skill.
+   * @param {string} skillName - The skill name.
+   */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
     await this.openSkillEditorInCurriculumAdminPage(skillName);
 
@@ -1150,6 +1245,11 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`All questions removed from skill "${skillName}".`);
   }
 
+  /**
+   * Create skill from topics and skills dashboard.
+   * @param {string} description - The description.
+   * @param {string} reviewMaterial - The review material.
+   */
   async createSkillFromTopicsAndSkillsDashboard(
     description: string,
     reviewMaterial: string
@@ -1168,12 +1268,20 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Skill "${description}" created from dashboard.`);
   }
 
+  /**
+   * Click on review material edit button.
+   */
   async clickOnReviewMaterialEditButton(): Promise<void> {
     await this.expectElementToBeVisible(editConceptCard);
     await this.clickOnElementWithSelector(editConceptCard);
     await this.expectElementToBeVisible(richTextAreaField);
   }
 
+  /**
+   * Add worked example RTE component.
+   * @param {string} question - The question.
+   * @param {string} answer - The answer.
+   */
   async addWorkedExampleRteComponent(
     question: string,
     answer: string
@@ -1197,17 +1305,26 @@ export class CurriculumAdmin extends TopicManager {
     });
   }
 
+  /**
+   * Save review material.
+   */
   async saveReviewMaterial(): Promise<void> {
     await this.expectElementToBeVisible(saveReviewMaterialButton);
     await this.clickOnElementWithSelector(saveReviewMaterialButton);
   }
 
+  /**
+   * Click on RTE and press enter.
+   */
   async clickOnRteAndPressEnter(): Promise<void> {
     await this.clickOnReviewMaterialEditButton();
     await this.clickOnElementWithSelector(richTextAreaField);
     await this.page.keyboard.press('Enter');
   }
 
+  /**
+   * Clear RTE and check if error disappears.
+   */
   async clearRteAndCheckIfErrorDisappears(): Promise<void> {
     await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOnElementWithSelector(richTextAreaField);
@@ -1217,6 +1334,9 @@ export class CurriculumAdmin extends TopicManager {
     });
   }
 
+  /**
+   * Publish skill changes.
+   */
   async publishSkillChanges(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileOptionsSelector);
@@ -1239,6 +1359,9 @@ export class CurriculumAdmin extends TopicManager {
     });
   }
 
+  /**
+   * Navigate to skill preview tab.
+   */
   async navigateToSkillPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       if (!(await this.isElementVisible(skillMobileNavContainer, true, 5000))) {
@@ -1255,6 +1378,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.waitForPageToFullyLoad();
   }
 
+  /**
+   * Check worked examples exist for skill.
+   * @param {string[][]} workedExamples - The worked examples.
+   */
   async checkWorkedExamplesExistForSkill(
     workedExamples: string[][]
   ): Promise<void> {
@@ -1278,6 +1405,15 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Create subtopic with study guide for topic.
+   * @param {string} title - The title.
+   * @param {string} urlFragment - The url fragment.
+   * @param {string} heading - The heading.
+   * @param {string} content - The content.
+   * @param {string} topicName - The topic name.
+   * @param {boolean} addWorkedExample - The add worked example.
+   */
   async createSubtopicWithStudyGuideForTopic(
     title: string,
     urlFragment: string,
@@ -1330,6 +1466,9 @@ export class CurriculumAdmin extends TopicManager {
     showMessage(`Subtopic ${title} is created.`);
   }
 
+  /**
+   * Check add section modal shows length error.
+   */
   async checkAddSectionModalShowsLengthError(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(showSubtopicsList);
@@ -1355,13 +1494,13 @@ export class CurriculumAdmin extends TopicManager {
     const richTextAreaFieldElement =
       await this.getElementInParent(richTextAreaField);
     await richTextAreaFieldElement.focus();
-    const pasteModifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-    await this.page.keyboard.down(pasteModifier);
-    await this.page.keyboard.press('KeyV');
-    await this.page.keyboard.up(pasteModifier);
+    await this.page.keyboard.press('ControlOrMeta+KeyV');
     await this.expectElementToBeVisible(addStudyGuideSectionContentLength);
   }
 
+  /**
+   * Clear content field and close add section modal.
+   */
   async clearContentFieldAndCloseAddSectionModal(): Promise<void> {
     await this.clearAllTextFrom(richTextAreaField);
     await this.expectElementToBeVisible(
@@ -1373,6 +1512,12 @@ export class CurriculumAdmin extends TopicManager {
     );
   }
 
+  /**
+   * Add subtopic study guide section.
+   * @param {string} sectionHeading - The section heading.
+   * @param {string} sectionContent - The section content.
+   * @param {number} currentNumberOfSections - The current number of sections.
+   */
   async addSubtopicStudyGuideSection(
     sectionHeading: string,
     sectionContent: string,
@@ -1396,6 +1541,14 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(deleteStudyGuideSectionButton);
   }
 
+  /**
+   * Add subtopic study guide section with worked example.
+   * @param {string} sectionHeading - The section heading.
+   * @param {string} sectionContent - The section content.
+   * @param {number} currentNumberOfSections - The current number of sections.
+   * @param {string} workedExampleQuestion - The worked example question.
+   * @param {string} workedExampleAnswer - The worked example answer.
+   */
   async addSubtopicStudyGuideSectionWithWorkedExample(
     sectionHeading: string,
     sectionContent: string,
@@ -1434,6 +1587,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(deleteStudyGuideSectionButton);
   }
 
+  /**
+   * Expand study guide section tile.
+   * @param {number} index - The index.
+   */
   async expandStudyGuideSectionTile(index: number): Promise<void> {
     await this.clickOnElementWithSelector(
       `.e2e-test-study-guide-section-${index}`
@@ -1445,11 +1602,17 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(expandedStudyGuideSectionTileContent);
   }
 
+  /**
+   * Open section heading editor.
+   */
   async openSectionHeadingEditor(): Promise<void> {
     await this.clickOnElementWithSelector(editStudyGuideSectionHeadingIcon);
     await this.expectElementToBeVisible(editStudyGuideSectionHeadingEditor);
   }
 
+  /**
+   * Open section content editor.
+   */
   async openSectionContentEditor(): Promise<void> {
     await this.clickOnElementWithSelector(editStudyGuideSectionContentIcon);
     if (this.isViewportAtMobileWidth()) {
@@ -1458,6 +1621,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(editStudyGuideSectionContentEditor);
   }
 
+  /**
+   * Delete study guide section.
+   * @param {number} index - The index.
+   */
   async deleteStudyGuideSection(index: number): Promise<void> {
     await this.clickOnElementWithSelector(
       `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
@@ -1470,6 +1637,9 @@ export class CurriculumAdmin extends TopicManager {
     );
   }
 
+  /**
+   * Preview study guide.
+   */
   async previewStudyGuide(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(showSubtopicsList);
@@ -1485,6 +1655,12 @@ export class CurriculumAdmin extends TopicManager {
     await this.waitForPageToFullyLoad();
   }
 
+  /**
+   * Expect subtopic study guide to have title and sections.
+   * @param {string} studyGuideTitle - The study guide title.
+   * @param {string[][]} studyGuideSections - The study guide sections.
+   * @param {boolean} expectWorkedExample - The expect worked example.
+   */
   async expectSubtopicStudyGuideToHaveTitleAndSections(
     studyGuideTitle: string,
     studyGuideSections: string[][],
@@ -1517,18 +1693,29 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Clear RTE.
+   */
   async clearRte(): Promise<void> {
     await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOnElementWithSelector(richTextAreaField);
     await this.clearAllTextFrom(richTextAreaField);
   }
 
+  /**
+   * Type text in review material editor.
+   * @param {string} text - The text.
+   */
   async typeTextInReviewMaterialEditor(text: string): Promise<void> {
     await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOnElementWithSelector(richTextAreaField);
     await this.typeInInputField(richTextAreaField, text);
   }
 
+  /**
+   * Copy worked example from review material RTE.
+   * @returns {string} The result.
+   */
   async copyWorkedExampleFromReviewMaterialRte(): Promise<string> {
     await this.expectElementToBeVisible(richTextAreaField);
     const html = await this.page.evaluate((selector: string) => {
@@ -1539,6 +1726,10 @@ export class CurriculumAdmin extends TopicManager {
     return html;
   }
 
+  /**
+   * Copy content from review material RTE.
+   * @returns {string} The result.
+   */
   async copyContentFromReviewMaterialRte(): Promise<string> {
     await this.expectElementToBeVisible(richTextAreaField);
     const html = await this.page.evaluate((selector: string) => {

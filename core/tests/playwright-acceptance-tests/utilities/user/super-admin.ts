@@ -249,10 +249,18 @@ export class SuperAdmin extends LoggedInUser {
     );
   }
 
+  /**
+   * Navigate to blog admin page.
+   */
   async navigateToBlogAdminPage(): Promise<void> {
     await this.goto(blogAdminUrl);
   }
 
+  /**
+   * Assign user to role from blog admin page.
+   * @param {string} username - The username.
+   * @param {BlogRoles} role - The role.
+   */
   async assignUserToRoleFromBlogAdminPage(
     username: string,
     role: BlogRoles

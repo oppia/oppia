@@ -2552,6 +2552,10 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Expect topic link returns404.
+   * @param {string} topicUrlFragment - The topic url fragment.
+   */
   async expectTopicLinkReturns404(topicUrlFragment: string): Promise<void> {
     await this.page.reload();
     await this.goto(`${baseUrl}/learn/staging/${topicUrlFragment}`);
