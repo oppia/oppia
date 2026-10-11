@@ -19,36 +19,258 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.domain import (
-    android_platform_parameter_domain,
-    platform_parameter_domain,
-)
+from core.domain import android_platform_parameter_domain
 from core.tests import test_utils
 
 from typing import List, Optional, cast
 
+parameter_domain = android_platform_parameter_domain
 
-class AndroidPlatformParameterConfigTests(test_utils.GenericTestBase):
-    """Tests for Android platform parameter config validation and evaluation."""
 
-    def _create_config(
+class AndroidEvaluationContextTests(test_utils.GenericTestBase):
+    """Tests for AndroidEvaluationContext."""
+
+    def test_from_dict_and_to_dict_round_trip(self) -> None:
+        context_dict: parameter_domain.AndroidEvaluationContextDict = {
+            'app_version': '1.2.3',
+            'app_version_flavour': 'beta',
+        }
+        context = parameter_domain.AndroidEvaluationContext.from_dict(
+            context_dict
+        )
+
+        self.assertEqual(context.app_version, '1.2.3')
+        self.assertEqual(context.app_version_flavour, 'beta')
+        self.assertDictEqual(context.to_dict(), context_dict)
+
+    def test_validate_accepts_valid_context(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext('1.2.3', 'release')
+        context.validate()
+
+    def test_validate_rejects_invalid_version(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext('1.2.beta', 'beta')
+
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
+            context.validate()
+
+    def test_validate_rejects_invalid_flavour(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext('1.2.3', 'unknown')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid Android app version flavour'
+        ):
+            context.validate()
+
+
+class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
+    """Tests for Android platform parameter filters."""
+
+    def _create_context(
+        self,
+        app_version: str = '1.2.3',
+        app_version_flavour: str = 'beta',
+    ) -> parameter_domain.AndroidEvaluationContext:
+        """Creates an Android evaluation context."""
+        return parameter_domain.AndroidEvaluationContext(
+            app_version, app_version_flavour
+        )
+
+    def test_from_dict_and_to_dict_round_trip(self) -> None:
+        filter_dict: parameter_domain.AndroidPlatformParameterFilterDict = {
+            'type': 'app_min_version',
+            'conditions': [['=', '1.2.3']],
+        }
+        filter_domain = (
+            parameter_domain.AndroidPlatformParameterFilter.from_dict(
+                filter_dict
+            )
+        )
+
+        self.assertEqual(filter_domain.type, 'app_min_version')
+        self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
+        self.assertDictEqual(filter_domain.to_dict(), filter_dict)
+
+    def test_validate_rejects_unsupported_filter_type(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version', [['=', '1.2.3']]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Unsupported Android.*filter type'
+        ):
+            filter_domain.validate()
+
+    def test_validate_rejects_malformed_condition(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', [['=']]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'must contain a string operator'
+        ):
+            filter_domain.validate()
+
+    def test_validate_rejects_unsupported_operator(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', [['>=', '1.2.3']]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Unsupported comparison operator'
+        ):
+            filter_domain.validate()
+
+    def test_validate_rejects_invalid_version_condition(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_max_version', [['=', 'one.two']]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid Android app version expression'
+        ):
+            filter_domain.validate()
+
+    def test_validate_rejects_invalid_flavour_condition(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version_flavour', [['=', 'unknown']]
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid Android app version flavour'
+        ):
+            filter_domain.validate()
+
+    def test_evaluate_app_min_version_inclusive(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', [['=', '1.2.3']]
+        )
+
+        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.3')))
+        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.4')))
+        self.assertFalse(filter_domain.evaluate(self._create_context('1.2.2')))
+
+    def test_evaluate_app_max_version_inclusive(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_max_version', [['=', '1.2.3']]
+        )
+
+        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.3')))
+        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.2')))
+        self.assertFalse(filter_domain.evaluate(self._create_context('1.2.4')))
+
+    def test_evaluate_flavour_filter(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version_flavour', [['=', 'beta']]
+        )
+
+        self.assertTrue(filter_domain.evaluate(self._create_context()))
+        self.assertFalse(
+            filter_domain.evaluate(
+                self._create_context(app_version_flavour='alpha')
+            )
+        )
+
+    def test_evaluate_unknown_type_returns_false(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'unknown', [['=', '1.2.3']]
+        )
+
+        self.assertFalse(filter_domain.evaluate(self._create_context()))
+
+    def test_evaluate_empty_conditions_returns_false(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', []
+        )
+
+        self.assertFalse(filter_domain.evaluate(self._create_context()))
+
+
+class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
+    """Tests for Android platform parameter rules."""
+
+    def _create_context(self) -> parameter_domain.AndroidEvaluationContext:
+        """Creates an Android evaluation context."""
+        return parameter_domain.AndroidEvaluationContext('1.2.3', 'beta')
+
+    def test_from_dict_and_to_dict_round_trip(self) -> None:
+        rule_dict: parameter_domain.AndroidPlatformParameterRuleDict = {
+            'filters': [
+                {
+                    'type': 'app_min_version',
+                    'conditions': [['=', '1.2.0']],
+                }
+            ],
+            'value_when_matched': True,
+        }
+        rule = parameter_domain.AndroidPlatformParameterRule.from_dict(
+            rule_dict
+        )
+
+        self.assertIsInstance(
+            rule.filters[0], parameter_domain.AndroidPlatformParameterFilter
+        )
+        self.assertDictEqual(rule.to_dict(), rule_dict)
+
+    def test_evaluate_requires_all_filters_to_match(self) -> None:
+        rule = parameter_domain.AndroidPlatformParameterRule.from_dict(
+            {
+                'filters': [
+                    {
+                        'type': 'app_min_version',
+                        'conditions': [['=', '1.0.0']],
+                    },
+                    {
+                        'type': 'app_version_flavour',
+                        'conditions': [['=', 'release']],
+                    },
+                ],
+                'value_when_matched': True,
+            }
+        )
+
+        self.assertFalse(rule.evaluate(self._create_context()))
+
+    def test_evaluate_empty_filters_matches(self) -> None:
+        rule = parameter_domain.AndroidPlatformParameterRule([], True)
+
+        self.assertTrue(rule.evaluate(self._create_context()))
+
+    def test_validate_checks_filters(self) -> None:
+        rule = parameter_domain.AndroidPlatformParameterRule.from_dict(
+            {
+                'filters': [
+                    {
+                        'type': 'app_min_version',
+                        'conditions': [['=', '1.2.3']],
+                    }
+                ],
+                'value_when_matched': True,
+            }
+        )
+        rule.validate()
+
+
+class AndroidPlatformParameterTests(test_utils.GenericTestBase):
+    """Tests for Android platform parameter validation and evaluation."""
+
+    def _create_parameter(
         self,
         rules: Optional[
-            List[
-                android_platform_parameter_domain.AndroidPlatformParameterRuleDict
-            ]
+            List[parameter_domain.AndroidPlatformParameterRuleDict]
         ] = None,
         default_value: Optional[
-            android_platform_parameter_domain.AndroidPlatformParameterValue
+            parameter_domain.AndroidPlatformDataTypes
         ] = False,
-        rule_schema_version: Optional[int] = None,
+        data_type: str = 'bool',
         name: str = 'android_parameter',
-    ) -> android_platform_parameter_domain.AndroidPlatformParameterConfig:
-        """Creates an Android config with optional test overrides."""
-        return android_platform_parameter_domain.AndroidPlatformParameterConfig(
+        rule_schema_version: Optional[int] = None,
+    ) -> parameter_domain.AndroidPlatformParameter:
+        """Creates an Android parameter with optional test overrides."""
+        return parameter_domain.AndroidPlatformParameter(
             name,
+            data_type,
             [
-                android_platform_parameter_domain.AndroidPlatformParameterRule.from_dict(
+                parameter_domain.AndroidPlatformParameterRule.from_dict(
                     rule_dict
                 )
                 for rule_dict in (rules or [])
@@ -62,28 +284,21 @@ class AndroidPlatformParameterConfigTests(test_utils.GenericTestBase):
         )
 
     def _create_context(
-        self, platform_type: str, app_version: Optional[str]
-    ) -> platform_parameter_domain.EvaluationContext:
-        """Creates a parameter evaluation context for a client."""
-        return platform_parameter_domain.EvaluationContext.from_dict(
-            {
-                'platform_type': platform_type,
-                'app_version': app_version,
-            },
-            {'server_mode': platform_parameter_domain.ServerMode.DEV},
-        )
+        self, app_version: str = '1.2.3', flavour: str = 'beta'
+    ) -> parameter_domain.AndroidEvaluationContext:
+        """Creates an Android evaluation context."""
+        return parameter_domain.AndroidEvaluationContext(app_version, flavour)
 
     def test_from_dict_and_to_dict_round_trip(self) -> None:
-        config_dict: (
-            android_platform_parameter_domain.AndroidPlatformParameterConfigDict
-        ) = {
+        param_dict: parameter_domain.AndroidPlatformParameterDict = {
             'name': 'android_parameter',
+            'data_type': 'bool',
             'rules': [
                 {
                     'filters': [
                         {
-                            'type': 'app_version',
-                            'conditions': [['>=', '1.2.3']],
+                            'type': 'app_min_version',
+                            'conditions': [['=', '1.2.0']],
                         }
                     ],
                     'value_when_matched': True,
@@ -94,62 +309,101 @@ class AndroidPlatformParameterConfigTests(test_utils.GenericTestBase):
             ),
             'default_value': False,
         }
+        parameter = parameter_domain.AndroidPlatformParameter.from_dict(
+            param_dict
+        )
 
-        config = android_platform_parameter_domain.AndroidPlatformParameterConfig.from_dict(
+        self.assertEqual(parameter.name, 'android_parameter')
+        self.assertEqual(parameter.data_type, 'bool')
+        self.assertEqual(parameter.default_value, False)
+        self.assertDictEqual(parameter.to_dict(), param_dict)
+
+    def test_from_dict_infers_type_for_current_model_shape(self) -> None:
+        config_dict: parameter_domain.AndroidPlatformParameterConfigDict = {
+            'name': 'android_parameter',
+            'rules': [],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            'default_value': 3,
+        }
+        parameter = parameter_domain.AndroidPlatformParameter.from_dict(
             config_dict
         )
 
-        self.assertDictEqual(config.to_dict(), config_dict)
-        self.assertIsInstance(
-            config.rules[0],
-            android_platform_parameter_domain.AndroidPlatformParameterRule,
-        )
+        self.assertEqual(parameter.data_type, 'number')
+        self.assertEqual(parameter.default_value, 3)
 
-    def test_validate_with_missing_default_value_raises_exception(
-        self,
-    ) -> None:
-        config = self._create_config(default_value=None)
+    def test_validate_accepts_all_supported_data_types(self) -> None:
+        parameters = [
+            self._create_parameter(default_value=True, data_type='bool'),
+            self._create_parameter(default_value='value', data_type='string'),
+            self._create_parameter(default_value=3, data_type='number'),
+            self._create_parameter(default_value=3.5, data_type='number'),
+        ]
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a default value'
-        ):
-            config.validate()
+        for parameter in parameters:
+            with self.subTest(data_type=parameter.data_type):
+                parameter.validate()
 
-    def test_validate_with_invalid_parameter_name_raises_exception(
-        self,
-    ) -> None:
-        config = self._create_config(name='android.parameter')
+    def test_validate_rejects_invalid_name(self) -> None:
+        parameter = self._create_parameter(name='android.parameter')
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid Android platform parameter name'
         ):
-            config.validate()
+            parameter.validate()
 
-    def test_validate_with_inconsistent_rule_value_raises_exception(
-        self,
-    ) -> None:
-        config = self._create_config(
-            rules=[
-                {
-                    'filters': [],
-                    'value_when_matched': 'not a bool',
-                }
-            ]
+    def test_validate_rejects_unsupported_data_type(self) -> None:
+        parameter = self._create_parameter(data_type='integer')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Unsupported Android platform parameter'
+        ):
+            parameter.validate()
+
+    def test_validate_rejects_missing_default(self) -> None:
+        parameter = self._create_parameter(default_value=None)
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'must have a default value'
+        ):
+            parameter.validate()
+
+    def test_validate_rejects_default_type_mismatch(self) -> None:
+        parameter = self._create_parameter(default_value='false')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected bool.*default value'
+        ):
+            parameter.validate()
+
+    def test_validate_rejects_old_schema_version(self) -> None:
+        parameter = self._create_parameter(rule_schema_version=0)
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Unsupported Android platform parameter'
+        ):
+            parameter.validate()
+
+    def test_validate_rejects_invalid_rule(self) -> None:
+        parameter = self._create_parameter(
+            rules=[{'filters': [], 'value_when_matched': 'true'}]
         )
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected bool.*value_when_matched'
         ):
-            config.validate()
+            parameter.validate()
 
-    def test_validate_rejects_web_specific_filter(self) -> None:
-        config = self._create_config(
+    def test_validate_rejects_invalid_filter(self) -> None:
+        parameter = self._create_parameter(
             rules=[
                 {
                     'filters': [
                         {
                             'type': 'platform_type',
-                            'conditions': [['=', 'Web']],
+                            'conditions': [['=', 'Android']],
                         }
                     ],
                     'value_when_matched': True,
@@ -158,105 +412,104 @@ class AndroidPlatformParameterConfigTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported filter type \'platform_type\''
+            utils.ValidationError, 'Unsupported Android.*filter type'
         ):
-            config.validate()
+            parameter.validate()
 
-    def test_from_dict_rejects_web_specific_fields(self) -> None:
+    def test_evaluate_returns_first_matching_rule(self) -> None:
+        parameter = self._create_parameter(
+            rules=[
+                {
+                    'filters': [
+                        {
+                            'type': 'app_min_version',
+                            'conditions': [['=', '1.0.0']],
+                        }
+                    ],
+                    'value_when_matched': True,
+                },
+                {'filters': [], 'value_when_matched': False},
+            ]
+        )
+
+        self.assertTrue(parameter.evaluate(self._create_context()))
+
+    def test_evaluate_returns_default_when_no_rule_matches(self) -> None:
+        parameter = self._create_parameter(
+            rules=[
+                {
+                    'filters': [
+                        {
+                            'type': 'app_min_version',
+                            'conditions': [['=', '2.0.0']],
+                        }
+                    ],
+                    'value_when_matched': True,
+                }
+            ]
+        )
+
+        self.assertFalse(parameter.evaluate(self._create_context()))
+
+    def test_evaluate_rejects_invalid_context(self) -> None:
+        parameter = self._create_parameter()
+
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
+            parameter.evaluate(self._create_context('invalid'))
+
+    def test_setters_update_parameter_values(self) -> None:
+        parameter = self._create_parameter()
+        rule = parameter_domain.AndroidPlatformParameterRule([], True)
+        parameter.set_rules([rule])
+        parameter.set_default_value(True)
+
+        self.assertEqual(parameter.rules, [rule])
+        self.assertIs(parameter.default_value, True)
+
+    def test_serialize_and_deserialize_returns_same_parameter(self) -> None:
+        parameter = self._create_parameter(
+            rules=[
+                {
+                    'filters': [
+                        {
+                            'type': 'app_version_flavour',
+                            'conditions': [['=', 'beta']],
+                        }
+                    ],
+                    'value_when_matched': True,
+                }
+            ]
+        )
+
+        restored = parameter_domain.AndroidPlatformParameter.deserialize(
+            parameter.serialize()
+        )
+        self.assertDictEqual(restored.to_dict(), parameter.to_dict())
+
+    def test_to_dict_rejects_missing_default(self) -> None:
+        parameter = self._create_parameter(default_value=None)
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'must have a default value'
+        ):
+            parameter.to_dict()
+
+    def test_from_dict_can_infer_unsupported_default_type(self) -> None:
+        # Here we use cast because this test intentionally supplies an invalid
+        # default value to verify type inference rejects unsupported values.
         config_dict = cast(
-            android_platform_parameter_domain.AndroidPlatformParameterConfigDict,
+            parameter_domain.AndroidPlatformParameterConfigDict,
             {
                 'name': 'android_parameter',
                 'rules': [],
                 'rule_schema_version': (
                     feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
                 ),
-                'default_value': False,
-                'data_type': 'bool',
+                'default_value': [],
             },
         )
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Web-specific fields'
-        ):
-            android_platform_parameter_domain.AndroidPlatformParameterConfig.from_dict(
-                config_dict
-            )
-
-    def test_validate_rejects_invalid_android_filter_condition(self) -> None:
-        config = self._create_config(
-            rules=[
-                {
-                    'filters': [
-                        {
-                            'type': 'app_version',
-                            'conditions': [['contains', '1.2.3']],
-                        }
-                    ],
-                    'value_when_matched': True,
-                }
-            ]
+        parameter = parameter_domain.AndroidPlatformParameter.from_dict(
+            config_dict
         )
 
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Unsupported comparison operator \'contains\'',
-        ):
-            config.validate()
-
-    def test_validate_with_old_schema_version_raises_exception(self) -> None:
-        config = self._create_config(rule_schema_version=0)
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported Android platform parameter'
-        ):
-            config.validate()
-
-    def test_evaluate_returns_first_matching_rule(self) -> None:
-        config = self._create_config(
-            rules=[
-                {
-                    'filters': [
-                        {
-                            'type': 'app_version',
-                            'conditions': [['>=', '1.0.0']],
-                        }
-                    ],
-                    'value_when_matched': True,
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': False,
-                },
-            ]
-        )
-
-        self.assertTrue(
-            config.evaluate(self._create_context('Android', '2.0.0'))
-        )
-
-    def test_evaluate_returns_default_when_rules_do_not_match(self) -> None:
-        config = self._create_config(
-            rules=[
-                {
-                    'filters': [
-                        {
-                            'type': 'app_version',
-                            'conditions': [['>=', '2.0.0']],
-                        }
-                    ],
-                    'value_when_matched': True,
-                }
-            ]
-        )
-
-        self.assertFalse(
-            config.evaluate(self._create_context('Android', '1.0.0'))
-        )
-
-    def test_evaluate_returns_default_for_non_android_context(self) -> None:
-        config = self._create_config(
-            rules=[{'filters': [], 'value_when_matched': True}]
-        )
-
-        self.assertFalse(config.evaluate(self._create_context('Web', None)))
+        self.assertEqual(parameter.data_type, '')

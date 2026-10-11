@@ -204,7 +204,7 @@ class AndroidPlatformParameterConfigModel(
             android_platform_parameter_domain.AndroidPlatformParameterRuleDict
         ],
         rule_schema_version: int,
-        default_value: android_platform_parameter_domain.AndroidPlatformParameterDataTypes,
+        default_value: android_platform_parameter_domain.AndroidPlatformDataTypes,
     ) -> AndroidPlatformParameterConfigModel:
         """Creates a AndroidPlatformParameterConfigModel instance.
 
@@ -224,7 +224,7 @@ class AndroidPlatformParameterConfigModel(
                                 operator for comparison and value is the value
                                 used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
-            default_value: AndroidPlatformParameterDataTypes. The default value of the platform
+            default_value: AndroidPlatformDataTypes. The default value of the platform
                 parameter.
 
         Returns:

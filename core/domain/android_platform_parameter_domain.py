@@ -18,14 +18,146 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 from core import feconf, utils
-from core.domain import platform_parameter_domain
+from core.constants import constants
+from core.domain import change_domain
 
-from typing import Callable, Dict, Final, List, Optional, TypedDict, Union
+from typing import Dict, Final, List, Optional, Pattern, TypedDict, Union
 
-AndroidPlatformParameterDataTypes = Union[str, int, bool, float]
+# Union type defined from allowed types that a platform parameter can contain
+# for its data types.
+AndroidPlatformDataTypes = Union[str, int, bool, float]
+
+ALLOWED_APP_VERSION_FLAVORS: List[str] = (
+    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
+)
+APP_VERSION_WITH_HASH_REGEXP: Pattern[str] = re.compile(
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+)
+APP_VERSION_WITHOUT_HASH_REGEXP: Pattern[str] = re.compile(
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
+)
+
+
+class AndroidPlatformParameterChange(change_domain.BaseChange):
+    """Domain object for changes made to a android platform parameter object.
+
+    The allowed commands, together with the attributes:
+        - 'edit_rules' (with new_rules)
+    """
+
+    CMD_EDIT_RULES: Final = 'edit_rules'
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
+        {
+            'name': CMD_EDIT_RULES,
+            'required_attribute_names': ['new_rules'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        }
+    ]
+
+
+class EditRulesAndroidPlatformParameterCmd(AndroidPlatformParameterChange):
+    """Class representing the AndroidPlatformParameterChange's
+    CMD_EDIT_RULES command.
+    """
+
+    new_rules: List[str]
+
+
+class AndroidEvaluationContextDict(TypedDict):
+    """Dictionary representation of an Android evaluation context."""
+
+    app_version: str
+    app_version_flavour: str
+
+
+class AndroidEvaluationContext:
+    """Domain object representing the context for Android platform parameter evaluation."""
+
+    def __init__(self, app_version: str, app_version_flavour: str) -> None:
+        self._app_version = app_version
+        self._app_version_flavour = app_version_flavour
+
+    @property
+    def app_version(self) -> str:
+        """Returns the numeric Android app version.
+
+        Returns:
+            str. The numeric Android app version.
+        """
+        return self._app_version
+
+    @property
+    def app_version_flavour(self) -> str:
+        """Returns the Android app version flavour.
+
+        Returns:
+            str. The Android app version flavour.
+        """
+        return self._app_version_flavour
+
+    def validate(self) -> None:
+        """Validates the Android app version and its flavour.
+
+        Raises:
+            ValidationError. The Android app version or flavour is invalid.
+        """
+        if not isinstance(self._app_version_flavour, str):
+            raise utils.ValidationError(
+                'Invalid Android app version flavour \'%s\', expected to be a '
+                'string.' % self._app_version_flavour
+            )
+        if not (APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(self._app_version)):
+            raise utils.ValidationError(
+                'Invalid version \'%s\', expected to match regexp %s.'
+                % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
+            )
+
+        if self._app_version_flavour not in ALLOWED_APP_VERSION_FLAVORS:
+            raise utils.ValidationError(
+                'Invalid Android app version flavour \'%s\', must be one of '
+                '%s.'
+                % (
+                    self._app_version_flavour,
+                    ALLOWED_APP_VERSION_FLAVORS,
+                )
+            )
+
+    def to_dict(self) -> AndroidEvaluationContextDict:
+        """Returns a dict representation of this context.
+
+        Returns:
+            dict. A dictionary mapping the Android app version and flavour.
+        """
+        return {
+            'app_version': self._app_version,
+            'app_version_flavour': self._app_version_flavour,
+        }
+
+    @classmethod
+    def from_dict(
+        cls, context_dict: AndroidEvaluationContextDict
+    ) -> AndroidEvaluationContext:
+        """Returns an Android evaluation context from a dict.
+
+        Args:
+            context_dict: dict. A dict mapping the Android app version and
+                flavour.
+
+        Returns:
+            AndroidEvaluationContext. The corresponding Android evaluation
+            context object.
+        """
+        return cls(
+            context_dict['app_version'],
+            context_dict['app_version_flavour'],
+        )
 
 
 class AndroidPlatformParameterFilterDict(TypedDict):
@@ -35,18 +167,148 @@ class AndroidPlatformParameterFilterDict(TypedDict):
     conditions: List[List[str]]
 
 
-class AndroidPlatformParameterFilter(
-    platform_parameter_domain.PlatformParameterFilter
-):
-    """Filter domain object supporting Android app version dimensions."""
+class AndroidPlatformParameterFilter:
+    """Domain object for filters in android platform parameters."""
 
-    SUPPORTED_FILTER_TYPES: Final = ['app_version', 'app_version_flavor']
+    SUPPORTED_FILTER_TYPES: Final = [
+        'app_min_version',
+        'app_max_version',
+        'app_version_flavour',
+    ]
+    SUPPORTED_OP_FOR_FILTERS: Final[Dict[str, List[str]]] = {
+        'app_min_version': ['='],
+        'app_max_version': ['='],
+        'app_version_flavour': ['='],
+    }
+
+    def __init__(self, filter_type: str, conditions: List[List[str]]) -> None:
+        self._type = filter_type
+        self._conditions = conditions
+
+    @property
+    def type(self) -> str:
+        """Returns filter type.
+
+        Returns:
+            str. The filter type.
+        """
+        return self._type
+
+    @property
+    def conditions(self) -> List[List[str]]:
+        """Returns filter conditions.
+
+        Returns:
+            list(list(str)). The filter conditions. Each element of the list
+            contain a list with 2-elements [op, value], where op is the operator
+            for comparison, value is the value used for comparison..
+        """
+        return self._conditions
+
+    def evaluate(self, context: AndroidEvaluationContext) -> bool:
+        """Tries to match the given context with the filter against its
+        value(s).
+
+        Args:
+            context: AndroidEvaluationContext. The context for evaluation.
+
+        Returns:
+            bool. True if the filter is matched.
+        """
+        if self._type == 'app_version_flavour':
+            return any(
+                op == '=' and context.app_version_flavour == value
+                for op, value in self._conditions
+            )
+
+        comparison_results = (
+            _compare_versions(context.app_version, value)
+            for op, value in self._conditions
+            if op == '='
+        )
+        if self._type == 'app_min_version':
+            return any(result >= 0 for result in comparison_results)
+        if self._type == 'app_max_version':
+            return any(result <= 0 for result in comparison_results)
+        return False
+
+    def validate(self) -> None:
+        """Validates the AndroidPlatformParameterFilter domain object.
+
+        Raises:
+            ValidationError. The filter type, operator, or condition values are
+            invalid.
+        """
+        if self._type not in self.SUPPORTED_FILTER_TYPES:
+            raise utils.ValidationError(
+                'Unsupported Android platform parameter filter type \'%s\'.'
+                % self._type
+            )
+
+        if not isinstance(self._conditions, list):
+            raise utils.ValidationError(
+                'Android platform parameter filter conditions must be a list.'
+            )
+
+        for condition in self._conditions:
+            if (
+                not isinstance(condition, (list, tuple))
+                or len(condition) != 2
+                or not all(isinstance(value, str) for value in condition)
+            ):
+                raise utils.ValidationError(
+                    'Each Android platform parameter filter condition must '
+                    'contain a string operator and string value.'
+                )
+
+            op, value = condition
+            if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
+                raise utils.ValidationError(
+                    'Unsupported comparison operator \'%s\' for %s filter, '
+                    'expected one of %s.'
+                    % (
+                        op,
+                        self._type,
+                        self.SUPPORTED_OP_FOR_FILTERS[self._type],
+                    )
+                )
+            if self._type == 'app_version_flavour':
+                if value not in ALLOWED_APP_VERSION_FLAVORS:
+                    raise utils.ValidationError(
+                        'Invalid Android app version flavour \'%s\', must be '
+                        'one of %s.'
+                        % (
+                            value,
+                            ALLOWED_APP_VERSION_FLAVORS,
+                        )
+                    )
+            elif not APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(value):
+                raise utils.ValidationError(
+                    'Invalid Android app version expression \'%s\'.' % value
+                )
+
+    def to_dict(self) -> AndroidPlatformParameterFilterDict:
+        """Returns a dict representation of the filter.
+
+        Returns:
+            dict. A dict mapping of all fields of the filter object.
+        """
+        return {'type': self._type, 'conditions': self._conditions}
 
     @classmethod
     def from_dict(
         cls, filter_dict: AndroidPlatformParameterFilterDict
     ) -> AndroidPlatformParameterFilter:
-        """Creates an Android filter from its dictionary representation."""
+        """Returns an AndroidPlatformParameterFilter object from a dict.
+
+        Args:
+            filter_dict: dict. A dict mapping of all fields of the filter
+                object.
+
+        Returns:
+            AndroidPlatformParameterFilter. The corresponding filter domain
+            object.
+        """
         return cls(filter_dict['type'], filter_dict['conditions'])
 
 
@@ -54,45 +316,67 @@ class AndroidPlatformParameterRuleDict(TypedDict):
     """Dictionary representation of an Android platform parameter rule."""
 
     filters: List[AndroidPlatformParameterFilterDict]
-    value_when_matched: AndroidPlatformParameterDataTypes
+    value_when_matched: AndroidPlatformDataTypes
 
 
 class AndroidPlatformParameterRule:
-    """Domain object for rules in Android platform parameters."""
+    """Domain object for an ordered Android parameter rule."""
 
     def __init__(
         self,
         filters: List[AndroidPlatformParameterFilter],
-        value_when_matched: AndroidPlatformParameterDataTypes,
+        value_when_matched: AndroidPlatformDataTypes,
     ) -> None:
         self._filters = filters
         self._value_when_matched = value_when_matched
 
     @property
     def filters(self) -> List[AndroidPlatformParameterFilter]:
-        """Returns the filters in this rule."""
+        """Returns the filters of this rule.
+
+        Returns:
+            list(AndroidPlatformParameterFilter). The ordered filters for this
+            rule.
+        """
         return self._filters
 
     @property
-    def value_when_matched(self) -> AndroidPlatformParameterDataTypes:
-        """Returns this rule's result when it matches."""
+    def value_when_matched(self) -> AndroidPlatformDataTypes:
+        """Returns the value produced when this rule matches.
+
+        Returns:
+            AndroidPlatformDataTypes. The value produced when this rule matches.
+        """
         return self._value_when_matched
 
-    def evaluate(
-        self, context: platform_parameter_domain.EvaluationContext
-    ) -> bool:
-        """Returns whether all filters match the Android request context."""
+    def evaluate(self, context: AndroidEvaluationContext) -> bool:
+        """Returns whether every filter in this rule matches.
+
+        Args:
+            context: AndroidEvaluationContext. The context for evaluation.
+
+        Returns:
+            bool. True if every filter in this rule matches.
+        """
         return all(
             filter_domain.evaluate(context) for filter_domain in self._filters
         )
 
     def validate(self) -> None:
-        """Validates all filters in this rule."""
+        """Validates all filters in this rule.
+
+        Raises:
+            ValidationError. One or more filters in this rule are invalid.
+        """
         for filter_domain in self._filters:
             filter_domain.validate()
 
     def to_dict(self) -> AndroidPlatformParameterRuleDict:
-        """Returns the dictionary representation of this rule."""
+        """Returns a dict representation of this rule.
+
+        Returns:
+            dict. A dict mapping of all fields of the rule object.
+        """
         return {
             'filters': [
                 filter_domain.to_dict() for filter_domain in self._filters
@@ -104,7 +388,14 @@ class AndroidPlatformParameterRule:
     def from_dict(
         cls, rule_dict: AndroidPlatformParameterRuleDict
     ) -> AndroidPlatformParameterRule:
-        """Creates an Android rule from its dictionary representation."""
+        """Returns an AndroidPlatformParameterRule object from a dict.
+
+        Args:
+            rule_dict: dict. A dict mapping of all fields of the rule object.
+
+        Returns:
+            AndroidPlatformParameterRule. The corresponding rule domain object.
+        """
         return cls(
             [
                 AndroidPlatformParameterFilter.from_dict(filter_dict)
@@ -114,73 +405,130 @@ class AndroidPlatformParameterRule:
         )
 
 
+class AndroidPlatformParameterDict(TypedDict):
+    """Dictionary representation of an Android platform parameter."""
+
+    name: str
+    data_type: str
+    rules: List[AndroidPlatformParameterRuleDict]
+    rule_schema_version: int
+    default_value: AndroidPlatformDataTypes
+
+
 class AndroidPlatformParameterConfigDict(TypedDict):
-    """Dictionary representation of an Android platform parameter config."""
+    """Legacy model-shaped dictionary for Android parameter configuration."""
 
     name: str
     rules: List[AndroidPlatformParameterRuleDict]
     rule_schema_version: int
-    default_value: AndroidPlatformParameterDataTypes
+    default_value: AndroidPlatformDataTypes
 
 
-class AndroidPlatformParameterConfig:
-    """Domain object for Android platform parameter configuration."""
+class AndroidPlatformParameter:
+    """Domain object for a typed Android platform parameter."""
 
-    _DATA_TYPE_PREDICATES: Final[
-        Dict[str, Callable[[AndroidPlatformParameterDataTypes], bool]]
-    ] = {
+    PARAMETER_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
+    DATA_TYPE_PREDICATES_DICT = {
         'bool': lambda value: isinstance(value, bool),
         'number': lambda value: isinstance(value, (int, float))
         and not isinstance(value, bool),
         'string': lambda value: isinstance(value, str),
     }
-    _DATA_TYPE_BY_DEFAULT_TYPE: Final[Dict[type, str]] = {
+    DATA_TYPE_BY_DEFAULT_TYPE: Final[Dict[type, str]] = {
         bool: 'bool',
         int: 'number',
         float: 'number',
         str: 'string',
     }
-    PARAMETER_NAME_REGEXP: Final = (
-        platform_parameter_domain.PlatformParameter.PARAMETER_NAME_REGEXP
-    )
 
     def __init__(
         self,
         name: str,
+        data_type: str,
         rules: List[AndroidPlatformParameterRule],
         rule_schema_version: int,
-        default_value: Optional[AndroidPlatformParameterDataTypes],
+        default_value: Optional[AndroidPlatformDataTypes],
     ) -> None:
         self._name = name
+        self._data_type = data_type
         self._rules = rules
         self._rule_schema_version = rule_schema_version
         self._default_value = default_value
 
     @property
     def name(self) -> str:
-        """Returns the parameter name."""
+        """Returns the name of the Android platform parameter.
+
+        Returns:
+            str. The parameter name.
+        """
         return self._name
 
     @property
+    def data_type(self) -> str:
+        """Returns the data type of the Android platform parameter.
+
+        Returns:
+            str. The parameter data type.
+        """
+        return self._data_type
+
+    @property
     def rules(self) -> List[AndroidPlatformParameterRule]:
-        """Returns the ordered rules."""
+        """Returns the ordered rules of the Android platform parameter.
+
+        Returns:
+            list(AndroidPlatformParameterRule). The ordered rules.
+        """
         return self._rules
 
     @property
     def rule_schema_version(self) -> int:
-        """Returns the rule schema version."""
+        """Returns the schema version of the rules.
+
+        Returns:
+            int. The rule schema version.
+        """
         return self._rule_schema_version
 
     @property
-    def default_value(self) -> Optional[AndroidPlatformParameterDataTypes]:
-        """Returns the fallback value."""
+    def default_value(self) -> Optional[AndroidPlatformDataTypes]:
+        """Returns the default value of the Android platform parameter.
+
+        Returns:
+            AndroidPlatformDataTypes|None. The default value for this parameter.
+        """
         return self._default_value
 
+    def set_rules(self, new_rules: List[AndroidPlatformParameterRule]) -> None:
+        """Sets the ordered rules of this Android platform parameter.
+
+        Args:
+            new_rules: list(AndroidPlatformParameterRule). The ordered rules to
+                set.
+        """
+        self._rules = new_rules
+
+    def set_default_value(
+        self, default_value: AndroidPlatformDataTypes
+    ) -> None:
+        """Sets the default value of this Android platform parameter.
+
+        Args:
+            default_value: AndroidPlatformDataTypes. The default value to set.
+        """
+        self._default_value = default_value
+
     def validate(self) -> None:
-        """Validates the config, rules, default, and their value types."""
+        """Validates the name, declared type, default, schema, and rules.
+
+        Raises:
+            ValidationError. The parameter configuration is invalid.
+        """
         if re.match(self.PARAMETER_NAME_REGEXP, self._name) is None:
             raise utils.ValidationError(
-                'Invalid Android platform parameter name.'
+                'Invalid Android platform parameter name \'%s\', expected to '
+                'match regexp %s.' % (self._name, self.PARAMETER_NAME_REGEXP)
             )
 
         if self._default_value is None:
@@ -188,12 +536,16 @@ class AndroidPlatformParameterConfig:
                 'Android platform parameter must have a default value.'
             )
 
-        data_type = self._DATA_TYPE_BY_DEFAULT_TYPE.get(
-            type(self._default_value)
-        )
-        if data_type is None:
+        predicate = self.DATA_TYPE_PREDICATES_DICT.get(self._data_type)
+        if predicate is None:
             raise utils.ValidationError(
-                'Unsupported Android platform parameter default value type.'
+                'Unsupported Android platform parameter data type \'%s\'.'
+                % self._data_type
+            )
+        if not predicate(self._default_value):
+            raise utils.ValidationError(
+                'Expected %s, received \'%s\' in default value.'
+                % (self._data_type, self._default_value)
             )
 
         if (
@@ -205,38 +557,50 @@ class AndroidPlatformParameterConfig:
                 '\'%s\'.' % self._rule_schema_version
             )
 
-        predicate = self._DATA_TYPE_PREDICATES[data_type]
         for rule in self._rules:
             if not predicate(rule.value_when_matched):
                 raise utils.ValidationError(
                     'Expected %s, received \'%s\' in value_when_matched.'
-                    % (data_type, rule.value_when_matched)
+                    % (self._data_type, rule.value_when_matched)
                 )
             rule.validate()
 
     def evaluate(
-        self, context: platform_parameter_domain.EvaluationContext
-    ) -> AndroidPlatformParameterDataTypes:
-        """Returns the first matching rule value or the default value."""
+        self, context: AndroidEvaluationContext
+    ) -> AndroidPlatformDataTypes:
+        """Returns the first matching rule value or the configured default.
+
+        Args:
+            context: AndroidEvaluationContext. The context used to evaluate
+                rules.
+
+        Returns:
+            AndroidPlatformDataTypes. The first matching rule value or the
+            configured default value.
+        """
         if self._default_value is None:
             raise utils.ValidationError(
                 'Android platform parameter must have a default value.'
             )
-        if context.platform_type != 'Android':
-            return self._default_value
+        context.validate()
         for rule in self._rules:
             if rule.evaluate(context):
                 return rule.value_when_matched
         return self._default_value
 
-    def to_dict(self) -> AndroidPlatformParameterConfigDict:
-        """Returns the dictionary representation of this config."""
+    def to_dict(self) -> AndroidPlatformParameterDict:
+        """Returns a dict representation of this parameter.
+
+        Returns:
+            dict. A dict mapping of all fields of the parameter object.
+        """
         if self._default_value is None:
             raise utils.ValidationError(
                 'Android platform parameter must have a default value.'
             )
         return {
             'name': self._name,
+            'data_type': self._data_type,
             'rules': [rule.to_dict() for rule in self._rules],
             'rule_schema_version': self._rule_schema_version,
             'default_value': self._default_value,
@@ -244,21 +608,86 @@ class AndroidPlatformParameterConfig:
 
     @classmethod
     def from_dict(
-        cls, config_dict: AndroidPlatformParameterConfigDict
-    ) -> AndroidPlatformParameterConfig:
-        """Creates an Android config from its dictionary representation."""
-        web_specific_fields = {'description', 'data_type'}
-        if web_specific_fields.intersection(config_dict):
-            raise utils.ValidationError(
-                'Web-specific fields are not allowed in an Android platform '
-                'parameter config.'
-            )
+        cls,
+        param_dict: Union[
+            AndroidPlatformParameterDict, AndroidPlatformParameterConfigDict
+        ],
+    ) -> AndroidPlatformParameter:
+        """Returns an AndroidPlatformParameter object from a dict.
+
+        Args:
+            param_dict: dict. A typed or legacy dict representation of the
+                Android platform parameter.
+
+        Returns:
+            AndroidPlatformParameter. The corresponding Android platform
+            parameter domain object.
+
+        Note:
+            The Android storage model does not persist ``data_type``; when
+            reading a model-shaped dictionary, the type is inferred from its
+            default value.
+        """
+        default_value = param_dict.get('default_value')
+        data_type = (
+            param_dict['data_type']
+            if 'data_type' in param_dict
+            else cls.DATA_TYPE_BY_DEFAULT_TYPE.get(type(default_value), '')
+        )
         return cls(
-            config_dict['name'],
+            param_dict['name'],
+            data_type,
             [
                 AndroidPlatformParameterRule.from_dict(rule_dict)
-                for rule_dict in config_dict['rules']
+                for rule_dict in param_dict['rules']
             ],
-            config_dict['rule_schema_version'],
-            config_dict.get('default_value'),
+            param_dict['rule_schema_version'],
+            default_value,
         )
+
+    def serialize(self) -> str:
+        """Returns this Android platform parameter as a JSON string.
+
+        Returns:
+            str. A JSON string representation of this Android platform
+            parameter.
+        """
+        return json.dumps(self.to_dict())
+
+    @classmethod
+    def deserialize(cls, json_string: str) -> AndroidPlatformParameter:
+        """Returns an Android platform parameter decoded from JSON.
+
+        Args:
+            json_string: str. The JSON string representation of the Android
+                platform parameter.
+
+        Returns:
+            AndroidPlatformParameter. The corresponding Android platform
+            parameter domain object.
+        """
+        return cls.from_dict(json.loads(json_string))
+
+
+def _compare_versions(version_a: str, version_b: str) -> int:
+    """Compares dotted numeric versions, padding missing components with 0.
+
+    Args:
+        version_a: str. The first version string for comparison.
+        version_b: str. The second version string for comparison.
+
+    Returns:
+        int. -1 if the first version is smaller, 0 if equal, and 1 if the
+        first version is larger.
+    """
+    components_a = [int(component) for component in version_a.split('.')]
+    components_b = [int(component) for component in version_b.split('.')]
+    component_count = max(len(components_a), len(components_b))
+    components_a.extend([0] * (component_count - len(components_a)))
+    components_b.extend([0] * (component_count - len(components_b)))
+
+    if components_a < components_b:
+        return -1
+    if components_a > components_b:
+        return 1
+    return 0
