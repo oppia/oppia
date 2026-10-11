@@ -45,7 +45,6 @@ import {I18nService} from 'i18n/i18n.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -211,7 +210,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
     private signInEventService: SignInEventService,
     private contentTranslationManagerService: ContentTranslationManagerService
@@ -246,13 +244,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    if (this.currentUrl !== 'signup') {
-      this.learnerGroupBackendApiService
-        .isLearnerGroupFeatureEnabledAsync()
-        .then(featureIsEnabled => {
-          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-        });
-    }
+    this.LEARNER_GROUPS_FEATURE_IS_ENABLED =
+      this.platformFeatureService.status.LearnerGroupsAreEnabled.isEnabled;
 
     this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
       this.urlService.getPathname().includes(path)
