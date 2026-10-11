@@ -95,10 +95,11 @@ describe('Voiceover Admin', function () {
       false
     );
 
-    await voiceoverAdmin.expectToSeeErrorToastMessage(
+    await voiceoverAdmin.expectErrorModalToBeVisible();
+    await voiceoverAdmin.expectErrorModalMessageToBe(
       invalidIdErrorToastMessage
     );
-    await voiceoverAdmin.closeToastMessage();
+    await voiceoverAdmin.closeErrorModal();
     await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
 
     // Add a valid user as a voiceover artist.
