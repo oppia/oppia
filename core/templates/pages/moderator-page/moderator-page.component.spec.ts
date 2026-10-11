@@ -16,13 +16,12 @@
  * @fileoverview Unit tests for Moderator Page Component.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick,
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
@@ -33,6 +32,7 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {ModeratorPageComponent} from './moderator-page.component';
 import {
   ActivityIdTypeDict,
@@ -43,6 +43,13 @@ import {
 } from './services/moderator-page-backend-api.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
+interface MockErrorResponse {
+  status: number;
+  error: {
+    error: string;
+  };
+}
+
 describe('Moderator Page Component', () => {
   let fixture: ComponentFixture<ModeratorPageComponent>;
   let componentInstance: ModeratorPageComponent;
@@ -50,6 +57,7 @@ describe('Moderator Page Component', () => {
   let loaderService: LoaderService;
   let datetimeFormatService: DateTimeFormatService;
   let alertsService: AlertsService;
+  let moderatorPageBackendApiService: ModeratorPageBackendApiService;
   let threadMessageBackendDict: ThreadMessageBackendDict = {
     author_username: 'author',
     created_on_msecs: 123,
@@ -155,6 +163,9 @@ describe('Moderator Page Component', () => {
     alertsService = TestBed.inject(
       AlertsService
     ) as jasmine.SpyObj<AlertsService>;
+    moderatorPageBackendApiService = TestBed.inject(
+      ModeratorPageBackendApiService
+    );
   });
 
   it('should create', () => {
@@ -197,9 +208,9 @@ describe('Moderator Page Component', () => {
   });
 
   it('should tell if message is from exploration', () => {
-    expect(componentInstance.isMessageFromExploration(message)).toBeTrue();
+    expect(componentInstance.isMessageFromExploration(message)).toBe(true);
     message.entityType = 'other_than_exploration';
-    expect(componentInstance.isMessageFromExploration(message)).toBeFalse();
+    expect(componentInstance.isMessageFromExploration(message)).toBe(false);
   });
 
   it('should get exploration create url', () => {
@@ -226,15 +237,15 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [
       {id: '', type: 'emptyID'},
     ];
-    expect(
-      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
-    ).toBeTrue();
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
+      true
+    );
     componentInstance.displayedFeaturedActivityReferences = [
       {id: 'is', type: 'not'},
     ];
-    expect(
-      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
-    ).toBeFalse();
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
+      false
+    );
   });
 
   it('should save featured activity references', () => {
@@ -265,7 +276,42 @@ describe('Moderator Page Component', () => {
     );
   });
 
-  it('should display error message for nonexistent exploration', () => {
+  it('should expose featured activity references as schema default value', () => {
+    const references: ActivityIdTypeDict[] = [
+      {
+        id: 'test_id',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = references;
+
+    expect(
+      componentInstance.displayedFeaturedActivityReferencesAsSchemaDefault as ActivityIdTypeDict[]
+    ).toEqual(references);
+  });
+
+  it('should ignore non-array values when updating featured activity references', () => {
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(null);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
+  it('should reject featured activity references with malformed list items', () => {
+    const newValue: SchemaDefaultValue[] = [
+      {
+        id: 'test_id',
+      },
+      {
+        id: 'test_id_2',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
+  it('should display error message for nonexistent exploration', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
 
     let newValue: ActivityIdTypeDict[] = [
@@ -278,7 +324,7 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError: MockErrorResponse = {
       status: 400,
       error: {
         error:
@@ -300,15 +346,17 @@ describe('Moderator Page Component', () => {
         },
       };
     });
+    ).and.returnValue(Promise.reject(mockError));
 
     componentInstance.saveFeaturedActivityReferences();
+    tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'These Exploration IDs do not exist: dne_exploration. Please enter a different ID.'
     );
-  });
+  }));
 
-  it('should display error message for nonexistent collection', () => {
+  it('should display error message for nonexistent collection', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
 
     let newValue: ActivityIdTypeDict[] = [
@@ -321,7 +369,7 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError: MockErrorResponse = {
       status: 400,
       error: {
         error:
@@ -343,15 +391,17 @@ describe('Moderator Page Component', () => {
         },
       };
     });
+    ).and.returnValue(Promise.reject(mockError));
 
     componentInstance.saveFeaturedActivityReferences();
+    tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'These Collection IDs do not exist: dne_collection. Please enter a different ID.'
     );
-  });
+  }));
 
-  it('should display error message for private exploration', () => {
+  it('should display error message for private exploration', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
 
     let newValue: ActivityIdTypeDict[] = [
@@ -364,7 +414,7 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError: MockErrorResponse = {
       status: 400,
       error: {
         error:
@@ -386,15 +436,17 @@ describe('Moderator Page Component', () => {
         },
       };
     });
+    ).and.returnValue(Promise.reject(mockError));
 
     componentInstance.saveFeaturedActivityReferences();
+    tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'These Exploration IDs are private: priv_exploration. Please enter a different ID.'
     );
-  });
+  }));
 
-  it('should display error message for private collection', () => {
+  it('should display error message for private collection', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
 
     let newValue: ActivityIdTypeDict[] = [
@@ -407,7 +459,7 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError: MockErrorResponse = {
       status: 400,
       error: {
         error:
@@ -429,18 +481,20 @@ describe('Moderator Page Component', () => {
         },
       };
     });
+    ).and.returnValue(Promise.reject(mockError));
 
     componentInstance.saveFeaturedActivityReferences();
+    tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'These Collection IDs are private: priv_collection. Please enter a different ID.'
     );
-  });
+  }));
 
-  it('should display message for miscellaneous errors', () => {
+  it('should display message for miscellaneous errors', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
 
-    const mockError = {
+    const mockError: MockErrorResponse = {
       status: 404,
       error: {
         error: '',
@@ -461,11 +515,13 @@ describe('Moderator Page Component', () => {
         },
       };
     });
+    ).and.returnValue(Promise.reject(mockError));
 
     componentInstance.saveFeaturedActivityReferences();
+    tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'An unexpected error occurred. Please try again later.'
     );
-  });
+  }));
 });
