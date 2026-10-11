@@ -1285,30 +1285,44 @@ class UserContributionRightsDataHandler(
             contribution_rights = user_services.get_user_contribution_rights(
                 self.user_id
             )
+        can_review_translation_for_language_codes = (
+            contribution_rights.can_review_translation_for_language_codes
+            if contribution_rights
+            else []
+        )
+        can_submit_translation_for_language_codes = (
+            contribution_rights.can_submit_translation_for_language_codes
+            if contribution_rights
+            else []
+        )
+        can_review_voiceover_for_language_codes = (
+            contribution_rights.can_review_voiceover_for_language_codes
+            if contribution_rights
+            else []
+        )
+        can_review_questions = (
+            contribution_rights.can_review_questions
+            if contribution_rights
+            else False
+        )
+        can_suggest_questions = (
+            contribution_rights.can_submit_questions
+            if contribution_rights
+            else False
+        )
         self.render_json(
             {
                 'can_review_translation_for_language_codes': (
-                    contribution_rights.can_review_translation_for_language_codes
-                    if contribution_rights
-                    else []
+                    can_review_translation_for_language_codes
+                ),
+                'can_submit_translation_for_language_codes': (
+                    can_submit_translation_for_language_codes
                 ),
                 'can_review_voiceover_for_language_codes': (
-                    contribution_rights.can_review_voiceover_for_language_codes
-                    if contribution_rights
-                    else []
+                    can_review_voiceover_for_language_codes
                 ),
-                'can_review_questions': (
-                    contribution_rights.can_review_questions
-                    if contribution_rights
-                    else False
-                ),
-                'can_suggest_questions': (
-                    (
-                        contribution_rights.can_submit_questions
-                        if contribution_rights
-                        else False
-                    )
-                ),
+                'can_review_questions': can_review_questions,
+                'can_suggest_questions': can_suggest_questions,
             }
         )
 
