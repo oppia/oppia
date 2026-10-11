@@ -32,6 +32,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UserInfo} from 'domain/user/user-info.model';
+import {AppConstants} from 'app.constants';
 
 class MockPlatformFeatureService {
   status = {
@@ -206,6 +207,22 @@ describe('ContributorDashboardAdminPageComponent', () => {
         component.ngOnInit();
         // Setting category to be translation.
         component.formData.addContributionReviewer.category = 'translation';
+        component.formData.addContributionReviewer.languageCode = 'en';
+        component.formData.addContributionReviewer.username = 'user1';
+
+        const result = component.formData.addContributionReviewer.isValid();
+
+        expect(result).toBe(true);
+      })
+    );
+
+    it(
+      'should return true if there are no validation errors ' +
+        'when updating user rights for category submit_translation',
+      fakeAsync(() => {
+        component.ngOnInit();
+        component.formData.addContributionReviewer.category =
+          'submit_translation';
         component.formData.addContributionReviewer.languageCode = 'en';
         component.formData.addContributionReviewer.username = 'user1';
 
@@ -765,5 +782,23 @@ describe('ContributorDashboardAdminPageComponent', () => {
 
     expect(component.contributionReviewersDataFetched).toBe(false);
     expect(component.contributionReviewersResult).toEqual({});
+  });
+
+  it('should correctly determine if a category is language specific', () => {
+    expect(
+      component.isLanguageSpecificReviewCategory(
+        AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+      )
+    ).toBe(true);
+    expect(
+      component.isLanguageSpecificReviewCategory(
+        AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION
+      )
+    ).toBe(true);
+    expect(
+      component.isLanguageSpecificReviewCategory(
+        AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+      )
+    ).toBe(false);
   });
 });

@@ -268,7 +268,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
   isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
     return (
-      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+      reviewCategory ===
+        AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION ||
+      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION
     );
   }
 
