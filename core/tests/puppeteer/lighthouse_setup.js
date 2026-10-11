@@ -25,6 +25,13 @@ const ADMIN_URL = 'http://localhost:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const TOPIC_AND_SKILLS_DASHBOARD_URL =
   'http://localhost:8181/topics-and-skills-dashboard';
+const RELEASE_COORDINATOR_URL = 'http://localhost:8181/release-coordinator';
+const LOGOUT_URL = 'http://localhost:8181/logout';
+// The second account seeded as a learner of the learner group. The
+// learner-group-viewer page requires its user to be a learner, and the primary
+// test admin cannot be both the facilitator and a learner of the same group.
+const LEARNER_ACCOUNT_EMAIL = 'learner@example.com';
+const LEARNER_ACCOUNT_USERNAME = 'username2';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
@@ -39,6 +46,7 @@ var topicId = 'Topic editor not loaded';
 var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
+var learnerGroupUrl = 'Learner group not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -101,6 +109,11 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var featuresTabSelector = '.e2e-test-features-tab';
+var featureFlagRowSelector = '.e2e-test-feature-flag';
+var featureFlagNameSelector = '.e2e-test-feature-name';
+var featureFlagValueSelector = '.e2e-test-value-selector';
+var featureFlagSaveButtonSelector = '.e2e-test-save-button';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
 var blogGenerateButton = '.e2e-test-generate-blog-post';
@@ -152,7 +165,12 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
-const login = async function (browser, page) {
+const login = async function (
+  browser,
+  page,
+  email = 'testadmin@example.com',
+  username = 'username1'
+) {
   try {
     // eslint-disable-next-line dot-notation
     // networkidle0 can wait forever on the heavy /admin page when its
@@ -164,7 +182,7 @@ const login = async function (browser, page) {
       timeout: 60000,
     });
     await page.waitForSelector(emailInput, {visible: true});
-    await page.type(emailInput, 'testadmin@example.com');
+    await page.type(emailInput, email);
     await page.click(signInButton);
 
     let cookies = await page.cookies();
@@ -198,7 +216,7 @@ const login = async function (browser, page) {
       return;
     }
 
-    await usernameInputElement.type('username1');
+    await usernameInputElement.type(username);
     await Promise.all([
       page.waitForResponse(response =>
         response.url().includes('/usernamehandler/data')
@@ -220,6 +238,14 @@ const login = async function (browser, page) {
     console.log(e);
     process.exit(1);
   }
+};
+
+// Signs the current user out so that the next login can authenticate as a
+// different account. The logout page signs out of Firebase and then redirects,
+// so the navigation completes while still on the transient /logout url.
+const logout = async function (browser, page) {
+  await page.goto(LOGOUT_URL, {waitUntil: 'networkidle2', timeout: 60000});
+  await page.waitForTimeout(2000);
 };
 
 const setRole = async function (browser, page, role) {
@@ -919,6 +945,208 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   }
 };
 
+// Force-enables a feature flag for every user through the release coordinator
+// page. Page routes gated behind a flag render the error page while the flag is
+// disabled, and there is no other way to turn a flag on for the audit server,
+// so the setup has to enable it before the checks run. The setup server runs in
+// the DEV stage, where every feature flag is listed, and the flag config is
+// persisted to the shared datastore that the audit server later reads.
+const enableFeatureFlagForAllUsers = async function (
+  browser,
+  page,
+  featureFlagName
+) {
+  try {
+    await page.goto(RELEASE_COORDINATOR_URL, {waitUntil: networkIdle});
+    await page.waitForSelector(featuresTabSelector, {visible: true});
+    await page.click(featuresTabSelector);
+    await page.waitForSelector(featureFlagRowSelector, {visible: true});
+
+    const featureFlagRows = await page.$$(featureFlagRowSelector);
+    for (let i = 0; i < featureFlagRows.length; i++) {
+      const featureFlagNameElement = await featureFlagRows[i].$(
+        featureFlagNameSelector
+      );
+      if (featureFlagNameElement === null) {
+        continue;
+      }
+      const rowFeatureFlagName = await page.evaluate(
+        element => element.textContent.trim(),
+        featureFlagNameElement
+      );
+      if (rowFeatureFlagName !== featureFlagName) {
+        continue;
+      }
+
+      const valueSelector = await featureFlagRows[i].$(
+        featureFlagValueSelector
+      );
+      if (valueSelector === null) {
+        throw new Error(
+          `Value selector not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      // The force-enable select is bound with [ngValue], so "Yes" is rendered
+      // with the Angular-encoded option value "0: true".
+      await valueSelector.select('0: true');
+
+      const saveButton = await featureFlagRows[i].$(
+        featureFlagSaveButtonSelector
+      );
+      if (saveButton === null) {
+        throw new Error(
+          `Save button not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      await saveButton.click();
+      await featureFlagRows[i].waitForSelector(
+        `${featureFlagSaveButtonSelector}[disabled]`,
+        {visible: true}
+      );
+      return;
+    }
+
+    throw new Error(`Feature flag not found: ${featureFlagName}.`);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(`Failed to enable feature flag: ${featureFlagName}`);
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+// Fetches the CSRF token that the frontend attaches to state-changing requests.
+// The token endpoint guards its JSON with a five-character XSSI prefix, so the
+// prefix is stripped before parsing.
+const getCsrfToken = async function (page) {
+  return page.evaluate(async () => {
+    const response = await fetch('/csrfhandler', {credentials: 'same-origin'});
+    const responseText = await response.text();
+    return JSON.parse(responseText.substring(5)).token;
+  });
+};
+
+// Creates a learner group as the logged-in facilitator and invites the given
+// learner, returning the new group id. The learner is invited rather than added
+// directly, because only accepting an invitation records the group on the
+// learner's own user model, which the learner group progress endpoints read.
+const createLearnerGroupAndInviteLearner = async function (
+  browser,
+  page,
+  title,
+  description,
+  invitedLearnerUsername
+) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const learnerGroupId = await page.evaluate(
+      async (csrfToken, title, description, invitedLearnerUsername) => {
+        const createResponse = await fetch('/create_learner_group_handler', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: new URLSearchParams({
+            csrf_token: csrfToken,
+            payload: JSON.stringify({
+              group_title: title,
+              group_description: description,
+            }),
+          }).toString(),
+        });
+        if (!createResponse.ok) {
+          return null;
+        }
+        const createBody = await createResponse.json();
+
+        const updateResponse = await fetch(
+          `/update_learner_group_handler/${createBody.id}`,
+          {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+              csrf_token: csrfToken,
+              payload: JSON.stringify({
+                group_title: title,
+                group_description: description,
+                learner_usernames: [],
+                invited_learner_usernames: [invitedLearnerUsername],
+                subtopic_page_ids: [],
+                story_ids: [],
+              }),
+            }).toString(),
+          }
+        );
+        return updateResponse.ok ? createBody.id : null;
+      },
+      csrfToken,
+      title,
+      description,
+      invitedLearnerUsername
+    );
+
+    if (!learnerGroupId) {
+      throw new Error('Failed to create the learner group.');
+    }
+    return learnerGroupId;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to create the learner group');
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+// Accepts the logged-in learner's invitation to the given group. Accepting is
+// what adds the group to the learner's own user model, so an invited-but-not-
+// accepted learner would break the learner-group-viewer page.
+const acceptLearnerGroupInvitation = async function (
+  browser,
+  page,
+  learnerGroupId,
+  learnerUsername
+) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const invitationAccepted = await page.evaluate(
+      async (csrfToken, learnerGroupId, learnerUsername) => {
+        const response = await fetch(
+          `/learner_group_learner_invitation_handler/${learnerGroupId}`,
+          {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+              csrf_token: csrfToken,
+              payload: JSON.stringify({
+                learner_username: learnerUsername,
+                is_invitation_accepted: 'true',
+                progress_sharing_permission: 'false',
+              }),
+            }).toString(),
+          }
+        );
+        return response.ok;
+      },
+      csrfToken,
+      learnerGroupId,
+      learnerUsername
+    );
+
+    if (!invitationAccepted) {
+      throw new Error('Failed to accept the learner group invitation.');
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to accept the learner group invitation');
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const addThumbnailToTopic = async function (page, topicName) {
   try {
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
@@ -1112,15 +1340,57 @@ const shard5Setup = async function (browser, page) {
   // Shard 5 audits the technical-feedback dashboard and its detail page, which
   // are gated on ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD. That action is
   // granted only by the TECH_TEAM_LEAD role (see role_services.py), so it has
-  // to be assigned here or both pages redirect to the error page.
+  // to be assigned here or both pages redirect to the error page. The
+  // facilitator dashboard and the learner group pages are gated on the
+  // learner_groups_are_enabled feature flag, whose enablement requires the
+  // RELEASE_COORDINATOR role, so that role is assigned here as well.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['TECH_TEAM_LEAD'])
+    setRoles(browser, page, ['TECH_TEAM_LEAD', 'RELEASE_COORDINATOR'])
   );
-  // The remaining pages on this shard (facilitator dashboard, learner group
-  // creator/editor/viewer, and the certificate pages) are either login-only or
-  // read the entities that the audit fixtures already create, and their URLs
-  // carry hardcoded ids rather than "{{entity}}" placeholders, so no entity
-  // generation or URL capture is needed here.
+  // The learner_groups_are_enabled feature flag is in the prod stage and is
+  // disabled by default, so it has to be force-enabled here or the facilitator
+  // dashboard and learner group pages render the error page instead of their
+  // content.
+  await logStep('enabling learner groups feature flag', () =>
+    enableFeatureFlagForAllUsers(browser, page, 'learner_groups_are_enabled')
+  );
+  // The learner-group-editor page is gated on the logged-in user being a
+  // facilitator of the group and the learner-group-viewer page on that user
+  // being a learner of it. A single account cannot be both (the learner group
+  // validator forbids a facilitator from also being a learner), so a second
+  // account is registered here and audited on the viewer page by the per-url
+  // login script. Registering it first makes its username resolvable when the
+  // group invites it below.
+  await logStep('registering learner account', async () => {
+    await logout(browser, page);
+    await login(browser, page, LEARNER_ACCOUNT_EMAIL, LEARNER_ACCOUNT_USERNAME);
+  });
+  // The group is created by the test admin as its facilitator, then the learner
+  // account is invited. Accepting the invitation (below) records the group on
+  // the learner's own user model, which the viewer page reads.
+  let learnerGroupId = null;
+  await logStep('creating learner group', async () => {
+    await logout(browser, page);
+    await login(browser, page);
+    learnerGroupId = await createLearnerGroupAndInviteLearner(
+      browser,
+      page,
+      'Lighthouse learner group',
+      'Learner group seeded for the lighthouse checks.',
+      LEARNER_ACCOUNT_USERNAME
+    );
+    learnerGroupUrl = `http://localhost:8181/edit-learner-group/${learnerGroupId}`;
+  });
+  await logStep('accepting learner group invitation', async () => {
+    await logout(browser, page);
+    await login(browser, page, LEARNER_ACCOUNT_EMAIL, LEARNER_ACCOUNT_USERNAME);
+    await acceptLearnerGroupInvitation(
+      browser,
+      page,
+      learnerGroupId,
+      LEARNER_ACCOUNT_USERNAME
+    );
+  });
 };
 
 const main = async function () {
@@ -1199,6 +1469,7 @@ const main = async function () {
   const ranExplorationSetup =
     setupKind === 'data-player' || setupKind === 'blog';
   const ranTopicStorySkillSetup = setupKind === 'editors';
+  const ranRoleGatedSetup = setupKind === 'role-gated';
 
   await runShardSetup(browser, page);
 
@@ -1227,6 +1498,9 @@ const main = async function () {
   }
   if (ranBlogSetup) {
     urls.push(`http://localhost:8181/blog/${blogUrlFragment}`);
+  }
+  if (ranRoleGatedSetup) {
+    urls.push(learnerGroupUrl);
   }
   await process.stdout.write(urls.join('\n'));
   if (record) {

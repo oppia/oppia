@@ -256,6 +256,7 @@ def get_entity(line: str) -> tuple[str, str] | None:
         'story_editor': ('story_id', 4),
         'skill_editor': ('skill_id', 4),
         '/blog/': ('blog_post_url_fragment', 4),
+        'edit-learner-group': ('learner_group_id', 4),
     }
     for url_pattern, (
         entity_name,

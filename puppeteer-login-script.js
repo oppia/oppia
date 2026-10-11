@@ -19,8 +19,17 @@
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
 const LOGIN_URL = 'http://localhost:8181/login';
+const LOGOUT_URL = 'http://localhost:8181/logout';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
+// The accounts available to the audits. The primary test admin is the
+// facilitator of the seeded learner group; the learner account is its learner
+// and is used to audit the learner-group-viewer page, which is gated on the
+// logged-in user being a learner.
+const USERNAME_TO_EMAIL = {
+  username1: 'testadmin@example.com',
+  username2: 'learner@example.com',
+};
 // The wrapper rendered whenever a page fails to load its content (a 400, 401,
 // 404 or 500 response). This class is shared by both the generic error page
 // (<error-page>) and the 404 page (<oppia-error-404-page>), so it covers every
@@ -52,11 +61,36 @@ var roleOptionLabels = {
   MODERATOR: 'moderator',
 };
 
+// Tracks the account currently signed into the shared browser session. LHCI
+// reuses one browser across every audited url, so switching accounts requires
+// signing the previous one out first.
+let currentLoggedInUsername = null;
+
+// Returns the account to audit the given url with. The viewer route is the
+// only /learner-group/ page; the editor route lives under /edit-learner-group/,
+// so a leading-slash check distinguishes them without matching the editor.
+const getAuditUsernameForUrl = function (url) {
+  return new URL(url).pathname.startsWith('/learner-group/')
+    ? 'username2'
+    : 'username1';
+};
+
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
+  const username = getAuditUsernameForUrl(context.url);
+  // The learner-group-viewer page has to be audited as the learner account,
+  // while every other page is audited as the primary test admin. Since the
+  // browser session is shared, sign the current account out before switching.
+  if (
+    currentLoggedInUsername !== null &&
+    currentLoggedInUsername !== username
+  ) {
+    await logout(page);
+  }
   // Sign into Oppia.
-  await login(context, page);
+  await login(context, page, username);
+  currentLoggedInUsername = username;
   if (context.url.includes('moderator')) {
     await setRole(page, 'MODERATOR');
   } else if (context.url.includes('collection/0')) {
@@ -131,7 +165,8 @@ const seedBlankPagesForLighthouseRuns = async function (
 };
 
 // Needed to relogin after lighthouse_setup.js.
-const login = async function (context, page) {
+const login = async function (context, page, username) {
+  const email = USERNAME_TO_EMAIL[username];
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(LOGIN_URL, {waitUntil: networkIdle});
@@ -140,12 +175,14 @@ const login = async function (context, page) {
       return;
     }
     await page.waitForSelector(emailInput, {visible: true});
-    await page.type(emailInput, 'testadmin@example.com');
+    await page.type(emailInput, email);
     await page.click(signInButton);
-    // Checks if the user's account was already made.
+    // Checks if the user's account was already made. The timeout is kept
+    // short because a returning account never shows the username field, so
+    // waiting the full default would stall every re-login.
     try {
-      await page.waitForSelector(usernameInput, {visible: true});
-      await page.type(usernameInput, 'username1');
+      await page.waitForSelector(usernameInput, {visible: true, timeout: 5000});
+      await page.type(usernameInput, username);
       await Promise.all([
         page.waitForResponse(response =>
           response.url().includes('/usernamehandler/data')
@@ -159,12 +196,22 @@ const login = async function (context, page) {
       await page.click(registerUser);
       await page.waitForSelector(navbarToggle);
     } catch (error) {
-      // Already Signed in.
+      // Already registered: signing in redirects to a page with the navbar.
+      // Waiting for it confirms the session is established before auditing.
+      await page.waitForSelector(navbarToggle);
     }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
   }
+};
+
+// Signs the current account out so that a different one can sign in. The
+// logout page signs out of Firebase and then redirects away from /logout, so a
+// short settle is needed before the next login attempts to navigate away.
+const logout = async function (page) {
+  await page.goto(LOGOUT_URL, {waitUntil: 'networkidle2'});
+  await page.waitForTimeout(2000);
 };
 
 const setRole = async function (page, role) {

@@ -208,11 +208,11 @@
     "page_module": "core/templates/pages/learner-group-pages/create-group/create-learner-group-page.module.ts"
   },
   "learner-group-editor": {
-    "url": "http://localhost:8181/edit-learner-group/learner-group-1",
+    "url": "http://localhost:8181/edit-learner-group/{{learner_group_id}}",
     "page_module": "core/templates/pages/learner-group-pages/edit-group/edit-learner-group-page.module.ts"
   },
   "learner-group-viewer": {
-    "url": "http://localhost:8181/learner-group/learner-group-1",
+    "url": "http://localhost:8181/learner-group/{{learner_group_id}}",
     "page_module": "core/templates/pages/learner-group-pages/view-group/view-learner-group-page.module.ts"
   },
   "technical-feedback-dashboard": {

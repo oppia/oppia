@@ -229,6 +229,49 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_injected_url,
         )
 
+    def test_get_entity_parses_learner_group_url(self) -> None:
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/edit-learner-group/AbCdEf123456'
+            ),
+            ('learner_group_id', 'AbCdEf123456'),
+        )
+
+    def test_get_entity_parses_supported_urls(self) -> None:
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/create/abc123'
+            ),
+            ('exploration_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/topic_editor/abc123'
+            ),
+            ('topic_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/story_editor/abc123'
+            ),
+            ('story_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/skill_editor/abc123'
+            ),
+            ('skill_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/blog/blog-fragment'
+            ),
+            ('blog_post_url_fragment', 'blog-fragment'),
+        )
+
+    def test_get_entity_returns_none_for_non_url_line(self) -> None:
+        self.assertIsNone(run_lighthouse_tests.get_entity('not a url'))
+
     def test_get_lighthouse_pages_config(self) -> None:
         with self.lighthouse_pages_json_filepath_swap:
             pages_config = run_lighthouse_tests.get_lighthouse_pages_config()
