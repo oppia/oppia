@@ -65,6 +65,7 @@ describe('Contribution Opportunities backend API service', function () {
         skill_description: 'A new skill for question',
         topic_name: 'A new topic',
         question_count: 30,
+        questions_in_review_count: 0,
       },
     ],
     next_cursor: '6',
