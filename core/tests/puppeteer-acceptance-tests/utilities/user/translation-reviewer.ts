@@ -18,6 +18,7 @@
 
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
+import {showMessage} from '../common/show-message';
 
 const opportunityItemSelector = '.e2e-test-opportunity-list-item';
 const opportunityItemHeadingSelector =
@@ -38,6 +39,18 @@ const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const translatedContentContainerSelector = '.e2e-test-translated-content';
 const reviewModalContainerSelector = '.e2e-test-translation-review-modal';
 const updateTranslationBtnSelector = '.e2e-test-update-translation-button';
+
+// How long to wait when checking whether the review modal is still open after
+// a suggestion has been resolved. The modal closes without a request of its
+// own, so this only has to cover a render.
+const reviewModalProbeTimeoutMsecs = 2000;
+
+// The suggestion list reloads itself shortly after it first renders, which
+// detaches the rows a search was holding. The search is therefore retried, and
+// three attempts spaced by the delay below comfortably outlast that reload
+// while still failing quickly when the row genuinely is not there.
+const opportunityCardSearchAttempts = 3;
+const opportunityCardSearchRetryDelayMsecs = 1000;
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -66,7 +79,7 @@ export class TranslationReviewer extends BaseUser {
         `Translate button for chapter ${chapterName} and story ${storyName} not found.`
       );
     }
-    await translateButton.click();
+    await translateButton.evaluate(el => (el as HTMLElement).click());
 
     // Verify that the translation editor is opened.
     const backToLessonButtonVisible = await this.isElementVisible(
@@ -96,29 +109,48 @@ export class TranslationReviewer extends BaseUser {
     heading: string,
     subheading: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(opportunityItemSelector);
-
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
     let opportunityItem: ElementHandle<Element> | null = null;
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
-      );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
-        opportunityItem = opportunityItemElement;
-        break;
+    for (let attempt = 1; attempt <= opportunityCardSearchAttempts; attempt++) {
+      try {
+        await this.expectElementToBeVisible(opportunityItemSelector);
+        const opportunityItems = await this.page.$$(opportunityItemSelector);
+
+        for (const opportunityItemElement of opportunityItems) {
+          const opportunityItemHeading = await opportunityItemElement.evaluate(
+            (el: Element, sel: string) =>
+              el.querySelector(sel)?.textContent?.trim(),
+            opportunityItemHeadingSelector
+          );
+          const opportunityItemSubHeading =
+            await opportunityItemElement.evaluate(
+              (el: Element, sel: string) =>
+                el.querySelector(sel)?.textContent?.trim(),
+              opportunitySubHeadingSelector
+            );
+
+          if (
+            opportunityItemHeading === heading &&
+            opportunityItemSubHeading?.includes(subheading)
+          ) {
+            opportunityItem = opportunityItemElement;
+            break;
+          }
+        }
+        if (opportunityItem) {
+          break;
+        }
+      } catch (error) {
+        // A row that the reload detached mid-search is retried rather than
+        // reported, since the list is about to render the same row again.
+        // Puppeteer only signals this in the message of the error it throws.
+        if (error instanceof Error && error.message.includes('detached')) {
+          continue;
+        }
+        throw error;
       }
+
+      await this.page.waitForTimeout(opportunityCardSearchRetryDelayMsecs);
     }
 
     if (!opportunityItem) {
@@ -143,10 +175,14 @@ export class TranslationReviewer extends BaseUser {
       subheading
     );
 
+    // Puppeteer scrolls a target back to the centre of the viewport before
+    // it dispatches a mouse event, which parks the button underneath the
+    // sticky header and delivers the click to the header instead.
+    // By evaluating the click, it is dispatched on the element itself where
+    // it cannot be intercepted.
     if (this.isViewportAtMobileWidth()) {
-      await opportunityItem.click();
+      await opportunityItem.evaluate(el => (el as HTMLElement).click());
     } else {
-      // Click on translate button in the opportunity item.
       const translateButton = await opportunityItem.waitForSelector(
         opportunityTranslateButtonSelector
       );
@@ -155,10 +191,73 @@ export class TranslationReviewer extends BaseUser {
           `Translate button for chapter ${chapterName} and story ${subheading} not found.`
         );
       }
-      await translateButton.click();
+      await translateButton.evaluate(el => (el as HTMLElement).click());
     }
 
     await this.expectModalTitleToBe('Review Translation Contributions');
+  }
+
+  /**
+   * Opens the first suggestion in the list for review. The modal decides its
+   * button labels, and whether it closes or walks to the next suggestion, from
+   * the position of the row that was opened, so opening the first row keeps
+   * that behaviour the same no matter how the list happens to be sorted.
+   */
+  async openFirstSuggestionForReview(): Promise<void> {
+    await this.expectElementToBeVisible(opportunityItemSelector);
+    const [firstSuggestion] = await this.page.$$(opportunityItemSelector);
+    if (!firstSuggestion) {
+      throw new Error('There are no suggestions to review.');
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      // At mobile width the whole row is the button, and the click is
+      // dispatched on it so the sticky navigation bar cannot intercept it.
+      await firstSuggestion.evaluate(el => (el as HTMLElement).click());
+    } else {
+      const reviewButton = await firstSuggestion.waitForSelector(
+        opportunityTranslateButtonSelector
+      );
+      if (!reviewButton) {
+        throw new Error('The review button on the first suggestion is absent.');
+      }
+      await reviewButton.evaluate(el => (el as HTMLElement).click());
+    }
+
+    await this.expectModalTitleToBe('Review Translation Contributions');
+  }
+
+  /**
+   * Opens the first suggestion in the list and accepts every suggestion the
+   * modal then walks through. Opening the first row means the modal holds all
+   * of the suggestions, so one pass resolves the whole list without reading it
+   * again.
+   * @param expectedToastMessage - The toast each accept raises.
+   * @param maxSuggestions - Safety bound so a modal that stops closing fails
+   *     instead of looping forever.
+   */
+  async acceptAllSuggestionsInReviewModal(
+    expectedToastMessage: string,
+    maxSuggestions: number
+  ): Promise<void> {
+    await this.openFirstSuggestionForReview();
+
+    for (let accepted = 1; accepted <= maxSuggestions; accepted++) {
+      const modalIsStillOpen = await this.reviewActiveSuggestion(
+        'accept',
+        undefined,
+        expectedToastMessage
+      );
+      if (!modalIsStillOpen) {
+        showMessage(`Accepted ${accepted} suggestions.`);
+        return;
+      }
+    }
+
+    throw new Error(
+      `The review modal was still open after accepting ${maxSuggestions} ` +
+        'suggestions.'
+    );
   }
 
   /**
@@ -177,32 +276,7 @@ export class TranslationReviewer extends BaseUser {
     reviewType: 'accept' | 'reject',
     reviewMessage?: string
   ): Promise<void> {
-    const buttonSelector =
-      reviewType === 'accept'
-        ? acceptTranslationButtonSelector
-        : rejectTranslationButtonSelector;
-    if (reviewMessage) {
-      await this.expectElementToBeVisible(reviewCommentInputSelector);
-      await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
-    }
-
-    await this.expectElementToBeVisible(reviewContentContainerSelector);
-    const initialReviewContent = await this.page.$eval(
-      reviewContentContainerSelector,
-      el => el.textContent
-    );
-
-    await this.clickOnElementWithSelector(buttonSelector);
-
-    await this.page.waitForFunction(
-      (selector: string, initialContent: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent !== initialContent;
-      },
-      {},
-      reviewContentContainerSelector,
-      initialReviewContent
-    );
+    await this.reviewActiveSuggestion(reviewType, reviewMessage);
   }
 
   /**
@@ -243,6 +317,169 @@ export class TranslationReviewer extends BaseUser {
   async clickOnUpdateTranslationButton(): Promise<void> {
     await this.clickOnElementWithSelector(updateTranslationBtnSelector);
     await this.expectElementToBeVisible(updateTranslationBtnSelector, false);
+  }
+
+  /**
+   * Checks the label on an opportunity card's action button.
+   * @param heading - The heading of the opportunity card.
+   * @param subheading - The subheading of the opportunity card.
+   * @param label - The label the action button is expected to carry.
+   */
+  async expectOpportunityActionButtonToBe(
+    heading: string,
+    subheading: string,
+    label: string
+  ): Promise<void> {
+    const opportunityItem = await this.getTranslationOpportunityCard(
+      heading,
+      subheading
+    );
+    const buttonText = await opportunityItem.evaluate(
+      (el: Element, sel: string) => el.querySelector(sel)?.textContent?.trim(),
+      opportunityTranslateButtonSelector
+    );
+    if (buttonText !== label) {
+      throw new Error(
+        `Expected the action button on "${heading}" to read "${label}", but ` +
+          `it read "${buttonText}".`
+      );
+    }
+  }
+
+  /**
+   * Checks whether the "Back to lessons" control is shown. It sits above the
+   * suggestion list on the lesson path only, so its absence is what
+   * distinguishes the skills path, where the suggestions are listed without an
+   * opportunity card to click through first.
+   * @param visible - Whether the control should be shown.
+   */
+  async expectBackToLessonsControlToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(backToLessonButtonSelector, visible);
+  }
+
+  /**
+   * Submits a review and checks the toast it raises. The toast is short-lived,
+   * so it is checked immediately after the click rather than after waiting for
+   * the next suggestion to load.
+   * @param reviewType - Whether to accept or reject the suggestion.
+   * @param expectedToastMessage - The toast the review is expected to raise.
+   * @param reviewMessage - The comment to leave, required to reject.
+   */
+  async submitTranslationReviewAndExpectToast(
+    reviewType: 'accept' | 'reject',
+    expectedToastMessage: string,
+    reviewMessage?: string
+  ): Promise<void> {
+    await this.reviewActiveSuggestion(
+      reviewType,
+      reviewMessage,
+      expectedToastMessage
+    );
+  }
+
+  /**
+   * Reviews the suggestion the modal is showing, then waits for the modal to
+   * either move on to the next suggestion or close.
+   * @param reviewType - The type of the review to submit.
+   * @param reviewMessage - The message to add to the review, if any.
+   * @param expectedToastMessage - The toast the review is expected to raise.
+   *     A review is sent as soon as its button is pressed and its toast clears
+   *     a few seconds later, so it is read here rather than by the caller.
+   * @returns Whether the modal is still open on a following suggestion.
+   */
+  private async reviewActiveSuggestion(
+    reviewType: 'accept' | 'reject',
+    reviewMessage?: string,
+    expectedToastMessage?: string
+  ): Promise<boolean> {
+    const buttonSelector =
+      reviewType === 'accept'
+        ? acceptTranslationButtonSelector
+        : rejectTranslationButtonSelector;
+    if (reviewMessage) {
+      await this.expectElementToBeVisible(reviewCommentInputSelector);
+      await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
+    }
+
+    await this.expectElementToBeVisible(reviewContentContainerSelector);
+    const contentBeforeReview = await this.page.$eval(
+      reviewContentContainerSelector,
+      el => el.textContent
+    );
+
+    await this.pressReviewButton(buttonSelector);
+    if (expectedToastMessage) {
+      await this.expectToastMessage(expectedToastMessage);
+    }
+
+    const modalIsStillOpen = await this.isElementVisible(
+      reviewModalContainerSelector,
+      true,
+      reviewModalProbeTimeoutMsecs
+    );
+    if (!modalIsStillOpen) {
+      return false;
+    }
+
+    // The modal stays on the suggestion just reviewed until the next one has
+    // loaded, and its review buttons stay disabled for that whole time, so
+    // whatever follows waits for the content to change first.
+    await this.page.waitForFunction(
+      (selector: string, previousContent: string) => {
+        const element = document.querySelector(selector);
+        return element === null || element.textContent !== previousContent;
+      },
+      {},
+      reviewContentContainerSelector,
+      contentBeforeReview ?? ''
+    );
+    return true;
+  }
+
+  /**
+   * Presses an accept or reject button in the review modal. The button is
+   * disabled while the previous review is still resolving, so this waits for
+   * it to come back, and dispatches the click on the element so that neither
+   * a toast nor the navigation bar can intercept it.
+   * @param buttonSelector - The review button to press.
+   */
+  private async pressReviewButton(buttonSelector: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(
+          selector
+        ) as HTMLButtonElement | null;
+        return button !== null && !button.disabled;
+      },
+      {},
+      buttonSelector
+    );
+
+    const button = await this.page.waitForSelector(buttonSelector);
+    if (!button) {
+      throw new Error(`The review button ${buttonSelector} was not found.`);
+    }
+    await button.evaluate(el => (el as HTMLElement).click());
+  }
+
+  /**
+   * Checks the label on the accept or reject button, which names the next
+   * suggestion while more remain and drops that mention on the last one.
+   * @param reviewType - Whether to check the accept or the reject button.
+   * @param label - The label the button is expected to carry.
+   */
+  async expectReviewButtonLabelToBe(
+    reviewType: 'accept' | 'reject',
+    label: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      reviewType === 'accept'
+        ? acceptTranslationButtonSelector
+        : rejectTranslationButtonSelector,
+      label
+    );
   }
 }
 
