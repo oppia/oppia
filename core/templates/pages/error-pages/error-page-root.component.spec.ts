@@ -27,17 +27,15 @@ import {BaseRootComponent} from 'pages/base-root.component';
 import {PageHeadService} from 'services/page-head.service';
 
 class MockWindowRef {
+  bodyErrorCode: string | null = '401';
+
   nativeWindow = {
     document: {
-      getElementsByTagName(tagName: string) {
-        return [
-          {
-            getAttribute(attr: string) {
-              return '401';
-            },
-          },
-        ];
-      },
+      getElementsByTagName: (tagName: string) => [
+        {
+          getAttribute: (attr: string) => this.bodyErrorCode,
+        },
+      ],
     },
   };
 }
@@ -56,6 +54,7 @@ class MockActivatedRoute {
 describe('ErrorPageRootComponent', () => {
   let fixture: ComponentFixture<ErrorPageRootComponent>;
   let component: ErrorPageRootComponent;
+  let mockWindowRef: MockWindowRef;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -64,9 +63,10 @@ describe('ErrorPageRootComponent', () => {
       providers: [
         PageHeadService,
         TranslateService,
+        MockWindowRef,
         {
           provide: WindowRef,
-          useClass: MockWindowRef,
+          useExisting: MockWindowRef,
         },
         {
           provide: ActivatedRoute,
@@ -78,6 +78,7 @@ describe('ErrorPageRootComponent', () => {
 
     fixture = TestBed.createComponent(ErrorPageRootComponent);
     component = fixture.componentInstance;
+    mockWindowRef = TestBed.inject(MockWindowRef);
   });
 
   it('should return title interpolation params', () => {
@@ -140,12 +141,11 @@ describe('ErrorPageRootComponent', () => {
     spyOn(component.activatedRoute.snapshot.paramMap, 'get').and.returnValue(
       null
     );
+    mockWindowRef.bodyErrorCode = null;
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
       'getElementsByTagName'
-    ).and.returnValue([
-      {getAttribute: () => null},
-    ] as unknown as HTMLCollectionOf<Element>);
+    ).and.callThrough();
 
     component.ngOnInit();
 
