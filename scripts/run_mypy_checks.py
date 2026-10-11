@@ -60,8 +60,6 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/draft_upgrade_services.py',
     'core/domain/email_services.py',
     'core/domain/user_services.py',
-    'core/domain/suggestion_services.py',
-    'core/domain/suggestion_registry.py',
     'core/jobs/transforms/validation/base_validation.py',
     'core/storage/base_model/gae_models_test.py',
     'core/domain/user_services_test.py',
