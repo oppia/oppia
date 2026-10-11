@@ -20,6 +20,7 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ParamChange} from 'domain/exploration/param-change.model';
 
 @Component({
   selector: 'oppia-preview-set-parameters-modal',
@@ -30,7 +31,7 @@ export class PreviewSetParametersModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() manualParamChanges!: string[];
+  @Input() manualParamChanges!: ParamChange[];
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
