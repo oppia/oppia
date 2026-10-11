@@ -801,4 +801,10 @@ describe('ContributorDashboardAdminPageComponent', () => {
       )
     ).toBe(false);
   });
+
+  it('should return false for isValid if filterCriterion is unknown', () => {
+    component.refreshFormData();
+    component.formData.viewContributionReviewers.filterCriterion = 'UNKNOWN';
+    expect(component.formData.viewContributionReviewers.isValid()).toBe(false);
+  });
 });

@@ -158,6 +158,7 @@ import {ReviewTestPageComponent} from 'pages/review-test-page/review-test-page.c
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {AnswerContentModalComponent} from './common-layout-directives/common-elements/answer-content-modal.component';
+import {ErrorModalComponent} from './common-layout-directives/common-elements/error-modal.component';
 import {VisualizationSortedTilesComponent} from '../../../extensions/visualizations/oppia-visualization-sorted-tiles.component';
 import {OppiaVisualizationClickHexbinsComponent} from '../../../extensions/visualizations/oppia-visualization-click-hexbins.directive';
 import {OppiaVisualizationFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-frequency-table.directive';
@@ -440,6 +441,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
   ],
@@ -616,6 +618,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
   ],
@@ -788,6 +791,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
   ],

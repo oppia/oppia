@@ -23,7 +23,7 @@ import sys
 
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import (
     build,
@@ -41,7 +41,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.print_arr: list[str] = []
+        # Here we use type Any because the print mock can receive either strings
+        # or bytes (such as when decoding subprocess output), which causes mypy
+        # to flag 'isinstance(msg, bytes)' as unreachable if typed as strictly str.
+        self.print_arr: list[Any] = []
 
         def mock_print(  # pylint: disable=unused-argument
             msg: str, end: str = '\n'
