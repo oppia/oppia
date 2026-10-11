@@ -23,6 +23,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   waitForAsync,
 } from '@angular/core/testing';
@@ -125,8 +126,21 @@ const questionDict = {
 };
 
 class MockQuestionBackendApiService {
-  async fetchQuestionsAsync() {
+  totalQuestionCount = 0;
+
+  async fetchQuestionsAsync(
+    skillIds: string[],
+    questionCount: number,
+    questionsSortedByDifficulty: boolean,
+    page: number = 0
+  ): Promise<QuestionBackendDict[]> {
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
+  }
+
+  async fetchTotalQuestionCountForSkillIdsAsync(
+    skillIds: string[]
+  ): Promise<number> {
+    return Promise.resolve(this.totalQuestionCount);
   }
 }
 
@@ -141,6 +155,7 @@ describe('Skill Preview Tab Component', () => {
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let windowDimensionsService: WindowDimensionsService;
+  let mockQuestionBackendApiService: MockQuestionBackendApiService;
 
   let displayedCard = new StateCard(
     '',
@@ -232,6 +247,9 @@ describe('Skill Preview Tab Component', () => {
     conversationFlowService = TestBed.inject(ConversationFlowService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    mockQuestionBackendApiService = TestBed.inject(
+      QuestionBackendApiService
+    ) as unknown as MockQuestionBackendApiService;
     questionPlayerEngineService =
       questionPlayerEngineService as unknown as jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
@@ -243,10 +261,10 @@ describe('Skill Preview Tab Component', () => {
       ) => {}
     );
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);
-    component.ngOnInit();
   });
 
   it('should initialize the variables', () => {
+    component.ngOnInit();
     expect(component.questionTextFilter).toEqual('');
     expect(component.displayCardIsInitialized).toEqual(false);
     expect(component.questionsFetched).toEqual(false);
@@ -372,5 +390,106 @@ describe('Skill Preview Tab Component', () => {
     currentInteractionService.onSubmit('answer', mockInteractionRule);
 
     expect(component.questionsFetched).toBe(false);
+  }));
+
+  it('should fetch the first page and compute the total page count', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValue(Promise.resolve([questionDict1]));
+    mockQuestionBackendApiService.totalQuestionCount = 45;
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 0);
+    expect(component.totalPageCount).toBe(3);
+    expect(component.questionsFetched).toBe(true);
+    expect(component.displayedQuestions).toEqual([questionDict1]);
+    expect(component.selectQuestionToPreview).toHaveBeenCalledWith(0);
+  }));
+
+  it('should keep filters applied when paging through questions', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(
+      Promise.resolve([questionDict1]),
+      Promise.resolve([questionDict3]),
+      Promise.resolve([questionDict1])
+    );
+    mockQuestionBackendApiService.totalQuestionCount = 40;
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    component.questionTextFilter = 'question1';
+    component.applyFilters();
+    expect(component.displayedQuestions).toEqual([questionDict1]);
+
+    component.nextPage();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 1);
+    // The active filter is re-applied to the newly fetched page, so the
+    // non-matching question is filtered out.
+    expect(component.displayedQuestions).toEqual([]);
+
+    component.questionTextFilter = 'question3';
+    component.applyFilters();
+    expect(component.displayedQuestions).toEqual([questionDict3]);
+
+    component.previousPage();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(0);
+    expect(fetchSpy).toHaveBeenCalledWith(['df432fe'], 20, false, 0);
+  }));
+
+  it('should not page before the first or past the last page', () => {
+    const fetchSpy = spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValue(Promise.resolve([]));
+    component.currentPage = 0;
+    component.totalPageCount = 2;
+
+    component.previousPage();
+    expect(component.currentPage).toBe(0);
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    component.currentPage = 1;
+    component.nextPage();
+    expect(component.currentPage).toBe(1);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('should ignore a stale response from an older page fetch', fakeAsync(() => {
+    spyOn(component, 'selectQuestionToPreview');
+    let resolveFirstPage: (value: QuestionBackendDict[]) => void = () => {};
+    const firstPagePromise = new Promise<QuestionBackendDict[]>(resolve => {
+      resolveFirstPage = resolve;
+    });
+    spyOn(
+      mockQuestionBackendApiService,
+      'fetchQuestionsAsync'
+    ).and.returnValues(firstPagePromise, Promise.resolve([questionDict3]));
+    component.questionTextFilter = '';
+    component.interactionFilter = component.INTERACTION_TYPES.ALL;
+    component.currentPage = 0;
+    component.totalPageCount = 3;
+
+    component.nextPage();
+    component.nextPage();
+    flushMicrotasks();
+    expect(component.questionDicts).toEqual([questionDict3]);
+
+    // Resolving the stale first page must not overwrite the current page.
+    resolveFirstPage([questionDict1]);
+    flushMicrotasks();
+    expect(component.questionDicts).toEqual([questionDict3]);
   }));
 });

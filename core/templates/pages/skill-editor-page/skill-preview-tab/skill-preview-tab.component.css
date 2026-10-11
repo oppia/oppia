@@ -5,6 +5,43 @@
   margin-top: 50px;
 }
 
+.oppia-skill-preview-pagination {
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 16px;
+}
+
+.oppia-skill-preview-pagination-label {
+  color: #757575;
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.oppia-skill-preview-pagination-btn {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #424242;
+  cursor: pointer;
+  display: flex;
+  font-size: 13px;
+  gap: 2px;
+  justify-content: center;
+  padding: 4px 12px;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.oppia-skill-preview-pagination-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .question-filter-box {
   width: 25%;
 }

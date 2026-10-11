@@ -556,8 +556,47 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         )
         json_response = self.get_json(url)
         self.assertEqual(
-            len(json_response['question_dicts']), feconf.QUESTION_BATCH_SIZE
+            len(json_response['question_dicts']),
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
         )
+
+    def test_questions_are_paginated_by_page_number(self) -> None:
+        url_template = (
+            '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
+            '&page=%s'
+        )
+        first_page = self.get_json(
+            url_template % (feconf.QUESTIONS_URL_PREFIX, self.skill_id, '0')
+        )
+        second_page = self.get_json(
+            url_template % (feconf.QUESTIONS_URL_PREFIX, self.skill_id, '1')
+        )
+
+        self.assertEqual(len(first_page['question_dicts']), 1)
+        self.assertEqual(len(second_page['question_dicts']), 1)
+        # Distinct pages must return distinct questions.
+        self.assertNotEqual(
+            first_page['question_dicts'][0]['id'],
+            second_page['question_dicts'][0]['id'],
+        )
+
+    def test_negative_page_defaults_to_first_page(self) -> None:
+        url = (
+            '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
+            '&page=-1' % (feconf.QUESTIONS_URL_PREFIX, self.skill_id)
+        )
+        json_response = self.get_json(url)
+        self.assertEqual(len(json_response['question_dicts']), 1)
+
+    def test_page_beyond_available_questions_returns_no_questions(
+        self,
+    ) -> None:
+        url = (
+            '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
+            '&page=5' % (feconf.QUESTIONS_URL_PREFIX, self.skill_id)
+        )
+        json_response = self.get_json(url)
+        self.assertEqual(json_response['question_dicts'], [])
 
     def test_invalid_skill_id_returns_no_questions(self) -> None:
         # Call the handler.

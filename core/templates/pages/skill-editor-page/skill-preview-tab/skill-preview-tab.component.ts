@@ -59,6 +59,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   skill!: Skill;
   htmlData!: string;
   questionDicts!: QuestionBackendDict[];
+  totalPageCount: number = 0;
+  currentPage: number = 0;
   displayedQuestions!: QuestionBackendDict[];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
@@ -72,6 +74,10 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
+  // Tracks the page number that each question fetch was started for, so
+  // responses for a no-longer-current page can be ignored and stale
+  // results cannot replace displayedQuestions or questionDicts.
+  requestedPageForFetch: number | null = null;
 
   ngOnInit(): void {
     const that = this;
@@ -90,16 +96,11 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.htmlData = this.skill
       ? this.skill.getConceptCard().getExplanation().html
       : 'loading review material';
-
+    this.fetchQuestionsForPage(this.currentPage);
     this.questionBackendApiService
-      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
+      .fetchTotalQuestionCountForSkillIdsAsync([this.skillId])
       .then(response => {
-        this.questionsFetched = true;
-        this.questionDicts = response;
-        this.displayedQuestions = response;
-        if (this.questionDicts.length) {
-          this.selectQuestionToPreview(0);
-        }
+        this.totalPageCount = Math.ceil(response / this.QUESTION_COUNT);
       });
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
@@ -107,6 +108,42 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.currentInteractionService.setOnSubmitFn(() => {
       this.conversationFlowService.onOppiaFeedbackAvailable.emit();
     });
+  }
+
+  private fetchQuestionsForPage(page: number): void {
+    this.requestedPageForFetch = page;
+    this.questionBackendApiService
+      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false, page)
+      .then(response => {
+        // Ignore the response if the page this fetch was started for is no
+        // longer the page currently displayed.
+        if (page !== this.requestedPageForFetch) {
+          return;
+        }
+        this.questionsFetched = true;
+        this.questionDicts = response;
+        // Re-apply the active text and interaction filters to the newly
+        // fetched page before selecting a question to preview, so the filters
+        // stay applied on every page.
+        this.applyFilters();
+        if (this.displayedQuestions.length) {
+          this.selectQuestionToPreview(0);
+        }
+      });
+  }
+
+  previousPage(): void {
+    if (0 < this.currentPage) {
+      this.currentPage -= 1;
+      this.fetchQuestionsForPage(this.currentPage);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPageCount - 1) {
+      this.currentPage += 1;
+      this.fetchQuestionsForPage(this.currentPage);
+    }
   }
 
   initializeQuestionCard(card: StateCard): void {

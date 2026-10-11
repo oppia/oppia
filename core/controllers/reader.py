@@ -1922,6 +1922,7 @@ class QuestionPlayerHandlerNormalizedRequestDict(TypedDict):
     skill_ids: str
     question_count: int
     fetch_by_difficulty: bool
+    page: Optional[int]
 
 
 class QuestionPlayerHandler(
@@ -1952,6 +1953,12 @@ class QuestionPlayerHandler(
                 }
             },
             'fetch_by_difficulty': {'schema': {'type': 'bool'}},
+            'page': {
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -1962,7 +1969,15 @@ class QuestionPlayerHandler(
         # a GET request.
         assert self.normalized_request is not None
         skill_ids = self.normalized_request['skill_ids'].split(',')
-        question_count = self.normalized_request['question_count']
+        question_count = int(self.normalized_request['question_count'])
+        page = self.normalized_request.get('page')
+        # A missing page (None) or a negative value falls back to the first
+        # page. Each page maps to a distinct offset, so later pages can fetch
+        # questions beyond the initial per-request limit.
+        if page is None or page < 0:
+            page = 0
+        offset = page * question_count
+
         fetch_by_difficulty = self.normalized_request['fetch_by_difficulty']
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
@@ -1971,16 +1986,20 @@ class QuestionPlayerHandler(
                 if self.user_id
                 else skill_ids
             )
-
-        questions = question_services.get_questions_by_skill_ids(
-            int(question_count), skill_ids, fetch_by_difficulty
-        )
-        random.shuffle(questions)
+        # Paginated fetching is deterministic and offset-based. Difficulty
+        # based sampling is random and cannot be paged, so it continues to use
+        # get_questions_by_skill_ids.
+        if len(skill_ids) == 1 and not fetch_by_difficulty:
+            questions = question_services.get_paginated_questions_by_skill_id(
+                question_count, skill_ids[0], offset
+            )
+        else:
+            questions = question_services.get_questions_by_skill_ids(
+                question_count, skill_ids, fetch_by_difficulty
+            )
 
         question_dicts = [question.to_dict() for question in questions]
-        self.values.update(
-            {'question_dicts': question_dicts[: feconf.QUESTION_BATCH_SIZE]}
-        )
+        self.values.update({'question_dicts': question_dicts[0:question_count]})
         self.render_json(self.values)
 
 

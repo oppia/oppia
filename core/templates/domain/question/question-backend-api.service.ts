@@ -69,6 +69,7 @@ export class QuestionBackendApiService {
   private _fetchQuestions(
     skillIds: string[],
     questionCount: number,
+    page: number,
     questionsSortedByDifficulty: boolean,
     successCallback: (value: QuestionBackendDict[]) => void,
     errorCallback: (reason: string) => void
@@ -84,6 +85,7 @@ export class QuestionBackendApiService {
         skill_ids: skillIds.join(','),
         question_count: questionCount.toString(),
         fetch_by_difficulty: questionsSortedByDifficulty.toString(),
+        page: page.toString(),
       }
     );
     this.http
@@ -217,12 +219,14 @@ export class QuestionBackendApiService {
   async fetchQuestionsAsync(
     skillIds: string[],
     questionCount: number,
-    questionsSortedByDifficulty: boolean
+    questionsSortedByDifficulty: boolean,
+    page: number = 0
   ): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchQuestions(
         skillIds,
         questionCount,
+        page,
         questionsSortedByDifficulty,
         resolve,
         reject

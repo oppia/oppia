@@ -305,6 +305,57 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 25, ['skill_1', 'skill_2'], False
             )
 
+    def test_get_paginated_questions_by_skill_id(self) -> None:
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_1, 'skill_1', 0.8
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, 'skill_1', 0.5
+        )
+
+        first_page = question_services.get_paginated_questions_by_skill_id(
+            2, 'skill_1', 0
+        )
+        second_page = question_services.get_paginated_questions_by_skill_id(
+            2, 'skill_1', 2
+        )
+
+        self.assertEqual(len(first_page), 2)
+        self.assertEqual(len(second_page), 1)
+        first_page_ids = [question.id for question in first_page]
+        second_page_ids = [question.id for question in second_page]
+        # Paging must not skip or repeat any question linked to the skill.
+        self.assertEqual(len(set(first_page_ids) & set(second_page_ids)), 0)
+        self.assertItemsEqual(
+            first_page_ids + second_page_ids,
+            [self.question_id, self.question_id_1, self.question_id_2],
+        )
+
+    def test_get_paginated_questions_by_skill_id_without_links(
+        self,
+    ) -> None:
+        self.assertEqual(
+            question_services.get_paginated_questions_by_skill_id(
+                2, 'skill_3', 0
+            ),
+            [],
+        )
+
+    def test_get_paginated_questions_by_skill_id_raises_error_with_high_count(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Question count is too high, please limit the question '
+            'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+        ):
+            question_services.get_paginated_questions_by_skill_id(
+                25, 'skill_1', 0
+            )
+
     def test_create_multi_question_skill_links_for_question(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(

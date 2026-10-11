@@ -108,7 +108,7 @@ describe('Question backend Api service', () => {
 
     let questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_difficulty=true';
+      '&fetch_by_difficulty=true&page=0';
 
     questionBackendApiService
       .fetchQuestionsAsync(['1'], 1, true)
@@ -135,7 +135,7 @@ describe('Question backend Api service', () => {
 
       let questionPlayerHandlerUrl =
         '/question_player_handler?skill_ids=1&question_count=1' +
-        '&fetch_by_difficulty=false';
+        '&fetch_by_difficulty=false&page=0';
 
       questionBackendApiService
         .fetchQuestionsAsync(['1'], 1, false)
@@ -153,6 +153,30 @@ describe('Question backend Api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully fetch questions for the requested page', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_difficulty=false&page=2';
+
+    questionBackendApiService
+      .fetchQuestionsAsync(['1'], 1, false, 2)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should successfully fetch question count from the backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -212,7 +236,7 @@ describe('Question backend Api service', () => {
 
     let questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_difficulty=true';
+      '&fetch_by_difficulty=true&page=0';
 
     questionBackendApiService
       .fetchQuestionsAsync(['1'], 1, true)

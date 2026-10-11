@@ -42,6 +42,22 @@
             </div>
           </div>
         </div>
+        <div class="oppia-skill-preview-pagination">
+          <span class="oppia-skill-preview-pagination-label">
+            Page {{ currentPage + 1 }}
+          </span>
+          <button class="oppia-skill-preview-pagination-btn"
+                  [disabled]="currentPage <= 0"
+                  (click)="previousPage()">
+            <i class="fas fa-angle-left"></i> Prev
+          </button>
+          <button class="oppia-skill-preview-pagination-btn"
+                  [disabled]="currentPage + 1 >= totalPageCount"
+                  (click)="nextPage()">
+            Next
+            <i class="fas fa-angle-right"></i>
+          </button>
+        </div>
         <div class="skill-description-box">
           <div class="skill-description">
             <div class="content-text-box">
