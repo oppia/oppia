@@ -19,8 +19,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 
-import './learner-group-details.component.css';
-
 @Component({
   selector: 'oppia-learner-group-details',
   templateUrl: './learner-group-details.component.html',

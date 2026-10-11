@@ -476,15 +476,6 @@ class RegistryUnitTest(test_utils.TestBase):
             dev_mode_translate_services,
         )
 
-    def test_import_search_services(self) -> None:
-        """Tests import search services function."""
-        from core.platform.search import elastic_search_services
-
-        self.assertEqual(
-            self.registry_instance.import_search_services(),
-            elastic_search_services,
-        )
-
     def test_import_storage_services(self) -> None:
         """Tests import storage services function."""
 
@@ -546,10 +537,10 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_machine_translate_services_in_prod_mode(self) -> None:
         """Tests import the machine translate services function in prod mode."""
-        from core.platform.translate import azure_translate_services
+        from core.platform.translate import gcp_translate_services
 
         with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
-                azure_translate_services,
+                gcp_translate_services,
                 self.registry_instance.import_machine_translate_services(),
             )

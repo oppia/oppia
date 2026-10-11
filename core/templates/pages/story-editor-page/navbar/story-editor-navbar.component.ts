@@ -36,7 +36,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DraftChapterConfirmationModalComponent} from '../modal-templates/draft-chapter-confirmation-modal.component';
-import './story-editor-navbar.component.css';
 
 @Component({
   selector: 'oppia-story-editor-navbar',

@@ -22,7 +22,6 @@ import {Subscription} from 'rxjs';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
-import './error-404-page.component.css';
 
 @Component({
   selector: 'oppia-error-404-page',

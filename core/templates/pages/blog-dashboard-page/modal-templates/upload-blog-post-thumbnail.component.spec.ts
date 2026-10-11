@@ -137,6 +137,12 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
+  it('should get invalid SVG issue URL', () => {
+    let svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue_url');
+    expect(componentInstance.getInvalidSvgIssueUrl()).toEqual('issue_url');
+  });
+
   it('should handle invalid image', () => {
     spyOn(componentInstance, 'reset');
 

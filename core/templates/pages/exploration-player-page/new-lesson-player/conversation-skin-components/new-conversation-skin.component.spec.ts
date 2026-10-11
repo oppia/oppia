@@ -805,13 +805,43 @@ describe('New Conversation skin component', () => {
     });
   });
 
+  it('should report whether the skin is in editor preview mode', () => {
+    componentInstance._editorPreviewMode = false;
+    expect(componentInstance.isInPreviewMode).toBe(false);
+
+    componentInstance._editorPreviewMode = true;
+    expect(componentInstance.isInPreviewMode).toBe(true);
+  });
+
+  it('should report whether the skin should open in a new window', () => {
+    componentInstance.isIframed = false;
+    expect(componentInstance.openInNewWindow).toBe(false);
+
+    componentInstance.isIframed = true;
+    expect(componentInstance.openInNewWindow).toBe(true);
+  });
+
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
     let isIframed = true;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1065,7 +1095,21 @@ describe('New Conversation skin component', () => {
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1204,7 +1248,21 @@ describe('New Conversation skin component', () => {
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1343,7 +1401,21 @@ describe('New Conversation skin component', () => {
       let isIframed = false;
       let collectionSummary = {
         is_admin: true,
-        summaries: [],
+        summaries: [
+          {
+            category: 'category',
+            community_owned: false,
+            last_updated_msec: 1000,
+            id: 'collectionId',
+            created_on: 1000,
+            language_code: 'en',
+            objective: 'objective',
+            status: 'public',
+            thumbnail_bg_color: 'bg_color',
+            thumbnail_icon_url: 'icon_url',
+            title: 'title',
+          },
+        ],
         user_email: '',
         is_topic_manager: false,
         username: true,

@@ -25,6 +25,10 @@ import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-ed
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 import './create-new-topic-modal.component.css';
 
 @Component({
@@ -49,6 +53,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   generatedUrlPrefix = `${this.hostname}/learn/staging`;
+  imageUploaderParameters!: ImageUploaderParameters;
 
   constructor(
     private pageContextService: PageContextService,
@@ -62,6 +67,30 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   ngOnInit(): void {
     this.pageContextService.setImageSaveDestinationToLocalStorage();
+    this.imageUploaderParameters = {
+      disabled: false,
+      maxImageSizeInKB: 100,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: (this.allowedBgColors as string[])[0],
+      allowedBgColors: this.allowedBgColors as string[],
+      allowedImageFormats: ['svg'],
+      aspectRatio: '4:3',
+      previewTitle: this.newlyCreatedTopic.name,
+      previewDescriptionBgColor: '#2F6687',
+    };
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageLocalStorageService.saveImage(
+        imageData.filename,
+        reader.result as string
+      );
+    };
+    reader.readAsDataURL(imageData.image_data);
+    this.imageLocalStorageService.setThumbnailBgColor(imageData.bg_color);
   }
 
   save(): void {
@@ -115,5 +144,9 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
           this.topicEditorStateService.getTopicWithNameExists();
       }
     );
+    this.imageUploaderParameters = {
+      ...this.imageUploaderParameters,
+      previewTitle: this.newlyCreatedTopic.name,
+    };
   }
 }

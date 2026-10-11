@@ -20,7 +20,6 @@ import {ChangeDetectorRef, Component, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminRouterService} from './services/admin-router.service';
-import './admin-page.component.css';
 
 @Component({
   selector: 'oppia-admin-page',

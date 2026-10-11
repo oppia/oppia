@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageRootComponent.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
@@ -29,7 +29,6 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {StateBackendDict} from 'domain/state/state.model';
 import {PageHeadService} from 'services/page-head.service';
 import {AlertsService} from 'services/alerts.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerStateService} from './certificate-assessment-player-state.service';
@@ -41,7 +40,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let playerStateService: CertificateAssessmentPlayerStateService;
   let router: Router;
   let translateService: jasmine.SpyObj<TranslateService>;
-  let preventPageUnloadEventServiceSpy: jasmine.SpyObj<PreventPageUnloadEventService>;
 
   const mockOffering = new CertificateAssessmentOfferingData(
     'cert-123',
@@ -50,7 +48,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     'math_classroom_01',
     {topic_place_values: 1},
     12,
-    60,
     ['Understanding of numbers'],
     'Available',
     1
@@ -153,10 +150,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
-    preventPageUnloadEventServiceSpy = jasmine.createSpyObj(
-      'PreventPageUnloadEventService',
-      ['addListener', 'removeListener']
-    );
     const playerStateServiceInstance =
       new CertificateAssessmentPlayerStateService();
     component = new CertificateAssessmentPlayerPageRootComponent(
@@ -166,7 +159,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateServiceInstance,
       {} as ClassroomBackendApiService,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       routerSpy,
       translateServiceSpy
     );
@@ -209,67 +201,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.isLoading).toBe(false);
   }));
 
-  it('should register the page-unload guard on initialization', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(preventPageUnloadEventServiceSpy.addListener).toHaveBeenCalledWith(
-      jasmine.any(Function)
-    );
-  }));
-
-  it('should warn on page close only while an attempt is active', fakeAsync(() => {
-    let validationCallback: () => boolean = () => false;
-    preventPageUnloadEventServiceSpy.addListener.and.callFake(
-      (callback: () => boolean) => {
-        validationCallback = callback;
-      }
-    );
-
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(false);
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(true);
-    component.ngOnDestroy();
-  }));
-
-  it('should stop warning once the attempt has been submitted', fakeAsync(() => {
-    let validationCallback: () => boolean = () => false;
-    preventPageUnloadEventServiceSpy.addListener.and.callFake(
-      (callback: () => boolean) => {
-        validationCallback = callback;
-      }
-    );
-    playerStateService.beginNewAttempt(mockAttempt);
-
-    component.ngOnInit();
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(true);
-
-    component.onAssessmentSubmitted([
-      {question_id: 'question_1', is_correct: true},
-    ]);
-    flushMicrotasks();
-
-    expect(validationCallback()).toBe(false);
-    component.ngOnDestroy();
-  }));
-
-  it('should remove the page-unload guard on destroy', fakeAsync(() => {
-    component.ngOnInit();
-    flushMicrotasks();
-
-    component.ngOnDestroy();
-
-    expect(preventPageUnloadEventServiceSpy.removeListener).toHaveBeenCalled();
-  }));
-
   it('should start an attempt and switch to questions when the route is session', fakeAsync(async () => {
     await configureComponent('session');
     component.ngOnInit();
@@ -280,7 +211,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ).toHaveBeenCalledWith('cert-123');
     expect(component.attempt).toEqual(mockAttempt);
     expect(component.currentStage).toBe('questions');
-    expect(component.remainingTimeInSeconds).toBe(3600);
     component.ngOnDestroy();
   }));
 
@@ -317,7 +247,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -426,66 +355,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(component.currentStage).toBe('questions');
   }));
 
-  // Arms a fully running countdown through the state service: registers
-  // the attempt (moving the learner to the questions stage) and applies
-  // the offering's one-hour time limit, which starts the interval.
-  const armCountdown = (): void => {
-    playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.configureForOffering(60);
-  };
-
-  it('should reset stale timing state only when a replacement attempt succeeds', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    spyOn(window, 'clearInterval').and.callThrough();
-    component.certificateId = 'cert-123';
-    armCountdown();
-    tick(3600000);
-    expect(component.isTimeExpired).toBe(true);
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    expect(component.isTimeExpired).toBe(false);
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(window.clearInterval).toHaveBeenCalled();
-    expect(window.setInterval).toHaveBeenCalledTimes(2);
-    component.ngOnDestroy();
-  }));
-
-  it('should leave the existing time window untouched when starting a new attempt fails', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    component.certificateId = 'cert-123';
-    armCountdown();
-    tick(60000);
-    (
-      certificateAssessmentOfferingBackendApiService.attemptCertificateAssessmentAsync as jasmine.Spy
-    ).and.returnValue(Promise.reject('Error'));
-
-    component.startAssessment();
-    flushMicrotasks();
-
-    // A failed start request must neither wipe nor extend the current
-    // window: resetting is reserved for successfully begun attempts.
-    expect(component.isTimeExpired).toBe(false);
-    expect(playerStateService.getAttempt()).toEqual(mockAttempt);
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'I18N_CERTIFICATE_ASSESSMENT_START_WARNING'
-    );
-    component.ngOnDestroy();
-  }));
-
-  it('should clear the countdown timer on destroy', fakeAsync(() => {
-    spyOn(window, 'setInterval').and.callThrough();
-    armCountdown();
-    expect(component.remainingTimeInSeconds).toBe(3600);
-
-    component.ngOnDestroy();
-    tick(2000);
-
-    expect(component.remainingTimeInSeconds).toBe(3600);
-    expect(component.isTimeExpired).toBe(false);
-  }));
-
   it('should not navigate to results when there is no attempt', fakeAsync(() => {
     component.onViewResults();
     flushMicrotasks();
@@ -565,44 +434,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     ]);
   }));
 
-  it('should not suppress navigation when the timer expires during a pending submission', fakeAsync(() => {
-    let resolveSubmit: (value: object) => void = () => {};
-    (
-      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
-    ).and.returnValue(
-      new Promise(resolve => {
-        resolveSubmit = resolve;
-      })
-    );
-    armCountdown();
-
-    const answers = [{question_id: 'question_1', is_correct: true}];
-    component.onAssessmentSubmitted(answers);
-    tick(3600000);
-    expect(component.isTimeExpired).toBe(true);
-
-    component.onAssessmentSubmitted(answers);
-    expect(
-      certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync
-    ).toHaveBeenCalledTimes(1);
-
-    resolveSubmit({attempt_id: 'attempt-1234', is_submitted: true});
-    flushMicrotasks();
-
-    expect(router.navigate).toHaveBeenCalled();
-  }));
-
-  it('should keep the user on the assessment page after an auto-submit', fakeAsync(() => {
-    playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
-    const answers = [{question_id: 'question_1', is_correct: true}];
-
-    component.onAssessmentSubmitted(answers);
-    flushMicrotasks();
-
-    expect(router.navigate).not.toHaveBeenCalled();
-  }));
-
   it('should not submit when there is no attempt', fakeAsync(() => {
     component.onAssessmentSubmitted([]);
     flushMicrotasks();
@@ -652,7 +483,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       })
     );
     playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
 
     component.onAssessmentSubmitted([
       {question_id: 'question_1', is_correct: true},
@@ -682,7 +512,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       certificateAssessmentOfferingBackendApiService.submitCertificateAssessmentAttemptAsync as jasmine.Spy
     ).and.returnValue(Promise.reject('Error'));
     playerStateService.beginNewAttempt(mockAttempt);
-    playerStateService.isTimeExpired = true;
 
     component.onAssessmentSubmitted([
       {question_id: 'question_1', is_correct: true},
@@ -696,15 +525,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith([
       `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_ASSESSMENT_RESULT.ROUTE.split('/')[0]}`,
       'attempt-1234',
-    ]);
-  }));
-
-  it('should navigate to the learner dashboard when the assessment is ended', fakeAsync(() => {
-    component.onAssessmentEnded();
-    flushMicrotasks();
-
-    expect(router.navigate).toHaveBeenCalledWith([
-      `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE}`,
     ]);
   }));
 
@@ -733,7 +553,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );
@@ -763,7 +582,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
       playerStateService,
       classroomBackendApiServiceSpy,
       {} as PageHeadService,
-      preventPageUnloadEventServiceSpy,
       router,
       translateService
     );

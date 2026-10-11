@@ -23,14 +23,14 @@
     <div *ngIf="selectedFeedbackId" class="oppia-my-suggestions-detail">
       <div class="oppia-my-suggestions-detail-actions">
         <button type="button"
-                class="oppia-my-suggestions-back"
+                class="oppia-my-suggestions-back e2e-test-my-suggestions-back-button"
                 (click)="goBackToListView()">
           <i class="fas fa-arrow-left" aria-hidden="true"></i>
           {{ 'I18N_BACK_TO_MY_SUGGESTIONS' | translate }}
         </button>
 
         <button type="button"
-                class="oppia-my-suggestions-follow-up-button"
+                class="oppia-my-suggestions-follow-up-button e2e-test-my-suggestions-follow-up-button"
                 [disabled]="!canAddFollowUpNote()"
                 (click)="openFollowUpModal()">
           {{ 'I18N_ADD_A_FOLLOW_UP_NOTE_HEADER_TITLE' | translate }}
@@ -41,9 +41,10 @@
         <div *ngIf="selectedFeedback.lesson_metadata as lesson"
              class="oppia-my-suggestions-lesson-context">
           <i class="fas fa-book" aria-hidden="true"></i>
-          <span>
+          <span class="e2e-test-my-suggestions-lesson-context">
             {{ 'I18N_MY_SUGGESTION_LESSON_METADATA_TEXT_START' | translate }}
-            <a [routerLink]="'/explore/' + lesson.exploration_id">
+            <a class="e2e-test-my-suggestions-exp-link"
+               [routerLink]="'/explore/' + lesson.exploration_id">
               {{ 'I18N_MY_SUGGESTION_LESSON_METADATA_TEXT_MIDDLE' | translate }}
             </a>,
             {{ getLessonStepDescription(lesson.state_name)}}.
@@ -52,18 +53,18 @@
 
         <div class="oppia-my-suggestions-detail-header">
           <div class="oppia-my-suggestions-meta-item">
-            <span class="oppia-my-suggestions-meta-label">
+            <span class="oppia-my-suggestions-meta-label e2e-test-my-suggestions-details-status-label">
               {{'I18N_MY_SUGGESTION_STATUS_LABEL' | translate }}
             </span>
-            <span class="oppia-my-suggestions-row-status"
+            <span class="oppia-my-suggestions-row-status e2e-test-my-suggestions-details-status-value"
                   [ngClass]="getStatusDetails(selectedFeedback.status).className"
-                  [attr.title]="getStatusDetails(selectedFeedback.status).tooltip">
+                  [ngbTooltip]="getStatusDetails(selectedFeedback.status).tooltip">
               {{ getStatusDetails(selectedFeedback.status).label }}
             </span>
           </div>
           <div class="oppia-my-suggestions-meta-item oppia-my-suggestions-meta-item-date">
-            <span class="oppia-my-suggestions-meta-label">{{ 'I18N_MY_SUGGESTION_SUBMITTED_ON'| translate }}</span>
-            <span class="oppia-my-suggestions-date">
+            <span class="oppia-my-suggestions-meta-label e2e-test-my-suggestions-details-submitted-on-label">{{ 'I18N_MY_SUGGESTION_SUBMITTED_ON'| translate }}</span>
+            <span class="oppia-my-suggestions-date e2e-test-my-suggestions-details-submitted-on-value">
               {{ formatDate(selectedFeedback.created_on_msecs) }}
             </span>
           </div>
@@ -76,14 +77,14 @@
             </span>
             <div class="oppia-my-suggestions-thread-content">
               <div class="oppia-my-suggestions-thread-meta">
-                <span class="oppia-my-suggestions-thread-author">
+                <span class="oppia-my-suggestions-thread-author e2e-test-my-suggestions-learner-thread-header">
                   {{ 'I18N_MY_SUGGESTION_LEARNER_THREAD_HEADER' | translate }}
                 </span>
-                <span class="oppia-my-suggestions-thread-date">
+                <span class="oppia-my-suggestions-thread-date e2e-test-my-suggestions-learner-thread-date">
                   {{ formatDate(selectedFeedback.created_on_msecs) }}
                 </span>
               </div>
-              <p>{{ selectedFeedback.feedback_text }}</p>
+              <p class="e2e-test-my-suggestions-learner-thread-text">{{ selectedFeedback.feedback_text }}</p>
             </div>
           </div>
 
@@ -94,14 +95,14 @@
             </span>
             <div class="oppia-my-suggestions-thread-content">
               <div class="oppia-my-suggestions-thread-meta">
-                <span class="oppia-my-suggestions-thread-author">
+                <span class="oppia-my-suggestions-thread-author e2e-test-my-suggestions-creator-thread-header">
                   {{ 'I18N_MY_SUGGESTION_CREATOR_THREAD_HEADER' | translate }}
                 </span>
-                <span class="oppia-my-suggestions-thread-date">
+                <span class="oppia-my-suggestions-thread-date e2e-test-my-suggestions-creator-thread-date">
                   {{ formatDate(response.responded_on) }}
                 </span>
               </div>
-              <p>{{ response.response_text }}</p>
+              <p class="e2e-test-my-suggestions-creators-response-text">{{ response.response_text }}</p>
             </div>
           </div>
         </div>

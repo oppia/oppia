@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
-import './primary-button.component.css';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({

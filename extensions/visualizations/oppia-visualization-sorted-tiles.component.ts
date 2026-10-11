@@ -21,9 +21,8 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnswerContentModalComponent} from 'components/common-layout-directives/common-elements/answer-content-modal.component';
 import {sum} from 'd3-array';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {UtilsService} from 'services/utils.service';
-
-import './oppia-visualization-sorted-tiles.component.css';
 
 @Component({
   selector: 'oppia-visualization-sorted-tiles',
@@ -83,6 +82,15 @@ export class VisualizationSortedTilesComponent implements OnInit {
       () => {},
       () => {}
     );
+  }
+
+  getAnswerHtml(answer: InteractionAnswer): string {
+    // This visualization is configured only for interactions whose answers
+    // are HTML strings. Guard the value so the answer is a string.
+    if (typeof answer !== 'string') {
+      return '';
+    }
+    return answer;
   }
 
   ngOnInit(): void {

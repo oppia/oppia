@@ -28,7 +28,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './practice-session-page.component.css';
 
 enum PracticeSessionType {
   Lesson = 'lesson',

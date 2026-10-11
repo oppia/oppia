@@ -19,7 +19,6 @@
 import {Component, Input} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
 import {AlertsService} from 'services/alerts.service';
-require('ngx-toastr/toastr.css');
 
 export interface MessageObject {
   type: string;

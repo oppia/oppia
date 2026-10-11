@@ -1,8 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
 @media (max-width: 1024px) {
   oppia-blog-home-page .oppia-search-bar-form .oppia-search-bar-input {
     border-radius: 4px;
@@ -194,30 +189,6 @@ ngb-pagination .page-item .pagination-button {
   line-height: 25px;
   padding: 0;
   width: 100%;
-}
-
-.tag-filter mat-form-field .mat-form-field-flex {
-  background: #fff;
-  border: 1px solid #707070;
-  border-radius: 4px;
-}
-
-mat-chip-list .mat-standard-chip {
-  background: #fff;
-  border: 1px solid #333;
-  border-radius: 2px;
-  color: #555;
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 16px;
-  font-weight: bold;
-  letter-spacing: 0;
-  line-height: 19px;
-  text-align: center;
-}
-
-mat-chip-list .mat-standard-chip .mat-chip-remove {
-  color: #555;
-  display: contents;
 }
 
 oppia-blog-home-page .blog-post-card {

@@ -18,7 +18,6 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
-import './exploration-objective-editor.component.css';
 
 @Component({
   selector: 'oppia-exploration-objective-editor',

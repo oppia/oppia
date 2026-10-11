@@ -58,6 +58,7 @@ describe('MathEquationInputInteractive', () => {
     asciimath() {
       return asciiDummyValue;
     }
+    activate(): void {}
 
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
@@ -108,6 +109,7 @@ describe('MathEquationInputInteractive', () => {
     windowRef = TestBed.inject(WindowRef);
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    spyOn(guppyInitializationService, 'activate').and.stub();
     mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(InteractiveMathEquationInput);

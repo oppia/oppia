@@ -24,7 +24,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {QuestionsListConstants} from 'components/question-directives/questions-list/questions-list.constants';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
-import './questions-list-select-skill-and-difficulty-modal.component.css';
 
 interface Summary {
   id: string;

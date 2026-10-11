@@ -1,8 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
 
 .oppia-learner-dashboard-container {
   margin: 0 auto 30px auto;
@@ -715,4 +710,9 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   flex: 0 0 25%;
   padding-left: 15px;
   padding-right: 15px;
+}
+
+.oppia-learner-dash-sidebar_btn .fa-lg {
+  line-height: 0.75em;
+  vertical-align: -0.0667em;
 }
