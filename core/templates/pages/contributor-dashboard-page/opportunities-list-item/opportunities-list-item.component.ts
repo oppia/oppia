@@ -111,6 +111,7 @@ export class OpportunitiesListItemComponent {
   opportunityDataIsLoading: boolean = true;
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
+  skillProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;
   tooltipText: string = 'All available translations are currently in review.';
 
@@ -157,31 +158,49 @@ export class OpportunitiesListItemComponent {
       ) {
         this.progressPercentage = `${Math.floor(Number(this.opportunity.progressPercentage))}%`;
         if (
-          this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
+          this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION ||
+          this.opportunityType === AppConstants.OPPORTUNITY_TYPE_SKILL
         ) {
-          this.translationProgressBar = true;
+          if (
+            this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
+          ) {
+            this.translationProgressBar = true;
+          } else if (
+            this.opportunityType === AppConstants.OPPORTUNITY_TYPE_SKILL
+          ) {
+            this.skillProgressBar = true;
+          }
+
           let translatedPercentage = 100;
           let inReviewTranslationsPercentage = 0;
           let untranslatedPercentage = 0;
 
           if (this.opportunity.totalCount > 0) {
-            translatedPercentage =
+            translatedPercentage = Math.min(
               (this.opportunity.translationsCount /
                 this.opportunity.totalCount) *
-              100;
-            inReviewTranslationsPercentage =
+                100,
+              100
+            );
+            inReviewTranslationsPercentage = Math.min(
               (this.opportunity.inReviewCount / this.opportunity.totalCount) *
-              100;
-            untranslatedPercentage =
-              100 - (translatedPercentage + inReviewTranslationsPercentage);
+                100,
+              100 - translatedPercentage
+            );
+            untranslatedPercentage = Math.max(
+              100 - (translatedPercentage + inReviewTranslationsPercentage),
+              0
+            );
           } else {
             this.progressPercentage = '100%';
           }
 
-          this.cardsAvailable =
+          this.cardsAvailable = Math.max(
             this.opportunity.totalCount -
-            (this.opportunity.translationsCount +
-              this.opportunity.inReviewCount);
+              (this.opportunity.translationsCount +
+                this.opportunity.inReviewCount),
+            0
+          );
 
           this.translatedProgressStyle = {width: translatedPercentage + '%'};
           this.untranslatedProgressStyle = {
