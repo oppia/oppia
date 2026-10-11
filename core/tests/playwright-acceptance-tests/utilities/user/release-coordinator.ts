@@ -16,7 +16,7 @@
  * @fileoverview Release coordinator users utility file.
  */
 
-import {ElementHandle, Page} from '@playwright/test';
+import {ElementHandle, expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -335,16 +335,9 @@ export class ReleaseCoordinator extends BaseUser {
     await this.expectElementToBeVisible(promoBarToggleSelector);
     await this.clickOnElementWithSelector(promoBarToggleSelector);
 
-    await this.page.waitForFunction(
-      ({selector, checked}: {selector: string; checked: boolean}) => {
-        const element = document.querySelector(selector);
-        return (element as HTMLInputElement)?.checked === checked;
-      },
-      {
-        selector: `${promoBarToggleSelector} input`,
-        checked: expectedState === 'enabled',
-      }
-    );
+    await expect(
+      this.page.locator(`${promoBarToggleSelector} input`)
+    ).toBeChecked({checked: expectedState === 'enabled'});
   }
 
   /**
@@ -374,28 +367,9 @@ export class ReleaseCoordinator extends BaseUser {
   async waitForProgressMessageDisappear(
     progressMessage: string
   ): Promise<void> {
-    const maxWaitTime = 10000; // 10 seconds.
-    const pollInterval = 500; // 500ms.
-    const startTime = Date.now();
-
-    while (Date.now() - startTime < maxWaitTime) {
-      const currentMessage = await this.getTextContent(
-        actionStatusMessageSelector
-      );
-
-      // If the current message doesn't contain the processing message, we're done.
-      if (!currentMessage?.includes(progressMessage)) {
-        return;
-      }
-
-      // Wait before checking again.
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
-    }
-
-    // If we get here, processing didn't complete within the timeout.
-    throw new Error(
-      `Progress message "${progressMessage}" did not disappear within ${maxWaitTime}ms`
-    );
+    await expect(
+      this.page.locator(actionStatusMessageSelector)
+    ).not.toContainText(progressMessage, {timeout: 10000});
   }
 
   /**
@@ -454,20 +428,20 @@ export class ReleaseCoordinator extends BaseUser {
   async expectTotalKeysStoredToBeInRange(
     maxValue?: number,
     minValue?: number
-  ): Promise<void> {
+  ): Promise<number> {
     await this.expectElementToBeVisible(memoryCacheProfileTableSelector);
 
-    const totalKeysStored = await this.page.evaluate(() => {
-      const cells = Array.from(
-        document.querySelectorAll('.view-results-table tbody tr td')
-      );
-      const totalKeysStoredText = cells[2]?.textContent;
-      return totalKeysStoredText ? parseInt(totalKeysStoredText, 10) : null;
-    });
+    const totalKeysStoredText = await this.page
+      .locator('.view-results-table tbody tr td')
+      .nth(2)
+      .textContent();
 
-    if (totalKeysStored === null) {
+    if (totalKeysStoredText === null || totalKeysStoredText === '') {
       throw new Error('totalKeysStored is null');
     }
+
+    const totalKeysStored = parseInt(totalKeysStoredText, 10);
+
     if (maxValue && totalKeysStored >= maxValue) {
       throw new Error(
         `Expected totalKeysStored to be less than ${maxValue}, but it was ${totalKeysStored}`
@@ -478,6 +452,8 @@ export class ReleaseCoordinator extends BaseUser {
         `Expected totalKeysStored to be greater than ${minValue}, but it was ${totalKeysStored}`
       );
     }
+
+    return totalKeysStored;
   }
 
   /**
@@ -608,25 +584,15 @@ export class ReleaseCoordinator extends BaseUser {
     groupName: string,
     present: boolean = true
   ): Promise<void> {
-    await this.page.waitForFunction(
-      ({
-        selector,
-        groupName,
-        present,
-      }: {
-        selector: string;
-        groupName: string;
-        present: boolean;
-      }) => {
-        const elements = document.querySelectorAll(selector);
-        return (
-          Array.from(elements).some(
-            element => element.textContent?.trim() === groupName
-          ) === present
-        );
-      },
-      {selector: userGroupItemSelector, groupName, present}
-    );
+    const matchingGroup = this.page
+      .locator(userGroupItemSelector)
+      .getByText(groupName, {exact: true});
+
+    if (present) {
+      await expect(matchingGroup).not.toHaveCount(0);
+    } else {
+      await expect(matchingGroup).toHaveCount(0);
+    }
   }
 
   /**

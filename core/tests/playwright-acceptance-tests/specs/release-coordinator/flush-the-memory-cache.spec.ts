@@ -42,7 +42,8 @@ test.describe('Release Coordinator', function () {
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
     await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.getMemoryCacheProfile();
-    await releaseCoordinator.expectTotalKeysStoredToBeInRange(undefined, 10); // Min value is 10.
+    const keysBeforeFlush =
+      await releaseCoordinator.expectTotalKeysStoredToBeInRange(undefined, 10); // Min value is 10.
 
     // Flush the cache.
     await releaseCoordinator.flushCache();
@@ -52,9 +53,15 @@ test.describe('Release Coordinator', function () {
 
     // Check memory cache profile again.
     await releaseCoordinator.getMemoryCacheProfile();
-    // TODO(#23307): Currently, the total keys stored is not updated after flushing the cache.
-    // Once fixed, reduct the max value in the below check to 5 from 100.
-    await releaseCoordinator.expectTotalKeysStoredToBeInRange(100, undefined); // Max value is 5.
+    // TODO(#23307): The cache key count may not drop to zero after flushing.
+    // This test checks that the count decreases; once the bug is fixed, check that fewer
+    // than 5 keys remain.
+    const keysAfterFlush =
+      await releaseCoordinator.expectTotalKeysStoredToBeInRange();
+
+    if (keysAfterFlush >= keysBeforeFlush) {
+      throw new Error('Cache key count did not decrease after flushing.');
+    }
   });
 
   test.afterAll(async function () {
