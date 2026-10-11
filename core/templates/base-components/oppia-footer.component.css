@@ -29,7 +29,8 @@
   text-decoration: none;
 }
 
-.oppia-footer-container a:focus {
+.oppia-footer-container a:focus,
+.oppia-footer-terms-privacy a:focus {
   outline: 2px solid #fff;
   text-decoration: underline;
 }
