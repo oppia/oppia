@@ -18,10 +18,7 @@
 
 import {Page} from '@playwright/test';
 import {showMessage} from '../common/show-message';
-import testConstants from '../common/test-constants';
 import {Contributor} from './contributor';
-
-const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
@@ -53,13 +50,6 @@ const questionDifficultySelectionModalSelector =
 
 export class PracticeQuestionSubmitter extends Contributor {
   /**
-   * Function for navigating to the contributor dashboard page.
-   */
-  async navigateToContributorDashboard(): Promise<void> {
-    await this.goto(contributorDashboardUrl);
-  }
-
-  /**
    * Opens the suggest questions modal and selects a specific skill and topic.
    * @param skillName - The name of the skill to suggest questions for.
    * @param topicName - The name of the topic to suggest questions for.
@@ -75,18 +65,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       skillName,
       topicName
     );
-
-    if (!questionElement) {
-      throw new Error(
-        `No opportunity found for topic "${topicName}" and skill "${skillName}".`
-      );
-    }
-
-    const button = await questionElement.$(suggestQuestionButton);
-    if (!button) {
-      throw new Error('Suggest Question button not found.');
-    }
-    await this.clickOnElement(button);
+    await questionElement.locator(suggestQuestionButton).click();
 
     await this.expectElementToBeVisible(
       questionDifficultySelectionModalSelector

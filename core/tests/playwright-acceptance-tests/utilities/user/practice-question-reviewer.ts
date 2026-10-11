@@ -37,21 +37,10 @@ export class PracticeQuestionReviewer extends Contributor {
       skill
     );
 
-    if (!questionElement) {
-      throw new Error(`Opportunity item for question ${question} not found.`);
-    }
-
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElement(questionElement);
+      await questionElement.click();
     } else {
-      const reviewButton = await questionElement.waitForSelector(
-        opportunityButtonSelector
-      );
-      if (!reviewButton) {
-        throw new Error('Review button not found.');
-      }
-
-      await this.clickOnElement(reviewButton);
+      await questionElement.locator(opportunityButtonSelector).click();
     }
     await this.expectModalTitleToBe(skill);
   }

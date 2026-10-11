@@ -16,8 +16,7 @@
  * @fileoverview Utility class for contributor actions.
  */
 
-import {ElementHandle, Page} from '@playwright/test';
-import {showMessage} from '../common/show-message';
+import {expect, Locator, Page} from '@playwright/test';
 import {ExplorationEditor} from './exploration-editor';
 
 const opportunityItemSelector = '.e2e-test-opportunity-list-item';
@@ -32,87 +31,29 @@ export class Contributor extends ExplorationEditor {
    * Checks if the opportunity is visible and matches the expected values.
    * @param heading - The expected heading of the opportunity.
    * @param subheading - The expected subheading of the opportunity.
-   * @param visible - Whether the opportunity should be visible or not.
    */
   async expectOpportunityToBePresent(
     heading: string,
-    subheading: string,
-    visible: boolean = true
-  ): Promise<ElementHandle<Element> | null> {
-    await this.waitForNetworkIdle();
-
-    const opportunitiesPresent = await this.isElementVisible(
-      opportunityItemSelector
+    subheading: string
+  ): Promise<Locator> {
+    const exactHeading = new RegExp(
+      `^\\s*${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`
     );
+    const opportunity = this.page
+      .locator(opportunityItemSelector)
+      .filter({
+        has: this.page
+          .locator(opportunityItemHeadingSelector)
+          .filter({hasText: exactHeading}),
+      })
+      .filter({
+        has: this.page
+          .locator(opportunitySubHeadingSelector)
+          .filter({hasText: subheading}),
+      });
 
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-
-    // Wait for the async opportunity list refresh to settle before reading it.
-    do {
-      await this.page.waitForTimeout(200);
-
-      const currentElementIds = await this.page.evaluate((selector: string) => {
-        const elements = document.querySelectorAll(selector);
-        return Array.from(elements).map((el, index) => {
-          return el.textContent?.trim() || `element-${index}`;
-        });
-      }, opportunityItemSelector);
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
-
-    if (!opportunitiesPresent) {
-      if (visible) {
-        throw new Error(
-          `Opportunity for ${heading} in ${subheading} not found.`
-        );
-      }
-      showMessage(
-        `Success: Opportunity for ${heading} in ${subheading} not found.`
-      );
-      return null;
-    }
-
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
-      );
-
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
-        if (!visible) {
-          throw new Error(
-            `Failure: Opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-          );
-        }
-        return opportunityItemElement;
-      }
-    }
-
-    if (visible) {
-      throw new Error(`Opportunity for ${heading} in ${subheading} not found.`);
-    }
-    showMessage(
-      `Success: Opportunity for ${heading} in ${subheading} not found.`
-    );
-    return null;
+    await expect(opportunity).toBeVisible();
+    return opportunity;
   }
 
   /**
