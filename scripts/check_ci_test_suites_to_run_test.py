@@ -883,8 +883,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
     def test_get_routes_without_standalone_pages(self) -> None:
         content_with_array = (
-            'export const ROUTES_WITH_NO_STANDALONE_PAGE =\n'
-            '  [\'LOGIN\', \'LOGOUT\'];\n'
+            '"ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],'
         )
         get_routes_without_standalone_pages = (
             check_ci_test_suites_to_run._get_routes_without_standalone_pages  # pylint: disable=protected-access,line-too-long

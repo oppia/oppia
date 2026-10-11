@@ -6649,6 +6649,11 @@ export default {
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
+  // Keys of routes that are pure redirect handlers (for example login and
+  // logout) without a dedicated page to audit. They cannot have a Lighthouse
+  // page entry, so the Lighthouse coverage and shard checks skip them.
+  "ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],
+
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "TECHNICAL_FEEDBACK_DASHBOARD": {

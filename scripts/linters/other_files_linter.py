@@ -73,17 +73,19 @@ LIGHTHOUSE_PAGES_JSON_FILEPATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'lighthouse-pages.json'
 )
 
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'constants.ts'
+)
+
 ROUTE_KEY_REGEX: Final = (
     r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 )
 
 MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
 ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
-    r'ROUTES_WITH_NO_STANDALONE_PAGE\s*=\s*\[([^\]]*)\]'
+    r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
 )
-QUOTED_STRING_REGEX: Final = (
-    r"'([^']+)'"  # pylint: disable=invalid-string-quote
-)
+QUOTED_STRING_REGEX: Final = r'"([^"]+)"'
 
 
 def _extract_top_level_route_objects(content: str) -> List[str]:
@@ -118,23 +120,23 @@ def _extract_top_level_route_objects(content: str) -> List[str]:
     return route_objects
 
 
-def _get_routes_without_standalone_pages(normalized_content: str) -> Set[str]:
+def _get_routes_without_standalone_pages(constants_content: str) -> Set[str]:
     """Gets the route keys that have no standalone Lighthouse page.
 
-    The routing module lists the keys of routes that are pure redirect handlers
-    (for example login and logout) in ROUTES_WITH_NO_STANDALONE_PAGE, so that
-    the coverage check can skip them without an inline hardcoded list.
+    The ROUTES_WITH_NO_STANDALONE_PAGE constant lists the keys of routes that
+    are pure redirect handlers (for example login and logout), so that the
+    coverage check can skip them without an inline hardcoded list.
 
     Args:
-        normalized_content: str. The routing module source with single-line
-            comments removed and string-concatenated imports joined.
+        constants_content: str. The contents of assets/constants.ts, where
+            ROUTES_WITH_NO_STANDALONE_PAGE is defined.
 
     Returns:
         set(str). The route keys listed in ROUTES_WITH_NO_STANDALONE_PAGE,
-        or an empty set if the array is not present.
+        or an empty set if the constant is not present.
     """
     array_match = re.search(
-        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, normalized_content
+        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, constants_content
     )
     if not array_match:
         return set()
@@ -459,6 +461,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         routing_content = self.file_cache.read(APP_ROUTING_MODULE_FILEPATH)
         lh_pages_content = self.file_cache.read(LIGHTHOUSE_PAGES_JSON_FILEPATH)
+        constants_content = self.file_cache.read(ASSETS_CONSTANTS_FILEPATH)
 
         # Normalize routing content: remove single-line comments and
         # join string-concatenated import paths so that the regex can
@@ -503,7 +506,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         # Find routes that have no corresponding Lighthouse page entry.
         routes_without_standalone_pages = _get_routes_without_standalone_pages(
-            normalized
+            constants_content
         )
         uncovered_keys = []
         for key, modules in sorted(key_to_modules.items()):

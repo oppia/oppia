@@ -30,10 +30,6 @@ import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
-// Login and logout routes are pure redirect handlers without a dedicated page
-// to audit, so they cannot have a Lighthouse page entry. The routes listed
-// here are skipped by the Lighthouse coverage and shard checks.
-export const ROUTES_WITH_NO_STANDALONE_PAGE = ['LOGIN', 'LOGOUT'];
 const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,

@@ -611,10 +611,24 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://[^/]+/blog-admin$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: '^http://[^/]+/blog/(?!author/).+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
@@ -624,10 +638,24 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://[^/]+/contributor-admin-dashboard$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: '^http://[^/]+/diagnostic-test-player(\\?.*)?$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           // The diagnostic player page's dummy content scores about 0.87 on
           // accessibility, so the floor matches the lowest threshold used
           // elsewhere in this file.
@@ -635,10 +663,24 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://[^/]+/learn/.+/practice/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
@@ -646,14 +688,35 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://[^/]+/release-coordinator$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: '^http://[^/]+/learn/.+/studyguide/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {
           matchingUrlPattern: '^http://[^/]+/voiceover-admin$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
           accessibilityMinScore: 0.9,
         },
         {

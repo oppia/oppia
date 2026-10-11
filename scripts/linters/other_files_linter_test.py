@@ -628,6 +628,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  }'
                     '}'
                 )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -662,6 +664,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return '{}'
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
                 return '{}'
             raise AssertionError('Unexpected file path: %s' % path)
 
@@ -702,6 +706,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  }'
                     '}'
                 )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -740,6 +746,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  }'
                     '}'
                 )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -780,6 +788,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  }'
                     '}'
                 )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -799,8 +809,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
-                        'const ROUTES_WITH_NO_STANDALONE_PAGE = ',
-                        '  [\'LOGIN\', \'LOGOUT\'];',
                         'const routes: Route[] = [',
                         '  {',
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
@@ -813,6 +821,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
                 return '{}'
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '"ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],'
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)

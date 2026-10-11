@@ -143,7 +143,9 @@ describe('ErrorPageRootComponent', () => {
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
       'getElementsByTagName'
-    ).and.returnValue([{getAttribute: () => null}]);
+    ).and.returnValue([
+      {getAttribute: () => null},
+    ] as unknown as HTMLCollectionOf<Element>);
 
     component.ngOnInit();
 

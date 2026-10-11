@@ -131,6 +131,9 @@ APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
     'routing',
     'app.routing.module.ts',
 )
+# ROUTES_WITH_NO_STANDALONE_PAGE is defined in assets/constants.ts, which is
+# the single source of truth for the route keys that have no standalone page.
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join('assets', 'constants.ts')
 # Maps the PascalCase FeatureNames members used in app.routing.module.ts to
 # their snake_case values, which are the identifiers the backend uses for the
 # feature flags (see core/feature_flag_list.py).
@@ -147,11 +150,9 @@ ROUTE_KEY_REGEX: Final = (
     r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 )
 ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
-    r'ROUTES_WITH_NO_STANDALONE_PAGE\s*=\s*\[([^\]]*)\]'
+    r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
 )
-QUOTED_STRING_REGEX: Final = (
-    r"'([^']+)'"  # pylint: disable=invalid-string-quote
-)
+QUOTED_STRING_REGEX: Final = r'"([^"]+)"'
 CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'ci-test-suite-configs'
 )
@@ -541,22 +542,35 @@ def _get_normalized_routing_content() -> str:
     return normalized_content
 
 
-def _get_routes_without_standalone_pages(normalized_content: str) -> Set[str]:
+def _get_assets_constants_content() -> str:
+    """Reads assets/constants.ts.
+
+    ROUTES_WITH_NO_STANDALONE_PAGE is defined here, so the CI check reads the
+    file directly to find the route keys that have no standalone page.
+
+    Returns:
+        str. The contents of assets/constants.ts.
+    """
+    with open(ASSETS_CONSTANTS_FILEPATH, 'r', encoding='utf-8') as f:
+        return f.read()
+
+
+def _get_routes_without_standalone_pages(constants_content: str) -> Set[str]:
     """Gets the route keys that have no standalone Lighthouse page.
 
-    The routing module lists the keys of routes that are pure redirect handlers
-    (for example login and logout) in the exported
-    ROUTES_WITH_NO_STANDALONE_PAGE array.
+    The ROUTES_WITH_NO_STANDALONE_PAGE constant lists the keys of routes that
+    are pure redirect handlers (for example login and logout).
 
     Args:
-        normalized_content: str. The normalized routing module source.
+        constants_content: str. The contents of assets/constants.ts, where
+            ROUTES_WITH_NO_STANDALONE_PAGE is defined.
 
     Returns:
         set(str). The route keys listed in ROUTES_WITH_NO_STANDALONE_PAGE,
-        or an empty set if the array is not present.
+        or an empty set if the constant is not present.
     """
     array_match = re.search(
-        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, normalized_content
+        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, constants_content
     )
     if not array_match:
         return set()
@@ -589,10 +603,10 @@ def _get_feature_names_members_to_values() -> Dict[str, str]:
 def _get_modules_without_standalone_pages() -> Set[str]:
     """Maps routes with no standalone page to the modules they lazy-import.
 
-    The routing module keeps the keys of routes that are pure redirect handlers
-    (for example login and logout) in ROUTES_WITH_NO_STANDALONE_PAGE. Pages
-    that audit those modules have no stable page to measure and must be kept
-    out of the Lighthouse shards.
+    ROUTES_WITH_NO_STANDALONE_PAGE keeps the keys of routes that are pure
+    redirect handlers (for example login and logout). Pages that audit those
+    modules have no stable page to measure and must be kept out of the
+    Lighthouse shards.
 
     Returns:
         set(str). The module import paths of the routes listed in
@@ -607,7 +621,8 @@ def _get_modules_without_standalone_pages() -> Set[str]:
                 MODULE_IMPORT_REGEX, route_object
             )
     modules_without_standalone_pages: Set[str] = set()
-    for route_key in _get_routes_without_standalone_pages(normalized_content):
+    constants_content = _get_assets_constants_content()
+    for route_key in _get_routes_without_standalone_pages(constants_content):
         modules_without_standalone_pages.update(
             key_to_modules.get(route_key, [])
         )
@@ -619,7 +634,7 @@ def _validate_shard_pages_without_standalone_pages(
 ) -> None:
     """Raises if a shard lists a page whose route has no standalone page.
 
-    Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE in app.routing.module.ts
+    Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE in assets/constants.ts
     (for example login and logout) are pure redirect handlers that lead to no
     page worth auditing, so the modules they lazy-import must not appear as
     page_module entries in any Lighthouse shard.

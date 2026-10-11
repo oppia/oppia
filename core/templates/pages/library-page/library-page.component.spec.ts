@@ -102,7 +102,6 @@ describe('Library Page Component', () => {
   let pageTitleService: PageTitleService;
   let libraryPageBackendApiService: LibraryPageBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let windowDimensionsService: WindowDimensionsService;
   let windowRef: MockWindowRef;
   let userService: UserService;
   let keyboardShortcutService: KeyboardShortcutService;
@@ -273,7 +272,6 @@ describe('Library Page Component', () => {
     translateService = TestBed.inject(TranslateService);
     libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     userService = TestBed.inject(UserService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     loggerService = TestBed.inject(LoggerService);
