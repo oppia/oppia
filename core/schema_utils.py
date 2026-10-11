@@ -323,6 +323,11 @@ def normalize_against_schema(
 
     if global_validators is not None:
         for validator in global_validators:
+            if validator['id'] == 'does_not_contain_email' and not isinstance(
+                normalized_obj, str
+            ):
+                continue
+
             kwargs = dict(validator)
             del kwargs['id']
             assert get_validator(validator['id'])(
