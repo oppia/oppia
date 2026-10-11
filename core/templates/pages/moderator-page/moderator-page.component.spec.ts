@@ -32,6 +32,7 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {ModeratorPageComponent} from './moderator-page.component';
 import {
   ActivityIdTypeDict,
@@ -268,6 +269,41 @@ describe('Moderator Page Component', () => {
     expect(componentInstance.displayedFeaturedActivityReferences).toEqual(
       newValue
     );
+  });
+
+  it('should expose featured activity references as schema default value', () => {
+    const references: ActivityIdTypeDict[] = [
+      {
+        id: 'test_id',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = references;
+
+    expect(
+      componentInstance.displayedFeaturedActivityReferencesAsSchemaDefault as ActivityIdTypeDict[]
+    ).toEqual(references);
+  });
+
+  it('should ignore non-array values when updating featured activity references', () => {
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(null);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
+  });
+
+  it('should reject featured activity references with malformed list items', () => {
+    const newValue: SchemaDefaultValue[] = [
+      {
+        id: 'test_id',
+      },
+      {
+        id: 'test_id_2',
+        type: 'exploration',
+      },
+    ];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences).toEqual([]);
   });
 
   it('should display error message for nonexistent exploration', fakeAsync(() => {
