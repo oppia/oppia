@@ -2857,7 +2857,11 @@ def get_contributor_usernames(
     """
     user_ids = []
     if (
-        category in (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,)
+        category
+        in (
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+        )
         and language_code is None
     ):
         raise Exception(
@@ -2868,6 +2872,12 @@ def get_contributor_usernames(
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
         user_ids = user_models.UserContributionRightsModel.get_translation_reviewer_user_ids(
+            language_code
+        )
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION:
+        # Ruling out the possibility of None for mypy type checking.
+        assert language_code is not None
+        user_ids = user_models.UserContributionRightsModel.get_translation_submitter_user_ids(
             language_code
         )
     elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:

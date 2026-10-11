@@ -3189,6 +3189,40 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
 
+    def test_get_translation_submitter_user_ids(self) -> None:
+        translation_submitter_ids = user_models.UserContributionRightsModel.get_translation_submitter_user_ids(
+            'hi'
+        )
+        self.assertEqual(len(translation_submitter_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=[],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False,
+            can_submit_translation_for_language_codes=['hi', 'en'],
+        ).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=[],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False,
+            can_submit_translation_for_language_codes=['hi'],
+        ).put()
+
+        translation_submitter_ids = user_models.UserContributionRightsModel.get_translation_submitter_user_ids(
+            'hi'
+        )
+        self.assertEqual(len(translation_submitter_ids), 2)
+        self.assertTrue(self.USER_ID_1 in translation_submitter_ids)
+        self.assertTrue(self.USER_ID_2 in translation_submitter_ids)
+
+        translation_submitter_ids = user_models.UserContributionRightsModel.get_translation_submitter_user_ids(
+            'en'
+        )
+        self.assertEqual(len(translation_submitter_ids), 1)
+        self.assertTrue(self.USER_ID_1 in translation_submitter_ids)
+
     def test_get_voiceover_reviewer_user_ids(self) -> None:
         voiceover_reviewer_ids = user_models.UserContributionRightsModel.get_voiceover_reviewer_user_ids(
             'hi'
