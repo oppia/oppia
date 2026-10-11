@@ -7,7 +7,7 @@
              [ngClass]="{'input-invalid': errorMessage && searchedUsername}"
              [placeholder]="'I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT' | translate"
              [(ngModel)]="searchedUsername"
-             [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+             [ngModelOptions]="{ updateOn: 'blur', standalone: true }"
              aria-label="Search bar"
              (keydown.enter)="onSearchQueryChangeExec($event.target.value)">
       <button type="submit"
