@@ -52,6 +52,7 @@ class MachineTranslationGenerateHandler(
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
+        assert self.user_id is not None
 
         if not feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
