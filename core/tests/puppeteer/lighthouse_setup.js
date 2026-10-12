@@ -165,6 +165,42 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
+// Runs an async setup action under a hard per-attempt deadline and retries it
+// after failures. Puppeteer's DOM interrogation calls (page.$$, page.evaluate,
+// page.select) have no built-in timeout, so a temporarily unresponsive
+// renderer can otherwise stall a shard for the entire CI job. Retrying once
+// under a bounded deadline turns such a transient stall into either a
+// completed step or a loud, specific failure instead of a long hang.
+const retryStep = async function (name, action, maxAttempts, timeoutMs) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let timeoutId = null;
+    const deadlinePromise = new Promise((resolve, reject) => {
+      timeoutId = setTimeout(
+        () =>
+          reject(new Error(`Step timed out after ${timeoutMs}ms: ${name}.`)),
+        timeoutMs
+      );
+    });
+    try {
+      lastError = null;
+      await Promise.race([action(), deadlinePromise]);
+      return;
+    } catch (error) {
+      lastError = error;
+      // eslint-disable-next-line no-console
+      console.log(
+        `Setup step failed on attempt ${attempt}/${maxAttempts}: ${name}`
+      );
+      // eslint-disable-next-line no-console
+      console.log(error);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+  throw lastError;
+};
+
 const login = async function (
   browser,
   page,
@@ -779,8 +815,11 @@ const reloadAllInteractionsExploration = async function (browser, page) {
 
     // The reload button is guarded by a native confirm dialog. Without a
     // dialog handler the page can block indefinitely waiting for it to be
-    // answered, so accept any dialog that appears before clicking.
-    page.on('dialog', async dialog => {
+    // answered, so accept the dialog that appears before clicking. The handler
+    // removes itself after the first dialog so a later reload step in the
+    // same session cannot double-accept a dialog, which Puppeteer rejects
+    // with "Cannot accept dialog which is already handled!".
+    page.once('dialog', async dialog => {
       await dialog.accept();
     });
 
@@ -844,8 +883,11 @@ const reloadDemoCollection = async function (browser, page) {
 
     // The reload button is guarded by a native confirm dialog. Without a
     // dialog handler the page can block indefinitely waiting for it to be
-    // answered, so accept any dialog that appears before clicking.
-    page.on('dialog', async dialog => {
+    // answered, so accept the dialog that appears before clicking. The handler
+    // removes itself after the first dialog so a later reload step in the
+    // same session cannot double-accept a dialog, which Puppeteer rejects
+    // with "Cannot accept dialog which is already handled!".
+    page.once('dialog', async dialog => {
       await dialog.accept();
     });
 
@@ -956,64 +998,63 @@ const enableFeatureFlagForAllUsers = async function (
   page,
   featureFlagName
 ) {
-  try {
-    await page.goto(RELEASE_COORDINATOR_URL, {waitUntil: networkIdle});
-    await page.waitForSelector(featuresTabSelector, {visible: true});
-    await page.click(featuresTabSelector);
-    await page.waitForSelector(featureFlagRowSelector, {visible: true});
+  await page.goto(RELEASE_COORDINATOR_URL, {
+    waitUntil: networkIdle,
+    timeout: 120000,
+  });
+  await page.waitForSelector(featuresTabSelector, {
+    visible: true,
+    timeout: 60000,
+  });
+  await page.click(featuresTabSelector);
+  await page.waitForSelector(featureFlagRowSelector, {
+    visible: true,
+    timeout: 60000,
+  });
 
-    const featureFlagRows = await page.$$(featureFlagRowSelector);
-    for (let i = 0; i < featureFlagRows.length; i++) {
-      const featureFlagNameElement = await featureFlagRows[i].$(
-        featureFlagNameSelector
-      );
-      if (featureFlagNameElement === null) {
-        continue;
-      }
-      const rowFeatureFlagName = await page.evaluate(
-        element => element.textContent.trim(),
-        featureFlagNameElement
-      );
-      if (rowFeatureFlagName !== featureFlagName) {
-        continue;
-      }
-
-      const valueSelector = await featureFlagRows[i].$(
-        featureFlagValueSelector
-      );
-      if (valueSelector === null) {
-        throw new Error(
-          `Value selector not found for feature flag: ${featureFlagName}.`
-        );
-      }
-      // The force-enable select is bound with [ngValue], so "Yes" is rendered
-      // with the Angular-encoded option value "0: true".
-      await valueSelector.select('0: true');
-
-      const saveButton = await featureFlagRows[i].$(
-        featureFlagSaveButtonSelector
-      );
-      if (saveButton === null) {
-        throw new Error(
-          `Save button not found for feature flag: ${featureFlagName}.`
-        );
-      }
-      await saveButton.click();
-      await featureFlagRows[i].waitForSelector(
-        `${featureFlagSaveButtonSelector}[disabled]`,
-        {visible: true}
-      );
-      return;
+  const featureFlagRows = await page.$$(featureFlagRowSelector);
+  for (let i = 0; i < featureFlagRows.length; i++) {
+    const featureFlagNameElement = await featureFlagRows[i].$(
+      featureFlagNameSelector
+    );
+    if (featureFlagNameElement === null) {
+      continue;
+    }
+    const rowFeatureFlagName = await page.evaluate(
+      element => element.textContent.trim(),
+      featureFlagNameElement
+    );
+    if (rowFeatureFlagName !== featureFlagName) {
+      continue;
     }
 
-    throw new Error(`Feature flag not found: ${featureFlagName}.`);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(`Failed to enable feature flag: ${featureFlagName}`);
-    // eslint-disable-next-line no-console
-    console.log(e);
-    process.exit(1);
+    const valueSelector = await featureFlagRows[i].$(featureFlagValueSelector);
+    if (valueSelector === null) {
+      throw new Error(
+        `Value selector not found for feature flag: ${featureFlagName}.`
+      );
+    }
+    // The force-enable select is bound with [ngValue], so "Yes" is rendered
+    // with the Angular-encoded option value "0: true".
+    await valueSelector.select('0: true');
+
+    const saveButton = await featureFlagRows[i].$(
+      featureFlagSaveButtonSelector
+    );
+    if (saveButton === null) {
+      throw new Error(
+        `Save button not found for feature flag: ${featureFlagName}.`
+      );
+    }
+    await saveButton.click();
+    await featureFlagRows[i].waitForSelector(
+      `${featureFlagSaveButtonSelector}[disabled]`,
+      {visible: true, timeout: 60000}
+    );
+    return;
   }
+
+  throw new Error(`Feature flag not found: ${featureFlagName}.`);
 };
 
 // Fetches the CSRF token that the frontend attaches to state-changing requests.
@@ -1350,9 +1391,21 @@ const shard5Setup = async function (browser, page) {
   // The learner_groups_are_enabled feature flag is in the prod stage and is
   // disabled by default, so it has to be force-enabled here or the facilitator
   // dashboard and learner group pages render the error page instead of their
-  // content.
+  // content. Force-enabling runs on the release-coordinator page, which can
+  // stall briefly on the emulated client, so the step is retried once under a
+  // bounded deadline instead of hanging the shard for the whole CI job.
   await logStep('enabling learner groups feature flag', () =>
-    enableFeatureFlagForAllUsers(browser, page, 'learner_groups_are_enabled')
+    retryStep(
+      'enabling the learner_groups_are_enabled feature flag',
+      () =>
+        enableFeatureFlagForAllUsers(
+          browser,
+          page,
+          'learner_groups_are_enabled'
+        ),
+      2,
+      150000
+    )
   );
   // The learner-group-editor page is gated on the logged-in user being a
   // facilitator of the group and the learner-group-viewer page on that user
