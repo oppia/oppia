@@ -2129,6 +2129,8 @@ export class LoggedInUser extends BaseUser {
         'Save Changes button is not disabled after saving changes'
       );
     }
+    // Scroll back to top so navbar elements (like profile dropdown) are in viewport.
+    await this.page.evaluate(() => window.scrollTo(0, 0));
     showMessage('Changes saved successfully in preferences page.');
   }
 

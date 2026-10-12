@@ -1895,6 +1895,7 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to creator dashboard using profile dropdown.
    */
   async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.evaluate(() => window.scrollTo(0, 0));
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
