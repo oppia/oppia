@@ -31,8 +31,7 @@
     {{outcome.dest}}
   </span>
   <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
-    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
-    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
+    <em>Nowhere yet...</em>
   </span>
   <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
     <em>(try again)</em>

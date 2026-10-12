@@ -665,9 +665,9 @@ describe('Exploration editor page component', () => {
 
     it('should generate the aria label correctly', () => {
       const mockWarnings = [
-        {message: 'Warning 1'},
-        {message: 'Warning 2'},
-        {message: 'Warning 3'},
+        {type: 'critical', message: 'Warning 1'},
+        {type: 'non-critical', message: 'Warning 2'},
+        {type: 'non-critical', message: 'Warning 3'},
       ];
 
       spyOn(component, 'getWarnings').and.returnValue(mockWarnings);
