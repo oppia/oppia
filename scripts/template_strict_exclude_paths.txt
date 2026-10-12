@@ -1,5 +1,0 @@
-# Contains the Angular components/directives whose templates are not yet strict
-# type-safe.
-# This list must be kept up-to-date manually and only shrink over time.
-# Please keep the list in alphabetical order.
-# NOTE TO DEVELOPERS: do not add new files to this list.
