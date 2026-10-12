@@ -78,6 +78,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   impactReports = [
     {
+      link: AppConstants.IMPACT_REPORT_LINK_2025,
+      year: '2025',
+    },
+    {
       link: AppConstants.IMPACT_REPORT_LINK_2024,
       year: '2024',
     },
