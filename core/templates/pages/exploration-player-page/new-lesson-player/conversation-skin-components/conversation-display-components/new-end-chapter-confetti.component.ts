@@ -16,14 +16,7 @@
  * @fileoverview Component for the end chapter celebration confetti component.
  */
 
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
@@ -34,10 +27,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 export class NewEndChapterConfettiComponent implements OnInit {
   @Input() topOffset: string = '40px';
   @Input() audioIsEnabled: boolean = true;
-  @Input() useVideoConfetti: boolean = false;
-  @ViewChild('confettiVideo') confettiVideoRef?: ElementRef<HTMLVideoElement>;
   confettiIsShown: boolean = false;
-  confettiVideoUrl: string = '';
   endChapterCelebratoryAudio = new Audio();
 
   constructor(
@@ -51,12 +41,6 @@ export class NewEndChapterConfettiComponent implements OnInit {
         '/end_chapter_celebratory_tadaa.mp3'
       );
     this.endChapterCelebratoryAudio.load();
-
-    if (this.useVideoConfetti) {
-      this.confettiVideoUrl = this.urlInterpolationService.getStaticImageUrl(
-        '/exploration_player/end_chapter_confetti.webm'
-      );
-    }
   }
 
   animateConfetti(): void {
@@ -64,22 +48,6 @@ export class NewEndChapterConfettiComponent implements OnInit {
     this.cdRef.detectChanges();
     if (this.audioIsEnabled) {
       this.endChapterCelebratoryAudio.play();
-    }
-
-    if (this.useVideoConfetti) {
-      const confettiVideo = this.confettiVideoRef?.nativeElement;
-      if (confettiVideo) {
-        const hideConfetti = (): void => {
-          this.confettiIsShown = false;
-          this.cdRef.detectChanges();
-        };
-        // Register the handler before playback so that it is always in
-        // place, and hide the video if the browser rejects playback (for
-        // example, because of autoplay restrictions).
-        confettiVideo.onended = hideConfetti;
-        confettiVideo.currentTime = 0;
-        confettiVideo.play().catch(hideConfetti);
-      }
     }
   }
 }
