@@ -264,10 +264,12 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         data_type: str = 'bool',
         name: str = 'android_parameter',
         rule_schema_version: Optional[int] = None,
+        description: str = '',
     ) -> parameter_domain.AndroidPlatformParameter:
         """Creates an Android parameter with optional test overrides."""
         return parameter_domain.AndroidPlatformParameter(
             name,
+            description,
             data_type,
             [
                 parameter_domain.AndroidPlatformParameterRule.from_dict(
@@ -292,6 +294,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
     def test_from_dict_and_to_dict_round_trip(self) -> None:
         param_dict: parameter_domain.AndroidPlatformParameterDict = {
             'name': 'android_parameter',
+            'description': '',
             'data_type': 'bool',
             'rules': [
                 {
@@ -319,20 +322,24 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         self.assertDictEqual(parameter.to_dict(), param_dict)
 
     def test_from_dict_infers_type_for_current_model_shape(self) -> None:
-        config_dict: parameter_domain.AndroidPlatformParameterConfigDict = {
-            'name': 'android_parameter',
-            'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
-            'default_value': 3,
-        }
+        config_dict = cast(
+            parameter_domain.AndroidPlatformParameterDict,
+            {
+                'name': 'android_parameter',
+                'rules': [],
+                'rule_schema_version': (
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                ),
+                'default_value': 3,
+            },
+        )
         parameter = parameter_domain.AndroidPlatformParameter.from_dict(
             config_dict
         )
 
         self.assertEqual(parameter.data_type, 'number')
         self.assertEqual(parameter.default_value, 3)
+        self.assertEqual(parameter.description, '')
 
     def test_validate_accepts_all_supported_data_types(self) -> None:
         parameters = [
@@ -498,7 +505,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         # Here we use cast because this test intentionally supplies an invalid
         # default value to verify type inference rejects unsupported values.
         config_dict = cast(
-            parameter_domain.AndroidPlatformParameterConfigDict,
+            parameter_domain.AndroidPlatformParameterDict,
             {
                 'name': 'android_parameter',
                 'rules': [],

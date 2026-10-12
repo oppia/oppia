@@ -103,20 +103,16 @@ class AndroidEvaluationContext:
         return self._app_version_flavour
 
     def validate(self) -> None:
-        """Validates the Android app version and its flavour.
-
-        Raises:
-            ValidationError. The Android app version or flavour is invalid.
-        """
-        if not isinstance(self._app_version_flavour, str):
+        """Validates the Android app version and its flavour."""
+        if not isinstance(self._app_version, str):
             raise utils.ValidationError(
-                'Invalid Android app version flavour \'%s\', expected to be a '
-                'string.' % self._app_version_flavour
+                'Invalid Android app version \'%s\', expected to be a '
+                'string.' % self._app_version
             )
         if not (APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(self._app_version)):
             raise utils.ValidationError(
-                'Invalid version \'%s\', expected to match regexp %s.'
-                % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
+                'Invalid Android app version \'%s\', expected to match regexp '
+                '%s.' % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
             )
 
         if self._app_version_flavour not in ALLOWED_APP_VERSION_FLAVORS:
@@ -178,7 +174,7 @@ class AndroidPlatformParameterFilter:
     SUPPORTED_OP_FOR_FILTERS: Final[Dict[str, List[str]]] = {
         'app_min_version': ['='],
         'app_max_version': ['='],
-        'app_version_flavour': ['='],
+        'app_version_flavour': ['=', '<', '<=', '>', '>='],
     }
 
     def __init__(self, filter_type: str, conditions: List[List[str]]) -> None:
@@ -215,21 +211,134 @@ class AndroidPlatformParameterFilter:
         Returns:
             bool. True if the filter is matched.
         """
+        return any(
+            self._evaluate_single_value(context, op, value)
+            for op, value in self._conditions
+        )
+
+    def _evaluate_single_value(
+        self, context: AndroidEvaluationContext, op: str, value: str
+    ) -> bool:
+        """Evaluates a single value against the given context.
+
+        Args:
+            context: AndroidEvaluationContext. The context for evaluation.
+            op: str. The operator for comparison.
+            value: str. The value used for comparison.
+
+        Returns:
+            bool. True if the filter is matched.
+
+            Raises:
+                Exception. Given operator is not supported for the filter type.
+        """
         if self._type == 'app_version_flavour':
-            return any(
-                op == '=' and context.app_version_flavour == value
-                for op, value in self._conditions
+            # Ruling out the possibility of None for mypy type checking.
+            assert context.app_version_flavour is not None
+            return self._match_app_version_flavour(context, op, value)
+
+        comparison_result = self._compare_versions(context.app_version, value)
+        if self._type == 'app_min_version' and op == '=':
+            return comparison_result >= 0
+        if self._type == 'app_max_version' and op == '=':
+            return comparison_result <= 0
+        return False
+
+    def _match_app_version_flavour(
+        self, context: AndroidEvaluationContext, op: str, value: str
+    ) -> bool:
+        """Matches the app version flavour against the given context.
+
+        Args:
+            context: AndroidEvaluationContext. The context for evaluation.
+            op: str. The operator for comparison.
+            value: str. The value used for comparison.
+
+        Returns:
+            bool. True if the filter is matched.
+        """
+
+        is_equal = context._app_version_flavour == value
+        is_client_flavor_smaller = self._is_first_flavor_smaller(
+            context._app_version_flavour, value
+        )
+        is_client_flavor_larger = self._is_first_flavor_smaller(
+            value, context._app_version_flavour
+        )
+        if op == '=':
+            return is_equal
+        elif op == '<':
+            return is_client_flavor_smaller
+        elif op == '<=':
+            return is_equal or is_client_flavor_smaller
+        elif op == '>':
+            return is_client_flavor_larger
+        elif op == '>=':
+            return is_equal or is_client_flavor_larger
+        else:
+            raise Exception(
+                'Unsupported comparison operator \'%s\' for %s filter, '
+                'expected one of %s.'
+                % (op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type])
             )
 
-        comparison_results = (
-            _compare_versions(context.app_version, value)
-            for op, value in self._conditions
-            if op == '='
-        )
-        if self._type == 'app_min_version':
-            return any(result >= 0 for result in comparison_results)
-        if self._type == 'app_max_version':
-            return any(result <= 0 for result in comparison_results)
+    def _is_first_flavor_smaller(self, flavor_a: str, flavor_b: str) -> bool:
+        """Compares two version flavors, return True if the first version is
+        smaller in the following ordering:
+        'test' < 'alpha' < 'beta' < 'release'.
+
+        Args:
+            flavor_a: str. The version flavor.
+            flavor_b: str. The version flavor.
+
+        Returns:
+            bool. True if the first flavor is smaller.
+        """
+        return ALLOWED_APP_VERSION_FLAVORS.index(
+            flavor_a
+        ) < ALLOWED_APP_VERSION_FLAVORS.index(flavor_b)
+
+    def _compare_versions(self, version_a: str, version_b: str) -> int:
+        """Compares dotted numeric versions, padding missing components with 0.
+
+        Args:
+            version_a: str. The first version string for comparison.
+            version_b: str. The second version string for comparison.
+
+        Returns:
+            int. -1 if the first version is smaller, 0 if equal, and 1 if the
+            first version is larger.
+        """
+        if self._is_first_version_smaller(version_a, version_b):
+            return -1
+        if self._is_first_version_smaller(version_b, version_a):
+            return 1
+        return 0
+
+    def _is_first_version_smaller(self, version_a: str, version_b: str) -> bool:
+        """Compares two version strings, return True if the first version is
+        smaller.
+
+        Args:
+            version_a: str. The version string (e.g. '12.5').
+            version_b: str. The version string (e.g. '12.5').
+
+        Returns:
+            bool. True if the first version is smaller.
+        """
+        splitted_version_a = [int(part) for part in version_a.split('.')]
+        splitted_version_b = [int(part) for part in version_b.split('.')]
+        max_len = max(len(splitted_version_a), len(splitted_version_b))
+        splitted_version_a.extend([0] * (max_len - len(splitted_version_a)))
+        splitted_version_b.extend([0] * (max_len - len(splitted_version_b)))
+
+        for sub_version_a, sub_version_b in zip(
+            splitted_version_a, splitted_version_b
+        ):
+            if sub_version_a < sub_version_b:
+                return True
+            elif sub_version_a > sub_version_b:
+                return False
         return False
 
     def validate(self) -> None:
@@ -288,12 +397,16 @@ class AndroidPlatformParameterFilter:
                 )
 
     def to_dict(self) -> AndroidPlatformParameterFilterDict:
-        """Returns a dict representation of the filter.
+        """Returns a dict representation of the AndroidPlatformParameterFilter domain
+        object.
 
         Returns:
             dict. A dict mapping of all fields of the filter object.
         """
-        return {'type': self._type, 'conditions': self._conditions}
+        return {
+            'type': self._type,
+            'conditions': self._conditions,
+        }
 
     @classmethod
     def from_dict(
@@ -302,11 +415,11 @@ class AndroidPlatformParameterFilter:
         """Returns an AndroidPlatformParameterFilter object from a dict.
 
         Args:
-            filter_dict: dict. A dict mapping of all fields of the filter
+            filter_dict: dict. A dict mapping of all fields of AndroidPlatformParameterFilter
                 object.
 
         Returns:
-            AndroidPlatformParameterFilter. The corresponding filter domain
+            AndroidPlatformParameterFilter. The corresponding AndroidPlatformParameterFilter domain
             object.
         """
         return cls(filter_dict['type'], filter_dict['conditions'])
@@ -372,10 +485,12 @@ class AndroidPlatformParameterRule:
             filter_domain.validate()
 
     def to_dict(self) -> AndroidPlatformParameterRuleDict:
-        """Returns a dict representation of this rule.
+        """Returns a dict representation of the AndroidPlatformParameterRule
+        domain object.
 
         Returns:
-            dict. A dict mapping of all fields of the rule object.
+            dict. A dict mapping of all fields of the AndroidPlatformParameterRule
+            domain object.
         """
         return {
             'filters': [
@@ -391,10 +506,12 @@ class AndroidPlatformParameterRule:
         """Returns an AndroidPlatformParameterRule object from a dict.
 
         Args:
-            rule_dict: dict. A dict mapping of all fields of the rule object.
+            rule_dict: dict. A dict mapping of all fields of the AndroidPlatformParameterRule
+            domain object.
 
         Returns:
-            AndroidPlatformParameterRule. The corresponding rule domain object.
+            AndroidPlatformParameterRule. The corresponding AndroidPlatformParameterRule
+            domain object.
         """
         return cls(
             [
@@ -409,23 +526,15 @@ class AndroidPlatformParameterDict(TypedDict):
     """Dictionary representation of an Android platform parameter."""
 
     name: str
+    description: str
     data_type: str
     rules: List[AndroidPlatformParameterRuleDict]
     rule_schema_version: int
     default_value: AndroidPlatformDataTypes
 
 
-class AndroidPlatformParameterConfigDict(TypedDict):
-    """Legacy model-shaped dictionary for Android parameter configuration."""
-
-    name: str
-    rules: List[AndroidPlatformParameterRuleDict]
-    rule_schema_version: int
-    default_value: AndroidPlatformDataTypes
-
-
 class AndroidPlatformParameter:
-    """Domain object for a typed Android platform parameter."""
+    """Domain object for Android platform parameter."""
 
     PARAMETER_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
     DATA_TYPE_PREDICATES_DICT = {
@@ -444,14 +553,16 @@ class AndroidPlatformParameter:
     def __init__(
         self,
         name: str,
-        data_type: str,
-        rules: List[AndroidPlatformParameterRule],
-        rule_schema_version: int,
-        default_value: Optional[AndroidPlatformDataTypes],
+        description: str = '',
+        data_type: str = 'bool',
+        rules: Optional[List[AndroidPlatformParameterRule]] = None,
+        rule_schema_version: int = 1,
+        default_value: Optional[AndroidPlatformDataTypes] = None,
     ) -> None:
         self._name = name
+        self._description = description
         self._data_type = data_type
-        self._rules = rules
+        self._rules = rules if rules is not None else []
         self._rule_schema_version = rule_schema_version
         self._default_value = default_value
 
@@ -463,6 +574,15 @@ class AndroidPlatformParameter:
             str. The parameter name.
         """
         return self._name
+
+    @property
+    def description(self) -> str:
+        """Returns the description of the Android platform parameter.
+
+        Returns:
+            str. The parameter description.
+        """
+        return self._description
 
     @property
     def data_type(self) -> str:
@@ -482,6 +602,15 @@ class AndroidPlatformParameter:
         """
         return self._rules
 
+    def set_rules(self, new_rules: List[AndroidPlatformParameterRule]) -> None:
+        """Sets the ordered rules of this Android platform parameter.
+
+        Args:
+            new_rules: list(AndroidPlatformParameterRule). The ordered rules to
+                set.
+        """
+        self._rules = new_rules
+
     @property
     def rule_schema_version(self) -> int:
         """Returns the schema version of the rules.
@@ -499,15 +628,6 @@ class AndroidPlatformParameter:
             AndroidPlatformDataTypes|None. The default value for this parameter.
         """
         return self._default_value
-
-    def set_rules(self, new_rules: List[AndroidPlatformParameterRule]) -> None:
-        """Sets the ordered rules of this Android platform parameter.
-
-        Args:
-            new_rules: list(AndroidPlatformParameterRule). The ordered rules to
-                set.
-        """
-        self._rules = new_rules
 
     def set_default_value(
         self, default_value: AndroidPlatformDataTypes
@@ -549,8 +669,9 @@ class AndroidPlatformParameter:
             )
 
         if (
-            self._rule_schema_version
-            != feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            1 > self._rule_schema_version
+            or self._rule_schema_version
+            > feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         ):
             raise utils.ValidationError(
                 'Unsupported Android platform parameter rule schema version '
@@ -600,6 +721,7 @@ class AndroidPlatformParameter:
             )
         return {
             'name': self._name,
+            'description': self._description,
             'data_type': self._data_type,
             'rules': [rule.to_dict() for rule in self._rules],
             'rule_schema_version': self._rule_schema_version,
@@ -608,16 +730,13 @@ class AndroidPlatformParameter:
 
     @classmethod
     def from_dict(
-        cls,
-        param_dict: Union[
-            AndroidPlatformParameterDict, AndroidPlatformParameterConfigDict
-        ],
+        cls, param_dict: AndroidPlatformParameterDict
     ) -> AndroidPlatformParameter:
         """Returns an AndroidPlatformParameter object from a dict.
 
         Args:
-            param_dict: dict. A typed or legacy dict representation of the
-                Android platform parameter.
+            param_dict: dict. A dict mapping of all fields of
+                AndroidPlatformParameter object.
 
         Returns:
             AndroidPlatformParameter. The corresponding Android platform
@@ -636,6 +755,7 @@ class AndroidPlatformParameter:
         )
         return cls(
             param_dict['name'],
+            param_dict.get('description', ''),
             data_type,
             [
                 AndroidPlatformParameterRule.from_dict(rule_dict)
@@ -659,35 +779,12 @@ class AndroidPlatformParameter:
         """Returns an Android platform parameter decoded from JSON.
 
         Args:
-            json_string: str. The JSON string representation of the Android
-                platform parameter.
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a PlatformParameter.
+                Only call on strings that were created using serialize().
 
         Returns:
             AndroidPlatformParameter. The corresponding Android platform
             parameter domain object.
         """
         return cls.from_dict(json.loads(json_string))
-
-
-def _compare_versions(version_a: str, version_b: str) -> int:
-    """Compares dotted numeric versions, padding missing components with 0.
-
-    Args:
-        version_a: str. The first version string for comparison.
-        version_b: str. The second version string for comparison.
-
-    Returns:
-        int. -1 if the first version is smaller, 0 if equal, and 1 if the
-        first version is larger.
-    """
-    components_a = [int(component) for component in version_a.split('.')]
-    components_b = [int(component) for component in version_b.split('.')]
-    component_count = max(len(components_a), len(components_b))
-    components_a.extend([0] * (component_count - len(components_a)))
-    components_b.extend([0] * (component_count - len(components_b)))
-
-    if components_a < components_b:
-        return -1
-    if components_a > components_b:
-        return 1
-    return 0
