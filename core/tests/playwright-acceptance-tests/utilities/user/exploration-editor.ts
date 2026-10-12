@@ -2536,6 +2536,13 @@ export class ExplorationEditor extends BaseUser {
         mobilePreviewTabButton
       );
       await previewButton?.click();
+
+      // If the mobile navigation bar is expanded, collapse it so it does not
+      // overlap with preview controls (e.g. lesson info button).
+      const mobileNav = await this.page.$(mobileNavbarOptions);
+      if (mobileNav) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
     } else {
       await this.page.waitForSelector(previewTabButton, {
         state: 'visible',
