@@ -35,6 +35,24 @@ const LEARNER_ACCOUNT_USERNAME = 'username2';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
+// Bounds every DOM wait that does not pass its own timeout, so a stuck page
+// fails the shard with a specific error instead of hanging until the CI step
+// times out.
+const SETUP_ACTION_TIMEOUT_MS = 60000;
+// Bounds navigations, which need more slack than DOM waits because the
+// emulated appserver and the development-mode bundles are slow to settle.
+const SETUP_NAVIGATION_TIMEOUT_MS = 120000;
+// Bounds the poll for a generated-data status message. Data generation writes
+// many entities and can legitimately take longer than a single DOM wait.
+const SETUP_STATUS_MESSAGE_TIMEOUT_MS = 120000;
+// Hard ceiling on the whole setup. If a defect slips past the per-action
+// timeouts, this aborts the shard well before the 45-minute CI step limit so
+// the failure is reported against the setup rather than the job timeout.
+const SETUP_WATCHDOG_MS = 20 * 60 * 1000;
+// The admin activities tab and the exploration editor render their progress
+// messages into these elements after a data-generation or save action.
+const statusMessageSelector = '.oppia-status-message-container';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
@@ -199,6 +217,37 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
     }
   }
   throw lastError;
+};
+
+// Waits until the element matching selector contains expectedText, polling once
+// a second. The wait is bounded so that a status message which never appears
+// (for example because a save silently failed) fails the shard with the last
+// observed text instead of looping forever until the CI job times out.
+const waitForStatusMessage = async function (
+  page,
+  selector,
+  expectedText,
+  timeoutMs
+) {
+  const deadline = Date.now() + timeoutMs;
+  let observedText = '';
+  while (Date.now() < deadline) {
+    // The page.evaluate call has no built-in timeout, so record whatever is on
+    // the page at each poll to make a timeout failure diagnosable.
+    observedText = await page.evaluate(sel => {
+      const element = document.querySelector(sel);
+      return element ? element.textContent.trim() : '';
+    }, selector);
+    if (observedText === expectedText) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  throw new Error(
+    `Timed out after ${timeoutMs}ms waiting for status message ` +
+      `"${expectedText}". Last observed text in ${selector}: ` +
+      `"${observedText}".`
+  );
 };
 
 const login = async function (
@@ -432,19 +481,12 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForSelector(saveDraftButton, {visible: true});
     await page.click(saveDraftButton);
 
-    const successMessage = 'Changes saved.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.e2e-test-toast-message'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      toastMessageSelector,
+      'Changes saved.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(publishExplorationButton);
@@ -618,19 +660,12 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
-    const successMessage = 'Dummy new structures data generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy new structures data generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -652,19 +687,12 @@ const generateDataForClassroom = async function (browser, page) {
     await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
-    const successMessage = 'Dummy new classroom generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy new classroom generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
     await addThumbnailToTopic(page, 'Fraction');
     await addThumbnailToTopic(page, 'Addition');
     await addThumbnailToTopic(page, 'Subtraction');
@@ -689,19 +717,12 @@ const generateBareClassrooms = async function (browser, page) {
     await page.waitForSelector(generateDefaultClassroomButton);
     await page.click(generateDefaultClassroomButton);
 
-    const successMessage = 'Dummy default classrooms generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy default classrooms generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -725,18 +746,12 @@ const generateDataForBlogPosts = async function (browser, page) {
     for (let i = 0; i < 11; i++) {
       const blogGenerateButtons = await page.$$(blogGenerateButton);
       await blogGenerateButtons[i % blogGenerateButtons.length].click();
-      let statusMessage;
-      do {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        statusMessage = await page.evaluate(() => {
-          const statusMessageElement = document.querySelector(
-            '.oppia-status-message-container'
-          );
-          return statusMessageElement
-            ? statusMessageElement.textContent.trim()
-            : '';
-        });
-      } while (statusMessage !== successMessage);
+      await waitForStatusMessage(
+        page,
+        statusMessageSelector,
+        successMessage,
+        SETUP_STATUS_MESSAGE_TIMEOUT_MS
+      );
     }
 
     // Navigate to the blog homepage and open the first published blog post to
@@ -782,19 +797,12 @@ const generateDummyExplorations = async function (browser, page) {
     );
     await generateButton.click();
 
-    const successMessage = 'Dummy explorations generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy explorations generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -993,13 +1001,19 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
 // so the setup has to enable it before the checks run. The setup server runs in
 // the DEV stage, where every feature flag is listed, and the flag config is
 // persisted to the shared datastore that the audit server later reads.
+//
+// The navigation waits for 'domcontentloaded' rather than 'networkidle0',
+// because the page opens on the beam jobs tab, whose component polls the
+// backend on an interval, so the network never goes idle and a networkidle0
+// wait always times out. The subsequent waits for the features tab and the
+// flag rows cover the page's asynchronous rendering.
 const enableFeatureFlagForAllUsers = async function (
   browser,
   page,
   featureFlagName
 ) {
   await page.goto(RELEASE_COORDINATOR_URL, {
-    waitUntil: networkIdle,
+    waitUntil: 'domcontentloaded',
     timeout: 120000,
   });
   await page.waitForSelector(featuresTabSelector, {
@@ -1457,6 +1471,19 @@ const main = async function () {
     width: 1920,
     height: 1080,
   });
+  // Bound every wait and navigation that does not pass its own timeout so a
+  // single stuck step cannot stall the shard indefinitely.
+  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
+  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+  // Last-resort ceiling for the whole setup; see SETUP_WATCHDOG_MS.
+  const watchdogId = setTimeout(() => {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[lighthouse-setup] Setup exceeded the ${SETUP_WATCHDOG_MS}ms watchdog ` +
+        'and was aborted.'
+    );
+    process.exit(1);
+  }, SETUP_WATCHDOG_MS);
 
   var recorder = null;
   let record = process.argv[2] && process.argv[2] === '-record';
@@ -1559,6 +1586,7 @@ const main = async function () {
   if (record) {
     await recorder.stop();
   }
+  clearTimeout(watchdogId);
   await page.close();
   process.exit(0);
 };

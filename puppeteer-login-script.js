@@ -22,6 +22,12 @@ const LOGIN_URL = 'http://localhost:8181/login';
 const LOGOUT_URL = 'http://localhost:8181/logout';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
+// Bounds every navigation made while preparing an audit. The login, role
+// assignment and admin pages can be slow under the emulated appserver, so the
+// bound is generous; it exists so a page that never reaches networkidle0 (for
+// example because of a long-lived polling request) fails the audit with a
+// timeout instead of hanging the shard until the CI step times out.
+const LOGIN_NAVIGATION_TIMEOUT_MS = 120000;
 // The accounts available to the audits. The primary test admin is the
 // facilitator of the seeded learner group; the learner account is its learner
 // and is used to audit the learner-group-viewer page, which is gated on the
@@ -77,7 +83,7 @@ const getAuditUsernameForUrl = function (url) {
 
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
-  await page.setDefaultNavigationTimeout(0);
+  await page.setDefaultNavigationTimeout(LOGIN_NAVIGATION_TIMEOUT_MS);
   const username = getAuditUsernameForUrl(context.url);
   // The learner-group-viewer page has to be audited as the learner account,
   // while every other page is audited as the primary test admin. Since the
@@ -177,11 +183,8 @@ const login = async function (context, page, username) {
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, email);
     await page.click(signInButton);
-    // Checks if the user's account was already made. The timeout is kept
-    // short because a returning account never shows the username field, so
-    // waiting the full default would stall every re-login.
     try {
-      await page.waitForSelector(usernameInput, {visible: true, timeout: 5000});
+      await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, username);
       await Promise.all([
         page.waitForResponse(response =>

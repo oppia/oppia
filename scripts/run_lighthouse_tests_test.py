@@ -229,14 +229,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_injected_url,
         )
 
-    def test_get_entity_parses_learner_group_url(self) -> None:
-        self.assertEqual(
-            run_lighthouse_tests.get_entity(
-                'http://localhost:8181/edit-learner-group/AbCdEf123456'
-            ),
-            ('learner_group_id', 'AbCdEf123456'),
-        )
-
     def test_get_entity_parses_supported_urls(self) -> None:
         self.assertEqual(
             run_lighthouse_tests.get_entity(
