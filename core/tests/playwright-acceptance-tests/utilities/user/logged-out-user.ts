@@ -3355,26 +3355,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks the element with the given selector and waits until the Donate
-   * page has loaded.
-   *
-   * Note: The Donate page contains an external DonorBox iframe that keeps
-   * network connections open, so we cannot wait for 'networkidle' (as
-   * clickAndWaitForNavigation does). Instead, we wait only for the 'load'
-   * event.
-   * @param {string} selector - The selector of the element to click.
-   */
-  private async clickAndWaitForDonatePage(selector: string): Promise<void> {
-    await Promise.all([
-      this.page.waitForURL((url: URL) => url.href.startsWith(donateUrl), {
-        waitUntil: 'load',
-        timeout: 60000,
-      }),
-      this.clickOnElementWithSelector(selector),
-    ]);
-  }
-
-  /**
    * Clicks the Donate button in the Get Involved menu on the navbar (or the
    * mobile sidebar) and checks that it opens the Donate page.
    */
@@ -3385,13 +3365,23 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
-      await this.clickAndWaitForDonatePage(
-        mobileSidebarGetInvolvedMenuDonateButton
+      // The Donate page has a DonorBox iframe that keeps network
+      // connections open, so wait for 'load' instead of 'networkidle'.
+      await this.clickAndWaitForNavigation(
+        mobileSidebarGetInvolvedMenuDonateButton,
+        true,
+        60000,
+        'load'
       );
     } else {
       await this.expectElementToBeVisible(navbarGetInvolvedTab);
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickAndWaitForDonatePage(navbarGetInvolvedTabDonateButton);
+      await this.clickAndWaitForNavigation(
+        navbarGetInvolvedTabDonateButton,
+        true,
+        60000,
+        'load'
+      );
     }
     await this.expectPageURLToContain(donateUrl);
   }
@@ -3409,7 +3399,12 @@ export class LoggedOutUser extends BaseUser {
       await this.openMobileSidebar();
     }
     await this.expectElementToBeVisible(navbarDonateButton);
-    await this.clickAndWaitForDonatePage(navbarDonateButton);
+    await this.clickAndWaitForNavigation(
+      navbarDonateButton,
+      true,
+      60000,
+      'load'
+    );
     await this.expectPageURLToContain(donateUrl);
   }
 
@@ -3501,8 +3496,8 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Navigates to the "Thanks for donating" modal on the Donate page.
-   * Waits only for the 'load' event, for the same DonorBox reason as
-   * clickAndWaitForDonatePage.
+   * Waits only for the 'load' event, since the DonorBox iframe on the
+   * Donate page keeps network connections open.
    */
   async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.goto(donatePageThanksModalURL, {waitUntil: 'load'});
