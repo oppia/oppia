@@ -35,6 +35,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
+  let explorationId1: string | null;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(6000000); // Setup is taking longer than default timeout.
@@ -45,12 +46,13 @@ test.describe('Logged-In Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    for (let i = 0; i < 2; i++) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(
-        `Explore Title ${i + 1}`,
-        'Algebra',
-        3
-      );
+    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 1',
+      'Algebra',
+      3
+    );
+    if (!explorationId1) {
+      throw new Error('Exploration ID is null or undefined.');
     }
     await curriculumAdmin.createAndPublishExplorationWithCards(
       'Explore Title 2',
