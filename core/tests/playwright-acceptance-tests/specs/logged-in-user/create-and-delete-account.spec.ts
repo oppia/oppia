@@ -47,7 +47,7 @@ test.describe('Logged-in User', function () {
       await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
 
       // Enter an invalid email.
-      await loggedInUser2.enterEmailAndProceedToNextPage('123@gmail.');
+      await loggedInUser2.enterEmail('123@gmail.');
       await loggedInUser2.expectValidationError('Invalid email address');
 
       // Enter a valid email.

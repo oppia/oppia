@@ -415,19 +415,29 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to enter email and proceed to the next page (username page).
-   * This will click "Sign In" and verify the username field is visible.
+   * Enters the given email in the sign-in email field.
+   * @param {string} email - The email to enter.
+   */
+  async enterEmail(email: string): Promise<void> {
+    await this.expectElementToBeVisible(signUpEmailField);
+    await this.page.locator(signUpEmailField).clear();
+    await this.typeInInputField(signUpEmailField, email);
+  }
+
+  /**
+   * Enters an email and proceeds to the username page.
    * @param {string} email - The email to enter.
    */
   async enterEmailAndProceedToNextPage(email: string): Promise<void> {
-    await this.expectElementToBeVisible(signUpEmailField);
-    await this.page.locator(signUpEmailField).fill(email);
+    await this.enterEmail(email);
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(signInButton);
     const signInButtonElement = this.page.locator(signInButton);
     if (await signInButtonElement.isDisabled()) {
-      return;
+      throw new Error(
+        `Unable to proceed to the username page with email: ${email}`
+      );
     }
 
     await this.clickOnElementWithSelector(signInButton);
@@ -2195,7 +2205,8 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(signUpUsernameField);
-    await this.page.locator(signUpUsernameField).fill(username);
+    await this.page.locator(signUpUsernameField).clear();
+    await this.typeInInputField(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
     await this.page.evaluate(selector => {
       (document.querySelector(selector) as HTMLElement)?.blur();
