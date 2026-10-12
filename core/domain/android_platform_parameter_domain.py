@@ -109,10 +109,9 @@ class AndroidEvaluationContext:
                 'Invalid Android app version \'%s\', expected to be a '
                 'string.' % self._app_version
             )
-        if not (
-            APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(self._app_version)
-            or APP_VERSION_WITH_HASH_REGEXP.fullmatch(self._app_version)
-        ):
+        if not APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(
+            self._app_version
+        ) and not APP_VERSION_WITH_HASH_REGEXP.fullmatch(self._app_version):
             raise utils.ValidationError(
                 'Invalid Android app version \'%s\', expected to match regexp '
                 '%s.' % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
@@ -232,12 +231,10 @@ class AndroidPlatformParameterFilter:
         Returns:
             bool. True if the filter is matched.
 
-            Raises:
-                Exception. Given operator is not supported for the filter type.
+        Raises:
+            ValueError. The operator is not supported for this filter type.
         """
         if self._type == 'app_version_flavour':
-            # Ruling out the possibility of None for mypy type checking.
-            assert context.app_version_flavour is not None
             return self._match_app_version_flavour(context, op, value)
 
         comparison_result = self._compare_versions(context.app_version, value)
@@ -259,14 +256,17 @@ class AndroidPlatformParameterFilter:
 
         Returns:
             bool. True if the filter is matched.
+
+        Raises:
+            ValueError. The operator is not supported for this flavour filter.
         """
 
-        is_equal = context._app_version_flavour == value
+        is_equal = context.app_version_flavour == value
         is_client_flavor_smaller = self._is_first_flavor_smaller(
-            context._app_version_flavour, value
+            context.app_version_flavour, value
         )
         is_client_flavor_larger = self._is_first_flavor_smaller(
-            value, context._app_version_flavour
+            value, context.app_version_flavour
         )
         if op == '=':
             return is_equal
@@ -279,7 +279,7 @@ class AndroidPlatformParameterFilter:
         elif op == '>=':
             return is_equal or is_client_flavor_larger
         else:
-            raise Exception(
+            raise ValueError(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.'
                 % (op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type])
@@ -304,17 +304,15 @@ class AndroidPlatformParameterFilter:
     def _compare_versions(self, version_a: str, version_b: str) -> int:
         """Compares dotted numeric versions, padding missing components with 0.
 
-        Android version names can include a commit hash and flavor suffix (for
-        example '12.5-5f58b8fbeb-dev'); comparison should ignore those suffixes
-        and compare only the numeric version prefix.
+        Android version names may include a commit hash or flavor suffix. This
+        method ignores those suffixes and compares only the version prefix.
 
         Args:
             version_a: str. The first version string for comparison.
             version_b: str. The second version string for comparison.
 
         Returns:
-            int. -1 if the first version is smaller, 0 if equal, and 1 if the
-            first version is larger.
+            int. The comparison result: -1, 0, or 1.
         """
         normalized_version_a = self._normalize_version(version_a)
         normalized_version_b = self._normalize_version(version_b)
@@ -329,12 +327,11 @@ class AndroidPlatformParameterFilter:
         return 0
 
     def _normalize_version(self, version: str) -> str:
-        """Strips any Android metadata suffix so only the numeric version prefix
-        is compared.
+        """Strips any Android metadata suffix so only the numeric prefix is
+        compared.
 
         Args:
-            version: str. The Android version string, such as
-                '12.5-5f58b8fbeb-dev'.
+            version: str. The Android version string, such as '12.5-5f58b8fbeb-dev'.
 
         Returns:
             str. The numeric version prefix, such as '12.5'.
@@ -374,8 +371,7 @@ class AndroidPlatformParameterFilter:
         """Validates the AndroidPlatformParameterFilter domain object.
 
         Raises:
-            ValidationError. The filter type, operator, or condition values are
-            invalid.
+            ValidationError. The filter type, operator, or condition values are invalid.
         """
         if self._type not in self.SUPPORTED_FILTER_TYPES:
             raise utils.ValidationError(
@@ -538,8 +534,8 @@ class AndroidPlatformParameterRule:
         """Returns an AndroidPlatformParameterRule object from a dict.
 
         Args:
-            rule_dict: dict. A dict mapping of all fields of the AndroidPlatformParameterRule
-            domain object.
+            rule_dict: dict. A dict mapping of all fields of the
+                AndroidPlatformParameterRule domain object.
 
         Returns:
             AndroidPlatformParameterRule. The corresponding AndroidPlatformParameterRule
@@ -767,17 +763,12 @@ class AndroidPlatformParameter:
         """Returns an AndroidPlatformParameter object from a dict.
 
         Args:
-            param_dict: dict. A dict mapping of all fields of
+            param_dict: dict. A dict mapping of all fields of the
                 AndroidPlatformParameter object.
 
         Returns:
-            AndroidPlatformParameter. The corresponding Android platform
-            parameter domain object.
-
-        Note:
-            The Android storage model does not persist ``data_type``; when
-            reading a model-shaped dictionary, the type is inferred from its
-            default value.
+            AndroidPlatformParameter. The corresponding Android platform parameter
+            domain object.
         """
         default_value = param_dict.get('default_value')
         data_type = (

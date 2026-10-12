@@ -356,6 +356,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         self.assertDictEqual(parameter.to_dict(), param_dict)
 
     def test_from_dict_infers_type_for_current_model_shape(self) -> None:
+        # Here we use cast because this test intentionally supplies a dictionary shape that omits required TypedDict fields
         config_dict = cast(
             parameter_domain.AndroidPlatformParameterDict,
             {
@@ -580,8 +581,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
             parameter.to_dict()
 
     def test_from_dict_can_infer_unsupported_default_type(self) -> None:
-        # Here we use cast because this test intentionally supplies an invalid
-        # default value to verify type inference rejects unsupported values.
+        # -> Here use cast because this test intentionally supplies an invalid default value to verify type inference rejects unsupported values
         config_dict = cast(
             parameter_domain.AndroidPlatformParameterDict,
             {
