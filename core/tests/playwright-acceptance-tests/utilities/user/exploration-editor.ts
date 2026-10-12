@@ -177,6 +177,8 @@ const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
+const saveRecommendationModalSaveButtonSelector =
+  'button.e2e-test-recommendation-prompt-save-button';
 const previewTabContainer = '.e2e-test-preview-tab-container';
 const nextCardArrowButton = '.e2e-test-next-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
@@ -2341,7 +2343,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.expectSaveRecommendationModalToBeVisible();
     await this.clickOnElementWithSelector(
-      '.e2e-test-save-recommendation-modal-save'
+      saveRecommendationModalSaveButtonSelector
     );
 
     if (commitMessage) {
