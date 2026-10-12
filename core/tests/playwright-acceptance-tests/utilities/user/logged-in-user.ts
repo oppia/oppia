@@ -2112,13 +2112,10 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(saveChangesButtonSelector);
     await this.clickOnElementWithSelector(saveChangesButtonSelector);
 
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const button = document.querySelector(selector);
-        return Boolean(button) && (button as HTMLButtonElement).disabled;
-      },
-      saveChangesButtonSelector
-    );
+    await this.page.waitForFunction((selector: string) => {
+      const button = document.querySelector(selector);
+      return Boolean(button) && (button as HTMLButtonElement).disabled;
+    }, saveChangesButtonSelector);
 
     const isDisabled = await this.page.$eval(
       `button${saveChangesButtonSelector}`,

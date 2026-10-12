@@ -1837,9 +1837,7 @@ export class ExplorationEditor extends BaseUser {
             return false;
           }
           const normalize = (s: string) => s.trim().replace(/\n+/g, '\n');
-          return (
-            (normalize(el.innerText) === normalize(value)) === matchCase
-          );
+          return (normalize(el.innerText) === normalize(value)) === matchCase;
         },
         {
           selector: stateConversationContent,
@@ -1901,7 +1899,9 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
-    await this.expectElementToBeVisible('.e2e-test-creator-dashboard-container');
+    await this.expectElementToBeVisible(
+      '.e2e-test-creator-dashboard-container'
+    );
   }
 
   /**
@@ -1954,9 +1954,7 @@ export class ExplorationEditor extends BaseUser {
       return cardName;
     }
     const suffix = '...';
-    return (
-      cardName.substring(0, maxNodeLabelLength - suffix.length) + suffix
-    );
+    return cardName.substring(0, maxNodeLabelLength - suffix.length) + suffix;
   }
 
   /**
@@ -2219,9 +2217,8 @@ export class ExplorationEditor extends BaseUser {
       state: 'visible',
     });
 
-    const cardContent = await this.page.$eval(
-      contentBoxSelector,
-      el => el.textContent?.trim()
+    const cardContent = await this.page.$eval(contentBoxSelector, el =>
+      el.textContent?.trim()
     );
 
     expect(cardContent).toBe(expectedCardContent);
@@ -2767,9 +2764,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForTimeout(500);
 
       try {
-        const isHintVisible = await this.page
-          .locator(hintSelector)
-          .isVisible();
+        const isHintVisible = await this.page.locator(hintSelector).isVisible();
         if (isHintVisible) {
           await this.clickOnElementWithSelector(hintSelector);
           await this.page.waitForSelector(gotItButtonSelector, {
