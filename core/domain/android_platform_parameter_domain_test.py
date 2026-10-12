@@ -441,6 +441,50 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
 
         self.assertTrue(parameter.evaluate(self._create_context()))
 
+    def test_evaluate_matches_version_and_flavour_filters_together(
+        self,
+    ) -> None:
+        parameter = self._create_parameter(
+            rules=[
+                {
+                    'filters': [
+                        {
+                            'type': 'app_min_version',
+                            'conditions': [['=', '2.0.0']],
+                        },
+                        {
+                            'type': 'app_max_version',
+                            'conditions': [['=', '3.0.0']],
+                        },
+                        {
+                            'type': 'app_version_flavour',
+                            'conditions': [['>=', 'beta']],
+                        },
+                    ],
+                    'value_when_matched': True,
+                }
+            ],
+            default_value=False,
+        )
+
+        test_cases = [
+            ('2.5.0', 'beta', True),
+            ('2.5.0', 'release', True),
+            ('1.9.9', 'beta', False),
+            ('3.0.1', 'release', False),
+            ('2.5.0', 'alpha', False),
+        ]
+        for app_version, app_version_flavour, expected_value in test_cases:
+            with self.subTest(
+                app_version=app_version,
+                app_version_flavour=app_version_flavour,
+            ):
+                context = self._create_context(app_version, app_version_flavour)
+                self.assertIs(
+                    parameter.evaluate(context),
+                    expected_value,
+                )
+
     def test_evaluate_returns_default_when_no_rule_matches(self) -> None:
         parameter = self._create_parameter(
             rules=[
