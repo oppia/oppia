@@ -89,6 +89,14 @@ export class InteractiveSetInputComponent implements OnInit {
     if (!Array.isArray(answer)) {
       return;
     }
+    // The schema editor's 'localValue' setter re-emits 'localValueChange'
+    // whenever the bound value changes reference. Since this handler reassigns
+    // 'answer' to a freshly filtered array, skipping the update when the value
+    // is unchanged prevents an infinite change-detection loop. TextInput and
+    // NumericInput already use the same identity guard.
+    if (this.answer === answer) {
+      return;
+    }
     this.answer = answer.filter(
       (element): element is string => typeof element === 'string'
     );
