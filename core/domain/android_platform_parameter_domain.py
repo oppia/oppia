@@ -32,13 +32,13 @@ from typing import Dict, Final, List, Optional, Pattern, TypedDict, Union
 AndroidPlatformDataTypes = Union[str, int, bool, float]
 
 ALLOWED_APP_VERSION_FLAVORS: List[str] = (
-    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
+    constants.ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
 )
 APP_VERSION_WITH_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
 )
 APP_VERSION_WITHOUT_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
+    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
 )
 
 
@@ -109,7 +109,10 @@ class AndroidEvaluationContext:
                 'Invalid Android app version \'%s\', expected to be a '
                 'string.' % self._app_version
             )
-        if not (APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(self._app_version)):
+        if not (
+            APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(self._app_version)
+            or APP_VERSION_WITH_HASH_REGEXP.fullmatch(self._app_version)
+        ):
             raise utils.ValidationError(
                 'Invalid Android app version \'%s\', expected to match regexp '
                 '%s.' % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
@@ -301,6 +304,10 @@ class AndroidPlatformParameterFilter:
     def _compare_versions(self, version_a: str, version_b: str) -> int:
         """Compares dotted numeric versions, padding missing components with 0.
 
+        Android version names can include a commit hash and flavor suffix (for
+        example '12.5-5f58b8fbeb-dev'); comparison should ignore those suffixes
+        and compare only the numeric version prefix.
+
         Args:
             version_a: str. The first version string for comparison.
             version_b: str. The second version string for comparison.
@@ -309,11 +316,33 @@ class AndroidPlatformParameterFilter:
             int. -1 if the first version is smaller, 0 if equal, and 1 if the
             first version is larger.
         """
-        if self._is_first_version_smaller(version_a, version_b):
+        normalized_version_a = self._normalize_version(version_a)
+        normalized_version_b = self._normalize_version(version_b)
+        if self._is_first_version_smaller(
+            normalized_version_a, normalized_version_b
+        ):
             return -1
-        if self._is_first_version_smaller(version_b, version_a):
+        if self._is_first_version_smaller(
+            normalized_version_b, normalized_version_a
+        ):
             return 1
         return 0
+
+    def _normalize_version(self, version: str) -> str:
+        """Strips any Android metadata suffix so only the numeric version prefix
+        is compared.
+
+        Args:
+            version: str. The Android version string, such as
+                '12.5-5f58b8fbeb-dev'.
+
+        Returns:
+            str. The numeric version prefix, such as '12.5'.
+        """
+        match = re.match(r'^(\d+(?:\.\d+)+)', version)
+        if match is None:
+            return version
+        return match.group(1)
 
     def _is_first_version_smaller(self, version_a: str, version_b: str) -> bool:
         """Compares two version strings, return True if the first version is
@@ -391,7 +420,10 @@ class AndroidPlatformParameterFilter:
                             ALLOWED_APP_VERSION_FLAVORS,
                         )
                     )
-            elif not APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(value):
+            elif not (
+                APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(value)
+                or APP_VERSION_WITH_HASH_REGEXP.fullmatch(value)
+            ):
                 raise utils.ValidationError(
                     'Invalid Android app version expression \'%s\'.' % value
                 )

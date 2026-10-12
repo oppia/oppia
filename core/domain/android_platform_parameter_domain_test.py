@@ -32,29 +32,35 @@ class AndroidEvaluationContextTests(test_utils.GenericTestBase):
 
     def test_from_dict_and_to_dict_round_trip(self) -> None:
         context_dict: parameter_domain.AndroidEvaluationContextDict = {
-            'app_version': '1.2.3',
-            'app_version_flavour': 'beta',
+            'app_version': '12.5-5f58b8fbeb-dev',
+            'app_version_flavour': 'dev',
         }
         context = parameter_domain.AndroidEvaluationContext.from_dict(
             context_dict
         )
 
-        self.assertEqual(context.app_version, '1.2.3')
-        self.assertEqual(context.app_version_flavour, 'beta')
+        self.assertEqual(context.app_version, '12.5-5f58b8fbeb-dev')
+        self.assertEqual(context.app_version_flavour, 'dev')
         self.assertDictEqual(context.to_dict(), context_dict)
 
     def test_validate_accepts_valid_context(self) -> None:
-        context = parameter_domain.AndroidEvaluationContext('1.2.3', 'release')
+        context = parameter_domain.AndroidEvaluationContext(
+            '12.5-5f58b8fbeb-dev', 'dev'
+        )
         context.validate()
 
     def test_validate_rejects_invalid_version(self) -> None:
-        context = parameter_domain.AndroidEvaluationContext('1.2.beta', 'beta')
+        context = parameter_domain.AndroidEvaluationContext(
+            '12.x-5f58b8fbeb-dev', 'beta'
+        )
 
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
             context.validate()
 
     def test_validate_rejects_invalid_flavour(self) -> None:
-        context = parameter_domain.AndroidEvaluationContext('1.2.3', 'unknown')
+        context = parameter_domain.AndroidEvaluationContext(
+            '12.5-5f58b8fbeb-dev', 'unknown'
+        )
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid Android app version flavour'
@@ -67,8 +73,8 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def _create_context(
         self,
-        app_version: str = '1.2.3',
-        app_version_flavour: str = 'beta',
+        app_version: str = '12.5-5f58b8fbeb-dev',
+        app_version_flavour: str = 'dev',
     ) -> parameter_domain.AndroidEvaluationContext:
         """Creates an Android evaluation context."""
         return parameter_domain.AndroidEvaluationContext(
@@ -78,7 +84,7 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_from_dict_and_to_dict_round_trip(self) -> None:
         filter_dict: parameter_domain.AndroidPlatformParameterFilterDict = {
             'type': 'app_min_version',
-            'conditions': [['=', '1.2.3']],
+            'conditions': [['=', '12.5']],
         }
         filter_domain = (
             parameter_domain.AndroidPlatformParameterFilter.from_dict(
@@ -87,12 +93,12 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(filter_domain.type, 'app_min_version')
-        self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
+        self.assertEqual(filter_domain.conditions, [['=', '12.5']])
         self.assertDictEqual(filter_domain.to_dict(), filter_dict)
 
     def test_validate_rejects_unsupported_filter_type(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_version', [['=', '1.2.3']]
+            'app_version', [['=', '12.5']]
         )
 
         with self.assertRaisesRegex(
@@ -112,7 +118,7 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_validate_rejects_unsupported_operator(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_min_version', [['>=', '1.2.3']]
+            'app_min_version', [['>=', '12.5']]
         )
 
         with self.assertRaisesRegex(
@@ -142,25 +148,49 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_evaluate_app_min_version_inclusive(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_min_version', [['=', '1.2.3']]
+            'app_min_version', [['=', '12.5']]
         )
 
-        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.3')))
-        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.4')))
-        self.assertFalse(filter_domain.evaluate(self._create_context('1.2.2')))
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.5-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.6-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertFalse(
+            filter_domain.evaluate(
+                self._create_context('12.4-5f58b8fbeb-dev', 'dev')
+            )
+        )
 
     def test_evaluate_app_max_version_inclusive(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_max_version', [['=', '1.2.3']]
+            'app_max_version', [['=', '12.5']]
         )
 
-        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.3')))
-        self.assertTrue(filter_domain.evaluate(self._create_context('1.2.2')))
-        self.assertFalse(filter_domain.evaluate(self._create_context('1.2.4')))
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.5-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.4-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertFalse(
+            filter_domain.evaluate(
+                self._create_context('12.6-5f58b8fbeb-dev', 'dev')
+            )
+        )
 
     def test_evaluate_flavour_filter(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_version_flavour', [['=', 'beta']]
+            'app_version_flavour', [['=', 'dev']]
         )
 
         self.assertTrue(filter_domain.evaluate(self._create_context()))
@@ -172,7 +202,7 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_evaluate_unknown_type_returns_false(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'unknown', [['=', '1.2.3']]
+            'unknown', [['=', '12.5']]
         )
 
         self.assertFalse(filter_domain.evaluate(self._create_context()))
@@ -190,7 +220,9 @@ class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
 
     def _create_context(self) -> parameter_domain.AndroidEvaluationContext:
         """Creates an Android evaluation context."""
-        return parameter_domain.AndroidEvaluationContext('1.2.3', 'beta')
+        return parameter_domain.AndroidEvaluationContext(
+            '12.5-5f58b8fbeb-dev', 'dev'
+        )
 
     def test_from_dict_and_to_dict_round_trip(self) -> None:
         rule_dict: parameter_domain.AndroidPlatformParameterRuleDict = {
@@ -286,7 +318,9 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         )
 
     def _create_context(
-        self, app_version: str = '1.2.3', flavour: str = 'beta'
+        self,
+        app_version: str = '12.5-5f58b8fbeb-dev',
+        flavour: str = 'dev',
     ) -> parameter_domain.AndroidEvaluationContext:
         """Creates an Android evaluation context."""
         return parameter_domain.AndroidEvaluationContext(app_version, flavour)
