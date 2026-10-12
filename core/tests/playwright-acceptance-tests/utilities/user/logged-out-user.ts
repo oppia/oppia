@@ -2970,7 +2970,10 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} selector - The selector of the link.
    * @param {string} expectedUrl - The expected href of the link.
    */
-  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
+  async expectLinkToHaveHref(
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(selector);
     const url = await this.page.$eval(selector, element =>
       element.getAttribute('href')
@@ -2987,7 +2990,7 @@ export class LoggedOutUser extends BaseUser {
    * newsletter has the correct link.
    */
   async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
-    await this.openExternalLink(
+    await this.expectLinkToHaveHref(
       watchAVideoButtonInThanksForSubscribe,
       watchAVideoUrl
     );
@@ -2999,7 +3002,7 @@ export class LoggedOutUser extends BaseUser {
    * newsletter has the correct link.
    */
   async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
-    await this.openExternalLink(
+    await this.expectLinkToHaveHref(
       readOurBlogButtonInThanksForSubscribe,
       readBlogUrl
     );
