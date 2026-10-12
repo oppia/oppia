@@ -42,7 +42,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() useLocalStorage!: boolean;
-  @Input() allowedBgColors!: string[];
+  @Input() allowedBgColors!: readonly string[];
   @Input() aspectRatio!: string;
   @Input() bgColor!: string;
   @Input() filename!: string;

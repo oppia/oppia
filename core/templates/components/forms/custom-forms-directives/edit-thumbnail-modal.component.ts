@@ -58,7 +58,7 @@ export class EditThumbnailModalComponent {
   @Input() previewDescriptionBgColor!: string;
   @Input() previewFooter!: string;
   @Input() previewTitle!: string;
-  @Input() allowedBgColors!: string[];
+  @Input() allowedBgColors!: readonly string[];
   @Input() tempBgColor!: string;
   @Input() dimensions!: Dimensions;
   @Input() uploadedImageMimeType!: string;

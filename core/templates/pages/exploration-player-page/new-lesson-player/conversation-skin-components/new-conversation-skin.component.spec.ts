@@ -805,6 +805,22 @@ describe('New Conversation skin component', () => {
     });
   });
 
+  it('should report whether the skin is in editor preview mode', () => {
+    componentInstance._editorPreviewMode = false;
+    expect(componentInstance.isInPreviewMode).toBe(false);
+
+    componentInstance._editorPreviewMode = true;
+    expect(componentInstance.isInPreviewMode).toBe(true);
+  });
+
+  it('should report whether the skin should open in a new window', () => {
+    componentInstance.isIframed = false;
+    expect(componentInstance.openInNewWindow).toBe(false);
+
+    componentInstance.isIframed = true;
+    expect(componentInstance.openInNewWindow).toBe(true);
+  });
+
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
