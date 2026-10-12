@@ -37,8 +37,6 @@ describe('Keyboard Shortcuts', () => {
   let nextButton = document.createElement('button');
   let continueButton = document.createElement('button');
   let backButton = document.createElement('button');
-  let searchBar = document.createElement('input');
-  let categoryBar = document.createElement('select');
 
   let openQuickReferenceSpy;
 
@@ -81,13 +79,9 @@ describe('Keyboard Shortcuts', () => {
     backButton.setAttribute('class', 'oppia-back-button');
     nextButton.setAttribute('class', 'oppia-next-button');
     continueButton.setAttribute('class', 'oppia-learner-confirm-button');
-    searchBar.setAttribute('class', 'oppia-search-bar-text-input');
-    categoryBar.setAttribute('class', 'oppia-search-bar-dropdown-toggle');
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);
-    document.body.append(searchBar);
-    document.body.append(categoryBar);
   });
 
   it(
@@ -155,12 +149,6 @@ describe('Keyboard Shortcuts', () => {
       Mousetrap.trigger('s');
       expect(skipButton.isEqualNode(document.activeElement));
 
-      Mousetrap.trigger('/');
-      expect(searchBar.isEqualNode(document.activeElement));
-
-      Mousetrap.trigger('c');
-      expect(categoryBar.isEqualNode(document.activeElement));
-
       Mousetrap.trigger('?');
       expect(openQuickReferenceSpy).toHaveBeenCalled();
 
@@ -190,11 +178,10 @@ describe('Keyboard Shortcuts', () => {
     }
   );
 
-  it('should not throw error if search bar or category bar is missing', () => {
+  it('should not throw error if skip button is missing', () => {
     spyOn(document, 'querySelector').and.returnValue(null);
     keyboardShortcutService.bindLibraryPageShortcuts();
 
-    expect(() => Mousetrap.trigger('/')).not.toThrowError();
-    expect(() => Mousetrap.trigger('c')).not.toThrowError();
+    expect(() => Mousetrap.trigger('s')).not.toThrowError();
   });
 });

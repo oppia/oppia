@@ -173,10 +173,8 @@ LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
     'COLLECTION_EDITOR',
     'COLLECTION_PLAYER',
     # These routes are deprecated or slated for deprecation.
-    'BLOG_HOMEPAGE_SEARCH',
     'FEEDBACK_UPDATES',
     'LIBRARY_RECENTLY_PUBLISHED',
-    'LIBRARY_SEARCH',
     'LIBRARY_TOP_RATED',
     'REVIEW_TEST',
     # These routes are excluded either because they are for redirection or

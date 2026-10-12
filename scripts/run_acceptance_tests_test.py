@@ -118,9 +118,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.managed_redis_server_swap = self.swap_with_checks(
             servers, 'managed_redis_server', mock_managed_process
         )
-        self.managed_elasticsearch_dev_server_swap = self.swap_with_checks(
-            servers, 'managed_elasticsearch_dev_server', mock_managed_process
-        )
         self.managed_firebase_auth_emulator_swap = self.swap_with_checks(
             servers, 'managed_firebase_auth_emulator', mock_managed_process
         )
@@ -349,9 +346,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -427,9 +421,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -514,9 +505,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -570,9 +558,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -641,9 +626,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(
@@ -710,9 +692,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -767,9 +746,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(self.managed_portserver_swap)
@@ -823,9 +799,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(self.build_js_files_swap)
         self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
         self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
         self.exit_stack.enter_context(self.managed_dev_appserver_swap)
         self.exit_stack.enter_context(

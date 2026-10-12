@@ -27,9 +27,10 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface NonnegativeIntSchema {
-  type: string;
+  type: 'int';
   validators: {
     id: string;
     min_value?: number;
@@ -73,7 +74,12 @@ export class NonnegativeIntEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue(value: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers are accepted.
+    if (typeof value !== 'number') {
+      return;
+    }
     if (value === this.value) {
       return;
     }

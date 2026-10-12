@@ -79,13 +79,6 @@
 <div class="oppia-library-container d-flex e2e-test-library-container e2e-test-community-library">
   <div class="oppia-library-container-inner mx-auto">
     <div>
-      <div class="oppia-search-bar-container oppia-search-results-bar-container" *ngIf="pageMode !== LIBRARY_PAGE_MODES.INDEX">
-        <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
-      </div>
-      <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.SEARCH">
-        <oppia-search-results></oppia-search-results>
-      </div>
-
       <div class="oppia-exp-summary-tiles-container oppia-exp-summary-tiles-container-extra-info"
            *ngIf="pageMode === LIBRARY_PAGE_MODES.GROUP">
         <div *ngIf="activityList?.length === 0"
@@ -139,16 +132,13 @@
         <div class="text-center w-100 mt-4" tabindex="0">
           <h2 class="oppia-library-h2">{{ 'I18N_LIBRARY_SUB_HEADER' | translate }}</h2>
         </div>
-        <div class="oppia-search-bar-container oppia-search-index-bar-container">
-          <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
-        </div>
         <div *ngIf="libraryGroups?.length === 0"
              class="text-center w-100 oppia-library-no-exploration-groups"
              tabindex="0">
              {{ 'I18N_LIBRARY_NO_EXPLORATION_GROUPS' | translate }}
         </div>
         <div class="oppia-library-group"
-             dir="auto"
+             [attr.dir]="'auto'"
              *ngFor="let group of libraryGroups; index as idx"
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
@@ -192,8 +182,7 @@
                                                  [getCategory]="tile.category"
                                                  [getThumbnailIconUrl]="tile.thumbnail_icon_url"
                                                  [getThumbnailBgColor]="tile.thumbnail_bg_color"
-                                                 [isOwnedByCurrentUser]="activitiesOwned.collections[tile.id]"
-                                                 [showLearnerDashboardIconsIfPossible]="true">
+                                                 [isOwnedByCurrentUser]="activitiesOwned.collections[tile.id]">
                   </oppia-collection-summary-tile>
                   <oppia-exploration-summary-tile *ngIf="tile.activity_type == 'exploration'"
                                                   [explorationId]="tile.id"
@@ -207,7 +196,6 @@
                                                   [thumbnailBgColor]="tile.thumbnail_bg_color"
                                                   class="e2e-test-exp-summary-tile"
                                                   [isOwnedByCurrentUser]="activitiesOwned.explorations[tile.id]"
-                                                  [showLearnerDashboardIconsIfPossible]="true"
                                                   [translatedMetadataFields]="tile.translated_metadata_fields || []">
                   </oppia-exploration-summary-tile>
                 </div>
@@ -239,7 +227,6 @@
                                              [getCategory]="activity.category"
                                              [getThumbnailIconUrl]="activity.thumbnail_icon_url"
                                              [getThumbnailBgColor]="activity.thumbnail_bg_color"
-                                             [showLearnerDashboardIconsIfPossible]="true"
                                              [isContainerNarrow]="true"
                                              [mobileCutoffPx]="537">
               </oppia-collection-summary-tile>
@@ -254,7 +241,6 @@
                                               [thumbnailIconUrl]="activity.thumbnail_icon_url"
                                               [thumbnailBgColor]="activity.thumbnail_bg_color"
                                               class="e2e-test-exp-summary-tile"
-                                              [showLearnerDashboardIconsIfPossible]="true"
                                               [isContainerNarrow]="true"
                                               [isOwnedByCurrentUser]="activitiesOwned.explorations[activity.id]"
                                               [mobileCutoffPx]="537">

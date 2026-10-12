@@ -95,4 +95,12 @@ describe('StateHintsEditorComponent', () => {
 
     expect(component.value).toBe('a');
   });
+
+  it('should not update value when the input is not a string', () => {
+    component.value = 'y';
+
+    component.updateValue(5);
+
+    expect(component.value).toBe('y');
+  });
 });

@@ -27,6 +27,7 @@ import {
 
 interface Choice {
   val: string;
+  id: string;
 }
 
 @Component({
