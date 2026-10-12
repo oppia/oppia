@@ -2110,9 +2110,16 @@ export class LoggedInUser extends BaseUser {
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(saveChangesButtonSelector);
-    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
-    // Wait for the button to re-appear in the reloaded DOM before querying it.
-    await this.expectElementToBeVisible(`button${saveChangesButtonSelector}`);
+    await this.clickOnElementWithSelector(saveChangesButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(selector);
+        return Boolean(button) && (button as HTMLButtonElement).disabled;
+      },
+      saveChangesButtonSelector
+    );
+
     const isDisabled = await this.page.$eval(
       `button${saveChangesButtonSelector}`,
       btn => (btn as HTMLButtonElement).disabled
