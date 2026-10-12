@@ -58,9 +58,17 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   questionsFetched!: boolean;
   skill!: Skill;
   htmlData!: string;
-  questionDicts!: QuestionBackendDict[];
+  questionDicts: QuestionBackendDict[] = [];
   totalPageCount: number = 0;
   currentPage: number = 0;
+  // The page whose questions are currently displayed. It is only updated when
+  // a fetch response actually replaces questionDicts, so a failed request can
+  // be rolled back to the page whose questions are still shown.
+  appliedPage: number = 0;
+  // Whether totalPageCount reflects the real number of pages. It stays false
+  // when the count request fails, in which case the end of the list is
+  // detected from a page response that is shorter than a full page.
+  totalPageCountIsKnown: boolean = false;
   displayedQuestions!: QuestionBackendDict[];
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
@@ -74,10 +82,11 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
-  // Tracks the page number that each question fetch was started for, so
-  // responses for a no-longer-current page can be ignored and stale
-  // results cannot replace displayedQuestions or questionDicts.
-  requestedPageForFetch: number | null = null;
+  // Incrementing id assigned to each question fetch. A response is only
+  // applied when its id still matches the most recent request, so stale
+  // responses are ignored even when an earlier and a newer request target
+  // the same page.
+  latestFetchRequestId: number = 0;
 
   ngOnInit(): void {
     const that = this;
@@ -101,6 +110,14 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       .fetchTotalQuestionCountForSkillIdsAsync([this.skillId])
       .then(response => {
         this.totalPageCount = Math.ceil(response / this.QUESTION_COUNT);
+        this.totalPageCountIsKnown = true;
+      })
+      .catch(() => {
+        // A failed count request must not lock pagination. Leave
+        // totalPageCountIsKnown unchanged so a page response that already
+        // established the last page is not undone; while the count is still
+        // unknown, the end of the list is detected from a page response that
+        // is shorter than a full page.
       });
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
@@ -111,17 +128,42 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   private fetchQuestionsForPage(page: number): void {
-    this.requestedPageForFetch = page;
+    const requestId = ++this.latestFetchRequestId;
     this.questionBackendApiService
       .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false, page)
       .then(response => {
-        // Ignore the response if the page this fetch was started for is no
-        // longer the page currently displayed.
-        if (page !== this.requestedPageForFetch) {
+        // Ignore the response if a newer fetch has been started since this
+        // one, even when both target the same page.
+        if (requestId !== this.latestFetchRequestId) {
           return;
+        }
+        // When the total page count is unknown, a response with fewer
+        // questions than requested marks the end of the list. An empty
+        // response means the requested page does not exist, so keep showing
+        // the last applied page and clamp the page count to exclude it.
+        if (
+          !this.totalPageCountIsKnown &&
+          response.length < this.QUESTION_COUNT
+        ) {
+          this.totalPageCountIsKnown = true;
+          if (response.length === 0) {
+            this.totalPageCount = page;
+            this.currentPage = this.appliedPage;
+            // The request completed, so stop showing the loading state even
+            // though the requested page has no questions. The empty response
+            // is not assigned to questionDicts, so questions from the last
+            // applied page stay displayed.
+            this.questionsFetched = true;
+            return;
+          }
+          this.totalPageCount = page + 1;
         }
         this.questionsFetched = true;
         this.questionDicts = response;
+        // Remember the page whose questions are now shown, so a later failed
+        // request rolls back here instead of to a page whose fetch never
+        // completed.
+        this.appliedPage = page;
         // Re-apply the active text and interaction filters to the newly
         // fetched page before selecting a question to preview, so the filters
         // stay applied on every page.
@@ -129,6 +171,18 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         if (this.displayedQuestions.length) {
           this.selectQuestionToPreview(0);
         }
+      })
+      .catch(() => {
+        if (requestId !== this.latestFetchRequestId) {
+          return;
+        }
+        // Restore the page whose questions are still displayed rather than
+        // the page the failed request started from, which may itself be a
+        // pending request that never applied its response.
+        this.currentPage = this.appliedPage;
+        // The request has completed (with an error), so clear the loading
+        // state even when no page has been applied yet.
+        this.questionsFetched = true;
       });
   }
 
@@ -140,7 +194,13 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPageCount - 1) {
+    // Paging forward stays available while the total page count is unknown,
+    // so a failed count request does not block the user from viewing more
+    // questions.
+    if (
+      !this.totalPageCountIsKnown ||
+      this.currentPage < this.totalPageCount - 1
+    ) {
       this.currentPage += 1;
       this.fetchQuestionsForPage(this.currentPage);
     }

@@ -27,7 +27,12 @@ export const QuestionDomainConstants = {
 
   QUESTION_PLAYER_URL_TEMPLATE:
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-    '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>&page=<page>',
+    '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>',
+
+  QUESTION_PLAYER_URL_TEMPLATE_WITH_PAGE:
+    '/question_player_handler?skill_ids=<skill_ids>&question_count' +
+    '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>' +
+    '&page=<page>',
 
   QUESTIONS_LIST_URL_TEMPLATE:
     '/questions_list_handler/<comma_separated_skill_ids>?offset=<offset>',

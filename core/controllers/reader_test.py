@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import logging
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -561,6 +562,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         )
 
     def test_questions_are_paginated_by_page_number(self) -> None:
+        """Test that distinct page numbers return distinct questions."""
         url_template = (
             '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
             '&page=%s'
@@ -581,6 +583,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         )
 
     def test_negative_page_defaults_to_first_page(self) -> None:
+        """Test that a negative page number falls back to the first page."""
         url = (
             '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
             '&page=-1' % (feconf.QUESTIONS_URL_PREFIX, self.skill_id)
@@ -591,12 +594,40 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     def test_page_beyond_available_questions_returns_no_questions(
         self,
     ) -> None:
+        """Test that a page past the available questions returns none."""
         url = (
             '%s?question_count=1&skill_ids=%s&fetch_by_difficulty=false'
             '&page=5' % (feconf.QUESTIONS_URL_PREFIX, self.skill_id)
         )
         json_response = self.get_json(url)
         self.assertEqual(json_response['question_dicts'], [])
+
+    def test_questions_sorted_by_difficulty_are_not_shuffled(self) -> None:
+        """Test that the difficulty ordering of the results is preserved."""
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX,
+            '1',
+            self.skill_id,
+            'true',
+        )
+        # get_questions_by_skill_ids orders difficulty-based results by their
+        # distance from medium difficulty, so the handler must not shuffle
+        # them.
+        with mock.patch('random.shuffle') as shuffle_mock:
+            self.get_json(url)
+        shuffle_mock.assert_not_called()
+
+    def test_random_sampled_questions_are_shuffled(self) -> None:
+        """Test that unpaged random sampling shuffles the results."""
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX,
+            '1',
+            self.skill_id,
+            'false',
+        )
+        with mock.patch('random.shuffle') as shuffle_mock:
+            self.get_json(url)
+        shuffle_mock.assert_called_once()
 
     def test_invalid_skill_id_returns_no_questions(self) -> None:
         # Call the handler.

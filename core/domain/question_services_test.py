@@ -306,6 +306,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             )
 
     def test_get_paginated_questions_by_skill_id(self) -> None:
+        """Test retrieving questions across pages without skips or repeats."""
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3
         )
@@ -337,6 +338,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_paginated_questions_by_skill_id_without_links(
         self,
     ) -> None:
+        """Test that a skill without linked questions returns none."""
         self.assertEqual(
             question_services.get_paginated_questions_by_skill_id(
                 2, 'skill_3', 0
@@ -347,6 +349,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_paginated_questions_by_skill_id_raises_error_with_high_count(
         self,
     ) -> None:
+        """Test that a question count over the limit raises an error."""
         with self.assertRaisesRegex(
             Exception,
             'Question count is too high, please limit the question '

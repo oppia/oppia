@@ -1971,12 +1971,12 @@ class QuestionPlayerHandler(
         skill_ids = self.normalized_request['skill_ids'].split(',')
         question_count = int(self.normalized_request['question_count'])
         page = self.normalized_request.get('page')
-        # A missing page (None) or a negative value falls back to the first
-        # page. Each page maps to a distinct offset, so later pages can fetch
-        # questions beyond the initial per-request limit.
+        # Pagination is only used when the caller explicitly requests a
+        # non-negative page. A missing or negative page falls back to the
+        # first page and keeps the default random-sampling behavior.
+        page_is_requested = page is not None and page >= 0
         if page is None or page < 0:
             page = 0
-        offset = page * question_count
 
         fetch_by_difficulty = self.normalized_request['fetch_by_difficulty']
 
@@ -1986,17 +1986,44 @@ class QuestionPlayerHandler(
                 if self.user_id
                 else skill_ids
             )
-        # Paginated fetching is deterministic and offset-based. Difficulty
-        # based sampling is random and cannot be paged, so it continues to use
-        # get_questions_by_skill_ids.
-        if len(skill_ids) == 1 and not fetch_by_difficulty:
-            questions = question_services.get_paginated_questions_by_skill_id(
-                question_count, skill_ids[0], offset
+        # Paginated fetching is deterministic and offset-based, and is used
+        # only when the caller asks for a specific page. When the page is
+        # omitted, or the request cannot be paged because it samples by
+        # difficulty or spans multiple skills, the existing random-sampling
+        # path is kept so unpaged requests behave as before.
+        if (
+            page_is_requested
+            and len(skill_ids) == 1
+            and not fetch_by_difficulty
+        ):
+            offset = page * question_count
+            # Bound the offset by the number of questions actually linked to
+            # the skill, so a client cannot force the Datastore query to skip
+            # an unbounded number of entities.
+            total_question_count = (
+                question_services.get_total_question_count_for_skill_ids(
+                    skill_ids
+                )
             )
+            if offset >= total_question_count:
+                questions = []
+            else:
+                questions = (
+                    question_services.get_paginated_questions_by_skill_id(
+                        question_count, skill_ids[0], offset
+                    )
+                )
         else:
             questions = question_services.get_questions_by_skill_ids(
                 question_count, skill_ids, fetch_by_difficulty
             )
+            # get_questions_by_skill_ids already randomizes the order within
+            # each skill, but the results stay grouped by skill id. Shuffle so
+            # a multi-skill sample is mixed. Difficulty-sorted results are
+            # left untouched because their order is part of the sampling
+            # contract.
+            if not fetch_by_difficulty:
+                random.shuffle(questions)
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({'question_dicts': question_dicts[0:question_count]})

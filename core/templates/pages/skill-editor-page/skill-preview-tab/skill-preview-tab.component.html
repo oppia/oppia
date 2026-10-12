@@ -52,7 +52,7 @@
             <i class="fas fa-angle-left"></i> Prev
           </button>
           <button class="oppia-skill-preview-pagination-btn"
-                  [disabled]="currentPage + 1 >= totalPageCount"
+                  [disabled]="totalPageCountIsKnown && currentPage + 1 >= totalPageCount"
                   (click)="nextPage()">
             Next
             <i class="fas fa-angle-right"></i>
