@@ -27,7 +27,6 @@ export enum FeatureNames {
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
   ShowTranslationSize = 'show_translation_size',
-  ShowFeedbackUpdatesInProfilePicDropdownMenu = 'show_feedback_updates_in_profile_pic_dropdown',
   ShowRedesignedLearnerDashboard = 'show_redesigned_learner_dashboard',
   IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
@@ -53,6 +52,7 @@ export enum FeatureNames {
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
   TechnicalFeedbackDashboardEnabled = 'technical_feedback_dashboard_enabled',
   StoryEditorArcs = 'story_editor_arcs',
+  EnableDropdownPagination = 'enable_dropdown_pagination',
 }
 
 export interface FeatureStatusSummaryBackendDict {

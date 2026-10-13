@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     opportunity_domain,
     opportunity_services,
+    question_domain,
     skill_fetchers,
     state_domain,
     story_domain,
@@ -47,7 +48,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, cast
+from typing import Dict, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -132,18 +133,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_1 = {
             'id': self.skill_id_1,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_2 = {
             'id': self.skill_id_2,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic1',
+            'questions_in_review_count': 0,
         }
 
         # The content_count is 2 for the expected dicts below since each
@@ -190,6 +194,60 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'],
             [
                 self.expected_skill_opportunity_dict_0,
+                self.expected_skill_opportunity_dict_1,
+            ],
+        )
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
+
+    def test_get_skill_opportunity_data_with_in_review_suggestions(
+        self,
+    ) -> None:
+        # Here we use cast because we need to bypass TypedDict checks for the
+        # empty question state data dict in the test context.
+        change_cmd: Dict[
+            str, Union[str, question_domain.QuestionDict, float]
+        ] = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': cast(state_domain.StateDict, {}),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ),
+                'linked_skill_ids': [self.skill_id_0],
+                'inapplicable_skill_misconception_ids': [],
+                'next_content_id_index': 0,
+            },
+            'skill_id': self.skill_id_0,
+            'skill_difficulty': 0.3,
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            self.skill_id_0,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.owner_id,
+            self.OWNER_USERNAME,
+            change_cmd,
+            'score_category',
+            'suggestion_id_1',
+            constants.DEFAULT_LANGUAGE_CODE,
+        )
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
+        )
+        self.assertEqual(len(response['opportunities']), 2)
+        expected_dict = self.expected_skill_opportunity_dict_0.copy()
+        expected_dict['questions_in_review_count'] = 1
+        self.assertEqual(
+            response['opportunities'],
+            [
+                expected_dict,
                 self.expected_skill_opportunity_dict_1,
             ],
         )
@@ -373,18 +431,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_4,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_5,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                 ],
             )
@@ -3765,3 +3826,123 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
                 % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
             )
             self.assertEqual(len(response['translatable_contents']), 1)
+
+
+class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
+    """Unit tests for the OpportunitiesCountHandler."""
+
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]
+    ) -> None:
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-three',
+            )
+        ]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = uncategorized_skill_ids
+        topic.uncategorized_skill_ids = uncategorized_skill_ids
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        # Create a skill opportunity.
+        self.save_new_skill('skill_1', self.owner_id, description='A skill')
+
+        # Create an exploration for translation opportunity.
+        self.save_new_valid_exploration(
+            'exp_1',
+            self.owner_id,
+            title='title 1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_1')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'topic', 'abbrev', 'description', 'fragm'
+        )
+        self._publish_valid_topic(topic, ['skill_1'])
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_1', 'topic_id_1', 'exp_1'
+        )
+
+        # Add the skill opportunity to a classroom so it shows up in counts.
+        self.classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=self.classroom_id,
+            topic_id_to_prerequisite_topic_ids={'topic_id_1': []},
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_skill_opportunities_count(self) -> None:
+        response = self.get_json('/opportunitiescounthandler/skill')
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_opportunities_count(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/translation?language_code=hi'
+        )
+        self.assertEqual(response['total_count'], 1)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION,
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+        ]
+    )
+    def test_get_translation_opportunities_count_with_new_models(self) -> None:
+        response = self.get_json(
+            '/opportunitiescounthandler/translation?language_code=hi'
+        )
+        # It's 0 because we didn't create a TranslationOpportunityModel in setUp.
+        self.assertEqual(response['total_count'], 0)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_translation_count_missing_language_code(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/translation', expected_status_int=400
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+    )
+    def test_get_invalid_opportunity_type(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/invalid_type', expected_status_int=404
+        )
+
+    def test_feature_flag_disabled(self) -> None:
+        self.get_json(
+            '/opportunitiescounthandler/skill', expected_status_int=404
+        )

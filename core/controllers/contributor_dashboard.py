@@ -76,6 +76,7 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     """A dictionary representation of client side SkillOpportunity object."""
 
     topic_name: str
+    questions_in_review_count: int
 
 
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -250,6 +251,7 @@ class ContributionOpportunitiesHandler(
                                 'question_count'
                             ],
                             'topic_name': topic_name,
+                            'questions_in_review_count': 0,
                         }
                         opportunities.append(client_side_skill_opportunity_dict)
             if (
@@ -259,6 +261,16 @@ class ContributionOpportunitiesHandler(
                 break
             skill_opportunities, cursor, more = (
                 opportunity_services.get_skill_opportunities(cursor)
+            )
+
+        skill_ids = [opp['id'] for opp in opportunities]
+        skill_id_to_in_review_count = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            skill_ids
+        )
+
+        for opp in opportunities:
+            opp['questions_in_review_count'] = skill_id_to_in_review_count.get(
+                opp['id'], 0
             )
 
         return opportunities, cursor, more
@@ -1048,6 +1060,94 @@ class TranslatableTextHandler(
             and s.change_cmd.content_id == content_id
             for s in suggestions
         )
+
+
+class OpportunitiesCountHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of OpportunitiesCountHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: Optional[str]
+    topic_name: Optional[str]
+    entity_type: Optional[str]
+
+
+class OpportunitiesCountHandler(
+    base.BaseHandler[
+        Dict[str, str], OpportunitiesCountHandlerNormalizedRequestDict
+    ]
+):
+    """Provides counts for opportunities available in different categories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'opportunity_type': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                },
+                'default_value': None,
+            },
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'entity_type': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self, opportunity_type: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            opportunity_type: str. The type of opportunity to count.
+
+        Raises:
+            NotFoundException. The opportunity_type is not valid.
+        """
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException
+
+        assert self.normalized_request is not None
+        language_code = self.normalized_request.get('language_code')
+        topic_name = self.normalized_request.get('topic_name')
+        entity_type = self.normalized_request.get('entity_type')
+
+        if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
+            count = opportunity_services.get_skill_opportunities_count()
+        elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+            if language_code is None:
+                raise self.InvalidInputException('language_code is required')
+
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+                self.user_id,
+            ):
+                count = opportunity_services.get_translation_opportunities_count_with_new_models(
+                    entity_type, language_code, topic_name
+                )
+            else:
+                count = (
+                    opportunity_services.get_translation_opportunities_count(
+                        language_code, topic_name
+                    )
+                )
+        else:
+            raise self.NotFoundException
+
+        self.values = {'total_count': count}
+        self.render_json(self.values)
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):

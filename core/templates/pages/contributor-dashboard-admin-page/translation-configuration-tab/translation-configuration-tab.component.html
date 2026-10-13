@@ -32,7 +32,7 @@
                     class="form-control e2e-test-language-dropdown"
                     aria-label="Select language">
               <option value="" disabled>Language</option>
-              <option *ngFor="let lang of getUnmappedLanguageOptions()"
+              <option *ngFor="let lang of unmappedLanguageOptions"
                       [value]="lang.code">
                 {{ lang.name }}
               </option>
