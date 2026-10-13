@@ -2101,6 +2101,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks that the community library shows exactly the given featured
+   * activities. An empty list means no featured activities should be shown.
+   * @param {string[]} expectedActivityTitles - The expected activity titles.
+   */
+  async expectToViewFeaturedActivities(
+    expectedActivityTitles: string[] = []
+  ): Promise<void> {
+    // Reload so that newly added or removed featured activities are shown.
+    await this.reloadPage();
+    const featuredActivityTitles = this.page
+      .locator('.oppia-library-group')
+      .filter({
+        has: this.page.locator('h2', {hasText: 'Featured Activities'}),
+      })
+      .locator('.e2e-test-exp-summary-tile-title');
+
+    await expect(featuredActivityTitles).toHaveText(expectedActivityTitles);
+    showMessage(
+      `Featured activities are as expected: [${expectedActivityTitles}].`
+    );
+  }
+
+  /**
    * Navigates to the learn tab in the topic page.
    */
   async navigateToLessonsTabInTopic(): Promise<void> {
