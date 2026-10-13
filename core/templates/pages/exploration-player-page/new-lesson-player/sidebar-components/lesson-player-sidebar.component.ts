@@ -107,6 +107,10 @@ export class LessonPlayerSidebarComponent implements OnInit {
     this.sidebarIsExpanded = this.mobileMenuService.getSidebarIsExpanded();
   }
 
+  toggleMenuVisibility(): void {
+    this.mobileMenuService.toggleMenuVisibility();
+  }
+
   isHackyExpDescTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
