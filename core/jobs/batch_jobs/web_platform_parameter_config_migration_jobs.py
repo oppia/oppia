@@ -48,7 +48,7 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
                 rules=legacy_model.rules,
                 rule_schema_version=legacy_model.rule_schema_version,
                 default_value=legacy_model.default_value,
-                version=legacy_model.version,
+                version=legacy_model.version + 1,
             )
             migrated_config.update_timestamps()
             return migrated_config

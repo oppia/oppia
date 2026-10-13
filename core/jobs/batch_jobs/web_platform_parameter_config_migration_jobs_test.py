@@ -65,7 +65,7 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
             'parameter_name'
         )
         self.assertIsNotNone(migrated_model)
-        self.assertEqual(migrated_model.version, legacy_model.version)
+        self.assertEqual(migrated_model.version, legacy_model.version + 1)
         self.assertEqual(
             migrated_model.rules,
             [{'filters': [], 'value_when_matched': False}],
@@ -108,7 +108,7 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
             'parameter_name'
         )
         self.assertIsNotNone(migrated_model)
-        self.assertEqual(migrated_model.version, 2)
+        self.assertEqual(migrated_model.version, legacy_model.version + 1)
         first_version = (
             config_models.WebPlatformParameterConfigModel.get_version(
                 'parameter_name', 1
