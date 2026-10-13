@@ -211,6 +211,15 @@ const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
+const mathClassroomUrl = testConstants.URLs.MathClassroom;
+const subtopicTitleInStudyTabSelector = '.subtopic-title';
+const newSubtopicViewerContainerSelector = '.new-subtopic-viewer-container';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
+const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
+const goToStudyGuideMenuButton = '.e2e-test-go-to-study-guide-menu-button';
+const goToPracticeSectionButton = '.e2e-test-go-to-practice-section-button';
+const goBackToTopicButton = '.e2e-test-go-back-to-topic-button';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2151,6 +2160,130 @@ export class LoggedOutUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(revisionTabSelector);
+  }
+
+  /**
+   * Opens the practice tab of a topic in the math classroom directly by URL.
+   * @param {string} topicUrlFragment - The url fragment of the topic.
+   */
+  async navigateToPracticeTabUsingURL(topicUrlFragment: string): Promise<void> {
+    await this.goto(`${mathClassroomUrl}/${topicUrlFragment}/practice`);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
+  }
+
+  /**
+   * Opens a subtopic's study guide by clicking its card in the study tab of
+   * the topic page.
+   * @param {string} subtopicName - The name of the subtopic to open.
+   */
+  async selectReviewCardToLearn(subtopicName: string): Promise<void> {
+    await this.expectElementToBeVisible(subtopicTitleInStudyTabSelector);
+    const subtopicCards = await this.page.$$(subtopicTitleInStudyTabSelector);
+    const subtopicTitles: string[] = [];
+    for (const card of subtopicCards) {
+      subtopicTitles.push((await card.innerText()).trim());
+    }
+    const cardIndex = subtopicTitles.indexOf(subtopicName);
+    if (cardIndex === -1) {
+      throw new Error(
+        `No subtopic card found with the name "${subtopicName}". ` +
+          `Found: ${JSON.stringify(subtopicTitles)}.`
+      );
+    }
+
+    await this.clickOnElement(subtopicCards[cardIndex]);
+    await this.expectElementToBeVisible(newSubtopicViewerContainerSelector);
+    await this.expectElementToBeVisible(subtopicTitleInStudyTabSelector, false);
+    showMessage(`Opened the study guide for ${subtopicName}.`);
+  }
+
+  /**
+   * Checks that the open study guide shows the given title and sections.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections, each given
+   * as [heading, content].
+   */
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][]
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      newSubtopicViewerContainerSelector,
+      studyGuideTitle
+    );
+
+    for (const [index, section] of studyGuideSections.entries()) {
+      if (section.length !== 2) {
+        throw new Error(
+          `Study guide section ${index + 1} should be [heading, content], ` +
+            `but got ${JSON.stringify(section)}.`
+        );
+      }
+      const [heading, content] = section;
+      await this.expectTextContentToContain(
+        newSubtopicViewerContainerSelector,
+        heading
+      );
+      await this.expectTextContentToContain(
+        newSubtopicViewerContainerSelector,
+        content
+      );
+    }
+    showMessage(`Study guide ${studyGuideTitle} has the expected sections.`);
+  }
+
+  /**
+   * Expands the worked example in the open study guide.
+   */
+  async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.expectElementToBeVisible(expandWorkedExampleButton);
+    await this.clickOnElementWithSelector(expandWorkedExampleButton);
+    await this.expectElementToBeVisible(collapseWorkedExampleButton);
+  }
+
+  /**
+   * Clicks the button that opens the next study guide in the topic.
+   */
+  async clickOnNextStudyGuideButton(): Promise<void> {
+    await this.expectElementToBeVisible(goToNextStudyGuideButton);
+    await this.clickOnElementWithSelector(goToNextStudyGuideButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(newSubtopicViewerContainerSelector);
+  }
+
+  /**
+   * Clicks the button that goes back to the list of study guides.
+   */
+  async clickOnStudyGuideMenuButton(): Promise<void> {
+    await this.expectElementToBeVisible(goToStudyGuideMenuButton);
+    await this.clickOnElementWithSelector(goToStudyGuideMenuButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(subtopicTitleInStudyTabSelector);
+  }
+
+  /**
+   * Clicks the button that opens the practice section for the open study
+   * guide's subtopic.
+   */
+  async clickOnPracticeButton(): Promise<void> {
+    await this.expectElementToBeVisible(goToPracticeSectionButton);
+    await this.clickOnElementWithSelector(goToPracticeSectionButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(
+      newSubtopicViewerContainerSelector,
+      false
+    );
+  }
+
+  /**
+   * Clicks the "Back to topic" button in the open study guide.
+   */
+  async clickOnBackToTopicButton(): Promise<void> {
+    await this.expectElementToBeVisible(goBackToTopicButton);
+    await this.clickOnElementWithSelector(goBackToTopicButton);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(topicViewerContainerSelector);
   }
 
   /**

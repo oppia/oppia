@@ -192,8 +192,8 @@
     },
     {
       "name": "logged-in-user/view-subtopic-study-guides",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/create-and-delete-account",
