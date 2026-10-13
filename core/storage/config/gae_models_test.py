@@ -204,25 +204,28 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class AndroidPlatformParameterSnapshotContentModelTests(
+class AndroidPlatformParameterConfigSnapshotContentModelTests(
     test_utils.GenericTestBase
 ):
     """Tests for Android platform parameter snapshot models."""
 
     def test_content_model_get_deletion_policy_is_not_applicable(self) -> None:
+        snapshot_content_model = (
+            config_models.AndroidPlatformParameterConfigSnapshotContentModel
+        )
         self.assertEqual(
-            config_models.AndroidPlatformParameterSnapshotContentModel.get_deletion_policy(),
+            snapshot_content_model.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE,
         )
 
     def test_android_config_uses_android_snapshot_models(self) -> None:
         self.assertIs(
             config_models.AndroidPlatformParameterConfigModel.SNAPSHOT_METADATA_CLASS,
-            config_models.AndroidPlatformParameterSnapshotMetadataModel,
+            config_models.AndroidPlatformParameterConfigSnapshotMetadataModel,
         )
         self.assertIs(
             config_models.AndroidPlatformParameterConfigModel.SNAPSHOT_CONTENT_CLASS,
-            config_models.AndroidPlatformParameterSnapshotContentModel,
+            config_models.AndroidPlatformParameterConfigSnapshotContentModel,
         )
 
 

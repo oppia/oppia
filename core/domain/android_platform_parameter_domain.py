@@ -25,7 +25,16 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, Final, List, Optional, Pattern, TypedDict, Union
+from typing import (
+    Callable,
+    Dict,
+    Final,
+    List,
+    Optional,
+    Pattern,
+    TypedDict,
+    Union,
+)
 
 # Union type defined from allowed types that a platform parameter can contain
 # for its data types.
@@ -565,7 +574,9 @@ class AndroidPlatformParameter:
     """Domain object for Android platform parameter."""
 
     PARAMETER_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
-    DATA_TYPE_PREDICATES_DICT = {
+    DATA_TYPE_PREDICATES_DICT: Dict[
+        str, Callable[[AndroidPlatformDataTypes], bool]
+    ] = {
         'bool': lambda value: isinstance(value, bool),
         'number': lambda value: isinstance(value, (int, float))
         and not isinstance(value, bool),

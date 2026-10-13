@@ -135,7 +135,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         )
 
 
-class AndroidPlatformParameterSnapshotMetadataModel(
+class AndroidPlatformParameterConfigSnapshotMetadataModel(
     base_models.BaseSnapshotMetadataModel
 ):
     """Storage model for metadata of an Android parameter snapshot."""
@@ -143,7 +143,7 @@ class AndroidPlatformParameterSnapshotMetadataModel(
     pass
 
 
-class AndroidPlatformParameterSnapshotContentModel(
+class AndroidPlatformParameterConfigSnapshotContentModel(
     base_models.BaseSnapshotContentModel
 ):
     """Storage model for content of an Android parameter snapshot."""
@@ -163,8 +163,10 @@ class AndroidPlatformParameterConfigModel(
     The id is the name of the parameter.
     """
 
-    SNAPSHOT_METADATA_CLASS = AndroidPlatformParameterSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = AndroidPlatformParameterSnapshotContentModel
+    SNAPSHOT_METADATA_CLASS = (
+        AndroidPlatformParameterConfigSnapshotMetadataModel
+    )
+    SNAPSHOT_CONTENT_CLASS = AndroidPlatformParameterConfigSnapshotContentModel
 
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = datastore_services.IntegerProperty(
