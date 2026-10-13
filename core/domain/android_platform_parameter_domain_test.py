@@ -229,7 +229,7 @@ class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
             'filters': [
                 {
                     'type': 'app_min_version',
-                    'conditions': [['=', '1.2.0']],
+                    'conditions': [['=', '12.5']],
                 }
             ],
             'value_when_matched': True,
@@ -249,7 +249,7 @@ class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
                 'filters': [
                     {
                         'type': 'app_min_version',
-                        'conditions': [['=', '1.0.0']],
+                        'conditions': [['=', '12.5']],
                     },
                     {
                         'type': 'app_version_flavour',
@@ -273,7 +273,7 @@ class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
                 'filters': [
                     {
                         'type': 'app_min_version',
-                        'conditions': [['=', '1.2.3']],
+                        'conditions': [['=', '12.5']],
                     }
                 ],
                 'value_when_matched': True,
@@ -312,7 +312,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
             (
                 rule_schema_version
                 if rule_schema_version is not None
-                else feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                else feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
             ),
             default_value,
         )
@@ -335,14 +335,14 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'app_min_version',
-                            'conditions': [['=', '1.2.0']],
+                            'conditions': [['=', '12.5']],
                         }
                     ],
                     'value_when_matched': True,
                 }
             ],
             'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
             ),
             'default_value': False,
         }
@@ -364,7 +364,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                 'name': 'android_parameter',
                 'rules': [],
                 'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                    feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
                 ),
                 'default_value': 3,
             },
@@ -466,7 +466,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'app_min_version',
-                            'conditions': [['=', '1.0.0']],
+                            'conditions': [['=', '12.5']],
                         }
                     ],
                     'value_when_matched': True,
@@ -486,11 +486,11 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'app_min_version',
-                            'conditions': [['=', '2.0.0']],
+                            'conditions': [['=', '12.5']],
                         },
                         {
                             'type': 'app_max_version',
-                            'conditions': [['=', '3.0.0']],
+                            'conditions': [['=', '13.0']],
                         },
                         {
                             'type': 'app_version_flavour',
@@ -504,11 +504,11 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
         )
 
         test_cases = [
-            ('2.5.0', 'beta', True),
-            ('2.5.0', 'release', True),
-            ('1.9.9', 'beta', False),
-            ('3.0.1', 'release', False),
-            ('2.5.0', 'alpha', False),
+            ('12.6-5f58b8fbeb-dev', 'beta', True),
+            ('12.6-5f58b8fbeb-dev', 'release', True),
+            ('12.4-5f58b8fbeb-dev', 'beta', False),
+            ('13.0.1-5f58b8fbeb-dev', 'release', False),
+            ('12.6-5f58b8fbeb-dev', 'alpha', False),
         ]
         for app_version, app_version_flavour, expected_value in test_cases:
             with self.subTest(
@@ -528,7 +528,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'app_min_version',
-                            'conditions': [['=', '13.0.0']],
+                            'conditions': [['=', '13.0']],
                         }
                     ],
                     'value_when_matched': True,
@@ -590,7 +590,7 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
                 'name': 'android_parameter',
                 'rules': [],
                 'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                    feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
                 ),
                 'default_value': [],
             },
