@@ -246,8 +246,8 @@ class AndroidPlatformParameterConfigModelTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'app_version',
-                            'conditions': [['>=', '1.2.3']],
+                            'type': 'app_min_version',
+                            'conditions': [['=', '12.5']],
                         }
                     ],
                     'value_when_matched': True,
@@ -274,8 +274,8 @@ class AndroidPlatformParameterConfigModelTests(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'app_version',
-                        'conditions': [['>=', '1.2.3']],
+                        'type': 'app_min_version',
+                        'conditions': [['=', '12.5']],
                     }
                 ],
                 'value_when_matched': True,
