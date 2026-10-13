@@ -40,6 +40,22 @@ from typing import (
 # for its data types.
 AndroidPlatformDataTypes = Union[str, int, bool, float]
 
+
+def _is_bool(value: AndroidPlatformDataTypes) -> bool:
+    """Returns whether the value is a bool."""
+    return isinstance(value, bool)
+
+
+def _is_number(value: AndroidPlatformDataTypes) -> bool:
+    """Returns whether the value is a number, excluding bool."""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _is_string(value: AndroidPlatformDataTypes) -> bool:
+    """Returns whether the value is a string."""
+    return isinstance(value, str)
+
+
 ALLOWED_APP_VERSION_FLAVORS: List[str] = (
     constants.ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
 )
@@ -577,10 +593,9 @@ class AndroidPlatformParameter:
     DATA_TYPE_PREDICATES_DICT: Dict[
         str, Callable[[AndroidPlatformDataTypes], bool]
     ] = {
-        'bool': lambda value: isinstance(value, bool),
-        'number': lambda value: isinstance(value, (int, float))
-        and not isinstance(value, bool),
-        'string': lambda value: isinstance(value, str),
+        'bool': _is_bool,
+        'number': _is_number,
+        'string': _is_string,
     }
     DATA_TYPE_BY_DEFAULT_TYPE: Final[Dict[type, str]] = {
         bool: 'bool',
