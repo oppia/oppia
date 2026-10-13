@@ -35,6 +35,9 @@ export interface UnicodeSchema {
   // 'ui_config' is optional because it may not be present in the schema.
   ui_config?: {
     languageDirection?: string;
+    // 'rows' is used by the schema-based-unicode-editor to set the height of
+    // the rendered text area.
+    rows?: number;
   };
 }
 
