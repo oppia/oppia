@@ -126,6 +126,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
+        # Only execute this job if reviewer emails are enabled and there
+        # are reviewers to notify.
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
