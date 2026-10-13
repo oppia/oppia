@@ -24,8 +24,7 @@ import {ConsoleReporter} from '../../utilities/common/console-reporter';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const duplicateBlogPostWarning =
-  ' Blog Post with the' +
-  ' given title exists already. Please use a different title. ';
+  'Blog Post with the given title exists already. Please use a different title.';
 
 // This is the error that appears in the console when we try to post a blog with a title
 // that already exists. Since we are testing this functionality, this error occurred.
@@ -66,6 +65,10 @@ describe('Blog Editor', function () {
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.expectErrorModalToBeVisible();
+      await blogPostEditor.expectErrorModalMessageToBe(
+        duplicateBlogPostWarning
+      );
       // Navigate to bottom of page, to ensure screenshots are taken from same
       // positions before comparing them.
       await blogPostEditor.scrollToBottomOfPage();
@@ -73,10 +76,10 @@ describe('Blog Editor', function () {
         'blogEditorPageWithErrorMessageForDuplicateBlogPostTitle',
         __dirname
       );
+      await blogPostEditor.closeErrorModal();
+      await blogPostEditor.fillRemainingBlogPostFieldsAndSave();
 
-      await blogPostEditor.expectUserUnableToPublishBlogPost(
-        duplicateBlogPostWarning
-      );
+      await blogPostEditor.expectUserUnableToPublishBlogPost();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

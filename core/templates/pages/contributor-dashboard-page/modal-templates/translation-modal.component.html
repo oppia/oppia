@@ -169,6 +169,11 @@
         </li>
       </ul>
     </div>
+    <div class="oppia-translation-rte-verify" *ngIf="reviewedRteComponentLabels.length > 0">
+      <p class="oppia-translation-rte-verify-text text-danger">
+        Please verify the reviewed text fields for: {{ reviewedRteComponentLabels.join(', ') }}.
+      </p>
+    </div>
   </div>
 </div>
 <div *ngIf="opportunity && !modifyTranslationOpportunity" class="oppia-translate-modal-footer modal-footer">

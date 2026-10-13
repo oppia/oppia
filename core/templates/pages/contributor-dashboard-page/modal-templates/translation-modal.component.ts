@@ -759,6 +759,17 @@ export class TranslationModalComponent {
       );
   }
 
+  get reviewedRteComponentLabels(): string[] {
+    return this.rteComponentsRequiringReview
+      .filter(componentId => this.reviewedRteComponents.includes(componentId))
+      .map(
+        componentId =>
+          REVIEWABLE_RTE_COMPONENTS.find(
+            component => component.componentId === componentId
+          )?.label || componentId
+      );
+  }
+
   ngAfterContentChecked(): void {
     this.computeTranslationEditorOverflowState();
   }

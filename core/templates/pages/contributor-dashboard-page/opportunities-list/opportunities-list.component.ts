@@ -314,6 +314,13 @@ export class OpportunitiesListComponent {
           );
           this.loadingOpportunityData = false;
         });
+      },
+      () => {
+        // If the request rejects (e.g. the service throws
+        // 'No more ... opportunities available.'), recover gracefully so
+        // the spinner clears instead of leaving the tab frozen.
+        this.more = false;
+        this.loadingOpportunityData = false;
       }
     );
   }
@@ -337,8 +344,17 @@ export class OpportunitiesListComponent {
             this.opportunities = this.opportunities.concat(opportunitiesDicts);
           }
         } catch (error) {
+          // // The service throws 'No more ... opportunities available.' when
+          // its internal availability flag disagrees with this.more. Clear
+          // the spinner and stop paging instead of leaving the tab frozen.
+          this.more = false;
           this.loadingOpportunityData = false;
-          return;
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            pageNumber,
+            this.more
+          );
         }
       };
 
