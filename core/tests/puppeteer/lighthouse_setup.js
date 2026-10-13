@@ -1321,13 +1321,28 @@ const shard2Setup = async function (browser, page) {
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
-  // (voiceover admin) role-gated pages, so these roles are assigned.
-  // Its other pages (classrooms, classroom, creator-dashboard,
+  // (voiceover admin) role-gated pages, so these roles are assigned. Enabling
+  // the new_lesson_player feature flag below also requires the release
+  // coordinator role. Its other pages (classrooms, classroom, creator-dashboard,
   // exploration-editor, exploration-player, community-library,
   // pending-account-deletion) are public or login-only, so no topic/story/skill
   // generation is needed here.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN'])
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  // The new_lesson_player feature flag is in the test stage and disabled by
+  // default, so it has to be force-enabled here or the new lesson player and
+  // its embed page render the error page instead of their content.
+  // Force-enabling runs on the release-coordinator page, so the step is retried
+  // once under a bounded deadline instead of hanging the shard for the whole CI
+  // job.
+  await logStep('enabling new lesson player feature flag', () =>
+    retryStep(
+      'enabling the new_lesson_player feature flag',
+      () => enableFeatureFlagForAllUsers(browser, page, 'new_lesson_player'),
+      2,
+      150000
+    )
   );
   // The exploration editor setup creates the exploration that backs the
   // exploration-editor and exploration-player pages.
@@ -1393,12 +1408,13 @@ const shard4Setup = async function (browser, page) {
 const shard5Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 5 audits the technical-feedback dashboard and its detail page, which
-  // are gated on ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD. That action is
-  // granted only by the TECH_TEAM_LEAD role (see role_services.py), so it has
-  // to be assigned here or both pages redirect to the error page. The
-  // facilitator dashboard and the learner group pages are gated on the
-  // learner_groups_are_enabled feature flag, whose enablement requires the
-  // RELEASE_COORDINATOR role, so that role is assigned here as well.
+  // are gated on the ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD action
+  // (granted only by the TECH_TEAM_LEAD role, see role_services.py) and on the
+  // technical_feedback_dashboard_enabled feature flag. The facilitator
+  // dashboard and the learner group pages are gated on the
+  // learner_groups_are_enabled feature flag. Enabling either feature flag
+  // requires the RELEASE_COORDINATOR role, so all three roles are assigned
+  // here.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['TECH_TEAM_LEAD', 'RELEASE_COORDINATOR'])
   );
@@ -1416,6 +1432,23 @@ const shard5Setup = async function (browser, page) {
           browser,
           page,
           'learner_groups_are_enabled'
+        ),
+      2,
+      150000
+    )
+  );
+  // The technical_feedback_dashboard_enabled feature flag is in the test stage
+  // and disabled by default, so it has to be force-enabled here or the
+  // technical feedback dashboard and its detail page render the error page
+  // instead of their content.
+  await logStep('enabling technical feedback feature flag', () =>
+    retryStep(
+      'enabling the technical_feedback_dashboard_enabled feature flag',
+      () =>
+        enableFeatureFlagForAllUsers(
+          browser,
+          page,
+          'technical_feedback_dashboard_enabled'
         ),
       2,
       150000

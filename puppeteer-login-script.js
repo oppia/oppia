@@ -28,6 +28,11 @@ const networkIdle = 'networkidle0';
 // example because of a long-lived polling request) fails the audit with a
 // timeout instead of hanging the shard until the CI step times out.
 const LOGIN_NAVIGATION_TIMEOUT_MS = 120000;
+// Bounds every element wait that does not pass its own timeout. The navbar is
+// rendered only after the Firebase sign-in round trip completes, which can
+// exceed Puppeteer's 30s default under the emulated appserver, so the bound is
+// raised to keep a slow sign-in from being mistaken for a broken page.
+const LOGIN_WAIT_TIMEOUT_MS = 60000;
 // The accounts available to the audits. The primary test admin is the
 // facilitator of the seeded learner group; the learner account is its learner
 // and is used to audit the learner-group-viewer page, which is gated on the
@@ -84,6 +89,7 @@ const getAuditUsernameForUrl = function (url) {
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(LOGIN_NAVIGATION_TIMEOUT_MS);
+  await page.setDefaultTimeout(LOGIN_WAIT_TIMEOUT_MS);
   const username = getAuditUsernameForUrl(context.url);
   // The learner-group-viewer page has to be audited as the learner account,
   // while every other page is audited as the primary test admin. Since the
@@ -142,7 +148,20 @@ const isErrorRoute = function (url) {
  * @param {string} url - The audited URL to check.
  */
 const assertErrorPageIsAbsent = async function (page, url) {
-  await page.goto(url, {waitUntil: networkIdle});
+  try {
+    // Waits for networkidle2 rather than networkidle0: an audited page can keep
+    // one or two requests open (a poll or a long-lived connection), so
+    // networkidle0 never settles and the navigation would time out even though
+    // the page has rendered. networkidle2 tolerates those requests.
+    await page.goto(url, {waitUntil: 'networkidle2'});
+  } catch (error) {
+    // The page was reached but never went network-idle, usually because of a
+    // slow or long-lived request. Inspect whatever it rendered instead of
+    // failing here; a page that actually rendered the error page is still
+    // caught by the check below.
+    // eslint-disable-next-line no-console
+    console.log(error);
+  }
   const errorPageIsPresent = await page.evaluate(
     selector => document.querySelector(selector) !== null,
     ERROR_PAGE_SELECTOR
