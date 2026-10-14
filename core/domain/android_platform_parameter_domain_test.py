@@ -57,6 +57,16 @@ class AndroidEvaluationContextTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
             context.validate()
 
+    def test_validate_rejects_non_string_app_version(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext(
+            cast(str, 12), 'beta'
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'expected to be a string'
+        ):
+            context.validate()
+
     def test_validate_rejects_invalid_flavour(self) -> None:
         context = parameter_domain.AndroidEvaluationContext(
             '12.5-5f58b8fbeb-dev', 'unknown'
@@ -116,6 +126,16 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
         ):
             filter_domain.validate()
 
+    def test_validate_rejects_non_list_conditions(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', cast(List[List[str]], (['=', '12.5'],))
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'conditions must be a list'
+        ):
+            filter_domain.validate()
+
     def test_validate_rejects_unsupported_operator(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
             'app_min_version', [['>=', '12.5']]
@@ -145,6 +165,47 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid Android app version flavour'
         ):
             filter_domain.validate()
+
+    def test_validate_accepts_valid_flavour_condition(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version_flavour', [['>=', 'beta']]
+        )
+
+        filter_domain.validate()
+
+    def test_evaluate_flavour_comparison_operators(self) -> None:
+        context = self._create_context(app_version_flavour='beta')
+        cases = [
+            ('<', 'release', True),
+            ('<=', 'release', True),
+            ('>', 'alpha', True),
+        ]
+
+        for op, value, expected in cases:
+            with self.subTest(operator=op, value=value):
+                filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+                    'app_version_flavour', [[op, value]]
+                )
+                self.assertIs(filter_domain.evaluate(context), expected)
+
+    def test_evaluate_flavour_rejects_unsupported_operator(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version_flavour', []
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Unsupported comparison operator'
+        ):
+            filter_domain._match_app_version_flavour(
+                self._create_context(), '!=', 'beta'
+            )
+
+    def test_normalize_version_without_numeric_prefix(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', []
+        )
+
+        self.assertEqual(filter_domain._normalize_version('invalid'), 'invalid')
 
     def test_evaluate_app_min_version_inclusive(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
@@ -552,6 +613,22 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
 
         self.assertEqual(parameter.rules, [rule])
         self.assertIs(parameter.default_value, True)
+
+    def test_rule_schema_version_property(self) -> None:
+        parameter = self._create_parameter()
+
+        self.assertEqual(
+            parameter.rule_schema_version,
+            feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+        )
+
+    def test_evaluate_rejects_missing_default(self) -> None:
+        parameter = self._create_parameter(default_value=None)
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'must have a default value'
+        ):
+            parameter.evaluate(self._create_context())
 
     def test_serialize_and_deserialize_returns_same_parameter(self) -> None:
         parameter = self._create_parameter(
