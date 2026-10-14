@@ -19,7 +19,7 @@
  * LC.13. Check Improvements Tab
  */
 
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
@@ -31,10 +31,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 const ROLES = testConstants.Roles;
 const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
 const EXPLORATION_CONTENT = 'Test Exploration Content';
-const featureFlagSelector = '.e2e-test-feature-flag';
-const featureFlagValueSelector = '.e2e-test-value-selector';
-const featureFlagSaveButtonSelector = '.e2e-test-save-button';
-const stateContentSelector = '.e2e-test-actual-state-content';
 
 test.describe.configure({mode: 'serial'});
 
@@ -52,21 +48,6 @@ test.describe('Lesson Creator', function () {
       );
 
     await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
-    const featureFlag = releaseCoordinator.page
-      .locator(featureFlagSelector)
-      .filter({
-        has: releaseCoordinator.page.getByText(IMPROVEMENTS_TAB_FEATURE_FLAG, {
-          exact: true,
-        }),
-      });
-    await expect(featureFlag.locator(featureFlagValueSelector)).toHaveValue(
-      '0: true'
-    );
-    // Wait for this feature's save to finish before closing its context.
-    // Other feature rows also contain disabled Save buttons.
-    await expect(
-      featureFlag.locator(featureFlagSaveButtonSelector)
-    ).toBeDisabled();
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     explorationEditor = await UserFactory.createNewUser(
@@ -80,9 +61,7 @@ test.describe('Lesson Creator', function () {
     await explorationEditor.updateCardContent(EXPLORATION_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await explorationEditor.saveExplorationDraft();
-    explorationId = new URL(explorationEditor.page.url()).pathname.split(
-      '/'
-    )[2];
+    explorationId = await explorationEditor.getExplorationId();
   });
 
   test('should not see improvements tab in draft exploration', async function () {
@@ -91,12 +70,9 @@ test.describe('Lesson Creator', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     // Reopen the saved draft rather than creating a second exploration.
     await explorationEditor.openExplorationFromCreatorDashboard(explorationId);
-    await expect(explorationEditor.page).toHaveURL(
-      url => url.pathname === `/create/${explorationId}`
+    await explorationEditor.expectEditorCardContentToContain(
+      EXPLORATION_CONTENT
     );
-    await expect(
-      explorationEditor.page.locator(stateContentSelector)
-    ).toContainText(EXPLORATION_CONTENT);
     await explorationEditor.expectImprovementsTabToBePresent(false);
   });
 

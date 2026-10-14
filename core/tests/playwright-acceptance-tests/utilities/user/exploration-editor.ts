@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {expect, Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -1154,6 +1154,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Returns the ID of the exploration currently open in the editor.
+   */
+  async getExplorationId(): Promise<string> {
+    await this.page.waitForURL(url => url.pathname.startsWith('/create/'));
+    return new URL(this.page.url()).pathname.split('/')[2];
+  }
+
+  /**
    * Opens an existing exploration from the Creator Dashboard.
    * @param {string} explorationId - The ID of the exploration to reopen.
    */
@@ -1167,7 +1175,7 @@ export class ExplorationEditor extends BaseUser {
       .first();
     await explorationLink.waitFor({state: 'visible'});
     await explorationLink.click();
-    await this.page.waitForURL(
+    await expect(this.page).toHaveURL(
       url => url.pathname === `/create/${explorationId}`
     );
     await this.expectElementToBeVisible(mainTabContainerSelector);
@@ -1296,6 +1304,16 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateContentInputField, false);
     await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Verifies the content of the current card in the exploration editor.
+   * @param {string} content - The expected card content.
+   */
+  async expectEditorCardContentToContain(content: string): Promise<void> {
+    await expect(this.page.locator(stateContentSelector)).toContainText(
+      content
+    );
   }
 
   /**
