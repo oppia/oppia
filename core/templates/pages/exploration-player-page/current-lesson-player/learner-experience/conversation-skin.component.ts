@@ -77,7 +77,7 @@ export class ConversationSkinComponent {
   @Input() diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _editorPreviewMode!: boolean;
+  editorPreviewMode!: boolean;
 
   isLoggedIn: boolean = false;
   voiceoversAreLoaded: boolean = false;
@@ -87,11 +87,7 @@ export class ConversationSkinComponent {
   OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary:
-    | LearnerExplorationSummary
-    | CollectionSummaryBackendDict
-    | string
-    | null = null;
+  collectionSummary: CollectionSummaryBackendDict | string | null = null;
   moveToExploration: boolean = false;
 
   pidInUrl: string | null = null;
@@ -141,7 +137,7 @@ export class ConversationSkinComponent {
   ) {}
 
   ngOnInit(): void {
-    this._editorPreviewMode =
+    this.editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
     this.correctnessFooterIsShown =
       !this.pageContextService.isInDiagnosticTestPlayerPage();
@@ -244,13 +240,13 @@ export class ConversationSkinComponent {
             return;
           }
           // To restart the preloader for the new state if required.
-          if (!this._editorPreviewMode) {
+          if (!this.editorPreviewMode) {
             this.imagePreloaderService.onStateChange(newStateName);
           }
           let nextCard = this.conversationFlowService.getNextStateCard();
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && nextCard.isTerminal()) {
+          if (!this.editorPreviewMode && nextCard.isTerminal()) {
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
             const completedChaptersCount =
@@ -291,7 +287,7 @@ export class ConversationSkinComponent {
         }
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
-          !this._editorPreviewMode &&
+          !this.editorPreviewMode &&
           !this.conversationFlowService.getDisplayedCard().isTerminal() &&
           !this.explorationModeService.isInQuestionMode()
         ) {
@@ -338,7 +334,7 @@ export class ConversationSkinComponent {
         this.collectionPlayerBackendApiService
           .fetchCollectionSummariesAsync(collectionId)
           .then(response => {
-            this.collectionSummary = response.summaries[0];
+            this.collectionSummary = response.summaries[0] ?? null;
           })
           .catch(() => {
             this.alertsService.addWarning(
@@ -354,7 +350,7 @@ export class ConversationSkinComponent {
       // We do not save checkpoints progress for iframes.
       if (
         !this.isIframed &&
-        !this._editorPreviewMode &&
+        !this.editorPreviewMode &&
         !this.explorationModeService.isInQuestionPlayerMode() &&
         !this.explorationModeService.isInDiagnosticTestPlayerMode()
       ) {
