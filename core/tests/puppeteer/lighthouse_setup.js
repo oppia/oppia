@@ -1128,7 +1128,13 @@ const createLearnerGroupAndInviteLearner = async function (
         if (!createResponse.ok) {
           return null;
         }
-        const createBody = await createResponse.json();
+        // The server's render_json prefixes every JSON body with the
+        // five-byte XSSI prefix, which the Angular frontend strips in an HTTP
+        // interceptor but this raw fetch does not. Parsing the prefix as JSON
+        // throws "Unexpected token ) in JSON at position 0".
+        const createBody = JSON.parse(
+          (await createResponse.text()).substring(5)
+        );
 
         const updateResponse = await fetch(
           `/update_learner_group_handler/${createBody.id}`,
