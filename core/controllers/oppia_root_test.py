@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core import feature_flag_list
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.tests import test_utils
 
@@ -34,6 +34,19 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                 )
                 response.mustcontain('<oppia-root></oppia-root>')
                 response.mustcontain('oppia-feature-flags')
+
+    def test_lesson_player_embed_url_renders_root_page(self) -> None:
+        """Tests that the lesson player embed URL renders the root page.
+
+        This route contains a url fragment, so it is registered manually in
+        the backend. If that registration is missing, the backend returns a
+        404 instead of the root page.
+        """
+        response = self.get_html_response(
+            '%s/0' % feconf.LESSON_URL_EMBED_PREFIX, expected_status_int=200
+        )
+        response.mustcontain('<oppia-root></oppia-root>')
+        response.mustcontain('oppia-feature-flags')
 
     def test_explore_and_embed_urls_render_with_no_iframe_restriction(
         self,

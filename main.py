@@ -1614,6 +1614,10 @@ URLS.extend(
             r'%s/<exploration_id>' % feconf.LESSON_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
+        get_redirect_route(
+            r'%s/<exploration_id>' % feconf.LESSON_URL_EMBED_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
         # The certificate, learner group and technical feedback pages below are
         # handled by the frontend router, but their routes contain url
         # fragments, so they need manual backend registrations. Without these
