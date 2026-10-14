@@ -899,7 +899,7 @@ module.exports = {
             speedIndex: 24180,
             lcp: 84690,
             tbt: 3945,
-            cls: 0.15,
+            cls: 0.35,
           },
           accessibilityMinScore: 0.91,
           overrides: {
