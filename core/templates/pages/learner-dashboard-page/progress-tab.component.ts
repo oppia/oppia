@@ -320,13 +320,13 @@ export class ProgressTabComponent {
 
   getNodeCountForSummaryTile(
     tile: LearnerExplorationSummary | CollectionSummary
-  ): string {
-    // The summary tiles expect a string value for the getNodeCount input,
-    // since the node count is displayed as text.
+  ): number {
+    // The collection summary tile takes the node count as a number and
+    // renders it as text, so the number is passed through unchanged.
     if (tile instanceof CollectionSummary) {
-      return tile.nodeCount.toString();
+      return tile.nodeCount;
     }
-    return '0';
+    return 0;
   }
 
   changePageByOne(direction: string, section: string): void {
