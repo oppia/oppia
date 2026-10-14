@@ -1012,63 +1012,79 @@ const enableFeatureFlagForAllUsers = async function (
   page,
   featureFlagName
 ) {
-  await page.goto(RELEASE_COORDINATOR_URL, {
-    waitUntil: 'domcontentloaded',
-    timeout: 120000,
-  });
-  await page.waitForSelector(featuresTabSelector, {
-    visible: true,
-    timeout: 60000,
-  });
-  await page.click(featuresTabSelector);
-  await page.waitForSelector(featureFlagRowSelector, {
-    visible: true,
-    timeout: 60000,
-  });
+  // Saving a flag opens a native confirm dialog, and an unanswered dialog
+  // blocks the renderer, so the Puppeteer call that triggered it (and the
+  // navigation on a retry) never resolves. Accept dialogs for the duration of
+  // this step, and remove the handler at the end so a later step cannot
+  // double-accept one, which Puppeteer rejects with "Cannot accept dialog
+  // which is already handled!".
+  const acceptDialog = async dialog => {
+    await dialog.accept();
+  };
+  page.on('dialog', acceptDialog);
+  try {
+    await page.goto(RELEASE_COORDINATOR_URL, {
+      waitUntil: 'domcontentloaded',
+      timeout: 120000,
+    });
+    await page.waitForSelector(featuresTabSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+    await page.click(featuresTabSelector);
+    await page.waitForSelector(featureFlagRowSelector, {
+      visible: true,
+      timeout: 60000,
+    });
 
-  const featureFlagRows = await page.$$(featureFlagRowSelector);
-  for (let i = 0; i < featureFlagRows.length; i++) {
-    const featureFlagNameElement = await featureFlagRows[i].$(
-      featureFlagNameSelector
-    );
-    if (featureFlagNameElement === null) {
-      continue;
-    }
-    const rowFeatureFlagName = await page.evaluate(
-      element => element.textContent.trim(),
-      featureFlagNameElement
-    );
-    if (rowFeatureFlagName !== featureFlagName) {
-      continue;
-    }
-
-    const valueSelector = await featureFlagRows[i].$(featureFlagValueSelector);
-    if (valueSelector === null) {
-      throw new Error(
-        `Value selector not found for feature flag: ${featureFlagName}.`
+    const featureFlagRows = await page.$$(featureFlagRowSelector);
+    for (let i = 0; i < featureFlagRows.length; i++) {
+      const featureFlagNameElement = await featureFlagRows[i].$(
+        featureFlagNameSelector
       );
-    }
-    // The force-enable select is bound with [ngValue], so "Yes" is rendered
-    // with the Angular-encoded option value "0: true".
-    await valueSelector.select('0: true');
-
-    const saveButton = await featureFlagRows[i].$(
-      featureFlagSaveButtonSelector
-    );
-    if (saveButton === null) {
-      throw new Error(
-        `Save button not found for feature flag: ${featureFlagName}.`
+      if (featureFlagNameElement === null) {
+        continue;
+      }
+      const rowFeatureFlagName = await page.evaluate(
+        element => element.textContent.trim(),
+        featureFlagNameElement
       );
+      if (rowFeatureFlagName !== featureFlagName) {
+        continue;
+      }
+
+      const valueSelector = await featureFlagRows[i].$(
+        featureFlagValueSelector
+      );
+      if (valueSelector === null) {
+        throw new Error(
+          `Value selector not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      // The force-enable select is bound with [ngValue], so "Yes" is rendered
+      // with the Angular-encoded option value "0: true".
+      await valueSelector.select('0: true');
+
+      const saveButton = await featureFlagRows[i].$(
+        featureFlagSaveButtonSelector
+      );
+      if (saveButton === null) {
+        throw new Error(
+          `Save button not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      await saveButton.click();
+      await featureFlagRows[i].waitForSelector(
+        `${featureFlagSaveButtonSelector}[disabled]`,
+        {visible: true, timeout: 60000}
+      );
+      return;
     }
-    await saveButton.click();
-    await featureFlagRows[i].waitForSelector(
-      `${featureFlagSaveButtonSelector}[disabled]`,
-      {visible: true, timeout: 60000}
-    );
-    return;
+
+    throw new Error(`Feature flag not found: ${featureFlagName}.`);
+  } finally {
+    page.off('dialog', acceptDialog);
   }
-
-  throw new Error(`Feature flag not found: ${featureFlagName}.`);
 };
 
 // Fetches the CSRF token that the frontend attaches to state-changing requests.
