@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Acceptance Test for checking Terms of Service and
+ * Privacy Policy pages as an interested parent (logged-out-user)
+ *
+ */
+
 import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
