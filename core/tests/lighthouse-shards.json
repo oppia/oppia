@@ -13,10 +13,7 @@
     "teach",
     "terms",
     "thanks",
-    "volunteer",
-    "error",
-    "error-iframed",
-    "maintenance"
+    "volunteer"
   ],
   "2": [
     "admin",
@@ -67,6 +64,9 @@
     "technical-feedback-detail",
     "learner-group-creator",
     "learner-group-editor",
-    "learner-group-viewer"
+    "learner-group-viewer",
+    "error",
+    "error-iframed",
+    "maintenance"
   ]
 }
