@@ -968,6 +968,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                     os.environ['LIGHTHOUSE_URLS_TO_RUN'],
                                     expected_lighthouse_urls_to_run,
                                 )
+                                # Shard 1 has no login setup, so the login
+                                # script must be told to skip signing in.
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_SKIP_LOGIN'], '1'
+                                )
 
         self.assertIn(
             'Building files in development mode for setup.', self.print_arr
@@ -1046,6 +1051,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 self.assertEqual(
                                     os.environ['LIGHTHOUSE_URLS_TO_RUN'],
                                     expected_lighthouse_urls_to_run,
+                                )
+                                # Shard 1 has no login setup, so the login
+                                # script must be told to skip signing in.
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_SKIP_LOGIN'], '1'
                                 )
 
         self.assertIn(
@@ -1221,6 +1231,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                             '--shard',
                                             '2',
                                         ]
+                                    )
+                                    # Shard 2 runs the login setup, so the login
+                                    # script must sign in as usual.
+                                    self.assertEqual(
+                                        os.environ['LIGHTHOUSE_SKIP_LOGIN'], '0'
                                     )
 
     def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(

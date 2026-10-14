@@ -630,6 +630,12 @@ def main(args: Optional[List[str]] = None) -> None:
             else parsed_args.pages
         )
         set_lighthouse_url_environment_variables(pages_to_run, entities)
+        # Shard 1 runs no setup, so the accounts the Lighthouse login script
+        # signs in as are never seeded. Tell the script to skip signing in
+        # rather than letting every page wait out the login timeout.
+        os.environ['LIGHTHOUSE_SKIP_LOGIN'] = (
+            '1' if parsed_args.shard == 1 else '0'
+        )
         with managed_lighthouse_appserver(SERVER_MODE_PROD):
             run_lighthouse_checks()
 

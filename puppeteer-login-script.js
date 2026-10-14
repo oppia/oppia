@@ -90,29 +90,35 @@ module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(LOGIN_NAVIGATION_TIMEOUT_MS);
   await page.setDefaultTimeout(LOGIN_WAIT_TIMEOUT_MS);
-  const username = getAuditUsernameForUrl(context.url);
-  // The learner-group-viewer page has to be audited as the learner account,
-  // while every other page is audited as the primary test admin. Since the
-  // browser session is shared, sign the current account out before switching.
-  if (
-    currentLoggedInUsername !== null &&
-    currentLoggedInUsername !== username
-  ) {
-    await logout(page);
-  }
-  // Sign into Oppia.
-  await login(context, page, username);
-  currentLoggedInUsername = username;
-  if (context.url.includes('moderator')) {
-    await setRole(page, 'MODERATOR');
-  } else if (context.url.includes('collection/0')) {
-    await createCollections(context, page);
-  } else if (context.url.includes('explore/0')) {
-    await createExplorations(context, page);
-  } else if (context.url.includes('blog-dashboard')) {
-    await setRole(page, 'BLOG_ADMIN');
-  } else if (context.url.includes('blog-admin')) {
-    await setRole(page, 'BLOG_ADMIN');
+  // Shard 1 audits only the static public pages and runs no login setup, so
+  // the accounts this script would sign in as are never seeded. Attempting the
+  // sign-in there can only end in the navbar wait timing out on every page, so
+  // skip the account switch, sign-in and role setup entirely.
+  if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {
+    const username = getAuditUsernameForUrl(context.url);
+    // The learner-group-viewer page has to be audited as the learner account,
+    // while every other page is audited as the primary test admin. Since the
+    // browser session is shared, sign the current account out before switching.
+    if (
+      currentLoggedInUsername !== null &&
+      currentLoggedInUsername !== username
+    ) {
+      await logout(page);
+    }
+    // Sign into Oppia.
+    await login(context, page, username);
+    currentLoggedInUsername = username;
+    if (context.url.includes('moderator')) {
+      await setRole(page, 'MODERATOR');
+    } else if (context.url.includes('collection/0')) {
+      await createCollections(context, page);
+    } else if (context.url.includes('explore/0')) {
+      await createExplorations(context, page);
+    } else if (context.url.includes('blog-dashboard')) {
+      await setRole(page, 'BLOG_ADMIN');
+    } else if (context.url.includes('blog-admin')) {
+      await setRole(page, 'BLOG_ADMIN');
+    }
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
   if (!isErrorRoute(context.url)) {
