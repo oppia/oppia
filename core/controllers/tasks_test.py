@@ -1332,6 +1332,56 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
                 expected_status_int=200,
             )
 
+    def test_non_string_recipient_email_triggers_retry(self) -> None:
+        self.payload['recipient_id'] = None  # type: ignore[assignment]
+
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
+            pass
+
+        send_mail_swap = self.swap(
+            email_services, 'send_mail', mock_send_mail
+        )
+
+        with send_mail_swap:
+            response = self.post_task(
+                self.url,
+                self.payload,
+                self.headers,
+                csrf_token=self.csrf_token,
+                expect_errors=True,
+                expected_status_int=500,
+            )
+
+        self.assertIn(
+            b'Failed to resend email: Recipient email must be a string.',
+            response.body,
+        )
+
+    def test_non_string_sender_email_triggers_retry(self) -> None:
+        self.payload['sender_email'] = None  # type: ignore[assignment]
+
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
+            pass
+
+        send_mail_swap = self.swap(
+            email_services, 'send_mail', mock_send_mail
+        )
+
+        with send_mail_swap:
+            response = self.post_task(
+                self.url,
+                self.payload,
+                self.headers,
+                csrf_token=self.csrf_token,
+                expect_errors=True,
+                expected_status_int=500,
+            )
+
+        self.assertIn(
+            b'Failed to resend email: Sender email must be a string.',
+            response.body,
+        )
+
     def test_failed_retry_raises_exception_to_trigger_cloud_task_retry(
         self,
     ) -> None:
