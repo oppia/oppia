@@ -74,6 +74,7 @@ import {
 } from '../services/version-history.service';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
+import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/interaction.model';
@@ -1491,4 +1492,94 @@ describe('Settings Tab Component', () => {
       component.onClickExploreVersionHistoryButton();
     }
   );
+
+  it('should get and set the category displayed value', () => {
+    explorationCategoryService.displayed = 'Algebra';
+    expect(component.categoryDisplayed).toBe('Algebra');
+
+    // The service property is typed as a union that can hold non-string
+    // values before initialization, so the accessor falls back to ''.
+    explorationCategoryService.displayed = 5;
+    expect(component.categoryDisplayed).toBe('');
+
+    component.categoryDisplayed = 'Geometry';
+    expect(explorationCategoryService.displayed).toBe('Geometry');
+  });
+
+  it('should get and set the language code displayed value', () => {
+    explorationLanguageCodeService.displayed = 'en';
+    expect(component.languageCodeDisplayed).toBe('en');
+
+    explorationLanguageCodeService.displayed = null;
+    expect(component.languageCodeDisplayed).toBe('');
+
+    component.languageCodeDisplayed = 'hi';
+    expect(explorationLanguageCodeService.displayed).toBe('hi');
+  });
+
+  it('should get and set the init state name displayed value', () => {
+    explorationInitStateNameService.displayed = 'Introduction';
+    expect(component.initStateNameDisplayed).toBe('Introduction');
+
+    explorationInitStateNameService.displayed = 3;
+    expect(component.initStateNameDisplayed).toBe('');
+
+    component.initStateNameDisplayed = 'Second state';
+    expect(explorationInitStateNameService.displayed).toBe('Second state');
+  });
+
+  it('should get the exploration title and objective', () => {
+    explorationTitleService.displayed = 'My exploration';
+    explorationObjectiveService.displayed = 'Learn to add';
+    expect(component.explorationTitle).toBe('My exploration');
+    expect(component.explorationObjective).toBe('Learn to add');
+  });
+
+  it('should delegate metadata reads to the language code service', () => {
+    spyOn(
+      explorationLanguageCodeService,
+      'getSupportedContentLanguages'
+    ).and.returnValue([{code: 'en', description: 'English'}]);
+    spyOn(
+      explorationLanguageCodeService,
+      'getCurrentLanguageDescription'
+    ).and.returnValue('English');
+
+    expect(component.getSupportedContentLanguages()).toEqual([
+      {code: 'en', description: 'English'},
+    ]);
+    expect(component.getCurrentLanguageDescription()).toBe('English');
+  });
+
+  it('should expose the notification preference service values', () => {
+    spyOn(
+      userEmailPreferencesService,
+      'areFeedbackNotificationsMuted'
+    ).and.returnValue(true);
+    spyOn(
+      userEmailPreferencesService,
+      'areSuggestionNotificationsMuted'
+    ).and.returnValue(true);
+
+    expect(component.areFeedbackNotificationsMuted()).toBeTrue();
+    expect(component.areSuggestionNotificationsMuted()).toBeTrue();
+  });
+
+  it('should expose whether param specs are saved', () => {
+    const explorationParamSpecsService = TestBed.inject(
+      ExplorationParamSpecsService
+    );
+    explorationParamSpecsService.savedMemento = new ParamSpecs({
+      randomProp: {obj_type: 'randomVal'},
+    });
+    expect(component.hasSavedParamSpecs()).toBeTrue();
+    expect(component.hasParamDict()).toBeTrue();
+    expect(component.getParamDict()).toEqual({
+      randomProp: {obj_type: 'randomVal'},
+    });
+
+    explorationParamSpecsService.savedMemento = null;
+    expect(component.hasSavedParamSpecs()).toBeFalse();
+    expect(component.hasParamDict()).toBeFalse();
+  });
 });
