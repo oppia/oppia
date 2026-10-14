@@ -16,7 +16,7 @@
         </div>
         <strong tabindex="0">Explanation:</strong>
         <span tabindex="0">
-          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="stateSolutionService.savedMemento.explanation.html">
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="solutionSavedMemento.explanation.html">
           </oppia-rte-output-display>
         </span>
       </div>
@@ -28,7 +28,7 @@
       <strong tabindex="0">Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor [schema]="getSchema()"
-                           [localValue]="stateSolutionService.displayed.explanation._html"
+                           [localValue]="displayedSolution.explanation._html"
                            (localValueChange)="updateExplanationHtml($event)">
       </schema-based-editor>
     </div>
@@ -46,7 +46,7 @@
         </button>
         <button type="button"
                 class="btn btn-success e2e-test-save-solution-explanation-edit"
-                [disabled]="!stateSolutionService.displayed.explanation.html || isSolutionExplanationLengthExceeded()"
+                [disabled]="!displayedSolution.explanation.html || isSolutionExplanationLengthExceeded()"
                 (click)="saveThisExplanation()">
           Save
         </button>

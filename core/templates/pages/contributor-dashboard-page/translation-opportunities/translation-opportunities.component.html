@@ -1,5 +1,6 @@
 <div *ngIf="languageSelected">
   <oppia-opportunities-list [loadOpportunities]="loadOpportunitiesAsync.bind(this)"
+                            [loadOpportunitiesCount]="loadOpportunitiesCountAsync.bind(this)"
                             (clickActionButton)="onClickButton($event)"
                             [loadMoreOpportunities]="loadMoreOpportunitiesAsync.bind(this)"
                             [progressBarRequired]="true"
