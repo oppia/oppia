@@ -48,6 +48,20 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
         response.mustcontain('<oppia-root></oppia-root>')
         response.mustcontain('oppia-feature-flags')
 
+    def test_collection_editor_url_renders_root_page(self) -> None:
+        """Tests that the collection editor URL renders the root page.
+
+        This route contains a url fragment, so it is registered manually in
+        the backend. If that registration is missing, the backend returns a
+        404 instead of the root page.
+        """
+        response = self.get_html_response(
+            '%s/0' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+            expected_status_int=200,
+        )
+        response.mustcontain('<oppia-root></oppia-root>')
+        response.mustcontain('oppia-feature-flags')
+
     def test_explore_and_embed_urls_render_with_no_iframe_restriction(
         self,
     ) -> None:

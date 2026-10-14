@@ -1531,6 +1531,10 @@ URLS.extend(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
         ),
         get_redirect_route(
+            r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
             r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
