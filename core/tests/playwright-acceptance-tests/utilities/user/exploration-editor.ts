@@ -1182,6 +1182,47 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Verifies that the exploration is a draft with no unsaved changes.
+   */
+  async expectExplorationToBeDraft(): Promise<void> {
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.page.locator(mobileSaveChangesButtonSelector).isVisible())
+    ) {
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+    }
+    const saveButton = this.page.locator(
+      this.isViewportAtMobileWidth()
+        ? mobileSaveChangesButtonSelector
+        : saveChangesButton
+    );
+    await expect(saveButton).toBeVisible();
+    await expect(saveButton).toHaveText('Save Draft');
+    await expect(saveButton).toBeDisabled();
+  }
+
+  /**
+   * Verifies that opening Improvements directly redirects to the editor tab.
+   */
+  async expectImprovementsTabToBeInaccessible(): Promise<void> {
+    const explorationId = await this.getExplorationId();
+    // Verify the redirect instead of waiting for the requested Improvements
+    // URL, since draft explorations cannot access this tab.
+    await this.goto(`${baseUrl}/create/${explorationId}#/improvements`, false);
+    // The editor router reads the hash on initialization. Changing only the
+    // hash of an already loaded editor does not trigger that routing logic.
+    await this.reloadPage();
+    await expect(this.page).toHaveURL(
+      url =>
+        url.pathname === `/create/${explorationId}` &&
+        url.hash.startsWith('#/gui/')
+    );
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
    * Verifies Improvements tab visibility after the main editor has loaded.
    * The mobile Options dropdown must initially be closed and is left closed.
    * @param {boolean} present - Whether the Improvements tab should be visible.
@@ -1209,6 +1250,7 @@ export class ExplorationEditor extends BaseUser {
         false
       );
     } else {
+      await this.expectElementToBeVisible(mainTabButton);
       await this.expectElementToBeVisible(improvementsTabButton, present);
     }
   }

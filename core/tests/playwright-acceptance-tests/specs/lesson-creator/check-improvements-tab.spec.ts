@@ -48,6 +48,11 @@ test.describe('Lesson Creator', function () {
       );
 
     await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
+    await releaseCoordinator.reloadPage();
+    await releaseCoordinator.navigateToFeaturesTab();
+    await releaseCoordinator.expectFeatureFlagToBeEnabled(
+      IMPROVEMENTS_TAB_FEATURE_FLAG
+    );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     explorationEditor = await UserFactory.createNewUser(
@@ -65,6 +70,7 @@ test.describe('Lesson Creator', function () {
   });
 
   test('should not see improvements tab in draft exploration', async function () {
+    await explorationEditor.expectExplorationToBeDraft();
     await explorationEditor.expectImprovementsTabToBePresent(false);
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -73,6 +79,16 @@ test.describe('Lesson Creator', function () {
     await explorationEditor.expectEditorCardContentToContain(
       EXPLORATION_CONTENT
     );
+    await explorationEditor.expectExplorationToBeDraft();
+    await explorationEditor.expectImprovementsTabToBePresent(false);
+  });
+
+  test('should return to editor tab when opening improvements tab in a draft exploration', async function () {
+    await explorationEditor.expectImprovementsTabToBeInaccessible();
+    await explorationEditor.expectEditorCardContentToContain(
+      EXPLORATION_CONTENT
+    );
+    await explorationEditor.expectExplorationToBeDraft();
     await explorationEditor.expectImprovementsTabToBePresent(false);
   });
 
