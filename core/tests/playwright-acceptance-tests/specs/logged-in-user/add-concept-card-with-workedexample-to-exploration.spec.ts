@@ -35,7 +35,8 @@ test.describe('Logged-in User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
   test.beforeAll(async ({browser}) => {
-    test.setTimeout(500000);
+    // Setup takes longer than default timeout.
+    test.setTimeout(420000);
 
     curriculumAdmin = await UserFactory.createNewUser(
       'conceptCardAdm',
