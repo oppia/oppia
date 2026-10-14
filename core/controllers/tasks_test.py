@@ -1333,14 +1333,14 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
             )
 
     def test_non_string_recipient_email_triggers_retry(self) -> None:
+        # Here we use MyPy ignore because this test checks recipient type
+        # validation when the task payload contains None.
         self.payload['recipient_id'] = None  # type: ignore[assignment]
 
         def mock_send_mail(*_args: str, **_kwargs: str) -> None:
             pass
 
-        send_mail_swap = self.swap(
-            email_services, 'send_mail', mock_send_mail
-        )
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
 
         with send_mail_swap:
             response = self.post_task(
@@ -1358,14 +1358,14 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
         )
 
     def test_non_string_sender_email_triggers_retry(self) -> None:
+        # Here we use MyPy ignore because this test checks sender type
+        # validation when the task payload contains None.
         self.payload['sender_email'] = None  # type: ignore[assignment]
 
         def mock_send_mail(*_args: str, **_kwargs: str) -> None:
             pass
 
-        send_mail_swap = self.swap(
-            email_services, 'send_mail', mock_send_mail
-        )
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
 
         with send_mail_swap:
             response = self.post_task(
