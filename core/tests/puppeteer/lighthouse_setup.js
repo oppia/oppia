@@ -985,7 +985,17 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
       {},
       classroomSaveButton
     );
-    await page.click(classroomSaveButton);
+    // The save button sits at the bottom of the classroom details page, which
+    // is taller than the viewport. Puppeteer's page.click scrolls the button
+    // into view and then measures it, and when that measurement lands outside
+    // the viewport the viewport-clipped quad collapses to zero area, failing
+    // the click with "Node is either not clickable or not an HTMLElement".
+    // Scroll the button into view and dispatch the click on the element itself
+    // instead, which does not depend on the button's on-screen position.
+    await page.$eval(classroomSaveButton, element => {
+      element.scrollIntoView({block: 'center', inline: 'center'});
+      element.click();
+    });
 
     // Wait for the classroom data to be saved and the editor to close.
     await page.waitForSelector(classroomNameView, {visible: true});
