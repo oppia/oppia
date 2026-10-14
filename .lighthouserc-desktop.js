@@ -245,7 +245,10 @@ module.exports = {
             fcp: 4395,
             speedIndex: 5670,
             lcp: 9315,
-            tbt: 300,
+            // The YouTube embed on the donate page contributes most of the
+            // total blocking time through its third-party scripts, so this
+            // uses the same budget as the other pages with heavy embeds.
+            tbt: 800,
             cls: 0.51,
           },
           overrides: {
