@@ -841,11 +841,11 @@ URLS = [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler
     ),
     get_redirect_route(
-        r'/memorycachehandler', release_coordinator.MemoryCacheHandler
+        r'/memorycachehandler', release_coordinator.WebMemoryCacheHandler
     ),
     get_redirect_route(
         r'%s' % feconf.FEATURE_FLAGS_URL,
-        release_coordinator.FeatureFlagsHandler,
+        release_coordinator.WebFeatureFlagsHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.USER_GROUPS_HANDLER_URL,
