@@ -260,6 +260,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ),
             ('blog_post_url_fragment', 'blog-fragment'),
         )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/technical-feedback-dashboard/'
+                'tech-internal/abc123'
+            ),
+            ('feedback_report_id', 'abc123'),
+        )
 
     def test_get_entity_returns_none_for_non_url_line(self) -> None:
         self.assertIsNone(run_lighthouse_tests.get_entity('not a url'))

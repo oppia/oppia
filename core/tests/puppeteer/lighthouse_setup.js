@@ -65,6 +65,7 @@ var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
 var learnerGroupUrl = 'Learner group not loaded';
+var feedbackReportId = 'Feedback report not created';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -1224,6 +1225,56 @@ const acceptLearnerGroupInvitation = async function (
   }
 };
 
+// Creates a platform feedback report through the public submission endpoint so
+// that the technical feedback detail page has a real report to render. The page
+// is audited at /technical-feedback-dashboard/<team>/<report_id> and returns a
+// 404, which the browser logs as a console error, unless that report exists.
+// The backend derives the report's team from the first path segment of the
+// submitted page_url: segments in TECHNICAL_EXTERNAL_DASHBOARD_PATHS route to
+// "tech-external" and every other segment routes to "tech-internal". This
+// submits from a page that routes to "tech-internal", so the audited URL in
+// core/tests/lighthouse-pages.json uses that team.
+const createTechnicalFeedbackReport = async function (browser, page) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const reportId = await page.evaluate(async csrfToken => {
+      const response = await fetch('/platform-feedback', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          csrf_token: csrfToken,
+          payload: JSON.stringify({
+            source: 'app',
+            report_message: 'Technical feedback report seeded for Lighthouse.',
+            page_url: 'http://localhost:8181/creator-dashboard',
+            include_technical_logs: false,
+          }),
+        }).toString(),
+      });
+      if (!response.ok) {
+        return null;
+      }
+      // The server's render_json prefixes every JSON body with the five-byte
+      // XSSI prefix, which the Angular frontend strips in an HTTP interceptor
+      // but this raw fetch does not.
+      const responseBody = JSON.parse((await response.text()).substring(5));
+      return responseBody.id;
+    }, csrfToken);
+
+    if (!reportId) {
+      throw new Error('Failed to create the technical feedback report.');
+    }
+    return reportId;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to create the technical feedback report');
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const addThumbnailToTopic = async function (page, topicName) {
   try {
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
@@ -1476,6 +1527,13 @@ const shard5Setup = async function (browser, page) {
       150000
     )
   );
+  // The technical feedback detail page reads a single report by id, so a report
+  // is seeded here; without it the page renders a 404 and logs a browser
+  // console error. The submission endpoint is open access, so it is created
+  // here while the test admin is still logged in.
+  await logStep('creating technical feedback report', async () => {
+    feedbackReportId = await createTechnicalFeedbackReport(browser, page);
+  });
   // The learner-group-editor page is gated on the logged-in user being a
   // facilitator of the group and the learner-group-viewer page on that user
   // being a learner of it. A single account cannot be both (the learner group
@@ -1636,6 +1694,10 @@ const main = async function () {
   }
   if (ranRoleGatedSetup) {
     urls.push(learnerGroupUrl);
+    urls.push(
+      'http://localhost:8181/technical-feedback-dashboard/tech-internal/' +
+        feedbackReportId
+    );
   }
   await process.stdout.write(urls.join('\n'));
   if (record) {
