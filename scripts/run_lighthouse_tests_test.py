@@ -229,6 +229,26 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_injected_url,
         )
 
+    def test_inject_entities_into_url_encodes_non_url_safe_entity(
+        self,
+    ) -> None:
+        # Feedback report IDs are base64 strings that can end in "=" padding.
+        # An unencoded "=" makes the Angular router stop matching the path
+        # segment, so the page audits an ID that does not exist.
+        entities = {'feedback_report_id': 'feedback.platform.YWJjZA=='}
+        url = (
+            'http://localhost:8181/technical-feedback-dashboard/'
+            'tech-internal/{{feedback_report_id}}'
+        )
+        expected_injected_url = (
+            'http://localhost:8181/technical-feedback-dashboard/'
+            'tech-internal/feedback.platform.YWJjZA%3D%3D'
+        )
+        self.assertEqual(
+            run_lighthouse_tests.inject_entities_into_url(url, entities),
+            expected_injected_url,
+        )
+
     def test_get_entity_parses_supported_urls(self) -> None:
         self.assertEqual(
             run_lighthouse_tests.get_entity(

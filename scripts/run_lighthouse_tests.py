@@ -23,6 +23,7 @@ import re
 import subprocess
 import sys
 import threading
+import urllib.parse
 
 from core.constants import constants
 from scripts import build, common, servers
@@ -464,12 +465,15 @@ def get_lighthouse_shards_config() -> dict[str, list[str]]:
 def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
     """Injects any entity IDs that a URL needs into the URL.
 
+    The injected entities are percent-encoded so that the resulting URL is
+    valid for the Angular router regardless of the characters in the entity ID.
+
     Args:
         url: str. The URL to inject entity IDs into.
         entities: dict(str, str). The possible entities to inject into the URL.
 
     Returns:
-        str. The URL with the entity ID injected into it.
+        str. The URL with the percent-encoded entity ID injected into it.
 
     Raises:
         ValueError. The entity referenced in the URL is not found in the
@@ -480,8 +484,16 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
+        # Entity IDs are used as URL path segments, and some of them are not
+        # URL-safe. The feedback report IDs are base64 strings that can end in
+        # "=" padding, and the Angular router stops matching a path segment at
+        # "=" (see SEGMENT_RE in @angular/router), so an unencoded "=" is
+        # dropped from the route parameter and the page then requests an ID
+        # that does not exist. The app itself builds these URLs with
+        # encodeURIComponent, so percent-encode the entity to match.
         injected_url = injected_url.replace(
-            '{{%s}}' % entity_name, entities[entity_name]
+            '{{%s}}' % entity_name,
+            urllib.parse.quote(entities[entity_name], safe=''),
         )
     return injected_url
 
