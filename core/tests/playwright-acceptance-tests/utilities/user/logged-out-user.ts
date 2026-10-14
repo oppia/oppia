@@ -2927,8 +2927,23 @@ export class LoggedOutUser extends BaseUser {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
   }
-}
 
+  async clickOnTermsOfServiceLinkFooter(): Promise<void> {
+    const termsLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Terms of Service/i});
+    await termsLink.scrollIntoViewIfNeeded();
+    await termsLink.click();
+  }
+
+  async clickOnPrivacyPolicyLinkInFooter(): Promise<void> {
+    const privacyLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Privacy Policy/i});
+    await privacyLink.scrollIntoViewIfNeeded();
+    await privacyLink.click();
+  }
+}
 export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
   return new LoggedOutUser(page);
 };
