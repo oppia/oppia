@@ -28,8 +28,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -53,7 +54,7 @@ export class MisconceptionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() getIndex!: string;
+  @Input() getIndex!: number;
   @Input() isEditable!: boolean;
   @Input() misconception!: Misconception;
   nameMemento!: string;
@@ -160,6 +161,30 @@ export class MisconceptionEditorComponent implements OnInit {
       this.container.misconceptionMustBeAddressed
     );
     this.onMisconceptionChange.emit();
+  }
+
+  updateMisconceptionNotes(value: SchemaDefaultValue): void {
+    // The schema type of the notes editor is 'html', so the emitted
+    // value is always a string.
+    if (
+      typeof value === 'string' &&
+      this.container.misconceptionNotes !== value
+    ) {
+      this.container.misconceptionNotes = value;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  updateMisconceptionFeedback(value: SchemaDefaultValue): void {
+    // The schema type of the feedback editor is 'html', so the emitted
+    // value is always a string.
+    if (
+      typeof value === 'string' &&
+      this.container.misconceptionFeedback !== value
+    ) {
+      this.container.misconceptionFeedback = value;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   saveFeedback(): void {

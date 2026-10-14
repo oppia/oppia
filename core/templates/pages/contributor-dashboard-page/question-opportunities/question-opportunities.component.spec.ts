@@ -101,12 +101,14 @@ describe('Question opportunities component', () => {
         skill_description: 'Skill description 1',
         topic_name: 'topic_1',
         question_count: 5,
+        questions_in_review_count: 0,
       }),
       SkillOpportunity.createFromBackendDict({
         id: '2',
         skill_description: 'Skill description 2',
         topic_name: 'topic_1',
         question_count: 2,
+        questions_in_review_count: 0,
       }),
     ];
   });
@@ -159,6 +161,25 @@ describe('Question opportunities component', () => {
       expect(more).toBe(false);
     });
   });
+
+  it('should load opportunities count', fakeAsync(() => {
+    spyOn(
+      contributionOpportunitiesService,
+      'getSkillOpportunitiesCountAsync'
+    ).and.returnValue(Promise.resolve(5));
+
+    let resolvedCount = null;
+    component.loadOpportunitiesCount('query').then(count => {
+      resolvedCount = count;
+    });
+
+    tick();
+
+    expect(
+      contributionOpportunitiesService.getSkillOpportunitiesCountAsync
+    ).toHaveBeenCalledWith('query');
+    expect(resolvedCount).toEqual(5);
+  }));
 
   it(
     'should register Contributor Dashboard suggest event when clicking on' +
