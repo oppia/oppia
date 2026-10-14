@@ -758,12 +758,11 @@
 /core/templates/services/auth-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 
-# Dynamic Feature Gating project
-/core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
-/core/feature_flag*.py @oppia/web-android-compatibility-reviewers
+# Feature Flags and Platform Parameters
 /core/controllers/feature_flag*.py @oppia/core-reviewers
-/core/domain/platform_parameter_services*.py @oppia/core-reviewers
+/core/domain/platform_parameter*.py @oppia/core-reviewers
 /core/domain/feature_flag*.py @oppia/core-reviewers
+/core/feature_flag*.py @oppia/core-reviewers
 /core/templates/domain/platform-parameter/ @oppia/core-reviewers
 /core/templates/domain/feature-flag/ @oppia/core-reviewers
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
