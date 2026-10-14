@@ -23,10 +23,10 @@ from core.domain import (
     exp_domain,
     feedback_domain,
     feedback_services,
-    platform_parameter_list,
     suggestion_services,
     taskqueue_services,
     user_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -1232,7 +1232,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -1292,18 +1292,18 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1383,18 +1383,18 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1437,18 +1437,18 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1498,18 +1498,18 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1580,18 +1580,18 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1660,18 +1660,18 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1751,7 +1751,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -1803,18 +1803,18 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1875,18 +1875,18 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -1950,18 +1950,18 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -2086,18 +2086,18 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]

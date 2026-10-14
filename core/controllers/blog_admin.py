@@ -23,12 +23,12 @@ from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
     blog_services,
-    platform_parameter_domain,
-    platform_parameter_list,
-    platform_parameter_registry,
-    platform_parameter_services,
     role_services,
     user_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_list,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
 )
 
 from typing import Dict, Final, Optional, TypedDict
@@ -77,19 +77,19 @@ class BlogAdminHandler(
     @acl_decorators.can_access_blog_admin_page
     def get(self) -> None:
         """Handles GET requests."""
-        max_no_of_tags_parameter = platform_parameter_registry.Registry.get_platform_parameter(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+        max_no_of_tags_parameter = web_platform_parameter_registry.Registry.get_web_platform_parameter(
+            web_platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         platform_params_for_blog_admin = {
             'max_number_of_tags_assigned_to_blog_post': {
                 'schema': (
-                    platform_parameter_services.get_platform_parameter_schema(
+                    web_platform_parameter_services.get_web_platform_parameter_schema(
                         max_no_of_tags_parameter.name
                     )
                 ),
                 'description': max_no_of_tags_parameter.description,
                 'value': (
-                    platform_parameter_services.get_platform_parameter_value(
+                    web_platform_parameter_services.get_web_platform_parameter_value(
                         max_no_of_tags_parameter.name
                     )
                 ),
@@ -129,11 +129,11 @@ class BlogAdminHandler(
                 ' action is save_platform_parameters.'
             )
         for name, value in new_platform_parameter_values.items():
-            param = platform_parameter_registry.Registry.get_platform_parameter(
+            param = web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 name
             )
             rules_for_platform_parameter = [
-                platform_parameter_domain.PlatformParameterRule.from_dict(
+                web_platform_parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': [
                             {
@@ -145,7 +145,7 @@ class BlogAdminHandler(
                     }
                 )
             ]
-            platform_parameter_registry.Registry.update_platform_parameter(
+            web_platform_parameter_registry.Registry.update_web_platform_parameter(
                 name,
                 self.user_id,
                 'Update platform parameter property from blog admin page.',

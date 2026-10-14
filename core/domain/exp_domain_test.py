@@ -32,10 +32,10 @@ from core.domain import (
     exp_services,
     exp_services_test,
     param_domain,
-    platform_parameter_list,
     rights_manager,
     state_domain,
     translation_domain,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -19370,14 +19370,14 @@ class ExplorationChangesMergeabilityUnitTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
@@ -19776,14 +19776,14 @@ class ExplorationChangesMergeabilityUnitTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(

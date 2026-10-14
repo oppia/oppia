@@ -49,7 +49,7 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         if (
             not self.DRY_RUN
-            and feature_flag_domain.get_server_mode()
+            and feature_flag_domain.get_web_platform_parameter_server_mode()
             == feature_flag_domain.ServerMode.PROD
         ):
             raise PermissionError(

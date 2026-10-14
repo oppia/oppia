@@ -217,7 +217,9 @@ def is_feature_flag_enabled(
     if feature_flag is None:
         feature_flag = registry.Registry.get_feature_flag(feature_flag_name)
 
-    current_server = feature_flag_domain.get_server_mode()
+    current_server = (
+        feature_flag_domain.get_web_platform_parameter_server_mode()
+    )
 
     if (
         current_server == feature_flag_domain.ServerMode.TEST

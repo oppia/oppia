@@ -25,7 +25,7 @@ from core import feature_flag_list
 from core.domain import (
     feature_flag_domain,
     feature_flag_registry,
-    platform_parameter_list,
+    web_platform_parameter_list,
 )
 from core.tests import test_utils
 
@@ -202,5 +202,5 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         feature_flag_names = []
         for feature_flag_enum in feature_flag_list.FeatureNames:
             feature_flag_names.append(feature_flag_enum.name)
-        for platform_param_enum in platform_parameter_list.ParamName:
+        for platform_param_enum in web_platform_parameter_list.ParamName:
             self.assertFalse(platform_param_enum.name in feature_flag_names)
