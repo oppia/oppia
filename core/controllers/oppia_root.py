@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core.controllers import acl_decorators, base
+from core.domain import feature_flag_services
 
 from typing import Dict
 
@@ -35,10 +36,29 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
         url = self.request.uri
+
+        # Feature flags are evaluated here so that they arrive with the initial
+        # page load, instead of requiring a separate blocking request to the
+        # feature flags evaluation handler during frontend bootstrap. This
+        # removes an extra network round-trip and a redundant auth/user lookup.
+        feature_flag_dict = (
+            feature_flag_services.evaluate_all_feature_flag_configs(
+                self.user_id
+            )
+        )
+        render_values: Dict[str, Dict[str, bool]] = {
+            'OPPIA_FEATURE_FLAGS': feature_flag_dict
+        }
+
         if 'explore' in url or 'embed' in url:
             self.render_template(
-                'oppia-root.mainpage.html', iframe_restriction=None
+                'oppia-root.mainpage.html',
+                iframe_restriction=None,
+                values=render_values,
             )
             return
 
-        self.render_template('oppia-root.mainpage.html')
+        self.render_template(
+            'oppia-root.mainpage.html',
+            values=render_values,
+        )

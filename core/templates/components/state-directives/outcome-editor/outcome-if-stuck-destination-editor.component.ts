@@ -25,7 +25,6 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
-import './outcome-if-stuck-destination-editor.component.css';
 
 interface DestinationChoice {
   id: string | null;

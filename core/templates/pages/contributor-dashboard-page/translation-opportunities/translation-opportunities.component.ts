@@ -42,7 +42,6 @@ import {
   ExplorationOpportunitiesDict,
 } from '../services/contribution-opportunities.service';
 import {TranslateTextService} from '../services/translate-text.service';
-import './translation-opportunities.component.css';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -220,6 +219,14 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
         this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
+  }
+
+  async loadOpportunitiesCountAsync(): Promise<number> {
+    return this.contributionOpportunitiesService.getTranslationOpportunitiesCountAsync(
+      this.translationLanguageService.getActiveLanguageCode(),
+      this.translationTopicService.getActiveTopicName(),
+      this.activeEntityType
+    );
   }
 
   async loadOpportunitiesAsync(): Promise<{

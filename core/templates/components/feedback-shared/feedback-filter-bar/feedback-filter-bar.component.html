@@ -1,9 +1,9 @@
-<div class="oppia-feedback-filter-bar">
+<div class="oppia-feedback-filter-bar e2e-test-feedback-filter-bar">
   <div class="oppia-feedback-filter-bar-row">
 
     <div class="oppia-feedback-filter-bar-stats">
       <span class="oppia-feedback-filter-bar-stats-label">Status:</span>
-      <select class="oppia-feedback-filter-bar-select"
+      <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-status-select"
               [(ngModel)]="selectedStatus">
         <option *ngFor="let s of statusOptions" [value]="s">
           {{ statusLabels[s] }}
@@ -13,7 +13,7 @@
 
     <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showTeamFilter">
       <span class="oppia-feedback-filter-bar-stats-label">Technical Team:</span>
-      <select class="oppia-feedback-filter-bar-select"
+      <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-technical-team-select"
               [(ngModel)]="selectedTechnicalTeam">
         <option *ngFor="let t of teamOptions" [value]="t">
           {{ teamLabels[t] }}
@@ -23,7 +23,7 @@
 
     <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showCreatorFeedbackTypeFilter">
       <span class="oppia-feedback-filter-bar-stats-label">Feedback Type:</span>
-      <select class="oppia-feedback-filter-bar-select"
+      <select class="oppia-feedback-filter-bar-select e2e-test-feedback-filter-creator-feedback-type-select"
               [(ngModel)]="selectedCreatorFeedbackType">
         <option *ngFor="let t of creatorFeedbackTypeOptions" [value]="t">
           {{ creatorFeedbackTypeLabels[t] }}
@@ -35,7 +35,7 @@
       <div class="oppia-feedback-filter-bar-stats">
         <span class="oppia-feedback-filter-bar-stats-label">Description Filter:</span>
         <input type="text"
-               class="oppia-feedback-filter-bar-search-input"
+               class="oppia-feedback-filter-bar-search-input e2e-test-feedback-filter-search-input "
                placeholder="Filter current page by description"
                [(ngModel)]="searchText">
       </div>
@@ -46,7 +46,7 @@
         <span class="oppia-feedback-filter-bar-stats-label">From Date:</span>
         <input type="date"
                [max]="today"
-               class="oppia-feedback-filter-bar-date"
+               class="oppia-feedback-filter-bar-date e2e-test-feedback-filter-from-date-input"
                placeholder="From Date"
                [(ngModel)]="fromDate">
       </div>
@@ -54,7 +54,7 @@
       <div class="oppia-feedback-filter-bar-stats">
         <span class="oppia-feedback-filter-bar-stats-label">To Date:</span>
         <input type="date"
-               class="oppia-feedback-filter-bar-date"
+               class="oppia-feedback-filter-bar-date e2e-test-feedback-filter-to-date-input"
                [max]="today"
                [min]="fromDate || null"
                placeholder="To Date"
@@ -63,10 +63,10 @@
     </div>
 
     <div class="oppia-feedback-filter-bar-stats">
-      <button class="oppia-feedback-filter-bar-apply" (click)="applyFilters()">
+      <button class="oppia-feedback-filter-bar-apply e2e-test-feedback-filter-apply" (click)="applyFilters()">
         Apply
       </button>
-      <button class="oppia-feedback-filter-bar-clear" (click)="clearAllFilters()">
+      <button class="oppia-feedback-filter-bar-clear e2e-test-feedback-filter-clear" (click)="clearAllFilters()">
         Clear
       </button>
     </div>

@@ -19,7 +19,6 @@
 import {Component, Input, ViewEncapsulation} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-import './partnerships-section.component.css';
 import {AboutPartnerData} from '../data.model';
 
 @Component({
@@ -29,7 +28,7 @@ import {AboutPartnerData} from '../data.model';
   encapsulation: ViewEncapsulation.None,
 })
 export class PartnershipsSectionComponent {
-  @Input() partnersData: AboutPartnerData[] = [];
+  @Input() partnersData: readonly AboutPartnerData[] = [];
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 

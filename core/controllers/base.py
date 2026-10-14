@@ -31,7 +31,12 @@ import urllib
 
 from core import feconf, handler_schema_constants, utils
 from core.controllers import payload_validator
-from core.domain import auth_domain, auth_services, user_services
+from core.domain import (
+    auth_domain,
+    auth_services,
+    feature_flag_services,
+    user_services,
+)
 
 import webapp2
 from typing import (
@@ -84,27 +89,93 @@ class ResponseValueDict(TypedDict):
 
 
 @functools.lru_cache(maxsize=128)
-def load_template(filename: str, *, template_is_aot_compiled: bool) -> str:
+def load_template(filename: str) -> str:
     """Return the HTML file contents at filepath.
 
     Args:
         filename: str. Name of the requested HTML file.
-        template_is_aot_compiled: bool. Used to determine which bundle to use.
 
     Returns:
         str. The HTML file content.
     """
-    filepath = os.path.join(
-        (
-            feconf.FRONTEND_AOT_DIR
-            if template_is_aot_compiled
-            else feconf.FRONTEND_TEMPLATES_DIR
-        ),
-        filename,
-    )
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
     with open(filepath, 'r', encoding='utf-8') as f:
         html_text = f.read()
     return html_text
+
+
+# Here we use type Any because the values argument is a dict of template
+# variables whose values can be of any JSON-serializable type (bools,
+# strings, nested containers etc.), which are substituted into the template.
+def render_html_response(
+    response: webapp2.Response,
+    filename: str,
+    iframe_restriction: Optional[str] = 'DENY',
+    *,
+    values: Optional[Dict[str, Any]] = None,
+) -> None:
+    """Writes the HTML file contents to the response with the Oppia security
+    and caching headers.
+
+    Template variable substitution is supported via the ``values``
+    argument. Each key in ``values`` is substituted for the corresponding
+    ``___KEY___`` marker within the template (e.g. a key of
+    ``OPPIA_FEATURE_FLAGS`` replaces every ``___OPPIA_FEATURE_FLAGS___``
+    occurrence). Non-string values are JSON-encoded before substitution, so
+    containers can be injected into ``<script type="application/json">`` tags.
+    This allows server-side data (such as feature flag evaluations) to be
+    delivered with the initial page load instead of as a separate request.
+
+    Args:
+        response: webapp2.Response. The response object to write to.
+        filename: str. The template filepath.
+        iframe_restriction: str or None. Possible values are 'DENY' and
+            'SAMEORIGIN':
+
+            DENY: Strictly prevents the template to load in an iframe.
+            SAMEORIGIN: The template can only be displayed in a frame
+                on the same origin as the page itself.
+        values: dict|None. A dict of template variables to substitute into
+            the template. Keys are matched against ``___KEY___`` markers.
+            Defaults to None (no substitution).
+
+    Raises:
+        Exception. Invalid iframe restriction value.
+    """
+
+    # The 'no-store' must be used to properly invalidate the cache when we
+    # deploy a new version, using only 'no-cache' doesn't work properly.
+    response.cache_control.no_store = True
+    response.cache_control.must_revalidate = True
+    response.headers['Strict-Transport-Security'] = (
+        'max-age=31536000; includeSubDomains'
+    )
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Xss-Protection'] = '1; mode=block'
+    if iframe_restriction is not None:
+        if iframe_restriction == 'SAMEORIGIN':
+            response.headers['Content-Security-Policy'] = (
+                'frame-ancestors \'self\''
+            )
+        elif iframe_restriction == 'DENY':
+            response.headers['Content-Security-Policy'] = (
+                'frame-ancestors \'none\''
+            )
+        else:
+            raise Exception(
+                'Invalid iframe restriction value: %s' % iframe_restriction
+            )
+
+    response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
+    response.pragma = 'no-cache'
+    html = load_template(filename)
+    if values:
+        for key, value in values.items():
+            rendered_value = (
+                value if isinstance(value, str) else json.dumps(value)
+            )
+            html = html.replace('___%s___' % key, rendered_value)
+    response.write(html)
 
 
 class SessionBeginHandler(webapp2.RequestHandler):
@@ -707,14 +778,27 @@ class BaseHandler(
         # writing bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
+    # Here we use type Any because the values dict is a generic substitution
+    # map for template variables, and its values can be either plain strings
+    # or arbitrary serializable objects (e.g. evaluated feature flags), which
+    # are JSON-encoded before substitution.
     def render_template(
         self,
         filepath: str,
         iframe_restriction: Optional[str] = 'DENY',
         *,
-        template_is_aot_compiled: bool = False,
+        values: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Prepares an HTML response to be sent to the client.
+
+        Template variable substitution is supported via the ``values``
+        argument. Each key in ``values`` is substituted for the corresponding
+        ``___KEY___`` marker within the template (e.g. a key of
+        ``feature_flags`` replaces every ``___feature_flags___`` occurrence).
+        Non-string values are JSON-encoded before substitution, so containers
+        can be injected into ``<script type="application/json">`` tags. This
+        allows server-side data (such as feature flag evaluations) to be
+        delivered with the initial page load instead of as a separate request.
 
         Args:
             filepath: str. The template filepath.
@@ -724,42 +808,19 @@ class BaseHandler(
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
-            template_is_aot_compiled: bool. False by default. Use
-                True when the template is compiled by angular AoT compiler.
+            values: dict|None. A dict of template variables to substitute into
+                the template. Keys are matched against ``___KEY___`` markers.
+                Defaults to None (no substitution).
 
         Raises:
             Exception. Invalid iframe restriction value.
         """
 
-        # The 'no-store' must be used to properly invalidate the cache when we
-        # deploy a new version, using only 'no-cache' doesn't work properly.
-        self.response.cache_control.no_store = True
-        self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains'
-        )
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
-        if iframe_restriction is not None:
-            if iframe_restriction == 'SAMEORIGIN':
-                self.response.headers['Content-Security-Policy'] = (
-                    'frame-ancestors \'self\''
-                )
-            elif iframe_restriction == 'DENY':
-                self.response.headers['Content-Security-Policy'] = (
-                    'frame-ancestors \'none\''
-                )
-            else:
-                raise Exception(
-                    'Invalid iframe restriction value: %s' % iframe_restriction
-                )
-
-        self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
-        self.response.pragma = 'no-cache'
-        self.response.write(
-            load_template(
-                filepath, template_is_aot_compiled=template_is_aot_compiled
-            )
+        render_html_response(
+            self.response,
+            filepath,
+            iframe_restriction,
+            values=values,
         )
 
     def _render_exception_json_or_html(
@@ -780,7 +841,15 @@ class BaseHandler(
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
-                self.render_template('oppia-root.mainpage.html')
+                feature_flags = (
+                    feature_flag_services.evaluate_all_feature_flag_configs(
+                        self.user_id
+                    )
+                )
+                self.render_template(
+                    'oppia-root.mainpage.html',
+                    values={'OPPIA_FEATURE_FLAGS': feature_flags},
+                )
         else:
             if return_type not in (
                 feconf.HANDLER_TYPE_JSON,

@@ -28,8 +28,6 @@ from typing import Dict, List, Optional, TypedDict
 VALID_ASYNC_STATUSES: List[str] = ['Available', 'Not_Ready', 'Blocked']
 MAX_TITLE_LENGTH = 80
 MAX_DESCRIPTION_LENGTH = 500
-MIN_TIME_LIMIT_IN_MINUTES = 5
-MAX_TIME_LIMIT_IN_MINUTES = 60
 MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
 # Minimum time (in minutes) that must elapse between a learner's last
@@ -60,7 +58,6 @@ class CertificateAssessmentOfferingDict(TypedDict):
     classroom_id: str
     topic_ids: List[str]
     total_questions: int
-    time_limit_in_minutes: int
     demonstrates: List[str]
     async_status: str
     version: int
@@ -86,7 +83,6 @@ class CertificateAssessmentOffering:
         classroom_id: str,
         topic_ids: List[str],
         total_questions: int,
-        time_limit_in_minutes: int,
         demonstrates: List[str],
         async_status: str,
         version: int,
@@ -105,8 +101,6 @@ class CertificateAssessmentOffering:
                 certificate.
             total_questions: int. Total number of questions in the
                 certificate assessment.
-            time_limit_in_minutes: int. Maximum time (in minutes) a
-                learner has to complete the assessment.
             demonstrates: list(str). Human-readable strings stating
                 what skills this certificate demonstrates.
             async_status: str. The publication status of this offering.
@@ -121,7 +115,6 @@ class CertificateAssessmentOffering:
         self.classroom_id = classroom_id
         self.topic_ids = topic_ids
         self.total_questions = total_questions
-        self.time_limit_in_minutes = time_limit_in_minutes
         self.demonstrates = demonstrates
         self.async_status = async_status
         self.version = version
@@ -182,20 +175,6 @@ class CertificateAssessmentOffering:
             raise utils.ValidationError(
                 'total_questions must be at most %d.' % MAX_TOTAL_QUESTIONS
             )
-        if not isinstance(self.time_limit_in_minutes, int):
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be a positive integer.'
-            )
-        if self.time_limit_in_minutes < MIN_TIME_LIMIT_IN_MINUTES:
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be greater than or equal to %d.'
-                % MIN_TIME_LIMIT_IN_MINUTES
-            )
-        if self.time_limit_in_minutes > MAX_TIME_LIMIT_IN_MINUTES:
-            raise utils.ValidationError(
-                'time_limit_in_minutes must be at most %d.'
-                % MAX_TIME_LIMIT_IN_MINUTES
-            )
         if not isinstance(self.demonstrates, list):
             raise utils.ValidationError(
                 'demonstrates must be a list of strings.'
@@ -234,7 +213,6 @@ class CertificateAssessmentOffering:
             'classroom_id': self.classroom_id,
             'topic_ids': self.topic_ids,
             'total_questions': self.total_questions,
-            'time_limit_in_minutes': self.time_limit_in_minutes,
             'demonstrates': self.demonstrates,
             'async_status': self.async_status,
             'version': self.version,
@@ -264,9 +242,6 @@ class CertificateAssessmentOffering:
             classroom_id=certificate_offering_dict['classroom_id'],
             topic_ids=certificate_offering_dict['topic_ids'],
             total_questions=certificate_offering_dict['total_questions'],
-            time_limit_in_minutes=(
-                certificate_offering_dict['time_limit_in_minutes']
-            ),
             demonstrates=certificate_offering_dict['demonstrates'],
             async_status=certificate_offering_dict['async_status'],
             version=certificate_offering_dict['version'],

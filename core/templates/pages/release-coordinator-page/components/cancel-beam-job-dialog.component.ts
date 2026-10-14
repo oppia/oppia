@@ -24,7 +24,6 @@ import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {of} from 'rxjs';
-import './cancel-beam-job-dialog.component.css';
 
 @Component({
   selector: 'cancel-beam-job-dialog',

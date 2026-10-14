@@ -26,7 +26,6 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/skill.model.ts';
-import './skill-misconceptions-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-misconceptions-editor',
@@ -95,7 +94,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     return misconception.getName();
   }
 
-  openDeleteMisconceptionModal(index: number, evt: string): void {
+  openDeleteMisconceptionModal(index: number, evt: Event): void {
     const modalInstance: NgbModalRef = this.ngbModal.open(
       DeleteMisconceptionModalComponent,
       {

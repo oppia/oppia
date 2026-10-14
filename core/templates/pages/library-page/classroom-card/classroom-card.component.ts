@@ -21,7 +21,6 @@ import {AppConstants} from 'app.constants';
 import {ClassroomSummaryDict} from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import './classroom-card.component.css';
 
 @Component({
   selector: 'oppia-classroom-card',

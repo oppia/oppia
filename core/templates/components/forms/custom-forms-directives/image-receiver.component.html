@@ -1,7 +1,7 @@
 <div class="image-receiver-drop-area"
      [ngClass]="{'image-receiver-is-active': backgroundWhileUploading, 'image-receiver-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
      #dropArea>
-  <div class="image-receiver-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+  <div class="image-receiver-text e2e-test-screenshot-dropzone-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
         class="image-receiver-error-message e2e-test-upload-error">
     <i class="fas fa-exclamation-triangle"></i>

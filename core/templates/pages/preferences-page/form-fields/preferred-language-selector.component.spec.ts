@@ -50,7 +50,6 @@ describe('Preferred Site Language Selector Component', () => {
       {
         id: 'en',
         text: 'english',
-        dir: 'ltr',
       },
     ];
     componentInstance.ngOnInit();
@@ -64,7 +63,6 @@ describe('Preferred Site Language Selector Component', () => {
       {
         id: 'en',
         text: 'english',
-        dir: 'ltr',
       },
     ];
     componentInstance.filterChoices('eng');

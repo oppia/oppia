@@ -23,7 +23,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UserService} from 'services/user.service';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 import {AppConstants} from 'app.constants';
-import './admin-navbar.component.css';
 
 @Component({
   selector: 'oppia-admin-navbar',

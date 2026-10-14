@@ -221,7 +221,8 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN_PAGE
+      .ROUTE,
     loadChildren: () =>
       import('pages/classroom-admin-page/classroom-admin-page.module').then(
         m => m.ClassroomAdminPageModule
@@ -344,15 +345,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
-    pathMatch: 'full',
-    canActivate: [IsLoggedInGuard],
-    loadChildren: () =>
-      import('pages/feedback-updates-page/feedback-updates-page.module').then(
-        m => m.FeedbackUpdatesPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
     loadChildren: () =>
       import('pages/profile-page/profile-page.module').then(
@@ -369,14 +361,6 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/library-page/library-page.module').then(
-        m => m.LibraryPageModule
-      ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import('pages/library-page/library-page.module').then(
@@ -511,15 +495,6 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/blog-home-page/blog-home-page.module').then(
-        m => m.BlogHomePageModule
-      ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH
-      .ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import('pages/blog-home-page/blog-home-page.module').then(

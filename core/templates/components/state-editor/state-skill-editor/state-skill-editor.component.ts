@@ -37,7 +37,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {UserService} from 'services/user.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
-import './state-skill-editor.component.css';
 
 @Component({
   selector: 'state-skill-editor',

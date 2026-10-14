@@ -5,7 +5,7 @@
 
   <span *ngIf="availableParamNames.length > 0">
     <schema-based-editor [schema]="SCHEMA"
-                         [localValue]="localValue"
+                         [localValue]="value"
                          (localValueChange)="updateValue($event)">
     </schema-based-editor>
   </span>

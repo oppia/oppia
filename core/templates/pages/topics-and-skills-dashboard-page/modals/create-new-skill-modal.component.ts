@@ -31,7 +31,6 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ValidatorsService} from 'services/validators.service';
-import './create-new-skill-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',

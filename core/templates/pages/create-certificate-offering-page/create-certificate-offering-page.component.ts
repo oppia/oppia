@@ -38,7 +38,6 @@ import {
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
-import './create-certificate-offering-page.component.css';
 
 @Component({
   selector: 'oppia-create-certificate-offering-page',
@@ -132,8 +131,6 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
           topic_data: this.certificateAssessmentOffering.topicData,
           demonstrates: this.certificateAssessmentOffering.demonstrates,
           total_questions: this.certificateAssessmentOffering.totalQuestions,
-          time_limit_in_minutes:
-            this.certificateAssessmentOffering.timeLimitInMinutes,
           async_status:
             action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
               ? CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY

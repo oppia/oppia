@@ -34,7 +34,6 @@ import {
 } from 'domain/certificate-assessment/certificate-assessment.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
-import './certificate-offering-add-topic-items.component.css';
 export interface TopicOption {
   id: string;
   title: string;

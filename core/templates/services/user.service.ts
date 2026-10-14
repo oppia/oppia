@@ -51,6 +51,14 @@ export class UserService {
 
   // This property will be null when the user is not logged in.
   private userInfo: UserInfo | null = null;
+
+  // The in-flight (or resolved) request for the user info. Storing the Promise
+  // itself (instead of only the resolved value) ensures that concurrent callers
+  // share the same HTTP request, rather than each firing a separate request
+  // because they all observe this.userInfo === null before the first one
+  // resolves. This property will be null until the first call is made.
+  private asyncGetUserInfoPromise: Promise<UserInfo> | null = null;
+
   private returnUrl = '';
 
   async getUserInfoAsync(): Promise<UserInfo> {
@@ -58,10 +66,24 @@ export class UserService {
     if (['/logout', '/signup'].includes(pathname)) {
       return UserInfo.createDefault();
     }
-    if (this.userInfo === null) {
-      this.userInfo = await this.userBackendApiService.getUserInfoAsync();
+    if (this.asyncGetUserInfoPromise === null) {
+      this.asyncGetUserInfoPromise = this.userBackendApiService
+        .getUserInfoAsync()
+        .then(
+          userInfo => {
+            this.userInfo = userInfo;
+            return userInfo;
+          },
+          error => {
+            // Clear the cached promise on failure so that later calls retry
+            // instead of reusing the rejected promise, then propagate the
+            // error to the current callers.
+            this.asyncGetUserInfoPromise = null;
+            throw error;
+          }
+        );
     }
-    return this.userInfo;
+    return this.asyncGetUserInfoPromise;
   }
 
   getProfileImageDataUrl(username: string): [string, string] {

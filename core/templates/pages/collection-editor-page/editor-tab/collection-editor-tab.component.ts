@@ -21,7 +21,6 @@ import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
-import './collection-editor-tab.component.css';
 
 @Component({
   selector: 'oppia-collection-editor-tab',

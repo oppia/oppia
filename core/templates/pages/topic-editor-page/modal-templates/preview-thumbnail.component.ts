@@ -19,7 +19,6 @@
 import {Component, Input} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import './preview-thumbnail.component.css';
 
 @Component({
   selector: 'oppia-preview-thumbnail',

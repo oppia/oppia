@@ -43,7 +43,6 @@
   letter-spacing: 0;
   line-height: 24px;
   margin: 0 0 8px;
-  text-transform: uppercase;
 }
 
 .mastery-challenge-description {
@@ -81,14 +80,14 @@
   filter: brightness(0.96);
 }
 
-.mastery-challenge-button.mastery-challenge-button-locked {
+.mastery-challenge-button-locked {
   background: #fff;
   border: 2px solid #78a8a2;
   box-shadow: none;
   color: #3f7f79;
 }
 
-.mastery-challenge-button.mastery-challenge-button-locked:hover:not(:disabled) {
+.mastery-challenge-button-locked:hover:not(:disabled) {
   background: #f7fbfa;
   filter: none;
 }

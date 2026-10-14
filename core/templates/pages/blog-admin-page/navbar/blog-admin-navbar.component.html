@@ -26,7 +26,6 @@
             <ul class="nav oppia-navbar-tabs-blog-admin">
               <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : profileDropdownIsActive}">
                 <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-bs-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
                   <picture *ngIf="profilePicturePngDataUrl">

@@ -33,9 +33,6 @@ export const ExplorationEditorPageConstants = {
   // resolved.
   UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD: 5,
 
-  // Constant for audio recording time limit.
-  RECORDING_TIME_LIMIT: 300,
-
   HINT_CHARACTER_LIMIT: 500,
 
   NEW_LINE_REGEX: /(\n)(\s\n)*/g,

@@ -43,7 +43,7 @@ export interface FocusObj {
 @Component({
   selector: 'math-equation-editor',
   templateUrl: './math-equation-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./math-equation-editor.component.css'],
 })
 export class MathEquationEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

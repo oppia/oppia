@@ -61,7 +61,6 @@ import {
   RteHelperService,
   RteComponentSpecs,
 } from './ck-editor-4-widgets.initializer';
-import './ck-editor-4-rte.component.css';
 
 interface UiConfig {
   (): UiConfig;

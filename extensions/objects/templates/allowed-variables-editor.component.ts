@@ -28,7 +28,7 @@ import {GuppyInitializationService} from 'services/guppy-initialization.service'
 @Component({
   selector: 'allowed-variables-editor',
   templateUrl: './allowed-variables-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./allowed-variables-editor.component.css'],
 })
 export class AllowedVariablesEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

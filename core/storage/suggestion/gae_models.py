@@ -512,11 +512,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(GeneralSuggestionModel). A list of new suggestions
             matching the criteria.
         """
-        current_time_millisecs = utils.get_current_time_in_millisecs()
-
-        threshold_datetime = datetime.datetime.utcfromtimestamp(
-            current_time_millisecs / 1000.0
-        ) - datetime.timedelta(days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION)
+        threshold_datetime = (
+            utils.get_current_utc_datetime()
+            - datetime.timedelta(days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION)
+        )
         return (
             cls.get_all()
             .filter(
@@ -1038,6 +1037,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     cls.target_id.IN(entity_ids),
                     cls.language_code == language_code,
+                )
+            )
+            .fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        )
+
+    @classmethod
+    def get_in_review_question_suggestions_by_skill_ids(
+        cls, skill_ids: List[str]
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review question suggestions matching the supplied
+        skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs matching the target ID of the
+                question suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            skill_ids.
+        """
+        return (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.status == STATUS_IN_REVIEW,
+                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    cls.target_id.IN(skill_ids),
                 )
             )
             .fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
