@@ -2110,8 +2110,11 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     // Reload so that newly added or removed featured activities are shown.
     await this.reloadPage();
-    const featuredActivityTitles = this.page
-      .locator('.oppia-library-group')
+    // The featured group is omitted when it is empty, so wait for the library
+    // groups to render before checking for an empty list.
+    const libraryGroups = this.page.locator('.oppia-library-group');
+    await expect(libraryGroups.first()).toBeVisible();
+    const featuredActivityTitles = libraryGroups
       .filter({
         has: this.page.locator('h2', {hasText: 'Featured Activities'}),
       })
