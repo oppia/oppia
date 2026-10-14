@@ -337,7 +337,7 @@ const createCollections = async function (context, page) {
     await page.goto('http://localhost:8181/admin');
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
-    await page.click('#reload-collection-button-id');
+    await page.click('.e2e-test-reload-collection-button');
     // eslint-disable-next-line no-console
     console.log('Collections Created');
   } catch (e) {
