@@ -1,4 +1,4 @@
-<div dir="auto" *ngIf="storyTitle && !isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+<div [attr.dir]="'auto'" *ngIf="storyTitle && !isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
   <div class="oppia-story-viewer-nav-separator"></div>
   <div class="oppia-story-viewer-nav-labels-container">
     <p class="oppia-story-navbar-title">
@@ -12,7 +12,7 @@
   </div>
 </div>
 
-<div dir="auto" *ngIf="storyTitle && isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+<div [attr.dir]="'auto'" *ngIf="storyTitle && isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
   <div class="oppia-story-viewer-nav-labels-container">
     <p class="oppia-story-navbar-title">
       <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">{{ storyTitle }}</span>

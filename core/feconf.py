@@ -110,12 +110,6 @@ FRONTEND_TEMPLATES_DIR = (
     if constants.DEV_MODE
     else os.path.join('build')
 )
-# To know more about AOT visit https://angular.io/guide/glossary#aot
-FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular')
-    if constants.DEV_MODE
-    else os.path.join('build')
-)
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
 )
@@ -1052,6 +1046,7 @@ REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
+OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'
 TRANSLATABLE_CONTENTS_V2_URL = '/gettranslatablecontentshandlerv2'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'

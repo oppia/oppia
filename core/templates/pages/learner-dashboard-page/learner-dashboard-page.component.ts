@@ -46,7 +46,6 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
@@ -181,7 +180,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlService: UrlService,
     private platFeatService: PlatformFeatureService,
     private feedbackBackendApiService: FeedbackBackendApiService
@@ -292,11 +290,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       }
     );
 
-    let learnerGroupFeatureIsEnabledPromise =
-      this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync();
-    learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
-      this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
-    });
+    this.LEARNER_GROUP_FEATURE_IS_ENABLED =
+      this.platFeatService.status.LearnerGroupsAreEnabled.isEnabled;
     if (this.isNewExplorationEditorFeedbackTabEnabled()) {
       this.fetchUnreadMySuggestionsCount();
     }
@@ -345,7 +340,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       dashboardCollectionsDataPromise,
       dashboardExplorationsDataPromise,
       dashboardTopicAndStoriesDataPromise,
-      learnerGroupFeatureIsEnabledPromise,
     ])
       .then(() => {
         setTimeout(() => {

@@ -490,6 +490,10 @@ URLS = [
         contributor_dashboard.ContributionOpportunitiesHandlerV2,
     ),
     get_redirect_route(
+        r'%s' % feconf.OPPORTUNITIES_COUNT_URL,
+        contributor_dashboard.OpportunitiesCountHandler,
+    ),
+    get_redirect_route(
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler,
     ),
@@ -1437,10 +1441,6 @@ URLS = [
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler,
-    ),
-    get_redirect_route(
-        '/learner_groups_feature_status_handler',
-        learner_group.LearnerGroupsFeatureStatusHandler,
     ),
     get_redirect_route(
         r'/android_platform_parameters',
