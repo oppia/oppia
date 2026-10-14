@@ -32,7 +32,7 @@ on:
           - '100'
           - '200'
       specs_to_run:
-        description: 'Comma-separated spec file paths to run, or ALL to run the full frontend suite.'
+        description: 'Comma-separated spec file paths to run.'
         required: true
         type: string
 
@@ -86,19 +86,26 @@ jobs:
       - name: Sanitize specs_to_run input
         shell: bash
         run: |
-          if [[ ! "$SPECS_TO_RUN" =~ ^([Aa][Ll][Ll]|[a-zA-Z0-9_./,-]+)$ ]]; then
-            echo "specs_to_run must be ALL or a comma-separated list of spec file paths."
+          if [[ -z "$SPECS_TO_RUN" ]]; then
+            echo "specs_to_run must not be empty. Specify one or more spec file paths."
+            exit 1
+          fi
+
+          # The whole value must be a comma-separated list of plain,
+          # repo-relative paths (an optional './' prefix is accepted per
+          # segment). Matching the entire string rejects empty segments
+          # (e.g. "a.ts,,b.ts"), whitespace, newlines and shell
+          # metacharacters, so the value is safe to hand to the runner as a
+          # single quoted argument below.
+          if [[ ! "$SPECS_TO_RUN" =~ ^(\./)?[a-zA-Z0-9_][a-zA-Z0-9_./-]*(,(\./)?[a-zA-Z0-9_][a-zA-Z0-9_./-]*)*$ ]]; then
+            echo "specs_to_run must be a comma-separated list of spec file paths. Got: $SPECS_TO_RUN"
             exit 1
           fi
       - name: Run frontend tests (run ${{ matrix.run }})
         shell: bash
         run: |
           set -o pipefail
-          SPECS_ARG=""
-          if [[ "$SPECS_TO_RUN" != "ALL" && "$SPECS_TO_RUN" != "all" ]]; then
-            SPECS_ARG="--specs_to_run=$SPECS_TO_RUN"
-          fi
-          python -m scripts.run_frontend_tests $SPECS_ARG --check_coverage 2>&1 \
+          python -m scripts.run_frontend_tests --specs_to_run="$SPECS_TO_RUN" --check_coverage 2>&1 \
             | tee "frontend_stress_test_run_${{ matrix.run }}.log"
       - name: Upload frontend test logs
         if: ${{ always() }}
