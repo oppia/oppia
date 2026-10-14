@@ -90,7 +90,8 @@ test.describe('Translation Reviewer', function () {
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
-      'Unit Fractions'
+      'Unit Fractions',
+      true
     );
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Picnic Problem',
