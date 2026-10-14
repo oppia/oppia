@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import feature_flag_config_model_migration_jobs
 from core.jobs.types import job_run_result
@@ -45,8 +47,10 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
             force_enable_for_all_users=True,
             rollout_percentage=25,
             user_group_ids=['group_1', 'group_2'],
+            created_on=datetime.datetime(2020, 1, 2),
+            last_updated=datetime.datetime(2021, 3, 4),
         )
-        legacy_model.update_timestamps()
+        legacy_model.update_timestamps(update_last_updated_time=False)
         legacy_model.put()
 
         self.assert_job_output_is(
@@ -69,6 +73,12 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             migrated_model.user_group_ids,
             ['group_1', 'group_2'],
+        )
+        self.assertEqual(
+            migrated_model.created_on, datetime.datetime(2020, 1, 2)
+        )
+        self.assertEqual(
+            migrated_model.last_updated, datetime.datetime(2021, 3, 4)
         )
 
         self.assertIsNotNone(

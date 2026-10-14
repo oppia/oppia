@@ -49,8 +49,10 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                 force_enable_for_all_users=legacy_model.force_enable_for_all_users,
                 rollout_percentage=legacy_model.rollout_percentage,
                 user_group_ids=legacy_model.user_group_ids,
+                created_on=legacy_model.created_on,
+                last_updated=legacy_model.last_updated,
             )
-            migrated_config.update_timestamps()
+            migrated_config.update_timestamps(update_last_updated_time=False)
             return migrated_config
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
