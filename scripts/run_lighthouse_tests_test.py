@@ -287,6 +287,41 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ),
             ('feedback_report_id', 'abc123'),
         )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/edit-learner-group/abc123'
+            ),
+            ('learner_group_id', 'abc123'),
+        )
+
+    def test_get_entity_strips_hash_fragment(self) -> None:
+        # Editor URLs are captured from page.url(), which the Angular router
+        # can leave with a trailing "#/" fragment. The fragment must not leak
+        # into the entity ID, otherwise it gets percent-encoded to "%23" and
+        # the audited URL points at a route that does not exist.
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/create/abc123#/'
+            ),
+            ('exploration_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/topic_editor/abc123#/'
+            ),
+            ('topic_id', 'abc123'),
+        )
+
+    def test_get_entity_strips_trailing_newline(self) -> None:
+        # The setup writes the URLs to stdout separated by newlines, so the
+        # line read back from the pipe keeps a trailing newline. It must not
+        # leak into the entity ID, otherwise it gets percent-encoded to "%0A".
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/edit-learner-group/abc123\n'
+            ),
+            ('learner_group_id', 'abc123'),
+        )
 
     def test_get_entity_returns_none_for_non_url_line(self) -> None:
         self.assertIsNone(run_lighthouse_tests.get_entity('not a url'))

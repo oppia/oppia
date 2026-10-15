@@ -249,7 +249,15 @@ def get_entity(line: str) -> tuple[str, str] | None:
     Returns:
         tuple(str, str) | None. The entity name and ID if the line is a URL.
     """
-    url_parts = line.split('/')
+    # The setup writes the URLs to stdout separated by newlines, so a line read
+    # back from the pipe keeps its trailing newline, and editor URLs can carry
+    # the "#/" hash fragment that the Angular router appends. Either artifact
+    # would otherwise become part of the last path segment and be
+    # percent-encoded into the audited URL ("\n" as "%0A", "#" as "%23"),
+    # pointing the audit at a route that does not exist so the page renders the
+    # Oppia error page instead of its content. Strip the fragment and any
+    # surrounding whitespace before splitting the URL into its path segments.
+    url_parts = line.strip().split('#', 1)[0].split('/')
     print('Parsing entity ID in line: %s' % line)
     url_patterns_to_entity_names = {
         'create': ('exploration_id', 4),
