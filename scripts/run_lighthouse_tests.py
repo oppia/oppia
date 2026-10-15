@@ -492,13 +492,6 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        # Entity IDs are used as URL path segments, and some of them are not
-        # URL-safe. The feedback report IDs are base64 strings that can end in
-        # "=" padding, and the Angular router stops matching a path segment at
-        # "=" (see SEGMENT_RE in @angular/router), so an unencoded "=" is
-        # dropped from the route parameter and the page then requests an ID
-        # that does not exist. The app itself builds these URLs with
-        # encodeURIComponent, so percent-encode the entity to match.
         injected_url = injected_url.replace(
             '{{%s}}' % entity_name,
             urllib.parse.quote(entities[entity_name], safe=''),
