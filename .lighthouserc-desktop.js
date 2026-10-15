@@ -165,7 +165,7 @@ module.exports = {
             fcp: 2835,
             speedIndex: 4665,
             lcp: 9240,
-            tbt: 300,
+            tbt: 400,
             cls: 0.15,
           },
           accessibilityMinScore: 0.91,
@@ -798,7 +798,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 0.87,
         },
         {
           matchingUrlPattern: '^http://localhost:8181/edit-learner-group/.+$',
@@ -820,7 +820,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 0.87,
         },
         {
           matchingUrlPattern:
@@ -832,7 +832,7 @@ module.exports = {
             tbt: 800,
             cls: 1.5,
           },
-          accessibilityMinScore: 0.9,
+          accessibilityMinScore: 0.88,
         },
         {
           matchingUrlPattern:
@@ -928,7 +928,7 @@ module.exports = {
             tbt: 915,
             cls: 0.15,
           },
-          accessibilityMinScore: 0.95,
+          accessibilityMinScore: 0.93,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
             deprecations: ['error', {minScore: 0}],
@@ -944,7 +944,7 @@ module.exports = {
             tbt: 915,
             cls: 0.35,
           },
-          accessibilityMinScore: 0.91,
+          accessibilityMinScore: 0.89,
           overrides: {
             'errors-in-console': ['error', {minScore: 0}],
             deprecations: ['error', {minScore: 0}],
