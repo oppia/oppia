@@ -591,7 +591,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         )
 
     def test_check_lighthouse_page_coverage_all_covered(self) -> None:
-        """All routes are either in LH or in the exclusion list."""
+        """All routes have a Lighthouse page whose URL audits them."""
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
@@ -617,7 +617,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 return (
                     '{'
                     '  "splash": {'
-                    '    "url": "http://localhost:8181/",'
+                    # A URL with no path segment still resolves to root.
+                    '    "url": "http://localhost:8181",'
                     '    "page_module": '
                     '"core/templates/pages/splash-page/splash-page.module.ts"'
                     '  },'
@@ -629,7 +630,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '}'
                 )
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "SPLASH": {"ROUTE": ""},'
+                    '    "ANDROID": {"ROUTE": "android"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -641,7 +649,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertFalse(result.failed)
 
     def test_check_lighthouse_page_coverage_new_route_fails(self) -> None:
-        """A new route without LH coverage or exclusion fails the check."""
+        """A route without a matching Lighthouse page URL fails the check."""
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
@@ -664,9 +672,24 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "splash": {'
+                    '    "url": "http://localhost:8181/",'
+                    '    "page_module": '
+                    '"core/templates/pages/splash-page/splash-page.module.ts"'
+                    '  }'
+                    '}'
+                )
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "SPLASH": {"ROUTE": ""},'
+                    '    "NEW_PAGE": {"ROUTE": "new-page"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -678,14 +701,20 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertTrue(
             any('NEW_PAGE' in msg for msg in result.trimmed_messages)
         )
+        self.assertFalse(
+            any('SPLASH' in msg for msg in result.trimmed_messages)
+        )
 
     def test_check_lighthouse_page_coverage_with_lh_entry(self) -> None:
-        """A new route that has a corresponding LH entry passes."""
+        """A route with a matching Lighthouse page URL passes, and non-route
+        objects in the routing module are ignored.
+        """
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
+                        'const notARoute = {foo: \'bar\'};',
                         'const routes: Route[] = [',
                         '  {',
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
@@ -707,7 +736,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '}'
                 )
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -747,7 +782,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '}'
                 )
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ADMIN": {"ROUTE": "admin"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -789,7 +830,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '}'
                 )
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -822,7 +869,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
                 return '{}'
             if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
-                return '"ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],'
+                return (
+                    '{'
+                    '  "ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "LOGIN": {"ROUTE": "login"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -832,6 +886,316 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             ).check_lighthouse_page_coverage()
         self.assertEqual('Lighthouse page coverage', result.name)
         self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_shared_module_fails(self) -> None:
+        """A route that only shares a module with an audited route is still
+        reported as uncovered, because coverage is matched on the URL.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.EXPLORATION_PLAYER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/exploration-player-page/'
+                        'current-lesson-player/exploration-player-page.module\')',
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.EXPLORATION_PLAYER_EMBED.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/exploration-player-page/'
+                        'current-lesson-player/exploration-player-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "exploration-player": {'
+                    '    "url": '
+                    '"http://localhost:8181/explore/{{exploration_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/exploration-player-page/'
+                    'current-lesson-player/exploration-player-page.module.ts"'
+                    '  },'
+                    '  "lesson-player-embed": {'
+                    '    "url": '
+                    '"http://localhost:8181/embed/lesson/{{exploration_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/exploration-player-page/'
+                    'current-lesson-player/exploration-player-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "EXPLORATION_PLAYER": '
+                    '{"ROUTE": "explore/:exploration_id"},'
+                    '    "EXPLORATION_PLAYER_EMBED": '
+                    '{"ROUTE": "embed/exploration/:exploration_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'EXPLORATION_PLAYER_EMBED' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+        self.assertFalse(
+            any(
+                '\n  EXPLORATION_PLAYER\n' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+
+    def test_check_lighthouse_page_coverage_route_param_matches_value(
+        self,
+    ) -> None:
+        """A router parameter matches the concrete sample value in the URL."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.COLLECTION_PLAYER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/collection-player-page/'
+                        'collection-player-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "collection-player": {'
+                    '    "url": "http://localhost:8181/collection/0",'
+                    '    "page_module": '
+                    '"core/templates/pages/collection-player-page/'
+                    'collection-player-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "COLLECTION_PLAYER": '
+                    '{"ROUTE": "collection/:collection_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_child_route_prefix(self) -> None:
+        """A route is covered when a page URL extends it with child-route
+        segments, such as the topic-viewer's /story path.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.TOPIC_VIEWER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/topic-viewer-page/'
+                        'topic-viewer-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "topic-viewer": {'
+                    '    "url": '
+                    '"http://localhost:8181/learn/staging/dummy-topic-one/story",'
+                    '    "page_module": '
+                    '"core/templates/pages/topic-viewer-page/'
+                    'topic-viewer-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "TOPIC_VIEWER": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_page_placeholder(self) -> None:
+        """A Lighthouse placeholder in the page URL matches a literal route
+        segment.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about/{{some_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about/extra"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_missing_route_path_fails(
+        self,
+    ) -> None:
+        """A route whose path cannot be resolved is reported as uncovered."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(any('ABOUT' in msg for msg in result.trimmed_messages))
+
+    def test_check_lighthouse_page_coverage_shorter_page_url_fails(
+        self,
+    ) -> None:
+        """A route with more segments than the page URL is uncovered."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about/extra"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(
