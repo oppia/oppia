@@ -47,7 +47,8 @@ test.describe('Logged-in User', function () {
 
     await curriculumAdmin.createTopicWithSkill(
       'Addition and Subtraction',
-      'skill1'
+      'skill1',
+      true
     );
 
     loggedInUser1 = await UserFactory.createNewUser(
