@@ -236,6 +236,29 @@ def _route_path_covers_page(
     return True
 
 
+def _route_path_specificity(route_segments: List[str]) -> Tuple[int, ...]:
+    """Ranks how specifically a route path matches a page URL's segments.
+
+    Each router parameter (``:name``) scores 0 and each literal segment scores
+    1, so comparing the tuples of two routes that both match the same page URL
+    orders them by how many of its leading segments they pin down exactly. A
+    tuple that extends a shorter one compares greater, so a route matching more
+    of the page URL is the more specific one. This is what stops a page auditing
+    the literal route ``practice/session`` from also being credited with the
+    sibling parameterised route ``practice/:node_id``, whose only match there is
+    the sample value ``session``.
+
+    Args:
+        route_segments: list(str). The segments of the route's path.
+
+    Returns:
+        tuple(int). A per-segment specificity score, most significant first.
+    """
+    return tuple(
+        0 if segment.startswith(':') else 1 for segment in route_segments
+    )
+
+
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
@@ -540,11 +563,15 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         A route is covered only when the URL of some Lighthouse page audits it:
         the page's URL path must lead with the route's path, treating router
-        parameters and Lighthouse placeholders as wildcards. Matching on the
-        URL rather than on the lazy-imported module is deliberate, so that a
-        route which merely shares a module with an audited route (for example
-        the embedded exploration player, which reuses the exploration-player
-        module) is still reported as uncovered.
+        parameters and Lighthouse placeholders as wildcards. Each page URL is
+        credited only to the most specific route it matches, so that a page
+        auditing a literal route (for example practice/session) is not also
+        counted as covering a sibling parameterised route (for example
+        practice/:node_id) whose only match there is the literal sample value.
+        Matching on the URL rather than on the lazy-imported module is
+        deliberate, so that a route which merely shares a module with an audited
+        route (for example the embedded exploration player, which reuses the
+        exploration-player module) is still reported as uncovered.
 
         The entries in lighthouse-pages.json and lighthouse-shards.json are
         intentionally ordered to group pages that share the same puppeteer
@@ -603,6 +630,41 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 continue
             routing_keys[key_match.group(1)] = True
 
+        # The path segments of each route key that registers a path. Keys
+        # without a registered path are reported as uncovered below.
+        key_to_segments: Dict[str, List[str]] = {}
+        for key in routing_keys:
+            route_path = key_to_route_path.get(key)
+            if route_path is not None:
+                key_to_segments[key] = _path_to_segments(route_path)
+
+        # Credit each page URL only to the most specific route it matches, so
+        # that a page auditing a literal route (for example practice/session) is
+        # not also counted as covering a sibling parameterised route (for
+        # example practice/:node_id) whose only match there is the literal
+        # sample value. Without this, such a parameterised route would look
+        # audited while no page ever reaches it.
+        covered_keys: Set[str] = set()
+        for page_path in page_paths:
+            matching_keys = [
+                key
+                for key, route_segments in key_to_segments.items()
+                if _route_path_covers_page(route_segments, page_path)
+            ]
+            most_specific = max(
+                (
+                    _route_path_specificity(key_to_segments[key])
+                    for key in matching_keys
+                ),
+                default=(),
+            )
+            covered_keys.update(
+                key
+                for key in matching_keys
+                if _route_path_specificity(key_to_segments[key])
+                == most_specific
+            )
+
         uncovered_keys = []
         for key in sorted(routing_keys):
             # Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE (for example
@@ -611,16 +673,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             # are not part of the coverage check.
             if key in routes_without_standalone_pages:
                 continue
-            route_path = key_to_route_path.get(key)
-            if route_path is None:
-                uncovered_keys.append(key)
-                continue
-            route_segments = _path_to_segments(route_path)
-            covered = any(
-                _route_path_covers_page(route_segments, page_path)
-                for page_path in page_paths
-            )
-            if not covered:
+            if key not in key_to_segments or key not in covered_keys:
                 uncovered_keys.append(key)
 
         if uncovered_keys:
