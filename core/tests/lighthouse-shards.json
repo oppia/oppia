@@ -38,6 +38,7 @@
     "creator-dashboard",
     "exploration-editor",
     "exploration-player",
+    "exploration-player-embed",
     "community-library",
     "pending-account-deletion",
     "voiceover-admin",
@@ -56,6 +57,8 @@
     "learner-dashboard",
     "diagnostic-test-player",
     "practice-session",
+    "mastery-challenge",
+    "end-of-arc-test",
     "subtopic-viewer"
   ],
   "5": [

@@ -139,6 +139,10 @@
     "url": "http://localhost:8181/explore/{{exploration_id}}",
     "page_module": "core/templates/pages/exploration-player-page/current-lesson-player/exploration-player-page.module.ts"
   },
+  "exploration-player-embed": {
+    "url": "http://localhost:8181/embed/exploration/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-player-page/current-lesson-player/exploration-player-page.module.ts"
+  },
   "topic-editor": {
     "url": "http://localhost:8181/topic_editor/{{topic_id}}",
     "page_module": "core/templates/pages/topic-editor-page/topic-editor-page.module.ts"
@@ -169,6 +173,14 @@
   },
   "practice-session": {
     "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/session?selected_subtopic_ids=[1]",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "mastery-challenge": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/mastery-challenge",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
+  "end-of-arc-test": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/test/arc/1",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
   },
   "community-library": {

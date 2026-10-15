@@ -1407,9 +1407,9 @@ const shard3Setup = async function (browser, page) {
   // (voiceover admin) role-gated pages, so these roles are assigned. Enabling
   // the new_lesson_player feature flag below also requires the release
   // coordinator role. Its other pages (classrooms, classroom, creator-dashboard,
-  // exploration-editor, exploration-player, community-library,
-  // pending-account-deletion) are public or login-only, so no topic/story/skill
-  // generation is needed here.
+  // exploration-editor, exploration-player, exploration-player-embed,
+  // community-library, pending-account-deletion) are public or login-only, so no
+  // topic/story/skill generation is needed here.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
   );
@@ -1428,7 +1428,7 @@ const shard3Setup = async function (browser, page) {
     )
   );
   // The exploration editor setup creates the exploration that backs the
-  // exploration-editor and exploration-player pages.
+  // exploration-editor, exploration-player and exploration-player-embed pages.
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
   );
@@ -1459,8 +1459,26 @@ const shard3Setup = async function (browser, page) {
 const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
-  // topic/story/skill editors, and the diagnostic test player page.
-  await logStep('assigning roles', () => setRoles(browser, page, ['ADMIN']));
+  // topic/story/skill editors, the diagnostic test player page, and the
+  // practice, mastery-challenge and end-of-arc-test pages. Enabling the
+  // story_editor_arcs feature flag below requires the release coordinator role.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
+  // The story_editor_arcs feature flag is in the test stage and disabled by
+  // default. The mastery-challenge and end-of-arc-test routes redirect to the
+  // error page while it is disabled, so it is force-enabled here or those pages
+  // render the error page instead of their content. Force-enabling runs on the
+  // release-coordinator page, so the step is retried once under a bounded
+  // deadline instead of hanging the shard for the whole CI job.
+  await logStep('enabling story editor arcs feature flag', () =>
+    retryStep(
+      'enabling the story_editor_arcs feature flag',
+      () => enableFeatureFlagForAllUsers(browser, page, 'story_editor_arcs'),
+      2,
+      150000
+    )
+  );
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
   // pages.

@@ -673,6 +673,30 @@ module.exports = {
           accessibilityMinScore: 0.9,
         },
         {
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/mastery-challenge$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/test/arc/.+$',
+          pagePerfThresholds: {
+            fcp: 31000,
+            speedIndex: 31000,
+            lcp: 105000,
+            tbt: 4800,
+            cls: 1.5,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
           matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
           pagePerfThresholds: {
             fcp: 31000,
@@ -858,6 +882,26 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://localhost:8181/embed/lesson/.+$',
+          pagePerfThresholds: {
+            fcp: 16125,
+            speedIndex: 24180,
+            lcp: 84690,
+            tbt: 3945,
+            cls: 0.15,
+          },
+          accessibilityMinScore: 0.91,
+          overrides: {
+            'errors-in-console': ['error', {minScore: 0}],
+            deprecations: ['error', {minScore: 0}],
+            'modern-image-formats': [
+              'error',
+              {maxLength: 3, strategy: 'pessimistic'},
+            ],
+            'offscreen-images': ['error', {minScore: 0}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/embed/exploration/.+$',
           pagePerfThresholds: {
             fcp: 16125,
             speedIndex: 24180,
