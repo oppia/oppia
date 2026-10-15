@@ -175,6 +175,10 @@
     "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/session?selected_subtopic_ids=[1]",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
   },
+  "node-practice-session": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/practice/1",
+    "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"
+  },
   "mastery-challenge": {
     "url": "http://localhost:8181/learn/staging/dummy-topic-one/mastery-challenge",
     "page_module": "core/templates/pages/practice-session-page/practice-session-page.module.ts"

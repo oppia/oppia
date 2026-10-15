@@ -57,6 +57,7 @@
     "learner-dashboard",
     "diagnostic-test-player",
     "practice-session",
+    "node-practice-session",
     "mastery-challenge",
     "end-of-arc-test",
     "subtopic-viewer"

@@ -1460,17 +1460,19 @@ const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
   // topic/story/skill editors, the diagnostic test player page, and the
-  // practice, mastery-challenge and end-of-arc-test pages. Enabling the
-  // story_editor_arcs feature flag below requires the release coordinator role.
+  // practice, node-practice, mastery-challenge and end-of-arc-test pages.
+  // Enabling the story_editor_arcs feature flag below requires the release
+  // coordinator role.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
   // The story_editor_arcs feature flag is in the test stage and disabled by
-  // default. The mastery-challenge and end-of-arc-test routes redirect to the
-  // error page while it is disabled, so it is force-enabled here or those pages
-  // render the error page instead of their content. Force-enabling runs on the
-  // release-coordinator page, so the step is retried once under a bounded
-  // deadline instead of hanging the shard for the whole CI job.
+  // default. The node-practice, mastery-challenge and end-of-arc-test routes
+  // redirect to the error page while it is disabled, so it is force-enabled here
+  // or those pages render the error page instead of their content.
+  // Force-enabling runs on the release-coordinator page, so the step is retried
+  // once under a bounded deadline instead of hanging the shard for the whole CI
+  // job.
   await logStep('enabling story editor arcs feature flag', () =>
     retryStep(
       'enabling the story_editor_arcs feature flag',
@@ -1481,7 +1483,7 @@ const shard4Setup = async function (browser, page) {
   );
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
-  // pages.
+  // pages, and its story nodes back the node-practice page.
   await logStep('generating topic and story data', () =>
     generateDataForTopicAndStoryPlayer(browser, page)
   );
