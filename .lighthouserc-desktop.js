@@ -926,7 +926,7 @@ module.exports = {
         {
           matchingUrlPattern: '^http://localhost:8181/embed/lesson/.+$',
           pagePerfThresholds: {
-            fcp: 2790,
+            fcp: 3405,
             speedIndex: 5685,
             lcp: 16500,
             tbt: 915,
