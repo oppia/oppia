@@ -51,9 +51,6 @@ describe('Lesson Creator', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
     await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-    await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_new_creator_feedback_tab'
     );
     await releaseCoordinator.enableFeatureFlag('web_feedback_modal_enabled');
