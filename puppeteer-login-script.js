@@ -64,6 +64,7 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var reloadCollectionButton = '.e2e-test-reload-collection-button';
 
 var roleOptionLabels = {
   ADMIN: 'curriculum admin',
@@ -332,12 +333,18 @@ const createCollections = async function (context, page) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     await setRole(page, 'COLLECTION_EDITOR');
-    // Load in Collection
+    // Load the admin activities tab, where the demo collection reload buttons
+    // are rendered. The hash selects the tab explicitly so the buttons are
+    // present regardless of the page's default tab.
     // eslint-disable-next-line dot-notation
-    await page.goto('http://localhost:8181/admin');
-    await page.waitForTimeout(2000);
+    await page.goto('http://localhost:8181/admin#/activities');
+    // The admin page paints its tabs asynchronously and is slow under the
+    // emulated appserver, so wait for the reload button itself. The fixed
+    // two-second delay this replaced raced that render and intermittently
+    // missed the button, leaving the demo collection unreloaded.
+    await page.waitForSelector(reloadCollectionButton, {timeout: 60000});
     await page.evaluate('window.confirm = () => true');
-    await page.click('.e2e-test-reload-collection-button');
+    await page.click(reloadCollectionButton);
     // eslint-disable-next-line no-console
     console.log('Collections Created');
   } catch (e) {
