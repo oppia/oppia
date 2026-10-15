@@ -212,6 +212,88 @@ const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
 
+// About page selectors.
+const aboutUsHeadingSelector = '.e2e-test-about-us-title';
+const aboutUsSubheadingSelector = '.e2e-test-about-page-title-new';
+const aboutPageSectionGoalTitleSelector =
+  '.oppia-about-foundation-section-goal-title';
+const exploreLessonsButtonInAboutUsPageSelector =
+  '.e2e-test-about-page-explore-lessons-button';
+const androidAppButtonInAboutUsPageSelector =
+  '.e2e-test-about-page-android-button';
+const partnershipStoryBoardDesktopSelector =
+  '.oppia-about-partnerships-cards-container-desktop .oppia-about-partnerships-card';
+const partnershipStoryBoardMobileSelector =
+  '.oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card';
+const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
+const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
+const impactReportButtonInAboutPage =
+  '.e2e-test-about-page-impact-report-button';
+const featuresSectionInAboutPage = '.e2e-test-about-page-features-section';
+const featuresAccordionExpandButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel-title-desktop';
+const featuresAccordionExpandButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-title-mobile';
+const featuresAccordionCloseButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel button';
+const featuresAccordionCloseButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-close-button';
+const featuresAccordionPanelContentDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel .panel-content';
+const featuresAccordionPanelContentMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-content';
+const volunteerCarouselSelectorDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-desktop';
+const volunteerCarouselSelectorMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-mobile';
+const volunteerCarouselSlideHeadingDesktopInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-desktop';
+const volunteerCarouselSlideHeadingMobileInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-mobile';
+const volunteerCarouselNextButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-desktop';
+const volunteerCarouselNextButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-mobile';
+const volunteerCarouselPrevButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-desktop';
+const volunteerCarouselPrevButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-mobile';
+const volunteerCarouselSlideHeadingsInAboutPage =
+  testConstants.AboutPageVolunteerCarouselHeadings;
+
+const footerVersionInfoSelector = '.e2e-test-footer-version-info';
+const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
+const teachUrl = testConstants.URLs.Teach;
+const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
+
+// Parents and Teachers Page.
+const subheadingInParentsAndTeachersPageSelector =
+  '.e2e-test-teach-page-subheading';
+const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
+const blogPageLink = testConstants.URLs.BlogPage;
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
+const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
+const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
+const lessonCreatorLinkedinButtonInTeachPage =
+  '.e2e-test-teach-page-linkedin-button';
+const creatorsCarouselNamesInTeachPage = testConstants.TeachPageCreatorsNames;
+const creatorsCarouselSelectorInTeachPage =
+  '.e2e-test-teach-page-creators-carousel';
+const creatorsCarouselPrevButton =
+  '.e2e-test-teach-page-creators-carousel-prev-btn';
+const creatorsCarouselNextButton =
+  '.e2e-test-teach-page-creators-carousel-next-btn';
+const creatorsCarouselNameInTeachPage =
+  '.e2e-test-teach-page-lesson-creator-name';
+const lessonCreationSectionInTeachPage =
+  '.e2e-test-teach-page-lesson-creation-section';
+const lessonCreationAccordionExpandButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel-title';
+const lessonCreationAccordionCloseButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel button';
+const lessonCreationAccordionPanelContentInTeachPage =
+  '.e2e-test-teach-page-lesson-panel .panel-content';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -2926,6 +3008,374 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Verifies that the footer version info matches the expected pattern.
+   * @param {RegExp} pattern - The regular expression pattern to match against the version text.
+   */
+  async expectFooterVersionToMatchPattern(pattern: RegExp): Promise<void> {
+    await this.expectElementToBeVisible(footerVersionInfoSelector);
+    const versionText = (
+      (await this.page.locator(footerVersionInfoSelector).textContent()) ?? ''
+    ).trim();
+
+    if (!pattern.test(versionText)) {
+      throw new Error(
+        `Footer version text "${versionText}" does not match expected pattern ${pattern}`
+      );
+    }
+
+    showMessage(`Footer version verified: ${versionText}`);
+  }
+
+  /**
+   * Function to click the Teach button in the About Menu on navbar
+   * and check if it opens the Teach page.
+   */
+  async clickTeachButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarTeachButton,
+        teachUrl
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabTeachButton,
+        teachUrl
+      );
+    }
+  }
+
+  /**
+   * Validates that a given subheading text appears on the Parents and Teachers page.
+   *
+   * @param subheading - The expected subheading text to be found.
+   */
+  async subheadingInParentsAndTeachersPageToContain(
+    subheading: string
+  ): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      subheadingInParentsAndTeachersPageSelector,
+      subheading
+    );
+  }
+
+  /**
+   * Checks that the "Check out our guide" button in the Teach page links to
+   * the Parents and Teachers guide.
+   */
+  async verifyGuideButtonInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(guideButtonInTeachPage);
+    await expect(this.page.locator(guideButtonInTeachPage)).toHaveAttribute(
+      'href',
+      parentsTeachersGuideUrl
+    );
+  }
+
+  /**
+   * Checks that the "Check out our blog" button in the Teach page links to
+   * the blog page.
+   */
+  async clickAndVerifyBlogButtonInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogButtonInTeachPage);
+    await expect(this.page.locator(blogButtonInTeachPage)).toHaveAttribute(
+      'href',
+      blogPageLink
+    );
+  }
+
+  /**
+   * Checks that the first LinkedIn button in the Teach page links to the
+   * corresponding lesson creator's LinkedIn profile. The link is not opened,
+   * since LinkedIn requires users to log in before showing profile pages.
+   */
+  async clickLinkedInButtonInTeachPage(): Promise<void> {
+    const firstLinkedInButton = this.page
+      .locator(lessonCreatorLinkedinButtonInTeachPage)
+      .first();
+    await expect(firstLinkedInButton).toBeVisible();
+    await expect(firstLinkedInButton).toHaveAttribute(
+      'href',
+      lessonCreatorLinkedInUrl
+    );
+  }
+
+  /**
+   * Verifies the lesson creators carousel in the Teach page: the first
+   * creator is shown, and on mobile, "next" shows the second creator and
+   * "prev" goes back to the first.
+   */
+  async expectLessonCreatorsCarouselToBeFunctionalInTeachPage(): Promise<void> {
+    const firstName = creatorsCarouselNamesInTeachPage[0];
+    const secondName = creatorsCarouselNamesInTeachPage[1];
+
+    await this.expectElementToBeVisible(creatorsCarouselSelectorInTeachPage);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      firstName
+    );
+
+    if (!this.isViewportAtMobileWidth()) {
+      // The carousel displays all creators at once in desktop view as it has
+      // enough space.
+      return;
+    }
+
+    await this.clickOnElementWithSelector(creatorsCarouselNextButton);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      secondName
+    );
+
+    await this.clickOnElementWithSelector(creatorsCarouselPrevButton);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      firstName
+    );
+    showMessage(
+      'The lesson creators carousel in teach page is working correctly.'
+    );
+  }
+
+  /**
+   * Verifies that the expand button of the Lesson Creation Steps accordion in
+   * the Teach page opens the panel content and the close button closes it.
+   */
+  async expectLessonCreationStepsAccordionToBeFunctionalInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(lessonCreationSectionInTeachPage);
+
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionExpandButtonInTeachPage
+    );
+    await this.expectElementToBeVisible(
+      lessonCreationAccordionPanelContentInTeachPage
+    );
+    showMessage('Lesson Creation accordion expand button is working correctly');
+
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionCloseButtonInTeachPage
+    );
+    await this.expectElementToBeVisible(
+      lessonCreationAccordionPanelContentInTeachPage,
+      false
+    );
+    showMessage('Lesson Creation accordion close button is working correctly');
+  }
+
+  /**
+   * Checks if the text content of any element with the given selector
+   * matches the given value exactly.
+   * @param {string} selector - The CSS selector to find the elements.
+   * @param {string} value - The expected text content value.
+   */
+  async expectAnyElementWithSelectorToHaveTextContent(
+    selector: string,
+    value: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const values = await this.page.$$eval(selector, elements =>
+      elements.map(element => element.textContent ?? '')
+    );
+
+    if (!values.includes(value)) {
+      throw new Error(
+        `Expected text content to contain ${value}, but found ${values.join(',')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if heading in about us page matches the expected heading.
+   * @param {string} heading - The expected heading.
+   */
+  async expectAboutUsPageHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      aboutUsHeadingSelector,
+      heading
+    );
+  }
+
+  /**
+   * Checks if given subheading is available in about page. Curly quotes and
+   * extra whitespace are normalized before comparing.
+   * @param {string} subheading - The expected subheading.
+   */
+  async expectSubheadingInAboutUsPageToContain(
+    subheading: string
+  ): Promise<void> {
+    const normalizeSubheadingText = (text: string | null | undefined): string =>
+      (text ?? '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    await this.expectElementToBeVisible(aboutUsSubheadingSelector);
+    const subheadings = await this.page.$$eval(
+      aboutUsSubheadingSelector,
+      elements => elements.map(element => element.textContent ?? '')
+    );
+
+    const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
+    const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
+
+    if (normalizedSubheadings.includes(normalizedExpectedSubheading)) {
+      showMessage(`Subheading ${subheading} is present.`);
+    } else {
+      throw new Error(
+        `Subheading "${subheading}" is not present. Subheading present: ${subheadings.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if given goal is listed in any section of about page.
+   * @param {string} sectionGoal - The expected section goal.
+   */
+  async expectSectionGoalsInAboutPageToContain(
+    sectionGoal: string
+  ): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      aboutPageSectionGoalTitleSelector,
+      sectionGoal
+    );
+  }
+
+  /**
+   * Checks if explore lessons button is visible in about page.
+   */
+  async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(
+      exploreLessonsButtonInAboutUsPageSelector
+    );
+  }
+
+  /**
+   * Checks if android app button is visible in about page.
+   */
+  async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(androidAppButtonInAboutUsPageSelector);
+  }
+
+  /**
+   * Verifies that the expand button of the Features accordion in the About
+   * page opens the panel content and the close button closes it.
+   */
+  async expectFeaturesAccordionToBeFunctionalInAboutPage(): Promise<void> {
+    await this.expectElementToBeVisible(featuresSectionInAboutPage);
+
+    const isMobile = this.isViewportAtMobileWidth();
+    const panelContentSelector = isMobile
+      ? featuresAccordionPanelContentMobileInAboutPage
+      : featuresAccordionPanelContentDesktopInAboutPage;
+    const expandButtonSelector = isMobile
+      ? featuresAccordionExpandButtonMobileInAboutPage
+      : featuresAccordionExpandButtonDesktopInAboutPage;
+    const closeButtonSelector = isMobile
+      ? featuresAccordionCloseButtonMobileInAboutPage
+      : featuresAccordionCloseButtonDesktopInAboutPage;
+
+    await this.clickOnElementWithSelector(expandButtonSelector);
+    await this.expectElementToBeVisible(panelContentSelector);
+
+    // The close button is clicked through the DOM, since it can be covered
+    // by the expanded panel.
+    await this.page.$eval(closeButtonSelector, button =>
+      (button as HTMLElement).click()
+    );
+
+    // The panel is closed when it is removed or loses the "show" class.
+    await this.page.waitForFunction((selector: string) => {
+      const panel = document.querySelector(selector);
+      return !panel || !panel.classList.contains('show');
+    }, panelContentSelector);
+  }
+
+  /**
+   * Verifies that the Volunteer carousel in the About page shows the first
+   * slide, moves to the next slide, and moves back to the first slide.
+   */
+  async expectVolunteerCarouselToBeFunctionalInAboutPage(): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const carouselSelector = isMobile
+      ? volunteerCarouselSelectorMobileInAboutPage
+      : volunteerCarouselSelectorDesktopInAboutPage;
+    const slideHeadingSelector = isMobile
+      ? volunteerCarouselSlideHeadingMobileInAboutPage
+      : volunteerCarouselSlideHeadingDesktopInAboutPage;
+    const nextButtonSelector = isMobile
+      ? volunteerCarouselNextButtonMobileInAboutPage
+      : volunteerCarouselNextButtonDesktopInAboutPage;
+    const prevButtonSelector = isMobile
+      ? volunteerCarouselPrevButtonMobileInAboutPage
+      : volunteerCarouselPrevButtonDesktopInAboutPage;
+    const firstSlideHeading = volunteerCarouselSlideHeadingsInAboutPage[0];
+    // Desktop shows two slides at a time, so "next" jumps two headings.
+    const secondSlideHeading = isMobile
+      ? volunteerCarouselSlideHeadingsInAboutPage[1]
+      : volunteerCarouselSlideHeadingsInAboutPage[2];
+
+    await this.expectElementToBeVisible(carouselSelector);
+
+    // The text content checks wait until the slide transition finishes.
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      firstSlideHeading
+    );
+
+    await this.clickOnElementWithSelector(nextButtonSelector);
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      secondSlideHeading
+    );
+
+    await this.clickOnElementWithSelector(prevButtonSelector);
+    await this.expectTextContentToContain(
+      slideHeadingSelector,
+      firstSlideHeading
+    );
+  }
+
+  /**
+   * Checks the number of partnership story boards in the About page.
+   * @param {number} n - The expected number of story boards.
+   */
+  async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? partnershipStoryBoardMobileSelector
+      : partnershipStoryBoardDesktopSelector;
+    await this.expectElementToBeAttachedInDOM(selector);
+    await this.expectNumberOfElementsToBe(selector, n);
+  }
+
+  /**
+   * Checks the number of impact stats listed in the About page.
+   * @param {number} n - The expected number of impact stats.
+   */
+  async expectImpactStatsTitlesToBe(n: number): Promise<void> {
+    await this.expectElementToBeAttachedInDOM(impactStatsTitleSelector);
+    await this.expectNumberOfElementsToBe(impactStatsTitleSelector, n);
+  }
+
+  /**
+   * Checks the number of impact charts shown in the About page.
+   * @param {number} n - The expected number of charts.
+   */
+  async expectImpactChartsToBe(n: number): Promise<void> {
+    await this.expectElementToBeAttachedInDOM(impactChartContainerSelector);
+    await this.expectNumberOfElementsToBe(impactChartContainerSelector, n);
+  }
+
+  /**
+   * Checks that the "View Report" button on the About page is visible.
+   */
+  async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(impactReportButtonInAboutPage);
   }
 }
 
