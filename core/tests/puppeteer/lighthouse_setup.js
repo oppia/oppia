@@ -184,12 +184,17 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
-// Runs an async setup action under a hard per-attempt deadline and retries it
-// after failures. Puppeteer's DOM interrogation calls (page.$$, page.evaluate,
-// page.select) have no built-in timeout, so a temporarily unresponsive
-// renderer can otherwise stall a shard for the entire CI job. Retrying once
-// under a bounded deadline turns such a transient stall into either a
-// completed step or a loud, specific failure instead of a long hang.
+// Runs a setup step with a time limit, and retries it if it fails.
+//
+// Each attempt gets timeoutMs milliseconds. If the action throws, or takes
+// longer than that, the attempt counts as failed and we try again, up to
+// maxAttempts times.
+//
+// Why: Puppeteer functions like page.$$, page.evaluate and page.select have no
+// timeout of their own. If the browser renderer gets stuck, one of them can
+// wait forever and freeze the whole shard for the rest of the CI job. Giving
+// each attempt its own deadline (and retrying) means a brief hiccup either
+// clears on the retry or fails quickly with the step name, instead of hanging.
 const retryStep = async function (name, action, maxAttempts, timeoutMs) {
   let lastError = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -220,10 +225,13 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
   throw lastError;
 };
 
-// Waits until the element matching selector contains expectedText, polling once
-// a second. The wait is bounded so that a status message which never appears
-// (for example because a save silently failed) fails the shard with the last
-// observed text instead of looping forever until the CI job times out.
+// Waits up to timeoutMs for the element matching selector to show
+// expectedText, checking once a second.
+//
+// The wait is time-limited on purpose: if the expected message never appears
+// (for example, because a save failed without reporting an error), the shard
+// fails right away with the text that was actually on the page. Otherwise this
+// would keep checking until the whole CI job gives up.
 const waitForStatusMessage = async function (
   page,
   selector,
@@ -258,10 +266,9 @@ const login = async function (
   username = 'username1'
 ) {
   try {
-    // eslint-disable-next-line dot-notation
-    // networkidle0 can wait forever on the heavy /admin page when its
-    // background requests keep a connection open (seen as a local hang), so
-    // allow up to two connections and cap the wait to surface a hard error
+    // Puppeteer's networkidle0 can wait forever on the heavy /admin page when
+    // its background requests keep a connection open (seen as a local hang),
+    // so allow up to two connections and cap the wait to surface a hard error
     // instead of spinning silently.
     await page.goto(ADMIN_URL, {
       waitUntil: 'networkidle2',
@@ -420,7 +427,6 @@ const selectExplorationInCreationModal = async function (page) {
 
 const getExplorationEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createButtonSelector, {visible: true});
 
@@ -538,7 +544,6 @@ const getExplorationEditorUrl = async function (browser, page) {
 
 const getTopicEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createTopicButtonSelector, {visible: true});
     await page.click(createTopicButtonSelector);
@@ -568,7 +573,6 @@ const getTopicEditorUrl = async function (browser, page) {
     await browser.pages();
 
     // Refresh page and click on topic link.
-    // eslint-disable-next-line dot-notation
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createdTopicLink, {visible: true});
     await page.click(createdTopicLink);
@@ -585,7 +589,6 @@ const getTopicEditorUrl = async function (browser, page) {
 
 const getStoryEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, {waitUntil: networkIdle});
     await page.waitForSelector(createStoryButtonSelector, {visible: true});
     await page.click(createStoryButtonSelector);
@@ -621,7 +624,6 @@ const getStoryEditorUrl = async function (browser, page) {
 
 const getSkillEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, {waitUntil: networkIdle});
     await page.waitForSelector(createSkillButtonSelector, {visible: true});
     await page.click(createSkillButtonSelector);
@@ -653,7 +655,6 @@ const getSkillEditorUrl = async function (browser, page) {
 
 const generateDataForTopicAndStoryPlayer = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -668,7 +669,6 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
       SETUP_STATUS_MESSAGE_TIMEOUT_MS
     );
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error(e);
     process.exit(1);
   }
@@ -676,7 +676,6 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
 
 const generateDataForClassroom = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -708,7 +707,6 @@ const generateDataForClassroom = async function (browser, page) {
 
 const generateBareClassrooms = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -733,7 +731,6 @@ const generateBareClassrooms = async function (browser, page) {
 
 const generateDataForBlogPosts = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -758,7 +755,6 @@ const generateDataForBlogPosts = async function (browser, page) {
     // Navigate to the blog homepage and open the first published blog post to
     // capture its URL fragment, which is needed for the blog post page
     // lighthouse check.
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/blog', {waitUntil: networkIdle});
     await page.waitForSelector('.e2e-test-blog-post-list .blog-card', {
       visible: true,
@@ -778,7 +774,6 @@ const generateDataForBlogPosts = async function (browser, page) {
 
 const generateDummyExplorations = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -813,7 +808,6 @@ const generateDummyExplorations = async function (browser, page) {
 
 const reloadAllInteractionsExploration = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     // Like the login navigation, the admin activities tab can keep a
     // background connection open, so avoid networkidle0 which can wait
     // forever; allow up to two connections and cap the wait.
@@ -822,12 +816,14 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       timeout: 60000,
     });
 
-    // The reload button is guarded by a native confirm dialog. Without a
-    // dialog handler the page can block indefinitely waiting for it to be
-    // answered, so accept the dialog that appears before clicking. The handler
-    // removes itself after the first dialog so a later reload step in the
-    // same session cannot double-accept a dialog, which Puppeteer rejects
-    // with "Cannot accept dialog which is already handled!".
+    // The reload button opens a native confirm dialog. While that dialog is
+    // open, Puppeteer's page can wait forever, so we accept the first dialog
+    // that appears before clicking.
+    //
+    // The handler is added with page.once, so it fires only for that first
+    // dialog. A later reload step in the same session has no leftover handler
+    // that could accept a dialog twice, which Puppeteer rejects with
+    // "Cannot accept dialog which is already handled!".
     page.once('dialog', async dialog => {
       await dialog.accept();
     });
@@ -859,9 +855,11 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       );
     }
 
-    // The admin activities page shows a status message when the reload
-    // finishes. waitForFunction polls the message until it matches and throws
-    // on timeout, which replaces a manual retry loop with the same behavior.
+    // After the reload finishes, the admin activities page shows a status
+    // message. page.waitForFunction keeps checking that message until it reads
+    // 'Data reloaded successfully.' (once a second, up to two minutes) and
+    // throws if it never appears. That is the same job the old hand-written
+    // retry loop did, just with less code.
     await page.waitForFunction(
       () => {
         const statusMessageElement = document.querySelector(
@@ -884,26 +882,23 @@ const reloadAllInteractionsExploration = async function (browser, page) {
 
 const reloadDemoCollection = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: 'networkidle2',
       timeout: 60000,
     });
 
-    // The reload button is guarded by a native confirm dialog. Without a
-    // dialog handler the page can block indefinitely waiting for it to be
-    // answered, so accept the dialog that appears before clicking. The handler
-    // removes itself after the first dialog so a later reload step in the
-    // same session cannot double-accept a dialog, which Puppeteer rejects
-    // with "Cannot accept dialog which is already handled!".
+    // The reload button opens a native confirm dialog. While that dialog is
+    // open, Puppeteer's page can wait forever, so we accept the first dialog
+    // that appears before clicking.
+    //
+    // The handler is added with page.once, so it fires only for that first
+    // dialog. A later reload step in the same session has no leftover handler
+    // that could accept a dialog twice, which Puppeteer rejects with
+    // "Cannot accept dialog which is already handled!".
     page.once('dialog', async dialog => {
       await dialog.accept();
     });
 
-    // Locate the reload button for the welcome_to_collections demo collection
-    // so that the collection editor and player pages have real content to
-    // render. The title in each reload row shows the demo collection file
-    // name, matching the data served by reloadDemoCollection.
     await page.waitForSelector(reloadCollectionRow, {timeout: 60000});
     const reloadButtons = await page.$$(reloadCollectionButton);
     let reloadStarted = false;
@@ -928,9 +923,11 @@ const reloadDemoCollection = async function (browser, page) {
       );
     }
 
-    // The admin activities page shows a status message when the reload
-    // finishes. waitForFunction polls the message until it matches and throws
-    // on timeout, which replaces a manual retry loop with the same behavior.
+    // After the reload finishes, the admin activities page shows a status
+    // message. page.waitForFunction keeps checking that message until it reads
+    // 'Data reloaded successfully.' (once a second, up to two minutes) and
+    // throws if it never appears. That is the same job the old hand-written
+    // retry loop did, just with less code.
     await page.waitForFunction(
       () => {
         const statusMessageElement = document.querySelector(
@@ -953,7 +950,6 @@ const reloadDemoCollection = async function (browser, page) {
 
 const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/classroom-admin', {
       waitUntil: networkIdle,
     });
@@ -985,13 +981,7 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
       {},
       classroomSaveButton
     );
-    // The save button sits at the bottom of the classroom details page, which
-    // is taller than the viewport. Puppeteer's page.click scrolls the button
-    // into view and then measures it, and when that measurement lands outside
-    // the viewport the viewport-clipped quad collapses to zero area, failing
-    // the click with "Node is either not clickable or not an HTMLElement".
-    // Scroll the button into view and dispatch the click on the element itself
-    // instead, which does not depend on the button's on-screen position.
+
     await page.$eval(classroomSaveButton, element => {
       element.scrollIntoView({block: 'center', inline: 'center'});
       element.click();
@@ -1359,7 +1349,6 @@ const setRoles = async function (browser, page, roles) {
     // session. Reloading the admin roles tab for each role used to repeat the
     // page load and the username look-up steps, so assigning roles no longer
     // performs one navigation per role.
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/roles', {
       waitUntil: 'networkidle2',
       timeout: 60000,
@@ -1620,7 +1609,6 @@ const main = async function () {
   await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
   // Last-resort ceiling for the whole setup; see SETUP_WATCHDOG_MS.
   const watchdogId = setTimeout(() => {
-    // eslint-disable-next-line no-console
     console.error(
       `[lighthouse-setup] Setup exceeded the ${SETUP_WATCHDOG_MS}ms watchdog ` +
         'and was aborted.'
