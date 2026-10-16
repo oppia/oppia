@@ -531,6 +531,48 @@ describe('Contributor stats component', () => {
     }));
   });
 
+  it('should refresh the table and emit rightsUpdated after question rights are updated', fakeAsync(() => {
+    spyOn(
+      contributorDashboardAdminBackendApiService,
+      'contributionReviewerRightsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        can_submit_questions: false,
+        can_review_questions: false,
+        can_review_translation_for_language_codes: [],
+        can_review_voiceover_for_language_codes: [],
+      })
+    );
+    const updateRightsSpy = spyOn(
+      contributorDashboardAdminBackendApiService,
+      'updateQuestionRightsAsync'
+    ).and.returnValue(Promise.resolve());
+    const refreshPaginationSpy = spyOn(component, 'refreshPagination');
+    const rightsUpdatedSpy = spyOn(component.rightsUpdated, 'emit');
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve({
+          isQuestionSubmitter: false,
+          isQuestionReviewer: true,
+        }),
+      } as NgbModalRef;
+    });
+
+    component.openCdAdminQuestionRoleEditorModal('user1');
+    tick();
+
+    expect(updateRightsSpy).toHaveBeenCalledWith(
+      'user1',
+      false,
+      true,
+      false,
+      false
+    );
+    expect(refreshPaginationSpy).toHaveBeenCalled();
+    expect(rightsUpdatedSpy).toHaveBeenCalled();
+  }));
+
   it(
     'should open question role editor modal and return changed value of' +
       ' translation submitter',
