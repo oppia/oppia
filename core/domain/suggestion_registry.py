@@ -86,6 +86,12 @@ class BaseSuggestionDict(TypedDict):
     edited_by_reviewer: bool
 
 
+class TranslationSuggestionDict(BaseSuggestionDict):
+    """Dictionary representing the SuggestionTranslateContent object."""
+
+    new_image_filenames: List[str]
+
+
 class BaseSuggestion:
     """Base class for a suggestion.
 
@@ -714,6 +720,41 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.created_on = created_on
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
+
+    def to_dict(self) -> TranslationSuggestionDict:
+        """Returns a dict representation of the
+        SuggestionTranslateContent object, including the filenames of
+        images newly added in the translation. This lets the frontend
+        resolve target-content images from the exploration namespace and
+        translation-added images from the suggestion namespace.
+
+        Returns:
+            TranslationSuggestionDict. A dict representation of the
+            translation suggestion.
+        """
+        base_dict = super().to_dict()
+        translation_dict: TranslationSuggestionDict = {
+            'suggestion_id': base_dict['suggestion_id'],
+            'suggestion_type': base_dict['suggestion_type'],
+            'target_type': base_dict['target_type'],
+            'target_id': base_dict['target_id'],
+            'target_version_at_submission': (
+                base_dict['target_version_at_submission']
+            ),
+            'status': base_dict['status'],
+            'author_name': base_dict['author_name'],
+            'final_reviewer_id': base_dict['final_reviewer_id'],
+            'change_cmd': base_dict['change_cmd'],
+            'score_category': base_dict['score_category'],
+            'language_code': base_dict['language_code'],
+            'last_updated': base_dict['last_updated'],
+            'created_on': base_dict['created_on'],
+            'edited_by_reviewer': base_dict['edited_by_reviewer'],
+            'new_image_filenames': (
+                self.get_new_image_filenames_added_in_suggestion()
+            ),
+        }
+        return translation_dict
 
     def validate(self) -> None:
         """Validates a suggestion object of type SuggestionTranslateContent.
