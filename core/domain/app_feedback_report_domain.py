@@ -25,9 +25,9 @@ from core import feconf, utils
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import exp_services  # pylint: disable=invalid-import-from
 from core.domain import (
     app_feedback_report_constants,
+    exp_services,  # pylint: disable=invalid-import-from
     story_domain,
     topic_domain,
 )

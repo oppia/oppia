@@ -50,9 +50,6 @@ if MYPY:  # pragma: no cover
         certificate_assessment_offering_models,
         collection_models,
         config_models,
-    )
-    from mypy_imports import exp_models as exploration_models
-    from mypy_imports import (
         feedback_models,
         general_feedback_models,
         improvements_models,
@@ -65,6 +62,7 @@ if MYPY:  # pragma: no cover
         topic_models,
         user_models,
     )
+    from mypy_imports import exp_models as exploration_models
 
 (
     app_feedback_report_models,

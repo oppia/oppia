@@ -66,6 +66,8 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
     'type: ignore',
     'pragma:',
     'https:',
+    'ruff:',
+    'noqa',
 ]
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
