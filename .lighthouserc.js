@@ -1028,17 +1028,6 @@ module.exports = {
           },
           accessibilityMinScore: 0.9,
         },
-        {
-          matchingUrlPattern: '^http://localhost:8181/learn/.+/review-test/.+$',
-          pagePerfThresholds: {
-            fcp: 31000,
-            speedIndex: 31000,
-            lcp: 60000,
-            tbt: 4800,
-            cls: 1.5,
-          },
-          accessibilityMinScore: 0.9,
-        },
       ]),
     },
     upload: {

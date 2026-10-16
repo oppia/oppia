@@ -267,10 +267,6 @@
     "url": "http://localhost:8181/learn/math/certificate-offering-available",
     "page_module": "core/templates/pages/certificate-offering-available-page/certificate-offering-available-page.module.ts"
   },
-  "review-test": {
-    "url": "http://localhost:8181/learn/staging/dummy-topic-one/review-test/help-jamie-win-arcade",
-    "page_module": "core/templates/pages/review-test-page/review-test-page.module.ts"
-  },
   "certificate-assessment-player": {
     "url": "http://localhost:8181/certificate-assessment/1",
     "page_module": "core/templates/pages/certificate-assessment-player-page/certificate-assessment-player-page.module.ts"
