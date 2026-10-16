@@ -738,6 +738,21 @@ module.exports = {
           accessibilityMinScore: 0.9,
         },
         {
+          // The signup page only renders for an account that has not finished
+          // registration, so this entry scores the registration form itself.
+          // It is a plain form on the shared app shell, so it uses the same
+          // thresholds as the pending-account-deletion entry below.
+          matchingUrlPattern: '^http://localhost:8181/signup$',
+          pagePerfThresholds: {
+            fcp: 5550,
+            speedIndex: 6150,
+            lcp: 16500,
+            tbt: 975,
+            cls: 1.0,
+          },
+          accessibilityMinScore: 0.9,
+        },
+        {
           matchingUrlPattern: '^http://[^/]+/pending-account-deletion$',
           pagePerfThresholds: {
             fcp: 5550,
@@ -871,7 +886,7 @@ module.exports = {
           accessibilityMinScore: 0.9,
         },
         {
-          matchingUrlPattern: '^http://localhost:8181/error/.+$',
+          matchingUrlPattern: '^http://localhost:8181/error/[^/]+$',
           pagePerfThresholds: {
             fcp: 9000,
             speedIndex: 9000,

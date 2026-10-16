@@ -33,6 +33,14 @@ const LOGIN_NAVIGATION_TIMEOUT_MS = 120000;
 // exceed Puppeteer's 30s default under the emulated appserver, so the bound is
 // raised to keep a slow sign-in from being mistaken for a broken page.
 const LOGIN_WAIT_TIMEOUT_MS = 60000;
+// The account that audits /signup, and the email it signs in with. It is
+// deliberately never registered: the signup page only renders for an account
+// that has not finished registration, and SignupPage in
+// core/controllers/profile.py sends a registered account to the homepage.
+// That redirect is invisible to an audit, because LHCI records lhr.finalUrl
+// rather than the URL it asked for.
+const SIGNUP_AUDIT_USERNAME = 'signup-audit';
+const SIGNUP_AUDIT_EMAIL = 'signup-audit@example.com';
 // The accounts available to the audits. The primary test admin is the
 // facilitator of the seeded learner group; the learner account is its learner
 // and is used to audit the learner-group-viewer page, which is gated on the
@@ -40,6 +48,7 @@ const LOGIN_WAIT_TIMEOUT_MS = 60000;
 const USERNAME_TO_EMAIL = {
   username1: 'testadmin@example.com',
   username2: 'learner@example.com',
+  [SIGNUP_AUDIT_USERNAME]: SIGNUP_AUDIT_EMAIL,
 };
 // The wrapper rendered whenever a page fails to load its content (a 400, 401,
 // 404 or 500 response). This class is shared by both the generic error page
@@ -51,6 +60,11 @@ const ERROR_PAGE_SELECTOR = '.oppia-error-page-main-content';
 // The /error routes are themselves error pages, so the absence check below is
 // skipped for them.
 const ERROR_ROUTE_PREFIX = '/error';
+// The single path whose landing URL is verified after the navigation below.
+// The signup page is only served to an account that has not completed
+// registration, so a registered account would be redirected away from it and
+// the audit would silently score the wrong page.
+const SIGNUP_PATH = '/signup';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -81,10 +95,14 @@ let currentLoggedInUsername = null;
 // Returns the account to audit the given url with. The viewer route is the
 // only /learner-group/ page; the editor route lives under /edit-learner-group/,
 // so a leading-slash check distinguishes them without matching the editor.
+// /signup is audited with the account that has never completed registration,
+// because SignupPage sends a registered account to the homepage instead.
 const getAuditUsernameForUrl = function (url) {
-  return new URL(url).pathname.startsWith('/learner-group/')
-    ? 'username2'
-    : 'username1';
+  const pathname = new URL(url).pathname;
+  if (pathname === SIGNUP_PATH) {
+    return SIGNUP_AUDIT_USERNAME;
+  }
+  return pathname.startsWith('/learner-group/') ? 'username2' : 'username1';
 };
 
 module.exports = async (browser, context) => {
@@ -98,8 +116,9 @@ module.exports = async (browser, context) => {
   if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {
     const username = getAuditUsernameForUrl(context.url);
     // The learner-group-viewer page has to be audited as the learner account,
-    // while every other page is audited as the primary test admin. Since the
-    // browser session is shared, sign the current account out before switching.
+    // and /signup as the account that has never completed registration, while
+    // every other page is audited as the primary test admin. Since the browser
+    // session is shared, sign the current account out before switching.
     if (
       currentLoggedInUsername !== null &&
       currentLoggedInUsername !== username
@@ -124,6 +143,9 @@ module.exports = async (browser, context) => {
   await seedBlankPagesForLighthouseRuns(browser, page, context);
   if (!isErrorRoute(context.url)) {
     await assertErrorPageIsAbsent(page, context.url);
+  }
+  if (new URL(context.url).pathname === SIGNUP_PATH) {
+    assertLandedOnRequestedPath(page, context.url);
   }
   await page.close();
 };
@@ -182,6 +204,30 @@ const assertErrorPageIsAbsent = async function (page, url) {
   }
 };
 
+/**
+ * Asserts that the loaded page is still at the path of the audited URL.
+ *
+ * The error-page check above only rejects a URL that rendered the error page,
+ * so a URL that silently redirected elsewhere would still be scored, and would
+ * be recorded under the page it landed on because LHCI reports lhr.finalUrl.
+ * That is exactly how the signup audit disappeared: a registered account makes
+ * /signup redirect to the homepage, which then forwards to a dashboard.
+ *
+ * @param {puppeteer.Page} page - The page to inspect.
+ * @param {string} url - The audited URL whose path must be the loaded one.
+ */
+const assertLandedOnRequestedPath = function (page, url) {
+  const requestedPath = new URL(url).pathname;
+  const loadedPath = new URL(page.url()).pathname;
+  if (loadedPath !== requestedPath) {
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the page landed on ${loadedPath}, so ` +
+        'the audit would score a different page than the one registered for ' +
+        'this route.'
+    );
+  }
+};
+
 const seedBlankPagesForLighthouseRuns = async function (
   browser,
   page,
@@ -209,6 +255,17 @@ const login = async function (context, page, username) {
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, email);
     await page.click(signInButton);
+    if (username === SIGNUP_AUDIT_USERNAME) {
+      // The username input is rendered only by the signup page, so waiting
+      // for it proves this unregistered account was signed in and sent
+      // there. Stop before submitting the form: registering the account
+      // would make SignupPage redirect the audit to the homepage. This wait
+      // sits outside the try block below, so an account that is somehow
+      // already registered fails the run instead of being read as a normal
+      // sign-in.
+      await page.waitForSelector(usernameInput, {visible: true});
+      return;
+    }
     try {
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, username);
