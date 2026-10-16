@@ -1402,12 +1402,7 @@ const shard3Setup = async function (browser, page) {
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
   );
-  // The new_lesson_player feature flag is in the test stage and disabled by
-  // default, so it has to be force-enabled here or the new lesson player and
-  // its embed page render the error page instead of their content.
-  // Force-enabling runs on the release-coordinator page, so the step is retried
-  // once under a bounded deadline instead of hanging the shard for the whole CI
-  // job.
+
   await logStep('enabling new lesson player feature flag', () =>
     retryStep(
       'enabling the new_lesson_player feature flag',
@@ -1455,13 +1450,7 @@ const shard4Setup = async function (browser, page) {
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
-  // The story_editor_arcs feature flag is in the test stage and disabled by
-  // default. The node-practice, mastery-challenge and end-of-arc-test routes
-  // redirect to the error page while it is disabled, so it is force-enabled here
-  // or those pages render the error page instead of their content.
-  // Force-enabling runs on the release-coordinator page, so the step is retried
-  // once under a bounded deadline instead of hanging the shard for the whole CI
-  // job.
+
   await logStep('enabling story editor arcs feature flag', () =>
     retryStep(
       'enabling the story_editor_arcs feature flag',
@@ -1510,12 +1499,7 @@ const shard5Setup = async function (browser, page) {
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['TECH_TEAM_LEAD', 'RELEASE_COORDINATOR'])
   );
-  // The learner_groups_are_enabled feature flag is in the prod stage and is
-  // disabled by default, so it has to be force-enabled here or the facilitator
-  // dashboard and learner group pages render the error page instead of their
-  // content. Force-enabling runs on the release-coordinator page, which can
-  // stall briefly on the emulated client, so the step is retried once under a
-  // bounded deadline instead of hanging the shard for the whole CI job.
+
   await logStep('enabling learner groups feature flag', () =>
     retryStep(
       'enabling the learner_groups_are_enabled feature flag',
@@ -1529,10 +1513,7 @@ const shard5Setup = async function (browser, page) {
       150000
     )
   );
-  // The technical_feedback_dashboard_enabled feature flag is in the test stage
-  // and disabled by default, so it has to be force-enabled here or the
-  // technical feedback dashboard and its detail page render the error page
-  // instead of their content.
+
   await logStep('enabling technical feedback feature flag', () =>
     retryStep(
       'enabling the technical_feedback_dashboard_enabled feature flag',
