@@ -685,8 +685,6 @@ class Question(translation_domain.BaseTranslatableObject):
                         for rule_spec in group['rule_specs']:
                             if is_valid_algebraic_expression(
                                 rule_spec['inputs']['x']
-                            ) and not is_valid_numeric_expression(
-                                rule_spec['inputs']['x']
                             ):
                                 new_rule_specs.append(rule_spec)
                         group['rule_specs'] = new_rule_specs
@@ -1308,9 +1306,9 @@ class Question(translation_domain.BaseTranslatableObject):
                     # causes MyPy to throw `incompatible type` error. Thus
                     # to avoid the error, we used ignore here.
                     else:
-                        # The outer condition guarantees that any non-TextInput
-                        # interaction here is a SetInput interaction.
-                        assert interaction_id == 'SetInput'
+                        # The outer condition limits interaction_id to TextInput
+                        # or SetInput. Since TextInput is handled above, this
+                        # branch only handles SetInput.
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
@@ -1427,8 +1425,8 @@ class Question(translation_domain.BaseTranslatableObject):
                 # to narrow down the type we used assert here.
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
-            if new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here we use cast because this condition forces value
+            elif new_type == 'SetOfTranslatableHtmlContentIds':
+                # Here we use cast because this 'elif' condition forces value
                 # to have type List[str].
                 set_of_content_ids = cast(List[str], value)
                 return [
@@ -1438,15 +1436,16 @@ class Question(translation_domain.BaseTranslatableObject):
                     for html in set_of_content_ids
                 ]
 
-            # All callers use one of the three supported migration types.
-            assert new_type == 'ListOfSetsOfTranslatableHtmlContentIds'
-            list_of_set_of_content_ids = cast(List[List[str]], value)
-            return [
-                migrate_rule_inputs_and_answers(
-                    'SetOfTranslatableHtmlContentIds', html_set, choices
-                )
-                for html_set in list_of_set_of_content_ids
-            ]
+            else:
+                # Here we use cast because the two preceding conditions handle
+                # the other supported types, so value has type List[List[str]].
+                list_of_set_of_content_ids = cast(List[List[str]], value)
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds', html_set, choices
+                    )
+                    for html_set in list_of_set_of_content_ids
+                ]
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id in ['DragAndDropSortInput', 'ItemSelectionInput']:

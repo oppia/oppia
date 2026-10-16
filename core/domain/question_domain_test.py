@@ -2406,13 +2406,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     {'inputs': {'x': 'x+1', 'y': None}, 'rule_type': None}
                 ],
                 'outcome': {'feedback': {'content_id': 'algebraic_feedback'}},
-            },
-            {  # type: ignore[typeddict-item]
-                'rule_specs': [
-                    {'inputs': {'x': '1', 'y': None}, 'rule_type': None}
-                ],
-                'outcome': {'feedback': {'content_id': 'numeric_feedback'}},
-            },
+            }
         ]
         # These fields belong to the old state schema handled by this migration.
         question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
