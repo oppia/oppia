@@ -5,9 +5,9 @@
       (mouseenter)="onEditButtonHover()"
       (mouseleave)="$event.stopPropagation(); onEditButtonHover()"
       class="nav-item">
-    <a href="#" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab">
+    <button type="button" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab" aria-label="Collection Editor">
       <i class="fas fa-pen"></i>
-    </a>
+    </button>
     <div *ngIf="getWarningsCount()"
          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
          (click)="selectMainTab()">
@@ -27,9 +27,9 @@
 
   <!-- Settings -->
   <li [ngClass]="{'active': getActiveTabName() === 'settings'}" class="nav-item">
-    <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab">
+    <button type="button" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab" aria-label="Collection Settings">
       <i class="fas fa-cog"></i>
-    </a>
+    </button>
   </li>
 
   <!-- Player -->

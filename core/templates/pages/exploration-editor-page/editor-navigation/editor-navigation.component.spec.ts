@@ -487,6 +487,49 @@ describe('Editor Navigation Component', () => {
       expect(component.getActiveTabName()).toBe('feedback');
     });
 
+    it('should render mobile tabs as focusable buttons that navigate without fragments', () => {
+      fixture.detectChanges();
+      component.mobileNavOptionsAreShown = true;
+      component.userIsLoggedIn = true;
+      component.improvementsTabIsEnabled = true;
+      fixture.detectChanges();
+
+      let mobileTabButtons = fixture.nativeElement.querySelectorAll(
+        '.oppia-exploration-editor-tabs-dropdown-element'
+      );
+      expect(mobileTabButtons.length).toBe(8);
+
+      mobileTabButtons.forEach((button: HTMLButtonElement) => {
+        expect(button.tagName).toBe('BUTTON');
+        expect(button.getAttribute('type')).toBe('button');
+        expect(button.hasAttribute('href')).toBe(false);
+        expect(button.tabIndex).toBe(0);
+        expect(button.disabled).toBe(false);
+      });
+
+      let navigationSpies = [
+        spyOn(routerService, 'navigateToMainTab'),
+        spyOn(routerService, 'navigateToTranslationTab'),
+        spyOn(routerService, 'navigateToPreviewTab'),
+        spyOn(routerService, 'navigateToSettingsTab'),
+        spyOn(routerService, 'navigateToStatsTab'),
+        spyOn(routerService, 'navigateToImprovementsTab'),
+        spyOn(routerService, 'navigateToHistoryTab'),
+        spyOn(routerService, 'navigateToFeedbackTab'),
+      ];
+      let initialHash = window.location.hash;
+
+      mobileTabButtons.forEach((button: HTMLButtonElement) => {
+        button.click();
+      });
+
+      navigationSpies.forEach(navigationSpy => {
+        expect(navigationSpy).toHaveBeenCalledTimes(1);
+      });
+      expect(window.location.hash).toBe(initialHash);
+      expect(window.location.hash).not.toBe('#');
+    });
+
     it('should get open thread count', () => {
       spyOn(threadDataBackendApiService, 'getOpenThreadsCount').and.returnValue(
         5
