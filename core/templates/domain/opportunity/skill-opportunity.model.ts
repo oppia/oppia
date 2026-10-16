@@ -21,6 +21,7 @@ export interface SkillOpportunityBackendDict {
   skill_description: string;
   topic_name: string;
   question_count: number;
+  questions_in_review_count: number;
 }
 
 export class SkillOpportunity {
@@ -28,17 +29,20 @@ export class SkillOpportunity {
   skillDescription: string;
   topicName: string;
   questionCount: number;
+  questionsInReviewCount: number;
 
   constructor(
     skillId: string,
     skillDescription: string,
     topicName: string,
-    questionCount: number
+    questionCount: number,
+    questionsInReviewCount: number
   ) {
     this.id = skillId;
     this.skillDescription = skillDescription;
     this.topicName = topicName;
     this.questionCount = questionCount;
+    this.questionsInReviewCount = questionsInReviewCount;
   }
 
   static createFromBackendDict(
@@ -48,7 +52,8 @@ export class SkillOpportunity {
       backendDict.id,
       backendDict.skill_description,
       backendDict.topic_name,
-      backendDict.question_count
+      backendDict.question_count,
+      backendDict.questions_in_review_count
     );
   }
 
@@ -66,5 +71,9 @@ export class SkillOpportunity {
 
   getQuestionCount(): number {
     return this.questionCount;
+  }
+
+  getQuestionsInReviewCount(): number {
+    return this.questionsInReviewCount;
   }
 }
