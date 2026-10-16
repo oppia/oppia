@@ -25,10 +25,14 @@ import {NavigationUtils} from '../common/navigation-utils';
 import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
 
 const aboutUrl = testConstants.URLs.About;
+const androidUrl = testConstants.URLs.Android;
 const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+
+const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
+const redirectToPlayStoreImageSelector = '.e2e-test-play-store-redirect-img';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -431,6 +435,33 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(button, useSelector);
     await this.expectPageURLToContain(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Clicks the Get Android App button on the splash page and verifies navigation
+   * to the Android page.
+   */
+  async clickGetAndroidAppButtonInSplashPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      getAndroidAppButtonSelector,
+      androidUrl
+    );
+  }
+
+  /**
+   * Clicks the Play Store image on the Android page and verifies that it opens
+   * the Oppia Android app listing in a new tab. Closes the tab afterwards.
+   */
+  async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
+    await this.expectElementToBeVisible(redirectToPlayStoreImageSelector);
+
+    const newTabPromise = this.page.waitForEvent('popup');
+    await this.clickOnElementWithSelector(redirectToPlayStoreImageSelector);
+    const newTabPage = await newTabPromise;
+    await expect(newTabPage).toHaveURL(
+      'https://play.google.com/store/apps/details?id=org.oppia.android'
+    );
+    await newTabPage.close();
   }
 
   /**
