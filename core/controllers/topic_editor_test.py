@@ -322,8 +322,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             ],
             thumbnail_filename='img.svg',
             url_fragment='url',
-            story_model_created_on=utils.get_current_local_datetime(),
-            story_model_last_updated=utils.get_current_local_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
         )
         story_services.save_story_summary(story_summary)
 

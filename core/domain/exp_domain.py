@@ -6292,15 +6292,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict = json.loads(json_string)
         exploration_dict = cls.migrate_state_schema(exploration_dict)
         created_on = (
-            utils.convert_string_to_naive_datetime_object(
-                exploration_dict['created_on']
+            utils.normalize_datetime_to_utc(
+                utils.convert_string_to_naive_datetime_object(
+                    exploration_dict['created_on']
+                )
             )
             if 'created_on' in exploration_dict
             else None
         )
         last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                exploration_dict['last_updated']
+            utils.normalize_datetime_to_utc(
+                utils.convert_string_to_naive_datetime_object(
+                    exploration_dict['last_updated']
+                )
             )
             if 'last_updated' in exploration_dict
             else None
