@@ -87,8 +87,8 @@
     },
     {
       "name": "interested-parent/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/sign-up-for-oppias-newsletter",
