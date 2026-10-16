@@ -26,6 +26,7 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 
 describe('Skill backend API service', () => {
@@ -117,7 +118,13 @@ describe('Skill backend API service', () => {
       version: 1,
     };
     const groupedSkillSummaries = {
-      topic: skillSummaryBackendDict,
+      topic: [
+        skillSummaryBackendDict,
+        {...skillSummaryBackendDict, id: 'second'},
+      ],
+      otherTopic: [{...skillSummaryBackendDict, id: 'third'}],
+      emptyTopic: [],
+      ['__proto__']: [skillSummaryBackendDict],
     };
 
     const backendResponse = {
@@ -129,17 +136,59 @@ describe('Skill backend API service', () => {
     const expectedResponse = {
       skill: skill,
       assignedSkillTopicData: assignedSkillTopicData,
-      groupedSkillSummaries: groupedSkillSummaries,
+      groupedSkillSummaries: {
+        topic: groupedSkillSummaries.topic.map(summary =>
+          SkillSummary.createFromBackendDict(summary)
+        ),
+        otherTopic: [
+          SkillSummary.createFromBackendDict(
+            groupedSkillSummaries.otherTopic[0]
+          ),
+        ],
+        emptyTopic: [],
+        ['__proto__']: [
+          SkillSummary.createFromBackendDict(skillSummaryBackendDict),
+        ],
+      },
     };
 
     skillBackendApiService.fetchSkillAsync('1').then(response => {
       expect(response).toEqual(expectedResponse);
+      expect(response.groupedSkillSummaries.topic[0]).toEqual(
+        jasmine.any(SkillSummary)
+      );
+      expect(response.groupedSkillSummaries.topic[0].languageCode).toBe('en');
+      expect(response.groupedSkillSummaries.topic[0]).not.toBe(
+        skillSummaryBackendDict
+      );
+      expect(groupedSkillSummaries.topic[0]).toBe(skillSummaryBackendDict);
+      expect(Object.keys(response.groupedSkillSummaries)).toEqual([
+        'topic',
+        'otherTopic',
+        'emptyTopic',
+        '__proto__',
+      ]);
+      expect(Object.getPrototypeOf(response.groupedSkillSummaries)).toBe(
+        Object.prototype
+      );
     });
 
     let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 
+    flushMicrotasks();
+  }));
+
+  it('should preserve an empty topic mapping', fakeAsync(() => {
+    skillBackendApiService.fetchSkillAsync('1').then(response => {
+      expect(response.groupedSkillSummaries).toEqual({});
+    });
+    httpTestingController.expectOne('/skill_editor_handler/data/1').flush({
+      skill_dict: skillBackendDict,
+      assigned_skill_topic_data_dict: {},
+      grouped_skill_summaries: {},
+    });
     flushMicrotasks();
   }));
 
