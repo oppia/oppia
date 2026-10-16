@@ -32,9 +32,24 @@ describe('Translation language selector', () => {
   let fixture: ComponentFixture<TranslationTopicSelectorComponent>;
 
   const topicsPerClassroomBackendDict = [
-    {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-    {classroom: 'Class 2', topics: ['Topic 3']},
-    {classroom: '', topics: ['All', 'Topic 4']},
+    {
+      classroom: 'Class 1',
+      topics: [
+        {name: 'Topic 1', id: 't1', completeness: 20},
+        {name: 'Topic 2', id: 't2', completeness: 80},
+      ],
+    },
+    {
+      classroom: 'Class 2',
+      topics: [{name: 'Topic 3', id: 't3', completeness: 50}],
+    },
+    {
+      classroom: '',
+      topics: [
+        {name: 'All', id: '', completeness: null},
+        {name: 'Topic 4', id: 't4', completeness: 30},
+      ],
+    },
   ];
 
   let contributionOpportunitiesBackendApiServiceStub: Partial<ContributionOpportunitiesBackendApiService> =
@@ -145,5 +160,56 @@ describe('Translation language selector', () => {
     fixture.detectChanges();
 
     expect(component.setActiveTopicName.emit).toHaveBeenCalledWith('Topic 1');
+  });
+
+  it('should display completeness percentage next to topics', async () => {
+    component.activeLanguageCode = 'hi';
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    clickDropdown();
+
+    const completenessEls = fixture.debugElement.nativeElement.querySelectorAll(
+      '.oppia-translation-topic-selector-completeness'
+    );
+    // 4 real topics have a percentage; the "All" sentinel (null) does not.
+    expect(completenessEls.length).toBe(4);
+  });
+
+  it('should refetch topics when the language changes', () => {
+    const fetchSpy = spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'fetchTranslatableTopicNamesPerClassroomAsync'
+    ).and.returnValue(Promise.resolve(topicsPerClassroomBackendDict));
+
+    component.activeLanguageCode = 'ar';
+    component.ngOnChanges({
+      activeLanguageCode: {
+        currentValue: 'ar',
+        previousValue: 'hi',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith('ar');
+  });
+
+  it('should not refetch topics on the first language change', () => {
+    const fetchSpy = spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'fetchTranslatableTopicNamesPerClassroomAsync'
+    ).and.returnValue(Promise.resolve(topicsPerClassroomBackendDict));
+
+    component.ngOnChanges({
+      activeLanguageCode: {
+        currentValue: 'hi',
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    });
+
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
