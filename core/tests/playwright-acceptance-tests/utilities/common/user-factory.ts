@@ -26,6 +26,9 @@ import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
 import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
 import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
+import {BLOG_RIGHTS} from './test-constants';
 import {
   ExplorationEditor,
   ExplorationEditorFactory,
@@ -52,6 +55,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -86,7 +90,7 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin & BlogAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -174,6 +178,13 @@ export class UserFactory {
             user.username,
             ROLES.TOPIC_MANAGER,
             args as string
+          );
+          break;
+        case ROLES.BLOG_POST_EDITOR:
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
           );
           break;
         default:
@@ -277,7 +288,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -287,10 +298,19 @@ export class UserFactory {
       'testadmin@example.com',
       browser
     );
+    if (!user.username) {
+      throw new Error('Username is null while creating super admin.');
+    }
 
-    superAdminInstance = UserFactory.composeUserWithRoles(user, [
+    const superAdmin = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
+    ]);
+    await superAdmin.assignRoleToUser(user.username, ROLES.BLOG_ADMIN);
+    await superAdmin.expectUserToHaveRole(user.username, ROLES.BLOG_ADMIN);
+
+    superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
+      BlogAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');
