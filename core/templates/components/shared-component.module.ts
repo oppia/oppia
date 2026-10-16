@@ -154,7 +154,6 @@ import {StateGraphVisualization} from 'pages/exploration-editor-page/editor-tab/
 import {VersionDiffVisualizationComponent} from './version-diff-visualization/version-diff-visualization.component';
 import {QuestionSuggestionEditorModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import {QuestionSuggestionReviewModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
-import {ReviewTestPageComponent} from 'pages/review-test-page/review-test-page.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {AnswerContentModalComponent} from './common-layout-directives/common-elements/answer-content-modal.component';
@@ -417,7 +416,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
@@ -592,7 +590,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     CopierComponent,
@@ -779,7 +776,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     TranslateModule,
     VisualizationSortedTilesComponent,
