@@ -589,6 +589,91 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             )
         self.logout()
 
+    def test_can_fetch_user_profile_picture_stored_via_dev_mode_storage(
+        self,
+    ) -> None:
+        """Profile pictures are committed via
+        user_services.update_profile_picture_data_url(), which stores them
+        directly under the user's assets folder (i.e. without an
+        'image/' filename-prefix). AssetDevHandler must still be able to
+        serve them at their 'assets/image/<filename>' URL. See #19737.
+        """
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
+        response = self.get_custom_response(
+            self._get_image_url(
+                feconf.ENTITY_TYPE_USER,
+                self.EDITOR_USERNAME,
+                'profile_picture.png',
+            ),
+            'image/png',
+        )
+        self.assertEqual(response.body, raw_image)
+
+    def test_fetching_missing_user_profile_picture_raises_404(self) -> None:
+        self.get_json(
+            self._get_image_url(
+                feconf.ENTITY_TYPE_USER,
+                'nonexistent_user',
+                'profile_picture.png',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_can_fetch_user_profile_picture_with_cache_buster_query_param(
+        self,
+    ) -> None:
+        """Regression test for #19737. UserService.getProfileImageDataUrl()
+        appends a '?v=<cache-buster>' query param to this URL so that browsers
+        don't serve a stale cached image after the picture is changed. This
+        must not be rejected as an unrecognized argument.
+        """
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
+        response = self.get_custom_response(
+            '%s?v=1234567.89'
+            % self._get_image_url(
+                feconf.ENTITY_TYPE_USER,
+                self.EDITOR_USERNAME,
+                'profile_picture.png',
+            ),
+            'image/png',
+        )
+        self.assertEqual(response.body, raw_image)
+
+    def test_fetching_user_profile_picture_with_unrecognized_query_param_fails(
+        self,
+    ) -> None:
+        """Confirms the 'v' allowance is specific, not a general loosening of
+        argument validation: any other unrecognized query param must still be
+        rejected.
+        """
+        self.get_json(
+            '%s?unexpected_arg=1'
+            % self._get_image_url(
+                feconf.ENTITY_TYPE_USER,
+                self.EDITOR_USERNAME,
+                'profile_picture.png',
+            ),
+            expected_status_int=400,
+        )
+
 
 class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
