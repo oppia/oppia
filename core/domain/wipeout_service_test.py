@@ -1361,6 +1361,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME: Final = 'username2'
     CONFIG_1_ID: Final = 'config_1_id'
     CONFIG_2_ID: Final = 'config_2_id'
+    ANDROID_CONFIG_1_ID: Final = 'android_config_1_id'
 
     def setUp(self) -> None:
         super().setUp()
@@ -1377,6 +1378,17 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             default_value=False,
         )
         param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command'}]
+        )
+        android_param_model = config_models.AndroidPlatformParameterConfigModel.create(
+            param_name=self.ANDROID_CONFIG_1_ID,
+            rule_dicts=[],
+            rule_schema_version=(
+                feconf.CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
+        )
+        android_param_model.commit(
             self.user_1_id, 'commit message', [{'cmd': 'command'}]
         )
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -1399,6 +1411,22 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID]
+        )
+
+    def test_android_config_snapshot_is_pseudonymized(self) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)
+        )
+
+        config_mappings = user_models.PendingDeletionRequestModel.get_by_id(
+            self.user_1_id
+        ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
+        metadata_model = config_models.AndroidPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.ANDROID_CONFIG_1_ID
+        )
+        self.assertEqual(
+            metadata_model.committer_id,
+            config_mappings[self.ANDROID_CONFIG_1_ID],
         )
 
     def test_remove_user_from_user_groups(self) -> None:

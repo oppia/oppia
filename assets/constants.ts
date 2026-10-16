@@ -6638,6 +6638,16 @@ export default {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
+  // Android-specific version metadata. These values are intentionally kept
+  // separate from the web platform parameter constants above because web and
+  // Android version encodings differ.
+  "ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
+    "dev", "test", "alpha", "beta", "release"],
+  "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+)+)$",
+  "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+)+)(?:-[a-z0-9]+)?(?:-(.+))?$",
+
   // Maximum allowed commit message length. 375 characters because indexed
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
