@@ -318,8 +318,8 @@ export class UserFactory {
     user.email = email;
 
     await user.openBrowser();
-    await user.signUpNewUser(username, email);
     activeUsers.push(user);
+    await user.signUpNewUser(username, email);
 
     return (await UserFactory.assignRolesToUser(
       user,
@@ -368,10 +368,10 @@ export class UserFactory {
   static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
     let user = new LoggedOutUser();
     await user.openBrowser();
+    activeUsers.push(user);
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
     await user.clickOnElementWithSelector(cookieBannerAcceptButton);
-    activeUsers.push(user);
     return user;
   };
   /**
