@@ -241,7 +241,6 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{
         fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse.count > 0
-        && github.event_name != 'merge_group'
       }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}

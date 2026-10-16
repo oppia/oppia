@@ -780,9 +780,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_GROUP_DATA_URL, library.LibraryGroupIndexHandler
-    ),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
@@ -1513,9 +1510,17 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend(
     (
+        # Error pages for specific status codes are rendered by the frontend
+        # from the status code in the route, so the backend serves the oppia
+        # root page instead of returning a 404 status for a known error URL.
+        get_redirect_route(r'/error/<status_code>', oppia_root.OppiaRootPage),
         get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
         get_redirect_route(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+            oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
             r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
@@ -1599,6 +1604,41 @@ URLS.extend(
         ),
         get_redirect_route(
             r'%s/<exploration_id>' % feconf.LESSON_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'%s/<exploration_id>' % feconf.LESSON_URL_EMBED_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        # The certificate, learner group and technical feedback pages below are
+        # handled by the frontend router, but their routes contain url
+        # fragments, so they need manual backend registrations. Without these
+        # the backend returns a 404 status and the Lighthouse audit of these
+        # pages fails.
+        get_redirect_route(
+            r'/edit-certificate-assessment-offering/<certificate_offering_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment/<certificate_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment-result/<attempt_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/edit-learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learn/<classroom_url_fragment>/certificate-offering-available',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/technical-feedback-dashboard/<team>/<report_id>',
             oppia_root.OppiaRootPage,
         ),
     )

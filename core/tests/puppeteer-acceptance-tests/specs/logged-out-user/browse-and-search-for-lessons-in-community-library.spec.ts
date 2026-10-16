@@ -69,14 +69,6 @@ describe('Logged-out User', function () {
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
 
-      // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
-      await loggedOutUser.navigateToTopRatedLessonsPage();
-      await loggedOutUser.expectLessonsInOrder(['Algebra I', 'Algebra II']);
-
-      // Visit the recently published explorations page at /community-library/recently-published.
-      await loggedOutUser.navigateToRecentlyPublishedLessonsPage();
-      await loggedOutUser.expectLessonsInOrder(['Algebra II', 'Algebra I']);
-
       // View the ratings on an exploration once a minimum number of ratings have been submitted.
       await loggedOutUser.expectLessonsToHaveRating(5, 'Algebra I');
     },

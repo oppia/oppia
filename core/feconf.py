@@ -267,14 +267,6 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 # for recently published explorations in /library page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
 
-# The maximum number of results to retrieve in a datastore query
-# for top rated published explorations in /library/top_rated page.
-NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
-
-# The maximum number of results to retrieve in a datastore query
-# for recently published explorations in /library/recently_published page.
-RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
-
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
 APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN = datetime.timedelta(days=90)
@@ -1004,12 +996,10 @@ LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
-LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
-LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 LESSON_URL_PREFIX = '/lesson'
+LESSON_URL_EMBED_PREFIX = '/embed/lesson'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
@@ -1249,20 +1239,6 @@ PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
-# The i18n id for the header of the "Top Rated Explorations" category in the
-# library index page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
-    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS'
-)
-# The i18n id for the header of the "Recently Published" category in the
-# library index page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
-
-# The group name that appears at the end of the url for the recently published
-# page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
-# The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
