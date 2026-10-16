@@ -396,7 +396,7 @@ Registry.create_platform_parameter(
     'subject. These emails are only sent if the functionality is enabled '
     'in feconf.py.',
     platform_parameter_domain.DataTypes.STRING,
-    default='Welcome to Oppia!',
+    default='THIS IS A PLACEHOLDER.',
 )
 
 Registry.create_platform_parameter(
@@ -406,7 +406,7 @@ Registry.create_platform_parameter(
     'These emails are only sent if the functionality is enabled in '
     'feconf.py.',
     platform_parameter_domain.DataTypes.STRING,
-    default='<p>Welcome to Oppia! Click <a href="%s">here</a> to manage preferences.</p>',
+    default='THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.',
 )
 
 Registry.create_platform_parameter(
