@@ -558,8 +558,8 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         self,
     ) -> concurrent_task_utils.TaskResult:
         """Checks that every route in the routing module has a corresponding
-        Lighthouse page entry in lighthouse-pages.json, or is explicitly
-        listed in the exclusion set.
+        Lighthouse page entry in lighthouse-pages.json, unless its key is
+        listed in the ROUTES_WITH_NO_STANDALONE_PAGE constant.
 
         A route is covered only when the URL of some Lighthouse page audits it:
         the page's URL path must lead with the route's path, treating router
