@@ -136,7 +136,8 @@ export class ContributionAndReviewService {
     shouldResetOffset: boolean,
     entityId: string | null,
     topicName: string | null,
-    targetType?: string
+    targetType?: string,
+    languageCode?: string | null
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -157,7 +158,8 @@ export class ContributionAndReviewService {
         fetcher.sortKey,
         entityId,
         topicName,
-        targetType
+        targetType,
+        languageCode
       )
       .then(responseBody => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -390,15 +392,18 @@ export class ContributionAndReviewService {
   async getUserCreatedTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    targetType?: string
+    targetType?: string,
+    topicName: string | null = null,
+    languageCode: string | null = null
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset,
       null,
-      null,
-      targetType
+      topicName,
+      targetType,
+      languageCode
     );
   }
 
