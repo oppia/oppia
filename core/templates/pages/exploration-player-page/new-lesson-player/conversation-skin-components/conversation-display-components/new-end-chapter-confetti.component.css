@@ -175,3 +175,34 @@
     top: -160px;
   }
 }
+
+.stage {
+  height: 0;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 0;
+  z-index: 1002;
+}
+
+.confetti-video {
+  left: 50%;
+  max-width: 700px;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 40px;
+  transform: translateX(-50%);
+  transition: opacity 150ms ease-in;
+  width: 90vw;
+}
+
+.confetti-video-shown {
+  opacity: 1;
+}
+
+@media(max-width: 700px) {
+  .confetti-video {
+    top: -160px;
+  }
+}

@@ -73,7 +73,7 @@ export class InteractiveTextInputComponent implements OnInit {
   }
 
   private validityCheckFn() {
-    return true;
+    return !!this.answer;
   }
 
   ngOnInit(): void {

@@ -16,11 +16,18 @@
  * @fileoverview Component for the correctness footer in the exploration player.
  */
 
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {NewEndChapterConfettiComponent} from '../conversation-display-components/new-end-chapter-confetti.component';
 
 @Component({
   selector: 'oppia-new-correctness-footer',
   templateUrl: './new-correctness-footer.component.html',
   styleUrls: ['./new-correctness-footer.component.css'],
 })
-export class NewCorrectnessFooterComponent {}
+export class NewCorrectnessFooterComponent implements AfterViewInit {
+  @ViewChild('answerConfetti') answerConfetti!: NewEndChapterConfettiComponent;
+
+  ngAfterViewInit(): void {
+    this.answerConfetti.animateConfetti();
+  }
+}
