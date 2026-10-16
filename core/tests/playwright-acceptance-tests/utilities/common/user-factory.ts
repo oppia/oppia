@@ -27,6 +27,10 @@ import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
 import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
 import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
+  VoiceoverSubmitter,
+  VoiceoverSubmitterFactory,
+} from '../user/voiceover-submitter';
+import {
   ExplorationEditor,
   ExplorationEditorFactory,
 } from '../user/exploration-editor';
@@ -52,6 +56,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -81,7 +86,8 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
+  TopicManager &
+  VoiceoverSubmitter;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -176,6 +182,17 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (typeof args !== 'string') {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            args,
+            user.username
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -225,6 +242,7 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      VoiceoverSubmitterFactory(page),
     ]);
 
     user.username = username;
@@ -292,6 +310,17 @@ export class UserFactory {
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
     ]);
+
+    // The super admin must also have the voiceover-admin role because
+    // assigning a voiceover submitter to an exploration is role-gated.
+    await superAdminInstance.assignRoleToUser(
+      superAdminInstance.username as string,
+      ROLES.VOICEOVER_ADMIN
+    );
+    await superAdminInstance.expectUserToHaveRole(
+      superAdminInstance.username as string,
+      ROLES.VOICEOVER_ADMIN
+    );
 
     showMessage('Super admin created successfully.');
     return superAdminInstance;
