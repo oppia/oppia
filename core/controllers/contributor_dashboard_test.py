@@ -1993,6 +1993,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': False,
                 'can_suggest_questions': False,
@@ -2010,6 +2011,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': False,
                 'can_suggest_questions': False,
@@ -2023,6 +2025,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': True,
                 'can_suggest_questions': False,
@@ -2040,6 +2043,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': False,
                 'can_suggest_questions': False,
@@ -2053,9 +2057,32 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': False,
                 'can_suggest_questions': True,
+            },
+        )
+
+    def test_can_submit_translation_in_response(self) -> None:
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        user_id = self.get_user_id_from_email(user_email)
+        self.login(user_email)
+
+        user_services.allow_user_to_submit_translation_in_language(
+            user_id, 'hi'
+        )
+
+        response = self.get_json('/usercontributionrightsdatahandler')
+        self.assertEqual(
+            response,
+            {
+                'can_review_translation_for_language_codes': [],
+                'can_submit_translation_for_language_codes': ['hi'],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False,
+                'can_suggest_questions': False,
             },
         )
 

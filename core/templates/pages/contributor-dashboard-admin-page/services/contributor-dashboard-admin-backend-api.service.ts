@@ -35,6 +35,7 @@ export interface ViewContributionBackendResponse {
 export interface ContributionRightsBackendResponse {
   can_review_questions: boolean;
   can_review_translation_for_language_codes: string[];
+  can_submit_translation_for_language_codes: string[];
   can_review_voiceover_for_language_codes: string[];
   can_submit_questions: boolean;
 }
