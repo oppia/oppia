@@ -1374,13 +1374,7 @@ class Question(translation_domain.BaseTranslatableObject):
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> List[List[str]]: ...
 
-        # Here we use MyPy ignore because MyPy expects a return value in
-        # every condition when we define a return type but here we are
-        # returning only in if-else conditions and we are not returning
-        # when none of the condition matches which causes MyPy to throw
-        # a 'Missing return statement' error. Thus to avoid the error,
-        # we used ignore here.
-        def migrate_rule_inputs_and_answers(  # type: ignore[return]
+        def migrate_rule_inputs_and_answers(
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict],

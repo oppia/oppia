@@ -2401,6 +2401,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_dict['interaction']['id'] = 'MathExpressionInput'
         question_state_dict['interaction']['solution'] = None
         question_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v34, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [
                     {'inputs': {'x': 'x+1', 'y': None}, 'rule_type': None}
@@ -2408,10 +2410,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'outcome': {'feedback': {'content_id': 'algebraic_feedback'}},
             }
         ]
-        # These fields belong to the old state schema handled by this migration.
+        # Here we use MyPy ignore because recorded_voiceovers belongs to the old
+        # state schema handled by this migration, not the latest StateDict type.
         question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': {}
         }
+        # Here we use MyPy ignore because written_translations belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
             'translations_mapping': {}
         }
@@ -2433,6 +2438,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         invalid_state_dict = copy.deepcopy(question_state_dict)
         invalid_state_dict['interaction']['id'] = 'MathExpressionInput'
         invalid_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v34, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [
                     {'inputs': {'x': '@', 'y': None}, 'rule_type': None}
@@ -2458,9 +2465,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_dict = copy.deepcopy(self.question_state_dict)
         question_state_dict['interaction']['id'] = 'TextInput'
         question_state_dict['interaction']['customization_args'] = {}
+        # Here we use MyPy ignore because written_translations belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
             'translations_mapping': {'default_outcome': {}}
         }
+        # Here we use MyPy ignore because recorded_voiceovers belongs to the old
+        # state schema handled by this migration, not the latest StateDict type.
         question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': {}
         }
@@ -2482,6 +2493,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_dict = copy.deepcopy(self.question_state_dict)
         question_state_dict['interaction']['id'] = 'TextInput'
         question_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v36, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': ''}}]
             }
@@ -2506,16 +2519,24 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_dict = copy.deepcopy(self.question_state_dict)
         question_state_dict['interaction']['id'] = 'SetInput'
         question_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v40, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [
                     {'rule_type': 'Equals', 'inputs': {'x': ['a', 'b']}}
                 ]
             }
         ]
+        # Here we use MyPy ignore because next_content_id_index belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        # Here we use MyPy ignore because written_translations belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
             'translations_mapping': {}
         }
+        # Here we use MyPy ignore because recorded_voiceovers belongs to the old
+        # state schema handled by this migration, not the latest StateDict type.
         question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': {}
         }
@@ -2536,7 +2557,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v41_without_solutions(
         self,
     ) -> None:
-        choices = [{'html': 'choice', 'content_id': 'choice_1'}]
+        choices: List[state_domain.SubtitledHtmlDict] = [
+            {'html': 'choice', 'content_id': 'choice_1'}
+        ]
         for interaction_id in ['ItemSelectionInput', 'DragAndDropSortInput']:
             question_state_dict = copy.deepcopy(self.question_state_dict)
             question_state_dict['interaction']['id'] = interaction_id
@@ -2547,6 +2570,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question_state_dict['interaction']['answer_groups'] = []
             if interaction_id == 'DragAndDropSortInput':
                 question_state_dict['interaction']['answer_groups'] = [
+                    # Here we use MyPy ignore because this test constructs an
+                    # answer group from v41, which differs from the latest type.
                     {  # type: ignore[typeddict-item]
                         'rule_specs': [
                             {'rule_type': 'UnchangedRule', 'inputs': {}}
@@ -2568,11 +2593,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_dict = copy.deepcopy(self.question_state_dict)
         question_state_dict['interaction']['id'] = 'NumericExpressionInput'
         question_state_dict['interaction']['answer_groups'] = [
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v49, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [
                     {'rule_type': 'MatchesExactlyWith', 'inputs': {'x': '1'}}
                 ]
             },
+            # Here we use MyPy ignore because this test constructs an answer
+            # group from state schema v49, which differs from the latest type.
             {  # type: ignore[typeddict-item]
                 'rule_specs': [
                     {'rule_type': 'ContainsSomeOf', 'inputs': {'x': '1'}}
@@ -2607,10 +2636,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversions_from_v53_to_v57(self) -> None:
         question_state_dict = copy.deepcopy(self.question_state_dict)
         question_state_dict['interaction']['id'] = 'TextInput'
+        # Here we use MyPy ignore because next_content_id_index belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['next_content_id_index'] = 0  # type: ignore[typeddict-item]
+        # Here we use MyPy ignore because written_translations belongs to the
+        # old schema handled by this migration, not the latest StateDict type.
         question_state_dict['written_translations'] = {  # type: ignore[typeddict-item]
             'translations_mapping': {}
         }
+        # Here we use MyPy ignore because recorded_voiceovers belongs to the old
+        # state schema handled by this migration, not the latest StateDict type.
         question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': {}
         }
@@ -2628,7 +2663,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
         test_value['state']['interaction']['id'] = None
-        old_voiceovers_mapping = {}
+        old_voiceovers_mapping: Dict[
+            str, Dict[str, state_domain.VoiceoverDict]
+        ] = {}
         for (
             content,
             content_type,
@@ -2637,10 +2674,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']
         ):
             if content_type == translation_domain.ContentType.RULE:
+                # Here we use MyPy ignore because RULE content uses contentId
+                # in this old schema instead of the latest content_id key.
                 old_content_id = content['contentId']  # type: ignore[typeddict-item]
             else:
                 old_content_id = content['content_id']
             old_voiceovers_mapping[old_content_id] = {}
+        # Here we use MyPy ignore because recorded_voiceovers belongs to the old
+        # state schema handled by this migration, not the latest StateDict type.
         test_value['state']['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': old_voiceovers_mapping
         }
