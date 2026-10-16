@@ -400,6 +400,17 @@ describe('Topics and skills dashboard page component', () => {
     expect(componentInstance.applyFilters).toHaveBeenCalled();
   });
 
+  it('should update the status filter when the skill status dropdown changes', () => {
+    componentInstance.filterObject =
+      TopicsAndSkillsDashboardFilter.createDefault();
+    spyOn(componentInstance, 'applyFilters');
+
+    componentInstance.onStatusFilterChanged('Assigned');
+
+    expect(componentInstance.filterObject.status).toBe('Assigned');
+    expect(componentInstance.applyFilters).toHaveBeenCalled();
+  });
+
   it('should update the sort filter when the sort dropdown changes', () => {
     componentInstance.filterObject =
       TopicsAndSkillsDashboardFilter.createDefault();

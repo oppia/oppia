@@ -36,6 +36,7 @@ import {
   ETopicPublishedOptions,
   ETopicSortOptions,
   ETopicStatusOptions,
+  SkillStatusOptions,
   TopicsAndSkillsDashboardPageConstants,
 } from './topics-and-skills-dashboard-page.constants';
 import {TopicsAndSkillsDashboardPageService} from './topics-and-skills-dashboard-page.service';
@@ -326,12 +327,14 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   onStatusFilterChanged(status: string): void {
     // The filtered-choices-field dropdown emits plain display strings. The
-    // status options passed to the dropdown are exactly the enum values, so
-    // the emitted value is one of the status enums and the cast preserves the
-    // value while satisfying the filter model's typed status field.
+    // status options passed to the dropdown are exactly the status enum
+    // values (topic statuses on the topics tab, skill statuses on the skills
+    // tab), so the cast preserves the value while satisfying the filter
+    // model's typed status field.
     this.filterObject.status = status as
       | ETopicPublishedOptions
-      | ETopicStatusOptions;
+      | ETopicStatusOptions
+      | SkillStatusOptions;
     this.applyFilters();
   }
 
