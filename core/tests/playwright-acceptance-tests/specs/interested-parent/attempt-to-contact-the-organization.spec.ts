@@ -19,19 +19,20 @@
  * IP.CP. Parent attempts to contact the organization
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Parent', function () {
+test.describe('Interested Parent', function () {
   let interestedParent: LoggedOutUser;
 
-  beforeAll(async function () {
-    interestedParent = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    interestedParent = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it('should be able to ask the organization a question', async function () {
+  test('should be able to ask the organization a question', async function () {
     await interestedParent.clickContactUsButtonInGetInvolvedMenuOnNavbar();
-    await interestedParent.expectScreenshotToMatch('contactUsPage', __dirname);
+    await interestedParent.expectScreenshotToMatch('contactUsPage');
 
     await interestedParent.verifyContactUsSubHeading(
       'We would love to hear from you!'
@@ -44,12 +45,14 @@ describe('Interested Parent', function () {
     ]);
   });
 
-  it('should be able to find contact email', async function () {
+  test('should be able to find contact email', async function () {
+    await interestedParent.clickContactUsButtonInGetInvolvedMenuOnNavbar();
+
     await interestedParent.verifyAdminEmailLinkInContactUsPage();
     await interestedParent.verifyPressEmailLinkInContactUsPage();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

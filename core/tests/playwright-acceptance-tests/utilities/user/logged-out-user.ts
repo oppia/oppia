@@ -29,7 +29,10 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 
+const contactUsContentCard = '.e2e-test-contact-page-content';
+const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
@@ -38,12 +41,21 @@ const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const languageDropdown = '.e2e-test-language-dropdown';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
+const contactUrl = testConstants.URLs.Contact;
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabContactUsButton =
+  'a.e2e-test-navbar-get-involved-menu-contact-us-button';
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuContactUsButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const closeButtonSelector = '.e2e-test-close-button';
 const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
 const createAccountButton = '.create-account-btn';
 const validityInfoTextSelector = '.guide-text';
+const emailLinkSelector = '.oppia-contact-mail';
 
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
@@ -414,6 +426,39 @@ export class LoggedOutUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabAboutButton,
         aboutUrl
+      );
+    }
+  }
+
+  /**
+   * Function to click the Contact Us button in the Get Involved Menu
+   * on navbar and check if it opens the Contact Us page.
+   */
+  async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.waitForAngularStability();
+
+      await this.page
+        .locator(mobileSidebarExpandGetInvolvedMenuButton)
+        .dispatchEvent('click');
+
+      await this.expectElementToBeVisible(
+        mobileSidebarGetInvolvedMenuContactUsButton
+      );
+
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuContactUsButton,
+        contactUrl
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabContactUsButton,
+        contactUrl
       );
     }
   }
@@ -2901,7 +2946,63 @@ export class LoggedOutUser extends BaseUser {
     // While mouse is over pause button, the pause button doesn't change its state.
     await this.page.mouse.move(10, 10);
   }
+  /**
+   * Verifies the admin email link on the Contact Us page.
+   */
+  async verifyAdminEmailLinkInContactUsPage(): Promise<void> {
+    const emailLink = this.page.locator(emailLinkSelector).first();
 
+    await expect(emailLink).toHaveAttribute(
+      'href',
+      'https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org'
+    );
+  }
+
+  /**
+   * Verifies the press email link on the Contact Us page.
+   */
+  async verifyPressEmailLinkInContactUsPage(): Promise<void> {
+    const emailLink = this.page.locator(emailLinkSelector).nth(1);
+
+    await expect(emailLink).toHaveAttribute(
+      'href',
+      'https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org'
+    );
+  }
+  /**
+   * Verifies the Contact Us page subheading.
+   */
+  async verifyContactUsSubHeading(subheading: string): Promise<void> {
+    await expect(this.page.locator(contactUsSubheadingSelector)).toHaveText(
+      subheading
+    );
+  }
+
+  /**
+   * Checks if a content card with the given heading exists on the Contact Us page.
+   * @param heading - The heading to check for in content cards.
+   */
+  async expectContactUsPageToContainContentCardWithHeading(
+    heading: string
+  ): Promise<void> {
+    const contentCardHeadings = await this.page
+      .locator(contactUsContentCardHeadingSelector)
+      .allTextContents();
+
+    expect(contentCardHeadings).toContain(heading);
+  }
+
+  /**
+   * Checks if content cards with the given headings exist on the Contact Us page.
+   * @param headings - The headings to check for in content cards.
+   */
+  async expectContactUsPageToContainContentCardsWithHeading(
+    headings: string[]
+  ): Promise<void> {
+    for (const heading of headings) {
+      await this.expectContactUsPageToContainContentCardWithHeading(heading);
+    }
+  }
   /**
    * Write feedback in the feedback popup and submit it.
    * @param {string} feedback - The feedback to write in the popup.
