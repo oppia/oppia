@@ -77,6 +77,7 @@ const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
+const impactReport2025Url = testConstants.URLs.ImpactReport2025Url;
 const blogPageLink = testConstants.URLs.BlogPage;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
@@ -1357,6 +1358,11 @@ export class LoggedOutUser extends BaseUser {
 
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
+        '2025',
+        impactReport2025Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
         '2024',
         impactReport2024Url
       );
@@ -1380,6 +1386,11 @@ export class LoggedOutUser extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2025',
+        impactReport2025Url
+      );
       await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
         '2024',
@@ -3436,7 +3447,7 @@ export class LoggedOutUser extends BaseUser {
   async clickViewReportButtonInAboutPage(): Promise<void> {
     await this.openExternalLink(
       impactReportButtonInAboutPage,
-      impactReport2024Url
+      impactReport2025Url
     );
   }
 

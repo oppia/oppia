@@ -20,7 +20,10 @@
 import {Component, Input} from '@angular/core';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {
+  ExplorationRatings,
+  LearnerExplorationSummary,
+} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -29,10 +32,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {Subscription} from 'rxjs';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
-import {
-  LearnerDashboardBackendApiService,
-  SubtopicMasterySummaryBackendDict,
-} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {SubtopicMasterySummaryBackendDict} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 
 interface ShowMoreInSectionDict {
@@ -49,8 +49,7 @@ export class ProgressTabComponent {
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private userService: UserService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private userService: UserService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -188,12 +187,27 @@ export class ProgressTabComponent {
     return webpImageUrl;
   }
 
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
-  }
-
   toggleDropdown(): void {
     this.dropdownEnabled = !this.dropdownEnabled;
+  }
+
+  toggledSummaryTiles: Set<LearnerExplorationSummary | CollectionSummary> =
+    new Set();
+
+  getSummaryTileToggleState(
+    summaryTile: LearnerExplorationSummary | CollectionSummary
+  ): boolean {
+    return this.toggledSummaryTiles.has(summaryTile);
+  }
+
+  toggleSummaryTile(
+    summaryTile: LearnerExplorationSummary | CollectionSummary
+  ): void {
+    if (this.toggledSummaryTiles.has(summaryTile)) {
+      this.toggledSummaryTiles.delete(summaryTile);
+    } else {
+      this.toggledSummaryTiles.add(summaryTile);
+    }
   }
 
   changeSection(section: string): void {
@@ -274,6 +288,37 @@ export class ProgressTabComponent {
       return 'exploration';
     }
     return 'collection';
+  }
+
+  getRatingsForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): ExplorationRatings | null {
+    if (tile instanceof LearnerExplorationSummary) {
+      return tile.ratings;
+    }
+    // Collections have no ratings, so return null and let the summary tile
+    // render its "no rating" (N/A) state instead of fabricating a ratings map.
+    return null;
+  }
+
+  getNumViewsForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): number {
+    if (tile instanceof LearnerExplorationSummary) {
+      return tile.numViews;
+    }
+    return 0;
+  }
+
+  getNodeCountForSummaryTile(
+    tile: LearnerExplorationSummary | CollectionSummary
+  ): number {
+    // The collection summary tile takes the node count as a number and
+    // renders it as text, so the number is passed through unchanged.
+    if (tile instanceof CollectionSummary) {
+      return tile.nodeCount;
+    }
+    return 0;
   }
 
   changePageByOne(direction: string, section: string): void {
@@ -416,12 +461,5 @@ export class ProgressTabComponent {
       }
     }
     return allProgress;
-  }
-
-  getTotalSkillCards(
-    acc: number,
-    curr: {topic: LearnerTopicSummary; progress: number[]}
-  ): number {
-    return acc + curr.topic.subtopics.length;
   }
 }
