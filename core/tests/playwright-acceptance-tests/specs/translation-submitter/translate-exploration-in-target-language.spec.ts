@@ -20,6 +20,7 @@
  */
 
 import {test} from '@playwright/test';
+import {HINDI_RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
@@ -50,20 +51,6 @@ const FEATURED_LANGUAGES = [
   'Ásụ̀sụ́ Ìgbò (Igbo)',
   'Èdè Yoùbá (Yoruba)',
 ] as const;
-
-const HINDI_RTE_BUTTON_TITLES = {
-  BOLD: 'बोल्ड',
-  ITALIC: 'इटैलिक',
-  NUMBERED_LIST: 'अंकीय सूची',
-  BULLETED_LIST: 'बुलॅट सूची',
-  PRE: 'Pre',
-  BLOCK_QUOTE: 'ब्लॉक-कोट',
-  INCREASE_INDENT: 'इन्डॅन्ट बढ़ायें',
-  DECREASE_INDENT: 'इन्डॅन्ट कम करें',
-  IMAGE: 'image',
-  MATH_FORMULA: 'mathematical formula',
-  CONCEPT_CARD: 'Concept Card',
-} as const;
 
 test.describe.configure({mode: 'serial'});
 
@@ -269,44 +256,18 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.BLOCK_QUOTE
     );
 
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      HINDI_RTE_BUTTON_TITLES.IMAGE
-    );
-    await translationSubmitter.clickOnElementWithText('UPLOAD');
-    await translationSubmitter.uploadFile(testConstants.data.profilePicture);
-    await translationSubmitter.clickOnElementWithText('Use This Image');
-    await translationSubmitter.expectImageUploadToComplete();
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'textarea',
-      'छवि विवरण'
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
+    await translationSubmitter.addImageToTranslation(
+      testConstants.data.profilePicture,
+      'छवि विवरण',
       'तस्वीर का शीर्षक'
     );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('ArrowRight');
 
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      HINDI_RTE_BUTTON_TITLES.MATH_FORMULA
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'textarea',
-      '\\frac{x}{y}'
-    );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('Enter');
+    await translationSubmitter.addMathFormulaToTranslation('\\frac{x}{y}');
 
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      HINDI_RTE_BUTTON_TITLES.CONCEPT_CARD
+    await translationSubmitter.addConceptCardToTranslation(
+      'संक्षिप्त होने वाला ब्लॉक खोल लिया है।',
+      'Math'
     );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
-    );
-    await translationSubmitter.selectSkillInConceptCard('Math');
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('Enter');
   });
 
   test('should be able to use copy tool', async function () {
@@ -331,7 +292,7 @@ test.describe('Translation Submitter', function () {
   });
 
   test('should be able to persist selected translation language', async function () {
-    await translationSubmitter.page.reload();
+    await translationSubmitter.reloadPage();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );

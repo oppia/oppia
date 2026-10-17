@@ -18,6 +18,7 @@
 
 import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
+import {HINDI_RTE_BUTTON_TITLES} from '../common/rte-editor';
 import {
   getTranslationOpportunityCard,
   opportunityItemHeadingSelector,
@@ -149,6 +150,51 @@ export class TranslationSubmitter extends BaseUser {
       .first();
     await expect(option).toBeVisible();
     await option.click();
+  }
+
+  /** Adds an image with translated description and caption to the RTE. */
+  async addImageToTranslation(
+    filePath: string,
+    description: string,
+    caption: string
+  ): Promise<void> {
+    await this.clickOnRTEOptionContainingTitle(HINDI_RTE_BUTTON_TITLES.IMAGE);
+    await this.clickOnElementWithText('UPLOAD');
+    await this.uploadFile(filePath);
+    await this.clickOnElementWithText('Use This Image');
+    await this.expectImageUploadToComplete();
+    await this.fillValueInTranslateTextCustomizeComponent(
+      'textarea',
+      description
+    );
+    await this.fillValueInTranslateTextCustomizeComponent('input', caption);
+    await this.clickOnSaveButtonInCustomizeRTEModal();
+    // Move the caret past the image so the next component is inserted after it.
+    await this.page.keyboard.press('ArrowRight');
+  }
+
+  /** Adds a LaTeX math formula to the translation RTE. */
+  async addMathFormulaToTranslation(latex: string): Promise<void> {
+    await this.clickOnRTEOptionContainingTitle(
+      HINDI_RTE_BUTTON_TITLES.MATH_FORMULA
+    );
+    await this.fillValueInTranslateTextCustomizeComponent('textarea', latex);
+    await this.clickOnSaveButtonInCustomizeRTEModal();
+    await this.page.keyboard.press('Enter');
+  }
+
+  /** Adds a concept-card link with translated text to the RTE. */
+  async addConceptCardToTranslation(
+    text: string,
+    skill: string
+  ): Promise<void> {
+    await this.clickOnRTEOptionContainingTitle(
+      HINDI_RTE_BUTTON_TITLES.CONCEPT_CARD
+    );
+    await this.fillValueInTranslateTextCustomizeComponent('input', text);
+    await this.selectSkillInConceptCard(skill);
+    await this.clickOnSaveButtonInCustomizeRTEModal();
+    await this.page.keyboard.press('Enter');
   }
 
   /** Fills a component editor field inside the currently open RTE helper modal. */
