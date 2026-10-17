@@ -559,7 +559,7 @@ class Collection:
             [],
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
             [],
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
         )
 
     @classmethod

@@ -1657,7 +1657,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
         'author_notes' are initialized to empty string; 'version' is
-        initializated to 0.
+        initialized to feconf.INITIAL_ENTITY_VERSION.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -1699,7 +1699,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states_dict,
             {},
             [],
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
             content_id_generator.next_content_id_index,
             True,

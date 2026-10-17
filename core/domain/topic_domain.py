@@ -1804,7 +1804,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             1,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             '',
             False,

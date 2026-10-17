@@ -2256,7 +2256,7 @@ class Question(translation_domain.BaseTranslatableObject):
             default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             skill_ids,
             [],
             content_id_generator.next_content_id_index,

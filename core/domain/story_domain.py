@@ -2271,7 +2271,7 @@ class Story:
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
             corresponding_topic_id,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             url_fragment,
             str(meta_tag_content),
         )
