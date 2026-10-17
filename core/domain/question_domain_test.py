@@ -2679,6 +2679,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 old_content_id = content['contentId']  # type: ignore[typeddict-item]
             else:
                 old_content_id = content['content_id']
+            assert isinstance(old_content_id, str)
             old_voiceovers_mapping[old_content_id] = {}
         # Here we use MyPy ignore because recorded_voiceovers belongs to the old
         # state schema handled by this migration, not the latest StateDict type.
