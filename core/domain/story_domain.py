@@ -2170,7 +2170,7 @@ class Story:
     def from_dict(
         cls,
         story_dict: StoryDict,
-        story_version: int = 0,
+        story_version: int = feconf.INITIAL_ENTITY_VERSION,
         story_created_on: Optional[datetime.datetime] = None,
         story_last_updated: Optional[datetime.datetime] = None,
     ) -> Story:

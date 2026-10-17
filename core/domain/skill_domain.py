@@ -1224,7 +1224,7 @@ class Skill(translation_domain.BaseTranslatableObject):
     def from_dict(
         cls,
         skill_dict: SkillDict,
-        skill_version: int = 0,
+        skill_version: int = feconf.INITIAL_ENTITY_VERSION,
         skill_created_on: Optional[datetime.datetime] = None,
         skill_last_updated: Optional[datetime.datetime] = None,
     ) -> Skill:

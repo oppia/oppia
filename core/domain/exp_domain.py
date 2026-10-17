@@ -1709,7 +1709,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def from_dict(
         cls,
         exploration_dict: ExplorationDict,
-        exploration_version: int = 0,
+        exploration_version: int = feconf.INITIAL_ENTITY_VERSION,
         exploration_created_on: Optional[datetime.datetime] = None,
         exploration_last_updated: Optional[datetime.datetime] = None,
     ) -> Exploration:
