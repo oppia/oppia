@@ -48,8 +48,8 @@ export class TopicQuestionsTabComponent
   newQuestionEditor: boolean = false;
   selectedSkillName!: string;
   selectedSkillId!: string;
-  getSkillsCategorizedByTopics!: CategorizedSkills;
-  getUntriagedSkillSummaries!: SkillSummary[];
+  skillsCategorizedByTopics!: CategorizedSkills;
+  untriagedSkillSummaries!: SkillSummary[];
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -80,8 +80,8 @@ export class TopicQuestionsTabComponent
     this.topicsAndSkillsDashboardBackendApiService
       .fetchDashboardDataAsync()
       .then(response => {
-        this.getSkillsCategorizedByTopics = response.categorizedSkillsDict;
-        this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
+        this.skillsCategorizedByTopics = response.categorizedSkillsDict;
+        this.untriagedSkillSummaries = response.untriagedSkillSummaries;
       });
     this.canEditQuestion = this.topicRights.canEditQuestion();
     this.questionEditorOpened =
