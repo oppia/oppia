@@ -179,7 +179,7 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
         )
         failed = proc.returncode != 0
         if failed:
-            error_message = proc.stdout if proc.stdout else proc.stderr
+            error_message = f'{proc.stdout}{proc.stderr}'
             error_messages.append(error_message)
 
         return concurrent_task_utils.TaskResult(
