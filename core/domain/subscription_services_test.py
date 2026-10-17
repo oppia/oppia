@@ -198,23 +198,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             [EXP_ID, EXP_ID_2],
         )
 
-    def test_get_all_threads_subscribed_to(self) -> None:
-        self.assertEqual(
-            subscription_services.get_all_threads_subscribed_to(USER_ID), []
-        )
-
-        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
-        self.assertEqual(
-            subscription_services.get_all_threads_subscribed_to(USER_ID),
-            [FEEDBACK_THREAD_ID],
-        )
-
-        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID_2)
-        self.assertEqual(
-            subscription_services.get_all_threads_subscribed_to(USER_ID),
-            [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2],
-        )
-
     def test_thread_and_exp_subscriptions_are_tracked_individually(
         self,
     ) -> None:

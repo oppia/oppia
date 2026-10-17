@@ -32,10 +32,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {Subscription} from 'rxjs';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
-import {
-  LearnerDashboardBackendApiService,
-  SubtopicMasterySummaryBackendDict,
-} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {SubtopicMasterySummaryBackendDict} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 
 interface ShowMoreInSectionDict {
@@ -52,8 +49,7 @@ export class ProgressTabComponent {
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private userService: UserService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private userService: UserService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -191,10 +187,6 @@ export class ProgressTabComponent {
     return webpImageUrl;
   }
 
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
-  }
-
   toggleDropdown(): void {
     this.dropdownEnabled = !this.dropdownEnabled;
   }
@@ -320,13 +312,13 @@ export class ProgressTabComponent {
 
   getNodeCountForSummaryTile(
     tile: LearnerExplorationSummary | CollectionSummary
-  ): string {
-    // The summary tiles expect a string value for the getNodeCount input,
-    // since the node count is displayed as text.
+  ): number {
+    // The collection summary tile takes the node count as a number and
+    // renders it as text, so the number is passed through unchanged.
     if (tile instanceof CollectionSummary) {
-      return tile.nodeCount.toString();
+      return tile.nodeCount;
     }
-    return '0';
+    return 0;
   }
 
   changePageByOne(direction: string, section: string): void {
@@ -469,12 +461,5 @@ export class ProgressTabComponent {
       }
     }
     return allProgress;
-  }
-
-  getTotalSkillCards(
-    acc: number,
-    curr: {topic: LearnerTopicSummary; progress: number[]}
-  ): number {
-    return acc + curr.topic.subtopics.length;
   }
 }
