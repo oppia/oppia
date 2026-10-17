@@ -490,6 +490,41 @@ describe('Exploration editor page component', () => {
       component.ngOnDestroy();
     });
 
+    it('should create the preview only after editor initialization completes', fakeAsync(() => {
+      let finishInitialization!: () => void;
+      const improvementsInitialization = new Promise<void>(resolve => {
+        finishInitialization = resolve;
+      });
+      eis.initAsync.and.returnValue(improvementsInitialization);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+      component.explorationEditorPageHasInitialized = true;
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+
+      expect(component.explorationEditorPageHasInitialized).toBe(false);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      finishInitialization();
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
     it('should start editor tutorial when on main page', fakeAsync(() => {
       explorationData.version = 1;
       tds.countOfOpenFeedbackThreads = 2;
