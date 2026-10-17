@@ -827,8 +827,8 @@ describe('Progress Tab Component', () => {
     const collectionSummary =
       CollectionSummary.createFromBackendDict(collection);
 
-    expect(component.getNodeCountForSummaryTile(collectionSummary)).toBe('13');
-    expect(component.getNodeCountForSummaryTile(explorationSummary)).toBe('0');
+    expect(component.getNodeCountForSummaryTile(collectionSummary)).toBe(13);
+    expect(component.getNodeCountForSummaryTile(explorationSummary)).toBe(0);
   });
 
   it('should toggle the summary tile based on object identity', () => {

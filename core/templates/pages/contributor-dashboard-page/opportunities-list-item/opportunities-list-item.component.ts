@@ -219,7 +219,7 @@ export class OpportunitiesListItemComponent {
             maxTranslatableCards -= this.opportunity.reviewerOnlyContentCount;
           }
 
-          // translationsCount and inReviewCount track all translations
+          // Note: translationsCount and inReviewCount track all translations
           // for the exploration (including reviewer-only cards). If a
           // reviewer translates reviewer-only content,
           // translationsCount + inReviewCount can exceed
