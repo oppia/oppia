@@ -137,8 +137,6 @@ def find_superseded_skill_in_topic(
     all_skill_ids = topic.get_all_skill_ids()
     all_skills = skill_fetchers.get_multi_skills(all_skill_ids, strict=False)
     for skill in all_skills:
-        if skill is None:
-            continue
         if skill.superseding_skill_id is not None:
             return skill
     return None
@@ -601,13 +599,13 @@ def _apply_subtopic_page_change(
         # Here we use cast because this 'if' condition forces change to have type
         # UpdateSubtopicPagePropertyPageContentsHtmlCmd, which is a specific
         # subtype of BaseChange with the required property_name and new_value.
-        update_cmd = cast(
+        update_html_cmd = cast(
             subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,
             change,
         )
 
         page_contents = state_domain.SubtitledHtml.from_dict(
-            update_cmd.new_value
+            update_html_cmd.new_value
         )
         page_contents.validate()
 
@@ -616,7 +614,7 @@ def _apply_subtopic_page_change(
         )
 
         if study_guide_id in modified_study_guides:
-            html_content = update_cmd.new_value['html']
+            html_content = update_html_cmd.new_value['html']
             modified_study_guides[study_guide_id].update_section_content(
                 html_content,
                 'section_content_1',
@@ -629,13 +627,15 @@ def _apply_subtopic_page_change(
         # Here we use cast because this 'elif' condition forces change to have type
         # UpdateSubtopicPagePropertyPageContentsAudioCmd, which is a specific
         # subtype of BaseChange with the required property_name and new_value.
-        update_cmd = cast(
+        update_audio_cmd = cast(
             subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,
             change,
         )
 
         modified_subtopic_pages[subtopic_page_id].update_page_contents_audio(
-            state_domain.RecordedVoiceovers.from_dict(update_cmd.new_value)
+            state_domain.RecordedVoiceovers.from_dict(
+                update_audio_cmd.new_value
+            )
         )
 
 
@@ -690,9 +690,14 @@ def _apply_study_guide_change(
         update_study_guide_sections_cmd = cast(
             study_guide_domain.UpdateStudyGuidePropertyCmd, change
         )
+        # Here we use cast because the command's new_value is known to hold
+        # a list of study guide section dicts.
         new_sections_dict_list: List[
             study_guide_domain.StudyGuideSectionDict
-        ] = update_study_guide_sections_cmd.new_value
+        ] = cast(
+            List[study_guide_domain.StudyGuideSectionDict],
+            update_study_guide_sections_cmd.new_value,
+        )
         new_sections: List[study_guide_domain.StudyGuideSection] = []
 
         # For updating the page_contents of the subtopic page corresponding
@@ -728,7 +733,7 @@ def _apply_study_guide_change(
         temporary_subtopic_page: Union[
             subtopic_page_domain.SubtopicPage, None
         ] = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, change.subtopic_id, False
+            topic_id, change.subtopic_id, strict=False
         )
         if temporary_subtopic_page is not None:
             modified_subtopic_pages[subtopic_page_id] = temporary_subtopic_page
@@ -2711,13 +2716,13 @@ def populate_topic_model_fields(
 
 
 def populate_topic_summary_model_fields(
-    topic_summary_model: topic_models.TopicSummaryModel,
+    topic_summary_model: Optional[topic_models.TopicSummaryModel],
     topic_summary: topic_domain.TopicSummary,
 ) -> topic_models.TopicSummaryModel:
     """Populate topic summary model with the data from topic summary object.
 
     Args:
-        topic_summary_model: TopicSummaryModel. The model to populate.
+        topic_summary_model: TopicSummaryModel|None. The model to populate.
         topic_summary: TopicSummary. The topic summary domain object which
             should be used to populate the model.
 
@@ -2904,65 +2909,8 @@ def get_all_published_story_exploration_ids(
     # use the topic to compute the mapping. Add each computed mapping to
     # the list of persisted mappings.
     mappings = []
-    ids_of_topic_summaries_without_mapping: List[str] = []
     for summary in fetched_topic_summaries:
-        if summary.published_story_exploration_mapping is None:
-            ids_of_topic_summaries_without_mapping.append(summary.id)
-        else:
-            mappings.append(summary.published_story_exploration_mapping)
-    if len(ids_of_topic_summaries_without_mapping) > 0:
-        topics_without_mapping = topic_fetchers.get_topics_by_ids(
-            ids_of_topic_summaries_without_mapping
-        )
-
-        published_story_ids_grouped_by_topic = [
-            [
-                story_ref.story_id
-                for story_ref in topic.canonical_story_references
-                + topic.additional_story_references
-                if story_ref.story_is_published
-            ]
-            for topic in topics_without_mapping
-            if topic is not None
-        ]
-        cumulative_published_story_counts_by_topic = list(
-            itertools.accumulate(
-                [0]
-                + [
-                    len(topic_published_story_ids)
-                    for topic_published_story_ids in published_story_ids_grouped_by_topic[
-                        :-1
-                    ]
-                ]
-            )
-        )
-
-        published_stories_in_all_topics_without_mapping = [
-            story
-            for story in story_fetchers.get_stories_by_ids(
-                list(
-                    itertools.chain.from_iterable(
-                        published_story_ids_grouped_by_topic
-                    )
-                ),
-                strict=False,
-            )
-            if story is not None
-        ]
-        published_stories_grouped_by_topic = [
-            [
-                published_stories_in_all_topics_without_mapping[
-                    cumulative_published_story_counts_by_topic[i] + j
-                ]
-                for j in range(len(published_story_ids_grouped_by_topic[i]))
-            ]
-            for i in range(len(published_story_ids_grouped_by_topic))
-        ]
-
-        for published_stories_in_topic in published_stories_grouped_by_topic:
-            mappings.append(
-                _compute_story_exploration_mapping(published_stories_in_topic)
-            )
+        mappings.append(summary.published_story_exploration_mapping)
 
     exp_ids = itertools.chain.from_iterable(
         itertools.chain.from_iterable(mapping.values()) for mapping in mappings
