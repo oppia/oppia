@@ -155,7 +155,8 @@ export class ContentTranslationManagerService {
     this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
       this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
         newLanguageCode,
-        this.entityVoiceoversService.getLanguageAccentCodes()
+        this.entityVoiceoversService.getLanguageAccentCodes(),
+        true
       );
       this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
         this.entityVoiceoversService.getActiveEntityVoiceovers()
@@ -197,10 +198,13 @@ export class ContentTranslationManagerService {
             response.languageAccentMasterList;
           this.voiceoverPlayerService.languageCodesMapping =
             response.languageCodesMapping;
+          this.voiceoverPlayerService.learnerFacingLanguageAccents =
+            response.learnerFacingLanguageAccents;
 
           this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
             selectedLanguageCode,
-            this.entityVoiceoversService.getLanguageAccentCodes()
+            this.entityVoiceoversService.getLanguageAccentCodes(),
+            true
           );
 
           this.audioPreloaderService.kickOffAudioPreloader(

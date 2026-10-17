@@ -162,22 +162,41 @@ describe('Voiceover player service', () => {
         'hi-IN': 'Hindi (India)',
       },
     };
+    voiceoverPlayerService.learnerFacingLanguageAccents = ['en-US'];
 
     voiceoverPlayerService.languageAccentDescriptions = [];
 
-    let expectedLanguageAccentDescriptions = [
-      'English (United States)',
-      'English (India)',
-    ];
+    let expectedLanguageAccentDescriptions = ['English (United States)'];
     let languageAccentCodes = ['en-US', 'en-IN'];
 
     voiceoverPlayerService.setLanguageAccentCodesDescriptions(
       'en',
-      languageAccentCodes
+      languageAccentCodes,
+      true
     );
 
     expect(voiceoverPlayerService.languageAccentDescriptions).toEqual(
       expectedLanguageAccentDescriptions
     );
+  });
+
+  it('should show all voiceovers when learner filtering is not requested', () => {
+    voiceoverPlayerService.languageAccentMasterList = {
+      en: {
+        'en-US': 'English (United States)',
+        'en-IN': 'English (India)',
+      },
+    };
+    voiceoverPlayerService.learnerFacingLanguageAccents = ['en-US'];
+
+    voiceoverPlayerService.setLanguageAccentCodesDescriptions('en', [
+      'en-US',
+      'en-IN',
+    ]);
+
+    expect(voiceoverPlayerService.languageAccentDescriptions).toEqual([
+      'English (United States)',
+      'English (India)',
+    ]);
   });
 });

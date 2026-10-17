@@ -247,6 +247,7 @@ describe('Content language selector component', () => {
           'en-US': true,
         },
       },
+      learnerFacingLanguageAccents: ['en-US'],
     };
     spyOn(
       voiceoverBackendApiService,

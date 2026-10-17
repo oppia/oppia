@@ -319,7 +319,8 @@ class TopicPageDataHandlerTests(
         self.publish_exploration(self.admin_id, no_translation_exploration_id)
 
         voiceover_services.save_language_accent_support(
-            language_codes_mapping={'en': {'en-US': True, 'en-UK': True}}
+            language_codes_mapping={'en': {'en-US': True, 'en-UK': True}},
+            learner_facing_language_accents=['en-US'],
         )
 
         manual_voiceover_dict: state_domain.VoiceoverDict = {
@@ -441,7 +442,7 @@ class TopicPageDataHandlerTests(
         self.assertEqual(node_dict['available_text_language_codes'], ['en'])
         self.assertEqual(
             set(node_dict['available_voiceover_language_codes']),
-            {'en-US', 'en-UK'},
+            {'en-US'},
         )
         accent_descriptions = node_dict[
             'available_voiceover_language_accent_descriptions'
@@ -449,7 +450,7 @@ class TopicPageDataHandlerTests(
         language_accent_codes_to_descriptions = (
             voiceover_services.get_language_accent_codes_to_descriptions()
         )
-        self.assertEqual(set(accent_descriptions.keys()), {'en-US', 'en-UK'})
+        self.assertEqual(set(accent_descriptions.keys()), {'en-US'})
         self.assertEqual(
             accent_descriptions['en-US'],
             language_accent_codes_to_descriptions['en-US'],
@@ -561,7 +562,8 @@ class TopicPageDataHandlerTests(
         voiceover_services.save_language_accent_support(
             language_codes_mapping={
                 'en': {'en-US': True, 'zh-Hans': True},
-            }
+            },
+            learner_facing_language_accents=['zh-Hans'],
         )
 
         manual_voiceover_dict: state_domain.VoiceoverDict = {

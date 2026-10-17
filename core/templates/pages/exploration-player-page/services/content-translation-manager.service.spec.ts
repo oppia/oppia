@@ -432,6 +432,7 @@ describe('Content translation manager service', () => {
     const voiceoverResponse = {
       languageAccentMasterList: {en: ['en-US']},
       languageCodesMapping: {en: 'English'},
+      learnerFacingLanguageAccents: ['en-US'],
     };
 
     spyOn(
