@@ -10,70 +10,81 @@
          *ngIf="!languageAccentCodeIsPresent">
         No language/accent pairs added!
       </p>
-      <p class="oppia-supported-language-pair-heading"
-         *ngIf="languageAccentCodeIsPresent">
-        <span class="language-accent-status-column-header" aria-hidden="true"></span>
-        <span class="language-accent-description-header">
-          Supported language/accent pairs
-        </span>
-        <span class="language-accent-autogeneration-header">
-          Supports autogeneration?
-        </span>
-        <span class="language-accent-action-header" aria-hidden="true"></span>
-      </p>
-    </div>
-    <div *ngIf="pageIsInitialized">
-      <div>
-        <mat-list class="oppia-supported-language-list">
-          <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
-            <div class="oppia-language-accent-list">
-              <span class="language-accent-status-column">
-                <mat-spinner *ngIf="languageAccentCodeBeingUpdated === languageAccentCodeToDescription.key"
-                             class="language-accent-job-status-spinner"
-                             color="accent"
-                             [diameter]="20">
-                </mat-spinner>
-                <mat-icon *ngIf="languageAccentCodeBeingUpdated !== languageAccentCodeToDescription.key && getBeamJobStateIcon(languageAccentCodeToDescription.key) as icon"
-                          class="language-accent-job-status"
-                          [class.error-icon]="getBeamJobStateIcon(languageAccentCodeToDescription.key) === 'error'"
-                          [matTooltip]="getBeamJobStateTooltip(languageAccentCodeToDescription.key)"
-                          [color]="getBeamJobStateMaterialThemeColor(languageAccentCodeToDescription.key)">
-                  {{icon}}
-                </mat-icon>
+      <div class="supported-language-table-container" *ngIf="languageAccentCodeIsPresent">
+        <table mat-table [dataSource]="supportedLanguageAccentCodesToDescriptions | keyvalue" class="supported-language-table">
+          <ng-container matColumnDef="languageAccent">
+            <th mat-header-cell *matHeaderCellDef>Language Accent</th>
+            <td mat-cell *matCellDef="let languageAccent">{{languageAccent.value}}</td>
+          </ng-container>
 
-              </span>
-              <span class="language-accent-description">
-                {{languageAccentCodeToDescription.value}}
-              </span>
-              <span class="language-accent-autogeneration-status">
-                <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
-                      matTooltip="This language accent does not support autogeneration functionality."
-                      matTooltipPosition="after">
-                  <span class="autogeneration-disabled-text">N/A</span>
-                  <span>
-                    <mat-icon>info</mat-icon>
-                  </span>
-                </span>
-                <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
-                                class="autogeneration-select-field">
-                  <mat-select
-                    [(ngModel)]="languageAccentCodesToSupportsAutogeneration[languageAccentCodeToDescription.key]"
-                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)"
-                    [ngClass]="'e2e-test-' + languageAccentCodeToDescription.key + '-supports-autogeneration-select'">
-                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="true">Yes</mat-option>
-                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="false">No</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </span>
-              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
-                      class="language-accent-remove-button"
-                      mat-icon-button
-                      mat-button>
-                <mat-icon>close</mat-icon>
+          <ng-container matColumnDef="supportsAutogeneration">
+            <th mat-header-cell *matHeaderCellDef>Support autogeneration</th>
+            <td mat-cell *matCellDef="let languageAccent">
+              <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccent.key)"
+                    matTooltip="This language accent does not support autogeneration functionality."
+                    matTooltipPosition="after">N/A</span>
+              <button *ngIf="isAutogenerationSupportedByCloudService(languageAccent.key)"
+                      type="button"
+                      class="voiceover-toggle"
+                      role="switch"
+                      [attr.aria-checked]="languageAccentCodesToSupportsAutogeneration[languageAccent.key]"
+                      [class.is-enabled]="languageAccentCodesToSupportsAutogeneration[languageAccent.key]"
+                      [ngClass]="'e2e-test-' + languageAccent.key + '-supports-autogeneration-select'"
+                      (click)="updateSupportsAutogenerationField(languageAccent.key, !languageAccentCodesToSupportsAutogeneration[languageAccent.key])">
+                <span class="voiceover-toggle-thumb"></span>
+                <span>{{languageAccentCodesToSupportsAutogeneration[languageAccent.key] ? 'Yes' : 'No'}}</span>
               </button>
-            </div>
-          </mat-list-item>
-        </mat-list>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="showToLearners">
+            <th mat-header-cell *matHeaderCellDef>Show to learners</th>
+            <td mat-cell *matCellDef="let languageAccent">
+              <button type="button"
+                      class="voiceover-toggle"
+                      role="switch"
+                      [attr.aria-checked]="languageAccentCodesToShowLearners[languageAccent.key]"
+                      [class.is-enabled]="languageAccentCodesToShowLearners[languageAccent.key]"
+                      (click)="toggleShowToLearners(languageAccent.key)">
+                <span class="voiceover-toggle-thumb"></span>
+                <span>{{languageAccentCodesToShowLearners[languageAccent.key] ? 'Yes' : 'No'}}</span>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="jobRunStatus">
+            <th mat-header-cell *matHeaderCellDef>Job run status</th>
+            <td mat-cell *matCellDef="let languageAccent">
+              <mat-spinner *ngIf="languageAccentCodeBeingUpdated === languageAccent.key"
+                           class="language-accent-job-status-spinner"
+                           color="accent"
+                           [diameter]="20">
+              </mat-spinner>
+              <mat-icon *ngIf="languageAccentCodeBeingUpdated !== languageAccent.key && getBeamJobStateIcon(languageAccent.key) as icon"
+                        class="language-accent-job-status"
+                        [class.error-icon]="getBeamJobStateIcon(languageAccent.key) === 'error'"
+                        [matTooltip]="getBeamJobStateTooltip(languageAccent.key)"
+                        [color]="getBeamJobStateMaterialThemeColor(languageAccent.key)">
+                {{icon}}
+              </mat-icon>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="delete">
+            <th mat-header-cell *matHeaderCellDef>Delete</th>
+            <td mat-cell *matCellDef="let languageAccent">
+              <button (click)="removeLanguageAccentCodeSupport(languageAccent.key)"
+                      class="language-accent-remove-button"
+                      aria-label="Delete language accent pair"
+                      mat-icon-button>
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="supportedLanguageAccentColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: supportedLanguageAccentColumns;"></tr>
+        </table>
       </div>
 
       <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">

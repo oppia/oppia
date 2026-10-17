@@ -89,25 +89,6 @@
 .datepicker-form-container {
   width: 30%;
 }
-.language-accent-status-column,
-.language-accent-status-column-header {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-}
-.language-accent-description,
-.language-accent-description-header {
-  min-width: 0;
-}
-.language-accent-autogeneration-status,
-.language-accent-autogeneration-header {
-  cursor: pointer;
-  min-width: 0;
-}
-.language-accent-action-header {
-  justify-self: center;
-  width: 48px;
-}
 .language-accent-job-status {
   font-size: 24px;
   height: 24px;
@@ -117,8 +98,7 @@
   display: inline-block;
 }
 .language-accent-remove-button {
-  justify-self: center;
-  margin-left: 0;
+  color: #a52714;
 }
 .table-container {
   max-height: 500px;
@@ -168,15 +148,6 @@
 .card-content {
   padding: 20px
 }
-.oppia-language-accent-list {
-  align-items: center;
-  border-radius: 5px;
-  column-gap: 8px;
-  display: grid;
-  grid-template-columns: 12% minmax(0, 44%) minmax(0, 32%) 48px;
-  padding: 0 10px;
-  width: -webkit-fill-available;
-}
 .oppia-language-accent-dropdown {
   display: flex;
   justify-content: space-between;
@@ -195,16 +166,6 @@
 .oppia-add-language-accent-button {
   color: #00645c;
 }
-.oppia-supported-language-pair-heading {
-  align-items: center;
-  column-gap: 8px;
-  display: grid;
-  font-weight: bold;
-  grid-template-columns: 12% minmax(0, 44%) minmax(0, 32%) 48px;
-  margin-left: 0;
-  padding: 0 10px 0 0;
-  width: 100%;
-}
 .oppia-supported-language-pair-heading-with-no-language {
   align-items: center;
   column-gap: 8px;
@@ -214,14 +175,46 @@
   padding: 0 10px 0 0;
   width: 100%;
 }
-.oppia-supported-language-list {
+.supported-language-table-container {
   max-height: 300px;
-  overflow-y: auto;
+  overflow: auto;
 }
-/* :ng-deep is used to style Angular Material list internals. */
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-::ng-deep .oppia-supported-language-list .mat-list-item-content {
-  padding: 0;
+.supported-language-table {
+  min-width: 700px;
+  width: 100%;
+}
+.supported-language-table th {
+  font-weight: bold;
+}
+.supported-language-table th:nth-child(n + 2),
+.supported-language-table td:nth-child(n + 2) {
+  text-align: center;
+}
+.voiceover-toggle {
+  align-items: center;
+  background: #eee;
+  border: 1px solid #777;
+  border-radius: 16px;
+  color: #333;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  min-width: 72px;
+  padding: 3px 8px 3px 4px;
+}
+.voiceover-toggle.is-enabled {
+  background: #e0f2f1;
+  border-color: #00645c;
+  color: #004d40;
+}
+.voiceover-toggle-thumb {
+  background: #777;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+}
+.voiceover-toggle.is-enabled .voiceover-toggle-thumb {
+  background: #00645c;
 }
 .mat-card.oppia-page-card {
   background: rgb(255,255,255);
@@ -254,30 +247,12 @@
 }
 
 @media (max-width: 600px) {
-  .oppia-supported-language-pair-heading,
-  .oppia-language-accent-list {
-    grid-template-columns: 14% minmax(0, 50%) minmax(0, 36%) 48px;
-  }
-  .oppia-supported-language-pair-heading {
-    font-size: 1rem;
-    margin-left: 0;
-  }
   .oppia-long-text-card {
     padding: 8px 2px 8px 2px;
   }
   .header-text {
     font-size: 1.2rem;
     margin-bottom: 10px;
-  }
-  .oppia-language-accent-list {
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 5px 0;
-    width: 100%;
-  }
-  .autogeneration-select-field {
-    width: 100%;
   }
   .oppia-language-accent-dropdown-selector {
     min-width: 120px;

@@ -115,6 +115,7 @@ describe('Voiceover Admin Page component ', () => {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      learnerFacingLanguageAccents: ['en-US'],
       autoGeneratableLanguageAccentCodes: ['en-US'],
       languageAccentCodeToBeamJobState: {},
     };
@@ -253,6 +254,22 @@ describe('Voiceover Admin Page component ', () => {
     });
   }));
 
+  it('should toggle whether a language accent is shown to learners', () => {
+    component.languageAccentCodesToShowLearners = {'en-US': true};
+    spyOn(
+      voiceoverBackendApiService,
+      'updateVoiceoverLanguageCodesMappingAsync'
+    ).and.returnValue(Promise.resolve({}));
+    component.languageCodesMapping = {};
+
+    component.toggleShowToLearners('en-US');
+
+    expect(component.languageAccentCodesToShowLearners['en-US']).toBeFalsy();
+    expect(
+      voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync
+    ).toHaveBeenCalledWith({}, []);
+  });
+
   it('should be able to show language accent dropdown', () => {
     component.languageAccentDropdownIsShown = false;
     component.showLanguageAccentDropdown();
@@ -346,6 +363,12 @@ describe('Voiceover Admin Page component ', () => {
         'hi-IN': true,
       },
     });
+    expect(
+      component.languageAccentCodesToSupportsAutogeneration['en-US']
+    ).toBeTrue();
+    expect(component.saveUpdatedLanguageAccentSupport).toHaveBeenCalledWith(
+      'en-US'
+    );
     flush();
     discardPeriodicTasks();
   }));

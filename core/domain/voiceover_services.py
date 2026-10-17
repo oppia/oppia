@@ -481,6 +481,20 @@ def get_all_language_accent_codes_for_voiceovers() -> (
     return language_codes_mapping
 
 
+def get_learner_facing_language_accents() -> List[str]:
+    """Returns the language-accent codes that are visible to learners.
+
+    Returns:
+        List[str]. The language-accent codes selected for learners.
+    """
+    policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+        voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+    )
+    if policy_model is None:
+        return []
+    return policy_model.learner_facing_language_accents
+
+
 def is_voiceover_autogeneration_using_cloud_service_enabled() -> bool:
     """The method verifies whether admins have enabled the configuration
     for generating voiceovers automatically using cloud service.
@@ -597,6 +611,7 @@ def save_entity_voiceovers(
 
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]],
+    learner_facing_language_accents: Optional[List[str]] = None,
 ) -> None:
     """The method saves the language-accent codes into the
     VoiceoverAutogenerationPolicyModel, which will be supported by
@@ -608,6 +623,9 @@ def save_language_accent_support(
             contains language_accent_codes as keys and booleans indicating
             whether it's possible to generate automatic voiceovers for this
             language-accent code as values.
+        learner_facing_language_accents: Optional[List[str]]. The language-
+            accent codes that should be available to learners. If not
+            specified, the currently stored list is preserved.
     """
     retrieved_voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
@@ -625,6 +643,10 @@ def save_language_accent_support(
     voiceover_autogeneration_policy_model.language_codes_mapping = (
         language_codes_mapping
     )
+    if learner_facing_language_accents is not None:
+        voiceover_autogeneration_policy_model.learner_facing_language_accents = (
+            learner_facing_language_accents
+        )
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
 

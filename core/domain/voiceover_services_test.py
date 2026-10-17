@@ -733,13 +733,17 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         retrieved_language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers()
         )
+        self.assertEqual(
+            voiceover_services.get_learner_facing_language_accents(), []
+        )
         expected_language_codes_mapping: Dict[str, Dict[str, bool]] = {}
         self.assertDictEqual(
             retrieved_language_codes_mapping, expected_language_codes_mapping
         )
 
         voiceover_services.save_language_accent_support(
-            language_codes_mapping=language_codes_mapping
+            language_codes_mapping=language_codes_mapping,
+            learner_facing_language_accents=['en-US'],
         )
 
         retrieved_language_codes_mapping = (
@@ -747,6 +751,10 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         )
         self.assertDictEqual(
             retrieved_language_codes_mapping, language_codes_mapping
+        )
+        self.assertEqual(
+            voiceover_services.get_learner_facing_language_accents(),
+            ['en-US'],
         )
 
 

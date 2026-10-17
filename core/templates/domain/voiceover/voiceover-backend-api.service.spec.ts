@@ -75,6 +75,7 @@ describe('Voiceover backend API service', function () {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      learnerFacingLanguageAccents: ['en-US'],
       autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
       languageAccentCodeToBeamJobState: {'en-US': 'RUNNING'},
     };
@@ -82,6 +83,7 @@ describe('Voiceover backend API service', function () {
     req.flush({
       language_accent_master_list: languageAccentMasterList,
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
       autogeneratable_language_accent_codes: ['en-US', 'hi-IN'],
       language_accent_code_to_beam_job_state: {'en-US': 'RUNNING'},
     });
@@ -129,9 +131,10 @@ describe('Voiceover backend API service', function () {
     };
     let payload = {
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
     };
     voiceoverBackendApiService
-      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping, ['en-US'])
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -187,9 +190,10 @@ describe('Voiceover backend API service', function () {
     };
     let payload = {
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
     };
     voiceoverBackendApiService
-      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping, ['en-US'])
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(

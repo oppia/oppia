@@ -72,6 +72,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
   languageAccentCodesToSupportsAutogeneration!: LanguageAccentCodesToSupportsAutogeneration;
+  languageAccentCodesToShowLearners: {[languageAccentCode: string]: boolean} =
+    {};
   languageAccentCodeToBeamJobState!: LanguageAccentCodeToBeamJobState;
   availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
@@ -81,6 +83,13 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentCodeIsPresent: boolean = false;
   languageAccentMasterList!: LanguageAccentMasterList;
   cloudSupportedLanguageAccentCodes: string[] = [];
+  supportedLanguageAccentColumns: string[] = [
+    'languageAccent',
+    'supportsAutogeneration',
+    'showToLearners',
+    'jobRunStatus',
+    'delete',
+  ];
   columnsToDisplay: string[] = [
     'voiceArtist',
     'languageCode',
@@ -128,15 +137,20 @@ export class VoiceoverAdminPageComponent implements OnInit {
       .fetchVoiceoverAdminDataAsync()
       .then(response => {
         this.languageCodesMapping = response.languageCodesMapping;
+        const learnerFacingLanguageAccents = new Set(
+          response.learnerFacingLanguageAccents
+        );
         this.languageAccentCodeToLanguageCode = {};
         this.supportedLanguageAccentCodesToDescriptions = {};
         this.languageAccentCodesToDescriptionsMasterList = {};
         this.availableLanguageAccentDescriptionsToCodes = {};
         this.languageAccentCodesToSupportsAutogeneration = {};
+        this.languageAccentCodesToShowLearners = {};
         this.languageAccentCodeToBeamJobState =
           response.languageAccentCodeToBeamJobState;
         this.initializeLanguageAccentCodesFields(
-          response.languageAccentMasterList
+          response.languageAccentMasterList,
+          learnerFacingLanguageAccents
         );
         this.languageAccentMasterList = response.languageAccentMasterList;
         this.cloudSupportedLanguageAccentCodes =
@@ -147,7 +161,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   initializeLanguageAccentCodesFields(
-    languageAccentMasterList: LanguageAccentMasterList
+    languageAccentMasterList: LanguageAccentMasterList,
+    learnerFacingLanguageAccents: Set<string>
   ): void {
     for (let languageCode in languageAccentMasterList) {
       const languageAccentCodesToDescriptions =
@@ -178,6 +193,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
         this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
           languageAccentToSupportsAutogeneration[languageAccentCode];
+        this.languageAccentCodesToShowLearners[languageAccentCode] =
+          learnerFacingLanguageAccents.has(languageAccentCode);
       }
     }
 
@@ -217,6 +234,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
     this.languageAccentCodesToSupportsAutogeneration[languageAccentCodeToAdd] =
       false;
+    this.languageAccentCodesToShowLearners[languageAccentCodeToAdd] = true;
 
     this.languageAccentCodeIsPresent =
       Object.keys(this.supportedLanguageAccentCodesToDescriptions).length !== 0;
@@ -226,6 +244,12 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
     return this.cloudSupportedLanguageAccentCodes?.includes(languageAccentCode);
+  }
+
+  toggleShowToLearners(languageAccentCode: string): void {
+    this.languageAccentCodesToShowLearners[languageAccentCode] =
+      !this.languageAccentCodesToShowLearners[languageAccentCode];
+    this.saveUpdatedLanguageAccentSupport(languageAccentCode);
   }
 
   getBeamJobStateIcon(languageAccentCode: string): string | null {
@@ -307,6 +331,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
       () => {
         this.languageCodesMapping[languageCode][languageAccentCode] =
           supportsAutogeneration;
+        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+          supportsAutogeneration;
         this.saveUpdatedLanguageAccentSupport(languageAccentCode);
         if (
           supportsAutogeneration &&
@@ -350,6 +376,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
         delete this.supportedLanguageAccentCodesToDescriptions[
           languageAccentCodeToRemove
         ];
+        delete this.languageAccentCodesToShowLearners[
+          languageAccentCodeToRemove
+        ];
         this.availableLanguageAccentDescriptionsToCodes[
           languageAccentDescription
         ] = languageAccentCodeToRemove;
@@ -379,7 +408,12 @@ export class VoiceoverAdminPageComponent implements OnInit {
   saveUpdatedLanguageAccentSupport(languageAccentCode: string): void {
     this.languageAccentCodeBeingUpdated = languageAccentCode;
     this.voiceoverBackendApiService
-      .updateVoiceoverLanguageCodesMappingAsync(this.languageCodesMapping)
+      .updateVoiceoverLanguageCodesMappingAsync(
+        this.languageCodesMapping,
+        Object.keys(this.languageAccentCodesToShowLearners).filter(
+          accentCode => this.languageAccentCodesToShowLearners[accentCode]
+        )
+      )
       .then(languageAccentCodeToBeamJobState => {
         this.languageAccentCodeToBeamJobState =
           languageAccentCodeToBeamJobState;

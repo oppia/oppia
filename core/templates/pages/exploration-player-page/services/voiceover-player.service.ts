@@ -37,6 +37,7 @@ export class VoiceoverPlayerService {
   public activeVoiceover!: Voiceover | undefined;
   public languageAccentMasterList!: LanguageAccentMasterList;
   public languageCodesMapping!: LanguageCodesMapping;
+  public learnerFacingLanguageAccents: string[] = [];
   public languageAccentDescriptions: string[] = [];
   public languageAccentDescriptionsToCodes: LanguageAccentDescriptionToCode =
     {};
@@ -87,7 +88,8 @@ export class VoiceoverPlayerService {
 
   setLanguageAccentCodesDescriptions(
     languageCode: string,
-    languageAccentCodes: string[]
+    languageAccentCodes: string[],
+    learnerFacingOnly: boolean = false
   ): void {
     let retrievedLanguageAccentCodes =
       this.languageAccentMasterList[languageCode] || {};
@@ -97,7 +99,11 @@ export class VoiceoverPlayerService {
     this.languageAccentDescriptionsToCodes = {};
 
     for (let languageAccentCode in retrievedLanguageAccentCodes) {
-      if (languageAccentCodes.includes(languageAccentCode)) {
+      if (
+        languageAccentCodes.includes(languageAccentCode) &&
+        (!learnerFacingOnly ||
+          this.learnerFacingLanguageAccents.includes(languageAccentCode))
+      ) {
         let description = retrievedLanguageAccentCodes[languageAccentCode];
 
         languageAccentDescriptions.push(description);

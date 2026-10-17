@@ -41,6 +41,7 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+  learner_facing_language_accents: string[];
   autogeneratable_language_accent_codes: string[];
   language_accent_code_to_beam_job_state: LanguageAccentCodeToBeamJobState;
 }
@@ -82,6 +83,7 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
+  learnerFacingLanguageAccents: string[];
   autoGeneratableLanguageAccentCodes: string[];
   languageAccentCodeToBeamJobState: LanguageAccentCodeToBeamJobState;
 }
@@ -163,6 +165,8 @@ export class VoiceoverBackendApiService {
             resolve({
               languageAccentMasterList: response.language_accent_master_list,
               languageCodesMapping: response.language_codes_mapping,
+              learnerFacingLanguageAccents:
+                response.learner_facing_language_accents,
               autoGeneratableLanguageAccentCodes:
                 response.autogeneratable_language_accent_codes,
               languageAccentCodeToBeamJobState:
@@ -177,13 +181,17 @@ export class VoiceoverBackendApiService {
   }
 
   async updateVoiceoverLanguageCodesMappingAsync(
-    languageCodesMapping: LanguageCodesMapping
+    languageCodesMapping: LanguageCodesMapping,
+    learnerFacingLanguageAccents: string[]
   ): Promise<LanguageAccentCodeToBeamJobState> {
     return new Promise((resolve, reject) => {
       this.http
         .put<UpdateLanguageCodesMappingBackendDict>(
           VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
-          {language_codes_mapping: languageCodesMapping}
+          {
+            language_codes_mapping: languageCodesMapping,
+            learner_facing_language_accents: learnerFacingLanguageAccents,
+          }
         )
         .toPromise()
         .then(
