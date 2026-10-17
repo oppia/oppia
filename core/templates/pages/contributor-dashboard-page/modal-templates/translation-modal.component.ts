@@ -409,7 +409,7 @@ export class TranslationModalComponent {
         // properly since contributors will not be able to view and translate
         // complex extensions.
         hide_complex_extensions: false,
-        rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
+        rte_component_config_id: 'TRANSLATION_COMPONENTS',
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),
@@ -516,6 +516,7 @@ export class TranslationModalComponent {
     this.reviewedRteComponents = [];
     this.translationEditorSelection = null;
     this.updateHtml(translatedText);
+    this.resetEditor();
   }
 
   private resetAutoTranslationState(): void {
