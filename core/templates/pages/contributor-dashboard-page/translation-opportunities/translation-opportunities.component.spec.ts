@@ -283,6 +283,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
@@ -295,6 +296,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
@@ -328,6 +330,7 @@ describe('Translation opportunities component', () => {
         totalCount: 4,
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
+        userIsReviewer: false,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
       expect(component.allOpportunities['2']).toEqual({
@@ -340,6 +343,7 @@ describe('Translation opportunities component', () => {
         totalCount: 10,
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
+        userIsReviewer: false,
         entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
       });
 
@@ -359,6 +363,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
         {
@@ -371,6 +376,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          userIsReviewer: false,
           entityType: AppConstants.ENTITY_TYPE.EXPLORATION,
         },
       ]);
@@ -457,10 +463,12 @@ describe('Translation opportunities component', () => {
       expect(opportunitiesDicts[0].totalCount).toEqual(10);
       // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
+      // Should correctly propagate userIsReviewer to the presentation layer.
+      expect(opportunitiesDicts[0].userIsReviewer).toBe(true);
     }
   );
 
-  it('should open translation modal when clicking button', fakeAsync(() => {
+  it('should open translation modal and reload opportunities on resolve', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en'
     );
@@ -474,9 +482,70 @@ describe('Translation opportunities component', () => {
     });
     component.ngOnInit();
     tick();
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+
+    let resolveModal: (value?: unknown) => void = () => {};
+    translationModal.result = new Promise((resolve, reject) => {
+      resolveModal = resolve;
+    });
+
     component.onClickButton('2');
     tick();
     expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    resolveModal();
+    tick();
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
+  }));
+
+  it('should reload opportunities when translation modal is rejected', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesAsync'
+    ).and.resolveTo({
+      opportunities: opportunitiesArray,
+      more: false,
+    });
+    component.ngOnInit();
+    tick();
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+
+    let rejectModal: (reason?: unknown) => void = () => {};
+    translationModal.result = new Promise((resolve, reject) => {
+      rejectModal = reject;
+    });
+
+    component.onClickButton('2');
+    tick();
+    expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    rejectModal();
+    tick();
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
   }));
 
   it('should not open translation modal when user is not logged', fakeAsync(() => {
