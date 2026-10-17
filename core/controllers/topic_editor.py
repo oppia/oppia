@@ -226,7 +226,9 @@ class TopicEditorStoryHandler(
                     upcoming_chapters_expected_days
                 ),
                 'overdue_chapters_count': overdue_chapters_count,
-                'arcs': [arc.to_dict() for arc in story.story_contents.arcs],
+                'modules': [
+                    module.to_dict() for module in story.story_contents.modules
+                ],
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict
