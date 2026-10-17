@@ -175,6 +175,8 @@ export class OpportunitiesListItemComponent {
           let inReviewTranslationsPercentage = 0;
           let untranslatedPercentage = 0;
 
+          // If totalCount is 0, there is no content to translate, so we default
+          // the progress to 100% and avoid division by zero (NaN).
           if (this.opportunity.totalCount > 0) {
             translatedPercentage = Math.min(
               (this.opportunity.translationsCount /
@@ -217,6 +219,12 @@ export class OpportunitiesListItemComponent {
             maxTranslatableCards -= this.opportunity.reviewerOnlyContentCount;
           }
 
+          // translationsCount and inReviewCount track all translations
+          // for the exploration (including reviewer-only cards). If a
+          // reviewer translates reviewer-only content,
+          // translationsCount + inReviewCount can exceed
+          // maxTranslatableCards for a non-reviewer. We use '>=' to
+          // ensure the button remains disabled in that case.
           this.opportunityButtonDisabled =
             this.disableButtonOnComplete &&
             this.opportunity.translationsCount +
