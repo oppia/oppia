@@ -487,7 +487,9 @@ export class LoggedOutUser extends BaseUser {
       // Wait for Angular to be stable before clicking the expand button.
       await this.waitForAngularStability();
 
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.page
+        .locator(mobileSidebarExpandAboutMenuButton)
+        .dispatchEvent('click');
 
       // Wait for the About submenu to expand and the About button to be visible.
       await this.expectElementToBeVisible(mobileSidebarAboutButton);
