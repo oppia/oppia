@@ -253,6 +253,7 @@ describe('RteHelperModalComponent', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('explorationId');
       component.ngOnInit();
       flush();
 
@@ -302,6 +303,7 @@ describe('RteHelperModalComponent', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('explorationId');
       component.ngOnInit();
       flush();
 
@@ -1336,6 +1338,7 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('explorationId');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
@@ -1376,6 +1379,7 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('explorationId');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
