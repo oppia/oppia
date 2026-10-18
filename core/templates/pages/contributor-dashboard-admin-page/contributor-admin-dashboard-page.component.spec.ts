@@ -28,7 +28,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {ContributorAdminDashboardPageComponent} from './contributor-admin-dashboard-page.component';
 import {UserService} from 'services/user.service';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, QueryList} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {
   CommunityContributionStatsBackendDict,
@@ -707,8 +707,19 @@ describe('Contributor dashboard Admin page', () => {
         ContributorAdminStatsTable.prototype,
         'refreshPagination'
       );
+      const mockStatsTable = Object.create(
+        ContributorAdminStatsTable.prototype
+      );
+      const queryList = new QueryList<ContributorAdminStatsTable>();
+      queryList.reset([mockStatsTable]);
+      component.statsTables = queryList;
       component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       fixture.detectChanges();
+
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'updateQuestionRightsAsync'
+      ).and.returnValue(Promise.resolve());
 
       spyOn(
         contributorDashboardAdminBackendApiService,
