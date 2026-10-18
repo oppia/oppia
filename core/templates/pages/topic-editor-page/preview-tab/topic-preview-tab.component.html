@@ -80,9 +80,11 @@
                       [classroomUrlFragment]="classroomUrlFragment">
         </practice-tab>
         <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
-          <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+          <h2 class="coming-soon-title">
+            {{ 'I18N_TOPIC_VIEWER_COMING_SOON' | translate }}
           </h2>
-          <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+          <div class="coming-soon-text">
+            {{ 'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate }}
           </div>
         </mat-card>
       </div>

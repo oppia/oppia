@@ -1,7 +1,8 @@
 <div class="e2e-test-learner-dash-progress-tab">
   <ng-container *ngIf="!learnerDashboardRedesignFeatureFlag">
     <div tabindex="0" class="community-lessons-section e2e-test-community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
-      <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
+      <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}">
+        {{ 'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate }}
       </h1>
       <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
         <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
@@ -27,7 +28,7 @@
         </div>
       </div>
       <div *ngIf="noCommunityLessonActivity">
-        <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></h2>
+        <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="empty-section">{{ 'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate }}</h2>
         <oppia-primary-button [customClasses]="['btn oppia-dashboard-intro-button']"
                               [buttonHref]="communityLibraryUrl"
                               [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
@@ -35,7 +36,8 @@
       </div>
       <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
         <div *ngIf="totalIncompleteLessonsList.length !== 0">
-          <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
+          <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title">
+            {{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}
           </h2>
           <div class="summary-container">
             <div *ngFor="let summaryTile of displayIncompleteLessonsList"
@@ -99,12 +101,13 @@
       </div>
       <div class="completed-section e2e-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
         <div *ngIf="totalCompletedLessonsList.length !== 0">
-          <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
+          <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title">
+            {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }}
           </h2>
           <div class="summary-container">
             <span class="oppia-learner-dashboard-nonexistent-exploration" *ngIf="completedToIncompleteCollections.length !== 0">
-              <span
-                [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+              <span>
+                {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length} }}
               </span>
               <span>
                 <ul>
@@ -251,7 +254,7 @@
       </div>
     </div>
     <div tabindex="0" class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
-      <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></h1>
+      <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title">{{ 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate }}</h1>
       <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
         <mat-card class="oppia-subscription-card oppia-subscription-container-list"
           *ngFor="let subscription of subscriptionsList">

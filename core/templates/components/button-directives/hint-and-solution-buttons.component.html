@@ -28,7 +28,7 @@
   </ul>
   <div class="hint-container" *ngIf="isVisible && isTooltipVisible() && !iframed">
     <div class="hint-box hint-box-add-ons">
-      <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
+      <span>{{ 'I18N_HINT_NEED_HELP' | translate }}</span>
       <button type="button"
               class="btn btn-close"
               aria-label="Close"
@@ -39,7 +39,7 @@
   <div class="hint-container solution-container"
        *ngIf="isTooltipForSolutionVisible && isSolutionTooltipVisible() && !iframed">
     <div class="hint-box hint-box-add-ons">
-      <span [innerHTML]="'I18N_SOLUTION_NEED_HELP' | translate"></span>
+      <span>{{ 'I18N_SOLUTION_NEED_HELP' | translate }}</span>
       <button type="button"
               class="btn btn-close"
               aria-label="Close"

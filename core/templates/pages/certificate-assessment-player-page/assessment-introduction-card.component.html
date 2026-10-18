@@ -28,10 +28,11 @@
             <div class="recommended-topic-title">{{ topicSummary.getName() }}</div>
             <div class="recommended-topic-lessons-count">
               {{ topicSummary.getTotalPublishedNodeCount() }}
-              <span [innerHTML]="lessonsCountI18nKey | translate: {
+              <span>
+                {{ lessonsCountI18nKey | translate: {
                   lessonCountValue: topicSummary.getTotalPublishedNodeCount(),
                   messageFormat: true
-                }">
+                } }}
               </span>
             </div>
           </div>

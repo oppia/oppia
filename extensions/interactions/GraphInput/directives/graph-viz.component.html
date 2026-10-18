@@ -150,8 +150,8 @@
     <div *ngIf="state.selectedVertex !== null && graph?.isLabeled && canEditVertexLabel">
       <input type="text" [(ngModel)]="selectedVertexLabel" [oppiaFocusOn]="vertexLabelEditBegun">
       <button mat-raised-button
-              (click)="state.selectedVertex = null"
-              [innerHTML]="'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate">
+              (click)="state.selectedVertex = null">
+        {{ 'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate }}
       </button>
     </div>
     <div *ngIf="state.selectedEdge !== null && graph?.isWeighted && canEditEdgeWeight">
@@ -162,8 +162,8 @@
              (blur)="shouldShowWrongWeightWarning = !isValidEdgeWeight()"
              (focus)="shouldShowWrongWeightWarning = false">
       <button mat-raised-button
-              (click)="onUpdateEdgeWeight()"
-              [innerHTML]="'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate">
+              (click)="onUpdateEdgeWeight()">
+        {{ 'I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT' | translate }}
       </button>
     </div>
   </div>
