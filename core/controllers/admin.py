@@ -2497,7 +2497,7 @@ class AdminHandler(
                     ),
                     'question_dict': {
                         'id': '',
-                        'version': 0,
+                        'version': feconf.INITIAL_ENTITY_VERSION,
                         'question_state_data': state.to_dict(),
                         'language_code': 'en',
                         'question_state_data_schema_version': 1,
