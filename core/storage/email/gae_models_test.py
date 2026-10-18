@@ -29,10 +29,10 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
+    from mypy_imports import (  # pylint: disable=unused-import
         base_models,
         email_models,
-        user_models,  # pylint: disable=unused-import
+        user_models,
     )
 
 base_models, email_models, user_models = models.Registry.import_models(

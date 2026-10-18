@@ -27,11 +27,10 @@ from typing import Dict, Final, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    # Here, 'state_domain' is imported only for type checking.
-    # Here, 'voiceover_domain' is imported only for type checking.
-    from core.domain import (
-        state_domain,  # pylint: disable=invalid-import
-        voiceover_domain,  # pylint: disable=invalid-import
+    # Here, 'state_domain' and 'voiceover_domain' are imported only for type checking.
+    from core.domain import (  # pylint: disable=invalid-import
+        state_domain,
+        voiceover_domain,
     )
     from mypy_imports import base_models, datastore_services
 

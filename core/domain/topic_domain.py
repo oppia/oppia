@@ -31,9 +31,9 @@ from core.constants import constants
 # functions in Topic class. This import should be removed
 # once the schema migration functions are moved outside the
 # domain file.
-from core.domain import (
+from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
-    fs_services,  # pylint: disable=invalid-import-from
+    fs_services,
     study_guide_domain,
     subtopic_page_domain,
 )

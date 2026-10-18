@@ -156,7 +156,7 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             check.
         """
         name = 'Import order'
-        error_messages = []
+        error_messages: List[str] = []
         files_to_check = self.all_filepaths
         if not files_to_check:
             return concurrent_task_utils.TaskResult(
