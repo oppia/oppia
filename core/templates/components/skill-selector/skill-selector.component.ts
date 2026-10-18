@@ -54,7 +54,9 @@ export class SkillSelectorComponent implements OnInit {
   selectedSkill!: string;
   skillFilterText: string = '';
   topicFilterList: {topicName: string; checked: boolean}[] = [];
+  visibleTopicFilterList: {topicName: string; checked: boolean}[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
+  visibleSubTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
   userCanEditSkills: boolean = false;
 
@@ -82,6 +84,7 @@ export class SkillSelectorComponent implements OnInit {
       }
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+    this.updateVisibleFilterLists();
 
     this.userService
       .canUserAccessTopicsAndSkillsDashboard()
@@ -160,6 +163,7 @@ export class SkillSelectorComponent implements OnInit {
     } else {
       this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
     }
+    this.updateVisibleFilterLists();
   }
 
   // The following function is called when the topic filter changes.
@@ -193,6 +197,41 @@ export class SkillSelectorComponent implements OnInit {
     // After we update the subtopic filter list, we need to update
     // the main skills list.
     this.updateSkillsListOnSubtopicFilterChange();
+  }
+
+  updateVisibleFilterLists(): void {
+    if (this.skillFilterText === '') {
+      this.visibleTopicFilterList = this.topicFilterList;
+      this.visibleSubTopicFilterDict = this.subTopicFilterDict;
+      return;
+    }
+
+    let matchingSubtopics: {[topicName: string]: Set<string>} = {};
+    for (let topicName in this.categorizedSkills) {
+      let matchingNames = new Set<string>();
+      for (let subtopicName in this.categorizedSkills[topicName]) {
+        let skills = this.categorizedSkills[topicName][subtopicName];
+        if (this.searchInSubtopicSkills(skills, this.skillFilterText).length) {
+          matchingNames.add(subtopicName);
+        }
+      }
+      if (matchingNames.size) {
+        matchingSubtopics[topicName] = matchingNames;
+      }
+    }
+
+    this.visibleTopicFilterList = this.topicFilterList.filter(
+      topic => matchingSubtopics[topic.topicName] !== undefined
+    );
+    this.visibleSubTopicFilterDict = {};
+    for (let topicName in this.subTopicFilterDict) {
+      let matchingNames = matchingSubtopics[topicName];
+      if (matchingNames) {
+        this.visibleSubTopicFilterDict[topicName] = this.subTopicFilterDict[
+          topicName
+        ].filter(subtopic => matchingNames.has(subtopic.subTopicName));
+      }
+    }
   }
 
   searchInSubtopicSkills(

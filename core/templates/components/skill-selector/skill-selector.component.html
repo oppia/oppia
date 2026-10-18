@@ -47,8 +47,8 @@
           <label>Filter By Topics</label>
         </mat-card>
         <div *ngIf="allowSkillsFromOtherTopics" class="oppia-list-view-item-container">
-          <mat-card *ngIf="topicFilterList.length" class="list-view-item ">
-            <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList"
+          <mat-card *ngIf="visibleTopicFilterList.length" class="list-view-item ">
+            <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of visibleTopicFilterList"
               [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}
             </mat-checkbox>
           </mat-card>
@@ -61,7 +61,7 @@
         </mat-card>
         <div class="oppia-list-view-item-container">
           <mat-card class="list-view-item">
-            <div *ngFor="let topic of subTopicFilterDict | keyvalue">
+            <div *ngFor="let topic of visibleSubTopicFilterDict | keyvalue">
               <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
               <mat-card class="list-view-item">
                 <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value"
