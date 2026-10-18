@@ -16,8 +16,6 @@
  * @fileoverview Unit test for DateTimeFormatService.
  */
 
-// @ts-nocheck
-
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import dayjs from 'dayjs';
 
@@ -46,6 +44,7 @@ describe('datetimeformatter', () => {
     // suppress this error because the actual 'Date' has more properties than
     // 'MockDateContructor'. We have only defined the properties we need in
     // 'MockDateContructor'.
+    // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 
