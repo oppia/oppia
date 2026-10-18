@@ -20397,3 +20397,4 @@ def create_old_schema_exploration(
     """
     exploration_dict = yaml.safe_load(yaml_content)
     return OldVersionExploration(exploration_id, exploration_dict)
+
