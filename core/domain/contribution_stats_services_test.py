@@ -510,3 +510,24 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
         self.assertNotIn('user1', contributor_ids)
         self.assertIn('user2', contributor_ids)
         self.assertIn('user3', contributor_ids)
+
+    def test_get_question_reviewer_total_stats_with_no_reviewers(self) -> None:
+        for user_id in ['user1', 'user2', 'user3']:
+            user_rights = user_models.UserContributionRightsModel.get_by_id(
+                user_id
+            )
+            user_rights.can_review_questions = False
+            user_rights.update_timestamps()
+            user_rights.put()
+
+        stats, next_offset, more = (
+            contribution_stats_services.get_question_reviewer_total_stats(
+                page_size=10,
+                offset=0,
+                sort_by=None,
+                max_days_since_last_activity=None,
+            )
+        )
+        self.assertEqual(stats, [])
+        self.assertEqual(next_offset, 0)
+        self.assertFalse(more)

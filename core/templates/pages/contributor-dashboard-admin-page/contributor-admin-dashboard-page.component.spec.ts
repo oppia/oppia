@@ -63,6 +63,7 @@ describe('Contributor dashboard Admin page', () => {
   let fetchContributorAdminStatsSpy: jasmine.Spy;
   let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
+  let fetchCommunityStatsSpy: jasmine.Spy;
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
     true,
@@ -309,7 +310,7 @@ describe('Contributor dashboard Admin page', () => {
 
   describe('when user is logged in', () => {
     beforeEach(() => {
-      spyOn(
+      fetchCommunityStatsSpy = spyOn(
         contributorDashboardAdminStatsBackendApiService,
         'fetchCommunityStats'
       ).and.returnValue(
@@ -734,6 +735,21 @@ describe('Contributor dashboard Admin page', () => {
       tick();
 
       expect(refreshPaginationSpy).toHaveBeenCalled();
+    }));
+
+    it('should refresh community stats', fakeAsync(() => {
+      fetchCommunityStatsSpy.and.returnValue(
+        Promise.resolve({
+          question_reviewers_count: 5,
+          translation_reviewers_count: {en: 3},
+        } as CommunityContributionStatsBackendDict)
+      );
+
+      component.refreshCommunityStats();
+      tick();
+
+      expect(component.questionReviewersCount).toBe(5);
+      expect(component.translationReviewersCountByLanguage).toEqual({en: 3});
     }));
 
     it(
