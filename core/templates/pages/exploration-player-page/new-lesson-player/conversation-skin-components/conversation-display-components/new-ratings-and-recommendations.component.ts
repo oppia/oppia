@@ -61,10 +61,6 @@ export interface QuestionPlayerConfig {
   skillList: string[];
   skillDescriptions: string[];
   questionCount: number;
-  questionPlayerMode?: {
-    modeType: string;
-    passCutoff: number;
-  };
   questionsSortedByDifficulty: boolean;
 }
 
