@@ -43,6 +43,7 @@ import {
   ExplorationFeaturesBackendApiService,
 } from 'services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {InsertScriptService} from 'services/insert-script.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -301,6 +302,17 @@ describe('Exploration editor page component', () => {
         UserExplorationPermissionsService,
         UrlInterpolationService,
         FocusManagerService,
+        {
+          // Guard against the real service appending an external PencilCode
+          // script during ngOnInit. A cross-origin script error would surface
+          // as an opaque "Script error." and be reported against whichever
+          // spec happens to be running (see #26940).
+          provide: InsertScriptService,
+          useValue: jasmine.createSpyObj('InsertScriptService', [
+            'loadScript',
+            'hasScriptLoaded',
+          ]),
+        },
         {
           provide: NgbModal,
           useClass: MockNgbModal,
