@@ -697,6 +697,45 @@ describe('Contributor dashboard Admin page', () => {
       })
     );
 
+    it('should refresh stats tables when question role editor modal is saved', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      const refreshPaginationSpy = spyOn(
+        ContributorAdminStatsTable.prototype,
+        'refreshPagination'
+      );
+      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      fixture.detectChanges();
+
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: false,
+          can_review_questions: true,
+          can_review_translation_for_language_codes: ['en'],
+          can_review_voiceover_for_language_codes: [],
+        })
+      );
+      spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: false,
+          }),
+        } as NgbModalRef;
+      });
+
+      component.openRoleEditor('user1');
+      tick();
+
+      expect(refreshPaginationSpy).toHaveBeenCalled();
+    }));
+
     it(
       'should open question role editor modal and return changed' +
         ' value of question reviewer',

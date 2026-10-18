@@ -27,9 +27,11 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
+    from mypy_imports import suggestion_models, user_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models, user_models) = models.Registry.import_models(
+    [models.Names.SUGGESTION, models.Names.USER]
+)
 
 
 class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
@@ -392,6 +394,16 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             coordinators_count=3,
         ).put()
 
+        user_models.UserContributionRightsModel(
+            id='user1', can_review_questions=True
+        ).put()
+        user_models.UserContributionRightsModel(
+            id='user2', can_review_questions=True
+        ).put()
+        user_models.UserContributionRightsModel(
+            id='user3', can_review_questions=True
+        ).put()
+
     def test_get_translation_submitter_admin_stats(self) -> None:
         stats, next_offset, more = (
             contribution_stats_services.get_translation_submitter_total_stats(  # pylint: disable=line-too-long
@@ -479,3 +491,22 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
         stats = contribution_stats_services.get_translator_counts('es')
 
         self.assertEqual(4, stats)
+
+    def test_revoked_question_reviewer_is_excluded_from_stats(self) -> None:
+        user_rights = user_models.UserContributionRightsModel.get_by_id('user1')
+        user_rights.can_review_questions = False
+        user_rights.update_timestamps()
+        user_rights.put()
+
+        stats, _, _ = (
+            contribution_stats_services.get_question_reviewer_total_stats(
+                page_size=10,
+                offset=0,
+                sort_by=None,
+                max_days_since_last_activity=None,
+            )
+        )
+        contributor_ids = [stat.contributor_id for stat in stats]
+        self.assertNotIn('user1', contributor_ids)
+        self.assertIn('user2', contributor_ids)
+        self.assertIn('user3', contributor_ids)
