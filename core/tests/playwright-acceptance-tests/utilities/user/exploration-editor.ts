@@ -1269,9 +1269,12 @@ export class ExplorationEditor extends BaseUser {
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.expectElementToBeVisible(createExplorationButtonSelector);
     await this.clickOnElementWithSelector(createExplorationButtonSelector);
+    // Images can delay the load event after the editor is ready to use.
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
+      waitUntil: 'domcontentloaded',
     });
+    await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
   /**
