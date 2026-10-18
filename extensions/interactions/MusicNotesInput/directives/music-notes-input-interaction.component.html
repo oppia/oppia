@@ -4,7 +4,7 @@
             class="btn btn-secondary oppia-music-input-btn oppia-music-input-play-btn"
             (click)="playCurrentSequence()">
       <span><i class="fas fa-play music-notes-play"></i></span>
-      <span [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY' | translate"></span>
+      <span>{{ 'I18N_INTERACTIONS_MUSIC_PLAY' | translate }}</span>
     </button>
     <music-phrase-editor>
     </music-phrase-editor>
@@ -36,15 +36,15 @@
   <div class="oppia-music-input-control-buttons">
     <button type="button"
             class="btn btn-secondary oppia-music-input-btn"
-            (click)="playSequenceToGuess()"
-            [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE' | translate">
+            (click)="playSequenceToGuess()">
+      {{ 'I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE' | translate }}
     </button>
     <div class="float-start">
       <button type="button"
               class="btn btn-secondary oppia-music-input-btn"
               [disabled]="!interactionIsActive"
-              (click)="clearSequence()"
-              [innerHTML]="'I18N_INTERACTIONS_MUSIC_CLEAR' | translate">
+              (click)="clearSequence()">
+        {{ 'I18N_INTERACTIONS_MUSIC_CLEAR' | translate }}
       </button>
     </div>
   </div>

@@ -168,8 +168,8 @@
              tabindex="0"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <span class="oppia-navbar-tab-content"
-                  [innerHTML]="'I18N_TOPNAV_ABOUT' | translate">
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_ABOUT' | translate }}
             </span>
           </a>
           <ul ngbDropdownMenu
@@ -239,8 +239,8 @@
              role="button"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <span class="oppia-navbar-tab-content"
-                 [innerHTML]="'I18N_TOPNAV_GET_INVOLVED' | translate">
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_GET_INVOLVED' | translate }}
             </span>
           </a>
           <ul ngbDropdownMenu
@@ -320,8 +320,8 @@
              tabindex="0"
              href="/donate"
              rel="noopener">
-            <span class="oppia-navbar-tab-content"
-                 [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_DONATE' | translate }}
             </span>
           </a>
         </li>
@@ -433,21 +433,21 @@
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/creator-dashboard"
              class="dropdown-item nav-link e2e-test-creator-dashboard-link">
-            <span [innerHTML]="'I18N_TOPNAV_CREATOR_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/learner-dashboard"
              class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
-            <span [innerHTML]="'I18N_TOPNAV_LEARNER_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/contributor-dashboard"
              class="dropdown-item nav-link e2e-test-contributor-dashboard-menu-link">
-            <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
@@ -461,7 +461,7 @@
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/facilitator-dashboard"
              class="dropdown-item nav-link">
-            <span [innerHTML]="'I18N_TOPNAV_FACILITATOR_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_FACILITATOR_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
@@ -469,7 +469,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/topics-and-skills-dashboard"
              class="dropdown-item nav-link e2e-test-topics-and-skills-dashboard-link">
-            <span [innerHTML]="'I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
@@ -477,7 +477,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/release-coordinator"
              class="dropdown-item nav-link e2e-release-coordinator-dashboard-link">
-            <span [innerHTML]="'I18N_TOPNAV_RELEASE_COORDINATOR_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_RELEASE_COORDINATOR_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
@@ -485,7 +485,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/contributor-admin-dashboard"
              class="dropdown-item nav-link e2e-test-contributor-admin-dashboard-link">
-            <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_ADMIN_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_CONTRIBUTOR_ADMIN_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
@@ -493,14 +493,14 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/blog-dashboard"
              class="dropdown-item nav-link e2e-test-blog-dashboard-link">
-            <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_BLOG_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              class="dropdown-item nav-link e2e-test-preferences-link">
-            <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_PREFERENCES' | translate }}</span>
           </a>
         </li>
         <li class="nav-item"
@@ -509,7 +509,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/moderator"
              rel="noopener">
-            <span [innerHTML]="'I18N_TOPNAV_MODERATOR_PAGE' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_MODERATOR_PAGE' | translate }}</span>
           </a>
         </li>
         <li class="nav-item"
@@ -518,7 +518,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/technical-feedback-dashboard"
              rel="noopener">
-            <span [innerHTML]="'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}</span>
           </a>
         </li>
         <li class="nav-item"
@@ -527,7 +527,7 @@
              (click)="closeSubmenuIfNotMobile($event)"
              href="/admin"
              rel="noopener">
-            <span [innerHTML]="'I18N_TOPNAV_ADMIN_PAGE' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_ADMIN_PAGE' | translate }}</span>
           </a>
         </li>
         <hr class="oppia-top-right-menu-item-separator" *ngIf="isWebFeedbackModalEnabled">
@@ -544,7 +544,7 @@
              (blur)="profileDropdown.close()"
              [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
              class="dropdown-item nav-link e2e-test-logout-link">
-            <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>
+            <span>{{ 'I18N_TOPNAV_LOGOUT' | translate }}</span>
           </a>
         </li>
       </ul>
@@ -557,7 +557,7 @@
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login sinin"
                 (click)="onLoginButtonClicked()">
-          <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
+          <span>{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</span>
         </button>
       </div>
       <ul ngbDropdownMenu
@@ -569,8 +569,8 @@
               <div class="oppia-signin-g-icon">
                 <img [src]="googleSignInIconUrl" alt="Google signin icon">
               </div>
-              <span class="oppia-signin-text"
-                    [innerHTML]="'I18N_TOPNAV_SIGN_IN_WITH_GOOGLE' | translate">
+              <span class="oppia-signin-text">
+                {{ 'I18N_TOPNAV_SIGN_IN_WITH_GOOGLE' | translate }}
               </span>
             </div>
           </a>

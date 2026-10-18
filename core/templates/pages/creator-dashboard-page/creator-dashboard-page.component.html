@@ -2,7 +2,7 @@
 <div class="oppia-dashboard-container position-relative e2e-test-creator-dashboard-container">
   <div class="oppia-dashboard-title"
     [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
-    <h1 tabindex="0" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
+    <h1 tabindex="0">{{ 'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate }}</h1>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
@@ -12,7 +12,7 @@
     <mat-card layout="row" class="oppia-mat-card">
       <div class="average-ratings stats-card"
            tabindex="0" >
-        <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
+        <p class="stat-description">{{ 'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate }}</p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
             [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="total-plays stats-card" tabindex="0">
-        <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
+        <p class="stat-description">{{ 'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate }}</p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
             [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -50,8 +50,8 @@
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
         <ng-container *ngIf="!isNewCreatorFeedbackTabEnabled()">
-          <p class="stat-description"
-            [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate">
+          <p class="stat-description">
+            {{ 'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate }}
           </p>
           <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
               [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
@@ -66,8 +66,8 @@
         </ng-container>
         <div *ngIf="isNewCreatorFeedbackTabEnabled()"
              class="oppia-feedback-status-breakdown">
-          <p class="stat-description"
-            [innerHTML]="'I18N_DASHBOARD_STATS_FEEDBACK' | translate">
+          <p class="stat-description">
+            {{ 'I18N_DASHBOARD_STATS_FEEDBACK' | translate }}
           </p>
           <span>
             {{ feedbackStatusCounts?.open || 0 }} Open
@@ -87,7 +87,7 @@
         </div>
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
-        <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
+        <p class="stat-description">{{ 'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate }}</p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
             [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -109,8 +109,8 @@
         <a class="oppia-dashboard-tabs-text"
            tabindex="0"
            (keydown.enter)="setActiveTab('myExplorations')"
-           (click)="setActiveTab('myExplorations')"
-           [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
+           (click)="setActiveTab('myExplorations')">
+          {{ 'I18N_DASHBOARD_EXPLORATIONS' | translate }}
         </a>
       </li>
       <li *ngIf="canCreateCollections && collectionsList?.length > 0"
@@ -118,8 +118,8 @@
         <a class="oppia-dashboard-tabs-text e2e-test-collections-tab"
            tabindex="0"
            (keydown.enter)="setActiveTab('myCollections')"
-           (click)="setActiveTab('myCollections')"
-           [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
+           (click)="setActiveTab('myCollections')">
+          {{ 'I18N_DASHBOARD_COLLECTIONS' | translate }}
         </a>
       </li>
       <li *ngIf="subscribersList?.length > 0"
@@ -128,8 +128,8 @@
         <a class="oppia-dashboard-tabs-text"
            tabindex="0"
            (keydown.enter)="setActiveTab('mySubscribers')"
-           (click)="setActiveTab('mySubscribers')"
-           [innerHTML]="'I18N_DASHBOARD_SUBSCRIBERS' | translate">
+           (click)="setActiveTab('mySubscribers')">
+          {{ 'I18N_DASHBOARD_SUBSCRIBERS' | translate }}
         </a>
       </li>
 
@@ -156,7 +156,7 @@
       <mat-card layout="row"
                 class="oppia-page-card oppia-dashboard-intro-card">
         <div>
-          <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
+          <p>{{ 'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate }}</p>
         </div>
         <div class="oppia-dashboard-intro-picture">
           <img [src]="emptyDashboardImgUrl" alt="emptyDashboardImageUrl">
@@ -168,14 +168,14 @@
       <span class="sort-explorations-select float-end"
             *ngIf="activeTab === 'myExplorations'"
             [ngClass]="{'sort-explorations-select-three-tabs': (collectionsList?.length !== 0 && subscribersList?.length !== 0)}">
-        <p class="sort-by-text" [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_SORT_BY' | translate">Sort By</p>
+        <p class="sort-by-text">{{ 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY' | translate }}</p>
         <select [(ngModel)]="currentSortType"
                 class="sort-options"
                 aria-label="Sort Type"
                 (change)="setExplorationsSortingOptions(currentSortType)">
           <option *ngFor="let item of HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS | keyvalue"
-                  [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]"
-                  [innerHTML]="item.value | translate">
+                  [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]">
+            {{ item.value | translate }}
           </option>
         </select>
         <span class="sort-order fas"
@@ -215,11 +215,11 @@
                ' Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order button'"
                 (keydown.enter)="setExplorationsSortingOptions(item.value)"
                 (click)="setExplorationsSortingOptions(item.value)">
-              <p *ngIf="item.key === 'TITLE'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate"></p>
-              <p *ngIf="item.key === 'RATING'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_RATING' | translate"></p>
-              <p *ngIf="item.key === 'NUM_VIEWS'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_PLAYS' | translate"></p>
-              <p *ngIf="item.key === 'OPEN_FEEDBACK'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS' | translate"></p>
-              <p *ngIf="item.key === 'LAST_UPDATED'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED' | translate"></p>
+              <p *ngIf="item.key === 'TITLE'">{{ 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate }}</p>
+              <p *ngIf="item.key === 'RATING'">{{ 'I18N_DASHBOARD_TABLE_HEADING_RATING' | translate }}</p>
+              <p *ngIf="item.key === 'NUM_VIEWS'">{{ 'I18N_DASHBOARD_TABLE_HEADING_PLAYS' | translate }}</p>
+              <p *ngIf="item.key === 'OPEN_FEEDBACK'">{{ 'I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS' | translate }}</p>
+              <p *ngIf="item.key === 'LAST_UPDATED'">{{ 'I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED' | translate }}</p>
               <span class="fas"
                     *ngIf="currentSortType === item.value"
                     [ngClass]="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
@@ -386,12 +386,12 @@
   <div *ngIf="activeTab === 'mySubscribers'" class="oppia-dashboard-subscribers-tab-panel-container">
     <div class="oppia-dashboard-tab-panel">
       <span *ngIf="subscribersList?.length > 1"
-            class="oppia-subscriber-text"
-            [innerHTML]="'I18N_TOTAL_SUBSCRIBERS_TEXT' | translate: {totalSubscribers: subscribersList?.length, messageFormat: true}">
+            class="oppia-subscriber-text">
+        {{ 'I18N_TOTAL_SUBSCRIBERS_TEXT' | translate: {totalSubscribers: subscribersList?.length, messageFormat: true} }}
       </span>
       <span *ngIf="subscribersList?.length === 1"
-            class="oppia-subscriber-text"
-            [innerHTML]="'I18N_ONE_SUBSCRIBER_TEXT' | translate">
+            class="oppia-subscriber-text">
+        {{ 'I18N_ONE_SUBSCRIBER_TEXT' | translate }}
       </span>
       <span class="sort-explorations-select float-end"
             *ngIf="activeTab === 'mySubscribers'"
