@@ -39,7 +39,8 @@ test.describe.configure({mode: 'serial', timeout: 600000});
 test.describe('Voiceover Submitter', function () {
   let voiceoverSubmitter: VoiceoverSubmitter &
     ExplorationEditor &
-    LoggedOutUser;
+    LoggedOutUser &
+    CurriculumAdmin;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & VoiceoverAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string;
@@ -72,7 +73,11 @@ test.describe('Voiceover Submitter', function () {
 
     // Card 1 (Introduction).
     await curriculumAdm.updateCardContent('What is 2 + 3?');
+
+    // Text input interaction.
     await curriculumAdm.addTextInputInteraction();
+
+    // Correct answer feedback.
     await curriculumAdm.addResponsesToTheInteraction(
       INTERACTION_TYPES.TEXT_INPUT,
       '5',
@@ -82,12 +87,18 @@ test.describe('Voiceover Submitter', function () {
       true
     );
     await curriculumAdm.updateTextInputInteraction('Type your answer here.');
+
+    // Default feedback.
     await curriculumAdm.editDefaultResponseFeedbackInExplorationEditorPage(
       'Try Again'
     );
+
+    // Hint.
     await curriculumAdm.addHintToState(
       'If you have 2 apples and someone gives you 3 apples, how many apples you have?'
     );
+
+    // Solution.
     await curriculumAdm.addSolutionToState('5', '2 + 3 = 5', false);
     await curriculumAdm.saveExplorationDraft();
 
@@ -104,6 +115,7 @@ test.describe('Voiceover Submitter', function () {
     );
     await curriculumAdm.addSupportedLanguageAccentPair('English (India)');
 
+    // Create a voiceover submitter.
     voiceoverSubmitter = await UserFactory.createNewUser(
       'voiceoverSubmitter',
       'voiceover_submitter@example.com',
@@ -114,42 +126,53 @@ test.describe('Voiceover Submitter', function () {
   });
 
   test('should see content for voiceover in exploration language', async function () {
-    await voiceoverSubmitter.goto(
-      `${testConstants.URLs.BaseURL}/create/${explorationId}#/`
-    );
+    // Navigate to the exploration editor.
+    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
     await voiceoverSubmitter.waitForPageToFullyLoad();
     await voiceoverSubmitter.dismissWelcomeModal();
+
+    // Navigate to the translation tab.
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.dismissTranslationTabWelcomeModal();
 
+    // Content.
     await voiceoverSubmitter.selectVoiceoverContentType('Content');
     await voiceoverSubmitter.expectContentVoiceoverToContain('What is 2 + 3?');
 
+    // Interaction.
     await voiceoverSubmitter.selectVoiceoverContentType('Interaction');
     await voiceoverSubmitter.expectInteractionVoiceoverToContain(
       'Type your answer here.'
     );
 
+    // Feedback.
     await voiceoverSubmitter.selectVoiceoverContentType('Feedback');
     await voiceoverSubmitter.expectVisibleFeedbackTextsToContain([
       'Great!',
       'Try Again',
     ]);
 
+    // Hints.
     await voiceoverSubmitter.selectVoiceoverContentType('Hints');
     await voiceoverSubmitter.expectVisibleHintTextsToContain([
       'If you have 2 apples and someone gives you 3 apples, how many apples you have?',
     ]);
 
+    // Solution.
     await voiceoverSubmitter.selectVoiceoverContentType('Solution');
     await voiceoverSubmitter.expectSolutionVoiceoverToContain('5');
   });
 
   test('should see correct accessibility labels in the voiceover translation tab', async function () {
+    // Select the content voiceover option.
     await voiceoverSubmitter.selectVoiceoverContentType('Content');
+
+    // Check numerical status accessibility.
     await voiceoverSubmitter.expectTranslationProgressAriaLabelToMatch(
       '0 items translated out of 7 items'
     );
+
+    // Check sub-tab accessibility.
     await voiceoverSubmitter.expectTranslationSubTabAriaLabelToBe(
       'Content',
       'Content of the card'
@@ -167,15 +190,20 @@ test.describe('Voiceover Submitter', function () {
       'Solutions for the state'
     );
 
+    // Select the language accent.
     await voiceoverSubmitter.selectVoiceoverLanguageAccent('English (India)');
     await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
     await voiceoverSubmitter.expectUploadVoiceoverFileButtonAccessibleNameToBe(
       'Upload voiceover file'
     );
+
+    // Upload a voiceover file to make the play button visible.
     await voiceoverSubmitter.uploadFile(
       testConstants.data.VoiceoverEnglishIndia
     );
     await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
+
+    // Check play button accessibility.
     await voiceoverSubmitter.expectPlayVoiceoverButtonAccessibleNameToBe(
       'Play recorded audio'
     );
@@ -184,6 +212,9 @@ test.describe('Voiceover Submitter', function () {
   });
 
   test('should be able to add and remove voiceovers to explorations', async function () {
+    test.setTimeout(450000);
+
+    // Add a voiceover in English (India).
     await voiceoverSubmitter.addVoiceoverToContent(
       'English',
       'English (India)',
@@ -213,6 +244,7 @@ test.describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
     await voiceoverSubmitter.saveExplorationDraft();
 
+    // Check that the voiceover is visible in the preview tab.
     await voiceoverSubmitter.navigateToPreviewTab();
     await voiceoverSubmitter.expectAudioExpandButtonToBeVisible();
     await voiceoverSubmitter.expandVoiceoverBar();
@@ -221,6 +253,7 @@ test.describe('Voiceover Submitter', function () {
     );
     await voiceoverSubmitter.expectVoiceoverIsPlayable();
 
+    // Remove the voiceover.
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
     await voiceoverSubmitter.saveExplorationDraft();
@@ -249,15 +282,19 @@ test.describe('Voiceover Submitter', function () {
   });
 
   test('should be able to mark/unmark voiceover as stale', async function () {
+    // Mark the voiceover as stale.
     await voiceoverSubmitter.uploadFile(
       testConstants.data.VoiceoverEnglishIndia
     );
     await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
     await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
     await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('needs update');
+
+    // Stale voiceovers should count as incomplete.
     await voiceoverSubmitter.expectTranslationNumericalStatusToBe('1/7');
     await voiceoverSubmitter.expectNodeWariningSignToBeVisible(true);
 
+    // Mark the voiceover as up to date.
     await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
     await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('upto date');
   });
