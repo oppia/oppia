@@ -3155,8 +3155,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec = answer_group.rule_specs[0]
         rule_spec.inputs = {}
         self._assert_validation_error(
-            exploration, "RuleSpec 'Contains' is missing inputs"
+            exploration, 'RuleSpec \'Contains\' is missing inputs'
         )
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected inputs to be a dict'
@@ -3206,7 +3207,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             exploration,
-            "RuleSpec 'ErrorContains' has an input with name 'x' which "
+            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
             'refers to an unknown parameter within the exploration: '
             'ExampleParam',
         )
@@ -3230,11 +3231,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Every outcome should have a destination.'
         )
         outcome.dest = destination
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string'
         )
         default_outcome.dest_if_really_stuck = None
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.dest = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome dest to be a string'
@@ -3242,6 +3245,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.dest = destination
         outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'The "labelled_as_correct" field should be a boolean'
@@ -3253,6 +3257,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate(strict=True)
         exploration.validate()
         outcome.labelled_as_correct = False
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string'
@@ -3270,17 +3275,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.labelled_as_correct = False
         outcome.dest_if_really_stuck = None
         outcome.dest = destination
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.param_changes = 'Changes'  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list'
         )
         outcome.param_changes = [
+            # Here we use MyPy ignore because this test intentionally uses an invalid type.
             param_domain.ParamChange(0, 'generator_id', {})  # type: ignore[arg-type]
         ]
         self._assert_validation_error(
             exploration, 'Expected param_change name to be a string, received 0'
         )
         outcome.param_changes = []
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -3288,6 +3296,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         outcome.refresher_exploration_id = 'valid_string'
         exploration.validate()
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -3309,6 +3318,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self._create_valid_exploration_for_validation()
         )
         interaction = init_state.interaction
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string'
@@ -3317,10 +3327,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Invalid interaction id')
         interaction.id = 'TextInput'
         valid_args = interaction.customization_args
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         interaction.customization_args = []  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected customization args to be a dict'
         )
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         interaction.customization_args = {15: ''}  # type: ignore[dict-item]
         self._assert_validation_error(
             exploration,
@@ -3328,6 +3340,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'InteractionCustomizationArg',
         )
         interaction.customization_args = {
+            # Here we use MyPy ignore because this test intentionally uses an invalid type.
             15: state_domain.InteractionCustomizationArg(  # type: ignore[dict-item]
                 '', {'type': 'unicode'}
             )
@@ -3337,6 +3350,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         interaction.customization_args = valid_args
         exploration.validate()
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         interaction.answer_groups = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list'
@@ -3381,6 +3395,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             generator.next_content_id_index
         )
         exploration.validate()
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         init_state.interaction.hints = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected hints to be a list'
@@ -3388,9 +3403,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_rejects_invalid_answer_groups(self) -> None:
         """Check misconception tags and answer-group rule lists."""
-        exploration, _, init_state, answer_group = (
+        exploration, _, _, answer_group = (
             self._create_valid_exploration_for_validation()
         )
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         answer_group.tagged_skill_misconception_id = 1  # type: ignore[assignment]
         self._assert_validation_error(
             exploration,
@@ -3423,6 +3439,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 allow_null_interaction=False,
                 tagged_skill_misconception_id_required=False,
             )
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         answer_group.rule_specs = {}  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list'
@@ -3450,6 +3467,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
+        # Here we use MyPy ignore because this test intentionally uses an invalid type.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
         self._assert_validation_error(exploration, 'param_specs to be a dict')
         exploration.param_specs = {
