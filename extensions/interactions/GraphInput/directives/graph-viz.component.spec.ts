@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the graph-viz.
  */
 
-// @ts-nocheck
-
 import {
   waitForAsync,
   ComponentFixture,
@@ -900,27 +898,29 @@ describe('GraphVizComponent', () => {
     buttonElements[1].classList.add('graph-button');
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
-    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+    spyOn(document, 'querySelectorAll').and.returnValue(
+      buttonElements as unknown as NodeListOf<Element>
+    );
 
     spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
       top: 100,
       bottom: 110,
       left: 200,
       right: 210,
-    });
+    } as DOMRect);
 
     spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
       top: 90,
       bottom: 135,
       left: 190,
       right: 275,
-    });
+    } as DOMRect);
     spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
       top: 50,
       bottom: 80,
       left: 150,
       right: 220,
-    });
+    } as DOMRect);
 
     spyOn(buttonElements[0], 'dispatchEvent');
 
@@ -945,27 +945,29 @@ describe('GraphVizComponent', () => {
     buttonElements[1].classList.add('graph-button');
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
-    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+    spyOn(document, 'querySelectorAll').and.returnValue(
+      buttonElements as unknown as NodeListOf<Element>
+    );
 
     spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
       top: 100,
       bottom: 110,
       left: 200,
       right: 210,
-    });
+    } as DOMRect);
 
     spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
       top: 50,
       bottom: 80,
       left: 150,
       right: 220,
-    });
+    } as DOMRect);
     spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
       top: 120,
       bottom: 150,
       left: 220,
       right: 290,
-    });
+    } as DOMRect);
 
     const result = component.isButtonOnTopOfDot();
 
@@ -2211,7 +2213,7 @@ describe('GraphVizComponent', () => {
 
       component.selectedEdgeWeight = null;
 
-      expect(component.selectedEdgeWeightValue).toBe('');
+      expect(component.selectedEdgeWeightValue as string | number).toBe('');
     }
   );
 

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the MultipleChoiceInput interaction.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -34,6 +32,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
@@ -52,7 +51,12 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
           value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
         },
         choices: {
-          value: JSON.parse(attributes.choicesWithValue),
+          value: (
+            JSON.parse(attributes.choicesWithValue) as {
+              html: string;
+              contentId: string;
+            }[]
+          ).map(dict => SubtitledHtml.createDefault(dict.html, dict.contentId)),
         },
       };
     }
@@ -160,19 +164,19 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       expect(component.choices).toEqual([
         {
           originalIndex: 0,
-          choice: {html: '<p>opt1</p>', contentId: 'ca_choices_9'},
+          choice: SubtitledHtml.createDefault('<p>opt1</p>', 'ca_choices_9'),
         },
         {
           originalIndex: 1,
-          choice: {html: '<p>opt2</p>', contentId: 'ca_choices_10'},
+          choice: SubtitledHtml.createDefault('<p>opt2</p>', 'ca_choices_10'),
         },
         {
           originalIndex: 2,
-          choice: {html: '<p>opt3</p>', contentId: 'ca_choices_11'},
+          choice: SubtitledHtml.createDefault('<p>opt3</p>', 'ca_choices_11'),
         },
         {
           originalIndex: 3,
-          choice: {html: '<p>opt4</p>', contentId: 'ca_choices_12'},
+          choice: SubtitledHtml.createDefault('<p>opt4</p>', 'ca_choices_12'),
         },
       ]);
 
@@ -199,8 +203,8 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     const buttons = fixture.nativeElement.querySelectorAll(
       'button.multiple-choice-option'
     );
-    expect(buttons[2].classList.contains('selected')).toBeTrue();
-    expect(buttons[0].classList.contains('selected')).toBeFalse();
+    expect(buttons[2].classList.contains('selected')).toBe(true);
+    expect(buttons[0].classList.contains('selected')).toBe(false);
   });
 
   it(
@@ -240,16 +244,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       currentInteractionService,
       'updateCurrentAnswer'
     );
-    spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-      classList: {
-        add: () => {
-          return;
-        },
-        remove: () => {
-          return;
-        },
-      },
-    });
+    const dummyButton = document.createElement('button');
+    spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+      dummyButton
+    );
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.answer).toBe(1);
@@ -276,16 +274,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         currentInteractionService,
         'updateCurrentAnswer'
       );
-      spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          },
-        },
-      });
+      const dummyButton = document.createElement('button');
+      spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+        dummyButton
+      );
       spyOn(component, 'submitAnswer');
 
       component.selectAnswer(dummyMouseEvent, '1');

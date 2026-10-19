@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
@@ -323,15 +321,7 @@ describe('NumberWithUnitsValidationService', () => {
     spyOn(NumberWithUnits, 'fromDict').and.returnValue({
       type: 'real',
       real: 0.0,
-      // This throws "Type '{ toFloat: () => number; }' is missing the
-      // following properties from type 'Fraction': isNegative, wholeNumber,
-      // numerator, denominator, and 6 more." We need to suppress this error
-      // because we only need to mock the toFloat function for testing.
-      fraction: {
-        toFloat: () => {
-          return 0.0;
-        },
-      },
+      fraction: new Fraction(false, 0, 0, 1),
       // This throws "Type null is not assignable to type
       // 'string'." We need to suppress this error
       // because of the need to test validations. This
@@ -350,7 +340,7 @@ describe('NumberWithUnitsValidationService', () => {
 
         return tmp.toDict();
       },
-    });
+    } as unknown as NumberWithUnits);
     answerGroups[0].rules = [
       equivalentToTwoByThreeRule,
       equivalentToTwoThousandRule,

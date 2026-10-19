@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the TextInput interaction.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA, ChangeDetectorRef} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateModule} from '@ngx-translate/core';
@@ -44,10 +42,10 @@ describe('InteractiveTextInputComponent', () => {
           },
         },
         rows: {
-          value: attributes.rowsWithValue,
+          value: Number(attributes.rowsWithValue),
         },
         catchMisspellings: {
-          value: attributes.catchMisspellingsWithValue,
+          value: attributes.catchMisspellingsWithValue === 'true',
         },
       };
     }
@@ -114,16 +112,16 @@ describe('InteractiveTextInputComponent', () => {
     component.ngOnInit();
 
     expect(component.placeholder).toBe('Placeholder text');
-    expect(component.rows).toBe('2');
-    expect(component.catchMisspellings).toBe('false');
+    expect(component.rows).toBe(2);
+    expect(component.catchMisspellings).toBe(false);
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBe('label');
     expect(component.schema).toEqual({
       type: 'unicode',
       ui_config: {
-        rows: '2',
+        rows: 2,
         placeholder: 'Placeholder text',
-        catchMisspellings: 'false',
+        catchMisspellings: false,
       },
     });
     // We cannot test what functions are exactly passed since anonymous
