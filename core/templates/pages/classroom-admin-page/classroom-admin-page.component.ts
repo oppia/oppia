@@ -430,7 +430,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     const backendDict = this.convertClassroomDictToBackendForm(
       this.tempClassroomData.getClassroomDict()
     );
-    this.classroomBackendApiService
+    await this.classroomBackendApiService
       .updateClassroomDataAsync(classroomId, backendDict)
       .then(
         () => {
