@@ -1024,9 +1024,6 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the classrooms page.
    */
   async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
-    if (this.page.url() === classroomsPageUrl) {
-      await this.page.reload();
-    }
     await this.goto(classroomsPageUrl, verifyURL);
   }
 
@@ -3634,6 +3631,7 @@ export class LoggedOutUser extends BaseUser {
    * This function verifies that the user is on the correct classroom page.
    */
   async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(classroomNameHeading);
 
     const buttonText = await this.page.$eval(
