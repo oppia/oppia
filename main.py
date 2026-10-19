@@ -14,6 +14,8 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging

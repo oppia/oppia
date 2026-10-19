@@ -16,6 +16,8 @@
 
 """Unit tests for jobs.decorators.validation_decorators."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

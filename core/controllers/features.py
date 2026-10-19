@@ -14,6 +14,8 @@
 
 """Controllers for fetching the features Oppia provides to its users."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

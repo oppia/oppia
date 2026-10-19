@@ -1900,7 +1900,12 @@ class SingleLinePragmaChecker(checkers.BaseTokenChecker):
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
         """
-        for token_type, _, (line_num, _), _, line in tokens:
+        seen_class_or_func = False
+        for token_type, token_string, (line_num, _), _, line in tokens:
+            # Track whether we have passed any class or function definition,
+            # which marks the end of the file-level scope.
+            if token_type == tokenize.NAME and token_string in ('class', 'def'):
+                seen_class_or_func = True
             if token_type == tokenize.COMMENT:
                 line = line.lstrip()
                 # Ignore line that is enabling this check.
@@ -1914,6 +1919,10 @@ class SingleLinePragmaChecker(checkers.BaseTokenChecker):
                 # ignore this line.
                 if re.search(r'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
+                        continue
+                    # Allow file-level pylint disable comments, i.e. those
+                    # that appear before any class or function definition.
+                    if not seen_class_or_func:
                         continue
                     self.add_message('single-line-pragma', line=line_num)
 

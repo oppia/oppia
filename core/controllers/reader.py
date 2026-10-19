@@ -14,6 +14,8 @@
 
 """Controllers for the Oppia exploration learner view."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import logging

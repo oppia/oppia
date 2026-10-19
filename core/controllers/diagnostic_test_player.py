@@ -14,6 +14,8 @@
 
 """Controllers for the diagnostic test player page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

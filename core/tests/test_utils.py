@@ -16,6 +16,8 @@
 
 """Common utilities for test classes."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import builtins

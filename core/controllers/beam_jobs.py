@@ -16,6 +16,8 @@
 
 """Controllers responsible for managing Apache Beam jobs."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

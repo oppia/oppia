@@ -14,6 +14,8 @@
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

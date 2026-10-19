@@ -25,6 +25,8 @@ validation functions in the expand function, and then flatten the output
 with the result of the super function.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

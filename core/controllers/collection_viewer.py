@@ -14,6 +14,8 @@
 
 """Controllers for the Oppia collection learner view."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf, utils

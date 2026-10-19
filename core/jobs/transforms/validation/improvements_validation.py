@@ -16,6 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of improvements models."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import job_utils
