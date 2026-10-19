@@ -95,6 +95,40 @@ class CustomHTMLParser(html.parser.HTMLParser):
             'wbr',
         ]
 
+        # Elements that implicitly close an open <p> tag. This mirrors the
+        # closedByChildren list for 'p' in Angular's template parser
+        # (@angular/compiler ml_parser/html_tags), which pops the <p> when
+        # one of these is its direct child, so an explicit </p> afterwards
+        # becomes an orphan closing tag and fails to compile.
+        self.p_closing_elements = [
+            'address',
+            'article',
+            'aside',
+            'blockquote',
+            'div',
+            'dl',
+            'fieldset',
+            'footer',
+            'form',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'header',
+            'hgroup',
+            'hr',
+            'main',
+            'nav',
+            'ol',
+            'p',
+            'pre',
+            'section',
+            'table',
+            'ul',
+        ]
+
     def handle_starttag(
         self, tag: str, attrs: List[Tuple[str, Optional[str]]]
     ) -> None:
@@ -160,6 +194,20 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     tag,
                     line_number,
                 )
+            )
+            self.error_messages.append(error_message)
+            self.failed = True
+
+        if (
+            self.tag_stack
+            and self.tag_stack[-1][0] == 'p'
+            and tag in self.p_closing_elements
+        ):
+            error_message = (
+                '%s --> <%s> tag on line %s cannot be placed inside a <p> '
+                'tag. The Angular compiler implicitly closes the <p> before '
+                'it, so the closing </p> fails to compile. Use a <div> '
+                'instead of the <p>.' % (self.filepath, tag, line_number)
             )
             self.error_messages.append(error_message)
             self.failed = True

@@ -47,6 +47,9 @@ INVALID_INDENTATION_HTML_FILEPATH: Final = os.path.join(
 INVALID_QUOTES_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_quotes.html'
 )
+INVALID_BLOCK_ELEMENT_INSIDE_P_HTML_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_block_element_inside_p.html'
+)
 VALID_QUOTES_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_quotes.html'
 )
@@ -131,6 +134,22 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
                 'The value color:white; of attribute '
                 'style for the tag content on line 12 should be enclosed '
                 'within double quotes.'
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('HTML tag and attribute', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_custom_linter_with_block_element_inside_p(self) -> None:
+        lint_task_report = html_linter.HTMLLintChecksManager(
+            [INVALID_BLOCK_ELEMENT_INSIDE_P_HTML_FILEPATH], FILE_CACHE
+        ).check_html_tags_and_attributes()
+        self.assert_same_list_elements(
+            [
+                '<h2> tag on line 10 cannot be placed inside a <p> tag. '
+                'The Angular compiler implicitly closes the <p> before it, '
+                'so the closing </p> fails to compile. Use a <div> instead '
+                'of the <p>.'
             ],
             lint_task_report.trimmed_messages,
         )
