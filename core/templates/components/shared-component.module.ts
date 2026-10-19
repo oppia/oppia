@@ -154,10 +154,10 @@ import {StateGraphVisualization} from 'pages/exploration-editor-page/editor-tab/
 import {VersionDiffVisualizationComponent} from './version-diff-visualization/version-diff-visualization.component';
 import {QuestionSuggestionEditorModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import {QuestionSuggestionReviewModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
-import {ReviewTestPageComponent} from 'pages/review-test-page/review-test-page.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {AnswerContentModalComponent} from './common-layout-directives/common-elements/answer-content-modal.component';
+import {ErrorModalComponent} from './common-layout-directives/common-elements/error-modal.component';
 import {VisualizationSortedTilesComponent} from '../../../extensions/visualizations/oppia-visualization-sorted-tiles.component';
 import {OppiaVisualizationClickHexbinsComponent} from '../../../extensions/visualizations/oppia-visualization-click-hexbins.directive';
 import {OppiaVisualizationFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-frequency-table.directive';
@@ -178,6 +178,7 @@ import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
+import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -415,7 +416,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
@@ -439,7 +439,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 
   entryComponents: [
@@ -588,7 +590,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     CopierComponent,
@@ -614,7 +615,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 
   exports: [
@@ -773,7 +776,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     TranslateModule,
     VisualizationSortedTilesComponent,
@@ -785,7 +787,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 })
 export class SharedComponentsModule {}
