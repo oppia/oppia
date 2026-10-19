@@ -114,7 +114,8 @@ test.describe('Translation Coordinator', function () {
     await translationSubmitter.createAndPublishTopic(
       'Fractions',
       'Basics of Fractions',
-      'fractions'
+      'fractions',
+      true
     );
 
     await translationSubmitter.createAndPublishStoryWithChapter(
