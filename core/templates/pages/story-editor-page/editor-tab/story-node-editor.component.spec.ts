@@ -838,6 +838,18 @@ describe('Story node editor component', () => {
     expect(component.editableOutline).toBe('outline');
   });
 
+  it('should have the correct schema configuration for chapter outline', () => {
+    expect(component.OUTLINE_SCHEMA).toEqual({
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: true,
+        startupFocusEnabled: false,
+        rows: 100,
+        rte_component_config_id: 'ALL_COMPONENTS',
+      },
+    });
+  });
+
   it(
     'should call StoryUpdateService and curatedExplorationValidationService' +
       ' to set node exploration id if story is published',

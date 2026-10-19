@@ -46,7 +46,12 @@ import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface StoryNodeEditorFormSchema {
   type: 'html';
-  ui_config: object;
+  ui_config: {
+    hide_complex_extensions: boolean;
+    startupFocusEnabled: boolean;
+    rows: number;
+    rte_component_config_id: string;
+  };
 }
 
 @Component({
@@ -108,9 +113,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   OUTLINE_SCHEMA: StoryNodeEditorFormSchema = {
     type: 'html',
     ui_config: {
-      rte_component_config_id: 'ALL_COMPONENTS',
+      hide_complex_extensions: true,
       startupFocusEnabled: false,
       rows: 100,
+      rte_component_config_id: 'ALL_COMPONENTS',
     },
   };
 
