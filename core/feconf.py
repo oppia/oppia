@@ -110,12 +110,6 @@ FRONTEND_TEMPLATES_DIR = (
     if constants.DEV_MODE
     else os.path.join('build')
 )
-# To know more about AOT visit https://angular.io/guide/glossary#aot
-FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular')
-    if constants.DEV_MODE
-    else os.path.join('build')
-)
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
 )
@@ -1048,8 +1042,6 @@ DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
 EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
-REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
-REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
 OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'
