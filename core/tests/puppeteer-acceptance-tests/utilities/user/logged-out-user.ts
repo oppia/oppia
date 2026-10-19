@@ -3631,7 +3631,6 @@ export class LoggedOutUser extends BaseUser {
    * This function verifies that the user is on the correct classroom page.
    */
   async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(classroomNameHeading);
 
     const buttonText = await this.page.$eval(
