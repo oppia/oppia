@@ -21,12 +21,12 @@
             <ul class="dropdown-menu oppia-editor-warnings-box story-editor-warning-box" *ngIf="warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
               <li class="oppia-editor-warnings-text e2e-test-warnings-text"
-                  *ngFor="let issue of validationIssues.concat(explorationValidationIssues);trackBy: $index">
+                  *ngFor="let issue of validationIssues.concat(explorationValidationIssues)">
                 <hr class="oppia-editor-warnings-separator">
                 {{ issue }}
               </li>
               <li class="oppia-editor-warnings-text e2e-test-warnings-text"
-                  *ngFor="let issue of prepublishValidationIssues;trackBy: $index">
+                  *ngFor="let issue of prepublishValidationIssues">
                 <hr class="oppia-editor-warnings-separator">
                 {{ issue }}
               </li>
