@@ -45,6 +45,12 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Component({
   selector: 'oppia-topic-editor-tab',
@@ -89,6 +95,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicQuestionCountDict!: Record<number, number>;
   uncategorizedSkillSummaries!: ShortSkillSummary[];
   editableThumbnailDataUrl!: string;
+  imageUploaderParameters!: ImageUploaderParameters;
   canonicalStorySummaries!: StorySummary[];
   mainTopicCardIsShown!: boolean;
   storiesListIsShown!: boolean;
@@ -108,6 +115,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   generatedUrlPrefix!: string;
 
   constructor(
+    private alertsService: AlertsService,
+    private assetsBackendApiService: AssetsBackendApiService,
     private pageContextService: PageContextService,
     private entityCreationService: EntityCreationService,
     private focusManagerService: FocusManagerService,
@@ -164,6 +173,20 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.editableTopicUrlFragment = this.topic.getUrlFragment();
     this.editableDescription = this.topic.getDescription();
     this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+    this.imageUploaderParameters = {
+      disabled: !this.topicRights.canEditTopic(),
+      maxImageSizeInKB: 100,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: this.topic.getThumbnailBgColor() || this.allowedBgColors[0],
+      allowedBgColors: [...this.allowedBgColors],
+      allowedImageFormats: ['svg'],
+      aspectRatio: '4:3',
+      filename: this.topic.getThumbnailFilename(),
+      previewTitle: this.editableName,
+      previewDescriptionBgColor: '#2F6687',
+      previewFooter: this.topic.getCanonicalStoryIds().length + ' Lessons',
+    };
     this.topicNameExists = false;
     this.topicUrlFragmentExists = false;
     this.hostname = this.windowRef.nativeWindow.location.hostname;
@@ -358,6 +381,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicName(newName: string): void {
+    // Keep the thumbnail preview title in sync with the topic name, as the
+    // image uploader modal reads it when it is opened.
+    this.imageUploaderParameters.previewTitle = newName;
     if (newName === this.initialTopicName) {
       this.topicNameExists = false;
       return;
@@ -429,6 +455,34 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       this.topic,
       newThumbnailBgColor
     );
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    // The image uploader component only emits the image data, so the upload
+    // of the thumbnail to the backend is handled here. The topic is only
+    // updated once the upload succeeds.
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+    if (!entityType || !entityId) {
+      return;
+    }
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .toPromise()
+      .then(
+        () => {
+          this.updateTopicThumbnailFilename(imageData.filename);
+          this.updateTopicThumbnailBgColor(imageData.bg_color);
+        },
+        () => {
+          this.alertsService.addWarning('Could not upload the thumbnail.');
+        }
+      );
   }
 
   updateTopicDescription(newDescription: string): void {
