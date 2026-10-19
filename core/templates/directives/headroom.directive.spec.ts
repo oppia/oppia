@@ -59,6 +59,6 @@ describe('Headroom Directive', () => {
 
   it('should not throw if headroom.destroy throws', () => {
     spyOn(directiveInstance.headroom, 'destroy').and.throwError('error');
-    expect(() => directiveInstance.ngOnDestroy()).not.toThrow();
+    expect(() => directiveInstance.ngOnDestroy()).not.toThrowError();
   });
 });
