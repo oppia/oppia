@@ -185,6 +185,97 @@ class EmailServicesTest(test_utils.EmailTestBase):
                     'html',
                 )
 
+        # Case when a cc email is malformed when calling send_mail.
+        malformed_cc_email = 'malformed_email'
+        email_exception = self.assertRaisesRegex(
+            ValueError,
+            'Malformed recipient email address in cc: %s' % malformed_cc_email,
+        )
+        with email_exception:
+            email_services.send_mail(
+                'sender@example.com',
+                'recipient@example.com',
+                'subject',
+                'body',
+                'html',
+                cc_emails=[malformed_cc_email],
+            )
+
+    def test_is_email_valid(self) -> None:
+        """Tests that _is_email_valid correctly validates email addresses,
+        including stripping leading and trailing whitespace.
+        """
+        # Testing private function _is_email_valid requires accessing
+        # protected member.
+        self.assertTrue(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                'user@example.com'
+            )
+        )
+        self.assertTrue(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                '  user@example.com  '
+            )
+        )
+        self.assertTrue(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                'user@example.com '
+            )
+        )
+        self.assertTrue(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                ' user@example.com'
+            )
+        )
+        self.assertFalse(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                'malformed_email'
+            )
+        )
+        self.assertFalse(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                ''
+            )
+        )
+        self.assertFalse(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                '   '
+            )
+        )
+        self.assertFalse(
+            email_services._is_email_valid(  # pylint: disable=protected-access
+                None  # type: ignore[arg-type]
+            )
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+        ]
+    )
+    def test_send_mail_with_cc_emails_and_whitespace(self) -> None:
+        """Verifies that send_mail works properly with cc_emails and
+        email addresses that contain leading/trailing whitespace.
+        """
+        email_services.send_mail(
+            ' sender@example.com ',
+            ' recipient@example.com ',
+            'subject',
+            'body',
+            'html',
+            cc_emails=[' cc@example.com '],
+            bcc_admin=False,
+        )
+        messages = self._get_sent_email_messages(' recipient@example.com ')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].subject, 'subject')
+        self.assertEqual(messages[0].cc, ' cc@example.com ')
+
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),

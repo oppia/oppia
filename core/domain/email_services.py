@@ -59,7 +59,7 @@ def _is_email_valid(email_address: str) -> bool:
     # Matches any characters before the "@" sign, a series of characters until
     # a ".", and then a series of characters after the period.
     regex = r'^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)$'
-    return bool(re.search(regex, email_address))
+    return bool(re.search(regex, stripped_address))
 
 
 def _is_sender_email_valid(sender_email: str) -> bool:
@@ -132,6 +132,14 @@ def send_mail(
 
     if not _is_sender_email_valid(sender_email):
         raise ValueError('Malformed sender email address: %s' % sender_email)
+
+    if cc_emails is not None:
+        for cc_email in cc_emails:
+            if not _is_email_valid(cc_email):
+                raise ValueError(
+                    'Malformed recipient email address in cc: %s' % cc_email
+                )
+
     admin_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
