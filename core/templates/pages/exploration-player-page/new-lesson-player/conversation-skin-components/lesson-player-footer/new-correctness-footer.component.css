@@ -42,6 +42,8 @@
   left: 50%;
   position: fixed;
   transform: translateX(-50%);
+  /* Above the confetti (z-index: 1002), so that it bursts from behind. */
+  z-index: 1003;
 }
 
 .tick-symbol-badge {

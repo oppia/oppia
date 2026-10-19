@@ -25,7 +25,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   styleUrls: ['./new-end-chapter-confetti.component.css'],
 })
 export class NewEndChapterConfettiComponent implements OnInit {
-  @Input() topOffset: string = '40px';
+  // Distance of the burst origin above the bottom of the viewport. The default
+  // is the centre of the correctness pill.
+  @Input() originBottom: string = '86px';
   @Input() audioIsEnabled: boolean = true;
   confettiIsShown: boolean = false;
   endChapterCelebratoryAudio = new Audio();

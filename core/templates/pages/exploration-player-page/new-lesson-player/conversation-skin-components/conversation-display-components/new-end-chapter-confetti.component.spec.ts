@@ -29,9 +29,6 @@ describe('End chapter confetti component', function () {
     getStaticAudioUrl(audioPath: string): string {
       return 'audio_url.mp3';
     }
-    getStaticImageUrl(path: string): string {
-      return 'end_chapter_confetti.webm';
-    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -59,15 +56,6 @@ describe('End chapter confetti component', function () {
     expect(component.endChapterCelebratoryAudio.src).toContain('audio_url.mp3');
   });
 
-  it('should obtain the confetti video URL upon initialization', () => {
-    component.useVideoConfetti = true;
-    expect(component.confettiVideoUrl).toBe('');
-
-    component.ngOnInit();
-
-    expect(component.confettiVideoUrl).toContain('end_chapter_confetti.webm');
-  });
-
   it('should animate the confetti and play audio', () => {
     expect(component.confettiIsShown).toBe(false);
 
@@ -79,42 +67,28 @@ describe('End chapter confetti component', function () {
     expect(component.endChapterCelebratoryAudio.play).toHaveBeenCalled();
   });
 
-  it('should play the confetti video and hide it once it ends', () => {
-    component.useVideoConfetti = true;
+  it('should position the burst using the origin offset', () => {
     fixture.detectChanges();
-    if (!component.confettiVideoRef) {
-      throw new Error('confettiVideoRef is not defined');
-    }
-    const videoElement = component.confettiVideoRef.nativeElement;
-    spyOn(videoElement, 'play').and.returnValue(Promise.resolve());
-    spyOn(component.endChapterCelebratoryAudio, 'play');
+    const stage = fixture.nativeElement.querySelector('.stage');
 
-    component.animateConfetti();
+    expect(component.originBottom).toBe('86px');
+    expect(stage.style.bottom).toBe('86px');
 
-    expect(videoElement.play).toHaveBeenCalled();
-    expect(component.confettiIsShown).toBe(true);
+    component.originBottom = '30px';
+    fixture.detectChanges();
 
-    videoElement.dispatchEvent(new Event('ended'));
-
-    expect(component.confettiIsShown).toBe(false);
+    expect(stage.style.bottom).toBe('30px');
   });
 
-  it('should hide the confetti video if playback is rejected', async () => {
-    component.useVideoConfetti = true;
+  it('should activate the confetti pieces when animated', () => {
     fixture.detectChanges();
-    if (!component.confettiVideoRef) {
-      throw new Error('confettiVideoRef is not defined');
-    }
-    const videoElement = component.confettiVideoRef.nativeElement;
-    spyOn(videoElement, 'play').and.returnValue(
-      Promise.reject(new Error('NotAllowedError'))
-    );
+    const stage = fixture.nativeElement.querySelector('.stage');
     spyOn(component.endChapterCelebratoryAudio, 'play');
 
-    component.animateConfetti();
-    await fixture.whenStable();
+    expect(stage.classList).not.toContain('confetti-active');
 
-    expect(videoElement.play).toHaveBeenCalled();
-    expect(component.confettiIsShown).toBe(false);
+    component.animateConfetti();
+
+    expect(stage.classList).toContain('confetti-active');
   });
 });
