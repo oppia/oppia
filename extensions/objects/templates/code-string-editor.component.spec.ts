@@ -16,8 +16,6 @@
  * @fileoverview Uni tests for code string editor.
  */
 
-// @ts-nocheck
-
 import {
   waitForAsync,
   ComponentFixture,
