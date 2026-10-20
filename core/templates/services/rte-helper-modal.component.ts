@@ -589,7 +589,11 @@ export class RteHelperModalComponent {
       }
       if (!svgFile) {
         this.alertsService.addWarning('SVG file is missing.');
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
       const resampledFile =
@@ -597,7 +601,11 @@ export class RteHelperModalComponent {
 
       if (!resampledFile) {
         this.alertsService.addWarning('Failed to process SVG file.');
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
 
@@ -653,7 +661,11 @@ export class RteHelperModalComponent {
         this.alertsService.addWarning(
           'Error: Could not retrieve entity type or entity ID.'
         );
-        this.ngbActiveModal.dismiss('cancel');
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss('cancel');
+        } else {
+          this.ngbActiveModal.dismiss('cancel');
+        }
         return;
       }
       this.assetsBackendApiService
