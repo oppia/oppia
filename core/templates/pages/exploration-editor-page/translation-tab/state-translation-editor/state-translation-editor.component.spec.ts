@@ -167,6 +167,27 @@ describe('State Translation Editor Component', () => {
     fixture.destroy();
   });
 
+  it('should get the active translation as html', () => {
+    component.activeWrittenTranslation = TranslatedContent.createNew('html');
+    component.activeWrittenTranslation.translation = 'Test translation';
+
+    expect(component.getActiveTranslationAsHtml()).toBe('Test translation');
+  });
+
+  it('should return an empty string when the active translation is not html', () => {
+    component.activeWrittenTranslation = null;
+    expect(component.getActiveTranslationAsHtml()).toBe('');
+
+    component.activeWrittenTranslation =
+      TranslatedContent.createFromBackendDict({
+        content_value: ['first', 'second'],
+        content_format: 'set_of_unicode_string',
+        needs_update: false,
+      });
+
+    expect(component.getActiveTranslationAsHtml()).toBe('');
+  });
+
   describe('on clicking save button', () => {
     it('should open model asking whether voiceover needs update', () => {
       let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);

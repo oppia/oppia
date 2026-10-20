@@ -38,8 +38,6 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
-import './checkpoint-celebration-modal.component.css';
-
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
 const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';

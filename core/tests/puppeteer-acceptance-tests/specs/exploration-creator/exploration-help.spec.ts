@@ -156,20 +156,6 @@ describe('Exploration Editor', function () {
     );
 
     await explorationEditor.continueToNextShepherdStep();
-    await explorationEditor.expectShepherdTitleToBe('Recording Audio');
-    await explorationEditor.expectShepherdContentToContain(
-      'To create audio translations in Oppia, we recommend using the'
-    );
-
-    await explorationEditor.continueToNextShepherdStep();
-    await explorationEditor.expectShepherdTitleToBe(
-      'Re-record/Re-upload audio'
-    );
-    await explorationEditor.expectShepherdContentToContain(
-      'The audio recording also has options related to updating and deleting translations'
-    );
-
-    await explorationEditor.continueToNextShepherdStep();
     await explorationEditor.expectShepherdTitleToBe('Tutorial Complete');
     await explorationEditor.expectShepherdContentToContain(
       'Now, you are ready to begin adding translations to your explorations!'

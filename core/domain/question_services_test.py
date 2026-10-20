@@ -1132,6 +1132,35 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, 2
             )
 
+    def test_get_questions_by_ids_and_versions_returns_all_questions(
+        self,
+    ) -> None:
+        questions = question_services.get_questions_by_ids_and_versions(
+            [
+                (self.question_id, 1),
+                (self.question_id_1, 1),
+            ]
+        )
+        self.assertEqual(len(questions), 2)
+        self.assertEqual(questions[0].id, self.question_id)
+        self.assertEqual(questions[0].version, 1)
+        self.assertEqual(questions[1].id, self.question_id_1)
+        self.assertEqual(questions[1].version, 1)
+
+    def test_get_questions_by_ids_and_versions_raises_for_missing_snapshot(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            question_services.QuestionSnapshotNotFoundError,
+            'Question snapshot for question %s version 2 was not found.'
+            % self.question_id,
+        ):
+            question_services.get_questions_by_ids_and_versions(
+                [
+                    (self.question_id, 2),
+                ]
+            )
+
     def test_untag_deleted_misconceptions_on_no_change_to_skill(self) -> None:
         misconceptions = [
             skill_domain.Misconception(

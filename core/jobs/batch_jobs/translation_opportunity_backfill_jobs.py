@@ -427,12 +427,12 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
 
             yield job_run_result.JobRunResult.as_stdout(
                 f'Audit Summary:\n'
-                f'- Matches: {totals.get("match", 0)}\n'
-                f'- Missing in Datastore: {totals.get("missing", 0)}\n'
-                f'- Discrepancies: {totals.get("discrepancy", 0)}\n'
-                f'- Orphaned in Datastore: {totals.get("orphaned", 0)}\n'
-                f'- Total Content Count (Existing): {totals.get("exist_content_count", 0)}\n'
-                f'- Total Content Count (Computed): {totals.get("comp_content_count", 0)}\n'
+                f'- Matches: {totals.get('match', 0)}\n'
+                f'- Missing in Datastore: {totals.get('missing', 0)}\n'
+                f'- Discrepancies: {totals.get('discrepancy', 0)}\n'
+                f'- Orphaned in Datastore: {totals.get('orphaned', 0)}\n'
+                f'- Total Content Count (Existing): {totals.get('exist_content_count', 0)}\n'
+                f'- Total Content Count (Computed): {totals.get('comp_content_count', 0)}\n'
                 f'- Total Translation Counts (Existing): {exist_translation_totals_str}\n'
                 f'- Total Translation Counts (Computed): {comp_translation_totals_str}'
             )

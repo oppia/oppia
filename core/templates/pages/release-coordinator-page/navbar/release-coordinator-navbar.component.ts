@@ -23,7 +23,6 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import {UserService} from 'services/user.service';
-import './release-coordinator-navbar.component.css';
 
 @Component({
   selector: 'oppia-release-coordinator-navbar',

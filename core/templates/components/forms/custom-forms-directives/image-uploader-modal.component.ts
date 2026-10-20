@@ -30,8 +30,10 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import './image-uploader-modal.component.css';
-require('cropperjs/dist/cropper.min.css');
+import {
+  LazyCssLoaderService,
+  KNOWN_CSS,
+} from 'services/lazy-css-loader.service';
 
 @Component({
   selector: 'oppia-image-uploader-modal',
@@ -63,7 +65,8 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal,
     private windowDimensionService: WindowDimensionsService,
-    private svgSanitizerService: SvgSanitizerService
+    private svgSanitizerService: SvgSanitizerService,
+    private lazyCssLoaderService: LazyCssLoaderService
   ) {
     super(ngbActiveModal);
   }
@@ -220,6 +223,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
+    this.lazyCssLoaderService.loadCss(KNOWN_CSS.CROPPER);
     if (this.imageUploaderParameters.previewImageUrl) {
       this.uploadedImage = this.imageUploaderParameters.previewImageUrl;
     }

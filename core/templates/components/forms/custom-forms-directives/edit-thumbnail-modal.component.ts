@@ -21,7 +21,6 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
-import './edit-thumbnail-modal.component.css';
 
 interface InvalidTagsAndAttributes {
   tags: string[];
@@ -59,7 +58,7 @@ export class EditThumbnailModalComponent {
   @Input() previewDescriptionBgColor!: string;
   @Input() previewFooter!: string;
   @Input() previewTitle!: string;
-  @Input() allowedBgColors!: string[];
+  @Input() allowedBgColors!: readonly string[];
   @Input() tempBgColor!: string;
   @Input() dimensions!: Dimensions;
   @Input() uploadedImageMimeType!: string;

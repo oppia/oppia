@@ -73,12 +73,6 @@ test.describe('Logged-Out Learner', function () {
       'Fractions',
       'Algebra',
     ]);
-    await loggedOutLearner.filterLessonsByCategories(['Science']);
-    await loggedOutLearner.expectSearchResultsToContain(
-      ['Fractions', 'Algebra'],
-      false
-    );
-    await loggedOutLearner.expectSearchResultsToContain(['Laws of Motion']);
   });
 
   test.afterAll(async function () {

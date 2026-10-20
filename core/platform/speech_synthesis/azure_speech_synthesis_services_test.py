@@ -194,19 +194,55 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
 
+    @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
+    @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
+    @mock.patch(
+        'core.platform.speech_synthesis.'
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
     def test_regenerate_speech_from_text_failed_for_invalid_credentials(
         self,
+        mock_word_boundary_collection: mock.Mock,
+        mock_speech_config: mock.Mock,
+        mock_speech_synthesizer: mock.Mock,
     ) -> None:
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
-
         mock_audio_data = None
-        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
-        mock_error_details = (
+
+        mock_speech_config_instance = mock_speech_config.return_value
+        mock_speech_config_instance.set_speech_synthesis_output_format = (
+            mock.MagicMock()
+        )
+        mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
+        mock_speech_synthesis_result = mock.MagicMock()
+        mock_speech_synthesis_result.audio_data = mock_audio_data
+        mock_cancellation_details = mock.MagicMock()
+
+        error_details = (
             'WebSocket upgrade failed: Authentication error (401). '
             'Please check subscription information and region name. USP state: '
             'Sending. Received audio size: 0 bytes.'
         )
+        mock_cancellation_details.reason = speechsdk.CancellationReason.Error
+        mock_cancellation_details.error_details = error_details
+        # Not one of the retryable error codes (TooManyRequests,
+        # ConnectionFailure, ServiceTimeout), so it fails fast without retrying.
+        mock_cancellation_details.error_code = (
+            speechsdk.CancellationErrorCode.AuthenticationFailure
+        )
+
+        mock_speech_synthesis_result.reason = speechsdk.ResultReason.Canceled
+        mock_speech_synthesis_result.cancellation_details = (
+            mock_cancellation_details
+        )
+        (
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
+        ) = mock_speech_synthesis_result
+        mock_word_boundary_instance = mock.MagicMock()
+        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
+        mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
         with self.swap_api_key_secrets_return_secret:
             result_binary_data, result_audio_offsets, result_error = (
@@ -217,7 +253,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertEqual(result_error, mock_error_details)
+        self.assertEqual(result_error, error_details)
 
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')

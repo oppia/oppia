@@ -53,15 +53,16 @@
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_TWO' | translate: { linkText: '<u>Oppia</u> // <u>CC BY SA 4.0</u>' }"></span></li>
             </ol>
-            <div data-bs-trigger="manual"
-                 data-bs-toggle="tooltip"
-                 data-bs-title="Copied!"
-                 data-bs-placement="bottom"
-                 data-bs-offset="0 20"
+            <div ngbTooltip="Copied!"
+                 triggers="manual"
+                 [autoClose]="false"
+                 placement="bottom"
+                 tooltipClass="attribution-tooltip-offset"
+                 #htmlAttributionTooltip="ngbTooltip"
                  class="attribution-html-code font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
             </div>
-            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
+            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-html-code', htmlAttributionTooltip)">COPY</button>
           </div>
           <div class="attribution-print-section" tabindex="0">
             <div class="fw-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
@@ -69,15 +70,16 @@
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_TWO' | translate: { link: printAttributionLink }"></span></li>
             </ol>
-            <div data-bs-trigger="manual"
-                 data-bs-toggle="tooltip"
-                 data-bs-title="Copied!"
-                 data-bs-placement="bottom"
-                 data-bs-offset="0 20"
+            <div ngbTooltip="Copied!"
+                 triggers="manual"
+                 [autoClose]="false"
+                 placement="bottom"
+                 tooltipClass="attribution-tooltip-offset"
+                 #printAttributionTooltip="ngbTooltip"
                  class="attribution-print-text font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               "{{getExplorationTitle()}}" by {{getAuthors()}}. Oppia. {{getPageUrl()}}
             </div>
-            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
+            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-print-text', printAttributionTooltip)">COPY</button>
           </div>
           <div class="sharing-section">
             <div class="fw-bold"><span [innerHTML]="'I18N_SHARE_LESSON' | translate"></span></div>

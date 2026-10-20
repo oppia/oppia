@@ -1,8 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
 .oppia-top-navigation-bar .oppia-navbar-tab:focus {
   background-color: #fff;
   color: #00645c;
@@ -423,6 +418,9 @@
  
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
   color: #00645c;
+}
+.oppia-top-navigation-bar .oppia-navbar-dropdown .oppia-navbar-username {
+  max-width: 200px;
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-word;
@@ -513,24 +511,6 @@
   font-size: 15px;
   margin-inline-end: 5px;
   padding-inline-start: 5px;
-}
-.oppia-top-navigation-bar .oppia-unread-feedback-indicator {
-  background-color: #f7a541;
-  border-radius: 20px;
-  bottom: 36px;
-  display: flex;
-  height: 15px;
-  justify-content: center;
-  position: absolute;
-  right: 25px;
-  width: 15px;
-}
-.oppia-top-navigation-bar .oppia-unread-feedback-number {
-  bottom: 0;
-  color: white;
-  font-size: 11px;
-  font-weight: bold;
-  position: absolute;
 }
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;

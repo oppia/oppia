@@ -31,7 +31,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 
-import './about-page.component.css';
 import {AccordionPanelData} from './data.model';
 
 @Component({
@@ -110,7 +109,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerIdealistLink = AppConstants.VOLUNTEER_IDEALIST_LINK;
-  IMPACT_REPORT_LINK_2024 = AppConstants.IMPACT_REPORT_LINK_2024;
+  IMPACT_REPORT_LINK_2025 = AppConstants.IMPACT_REPORT_LINK_2025;
   screenType!: 'desktop' | 'tablet' | 'mobile';
 
   constructor(

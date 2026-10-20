@@ -178,7 +178,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=8,
-            time_limit_in_minutes=45,
             demonstrates=['Historical reasoning'],
             async_status='Available',
         )
@@ -193,7 +192,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -217,7 +215,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -236,7 +233,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=8,
-            time_limit_in_minutes=40,
             demonstrates=['Living systems'],
             async_status='Blocked',
         )
@@ -321,7 +317,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -356,13 +351,68 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(
-            questions,
-            [
-                {'question_id': question_id_1, 'question_version': 1},
-                {'question_id': question_id_2, 'question_version': 1},
-                {'question_id': question_id_3, 'question_version': 1},
-            ],
+            [question['question_id'] for question in questions],
+            [question_id_1, question_id_2, question_id_3],
         )
+        self.assertEqual(
+            [question['question_version'] for question in questions],
+            [1, 1, 1],
+        )
+        for question in questions:
+            question_state_data = question['question_state_data']
+            self.assertIn('content', question_state_data)
+            self.assertIn('interaction', question_state_data)
+
+    def test_start_attempt_strips_solution_and_hints(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer 1', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Pinned Check',
+            description='Checks that question state is pinned.',
+            classroom_id=self.classroom_id,
+            topic_ids=[topic_id],
+            total_questions=3,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        with mock.patch.object(
+            secrets.SystemRandom,
+            'sample',
+            side_effect=lambda items, count: items[:count],
+        ):
+            _, questions = (
+                certificate_assessment_services.start_certificate_assessment_attempt(
+                    created_offering.certificate_id,
+                    owner_id,
+                )
+            )
+
+        self.assertEqual(len(questions), 3)
+        for question in questions:
+            question_state_data = question['question_state_data']
+            self.assertIsNone(question_state_data['interaction']['solution'])
+            self.assertEqual(question_state_data['interaction']['hints'], [])
+            # The question still carries its content so it can be served to the
+            # learner without a further per-question request.
+            self.assertIn('content', question_state_data)
 
     def test_get_topic_question_ids_by_difficulty_groups_by_difficulty(
         self,
@@ -551,7 +601,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -569,7 +619,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     'question_versions': {'question_1': 1},
                     'question_topic_links': {'question_1': ['topic_1']},
                 },
-                started_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
                 finished_at=None,
                 is_submitted=False,
             )
@@ -588,7 +638,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -617,8 +667,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     'question_versions': {'question_1': 1},
                     'question_topic_links': {'question_1': ['topic_1']},
                 },
-                started_at=datetime.datetime.utcnow(),
-                finished_at=datetime.datetime.utcnow(),
+                started_at=utils.get_current_utc_datetime(),
+                finished_at=utils.get_current_utc_datetime(),
                 is_submitted=True,
             )
         # A submitted attempt for a different certificate is not counted.
@@ -635,8 +685,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
+            finished_at=utils.get_current_utc_datetime(),
             is_submitted=True,
         )
         # An in-progress attempt is ignored even if it carries a higher index.
@@ -653,7 +703,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -672,115 +722,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             )('learner_1', 'cert_missing'),
             1,
         )
-
-    def test_get_question_state_data_for_assessment_attempt_raises_for_invalid_cases(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Attempt does not exist.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', 'missing_attempt', 'question_1'
-            )
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'This attempt does not belong to the current learner.',
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'other_learner', attempt.id, 'question_1'
-            )
-        attempt.is_submitted = True
-        attempt.update_timestamps()
-        attempt.put()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'This assessment has already been submitted.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'question_1'
-            )
-
-    def test_get_question_state_data_for_assessment_attempt_strips_solution_and_hints(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        question = mock.Mock()
-        question.question_state_data.to_dict.return_value = {
-            'content': {'html': '<p>Question</p>'},
-            'interaction': {'solution': 'solution', 'hints': ['hint']},
-        }
-        with mock.patch.object(
-            question_services,
-            'get_question_by_id_and_version',
-            return_value=question,
-        ) as get_question_mock:
-            result = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'question_1'
-            )
-
-        get_question_mock.assert_called_once_with('question_1', 1)
-        self.assertIsNone(result['interaction']['solution'])
-        self.assertEqual(result['interaction']['hints'], [])
-        self.assertEqual(result['content'], {'html': '<p>Question</p>'})
-
-    def test_get_question_state_data_for_assessment_attempt_raises_for_question_not_in_attempt(
-        self,
-    ) -> None:
-        attempt = gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            certificate_id='cert_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=None,
-            is_submitted=False,
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Question is not part of this attempt.'
-        ):
-            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
-                'learner_1', attempt.id, 'unrelated_question'
-            )
 
     def test_get_certificate_assessment_attempt_raises_for_missing_attempt(
         self,
@@ -817,7 +758,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -836,7 +776,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=4, seconds=30)
             ),
             finished_at=None,
@@ -898,7 +838,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -917,7 +856,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=9, seconds=30)
             ),
             finished_at=None,
@@ -971,7 +910,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -990,7 +928,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_topic_links': {'dummy_question_id': [topic_id]},
             },
             started_at=(
-                datetime.datetime.utcnow()
+                utils.get_current_utc_datetime()
                 - datetime.timedelta(minutes=10, seconds=1)
             ),
             finished_at=None,
@@ -1023,7 +961,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -1074,8 +1011,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_1': 1},
                 'question_topic_links': {'question_1': ['topic_1']},
             },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
+            finished_at=utils.get_current_utc_datetime(),
             is_submitted=True,
         )
         with self.assertRaisesRegex(
@@ -1109,7 +1046,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=3,
-            time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
             async_status='Available',
         )
@@ -1134,7 +1070,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     question_id_3: [self.topic_id],
                 },
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1244,7 +1180,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                     question_id: ['topic_1'] for question_id in question_ids
                 },
             },
-            started_at=datetime.datetime.utcnow(),
+            started_at=utils.get_current_utc_datetime(),
             finished_at=None,
             is_submitted=False,
         )
@@ -1449,7 +1385,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Map reading'],
             async_status='Available',
         )
@@ -1459,7 +1394,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -1493,7 +1427,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=6,
-            time_limit_in_minutes=30,
             demonstrates=['Living systems'],
             async_status='Available',
         )
@@ -1554,7 +1487,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1564,7 +1496,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1574,7 +1505,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Blocked',
         )
@@ -1584,7 +1514,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.other_classroom_id,
             topic_ids=[self.other_topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1607,7 +1536,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1617,7 +1545,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1627,7 +1554,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1672,6 +1598,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             ),
         )
         self.assertIsNone(offering_by_title['Passed']['failed_on_date'])
+        self.assertTrue(offering_by_title['Passed']['attempt_id'])
         self.assertEqual(
             offering_by_title['Not Passed']['failed_on_date'],
             utils.get_time_in_millisecs(
@@ -1679,8 +1606,10 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             ),
         )
         self.assertIsNone(offering_by_title['Not Passed']['passed_on_date'])
+        self.assertTrue(offering_by_title['Not Passed']['attempt_id'])
         self.assertIsNone(offering_by_title['Not Attempted']['passed_on_date'])
         self.assertIsNone(offering_by_title['Not Attempted']['failed_on_date'])
+        self.assertIsNone(offering_by_title['Not Attempted']['attempt_id'])
 
     def test_get_certificate_offerings_for_classroom_uses_most_recent_attempt(
         self,
@@ -1691,7 +1620,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1735,7 +1663,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )
@@ -1789,7 +1716,6 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             classroom_id=self.classroom_id,
             topic_ids=[self.topic_id],
             total_questions=5,
-            time_limit_in_minutes=30,
             demonstrates=['Skill'],
             async_status='Available',
         )

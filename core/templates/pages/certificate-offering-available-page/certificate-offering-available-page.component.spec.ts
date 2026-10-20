@@ -183,12 +183,14 @@ describe('AvailableCertificateOfferingPageComponent', () => {
         new AvailableCertificateAssessmentOfferingData(
           'certificate-1',
           'Arithmetic',
-          'Passed'
+          'Passed',
+          'attempt-1'
         ),
         new AvailableCertificateAssessmentOfferingData(
           'certificate-2',
           'Zoology',
-          'Failed'
+          'Failed',
+          'attempt-2'
         ),
         new AvailableCertificateAssessmentOfferingData(
           'certificate-3',
@@ -215,6 +217,11 @@ describe('AvailableCertificateOfferingPageComponent', () => {
 
     expect(checkScoreButtons.length).toBe(passedOrFailedCount);
     expect(checkScoreButtons.length).toBe(2);
+    checkScoreButtons.forEach(button => {
+      expect(button.getAttribute('ng-reflect-router-link')).toContain(
+        '/certificate-assessment-result'
+      );
+    });
   });
 
   it('should show passed and failed on dates for passed and failed certificates', async () => {
@@ -224,6 +231,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
           'certificate-1',
           'Arithmetic',
           'Passed',
+          'attempt-1',
           1788300000000,
           null
         ),
@@ -231,6 +239,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
           'certificate-2',
           'Zoology',
           'Not Passed',
+          'attempt-2',
           null,
           1788300000000
         ),
@@ -311,5 +320,16 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       '/certificate-assessment',
       'some_cert_id',
     ]);
+  });
+
+  it('should build the result route with the attempt id', () => {
+    expect(component.getCertificateResultRoute('attempt-123')).toEqual([
+      '/certificate-assessment-result',
+      'attempt-123',
+    ]);
+  });
+
+  it('should return an empty result route when there is no attempt id', () => {
+    expect(component.getCertificateResultRoute(null)).toEqual([]);
   });
 });

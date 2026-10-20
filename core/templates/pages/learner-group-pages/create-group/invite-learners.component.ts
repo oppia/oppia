@@ -21,8 +21,6 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
 import {UserService} from 'services/user.service';
 
-import './invite-learners.component.css';
-
 @Component({
   selector: 'oppia-invite-learners',
   templateUrl: './invite-learners.component.html',

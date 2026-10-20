@@ -41,35 +41,23 @@ describe('AssessmentInstructionPanelComponent', () => {
     expect(component.certificateTitle).toBe('');
   });
 
-  it('should default the assessment duration in minutes to zero', () => {
-    expect(component.timeLimitInMinutes).toBe(0);
-  });
-
   it('should default the total questions to zero', () => {
     expect(component.totalQuestions).toBe(0);
   });
 
   it('should allow values to be set via input bindings', () => {
     component.certificateTitle = 'Everyday Arithmetic & Number Confidence';
-    component.timeLimitInMinutes = 60;
     component.totalQuestions = 12;
 
     expect(component.certificateTitle).toBe(
       'Everyday Arithmetic & Number Confidence'
     );
-    expect(component.timeLimitInMinutes).toBe(60);
     expect(component.totalQuestions).toBe(12);
   });
 
   it('should have the correct i18n key for the instructions heading', () => {
     expect(component.instructionsHeadingI18nKey).toBe(
       'I18N_ASSESSMENT_INSTRUCTIONS_HEADING'
-    );
-  });
-
-  it('should have the correct i18n key for the time limit instruction', () => {
-    expect(component.timeLimitInstructionI18nKey).toBe(
-      'I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT'
     );
   });
 
@@ -81,7 +69,6 @@ describe('AssessmentInstructionPanelComponent', () => {
 
   it('should list the correct i18n keys for the static instructions', () => {
     expect(component.staticInstructionI18nKeys).toEqual([
-      'I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT',
       'I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME',
       'I18N_ASSESSMENT_INSTRUCTION_NAVIGATION',
       'I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS',

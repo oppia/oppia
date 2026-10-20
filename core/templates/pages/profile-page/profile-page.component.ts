@@ -29,8 +29,6 @@ import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {ProfilePageBackendApiService} from './profile-page-backend-api.service';
 
-import './profile-page.component.css';
-
 interface ViewedProfileUsername {
   title: string;
   value: string;
@@ -249,7 +247,7 @@ export class ProfilePageComponent {
     }
   }
 
-  getExplorationsToDisplay(): Object[] {
+  getExplorationsToDisplay(): LearnerExplorationSummary[] {
     this.explorationsOnPage = [];
     if (this.userEditedExplorations.length === 0) {
       return this.explorationsOnPage;

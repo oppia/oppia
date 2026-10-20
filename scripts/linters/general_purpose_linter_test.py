@@ -117,6 +117,9 @@ INVALID_MERGE_CONFLICT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_merge_conflict.py'
 )
 INVALID_TODO_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid_todo.py')
+VALID_TODO_IN_STRING_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_todo_in_string.py'
+)
 INVALID_COPYRIGHT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py'
 )
@@ -346,6 +349,17 @@ class GeneralLintTests(test_utils.LinterTestBase):
         )
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_valid_todo_in_string(self) -> None:
+        """Tests that a TODO pattern inside a string literal does not fail."""
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_TODO_IN_STRING_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_bad_patterns()
+        # The trimmed_messages list should be empty because the syntax is valid.
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_error_message_includes_filepath(self) -> None:
         def _mock_readlines_error(unused_self: str) -> None:

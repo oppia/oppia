@@ -31,6 +31,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-new-chapter-title-modal',
   templateUrl: './new-chapter-title-modal.component.html',
+  styleUrls: ['./new-chapter-title-modal.component.css'],
 })
 export class NewChapterTitleModalComponent implements OnInit {
   @Input() nodeTitles!: string | string[];
@@ -45,8 +46,8 @@ export class NewChapterTitleModalComponent implements OnInit {
   editableThumbnailBgColor!: string;
   editableThumbnailFilename!: string;
   categoryIsDefault!: boolean;
-  statesWithRestrictedInteractions!: string | string[];
-  statesWithTooFewMultipleChoiceOptions!: string | string[];
+  statesWithRestrictedInteractions!: string[];
+  statesWithTooFewMultipleChoiceOptions!: string[];
   allowedBgColors = newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
 
   constructor(

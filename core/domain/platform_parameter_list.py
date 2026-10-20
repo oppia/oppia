@@ -64,7 +64,6 @@ class ParamName(enum.Enum):
         'unpublish_exploration_email_html_body'
     )
     RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'
-    SERVER_CAN_SEND_EMAILS = 'server_can_send_emails'
     SYSTEM_EMAIL_ADDRESS = 'system_email_address'
     SYSTEM_EMAIL_NAME = 'system_email_name'
     ADMIN_EMAIL_ADDRESS = 'admin_email_address'
@@ -72,8 +71,6 @@ class ParamName(enum.Enum):
     MAILCHIMP_AUDIENCE_ID = 'mailchimp_audience_id'
     MAILCHIMP_USERNAME = 'mailchimp_username'
     MAILGUN_DOMAIN_NAME = 'mailgun_domain_name'
-    ES_CLOUD_ID = 'es_cloud_id'
-    ES_USERNAME = 'es_username'
     OPPIA_SITE_URL_FOR_EMAILS = 'oppia_site_url_for_emails'
 
 
@@ -96,7 +93,6 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
     ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
     ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
-    ParamName.SERVER_CAN_SEND_EMAILS,
     ParamName.SYSTEM_EMAIL_ADDRESS,
     ParamName.SYSTEM_EMAIL_NAME,
     ParamName.ADMIN_EMAIL_ADDRESS,
@@ -104,7 +100,5 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.MAILCHIMP_AUDIENCE_ID,
     ParamName.MAILCHIMP_USERNAME,
     ParamName.MAILGUN_DOMAIN_NAME,
-    ParamName.ES_CLOUD_ID,
-    ParamName.ES_USERNAME,
     ParamName.OPPIA_SITE_URL_FOR_EMAILS,
 ]

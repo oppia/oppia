@@ -28,6 +28,7 @@ import {StoryNode} from 'domain/story/story-node.model';
 @Component({
   selector: 'oppia-chapter-editor-tab',
   templateUrl: './chapter-editor-tab.component.html',
+  styleUrls: ['./chapter-editor-tab.component.css'],
 })
 export class ChapterEditorTabComponent implements OnInit, OnDestroy {
   // These properties are all set in initEditor(), which is called from the

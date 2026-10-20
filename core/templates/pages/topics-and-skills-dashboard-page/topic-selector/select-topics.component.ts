@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import './select-topics.component.css';
 
 @Component({
   selector: 'oppia-select-topics',

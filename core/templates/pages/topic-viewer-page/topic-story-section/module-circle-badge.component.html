@@ -1,0 +1,22 @@
+<span [class]="circleClass"
+      [attr.aria-label]="getAriaLabel()"
+      [attr.title]="getTooltipText()"
+      [ngStyle]="{
+        'background-color': backgroundColor,
+        'border-color': borderColor,
+        color: textColor
+      }">
+  <img *ngIf="hasIconImage"
+       class="module-circle-badge-icon-image"
+       [src]="iconImageUrl"
+       alt=""
+       aria-hidden="true">
+  <i *ngIf="hasIcon && !hasIconImage"
+     class="material-icons"
+     aria-hidden="true">
+    {{ iconName }}
+  </i>
+  <span *ngIf="!hasIcon" class="module-circle-badge-label">
+    {{ label }}
+  </span>
+</span>

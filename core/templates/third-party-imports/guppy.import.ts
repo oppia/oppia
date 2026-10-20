@@ -17,4 +17,3 @@
  */
 
 (window as Window).Guppy = require('guppy-dev/build/guppy.min.js');
-import 'guppy-dev/build/guppy-default.min.css';

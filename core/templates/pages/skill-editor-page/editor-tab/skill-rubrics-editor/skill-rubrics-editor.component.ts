@@ -23,7 +23,6 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import './skill-rubrics-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-rubrics-editor',

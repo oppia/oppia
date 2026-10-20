@@ -28,8 +28,6 @@ from core.domain import (
     email_manager,
     fs_services,
     image_validation_services,
-    platform_parameter_list,
-    platform_parameter_services,
     question_services,
     role_services,
     skill_services,
@@ -197,6 +195,13 @@ class TopicEditorStoryHandler(
                         overdue_chapters_count += 1
 
             upcoming_chapters_expected_days.sort()
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, summary['id']
+            )['pending_nodes']
+            pending_node_titles = [node.title for node in pending_nodes]
+            completed_node_titles = utils.compute_list_difference(
+                summary['node_titles'], pending_node_titles
+            )
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -212,7 +217,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]
                 ),
-                'completed_node_titles': [],
+                'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in nodes],
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
@@ -229,6 +234,13 @@ class TopicEditorStoryHandler(
 
         updated_additional_story_summary_dicts = []
         for summary in additional_story_summary_dicts:
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, summary['id']
+            )['pending_nodes']
+            pending_node_titles = [node.title for node in pending_nodes]
+            additional_completed_node_titles = utils.compute_list_difference(
+                summary['node_titles'], pending_node_titles
+            )
             updated_additional_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -244,7 +256,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]
                 ),
-                'completed_node_titles': [],
+                'completed_node_titles': additional_completed_node_titles,
                 'all_node_dicts': [],
             }
             updated_additional_story_summary_dicts.append(
@@ -571,15 +583,11 @@ class EditableTopicDataHandler(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
-                server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in '
+                    'topic with id %s' % (deleted_skills_string, topic_id),
                 )
-                if server_can_send_emails:
-                    email_manager.send_mail_to_admin(
-                        'Deleted skills present in topic',
-                        'The deleted skills: %s are still present in '
-                        'topic with id %s' % (deleted_skills_string, topic_id),
-                    )
             skill_summaries = skill_services.get_multi_skill_summaries(
                 topic_object.get_all_skill_ids()
             )
@@ -715,15 +723,11 @@ class EditableTopicDataHandler(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with '
+                'id %s' % (deleted_skills_string, topic_id),
             )
-            if server_can_send_emails:
-                email_manager.send_mail_to_admin(
-                    'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (deleted_skills_string, topic_id),
-                )
 
         self.values.update(
             {
@@ -885,22 +889,16 @@ class TopicPublishSendMailHandler(
         """
         assert self.normalized_payload is not None
         topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
+        email_manager.send_mail_to_admin(
+            'Request to review and publish a topic',
+            '%s wants to publish topic: %s at URL %s, please review'
+            ' and publish if it looks good.'
+            % (
+                self.username,
+                self.normalized_payload['topic_name'],
+                topic_url,
+            ),
         )
-        if server_can_send_emails:
-            email_manager.send_mail_to_admin(
-                'Request to review and publish a topic',
-                '%s wants to publish topic: %s at URL %s, please review'
-                ' and publish if it looks good.'
-                % (
-                    self.username,
-                    self.normalized_payload['topic_name'],
-                    topic_url,
-                ),
-            )
 
         self.render_json(self.values)
 

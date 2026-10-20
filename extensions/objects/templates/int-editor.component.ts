@@ -21,9 +21,10 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit} from '@angular/core';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface IntValidatorSchema {
-  type: string;
+  type: 'int';
   validators: {id: string}[];
 }
 
@@ -59,7 +60,12 @@ export class IntEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue(value: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only numbers are accepted.
+    if (typeof value !== 'number') {
+      return;
+    }
     this.value = value;
     this.valueChanged.emit(value);
   }

@@ -91,6 +91,7 @@ interface OpacityMap {
 @Component({
   selector: 'state-graph-visualization',
   templateUrl: './state-graph-visualization.component.html',
+  styleUrls: ['./state-graph-visualization.component.css'],
 })
 export class StateGraphVisualization implements OnInit, OnDestroy {
   // Function called when node is clicked. Should take a parameter
@@ -111,10 +112,7 @@ export class StateGraphVisualization implements OnInit, OnDestroy {
   @Input() initStateId2!: string;
   @Input() isEditable!: boolean;
   // Object which maps linkProperty to a style.
-  @Input() linkPropertyMapping!: {
-    added: string;
-    deleted: string;
-  };
+  @Input() linkPropertyMapping!: Record<string, string>;
 
   @Input() versionGraphData!: GraphData;
   @Input() maximize: boolean = false;
