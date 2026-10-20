@@ -21,12 +21,18 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate a token for the Oppiabot GitHub App
+        id: generate_oppiabot_token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.CLIENT_ID_FOR_OPPIABOT_GITHUB_APP }}
+          private-key: ${{ secrets.PRIVATE_KEY_FOR_OPPIABOT_GITHUB_APP }}
       - name: Notify reviewers
         # SHA1 hash of the develop commit.
         uses: oppia/stale-review-request-notifier@f3d4ed51bbd7339f408cfb73201e2c5925fff1cc
         with:
           category-name: Notify\ Reviewers
-          repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
+          repo-token: ${{ steps.generate_oppiabot_token.outputs.token }}
           review-turnaround-hours: 48
       - name: Report if failed
         if: ${{ failure() }}
