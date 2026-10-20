@@ -33,6 +33,13 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -56,6 +63,7 @@ export class CreateNewSubtopicModalComponent
   schemaEditorIsShown!: boolean;
   editableThumbnailFilename!: string;
   editableThumbnailBgColor!: string;
+  imageUploaderParameters!: ImageUploaderParameters;
   editableUrlFragment!: string;
   allowedBgColors!: readonly string[];
   subtopicId!: number;
@@ -73,7 +81,10 @@ export class CreateNewSubtopicModalComponent
     AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
   constructor(
+    private alertsService: AlertsService,
+    private assetsBackendApiService: AssetsBackendApiService,
     private ngbActiveModal: NgbActiveModal,
+    private pageContextService: PageContextService,
     private subtopicValidationService: SubtopicValidationService,
     private topicUpdateService: TopicUpdateService,
     private topicEditorStateService: TopicEditorStateService,
@@ -111,6 +122,18 @@ export class CreateNewSubtopicModalComponent
     this.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING =
       AppConstants.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING;
     this.subtopicTitle = '';
+    this.imageUploaderParameters = {
+      disabled: false,
+      maxImageSizeInKB: 100,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: this.allowedBgColors[0],
+      allowedBgColors: [...this.allowedBgColors],
+      allowedImageFormats: ['svg'],
+      aspectRatio: '4:3',
+      previewTitle: this.subtopicTitle,
+      previewDescriptionBgColor: '#BE563C',
+    };
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/studyguide`;
@@ -150,6 +173,41 @@ export class CreateNewSubtopicModalComponent
 
   updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
     this.editableThumbnailBgColor = newThumbnailBgColor;
+  }
+
+  updatePreviewTitle(newSubtopicTitle: string): void {
+    // Keep the thumbnail preview title in sync with the subtopic title, as the
+    // image uploader modal reads it when it is opened.
+    this.imageUploaderParameters.previewTitle = newSubtopicTitle;
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    // The image uploader component only emits the image data, so the
+    // thumbnail is uploaded here. It is uploaded immediately because the
+    // parent topic already exists, so the subtopic change list can reference
+    // the stored filename once the subtopic is created.
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+    if (!entityType || !entityId) {
+      return;
+    }
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .toPromise()
+      .then(
+        () => {
+          this.updateSubtopicThumbnailFilename(imageData.filename);
+          this.updateSubtopicThumbnailBgColor(imageData.bg_color);
+        },
+        () => {
+          this.alertsService.addWarning('Could not upload the thumbnail.');
+        }
+      );
   }
 
   resetErrorMsg(): void {
