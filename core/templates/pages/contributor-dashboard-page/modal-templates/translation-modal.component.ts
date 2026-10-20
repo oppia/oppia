@@ -653,11 +653,7 @@ export class TranslationModalComponent {
     }
     if (Array.isArray(value)) {
       value.forEach(item =>
-        this.collectNestedRteHtmlStrings(
-          item,
-          foundComponentIds,
-          inspectedHtml
-        )
+        this.collectNestedRteHtmlStrings(item, foundComponentIds, inspectedHtml)
       );
       return;
     }

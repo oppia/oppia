@@ -297,7 +297,6 @@ describe('Translation Modal Component', () => {
   it('should mark a required component type as reviewed when its modal opens', fakeAsync(() => {
     // eslint-disable-next-line dot-notation
     spyOn(component['rteHelperService'], 'openCustomizationModal');
-    component.rteComponentsRequiringReview = ['image', 'workedexample'];
     component.ngOnInit();
 
     const req = httpTestingController.expectOne(
@@ -310,6 +309,7 @@ describe('Translation Modal Component', () => {
       version: 1,
     });
     tick();
+    component.rteComponentsRequiringReview = ['image', 'workedexample'];
 
     expect(component.unconfirmedRteComponentLabels).toEqual([
       'image',
@@ -386,7 +386,9 @@ describe('Translation Modal Component', () => {
     it('should save the current editor range before opening a popup', () => {
       const clonedRange = {};
       const range = {
-        cloneRange: jasmine.createSpy('cloneRange').and.returnValue(clonedRange),
+        cloneRange: jasmine
+          .createSpy('cloneRange')
+          .and.returnValue(clonedRange),
       };
       const selection = {
         rangeCount: 1,
@@ -400,6 +402,7 @@ describe('Translation Modal Component', () => {
 
       expect(selection.getRangeAt).toHaveBeenCalledWith(0);
       expect(range.cloneRange).toHaveBeenCalled();
+      // eslint-disable-next-line dot-notation
       expect(component['translationEditorSelection']).toBe(clonedRange);
     });
 
@@ -415,6 +418,7 @@ describe('Translation Modal Component', () => {
       component.saveTranslationEditorSelection();
 
       expect(selection.getRangeAt).not.toHaveBeenCalled();
+      // eslint-disable-next-line dot-notation
       expect(component['translationEditorSelection']).toBeNull();
     });
   });
@@ -1844,9 +1848,9 @@ describe('Translation Modal Component', () => {
         '&amp;quot;x&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">' +
         '</oppia-noninteractive-math>';
 
-      const componentIds = component[
-        'getRteComponentsWithNonemptyTextFields'
-      ](sourceHtml);
+      const componentIds =
+        // eslint-disable-next-line dot-notation
+        component['getRteComponentsWithNonemptyTextFields'](sourceHtml);
 
       expect(componentIds).toEqual([
         'image',
@@ -1864,6 +1868,7 @@ describe('Translation Modal Component', () => {
         '</oppia-noninteractive-link>';
 
       expect(
+        // eslint-disable-next-line dot-notation
         component['getRteComponentsWithNonemptyTextFields'](sourceHtml)
       ).toEqual([]);
     });
@@ -1897,9 +1902,9 @@ describe('Translation Modal Component', () => {
         collapsibleContent +
         tabsContent;
 
-      const componentIds = component[
-        'getRteComponentsWithNonemptyTextFields'
-      ](sourceHtml);
+      const componentIds =
+        // eslint-disable-next-line dot-notation
+        component['getRteComponentsWithNonemptyTextFields'](sourceHtml);
 
       expect(componentIds).toEqual([
         'image',
@@ -2034,7 +2039,9 @@ describe('Translation Modal Component', () => {
       editorRange.collapse(true);
       const editorSelection = {
         rangeCount: 1,
-        getRangeAt: jasmine.createSpy('getRangeAt').and.returnValue(editorRange),
+        getRangeAt: jasmine
+          .createSpy('getRangeAt')
+          .and.returnValue(editorRange),
         removeAllRanges: jasmine.createSpy('removeAllRanges'),
         addRange: jasmine.createSpy('addRange'),
       };
@@ -2043,6 +2050,7 @@ describe('Translation Modal Component', () => {
         .createSpy('getSelection')
         .and.returnValue(editorSelection);
       spyOn(editor, 'focus');
+      // eslint-disable-next-line dot-notation
       component['translationEditorSelection'] = editorRange;
       spyOn(
         translateTextBackendApiService,
