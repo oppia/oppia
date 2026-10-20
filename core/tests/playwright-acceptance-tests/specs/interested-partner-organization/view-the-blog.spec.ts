@@ -83,9 +83,6 @@ test.describe('Logged-out User', function () {
   });
 
   test('should paginate blog posts after the first 10 items', async function () {
-    // Publishing 11 blog posts takes longer than the default timeout.
-    test.setTimeout(900000);
-
     // As blogPostWriter: Create and publish 11 new blogs.
     await blogPostWriter.navigateToBlogDashboardPage();
     for (let i = 3; i <= 13; i++) {
