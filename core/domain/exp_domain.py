@@ -6245,7 +6245,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     def to_dict_for_android(self) -> ExplorationDict:
         """Returns a dict representing this Exploration domain object for
-        Android, with allowExponentialNotation reset to False on all
+        Android, with allowExponentialNotation reset to True on all
         NumericInput interactions for backward compatibility.
 
         Returns:
