@@ -131,6 +131,15 @@ describe('InteractiveTextInputComponent', () => {
     ).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
   });
 
+  it('should populate schema with catchMisspellings when true', () => {
+    component.catchMisspellingsWithValue = 'true';
+
+    component.ngOnInit();
+
+    expect(component.catchMisspellings).toBe(true);
+    expect(component.schema.ui_config.catchMisspellings).toBe(true);
+  });
+
   it('should save solution when user saves solution for the interaction', () => {
     component.savedSolution = 'saved solution';
 
