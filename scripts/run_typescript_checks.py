@@ -75,31 +75,11 @@ STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
 TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'tsconfig-template-strict.json'
 TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-template-strict.json'
-TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH = os.path.join(
-    'scripts', 'template_strict_exclude_paths.txt'
-)
 TYPE_TESTS_TSCONFIG_FILEPATH = os.path.join('typings', 'tests', 'tsconfig.json')
 PREFIXES = ('core', 'extensions', 'typings')
 TEMPLATE_ERROR_FILEPATH_REGEX = re.compile(
     r'((?:core/templates|extensions)/[^\n:]+\.ts)'
 )
-
-
-def load_exclude_paths(filepath: str) -> List[str]:
-    """Loads a newline-delimited strict-check allowlist from a file.
-
-    Args:
-        filepath: str. The path of the allowlist file.
-
-    Returns:
-        List[str]. The allowlisted file paths.
-    """
-    with open(filepath, 'r', encoding='utf-8') as f:
-        return [
-            line.strip()
-            for line in f.readlines()
-            if line.strip() and not line.startswith('#')
-        ]
 
 
 def validate_compiled_js_dir() -> None:
@@ -219,7 +199,8 @@ def run_ngcc() -> None:
 def compile_temp_strict_template_tsconfig(
     config_path: str, error_messages: List[str]
 ) -> None:
-    """Compiles a strict Angular-template config for non-allowlisted files.
+    """Compiles a strict Angular-template config for files with template
+    errors.
 
     Args:
         config_path: str. The config that should be used to run the template
@@ -228,18 +209,9 @@ def compile_temp_strict_template_tsconfig(
             compiling the full strict template config.
     """
     errors = [x.strip() for x in error_messages]
-    files_with_errors = sorted(
+    files_not_template_strict = sorted(
         set(TEMPLATE_ERROR_FILEPATH_REGEX.findall('\n'.join(errors)))
     )
-
-    template_strict_exclude_paths = load_exclude_paths(
-        TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH
-    )
-    files_not_template_strict = [
-        filename
-        for filename in files_with_errors
-        if filename not in template_strict_exclude_paths
-    ]
     files_not_template_strict.append('typings')
 
     with open(TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:

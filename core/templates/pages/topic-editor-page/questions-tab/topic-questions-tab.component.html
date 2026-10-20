@@ -10,7 +10,7 @@
     <mat-label>Select a skill to view question list or create a new question</mat-label>
     <mat-select [(value)]="selectedSkillId"
                 (selectionChange)="reinitializeQuestionsList(selectedSkillId)"
-                [oppiaFocusOn]="selectSkillField">
+                [oppiaFocusOn]="'selectSkillField'">
       <mat-option *ngFor="let summary of allSkillSummaries"
                   [value]="summary.getId()">
         {{ summary.getDescription() }}

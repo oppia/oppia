@@ -26,7 +26,11 @@ import {
 import {Subscription} from 'rxjs';
 import {QuestionsListService} from 'services/questions-list.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {Rubric} from 'domain/skill/rubric.model';
+import {
+  GroupedSkillSummaryDict,
+  TopicEditorStateService,
+} from '../services/topic-editor-state.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
@@ -40,8 +44,8 @@ export class TopicQuestionsTabComponent
 {
   topic!: Topic;
   topicRights!: TopicRights;
-  groupedSkillSummaries!: object;
-  skillIdToRubricsObject!: object;
+  groupedSkillSummaries!: GroupedSkillSummaryDict;
+  skillIdToRubricsObject!: Record<string, Rubric[]>;
   allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
   questionEditorOpened: boolean = false;

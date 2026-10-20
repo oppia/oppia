@@ -236,4 +236,16 @@ describe('InteractiveTextInputComponent', () => {
     expect(component.answer).toBe('answers');
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
+
+  it('should ignore a non-string update from the schema editor', () => {
+    spyOn(currentInteractionService, 'updateCurrentAnswer');
+    component.answer = 'answers';
+
+    component.updateAnswer(null);
+
+    expect(component.answer).toBe('answers');
+    expect(
+      currentInteractionService.updateCurrentAnswer
+    ).not.toHaveBeenCalled();
+  });
 });
