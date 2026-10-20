@@ -4082,11 +4082,9 @@ class SingleLinePragmaCheckerTests(CheckerTestBase):
             pylint_utils.tokenize_module(node_pragma_for_multiline)
         )
 
-        message1 = testutils.MessageTest(msg_id='single-line-pragma', line=2)
+        message1 = testutils.MessageTest(msg_id='single-line-pragma', line=6)
 
-        message2 = testutils.MessageTest(msg_id='single-line-pragma', line=6)
-
-        with self.checker_test_object.assertAddsMessages(message1, message2):
+        with self.checker_test_object.assertAddsMessages(message1):
             temp_file.close()
 
     def test_enable_single_line_pragma_for_multiline(self) -> None:
@@ -4115,9 +4113,7 @@ class SingleLinePragmaCheckerTests(CheckerTestBase):
             )
         )
 
-        message = testutils.MessageTest(msg_id='single-line-pragma', line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
     def test_enable_single_line_pragma_with_invalid_name(self) -> None:
@@ -4148,9 +4144,7 @@ class SingleLinePragmaCheckerTests(CheckerTestBase):
             )
         )
 
-        message = testutils.MessageTest(msg_id='single-line-pragma', line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
     def test_single_line_pylint_pragma(self) -> None:
@@ -4199,9 +4193,7 @@ class SingleLinePragmaCheckerTests(CheckerTestBase):
             pylint_utils.tokenize_module(node_no_and_extra_space_before_pylint)
         )
 
-        message = testutils.MessageTest(msg_id='single-line-pragma', line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
 
