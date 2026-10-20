@@ -25,6 +25,7 @@ from core.domain import (
     skill_services,
     state_domain,
     story_domain,
+    story_fetchers,
     story_services,
     topic_domain,
     topic_services,
@@ -1044,6 +1045,24 @@ class TopicPageDataHandlerTests(
             self.assertIn('arcs', canonical_story_dict)
         for additional_story_dict in json_response['additional_story_dicts']:
             self.assertIn('arcs', additional_story_dict)
+        self.logout()
+
+    def test_get_fetches_story_nodes_once_per_story(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        call_counter = test_utils.CallCounter(
+            story_fetchers.get_pending_and_all_nodes_in_story
+        )
+        with self.swap(
+            story_fetchers, 'get_pending_and_all_nodes_in_story', call_counter
+        ):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+            )
+        num_stories = len(json_response['canonical_story_dicts']) + len(
+            json_response['additional_story_dicts']
+        )
+        self.assertGreater(num_stories, 0)
+        self.assertEqual(call_counter.times_called, num_stories)
         self.logout()
 
 

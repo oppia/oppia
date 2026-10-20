@@ -93,15 +93,12 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         additional_story_ids = topic.get_additional_story_ids(
             include_only_published=True
         )
-        canonical_story_summaries = [
-            story_fetchers.get_story_summary_by_id(canonical_story_id)
-            for canonical_story_id in canonical_story_ids
-        ]
-
-        additional_story_summaries = [
-            story_fetchers.get_story_summary_by_id(additional_story_id)
-            for additional_story_id in additional_story_ids
-        ]
+        canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            canonical_story_ids
+        )
+        additional_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            additional_story_ids
+        )
 
         are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
@@ -120,19 +117,14 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     exploration_ids.add(node.exploration_id)
 
         for story_summary in canonical_story_summaries:
-            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+            story_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
-            )['all_nodes']
-            filtered_nodes = [
-                node
-                for node in all_nodes
-                if node.status != constants.STORY_NODE_STATUS_DRAFT
+            )
+            all_nodes = story_nodes['all_nodes']
+            _collect_exploration_ids_from_nodes(all_nodes)
+            pending_node_titles = [
+                node.title for node in story_nodes['pending_nodes']
             ]
-            _collect_exploration_ids_from_nodes(filtered_nodes)
-            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['pending_nodes']
-            pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles
             )
@@ -141,7 +133,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
-                'node_titles': [node.title for node in filtered_nodes],
+                'node_titles': [node.title for node in all_nodes],
                 'thumbnail_bg_color': story_summary_dict['thumbnail_bg_color'],
                 'thumbnail_filename': story_summary_dict['thumbnail_filename'],
                 'url_fragment': story_summary_dict['url_fragment'],
@@ -155,19 +147,19 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     arc.to_dict() for arc in story.story_contents.arcs
                 ]
             canonical_story_dicts.append(canonical_story_dict)
-            canonical_story_nodes.append(filtered_nodes)
+            canonical_story_nodes.append(all_nodes)
 
         additional_story_dicts: List[StoryResponseDict] = []
         additional_story_nodes: List[Sequence[story_domain.StoryNode]] = []
         for story_summary in additional_story_summaries:
-            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+            story_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
-            )['all_nodes']
+            )
+            all_nodes = story_nodes['all_nodes']
             _collect_exploration_ids_from_nodes(all_nodes)
-            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['pending_nodes']
-            pending_node_titles = [node.title for node in pending_nodes]
+            pending_node_titles = [
+                node.title for node in story_nodes['pending_nodes']
+            ]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles
             )
