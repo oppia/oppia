@@ -334,6 +334,43 @@ describe('Story node editor component', () => {
     );
   });
 
+  it('should return the absolute exploration editor URL', () => {
+    expect(component.getExplorationEditorUrl('exp_1')).toEqual(
+      window.location.origin + '/create/exp_1'
+    );
+  });
+
+  it('should show a link to the exploration editor when an exploration is linked', () => {
+    // The first change detection run calls ngOnInit, which copies the
+    // explorationId input into currentExplorationId.
+    component.explorationId = 'exp_1';
+    component.mainChapterCardIsShown = true;
+    fixture.detectChanges();
+
+    const link: HTMLAnchorElement | null = fixture.nativeElement.querySelector(
+      'a[href$="/create/exp_1"]'
+    );
+    expect(link).not.toBeNull();
+    expect(link?.getAttribute('target')).toEqual('_blank');
+    expect(link?.textContent?.trim()).toEqual(
+      window.location.origin + '/create/exp_1'
+    );
+  });
+
+  it('should not show the exploration editor link when no exploration is linked', () => {
+    component.explorationId = null;
+    component.mainChapterCardIsShown = true;
+    fixture.detectChanges();
+
+    // The exploration ID field is rendered, but there is no link.
+    expect(
+      fixture.nativeElement.querySelector('.e2e-test-exploration-id-input')
+    ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('a[href*="/create/"]')
+    ).toBeNull();
+  });
+
   it('should fetch the descriptions for prerequisite skills', fakeAsync(() => {
     component.prerequisiteSkillIds = ['1', '2', '3'];
 
