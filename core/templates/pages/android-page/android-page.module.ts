@@ -27,8 +27,6 @@ import {I18nModule} from 'i18n/i18n.module';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
-import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
 import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 
@@ -36,8 +34,6 @@ import {TranslateModule} from '@ngx-translate/core';
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    DonationBoxModule,
-    FullExpandAccordionModule,
     MaterialModule,
     TranslateModule,
     CommonModule,
