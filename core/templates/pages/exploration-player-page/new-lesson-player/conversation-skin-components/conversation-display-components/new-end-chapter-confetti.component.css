@@ -179,7 +179,7 @@
     width: calc(100vw - 83px);
     z-index: 2;
   }
-  .stage.expanded-sidebar {
+  .stage.confetti-sidebar-expanded {
     width: calc(100vw - 243px);
   }
   .confetti,
@@ -189,7 +189,7 @@
 }
 @media(min-width: 701px) and (max-width: 767px) {
   .stage,
-  .stage.expanded-sidebar {
+  .stage.confetti-sidebar-expanded {
     width: 100vw;
   }
 }

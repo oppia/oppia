@@ -479,7 +479,7 @@
     right: 30px;
   }
 
-  .confetti-piece:nth-child(n + 41) {
+  .confetti-piece:nth-child(n + 61) {
     visibility: hidden;
   }
 
@@ -493,7 +493,7 @@
     --height: 60vh;
   }
 
-  .confetti-piece:nth-child(n + 31) {
+  .confetti-piece:nth-child(n + 41) {
     visibility: hidden;
   }
 
@@ -583,206 +583,269 @@
   }
 }
 
-/* Large screens (the small-screen behaviour above is left as it was): closer to
-   the reference animation.
-   - The burst is fast: pieces shoot up in well under a second, tops of the
-     burst reach (and go past) the top of the lesson area.
-   - Pieces are thrown both outwards and inwards in roughly equal amounts, so
-     the confetti covers the whole width instead of piling up in the middle.
+/* Motion shared by all screen sizes, closer to the reference animation.
+   - The burst is fast: pieces shoot up in well under a second.
    - After the peak a piece falls at an almost constant speed (like paper
      dragged by the air) all the way back down past the pill, instead of
      hanging in the air and fading out. */
+.confetti-piece {
+  animation:
+    confetti-drift-x var(--dur) cubic-bezier(0.05, 0.8, 0.2, 1) var(--start) forwards,
+    confetti-rise-and-fall-wide var(--dur) linear var(--start) forwards,
+    confetti-fade-wide var(--dur) linear var(--start) forwards;
+}
+
+.confetti-piece:nth-child(13n + 1) {
+  --power: 0.8;
+}
+
+.confetti-piece:nth-child(13n + 2) {
+  --power: 0.55;
+}
+
+.confetti-piece:nth-child(13n + 3) {
+  --power: 1;
+}
+
+.confetti-piece:nth-child(13n + 4) {
+  --power: 0.7;
+}
+
+.confetti-piece:nth-child(13n + 5) {
+  --power: 0.92;
+}
+
+.confetti-piece:nth-child(13n + 6) {
+  --power: 0.5;
+}
+
+.confetti-piece:nth-child(13n + 7) {
+  --power: 0.98;
+}
+
+.confetti-piece:nth-child(13n + 8) {
+  --power: 0.62;
+}
+
+.confetti-piece:nth-child(13n + 9) {
+  --power: 0.78;
+}
+
+.confetti-piece:nth-child(13n + 10) {
+  --power: 1.05;
+}
+
+.confetti-piece:nth-child(13n + 11) {
+  --power: 0.56;
+}
+
+.confetti-piece:nth-child(13n + 12) {
+  --power: 0.88;
+}
+
+.confetti-piece:nth-child(13n + 13) {
+  --power: 0.66;
+}
+
+.confetti-piece:nth-child(7n + 1) {
+  --fall: calc(var(--height) * 0.14);
+}
+
+.confetti-piece:nth-child(7n + 2) {
+  --fall: calc(var(--height) * 0.2);
+}
+
+.confetti-piece:nth-child(7n + 3) {
+  --fall: calc(var(--height) * 0.17);
+}
+
+.confetti-piece:nth-child(7n + 4) {
+  --fall: calc(var(--height) * 0.24);
+}
+
+.confetti-piece:nth-child(7n + 5) {
+  --fall: calc(var(--height) * 0.15);
+}
+
+.confetti-piece:nth-child(7n + 6) {
+  --fall: calc(var(--height) * 0.19);
+}
+
+.confetti-piece:nth-child(7n + 7) {
+  --fall: calc(var(--height) * 0.26);
+}
+
+.confetti-piece:nth-child(9n + 1) {
+  --dur: 3800ms;
+}
+
+.confetti-piece:nth-child(9n + 2) {
+  --dur: 4200ms;
+}
+
+.confetti-piece:nth-child(9n + 3) {
+  --dur: 4600ms;
+}
+
+.confetti-piece:nth-child(9n + 4) {
+  --dur: 4000ms;
+}
+
+.confetti-piece:nth-child(9n + 5) {
+  --dur: 4400ms;
+}
+
+.confetti-piece:nth-child(9n + 6) {
+  --dur: 4800ms;
+}
+
+.confetti-piece:nth-child(9n + 7) {
+  --dur: 4100ms;
+}
+
+.confetti-piece:nth-child(9n + 8) {
+  --dur: 4500ms;
+}
+
+.confetti-piece:nth-child(9n + 9) {
+  --dur: 4900ms;
+}
+
+/* Streamers are lighter: not thrown as high, and they float down later. */
+.confetti-piece:nth-child(18n + 4),
+.confetti-piece:nth-child(18n + 13) {
+  --dur: 4900ms;
+  --fall: calc(var(--height) * 0.22);
+  --power: 0.6;
+}
+
+/* Large screens: the burst reaches (and goes past) the top of the lesson area,
+   and pieces are thrown both outwards and inwards in roughly equal amounts, so
+   the confetti covers the whole width instead of piling up in the middle. */
 @media (min-width: 960px) {
   .confetti-stage {
     --height: min(92vh, 1000px);
     --reach: min(22vw, 300px);
   }
 
-  .confetti-piece {
-    animation:
-      confetti-drift-x var(--dur) cubic-bezier(0.05, 0.8, 0.2, 1) var(--start) forwards,
-      confetti-rise-and-fall-wide var(--dur) linear var(--start) forwards,
-      confetti-fade-wide var(--dur) linear var(--start) forwards;
+    .confetti-piece:nth-child(11n + 1) {
+      --throw: -0.7;
+      --dome: 0.86;
+    }
+
+    .confetti-piece:nth-child(11n + 2) {
+      --throw: -0.3;
+      --dome: 0.94;
+    }
+
+    .confetti-piece:nth-child(11n + 3) {
+      --throw: 0.15;
+      --dome: 0.97;
+    }
+
+    .confetti-piece:nth-child(11n + 4) {
+      --throw: 0.5;
+      --dome: 0.9;
+    }
+
+    .confetti-piece:nth-child(11n + 5) {
+      --throw: -0.5;
+      --dome: 0.9;
+    }
+
+    .confetti-piece:nth-child(11n + 6) {
+      --throw: 0.9;
+      --dome: 0.82;
+    }
+
+    .confetti-piece:nth-child(11n + 7) {
+      --throw: 0;
+      --dome: 1;
+    }
+
+    .confetti-piece:nth-child(11n + 8) {
+      --throw: 0.7;
+      --dome: 0.86;
+    }
+
+    .confetti-piece:nth-child(11n + 9) {
+      --throw: -0.15;
+      --dome: 0.97;
+    }
+
+    .confetti-piece:nth-child(11n + 10) {
+      --throw: 0.35;
+      --dome: 0.93;
+    }
+
+    .confetti-piece:nth-child(11n + 11) {
+      --throw: 1.0;
+      --dome: 0.8;
+    }
+}
+
+/* Smaller screens: the two cannons are close together, so nearly every piece
+   is thrown inwards, towards the middle of the page, and the two sprays cross
+   over each other instead of both going straight up the sides. */
+@media (max-width: 959px) {
+  .confetti-stage {
+    --reach: min(42vw, 300px);
   }
 
-  .confetti-piece:nth-child(11n + 1) {
-    --throw: -0.7;
-    --dome: 0.86;
-  }
+    .confetti-piece:nth-child(11n + 1) {
+      --throw: 0.2;
+      --dome: 0.96;
+    }
 
-  .confetti-piece:nth-child(11n + 2) {
-    --throw: -0.3;
-    --dome: 0.94;
-  }
+    .confetti-piece:nth-child(11n + 2) {
+      --throw: 0.45;
+      --dome: 0.92;
+    }
 
-  .confetti-piece:nth-child(11n + 3) {
-    --throw: 0.15;
-    --dome: 0.97;
-  }
+    .confetti-piece:nth-child(11n + 3) {
+      --throw: 0.7;
+      --dome: 0.87;
+    }
 
-  .confetti-piece:nth-child(11n + 4) {
-    --throw: 0.5;
-    --dome: 0.9;
-  }
+    .confetti-piece:nth-child(11n + 4) {
+      --throw: 0.95;
+      --dome: 0.83;
+    }
 
-  .confetti-piece:nth-child(11n + 5) {
-    --throw: -0.5;
-    --dome: 0.9;
-  }
+    .confetti-piece:nth-child(11n + 5) {
+      --throw: 0.3;
+      --dome: 0.95;
+    }
 
-  .confetti-piece:nth-child(11n + 6) {
-    --throw: 0.9;
-    --dome: 0.82;
-  }
+    .confetti-piece:nth-child(11n + 6) {
+      --throw: 0.6;
+      --dome: 0.89;
+    }
 
-  .confetti-piece:nth-child(11n + 7) {
-    --throw: 0;
-    --dome: 1;
-  }
+    .confetti-piece:nth-child(11n + 7) {
+      --throw: 1.1;
+      --dome: 0.8;
+    }
 
-  .confetti-piece:nth-child(11n + 8) {
-    --throw: 0.7;
-    --dome: 0.86;
-  }
+    .confetti-piece:nth-child(11n + 8) {
+      --throw: 0.1;
+      --dome: 0.98;
+    }
 
-  .confetti-piece:nth-child(11n + 9) {
-    --throw: -0.15;
-    --dome: 0.97;
-  }
+    .confetti-piece:nth-child(11n + 9) {
+      --throw: 0.8;
+      --dome: 0.85;
+    }
 
-  .confetti-piece:nth-child(11n + 10) {
-    --throw: 0.35;
-    --dome: 0.93;
-  }
+    .confetti-piece:nth-child(11n + 10) {
+      --throw: 0.5;
+      --dome: 0.91;
+    }
 
-  .confetti-piece:nth-child(11n + 11) {
-    --throw: 1.0;
-    --dome: 0.8;
-  }
-
-  .confetti-piece:nth-child(13n + 1) {
-    --power: 0.8;
-  }
-
-  .confetti-piece:nth-child(13n + 2) {
-    --power: 0.55;
-  }
-
-  .confetti-piece:nth-child(13n + 3) {
-    --power: 1;
-  }
-
-  .confetti-piece:nth-child(13n + 4) {
-    --power: 0.7;
-  }
-
-  .confetti-piece:nth-child(13n + 5) {
-    --power: 0.92;
-  }
-
-  .confetti-piece:nth-child(13n + 6) {
-    --power: 0.5;
-  }
-
-  .confetti-piece:nth-child(13n + 7) {
-    --power: 0.98;
-  }
-
-  .confetti-piece:nth-child(13n + 8) {
-    --power: 0.62;
-  }
-
-  .confetti-piece:nth-child(13n + 9) {
-    --power: 0.78;
-  }
-
-  .confetti-piece:nth-child(13n + 10) {
-    --power: 1.05;
-  }
-
-  .confetti-piece:nth-child(13n + 11) {
-    --power: 0.56;
-  }
-
-  .confetti-piece:nth-child(13n + 12) {
-    --power: 0.88;
-  }
-
-  .confetti-piece:nth-child(13n + 13) {
-    --power: 0.66;
-  }
-
-  .confetti-piece:nth-child(7n + 1) {
-    --fall: calc(var(--height) * 0.14);
-  }
-
-  .confetti-piece:nth-child(7n + 2) {
-    --fall: calc(var(--height) * 0.2);
-  }
-
-  .confetti-piece:nth-child(7n + 3) {
-    --fall: calc(var(--height) * 0.17);
-  }
-
-  .confetti-piece:nth-child(7n + 4) {
-    --fall: calc(var(--height) * 0.24);
-  }
-
-  .confetti-piece:nth-child(7n + 5) {
-    --fall: calc(var(--height) * 0.15);
-  }
-
-  .confetti-piece:nth-child(7n + 6) {
-    --fall: calc(var(--height) * 0.19);
-  }
-
-  .confetti-piece:nth-child(7n + 7) {
-    --fall: calc(var(--height) * 0.26);
-  }
-
-  .confetti-piece:nth-child(9n + 1) {
-    --dur: 3800ms;
-  }
-
-  .confetti-piece:nth-child(9n + 2) {
-    --dur: 4200ms;
-  }
-
-  .confetti-piece:nth-child(9n + 3) {
-    --dur: 4600ms;
-  }
-
-  .confetti-piece:nth-child(9n + 4) {
-    --dur: 4000ms;
-  }
-
-  .confetti-piece:nth-child(9n + 5) {
-    --dur: 4400ms;
-  }
-
-  .confetti-piece:nth-child(9n + 6) {
-    --dur: 4800ms;
-  }
-
-  .confetti-piece:nth-child(9n + 7) {
-    --dur: 4100ms;
-  }
-
-  .confetti-piece:nth-child(9n + 8) {
-    --dur: 4500ms;
-  }
-
-  .confetti-piece:nth-child(9n + 9) {
-    --dur: 4900ms;
-  }
-
-  /* Streamers are lighter: not thrown as high, and they float down later. */
-  .confetti-piece:nth-child(18n + 4),
-  .confetti-piece:nth-child(18n + 13) {
-    --dur: 4900ms;
-    --fall: calc(var(--height) * 0.22);
-    --power: 0.6;
-  }
+    .confetti-piece:nth-child(11n + 11) {
+      --throw: -0.15;
+      --dome: 0.97;
+    }
 }
 
 /* Up very quickly, brief hang at the peak, then down at a nearly constant
