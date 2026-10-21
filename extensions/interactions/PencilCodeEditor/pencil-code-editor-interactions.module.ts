@@ -25,10 +25,17 @@ import {ResponePencilCodeEditor} from './directives/oppia-response-pencil-code-e
 import {ShortResponePencilCodeEditor} from './directives/oppia-short-response-pencil-code-editor.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {CommonModule} from '@angular/common';
 
 @NgModule({
-  imports: [SharedPipesModule, CommonModule, MaterialModule, TranslateModule],
+  imports: [
+    SharedPipesModule,
+    StringUtilityPipesModule,
+    CommonModule,
+    MaterialModule,
+    TranslateModule,
+  ],
   declarations: [
     PencilCodeEditor,
     PencilCodeResetConfirmation,

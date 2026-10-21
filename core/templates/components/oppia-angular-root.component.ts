@@ -83,7 +83,6 @@ import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-back
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
-import 'third-party-imports/ckeditor.import';
 
 import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
 import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
@@ -235,15 +234,22 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
     if (!OppiaAngularRootComponent.pageContextService) {
       OppiaAngularRootComponent.pageContextService = this.pageContextService;
     }
-    this.ngZone.runOutsideAngular(() => {
-      CkEditorInitializerService.ckEditorInitializer(
-        // The 'unknown' type is used here because the rteHelperService can be of any type.
-        OppiaAngularRootComponent.rteHelperService as unknown as RteHelperServiceLocal,
-        this.htmlEscaperService,
-        this.pageContextService,
-        this.ngZone
-      );
-    });
+    // The CKEditor library is large, so it should only be loaded on pages
+    // that actually render a rich text editor. Angular initializes child
+    // views before the parent, so if this page has an RTE it will already
+    // be present in the DOM at this point. Pages without one skip the load
+    // entirely, keeping CKEditor out of their bundles.
+    if (document.querySelector('ck-editor-4-rte')) {
+      this.ngZone.runOutsideAngular(() => {
+        CkEditorInitializerService.ckEditorInitializer(
+          // The 'unknown' type is used here because the rteHelperService can be of any type.
+          OppiaAngularRootComponent.rteHelperService as unknown as RteHelperServiceLocal,
+          this.htmlEscaperService,
+          this.pageContextService,
+          this.ngZone
+        );
+      });
+    }
     OppiaAngularRootComponent.classroomBackendApiService =
       this.classroomBackendApiService;
     OppiaAngularRootComponent.i18nLanguageCodeService =

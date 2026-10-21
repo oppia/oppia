@@ -28,6 +28,7 @@ import {MaterialModule} from 'modules/material.module';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {TranslationModalUneditedConfirmationModalModule} from 'components/shared_parts/translation-modal-unedited-confirmation-modal.module';
 
 @NgModule({
@@ -41,6 +42,7 @@ import {TranslationModalUneditedConfirmationModalModule} from 'components/shared
     OppiaCkEditorCopyToolBarModule,
     RichTextComponentsModule,
     SharedFormsModule,
+    StringUtilityPipesModule,
     TranslationModalUneditedConfirmationModalModule,
   ],
   declarations: [TranslationModalComponent],
