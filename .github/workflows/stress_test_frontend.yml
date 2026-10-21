@@ -1,0 +1,108 @@
+# This workflow is used to run the frontend unit tests multiple times.
+# It is not used in the CI, but is used to test the flakiness of the
+# frontend unit tests by running them repeatedly with fresh, randomly
+# ordered Jasmine execution (Karma randomises the order of specs on
+# every run). It mirrors the acceptance test stress workflow and is
+# intended to be triggered manually from a fork, following the same
+# reproduction process described in:
+#   - https://github.com/oppia/oppia/wiki/Frontend-tests
+#   - https://github.com/oppia/oppia/wiki/Acceptance-Tests#1-reproduction
+
+name: Stress Test (Frontend Unit Tests)
+
+permissions: read-all
+on:
+  workflow_dispatch:
+    inputs:
+      num_runs:
+        # A maximum of 256 jobs can be generated using a matrix.
+        # Ref: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstrategymatrix
+        description: 'Number of times to run the frontend tests (Max: 256).'
+        required: true
+        default: '20'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '5'
+          - '10'
+          - '20'
+          - '50'
+          - '100'
+          - '200'
+      specs_to_run:
+        description: 'Comma-separated spec file paths to run, or ALL to run the full frontend suite.'
+        required: true
+        type: string
+
+jobs:
+  setup_merge_sha:
+    name: Capture develop SHA
+    runs-on: ubuntu-22.04
+    outputs:
+      develop_sha: ${{ steps.get_sha.outputs.sha }}
+    steps:
+      - name: Get latest develop SHA
+        id: get_sha
+        run: |
+          SHA=$(git ls-remote https://github.com/oppia/oppia.git refs/heads/develop | awk '{print $1}')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+  generate-matrix:
+    name: Generate job strategy matrix
+    needs: setup_merge_sha
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      NUM_RUNS: ${{ inputs.num_runs }}
+    steps:
+      - name: Generate Matrix
+        id: set-matrix
+        shell: bash
+        run: |
+          MATRIX=$(seq 1 "$NUM_RUNS" | jq -R . | jq -s -c .)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+  run_frontend_test:
+    name: "Run ${{ matrix.run }}"
+    needs: [generate-matrix, setup_merge_sha]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      max-parallel: 25
+      matrix:
+        run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    env:
+      SPECS_TO_RUN: ${{ inputs.specs_to_run }}
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
+      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Sanitize specs_to_run input
+        shell: bash
+        run: |
+          if [[ ! "$SPECS_TO_RUN" =~ ^([Aa][Ll][Ll]|[a-zA-Z0-9_./,-]+)$ ]]; then
+            echo "specs_to_run must be ALL or a comma-separated list of spec file paths."
+            exit 1
+          fi
+      - name: Run frontend tests (run ${{ matrix.run }})
+        shell: bash
+        run: |
+          set -o pipefail
+          SPECS_ARG=""
+          if [[ "$SPECS_TO_RUN" != "ALL" && "$SPECS_TO_RUN" != "all" ]]; then
+            SPECS_ARG="--specs_to_run=$SPECS_TO_RUN"
+          fi
+          python -m scripts.run_frontend_tests $SPECS_ARG --check_coverage 2>&1 \
+            | tee "frontend_stress_test_run_${{ matrix.run }}.log"
+      - name: Upload frontend test logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-stress-test-run-${{ matrix.run }}
+          path: frontend_stress_test_run_${{ matrix.run }}.log

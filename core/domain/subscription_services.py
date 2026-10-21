@@ -160,34 +160,6 @@ def unsubscribe_from_creator(user_id: str, creator_id: str) -> None:
         subscriptions_model_user.put()
 
 
-def get_all_threads_subscribed_to(user_id: str) -> List[str]:
-    """Returns a list with ids of all the feedback and suggestion threads to
-    which the user is subscribed.
-
-    WARNING: Callers of this function should ensure that the user_id is valid.
-
-    Args:
-        user_id: str. The user ID of the subscriber.
-
-    Returns:
-        list(str). IDs of all the feedback and suggestion threads to
-        which the user is subscribed.
-    """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False
-    )
-    # TODO(#15621): The explicit declaration of type for ndb properties should
-    # be removed. Currently, these ndb properties are annotated with Any return
-    # type. Once we have proper return type we can remove this.
-    if subscriptions_model:
-        feedback_thread_ids: List[str] = (
-            subscriptions_model.general_feedback_thread_ids
-        )
-        return feedback_thread_ids
-    else:
-        return []
-
-
 def get_all_creators_subscribed_to(user_id: str) -> List[str]:
     """Returns a list with ids of all the creators to which this learner has
     subscribed.
