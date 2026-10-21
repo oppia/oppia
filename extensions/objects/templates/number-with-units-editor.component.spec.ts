@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for number with units editor.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NumberConversionService} from 'services/number-conversion.service';
