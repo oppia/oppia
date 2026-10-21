@@ -1,7 +1,7 @@
-
-
 oppia-progress-tracker {
-  left: 50%;
+  /* The lesson content area is the viewport minus the collapsed sidebar
+     (83px), so centre on that area rather than on the whole viewport. */
+  left: calc(50% - 41.5px);
   position: fixed;
   transform: translateX(-50%);
   width: 375px;
@@ -160,6 +160,14 @@ oppia-progress-tracker.sidebar-expanded {
   -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
+}
+
+/* On small screens the sidebar does not take up any width. */
+@media (max-width: 767px) {
+  oppia-progress-tracker,
+  oppia-progress-tracker.sidebar-expanded {
+    left: 50%;
+  }
 }
 
 @media (max-width: 1024px) {

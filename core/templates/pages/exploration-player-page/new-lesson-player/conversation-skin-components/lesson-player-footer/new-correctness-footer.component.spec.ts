@@ -19,7 +19,6 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NewEndChapterConfettiComponent} from '../conversation-display-components/new-end-chapter-confetti.component';
 import {NewCorrectnessFooterComponent} from './new-correctness-footer.component';
 
 describe('NewCorrectnessFooterComponent', () => {
@@ -42,14 +41,21 @@ describe('NewCorrectnessFooterComponent', () => {
     expect(component).toBeDefined();
   });
 
-  it('should animate the confetti after the view is initialized', () => {
-    const animateConfettiSpy = jasmine.createSpy('animateConfetti');
-    component.answerConfetti = {
-      animateConfetti: animateConfettiSpy,
-    } as unknown as NewEndChapterConfettiComponent;
+  it('should render one decorative element for each confetti piece', () => {
+    fixture.detectChanges();
+    const stage = fixture.nativeElement.querySelector('.confetti-stage');
+    const pieces = fixture.nativeElement.querySelectorAll('.confetti-piece');
 
-    component.ngAfterViewInit();
+    expect(component.confettiPieces.length).toBeGreaterThan(0);
+    expect(pieces.length).toBe(component.confettiPieces.length);
+    expect(stage.getAttribute('aria-hidden')).toBe('true');
+  });
 
-    expect(animateConfettiSpy).toHaveBeenCalledTimes(1);
+  it('should show the correct feedback', () => {
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.e2e-test-correct-feedback')
+    ).not.toBeNull();
   });
 });

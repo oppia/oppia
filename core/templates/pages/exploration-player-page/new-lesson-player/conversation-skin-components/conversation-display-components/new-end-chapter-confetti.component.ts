@@ -18,6 +18,7 @@
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-new-end-chapter-confetti',
@@ -25,17 +26,19 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   styleUrls: ['./new-end-chapter-confetti.component.css'],
 })
 export class NewEndChapterConfettiComponent implements OnInit {
-  // Distance of the burst origin above the bottom of the viewport. The default
-  // is the centre of the correctness pill.
-  @Input() originBottom: string = '86px';
-  @Input() audioIsEnabled: boolean = true;
+  @Input() topOffset: string = '40px';
   confettiIsShown: boolean = false;
   endChapterCelebratoryAudio = new Audio();
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private mobileMenuService: MobileMenuService
   ) {}
+
+  getSidebarIsExpanded(): boolean {
+    return this.mobileMenuService.getSidebarIsExpanded();
+  }
 
   ngOnInit(): void {
     this.endChapterCelebratoryAudio.src =
@@ -48,8 +51,6 @@ export class NewEndChapterConfettiComponent implements OnInit {
   animateConfetti(): void {
     this.confettiIsShown = true;
     this.cdRef.detectChanges();
-    if (this.audioIsEnabled) {
-      this.endChapterCelebratoryAudio.play();
-    }
+    this.endChapterCelebratoryAudio.play();
   }
 }

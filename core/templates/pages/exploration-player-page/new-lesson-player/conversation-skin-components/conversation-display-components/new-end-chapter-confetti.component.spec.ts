@@ -66,29 +66,4 @@ describe('End chapter confetti component', function () {
     expect(component.confettiIsShown).toBe(true);
     expect(component.endChapterCelebratoryAudio.play).toHaveBeenCalled();
   });
-
-  it('should position the burst using the origin offset', () => {
-    fixture.detectChanges();
-    const stage = fixture.nativeElement.querySelector('.stage');
-
-    expect(component.originBottom).toBe('86px');
-    expect(stage.style.bottom).toBe('86px');
-
-    component.originBottom = '30px';
-    fixture.detectChanges();
-
-    expect(stage.style.bottom).toBe('30px');
-  });
-
-  it('should activate the confetti pieces when animated', () => {
-    fixture.detectChanges();
-    const stage = fixture.nativeElement.querySelector('.stage');
-    spyOn(component.endChapterCelebratoryAudio, 'play');
-
-    expect(stage.classList).not.toContain('confetti-active');
-
-    component.animateConfetti();
-
-    expect(stage.classList).toContain('confetti-active');
-  });
 });

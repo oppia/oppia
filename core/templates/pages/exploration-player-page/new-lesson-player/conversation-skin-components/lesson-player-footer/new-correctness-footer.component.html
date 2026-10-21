@@ -1,8 +1,10 @@
-<oppia-new-end-chapter-confetti
-  #answerConfetti
-  [audioIsEnabled]="true">
-</oppia-new-end-chapter-confetti>
 <div class="inner-container-alignment">
+  <!-- Burst of confetti for a correct answer, fired from the two sides of the
+       pill. It is purely decorative and is played by CSS as soon as the footer
+       is rendered. -->
+  <div class="confetti-stage" aria-hidden="true">
+    <div class="confetti-piece" *ngFor="let piece of confettiPieces"></div>
+  </div>
   <div class="inner-container inner-container-fade-out">
     <span class="tick-symbol-badge">
       <i class="fas fa-check tick-symbol"></i>
