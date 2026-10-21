@@ -88,7 +88,6 @@ EXCLUDED_PATHS: Final = (
     'core/tests/build_sources/*',
     '*.mp3',
     '*.mp4',
-    '*.webm',
     'node_modules/*',
     'typings/*',
     'local_compiled_js/*',
