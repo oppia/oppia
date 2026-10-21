@@ -18,9 +18,10 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser} from '@playwright/test';
+import {Browser, Page} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import {ConsoleReporter} from './console-reporter';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
@@ -90,6 +91,23 @@ let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
+  /**
+   * This function creates a new browser context whose console errors are
+   * tracked by the ConsoleReporter, and returns the first page of it.
+   * @param {Browser} browser - The Playwright browser instance.
+   */
+  private static createPageInNewContext = async function (
+    browser: Browser
+  ): Promise<Page> {
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: VIDEO_RECORDING_DIR,
+      },
+    });
+    ConsoleReporter.trackConsoleMessagesInContext(context);
+    return await context.newPage();
+  };
+
   /**
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
@@ -212,12 +230,7 @@ export class UserFactory {
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
     args?: string | string[]
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
-    const context = await browser.newContext({
-      recordVideo: {
-        dir: VIDEO_RECORDING_DIR,
-      },
-    });
-    const page = await context.newPage();
+    const page = await UserFactory.createPageInNewContext(browser);
 
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
@@ -250,12 +263,7 @@ export class UserFactory {
   static createUserForSignup = async function (
     browser: Browser
   ): Promise<LoggedInUser & LoggedOutUser> {
-    const context = await browser.newContext({
-      recordVideo: {
-        dir: VIDEO_RECORDING_DIR,
-      },
-    });
-    const page = await context.newPage();
+    const page = await UserFactory.createPageInNewContext(browser);
 
     const user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
@@ -305,12 +313,7 @@ export class UserFactory {
   static createLoggedOutUser = async function (
     browser: Browser
   ): Promise<LoggedOutUser> {
-    const context = await browser.newContext({
-      recordVideo: {
-        dir: VIDEO_RECORDING_DIR,
-      },
-    });
-    const page = await context.newPage();
+    const page = await UserFactory.createPageInNewContext(browser);
 
     let user = new LoggedOutUser(page);
 
@@ -323,7 +326,9 @@ export class UserFactory {
   };
 
   /**
-   * This function closes all the browsers opened by different users.
+   * This function closes all the browsers opened by different users, and
+   * then fails the spec if any unexpected console errors were detected while
+   * it ran.
    */
   static closeAllBrowsers = async function (): Promise<void> {
     showMessage(`Closing browsers for ${activeUsers.length} users.`);
@@ -335,6 +340,12 @@ export class UserFactory {
 
     activeUsers = [];
     showMessage('All browsers closed.');
+
+    // Every spec calls this function in its afterAll hook, which makes it a
+    // single place to report console errors for all specs. Errors are
+    // reported only after the browsers are closed so that a failure here
+    // does not leave any browser context open.
+    ConsoleReporter.reportConsoleErrors();
   };
 
   /**
