@@ -20,12 +20,9 @@ import {AppConstants} from 'app.constants';
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
-import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 
@@ -38,9 +35,7 @@ import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.componen
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
-    private deviceInfoService: DeviceInfoService,
     private dialog: MatDialog
   ) {}
 
@@ -53,9 +48,7 @@ export class GoalsTabComponent implements OnInit {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
-  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
-  topicBelongToCurrentGoals: boolean[] = [];
   checkedTopics: Set<string> = new Set();
   completedTopics: Set<string> = new Set();
   topicToIndexMapping = {
@@ -64,7 +57,6 @@ export class GoalsTabComponent implements OnInit {
     NEITHER: 2,
   };
 
-  activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 

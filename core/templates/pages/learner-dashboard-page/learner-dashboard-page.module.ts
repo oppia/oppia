@@ -38,7 +38,6 @@ import {LearnerDashboardPageRootComponent} from './learner-dashboard-page-root.c
 import {RemoveActivityModalComponent} from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import {DeclineInvitationModalComponent} from './modal-templates/decline-invitaiton-modal.component';
 import {ViewLearnerGroupInvitationModalComponent} from './modal-templates/view-learner-group-invitation-modal.component';
-import {LearnerDashboardSuggestionModalComponent} from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-learner-group-details-modal.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
@@ -95,7 +94,6 @@ import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a
     LearnerTopicSummaryTileComponent,
     ProgressTabComponent,
     RemoveActivityModalComponent,
-    LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
@@ -117,7 +115,6 @@ import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a
     LearnerTopicSummaryTileComponent,
     ProgressTabComponent,
     RemoveActivityModalComponent,
-    LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,

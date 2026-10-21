@@ -31,7 +31,6 @@ import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learne
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
@@ -63,8 +62,6 @@ export class HomeTabComponent {
   goalTopicsLength!: number;
   width!: number;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
-  displayCollections: boolean = false;
-  nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
@@ -80,7 +77,6 @@ export class HomeTabComponent {
   loadingMessage: string = 'Loading';
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
