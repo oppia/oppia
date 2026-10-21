@@ -18,6 +18,8 @@
 
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
+import {StaleTabInfoModalModule} from 'components/shared_parts/stale-tab-info-modal.module';
+import {UnsavedChangesStatusInfoModalModule} from 'components/shared_parts/unsaved-changes-status-info-modal.module';
 import {ToastrModule} from 'ngx-toastr';
 import {StoryEditorSaveModalComponent} from './modal-templates/story-editor-save-modal.component';
 import {StoryEditorUnpublishModalComponent} from './modal-templates/story-editor-unpublish-modal.component';
@@ -54,8 +56,10 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     UrlFragmentEditorModule,
+    UnsavedChangesStatusInfoModalModule,
     TranslateModule,
     ThumbnailUploaderModule,
+    StaleTabInfoModalModule,
     SharedFormsModule,
     SelectSkillModalModule,
     SavePendingChangesModalModule,

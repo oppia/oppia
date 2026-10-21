@@ -50,6 +50,7 @@ import {RteHelperService} from 'services/rte-helper.service';
 
 import {BaseModule} from 'base-components/base.module';
 import {LazyLoadingModule} from 'components/shared_parts/lazy-loading.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
 import {MaterialModule} from 'modules/material.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionSuggestionEditorModalModule} from 'components/shared_parts/question-suggestion-editor-modal.module';
@@ -66,6 +67,7 @@ import {UndoSnackbarModule} from 'components/shared_parts/undo-snackbar.module';
     TranslationModalModule,
     TranslateModule,
     StringUtilityPipesModule,
+    RteHelperModalModule,
     RichTextComponentsModule,
     QuestionsOpportunitiesSelectDifficultyModalModule,
     QuestionSuggestionReviewModalModule,

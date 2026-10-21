@@ -180,7 +180,30 @@ import {BaseModule} from 'base-components/base.module';
 import {CodeMirrorModule} from 'components/code-mirror/codemirror.module';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
 import {CompletionGraphModule} from 'components/shared_parts/completion-graph.module';
+import {ConfirmDeleteStateModalModule} from 'components/shared_parts/confirm-delete-state-modal.module';
+import {ConfirmDiscardChangesModalModule} from 'components/shared_parts/confirm-discard-changes-modal.module';
 import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {EditorReloadingModalModule} from 'components/shared_parts/editor-reloading-modal.module';
+import {ExplorationMetadataModalModule} from 'components/shared_parts/exploration-metadata-modal.module';
+import {ExplorationModifyTranslationsModalModule} from 'components/shared_parts/exploration-modify-translations-modal.module';
+import {ExplorationPublishModalModule} from 'components/shared_parts/exploration-publish-modal.module';
+import {ExplorationSaveModalModule} from 'components/shared_parts/exploration-save-modal.module';
+import {LostChangesModalModule} from 'components/shared_parts/lost-changes-modal.module';
+import {OppiaVisualizationClickHexbinsDirectiveModule} from 'components/shared_parts/oppia-visualization-click-hexbins-directive.module';
+import {OppiaVisualizationEnumeratedFrequencyTableDirectiveModule} from 'components/shared_parts/oppia-visualization-enumerated-frequency-table-directive.module';
+import {OppiaVisualizationFrequencyTableDirectiveModule} from 'components/shared_parts/oppia-visualization-frequency-table-directive.module';
+import {PostPublishModalModule} from 'components/shared_parts/post-publish-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {SaveValidationFailModalModule} from 'components/shared_parts/save-validation-fail-modal.module';
+import {SaveVersionMismatchModalModule} from 'components/shared_parts/save-version-mismatch-modal.module';
+import {TrainingDataEditorPanelModalModule} from 'components/shared_parts/training-data-editor-panel-modal.module';
+import {TrainingModalModule} from 'components/shared_parts/training-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
 import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
@@ -194,6 +217,7 @@ import {PreviewSummaryTileModalModule} from 'components/shared_parts/preview-sum
 import {ProfileLinkTextModule} from 'components/shared_parts/profile-link-text.module';
 import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {DynamicComponentModule} from 'value_generators/templates/dynamic-component.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {StateEditorModule} from 'components/shared_parts/state-editor.module';
@@ -207,26 +231,50 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
   imports: [
     VersionDiffVisualizationModule,
     TranslateModule,
+    TrainingModalModule,
+    TrainingDataEditorPanelModalModule,
     ThreadTableModule,
     StringUtilityPipesModule,
     StateGraphVisualizationModule,
     StateEditorModule,
     SharedPipesModule,
     SharedFormsModule,
+    SaveVersionMismatchModalModule,
+    SaveValidationFailModalModule,
+    RteHelperModalModule,
     RichTextComponentsModule,
+    DynamicComponentModule,
     ResponseHeaderModule,
     ProfileLinkTextModule,
     PreviewSummaryTileModalModule,
+    PostPublishModalModule,
     OppiaVisualizationSortedTilesModule,
+    OppiaVisualizationFrequencyTableDirectiveModule,
+    OppiaVisualizationEnumeratedFrequencyTableDirectiveModule,
+    OppiaVisualizationClickHexbinsDirectiveModule,
     OnScreenKeyboardModule,
     NewConversationSkinModule,
     MaterialModule,
+    LostChangesModalModule,
     ExplorationTitleEditorModule,
+    ExplorationSaveModalModule,
+    ExplorationPublishModalModule,
     ExplorationObjectiveEditorModule,
+    ExplorationModifyTranslationsModalModule,
+    ExplorationMetadataModalModule,
     ExplorationFooterModule,
+    EditorReloadingModalModule,
     DynamicContentModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
     DirectivesModule,
     ConversationSkinModule,
+    ConfirmDiscardChangesModalModule,
+    ConfirmDeleteStateModalModule,
     CompletionGraphModule,
     CommonElementsModule,
     CodeMirrorModule,

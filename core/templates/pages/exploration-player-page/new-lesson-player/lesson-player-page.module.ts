@@ -46,6 +46,14 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
 
 import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
 import {BaseModule} from 'base-components/base.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
+import {TakeBreakModalModule} from 'components/shared_parts/take-break-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
 import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
@@ -59,6 +67,7 @@ import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
+    TakeBreakModalModule,
     StringUtilityPipesModule,
     SharedFormsModule,
     ShareLessonModalModule,
@@ -66,7 +75,14 @@ import {TranslateModule} from '@ngx-translate/core';
     OnScreenKeyboardModule,
     NgbModule,
     NewConversationSkinModule,
+    KeyboardShortcutHelpModalModule,
     FormsModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
     DirectivesModule,
     BaseModule,
     AttributionGuideModule,

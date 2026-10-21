@@ -46,6 +46,14 @@ import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
 import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
+import {TakeBreakModalModule} from 'components/shared_parts/take-break-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
 import {FeedbackPopupModule} from 'components/shared_parts/feedback-popup.module';
@@ -56,11 +64,19 @@ import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
+    TakeBreakModalModule,
     OnScreenKeyboardModule,
     NgbModule,
+    KeyboardShortcutHelpModalModule,
     FormsModule,
     FeedbackPopupModule,
     ExplorationFooterModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
     DirectivesModule,
     ConversationSkinModule,
     BaseModule,

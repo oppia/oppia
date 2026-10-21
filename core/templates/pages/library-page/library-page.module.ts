@@ -28,12 +28,14 @@ import {ClassroomCardComponent} from './classroom-card/classroom-card.component'
 import {BaseModule} from 'base-components/base.module';
 import {CollectionSummaryTileModule} from 'components/shared_parts/collection-summary-tile.module';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
 import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     MaterialModule,
+    KeyboardShortcutHelpModalModule,
     ExplorationSummaryTileModule,
     CollectionSummaryTileModule,
     BaseModule,

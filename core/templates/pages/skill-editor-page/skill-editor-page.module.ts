@@ -47,6 +47,9 @@ import {BaseModule} from 'base-components/base.module';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
 import {CommonModule} from '@angular/common';
 import {ConfirmQuestionExitModalModule} from 'components/shared_parts/confirm-question-exit-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {StaleTabInfoModalModule} from 'components/shared_parts/stale-tab-info-modal.module';
+import {UnsavedChangesStatusInfoModalModule} from 'components/shared_parts/unsaved-changes-status-info-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
 import {MaterialModule} from 'modules/material.module';
@@ -64,13 +67,16 @@ import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    UnsavedChangesStatusInfoModalModule,
     TutorCardModule,
     SupplementalCardModule,
     SummaryListHeaderModule,
+    StaleTabInfoModalModule,
     SharedFormsModule,
     SelectSkillModalModule,
     SavePendingChangesModalModule,
     RubricsEditorModule,
+    RteHelperModalModule,
     RichTextComponentsModule,
     ReviewMaterialEditorModule,
     QuestionsListModule,

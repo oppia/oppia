@@ -82,6 +82,9 @@ import {BackgroundBannerModule} from 'components/common-layout-directives/common
 import {BaseModule} from 'base-components/base.module';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
 import {ConfirmQuestionExitModalModule} from 'components/shared_parts/confirm-question-exit-modal.module';
+import {CreateNewSkillModalModule} from 'components/shared_parts/create-new-skill-modal.module';
+import {QuestionsListSelectSkillAndDifficultyModalModule} from 'components/shared_parts/questions-list-select-skill-and-difficulty-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
 import {MaterialModule} from 'modules/material.module';
@@ -105,7 +108,9 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     SummaryListHeaderModule,
     SharedFormsModule,
     SavePendingChangesModalModule,
+    RteHelperModalModule,
     RichTextComponentsModule,
+    QuestionsListSelectSkillAndDifficultyModalModule,
     QuestionsListModule,
     PreviewThumbnailModule,
     PracticeTabModule,
@@ -114,6 +119,7 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     DragDropModule,
     FormsModule,
     DirectivesModule,
+    CreateNewSkillModalModule,
     ConfirmQuestionExitModalModule,
     CommonElementsModule,
     BaseModule,

@@ -21,6 +21,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
 import {BlogDashboardPageComponent} from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
@@ -39,6 +40,7 @@ import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
+    RteHelperModalModule,
     MaterialModule,
     FormsModule,
     CommonModule,
