@@ -19,18 +19,29 @@
 import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {AndroidPageComponent} from './android-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {AndroidPageRootComponent} from './android-page-root.component';
 import {CommonModule} from '@angular/common';
 import {AndroidPageRoutingModule} from './android-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {I18nModule} from 'i18n/i18n.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    TranslateModule,
     CommonModule,
     HttpClientModule,
-    SharedComponentsModule,
     AndroidPageRoutingModule,
     Error404PageModule,
     I18nModule,

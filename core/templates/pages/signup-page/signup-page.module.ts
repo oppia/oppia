@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RegistrationSessionExpiredModalComponent} from './modals/registration-session-expired-modal.component';
 import {LicenseExplanationModalComponent} from './modals/license-explanation-modal.component';
 import {SignupPageRootComponent} from './signup-page-root.component';
@@ -25,8 +24,19 @@ import {SignupPageComponent} from './signup-page.component';
 import {CommonModule} from '@angular/common';
 import {SignupPageRoutingModule} from './signup-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {FormsModule} from '@angular/forms';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, SignupPageRoutingModule],
+  imports: [
+    TranslateModule,
+    MaterialModule,
+    FormsModule,
+    BaseModule,
+    CommonModule,
+    SignupPageRoutingModule,
+  ],
   declarations: [
     SignupPageComponent,
     SignupPageRootComponent,

@@ -17,15 +17,21 @@
  */
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateCreatorDashboardPageComponent} from './certificate-creator-dashboard-page.component';
 import {CertificateCreatorDashboardPageRoutingModule} from './certificate-creator-dashboard-page-routing.module';
 import {CertificateCreatorDashboardPageRootComponent} from './certificate-creator-dashboard-page-root.component';
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {MaterialModule} from 'modules/material.module';
+import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    RouterModule,
+    MaterialModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     CertificateCreatorDashboardPageRoutingModule,
   ],

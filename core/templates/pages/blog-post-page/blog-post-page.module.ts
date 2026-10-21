@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InfiniteScrollModule} from 'ngx-infinite-scroll';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {FormsModule} from '@angular/forms';
@@ -32,12 +31,19 @@ import {MatMenuModule} from '@angular/material/menu';
 import {BlogPostPageRoutingModule} from './blog-post-page-routing.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
-import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
+import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {MaterialModule} from 'modules/material.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 @NgModule({
   imports: [
+    SharingLinksModule,
+    RichTextComponentsModule,
+    MaterialModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     InfiniteScrollModule,
     BlogPostPageRoutingModule,
     FormsModule,
@@ -47,7 +53,7 @@ import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-
     TranslateModule,
     ReactiveFormsModule,
     Error404PageModule,
-    SharedBlogComponentsModule,
+    BlogDisplayComponentsModule,
     MatTooltipModule,
   ],
   declarations: [BlogPostPageComponent, BlogPostPageRootComponent],

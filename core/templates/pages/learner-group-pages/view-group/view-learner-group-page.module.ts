@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
@@ -30,11 +29,16 @@ import {ExitLearnerGroupModalComponent} from '../templates/exit-learner-group-mo
 import {SharedLearnerGroupComponentsModule} from '../shared-learner-group-component.module';
 import {RouterModule} from '@angular/router';
 
+import {BaseModule} from 'base-components/base.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    MaterialModule,
+    BaseModule,
     CommonModule,
     NgbPopoverModule,
-    SharedComponentsModule,
     RouterModule,
     ViewLearnerGroupPageRoutingModule,
     SharedLearnerGroupComponentsModule,

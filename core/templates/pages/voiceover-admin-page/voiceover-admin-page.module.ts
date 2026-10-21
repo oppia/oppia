@@ -23,7 +23,6 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableModule} from '@angular/material/table';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
@@ -39,13 +38,20 @@ import {MatInputModule} from '@angular/material/input';
 import {MatNativeDateModule} from '@angular/material/core';
 import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voiceover-regeneration-support-modal.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {CommonModule} from '@angular/common';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbModule,
+    MaterialModule,
+    CommonModule,
+    BaseModule,
     FormsModule,
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     MatPaginatorModule,
     MatTableModule,
     ToastrModule.forRoot(toastrConfig),

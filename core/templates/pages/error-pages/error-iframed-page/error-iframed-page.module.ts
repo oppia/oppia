@@ -17,15 +17,26 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ErrorIframedPageRootComponent} from './error-iframed-root.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {RouterModule} from '@angular/router';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    TranslateModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

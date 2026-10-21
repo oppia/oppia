@@ -17,8 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
 import {LibraryFooterComponent} from './library-footer/library-footer.component';
 import {LibraryPageRootComponent} from './library-page-root.component';
 import {LibraryPageComponent} from './library-page.component';
@@ -27,10 +25,19 @@ import {LibraryPageRoutingModule} from './library-page-routing.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomCardComponent} from './classroom-card/classroom-card.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {CollectionSummaryTileModule} from 'components/shared_parts/collection-summary-tile.module';
+import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    MaterialModule,
+    ExplorationSummaryTileModule,
+    CollectionSummaryTileModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     LibraryPageRoutingModule,
     NgbModule,
   ],

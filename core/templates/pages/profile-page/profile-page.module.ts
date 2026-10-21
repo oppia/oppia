@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ProfilePageNavbarComponent} from 'pages/profile-page/profile-page-navbar.component';
 import {ProfilePageComponent} from './profile-page.component';
 import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
@@ -27,11 +26,24 @@ import {ProfilePageRoutingModule} from './profile-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    StringUtilityPipesModule,
+    NgbModule,
+    MaterialModule,
+    ExplorationSummaryTileModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     NgbPopoverModule,
-    SharedComponentsModule,
     RouterModule,
     ProfilePageRoutingModule,
     Error404PageModule,

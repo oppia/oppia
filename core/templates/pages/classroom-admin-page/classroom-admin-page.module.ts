@@ -22,7 +22,6 @@ import {MatCardModule} from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ClassroomAdminNavbarComponent} from './navbar/classroom-admin-navbar.component';
 import {ClassroomAdminPageComponent} from './classroom-admin-page.component';
 import {ToastrModule} from 'ngx-toastr';
@@ -37,14 +36,21 @@ import {ClassroomAdminPageRootComponent} from './classroom-admin-page-root.compo
 import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
 import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {ImageUploaderModule} from 'components/shared_parts/image-uploader.module';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbModule,
+    MaterialModule,
+    ImageUploaderModule,
+    BaseModule,
     FormsModule,
     MatCardModule,
     CommonModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

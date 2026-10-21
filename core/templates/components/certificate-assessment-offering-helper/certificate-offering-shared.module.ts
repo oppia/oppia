@@ -18,7 +18,6 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {TranslateModule} from '@ngx-translate/core';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
@@ -31,8 +30,9 @@ import {PostCertificateOfferingResultModalComponent} from './post-certificate-of
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 import {FormsModule} from '@angular/forms';
 
+import {MaterialModule} from 'modules/material.module';
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule, TranslateModule],
+  imports: [MaterialModule, CommonModule, FormsModule, TranslateModule],
   declarations: [
     CertificateOfferingDetailsComponent,
     CertificateOfferingProgressComponent,

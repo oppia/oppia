@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CollectionFooterComponent} from './collection-footer/collection-footer.component';
 import {CollectionLocalNavComponent} from './collection-local-nav/collection-local-nav.component';
 import {CollectionNavbarComponent} from './collection-navbar/collection-navbar.component';
@@ -35,13 +34,22 @@ import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BaseModule} from 'base-components/base.module';
+import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 @NgModule({
   imports: [
+    SharingLinksModule,
+    NgbModule,
+    ExplorationSummaryTileModule,
+    BaseModule,
+    AttributionGuideModule,
     CommonModule,
     MaterialModule,
     TranslateModule,
     BackgroundBannerModule,
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

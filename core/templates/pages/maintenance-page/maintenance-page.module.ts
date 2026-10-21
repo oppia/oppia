@@ -19,19 +19,30 @@
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {MaintenancePageRootComponent} from './maintenance-page-root.component';
 import {CommonModule} from '@angular/common';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    TranslateModule,
     CommonModule,
     RouterModule.forRoot([]),
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

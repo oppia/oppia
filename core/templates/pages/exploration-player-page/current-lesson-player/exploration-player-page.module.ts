@@ -20,7 +20,6 @@ import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
 import {ExplorationPlayerViewerCommonModule} from './exploration-player-viewer-common.module';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
 import {LearnerLocalNavComponent} from './layout-directives/learner-local-nav.component';
@@ -43,8 +42,30 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {RouterModule} from '@angular/router';
 import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
+import {FeedbackPopupModule} from 'components/shared_parts/feedback-popup.module';
+import {FormsModule} from '@angular/forms';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    OnScreenKeyboardModule,
+    NgbModule,
+    FormsModule,
+    FeedbackPopupModule,
+    ExplorationFooterModule,
+    DirectivesModule,
+    ConversationSkinModule,
+    BaseModule,
+    BackgroundBannerModule,
+    AttributionGuideModule,
     CommonModule,
     InteractionExtensionsModule,
     MatButtonModule,
@@ -52,7 +73,6 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     MaterialModule,
     NgbPopoverModule,
     ExplorationPlayerViewerCommonModule,
-    SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

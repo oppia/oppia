@@ -17,14 +17,29 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {PrivacyPageComponent} from './privacy-page.component';
 import {PrivacyPageRootComponent} from './privacy-page-root.component';
 import {CommonModule} from '@angular/common';
 import {PrivacyPageRoutingModule} from './privacy-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, PrivacyPageRoutingModule],
+  imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    CommonModule,
+    PrivacyPageRoutingModule,
+    TranslateModule,
+  ],
   declarations: [PrivacyPageRootComponent, PrivacyPageComponent],
   entryComponents: [PrivacyPageRootComponent, PrivacyPageComponent],
 })

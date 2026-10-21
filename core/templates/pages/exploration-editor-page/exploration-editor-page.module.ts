@@ -21,7 +21,6 @@ import {RouterModule} from '@angular/router';
 
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {StateParamChangesEditorComponent} from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import {DeleteStateSkillModalComponent} from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
@@ -175,9 +174,65 @@ import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {AudioFileUploaderModule} from 'components/shared_parts/audio-file-uploader.module';
+import {BaseModule} from 'base-components/base.module';
+import {CodeMirrorModule} from 'components/code-mirror/codemirror.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {CompletionGraphModule} from 'components/shared_parts/completion-graph.module';
+import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
+import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
+import {ExplorationObjectiveEditorModule} from 'components/shared_parts/exploration-objective-editor.module';
+import {ExplorationTitleEditorModule} from 'components/shared_parts/exploration-title-editor.module';
+import {MaterialModule} from 'modules/material.module';
+import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {OppiaVisualizationSortedTilesModule} from 'components/shared_parts/oppia-visualization-sorted-tiles.module';
+import {PreviewSummaryTileModalModule} from 'components/shared_parts/preview-summary-tile-modal.module';
+import {ProfileLinkTextModule} from 'components/shared_parts/profile-link-text.module';
+import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {StateEditorModule} from 'components/shared_parts/state-editor.module';
+import {StateGraphVisualizationModule} from 'components/shared_parts/state-graph-visualization.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {ThreadTableModule} from 'components/shared_parts/thread-table.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {VersionDiffVisualizationModule} from 'components/shared_parts/version-diff-visualization.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    VersionDiffVisualizationModule,
+    TranslateModule,
+    ThreadTableModule,
+    StringUtilityPipesModule,
+    StateGraphVisualizationModule,
+    StateEditorModule,
+    SharedPipesModule,
+    SharedFormsModule,
+    RichTextComponentsModule,
+    ResponseHeaderModule,
+    ProfileLinkTextModule,
+    PreviewSummaryTileModalModule,
+    OppiaVisualizationSortedTilesModule,
+    OnScreenKeyboardModule,
+    NewConversationSkinModule,
+    MaterialModule,
+    ExplorationTitleEditorModule,
+    ExplorationObjectiveEditorModule,
+    ExplorationFooterModule,
+    DynamicContentModule,
+    DirectivesModule,
+    ConversationSkinModule,
+    CompletionGraphModule,
+    CommonElementsModule,
+    CodeMirrorModule,
+    BaseModule,
+    AudioFileUploaderModule,
+    AttributionGuideModule,
     CommonModule,
     RouterModule.forChild([
       {
@@ -193,7 +248,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    SharedComponentsModule,
     FeedbackSharedModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,

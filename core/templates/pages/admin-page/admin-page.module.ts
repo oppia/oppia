@@ -22,7 +22,6 @@ import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicManagerRoleEditorModalComponent} from './roles-tab/topic-manager-role-editor-modal.component';
 import {TranslationCoordinatorRoleEditorModalComponent} from './roles-tab/translation-coordinator-role-editor-modal.component';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
@@ -38,11 +37,16 @@ import {AdminMiscTabComponent} from './misc-tab/admin-misc-tab.component';
 import {AdminRolesTabComponent} from './roles-tab/admin-roles-tab.component';
 import {AdminPageComponent} from './admin-page.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbModule,
+    MaterialModule,
+    BaseModule,
     CommonModule,
     FormsModule,
-    SharedComponentsModule,
     SharedFormsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

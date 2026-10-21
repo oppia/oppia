@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {PendingAccountDeletionPageComponent} from './pending-account-deletion-page.component';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
@@ -26,10 +25,21 @@ import {CommonModule} from '@angular/common';
 import {PendingAccountDeletionPageRoutingModule} from './pending-account-deletion-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     SharedPipesModule,
     TranslateModule,
     PendingAccountDeletionPageRoutingModule,

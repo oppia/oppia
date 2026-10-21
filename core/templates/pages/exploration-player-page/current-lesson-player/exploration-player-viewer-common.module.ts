@@ -22,10 +22,28 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SwitchContentLanguageRefreshRequiredModalComponent} from './modals/switch-content-language-refresh-required-modal.component';
 import {LessonInformationCardModalComponent} from './templates/lesson-information-card-modal.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
+import {CopyUrlModule} from 'components/shared_parts/copy-url.module';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {ProfileLinkImageModule} from 'components/shared_parts/profile-link-image.module';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {SummarizeNonnegativeNumberPipeModule} from 'components/shared_parts/summarize-nonnegative-number-pipe.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule],
+  imports: [
+    TranslateModule,
+    SummarizeNonnegativeNumberPipeModule,
+    StringUtilityPipesModule,
+    SharingLinksModule,
+    SharedPipesModule,
+    ProfileLinkImageModule,
+    NgbModule,
+    MaterialModule,
+    CopyUrlModule,
+    CommonModule,
+  ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     LessonInformationCardModalComponent,

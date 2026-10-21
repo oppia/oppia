@@ -17,17 +17,28 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ContactPageComponent} from './contact-page.component';
 import {ContactPageRootComponent} from './contact-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ContactPageRoutingModule} from './contact-page-routing.module';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     ContactPageRoutingModule,
     CampaignBannerModule,
   ],

@@ -16,11 +16,11 @@
  * @fileoverview Module for the topic editor page.
  */
 
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {SubtopicPreviewTab} from './subtopic-editor/subtopic-preview-tab.component';
 import {ChangeSubtopicAssignmentModalComponent} from './modal-templates/change-subtopic-assignment-modal.component';
@@ -78,11 +78,47 @@ import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtop
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {StudyGuideSectionEditorComponent} from './subtopic-editor/study-guide-section-editor.component';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {ConfirmQuestionExitModalModule} from 'components/shared_parts/confirm-question-exit-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {FormsModule} from '@angular/forms';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
+import {PreviewThumbnailModule} from 'components/shared_parts/preview-thumbnail.module';
+import {QuestionsListModule} from 'components/shared_parts/questions-list.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {SavePendingChangesModalModule} from 'components/shared_parts/save-pending-changes-modal.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SummaryListHeaderModule} from 'components/shared_parts/summary-list-header.module';
+import {ThumbnailUploaderModule} from 'components/shared_parts/thumbnail-uploader.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-editor.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    UrlFragmentEditorModule,
+    TranslateModule,
+    ThumbnailUploaderModule,
+    SummaryListHeaderModule,
+    SharedFormsModule,
+    SavePendingChangesModalModule,
+    RichTextComponentsModule,
+    QuestionsListModule,
+    PreviewThumbnailModule,
+    PracticeTabModule,
+    NgbModule,
+    MaterialModule,
+    DragDropModule,
+    FormsModule,
+    DirectivesModule,
+    ConfirmQuestionExitModalModule,
+    CommonElementsModule,
+    BaseModule,
+    BackgroundBannerModule,
     InteractionExtensionsModule,
-    SharedComponentsModule,
     CommonModule,
     ReactiveFormsModule,
     TopicPlayerViewerCommonModule,

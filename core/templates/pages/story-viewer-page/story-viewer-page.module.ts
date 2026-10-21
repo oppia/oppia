@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {StoryViewerNavbarBreadcrumbComponent} from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import {StoryViewerNavbarPreLogoActionComponent} from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
 import {StoryViewerPageComponent} from './story-viewer-page.component';
@@ -25,8 +24,21 @@ import {StoryViewerPageRootComponent} from './story-viewer-page-root.component';
 import {CommonModule} from '@angular/common';
 import {StoryViewerPageRoutingModule} from './story-viewer-page-routing.module';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, StoryViewerPageRoutingModule],
+  imports: [
+    TranslateModule,
+    MaterialModule,
+    BaseModule,
+    BackgroundBannerModule,
+    AttributionGuideModule,
+    CommonModule,
+    StoryViewerPageRoutingModule,
+  ],
   declarations: [
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,

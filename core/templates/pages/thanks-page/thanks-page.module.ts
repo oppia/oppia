@@ -19,13 +19,28 @@
 import {NgModule} from '@angular/core';
 
 import {ThanksPageComponent} from './thanks-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ThanksPageRootComponent} from './thanks-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ThanksPageRoutingModule} from './thanks-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, ThanksPageRoutingModule],
+  imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MaterialModule,
+    CommonModule,
+    ThanksPageRoutingModule,
+    TranslateModule,
+  ],
   declarations: [ThanksPageComponent, ThanksPageRootComponent],
   entryComponents: [ThanksPageComponent, ThanksPageRootComponent],
 })

@@ -20,9 +20,9 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {BlogDashboardPageComponent} from 'pages/blog-dashboard-page/blog-dashboard-page.component';
+import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
 import {NgModule} from '@angular/core';
 import {ToastrModule} from 'ngx-toastr';
@@ -31,9 +31,19 @@ import {BlogDashboardPageRootComponent} from './blog-dashboard-page-root.compone
 import {BlogAuthorDetailsEditorComponent} from './modal-templates/author-detail-editor-modal.component';
 import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
 import {RteHelperService} from 'services/rte-helper.service';
+import {BaseModule} from 'base-components/base.module';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    MaterialModule,
+    FormsModule,
+    CommonModule,
+    BaseModule,
+    BlogDisplayComponentsModule,
     SharedBlogComponentsModule,
     MatTabsModule,
     MatMenuModule,

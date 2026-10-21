@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {RouterModule} from '@angular/router';
@@ -39,9 +38,16 @@ import {InviteSuccessfulModalComponent} from '../templates/invite-successful-mod
 import {DeleteLearnerGroupModalComponent} from '../templates/delete-learner-group-modal.component';
 import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shared-learner-group-component.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {FormsModule} from '@angular/forms';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    NgbModule,
+    FormsModule,
+    BaseModule,
     CommonModule,
     SharedLearnerGroupComponentsModule,
     ToastrModule.forRoot(toastrConfig),

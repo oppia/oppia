@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
 import {MaterialModule} from 'modules/material.module';
@@ -45,8 +44,32 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
 import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 import {ConversationFlowService} from '../services/conversation-flow.service';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BaseModule} from 'base-components/base.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {FormsModule} from '@angular/forms';
+import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
+import {ShareLessonModalModule} from 'components/shared_parts/share-lesson-modal.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    StringUtilityPipesModule,
+    SharedFormsModule,
+    ShareLessonModalModule,
+    PlayerHeaderModule,
+    OnScreenKeyboardModule,
+    NgbModule,
+    NewConversationSkinModule,
+    FormsModule,
+    DirectivesModule,
+    BaseModule,
+    AttributionGuideModule,
     CommonModule,
     NewLessonPlayerPageRoutingModule,
     InteractionExtensionsModule,
@@ -55,7 +78,6 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    SharedComponentsModule,
     ToastrModule,
     MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),

@@ -23,7 +23,6 @@ import {RouterModule} from '@angular/router';
 import {MatTableModule} from '@angular/material/table';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {UsernameInputModal} from './username-input-modal/username-input-modal.component';
@@ -38,8 +37,18 @@ import {ContributorDashboardAdminAuthGuard} from './contributor-dashboard-admin-
 import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-admin-page.component';
 import {TranslationConfigurationTabComponent} from './translation-configuration-tab/translation-configuration-tab.component';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {MaterialModule} from 'modules/material.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbModule,
+    MaterialModule,
+    CommonElementsModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     FormsModule,
     MatTableModule,
@@ -54,7 +63,6 @@ import {TranslationConfigurationTabComponent} from './translation-configuration-
       },
     ]),
     ReactiveFormsModule,
-    SharedComponentsModule,
   ],
   declarations: [
     CdAdminTranslationRoleEditorModal,

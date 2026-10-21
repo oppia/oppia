@@ -20,7 +20,6 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
@@ -31,15 +30,30 @@ import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-auth.guard';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {MaterialModule} from 'modules/material.module';
+import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
+import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
+import {ProgressBarModule} from 'components/shared_parts/progress-bar.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    ProgressBarModule,
+    PlayerHeaderModule,
+    NewConversationSkinModule,
+    MaterialModule,
+    ConversationSkinModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     FormsModule,
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,
     InteractionExtensionsModule,
-    SharedComponentsModule,
     SummaryTilesModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

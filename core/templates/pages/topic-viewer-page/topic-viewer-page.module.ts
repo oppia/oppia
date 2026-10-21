@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PracticeSessionConfirmationModal} from './deprecations/modals/practice-session-confirmation-modal.component';
@@ -31,9 +30,20 @@ import {PracticeTabComponent} from './deprecations/practice-tab/practice-tab.com
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {MaterialModule} from 'modules/material.module';
+import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    PracticeTabModule,
+    MaterialModule,
+    DirectivesModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),
