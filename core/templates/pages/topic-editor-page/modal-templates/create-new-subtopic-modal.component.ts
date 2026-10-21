@@ -40,6 +40,15 @@ import {
   ImageUploaderData,
   ImageUploaderParameters,
 } from 'components/forms/custom-forms-directives/image-uploader.component';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+
+// The schema for the subtopic page content rich-text editor. The 'html' type
+// and the ui_config literal are fixed by the assignment in ngOnInit so the
+// schema can be statically typed instead of being an opaque object.
+interface SubtopicPageFormSchema {
+  type: 'html';
+  ui_config: object;
+}
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -56,7 +65,7 @@ export class CreateNewSubtopicModalComponent
   hostname!: string;
   classroomUrlFragment!: string | null;
   topic!: Topic;
-  SUBTOPIC_PAGE_SCHEMA!: object;
+  SUBTOPIC_PAGE_SCHEMA!: SubtopicPageFormSchema;
   htmlData!: string;
   sectionHeadingPlaintext!: string;
   sectionContentHtml!: string;
@@ -139,7 +148,7 @@ export class CreateNewSubtopicModalComponent
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/studyguide`;
   }
 
-  getSchema(): object {
+  getSchema(): SubtopicPageFormSchema {
     return this.SUBTOPIC_PAGE_SCHEMA;
   }
 
@@ -342,10 +351,12 @@ export class CreateNewSubtopicModalComponent
     this.ngbActiveModal.close(this.subtopicId);
   }
 
-  localValueChange(event: string): void {
-    this.htmlData = event;
+  localValueChange(event: SchemaDefaultValue): void {
+    // The rich-text editor may emit non-string values (e.g. null) in some
+    // edge cases, so non-string values are reset to the empty string.
+    this.htmlData = typeof event === 'string' ? event : '';
   }
-  localContentValueChange(event: string): void {
-    this.sectionContentHtml = event;
+  localContentValueChange(event: SchemaDefaultValue): void {
+    this.sectionContentHtml = typeof event === 'string' ? event : '';
   }
 }
