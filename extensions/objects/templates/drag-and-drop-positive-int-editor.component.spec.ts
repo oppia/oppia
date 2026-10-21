@@ -74,7 +74,12 @@ describe('DragAndDropPositiveIntEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     component.value = 1;
 
-    component.onSelectionChange({target: {value: '3'}} as Event);
+    const selectElement = document.createElement('select');
+    selectElement.value = '3';
+    const event = new Event('change');
+    Object.defineProperty(event, 'target', {value: selectElement});
+
+    component.onSelectionChange(event);
 
     expect(component.value).toBe(3);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(3);

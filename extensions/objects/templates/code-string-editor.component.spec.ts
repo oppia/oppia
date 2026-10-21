@@ -59,11 +59,12 @@ describe('CodeStringEditorComponent', () => {
     component.value = 'test';
     component.ngOnInit();
 
-    component.onEdit({
-      target: {
-        value: "print('Hello');",
-      },
-    });
+    const textarea = document.createElement('textarea');
+    textarea.value = "print('Hello');";
+    const event = new Event('input');
+    Object.defineProperty(event, 'target', {value: textarea});
+
+    component.onEdit(event);
     tick(60);
 
     expect(component.warningText).toBe('');
@@ -76,11 +77,12 @@ describe('CodeStringEditorComponent', () => {
     component.value = 'test';
     component.ngOnInit();
 
-    component.onEdit({
-      target: {
-        value: "\tprint('Hello');",
-      },
-    });
+    const textarea = document.createElement('textarea');
+    textarea.value = "\tprint('Hello');";
+    const event = new Event('input');
+    Object.defineProperty(event, 'target', {value: textarea});
+
+    component.onEdit(event);
     tick(60);
 
     expect(component.warningText).toBe('Code may not contain tab characters.');
