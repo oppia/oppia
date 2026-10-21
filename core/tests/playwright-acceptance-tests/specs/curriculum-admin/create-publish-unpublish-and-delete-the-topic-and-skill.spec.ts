@@ -52,7 +52,7 @@ test.describe('Curriculum Admin', function () {
 
   test('should be able to create a topic.', async function () {
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one', true);
     await curriculumAdmin.expectToBeInTopicEditor('Test Topic 1');
   });
 

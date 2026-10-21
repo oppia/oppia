@@ -46,7 +46,7 @@ test.describe('Curriculum Admin', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser(browser);
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one', true);
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
       'test-subtopic-one',

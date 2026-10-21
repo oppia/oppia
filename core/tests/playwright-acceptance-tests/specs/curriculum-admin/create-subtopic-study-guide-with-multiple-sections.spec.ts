@@ -52,7 +52,11 @@ test.describe('Curriculum Admin', function () {
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');
+    await curriculumAdmin.createTopic(
+      'Addition and Subtraction',
+      'addsub',
+      true
+    );
   });
 
   test('should create a study guide with multiple sections.', async function () {
