@@ -95,7 +95,9 @@
    script. A piece is animated on two layers so that the motions can overlap
    like real paper:
    - the piece itself travels: it is thrown sideways and decelerates (air
-     drag), and goes up quickly, hangs at its peak and then drifts down;
+     drag), goes up very quickly, hangs briefly at its peak and then falls at
+     an almost constant speed (like paper dragged by the air) all the way back
+     down past the pill;
    - its ::before flutters: a sway, a spin and a 3D flip. */
 
 .confetti-stage {
@@ -142,6 +144,11 @@
   --sway: 10px;
   --throw: 0.5;
   --w: 11px;
+  /* Thrown sideways (fast at first, then slowed by the air), up and down, and
+     faded out at the very end. */
+  animation: confetti-drift-x var(--dur) cubic-bezier(0.05, 0.8, 0.2, 1) var(--start) forwards,
+    confetti-rise-and-fall var(--dur) linear var(--start) forwards,
+    confetti-fade var(--dur) linear var(--start) forwards;
   left: calc(50% + var(--side) * 50%);
   opacity: 0;
   position: absolute;
@@ -149,6 +156,9 @@
 }
 
 .confetti-piece::before {
+  animation: confetti-sway calc(var(--dur) / 4) ease-in-out var(--start) infinite,
+    confetti-spin var(--dur) linear var(--start) forwards,
+    confetti-flip var(--flip) linear var(--start) infinite;
   background-color: var(--color);
   content: '';
   display: block;
@@ -203,23 +213,24 @@
 }
 
 /* Throw: how far sideways each piece is thrown, as a fraction of --reach
-   (positive: towards the middle, negative: away from it). Most pieces go
-   mostly upwards. Pieces thrown far rise a little less (--dome). */
+   (positive: towards the middle, negative: away from it). Pieces thrown far
+   rise a little less (--dome). The values are overridden per screen size in
+   the media queries below. */
 .confetti-piece:nth-child(11n + 1) {
   --throw: -0.35;
-  --dome: 1.0;
+  --dome: 1;
 }
 .confetti-piece:nth-child(11n + 2) {
   --throw: -0.15;
-  --dome: 1.0;
+  --dome: 1;
 }
 .confetti-piece:nth-child(11n + 3) {
   --throw: 0;
-  --dome: 1.0;
+  --dome: 1;
 }
 .confetti-piece:nth-child(11n + 4) {
   --throw: 0.1;
-  --dome: 1.0;
+  --dome: 1;
 }
 .confetti-piece:nth-child(11n + 5) {
   --throw: 0.2;
@@ -252,7 +263,7 @@
 
 /* Power: how high each piece goes. */
 .confetti-piece:nth-child(13n + 1) {
-  --power: 0.82;
+  --power: 0.8;
 }
 .confetti-piece:nth-child(13n + 2) {
   --power: 0.55;
@@ -264,13 +275,13 @@
   --power: 0.7;
 }
 .confetti-piece:nth-child(13n + 5) {
-  --power: 0.9;
+  --power: 0.92;
 }
 .confetti-piece:nth-child(13n + 6) {
-  --power: 0.48;
+  --power: 0.5;
 }
 .confetti-piece:nth-child(13n + 7) {
-  --power: 0.96;
+  --power: 0.98;
 }
 .confetti-piece:nth-child(13n + 8) {
   --power: 0.62;
@@ -282,10 +293,10 @@
   --power: 1.05;
 }
 .confetti-piece:nth-child(13n + 11) {
-  --power: 0.52;
+  --power: 0.56;
 }
 .confetti-piece:nth-child(13n + 12) {
-  --power: 0.86;
+  --power: 0.88;
 }
 .confetti-piece:nth-child(13n + 13) {
   --power: 0.66;
@@ -294,45 +305,31 @@
 /* Weight: how far each piece has fallen back when it fades out, and how much
    it sways on the way down. */
 .confetti-piece:nth-child(7n + 1) {
-  --fall: calc(var(--height) * 0.06);
-}
-.confetti-piece:nth-child(7n + 2) {
-  --fall: calc(var(--height) * 0.11);
-}
-.confetti-piece:nth-child(7n + 3) {
-  --fall: calc(var(--height) * 0.08);
-}
-.confetti-piece:nth-child(7n + 4) {
-  --fall: calc(var(--height) * 0.13);
-}
-.confetti-piece:nth-child(7n + 5) {
-  --fall: calc(var(--height) * 0.07);
-}
-.confetti-piece:nth-child(7n + 6) {
-  --fall: calc(var(--height) * 0.1);
-}
-.confetti-piece:nth-child(7n + 7) {
-  --fall: calc(var(--height) * 0.15);
-}
-.confetti-piece:nth-child(7n + 1) {
+  --fall: calc(var(--height) * 0.14);
   --sway: 10px;
 }
 .confetti-piece:nth-child(7n + 2) {
+  --fall: calc(var(--height) * 0.2);
   --sway: -14px;
 }
 .confetti-piece:nth-child(7n + 3) {
+  --fall: calc(var(--height) * 0.17);
   --sway: 18px;
 }
 .confetti-piece:nth-child(7n + 4) {
+  --fall: calc(var(--height) * 0.24);
   --sway: -8px;
 }
 .confetti-piece:nth-child(7n + 5) {
+  --fall: calc(var(--height) * 0.15);
   --sway: 14px;
 }
 .confetti-piece:nth-child(7n + 6) {
+  --fall: calc(var(--height) * 0.19);
   --sway: -18px;
 }
 .confetti-piece:nth-child(7n + 7) {
+  --fall: calc(var(--height) * 0.26);
   --sway: 8px;
 }
 
@@ -362,31 +359,31 @@
   --delay: 330ms;
 }
 .confetti-piece:nth-child(9n + 1) {
-  --dur: 4200ms;
+  --dur: 3800ms;
 }
 .confetti-piece:nth-child(9n + 2) {
-  --dur: 4600ms;
+  --dur: 4200ms;
 }
 .confetti-piece:nth-child(9n + 3) {
-  --dur: 5000ms;
+  --dur: 4600ms;
 }
 .confetti-piece:nth-child(9n + 4) {
-  --dur: 4400ms;
+  --dur: 4000ms;
 }
 .confetti-piece:nth-child(9n + 5) {
-  --dur: 4800ms;
+  --dur: 4400ms;
 }
 .confetti-piece:nth-child(9n + 6) {
-  --dur: 5200ms;
+  --dur: 4800ms;
 }
 .confetti-piece:nth-child(9n + 7) {
-  --dur: 4500ms;
+  --dur: 4100ms;
 }
 .confetti-piece:nth-child(9n + 8) {
-  --dur: 4900ms;
+  --dur: 4500ms;
 }
 .confetti-piece:nth-child(9n + 9) {
-  --dur: 5400ms;
+  --dur: 4900ms;
 }
 
 /* Tumbling: how much each piece spins, and how fast and around which axis it
@@ -448,12 +445,12 @@
 }
 
 /* Streamers: thin and wavy, lighter than the other pieces, so they are thrown
-   less high and float down more slowly. */
+   less high and float down later. */
 .confetti-piece:nth-child(18n + 4),
 .confetti-piece:nth-child(18n + 13) {
-  --dur: 5400ms;
-  --fall: calc(var(--height) * 0.14);
-  --power: 0.55;
+  --dur: 4900ms;
+  --fall: calc(var(--height) * 0.22);
+  --power: 0.6;
 }
 .confetti-piece:nth-child(18n + 4)::before,
 .confetti-piece:nth-child(18n + 13)::before {
@@ -502,19 +499,133 @@
   }
 }
 
-/* Playback. */
-.confetti-piece {
-  animation:
-    confetti-drift-x var(--dur) cubic-bezier(0.1, 0.6, 0.25, 1) var(--start) forwards,
-    confetti-rise-and-fall var(--dur) linear var(--start) forwards,
-    confetti-fade var(--dur) linear var(--start) forwards;
+/* Large screens: the burst reaches (and goes past) the top of the lesson area,
+   and pieces are thrown both outwards and inwards in roughly equal amounts, so
+   the confetti covers the whole width instead of piling up in the middle. */
+@media (min-width: 960px) {
+  .confetti-stage {
+    --height: min(92vh, 1000px);
+    --reach: min(22vw, 300px);
+  }
+
+  .confetti-piece:nth-child(11n + 1) {
+    --throw: -0.7;
+    --dome: 0.86;
+  }
+
+  .confetti-piece:nth-child(11n + 2) {
+    --throw: -0.3;
+    --dome: 0.94;
+  }
+
+  .confetti-piece:nth-child(11n + 3) {
+    --throw: 0.15;
+    --dome: 0.97;
+  }
+
+  .confetti-piece:nth-child(11n + 4) {
+    --throw: 0.5;
+    --dome: 0.9;
+  }
+
+  .confetti-piece:nth-child(11n + 5) {
+    --throw: -0.5;
+    --dome: 0.9;
+  }
+
+  .confetti-piece:nth-child(11n + 6) {
+    --throw: 0.9;
+    --dome: 0.82;
+  }
+
+  .confetti-piece:nth-child(11n + 7) {
+    --throw: 0;
+    --dome: 1;
+  }
+
+  .confetti-piece:nth-child(11n + 8) {
+    --throw: 0.7;
+    --dome: 0.86;
+  }
+
+  .confetti-piece:nth-child(11n + 9) {
+    --throw: -0.15;
+    --dome: 0.97;
+  }
+
+  .confetti-piece:nth-child(11n + 10) {
+    --throw: 0.35;
+    --dome: 0.93;
+  }
+
+  .confetti-piece:nth-child(11n + 11) {
+    --throw: 1;
+    --dome: 0.8;
+  }
 }
 
-.confetti-piece::before {
-  animation:
-    confetti-sway calc(var(--dur) / 4) ease-in-out var(--start) infinite,
-    confetti-spin var(--dur) linear var(--start) forwards,
-    confetti-flip var(--flip) linear var(--start) infinite;
+/* Smaller screens: the two cannons are close together, so nearly every piece
+   is thrown inwards, towards the middle of the page, and the two sprays cross
+   over each other instead of both going straight up the sides. */
+@media (max-width: 959px) {
+  .confetti-stage {
+    --reach: min(42vw, 300px);
+  }
+
+  .confetti-piece:nth-child(11n + 1) {
+    --throw: 0.2;
+    --dome: 0.96;
+  }
+
+  .confetti-piece:nth-child(11n + 2) {
+    --throw: 0.45;
+    --dome: 0.92;
+  }
+
+  .confetti-piece:nth-child(11n + 3) {
+    --throw: 0.7;
+    --dome: 0.87;
+  }
+
+  .confetti-piece:nth-child(11n + 4) {
+    --throw: 0.95;
+    --dome: 0.83;
+  }
+
+  .confetti-piece:nth-child(11n + 5) {
+    --throw: 0.3;
+    --dome: 0.95;
+  }
+
+  .confetti-piece:nth-child(11n + 6) {
+    --throw: 0.6;
+    --dome: 0.89;
+  }
+
+  .confetti-piece:nth-child(11n + 7) {
+    --throw: 1.1;
+    --dome: 0.8;
+  }
+
+  .confetti-piece:nth-child(11n + 8) {
+    --throw: 0.1;
+    --dome: 0.98;
+  }
+
+  .confetti-piece:nth-child(11n + 9) {
+    --throw: 0.8;
+    --dome: 0.85;
+  }
+
+  .confetti-piece:nth-child(11n + 10) {
+    --throw: 0.5;
+    --dome: 0.91;
+  }
+
+  .confetti-piece:nth-child(11n + 11) {
+    --throw: -0.15;
+    --dome: 0.97;
+  }
 }
 
 /* Thrown sideways: fast at first, then slowed by the air. */
@@ -527,14 +638,15 @@
   }
 }
 
-/* Up quickly, hang at the peak, then fall back more and more slowly. */
+/* Up very quickly, brief hang at the peak, then down at a nearly constant
+   speed. */
 @keyframes confetti-rise-and-fall {
   0% {
-    animation-timing-function: cubic-bezier(0.15, 0.75, 0.35, 1);
+    animation-timing-function: cubic-bezier(0.1, 0.9, 0.3, 1);
     translate: 0 0;
   }
-  24% {
-    animation-timing-function: cubic-bezier(0.35, 0, 0.85, 0.75);
+  16% {
+    animation-timing-function: cubic-bezier(0.2, 0.25, 0.75, 0.75);
     translate: 0 calc(var(--peak) * -1);
   }
   100% {
@@ -542,9 +654,11 @@
   }
 }
 
+/* The pieces leave through the bottom of the screen, so they only fade at the
+   very end. */
 @keyframes confetti-fade {
   0%,
-  78% {
+  88% {
     opacity: 1;
   }
   100% {
@@ -583,299 +697,6 @@
   }
 }
 
-/* Motion shared by all screen sizes, closer to the reference animation.
-   - The burst is fast: pieces shoot up in well under a second.
-   - After the peak a piece falls at an almost constant speed (like paper
-     dragged by the air) all the way back down past the pill, instead of
-     hanging in the air and fading out. */
-.confetti-piece {
-  animation:
-    confetti-drift-x var(--dur) cubic-bezier(0.05, 0.8, 0.2, 1) var(--start) forwards,
-    confetti-rise-and-fall-wide var(--dur) linear var(--start) forwards,
-    confetti-fade-wide var(--dur) linear var(--start) forwards;
-}
-
-.confetti-piece:nth-child(13n + 1) {
-  --power: 0.8;
-}
-
-.confetti-piece:nth-child(13n + 2) {
-  --power: 0.55;
-}
-
-.confetti-piece:nth-child(13n + 3) {
-  --power: 1;
-}
-
-.confetti-piece:nth-child(13n + 4) {
-  --power: 0.7;
-}
-
-.confetti-piece:nth-child(13n + 5) {
-  --power: 0.92;
-}
-
-.confetti-piece:nth-child(13n + 6) {
-  --power: 0.5;
-}
-
-.confetti-piece:nth-child(13n + 7) {
-  --power: 0.98;
-}
-
-.confetti-piece:nth-child(13n + 8) {
-  --power: 0.62;
-}
-
-.confetti-piece:nth-child(13n + 9) {
-  --power: 0.78;
-}
-
-.confetti-piece:nth-child(13n + 10) {
-  --power: 1.05;
-}
-
-.confetti-piece:nth-child(13n + 11) {
-  --power: 0.56;
-}
-
-.confetti-piece:nth-child(13n + 12) {
-  --power: 0.88;
-}
-
-.confetti-piece:nth-child(13n + 13) {
-  --power: 0.66;
-}
-
-.confetti-piece:nth-child(7n + 1) {
-  --fall: calc(var(--height) * 0.14);
-}
-
-.confetti-piece:nth-child(7n + 2) {
-  --fall: calc(var(--height) * 0.2);
-}
-
-.confetti-piece:nth-child(7n + 3) {
-  --fall: calc(var(--height) * 0.17);
-}
-
-.confetti-piece:nth-child(7n + 4) {
-  --fall: calc(var(--height) * 0.24);
-}
-
-.confetti-piece:nth-child(7n + 5) {
-  --fall: calc(var(--height) * 0.15);
-}
-
-.confetti-piece:nth-child(7n + 6) {
-  --fall: calc(var(--height) * 0.19);
-}
-
-.confetti-piece:nth-child(7n + 7) {
-  --fall: calc(var(--height) * 0.26);
-}
-
-.confetti-piece:nth-child(9n + 1) {
-  --dur: 3800ms;
-}
-
-.confetti-piece:nth-child(9n + 2) {
-  --dur: 4200ms;
-}
-
-.confetti-piece:nth-child(9n + 3) {
-  --dur: 4600ms;
-}
-
-.confetti-piece:nth-child(9n + 4) {
-  --dur: 4000ms;
-}
-
-.confetti-piece:nth-child(9n + 5) {
-  --dur: 4400ms;
-}
-
-.confetti-piece:nth-child(9n + 6) {
-  --dur: 4800ms;
-}
-
-.confetti-piece:nth-child(9n + 7) {
-  --dur: 4100ms;
-}
-
-.confetti-piece:nth-child(9n + 8) {
-  --dur: 4500ms;
-}
-
-.confetti-piece:nth-child(9n + 9) {
-  --dur: 4900ms;
-}
-
-/* Streamers are lighter: not thrown as high, and they float down later. */
-.confetti-piece:nth-child(18n + 4),
-.confetti-piece:nth-child(18n + 13) {
-  --dur: 4900ms;
-  --fall: calc(var(--height) * 0.22);
-  --power: 0.6;
-}
-
-/* Large screens: the burst reaches (and goes past) the top of the lesson area,
-   and pieces are thrown both outwards and inwards in roughly equal amounts, so
-   the confetti covers the whole width instead of piling up in the middle. */
-@media (min-width: 960px) {
-  .confetti-stage {
-    --height: min(92vh, 1000px);
-    --reach: min(22vw, 300px);
-  }
-
-    .confetti-piece:nth-child(11n + 1) {
-      --throw: -0.7;
-      --dome: 0.86;
-    }
-
-    .confetti-piece:nth-child(11n + 2) {
-      --throw: -0.3;
-      --dome: 0.94;
-    }
-
-    .confetti-piece:nth-child(11n + 3) {
-      --throw: 0.15;
-      --dome: 0.97;
-    }
-
-    .confetti-piece:nth-child(11n + 4) {
-      --throw: 0.5;
-      --dome: 0.9;
-    }
-
-    .confetti-piece:nth-child(11n + 5) {
-      --throw: -0.5;
-      --dome: 0.9;
-    }
-
-    .confetti-piece:nth-child(11n + 6) {
-      --throw: 0.9;
-      --dome: 0.82;
-    }
-
-    .confetti-piece:nth-child(11n + 7) {
-      --throw: 0;
-      --dome: 1;
-    }
-
-    .confetti-piece:nth-child(11n + 8) {
-      --throw: 0.7;
-      --dome: 0.86;
-    }
-
-    .confetti-piece:nth-child(11n + 9) {
-      --throw: -0.15;
-      --dome: 0.97;
-    }
-
-    .confetti-piece:nth-child(11n + 10) {
-      --throw: 0.35;
-      --dome: 0.93;
-    }
-
-    .confetti-piece:nth-child(11n + 11) {
-      --throw: 1.0;
-      --dome: 0.8;
-    }
-}
-
-/* Smaller screens: the two cannons are close together, so nearly every piece
-   is thrown inwards, towards the middle of the page, and the two sprays cross
-   over each other instead of both going straight up the sides. */
-@media (max-width: 959px) {
-  .confetti-stage {
-    --reach: min(42vw, 300px);
-  }
-
-    .confetti-piece:nth-child(11n + 1) {
-      --throw: 0.2;
-      --dome: 0.96;
-    }
-
-    .confetti-piece:nth-child(11n + 2) {
-      --throw: 0.45;
-      --dome: 0.92;
-    }
-
-    .confetti-piece:nth-child(11n + 3) {
-      --throw: 0.7;
-      --dome: 0.87;
-    }
-
-    .confetti-piece:nth-child(11n + 4) {
-      --throw: 0.95;
-      --dome: 0.83;
-    }
-
-    .confetti-piece:nth-child(11n + 5) {
-      --throw: 0.3;
-      --dome: 0.95;
-    }
-
-    .confetti-piece:nth-child(11n + 6) {
-      --throw: 0.6;
-      --dome: 0.89;
-    }
-
-    .confetti-piece:nth-child(11n + 7) {
-      --throw: 1.1;
-      --dome: 0.8;
-    }
-
-    .confetti-piece:nth-child(11n + 8) {
-      --throw: 0.1;
-      --dome: 0.98;
-    }
-
-    .confetti-piece:nth-child(11n + 9) {
-      --throw: 0.8;
-      --dome: 0.85;
-    }
-
-    .confetti-piece:nth-child(11n + 10) {
-      --throw: 0.5;
-      --dome: 0.91;
-    }
-
-    .confetti-piece:nth-child(11n + 11) {
-      --throw: -0.15;
-      --dome: 0.97;
-    }
-}
-
-/* Up very quickly, brief hang at the peak, then down at a nearly constant
-   speed. */
-@keyframes confetti-rise-and-fall-wide {
-  0% {
-    animation-timing-function: cubic-bezier(0.1, 0.9, 0.3, 1);
-    translate: 0 0;
-  }
-  16% {
-    animation-timing-function: cubic-bezier(0.2, 0.25, 0.75, 0.75);
-    translate: 0 calc(var(--peak) * -1);
-  }
-  100% {
-    translate: 0 var(--fall);
-  }
-}
-
-/* The pieces leave through the bottom of the screen, so they only fade at the
-   very end. */
-@keyframes confetti-fade-wide {
-  0%,
-  88% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .confetti-stage {
     display: none;
@@ -884,13 +705,13 @@
 
 /* Some mobile devices have CSS width below 520px, use a responsive min-width
   when under 520px to prevent pushing things offscreen. */
-@media(max-width: 500px) {
+@media (max-width: 500px) {
   .inner-container {
     min-width: 250px;
   }
 }
 
-@media(max-width: 959px) {
+@media (max-width: 959px) {
   .inner-container-alignment {
     padding-left: 30px;
     padding-right: 30px;
