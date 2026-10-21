@@ -35,8 +35,6 @@ test.describe('Logged-out User', function () {
   let blogPostWriter: BlogPostEditor & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(500000); // Setup takes longer than the default timeout.
-
     interestedPartnerOrg = await UserFactory.createLoggedOutUser(browser);
     blogPostWriter = await UserFactory.createNewUser(
       'blogPostWriter',
