@@ -6644,7 +6644,7 @@ export default {
   // separate from the web platform parameter constants above because web and
   // Android version encodings differ.
   "ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
-    "dev", "test", "alpha", "beta", "release"],
+    "dev", "alpha", "beta", "ga"],
   "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+)+)$",
   "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
