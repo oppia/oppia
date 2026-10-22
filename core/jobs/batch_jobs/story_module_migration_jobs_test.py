@@ -158,6 +158,9 @@ class MigrateStoryModulesJobTests(job_test_utils.JobTestBase):
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    def test_job_writes_to_datastore(self) -> None:
+        self.assertTrue(self.JOB_CLASS.DATASTORE_UPDATES_ALLOWED)
+
     def test_outdated_feature_flag_config_is_migrated(self) -> None:
         config_models.FeatureFlagConfigModel.create(
             self.OLD_FLAG_NAME, True, 50, ['user_group_1']
@@ -598,6 +601,9 @@ class AuditStoryModulesMigrationJobTests(job_test_utils.JobTestBase):
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
+
+    def test_job_is_read_only_by_default(self) -> None:
+        self.assertFalse(self.JOB_CLASS.DATASTORE_UPDATES_ALLOWED)
 
     def test_audit_counts_outdated_feature_flag_config(self) -> None:
         config_models.FeatureFlagConfigModel.create(

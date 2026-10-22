@@ -112,14 +112,12 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_story_from_model(self) -> None:
-        # Downgrade by two versions rather than one, so that the whole
-        # conversion chain runs. The v6 -> v7 converter is the one that
-        # synthesizes the default 'arc_default' module from the existing node
-        # ids, and the v7 -> v8 converter then renames the 'arcs' key to
-        # 'modules'. Starting at v7 would only exercise the latter, which
-        # renames a key and creates nothing, so the expected default module
-        # below would never appear.
-        schema_version = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 2
+        # Start at the last schema version without chapter groupings. The
+        # v6 -> v7 converter synthesizes the default 'arc_default' module from
+        # the existing node ids, and the v7 -> v8 converter renames the 'arcs'
+        # key to 'modules'. Hard-coding the version keeps the whole conversion
+        # chain running even after newer schema versions are added.
+        schema_version = 6
         story_model = story_models.StoryModel.get(self.story_id)
         story_model.story_contents_schema_version = schema_version
         story = story_fetchers.get_story_from_model(story_model)
