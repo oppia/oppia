@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import contextlib
 import enum
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -213,6 +214,27 @@ class WebFeatureFlagServiceTest(test_utils.GenericTestBase):
                     ],
                     expected_feature_flags_dict,
                 )
+
+    def test_bulk_flag_loading_falls_back_to_legacy_model(self) -> None:
+        with mock.patch.object(
+            feature_services.config_models.WebFeatureFlagConfigModel,
+            'get_multi',
+            return_value=[None],
+        ):
+            with self.assertLogs(level='DEBUG') as logs:
+                with self.swap_name_to_description_feature_stage_dict:
+                    loaded_flags = (
+                        feature_services.load_web_feature_flags_from_storage(
+                            [self.dev_feature_flag.name]
+                        )
+                    )
+
+        loaded_flag = loaded_flags[self.dev_feature_flag.name]
+        assert loaded_flag is not None
+        self.assertTrue(
+            loaded_flag.web_feature_flag_config.force_enable_for_all_users
+        )
+        self.assertIn('falling back to legacy model', '\n'.join(logs.output))
 
     def test_feature_flag_is_correctly_fetched_when_not_present_in_storage(
         self,

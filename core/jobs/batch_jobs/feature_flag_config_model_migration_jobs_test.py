@@ -68,6 +68,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
             'feature_flag_a'
         )
         assert migrated_model is not None
+        self.assertEqual(migrated_model.key.id(), legacy_model.key.id())
         self.assertTrue(migrated_model.force_enable_for_all_users)
         self.assertEqual(migrated_model.rollout_percentage, 25)
         self.assertEqual(
@@ -86,6 +87,40 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
                 'feature_flag_a', strict=False
             )
         )
+
+    def test_skips_legacy_model_when_web_model_already_exists(self) -> None:
+        legacy_model = config_models.FeatureFlagConfigModel(
+            id='feature_flag_a',
+            force_enable_for_all_users=False,
+            rollout_percentage=20,
+            user_group_ids=['legacy_group'],
+        )
+        legacy_model.update_timestamps()
+        legacy_model.put()
+        web_model = config_models.WebFeatureFlagConfigModel(
+            id='feature_flag_a',
+            force_enable_for_all_users=True,
+            rollout_percentage=80,
+            user_group_ids=['web_group'],
+        )
+        web_model.update_timestamps()
+        web_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'MIGRATED FEATURE FLAG CONFIG MODEL COUNT: 0.'
+                ),
+            ]
+        )
+
+        stored_web_model = config_models.WebFeatureFlagConfigModel.get(
+            'feature_flag_a'
+        )
+        assert stored_web_model is not None
+        self.assertTrue(stored_web_model.force_enable_for_all_users)
+        self.assertEqual(stored_web_model.rollout_percentage, 80)
+        self.assertEqual(stored_web_model.user_group_ids, ['web_group'])
 
 
 class AuditFeatureFlagConfigModelsMigrationJobTests(job_test_utils.JobTestBase):
@@ -113,6 +148,12 @@ class AuditFeatureFlagConfigModelsMigrationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
+                job_run_result.JobRunResult.as_stdout(
+                    'LEGACY FEATURE FLAG CONFIG MODEL COUNT: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'WEB FEATURE FLAG CONFIG MODEL COUNT: 0.'
+                ),
                 job_run_result.JobRunResult.as_stdout(
                     'MIGRATED FEATURE FLAG CONFIG MODEL COUNT: 1.'
                 ),

@@ -18,6 +18,9 @@
 
 from __future__ import annotations
 
+import logging
+from typing import Iterable, List
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -41,9 +44,20 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
     def _migrate_legacy_model(
         self,
         legacy_model: config_models.FeatureFlagConfigModel,
-    ) -> config_models.WebFeatureFlagConfigModel:
-        """Creates the new web feature flag config model from a legacy one."""
+    ) -> Iterable[config_models.WebFeatureFlagConfigModel]:
+        """Yields a model only if it has not already been dual-written."""
         with datastore_services.get_ndb_context():
+            existing_model = config_models.WebFeatureFlagConfigModel.get_by_id(
+                legacy_model.id
+            )
+            if existing_model is not None:
+                logging.info(
+                    'Skipping migration for feature flag %s because '
+                    'WebFeatureFlagConfigModel already exists.',
+                    legacy_model.id,
+                )
+                return
+
             migrated_config = config_models.WebFeatureFlagConfigModel(
                 id=legacy_model.id,
                 force_enable_for_all_users=legacy_model.force_enable_for_all_users,
@@ -51,9 +65,10 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                 user_group_ids=legacy_model.user_group_ids,
                 created_on=legacy_model.created_on,
                 last_updated=legacy_model.last_updated,
+                deleted=legacy_model.deleted,
             )
             migrated_config.update_timestamps(update_last_updated_time=False)
-            return migrated_config
+            yield migrated_config
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the migration from old to new feature flag config models."""
@@ -70,7 +85,7 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
         migrated_models = (
             legacy_models
             | 'Migrate legacy models to WebFeatureFlagConfigModel'
-            >> beam.Map(self._migrate_legacy_model)
+            >> beam.FlatMap(self._migrate_legacy_model)
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
@@ -92,6 +107,43 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
             )
         )
 
+        count_results: List[beam.PCollection[job_run_result.JobRunResult]] = [
+            count_result
+        ]
+        if not self.DATASTORE_UPDATES_ALLOWED:
+            source_count_result = (
+                legacy_models
+                | 'Count legacy feature flag configs'
+                >> beam.combiners.Count.Globally().with_defaults(0)
+                | 'Format legacy feature flag config count'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        'LEGACY FEATURE FLAG CONFIG MODEL COUNT: %d.' % count
+                    )
+                )
+            )
+            target_models = (
+                self.pipeline
+                | 'Get existing WebFeatureFlagConfigModels'
+                >> ndb_io.GetModels(
+                    config_models.WebFeatureFlagConfigModel.get_all(
+                        include_deleted=False
+                    )
+                )
+            )
+            target_count_result = (
+                target_models
+                | 'Count existing web feature flag configs'
+                >> beam.combiners.Count.Globally().with_defaults(0)
+                | 'Format existing web feature flag config count'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        'WEB FEATURE FLAG CONFIG MODEL COUNT: %d.' % count
+                    )
+                )
+            )
+            count_results.extend([source_count_result, target_count_result])
+
         migrated_model_results = (
             migrated_models
             | 'Log migrated model IDs'
@@ -102,10 +154,7 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
             )
         )
 
-        return (
-            count_result,
-            migrated_model_results,
-        ) | beam.Flatten()
+        return (count_results + [migrated_model_results]) | beam.Flatten()
 
 
 class AuditFeatureFlagConfigModelsMigrationJob(

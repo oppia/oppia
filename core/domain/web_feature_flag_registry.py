@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import web_feature_flag_list
 from core.domain import web_feature_flag_domain
 from core.platform import models
@@ -129,15 +131,26 @@ class Registry:
             config_models.WebFeatureFlagConfigModel.get(name, strict=False)
         )
 
-        if web_feature_flag_config_model is not None:
-            return web_feature_flag_domain.WebFeatureFlagConfig(
-                web_feature_flag_config_model.force_enable_for_all_users,
-                web_feature_flag_config_model.rollout_percentage,
-                web_feature_flag_config_model.user_group_ids,
-                web_feature_flag_config_model.last_updated,
+        if web_feature_flag_config_model is None:
+            logging.debug(
+                'Flag config %s not found in WebFeatureFlagConfigModel, '
+                'falling back to legacy model.',
+                name,
+            )
+            model_instance = config_models.FeatureFlagConfigModel.get(
+                name, strict=False
             )
         else:
+            model_instance = web_feature_flag_config_model
+
+        if model_instance is None:
             return None
+        return web_feature_flag_domain.WebFeatureFlagConfig(
+            model_instance.force_enable_for_all_users,
+            model_instance.rollout_percentage,
+            model_instance.user_group_ids,
+            model_instance.last_updated,
+        )
 
     @classmethod
     def _update_web_feature_flag_storage_model(
@@ -152,26 +165,10 @@ class Registry:
             web_feature_flag.web_feature_flag_spec.feature_stage
         )
 
-        model_instance = config_models.WebFeatureFlagConfigModel.get(
-            web_feature_flag.name, strict=False
+        config = web_feature_flag.web_feature_flag_config
+        config_models.FeatureFlagConfigModel.save_config(
+            web_feature_flag.name,
+            config.force_enable_for_all_users,
+            config.rollout_percentage,
+            config.user_group_ids,
         )
-        if model_instance is None:
-            model_instance = config_models.WebFeatureFlagConfigModel.create(
-                web_feature_flag.name,
-                web_feature_flag.web_feature_flag_config.force_enable_for_all_users,
-                web_feature_flag.web_feature_flag_config.rollout_percentage,
-                web_feature_flag.web_feature_flag_config.user_group_ids,
-            )
-            return
-
-        model_instance.force_enable_for_all_users = (
-            web_feature_flag.web_feature_flag_config.force_enable_for_all_users
-        )
-        model_instance.rollout_percentage = (
-            web_feature_flag.web_feature_flag_config.rollout_percentage
-        )
-        model_instance.user_group_ids = (
-            web_feature_flag.web_feature_flag_config.user_group_ids
-        )
-        model_instance.update_timestamps()
-        model_instance.put()

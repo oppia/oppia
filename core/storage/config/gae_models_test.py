@@ -217,12 +217,16 @@ class WebFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
             rollout_percentage=50,
             user_group_ids=['User Group 1', 'User Group 2'],
         )
+        assert web_feature_model is not None
         self.assertEqual(web_feature_model.id, 'web_feature_name')
         self.assertEqual(web_feature_model.rollout_percentage, 50)
         self.assertEqual(
             web_feature_model.user_group_ids, ['User Group 1', 'User Group 2']
         )
         self.assertEqual(web_feature_model.force_enable_for_all_users, False)
+        self.assertIsNotNone(
+            config_models.FeatureFlagConfigModel.get('web_feature_name')
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -269,6 +273,46 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
             feature_flag_model.user_group_ids, ['User Group 1', 'User Group 2']
         )
         self.assertEqual(feature_flag_model.force_enable_for_all_users, False)
+        web_feature_flag_model = config_models.WebFeatureFlagConfigModel.get(
+            'feature_flag_name'
+        )
+        assert web_feature_flag_model is not None
+        self.assertEqual(web_feature_flag_model.rollout_percentage, 50)
+        self.assertEqual(
+            web_feature_flag_model.user_group_ids,
+            ['User Group 1', 'User Group 2'],
+        )
+        self.assertFalse(web_feature_flag_model.force_enable_for_all_users)
+
+    def test_create_model_survives_secondary_write_failure(self) -> None:
+        def fail_web_model_put(
+            unused_model: config_models.WebFeatureFlagConfigModel,
+        ) -> None:
+            raise RuntimeError('Secondary write failed.')
+
+        with self.swap(
+            config_models.WebFeatureFlagConfigModel,
+            'put',
+            fail_web_model_put,
+        ):
+            with self.assertLogs(
+                'core.storage.config.gae_models', level='ERROR'
+            ):
+                legacy_model = config_models.FeatureFlagConfigModel.create(
+                    feature_flag_name='legacy_only_flag',
+                    force_enable_for_all_users=True,
+                    rollout_percentage=60,
+                    user_group_ids=[],
+                )
+
+        self.assertIsNotNone(
+            config_models.FeatureFlagConfigModel.get(legacy_model.id)
+        )
+        self.assertIsNone(
+            config_models.WebFeatureFlagConfigModel.get(
+                legacy_model.id, strict=False
+            )
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(

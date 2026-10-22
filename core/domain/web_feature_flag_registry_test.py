@@ -59,6 +59,67 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
         self.assertIsNotNone(feature_flag)
         self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
 
+    def test_get_feature_flag_prefers_web_model(self) -> None:
+        legacy_model = registry.config_models.FeatureFlagConfigModel(
+            id=WebFeatureNames.FEATURE_A.value,
+            force_enable_for_all_users=False,
+            rollout_percentage=10,
+            user_group_ids=[],
+        )
+        legacy_model.update_timestamps()
+        legacy_model.put()
+        web_model = registry.config_models.WebFeatureFlagConfigModel(
+            id=WebFeatureNames.FEATURE_A.value,
+            force_enable_for_all_users=True,
+            rollout_percentage=75,
+            user_group_ids=['web_group'],
+        )
+        web_model.update_timestamps()
+        web_model.put()
+
+        with self.swap_name_to_description_feature_stage_dict:
+            feature_flag = registry.Registry.get_feature_flag(
+                WebFeatureNames.FEATURE_A.value
+            )
+
+        self.assertTrue(
+            feature_flag.web_feature_flag_config.force_enable_for_all_users
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.rollout_percentage, 75
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.user_group_ids, ['web_group']
+        )
+
+    def test_get_feature_flag_falls_back_to_legacy_model(self) -> None:
+        legacy_model = registry.config_models.FeatureFlagConfigModel(
+            id=WebFeatureNames.FEATURE_A.value,
+            force_enable_for_all_users=True,
+            rollout_percentage=35,
+            user_group_ids=['legacy_group'],
+        )
+        legacy_model.update_timestamps()
+        legacy_model.put()
+
+        with self.swap_name_to_description_feature_stage_dict:
+            with self.assertLogs(registry.__name__, level='DEBUG') as logs:
+                feature_flag = registry.Registry.get_feature_flag(
+                    WebFeatureNames.FEATURE_A.value
+                )
+
+        self.assertTrue(
+            feature_flag.web_feature_flag_config.force_enable_for_all_users
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.rollout_percentage, 35
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.user_group_ids,
+            ['legacy_group'],
+        )
+        self.assertIn('falling back to legacy model', '\n'.join(logs.output))
+
     def test_get_non_existing_feature_failure(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Feature flag not found: feature_d'
@@ -104,6 +165,19 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
                 updated_feature_flag.web_feature_flag_config.user_group_ids,
                 ['user_group_1', 'user_group_2', 'user_group_3'],
             )
+
+            for model_class in (
+                registry.config_models.FeatureFlagConfigModel,
+                registry.config_models.WebFeatureFlagConfigModel,
+            ):
+                stored_model = model_class.get(WebFeatureNames.FEATURE_A.value)
+                assert stored_model is not None
+                self.assertTrue(stored_model.force_enable_for_all_users)
+                self.assertEqual(stored_model.rollout_percentage, 100)
+                self.assertEqual(
+                    stored_model.user_group_ids,
+                    ['user_group_1', 'user_group_2', 'user_group_3'],
+                )
 
     def test_update_web_feature_flag(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:

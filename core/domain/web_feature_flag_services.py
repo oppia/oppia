@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 
 from core import web_feature_flag_list
 from core.domain import web_feature_flag_domain
@@ -174,36 +175,54 @@ def load_web_feature_flags_from_storage(
             web_feature_flag_names_list
         )
     )
+    legacy_feature_flag_config_models = (
+        config_models.FeatureFlagConfigModel.get_multi(
+            web_feature_flag_names_list
+        )
+    )
 
-    for web_feature_flag_config_model in web_feature_flag_config_models:
-        if web_feature_flag_config_model:
+    for index, web_feature_flag_config_model in enumerate(
+        web_feature_flag_config_models
+    ):
+        feature_flag_config_model = web_feature_flag_config_model
+        if feature_flag_config_model is None:
+            web_feature_flag_name = web_feature_flag_names_list[index]
+            logging.debug(
+                'Flag config %s not found in WebFeatureFlagConfigModel, '
+                'falling back to legacy model.',
+                web_feature_flag_name,
+            )
+            feature_flag_config_model = legacy_feature_flag_config_models[index]
+
+        if feature_flag_config_model:
             web_feature_flag_spec = _get_web_feature_flag_spec(
-                web_feature_flag_config_model.id
+                feature_flag_config_model.id
             )
             web_feature_flag_config = (
                 web_feature_flag_domain.WebFeatureFlagConfig(
-                    web_feature_flag_config_model.force_enable_for_all_users,
-                    web_feature_flag_config_model.rollout_percentage,
-                    web_feature_flag_config_model.user_group_ids,
-                    web_feature_flag_config_model.last_updated,
+                    feature_flag_config_model.force_enable_for_all_users,
+                    feature_flag_config_model.rollout_percentage,
+                    feature_flag_config_model.user_group_ids,
+                    feature_flag_config_model.last_updated,
                 )
             )
 
             web_feature_flag_name_to_feature_flag_dict[
-                web_feature_flag_config_model.id
+                feature_flag_config_model.id
             ] = web_feature_flag_domain.FeatureFlag(
-                web_feature_flag_config_model.id,
+                feature_flag_config_model.id,
                 web_feature_flag_spec,
                 web_feature_flag_config,
             )
 
-        for web_feature_flag_name in web_feature_flag_names_list:
-            if web_feature_flag_name not in (
-                web_feature_flag_name_to_feature_flag_dict
-            ):
-                web_feature_flag_name_to_feature_flag_dict[
-                    web_feature_flag_name
-                ] = None
+    for web_feature_flag_name in web_feature_flag_names_list:
+        if (
+            web_feature_flag_name
+            not in web_feature_flag_name_to_feature_flag_dict
+        ):
+            web_feature_flag_name_to_feature_flag_dict[
+                web_feature_flag_name
+            ] = None
 
     return web_feature_flag_name_to_feature_flag_dict
 
