@@ -508,6 +508,24 @@ describe('Opportunities List Item Component', () => {
       });
     });
 
+    describe('when all remaining content is reviewer-only and user is a reviewer', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 3;
+        opportunity.reviewerOnlyContentCount = 2;
+        opportunity.userIsReviewer = true;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should keep button enabled for reviewer', () => {
+        expect(component.cardsAvailable).toBe(2);
+        expect(component.opportunityButtonDisabled).toBe(false);
+      });
+    });
+
     describe('when button is disabled and reviewerOnlyContentCount is undefined', () => {
       beforeEach(() => {
         let opportunity = component.opportunity as ExplorationOpportunity;

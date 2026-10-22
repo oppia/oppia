@@ -212,34 +212,25 @@ export class OpportunitiesListItemComponent {
             width: inReviewTranslationsPercentage + '%',
           };
           let maxTranslatableCards = this.opportunity.totalCount;
-          if (
-            !this.opportunity.userIsReviewer &&
-            this.opportunity.reviewerOnlyContentCount !== undefined
-          ) {
-            maxTranslatableCards -= this.opportunity.reviewerOnlyContentCount;
-          }
 
-          // Note: translationsCount and inReviewCount track all translations
-          // for the exploration (including reviewer-only cards). If a
-          // reviewer translates reviewer-only content,
-          // translationsCount + inReviewCount can exceed
-          // maxTranslatableCards for a non-reviewer. We use '>=' to
-          // ensure the button remains disabled in that case.
+          let onlyReviewerCardsRemaining =
+            !this.opportunity.userIsReviewer &&
+            this.opportunity.reviewerOnlyContentCount !== undefined &&
+            this.opportunity.reviewerOnlyContentCount > 0 &&
+            this.cardsAvailable <= this.opportunity.reviewerOnlyContentCount;
+
           this.opportunityButtonDisabled =
             this.disableButtonOnComplete &&
-            this.opportunity.translationsCount +
+            (this.opportunity.translationsCount +
               this.opportunity.inReviewCount >=
-              maxTranslatableCards;
+              maxTranslatableCards ||
+              onlyReviewerCardsRemaining);
 
           if (this.opportunityButtonDisabled) {
-            if (
-              !this.opportunity.userIsReviewer &&
-              this.opportunity.reviewerOnlyContentCount !== undefined &&
-              this.opportunity.reviewerOnlyContentCount > 0 &&
-              this.cardsAvailable > 0
-            ) {
+            if (onlyReviewerCardsRemaining && this.cardsAvailable > 0) {
               this.tooltipText =
-                'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.';
+                'There are no more cards available for translation. The ' +
+                'remaining cards require reviewer privileges to translate.';
             } else {
               this.tooltipText =
                 'All available translations are currently in review.';
