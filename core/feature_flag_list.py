@@ -145,7 +145,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
-    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.STORY_EDITOR_ARCS,
@@ -165,6 +164,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
+    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
@@ -342,7 +342,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Enables automatic AI-generated translation suggestions in the '
             'Contributor Dashboard to assist translators.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
