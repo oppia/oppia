@@ -6647,6 +6647,11 @@ export default {
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
+  // Keys of routes that are pure redirect handlers (for example login and
+  // logout) without a dedicated page to audit. They cannot have a Lighthouse
+  // page entry, so the Lighthouse coverage and shard checks skip them.
+  "ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],
+
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "TECHNICAL_FEEDBACK_DASHBOARD": {
@@ -6669,6 +6674,10 @@ export default {
     },
     "TECHNICAL_FEEDBACK_DETAIL": {
       "ROUTE": "technical-feedback-dashboard/:team/:reportId",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Technical Feedback Dashboard | Oppia",
       "META": [
         {
@@ -6740,6 +6749,10 @@ export default {
     },
     "EDIT_CERTIFICATE_OFFERING": {
       "ROUTE": "edit-certificate-assessment-offering/:certificate_offering_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Edit Certificate Offering | Oppia",
       "META": [
         {
@@ -6911,6 +6924,10 @@ export default {
     },
     "CERTIFICATE_ASSESSMENT_PLAYER": {
       "ROUTE": "certificate-assessment/:certificate_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Certificate Assessment Player | Oppia",
       "META": [
         {
@@ -6929,6 +6946,10 @@ export default {
     },
     "CERTIFICATE_ASSESSMENT_RESULT": {
       "ROUTE": "certificate-assessment-result/:attempt_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Certificate Assessment Result | Oppia",
       "META": [
         {
@@ -7405,24 +7426,6 @@ export default {
         }
       ]
     },
-    "LIBRARY_RECENTLY_PUBLISHED": {
-      "ROUTE": "community-library/recently-published",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
-        }
-      ]
-    },
     "PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/session",
       "TITLE": "Practice Session Page",
@@ -7525,24 +7528,6 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create and manage blog posts on the Oppia blog dashboard."
-        }
-      ]
-    },
-    "LIBRARY_TOP_RATED": {
-      "ROUTE": "community-library/top-rated",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
         }
       ]
     },
@@ -7802,6 +7787,10 @@ export default {
     },
     "LEARNER_GROUP_EDITOR": {
       "ROUTE": "edit-learner-group/:learner_group_id",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "TITLE": "Edit Learner Group | Oppia",
       "META": [
         {
