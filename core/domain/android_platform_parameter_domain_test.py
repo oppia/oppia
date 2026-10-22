@@ -176,8 +176,8 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_flavour_comparison_operators(self) -> None:
         context = self._create_context(app_version_flavour='beta')
         cases = [
-            ('<', 'release', True),
-            ('<=', 'release', True),
+            ('<', 'ga', True),
+            ('<=', 'ga', True),
             ('>', 'alpha', True),
         ]
 
@@ -314,7 +314,7 @@ class AndroidPlatformParameterRuleTests(test_utils.GenericTestBase):
                     },
                     {
                         'type': 'app_version_flavour',
-                        'conditions': [['=', 'release']],
+                        'conditions': [['=', 'ga']],
                     },
                 ],
                 'value_when_matched': True,
@@ -566,9 +566,9 @@ class AndroidPlatformParameterTests(test_utils.GenericTestBase):
 
         test_cases = [
             ('12.6-5f58b8fbeb-dev', 'beta', True),
-            ('12.6-5f58b8fbeb-dev', 'release', True),
+            ('12.6-5f58b8fbeb-dev', 'ga', True),
             ('12.4-5f58b8fbeb-dev', 'beta', False),
-            ('13.0.1-5f58b8fbeb-dev', 'release', False),
+            ('13.0.1-5f58b8fbeb-dev', 'ga', False),
             ('12.6-5f58b8fbeb-dev', 'alpha', False),
         ]
         for app_version, app_version_flavour, expected_value in test_cases:
