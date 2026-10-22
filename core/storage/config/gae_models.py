@@ -319,7 +319,7 @@ class WebFeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
 
         Returns:
             WebFeatureFlagConfigModel|None. The created web config, or None if
-                the secondary write failed after the legacy model was saved.
+            the secondary write failed after the legacy model was saved.
         """
         FeatureFlagConfigModel.save_config(
             web_feature_flag_name,

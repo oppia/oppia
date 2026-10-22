@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Iterable, List
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -28,6 +27,7 @@ from core.platform import models
 from core.storage.config import gae_models as config_models
 
 import apache_beam as beam
+from typing import Iterable, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
