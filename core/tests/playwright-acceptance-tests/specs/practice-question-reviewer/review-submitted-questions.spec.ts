@@ -93,7 +93,8 @@ test.describe('Practice Question Reviewer', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition and Subtraction',
-      'Addition'
+      'Addition',
+      true
     );
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
