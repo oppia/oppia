@@ -75,6 +75,9 @@ describe('DragAndDropPositiveIntEditorComponent', () => {
     component.value = 1;
 
     const selectElement = document.createElement('select');
+    const option = document.createElement('option');
+    option.value = '3';
+    selectElement.appendChild(option);
     selectElement.value = '3';
     const event = new Event('change');
     Object.defineProperty(event, 'target', {value: selectElement});
