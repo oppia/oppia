@@ -30,12 +30,12 @@ import {SharedLearnerGroupComponentsModule} from '../shared-learner-group-compon
 import {RouterModule} from '@angular/router';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatRadioModule} from '@angular/material/radio';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    MaterialModule,
+    MatRadioModule,
     BaseModule,
     CommonModule,
     NgbPopoverModule,

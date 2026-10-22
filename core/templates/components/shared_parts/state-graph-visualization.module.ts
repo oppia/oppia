@@ -21,10 +21,10 @@ import {NgModule} from '@angular/core';
 import {StateGraphVisualization} from '../../pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, NgbModule],
+  imports: [CommonModule, TranslateModule, NgbTooltipModule],
   declarations: [StateGraphVisualization],
   exports: [StateGraphVisualization],
 })

@@ -33,7 +33,12 @@ import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-displa
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {TranslateModule} from '@ngx-translate/core';
@@ -44,7 +49,12 @@ import {TranslateModule} from '@ngx-translate/core';
     CommonModule,
     FormsModule,
     ImageReceiverModule,
-    MaterialModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDividerModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     MatButtonToggleModule,
     MatMenuModule,
     MatTabsModule,

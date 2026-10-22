@@ -22,7 +22,7 @@ import {ProgressTrackerComponent} from '../../pages/exploration-player-page/new-
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {CheckpointBarModule} from 'components/shared_parts/checkpoint-bar.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatIconModule} from '@angular/material/icon';
 import {SaveProgressModalModule} from 'components/shared_parts/save-progress-modal.module';
 
 @NgModule({
@@ -30,7 +30,7 @@ import {SaveProgressModalModule} from 'components/shared_parts/save-progress-mod
     CommonModule,
     TranslateModule,
     CheckpointBarModule,
-    MaterialModule,
+    MatIconModule,
     SaveProgressModalModule,
   ],
   declarations: [ProgressTrackerComponent],

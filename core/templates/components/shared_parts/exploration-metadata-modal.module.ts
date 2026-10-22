@@ -24,7 +24,11 @@ import {TranslateModule} from '@ngx-translate/core';
 import {ExplorationObjectiveEditorModule} from 'components/shared_parts/exploration-objective-editor.module';
 import {ExplorationTitleEditorModule} from 'components/shared_parts/exploration-title-editor.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 @NgModule({
   imports: [
@@ -33,7 +37,11 @@ import {MaterialModule} from 'modules/material.module';
     ExplorationObjectiveEditorModule,
     ExplorationTitleEditorModule,
     FormsModule,
-    MaterialModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
   ],
   declarations: [ExplorationMetadataModalComponent],
   exports: [ExplorationMetadataModalComponent],

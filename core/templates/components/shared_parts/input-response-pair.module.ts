@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
@@ -32,7 +32,7 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     TranslateModule,
     CommonElementsModule,
     DynamicContentModule,
-    NgbModule,
+    NgbPopoverModule,
     RichTextComponentsModule,
   ],
   declarations: [InputResponsePairComponent],

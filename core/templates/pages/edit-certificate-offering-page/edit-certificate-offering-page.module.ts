@@ -25,12 +25,12 @@ import {EditCertificateOfferingPageRootComponent} from './edit-certificate-offer
 import {EditCertificateOfferingPageRoutingModule} from './edit-certificate-offering-page-routing.module';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
     RouterModule,
-    MaterialModule,
+    MatProgressSpinnerModule,
     BaseModule,
     CommonModule,
     CertificateOfferingSharedModule,

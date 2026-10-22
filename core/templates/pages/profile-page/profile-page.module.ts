@@ -29,16 +29,14 @@ import {RouterModule} from '@angular/router';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatCardModule} from '@angular/material/card';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     StringUtilityPipesModule,
-    NgbModule,
-    MaterialModule,
+    MatCardModule,
     ExplorationSummaryTileModule,
     BaseModule,
     BackgroundBannerModule,

@@ -34,16 +34,28 @@ import {BackgroundBannerModule} from 'components/common-layout-directives/common
 import {BaseModule} from 'base-components/base.module';
 import {FormsModule} from '@angular/forms';
 import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     StringUtilityPipesModule,
-    NgbModule,
-    MaterialModule,
+    NgbModalModule,
+    MatAutocompleteModule,
+    MatCardModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
     ImageReceiverModule,
     FormsModule,
     BaseModule,

@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {CorrectnessFooterModule} from 'components/shared_parts/correctness-footer.module';
 import {LearnerAnswerInfoCardModule} from 'components/shared_parts/learner-answer-info-card.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {ProgressNavModule} from 'components/shared_parts/progress-nav.module';
 import {SupplementalCardModule} from 'components/shared_parts/supplemental-card.module';
 import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
@@ -34,7 +34,7 @@ import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
     TranslateModule,
     CorrectnessFooterModule,
     LearnerAnswerInfoCardModule,
-    MaterialModule,
+    MatButtonModule,
     ProgressNavModule,
     SupplementalCardModule,
     TutorCardModule,

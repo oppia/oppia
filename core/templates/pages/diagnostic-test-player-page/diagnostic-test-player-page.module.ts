@@ -33,7 +33,6 @@ import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-a
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
 import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
-import {MaterialModule} from 'modules/material.module';
 import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
 import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
 import {ProgressBarModule} from 'components/shared_parts/progress-bar.module';
@@ -44,7 +43,6 @@ import {TranslateModule} from '@ngx-translate/core';
     ProgressBarModule,
     PlayerHeaderModule,
     NewConversationSkinModule,
-    MaterialModule,
     ConversationSkinModule,
     BaseModule,
     BackgroundBannerModule,

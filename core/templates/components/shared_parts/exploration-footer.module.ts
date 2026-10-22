@@ -22,14 +22,16 @@ import {ExplorationFooterComponent} from '../../pages/exploration-player-page/cu
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {HintAndSolutionButtonsModule} from 'components/shared_parts/hint-and-solution-buttons.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
     HintAndSolutionButtonsModule,
-    MaterialModule,
+    MatButtonModule,
+    MatIconModule,
   ],
   declarations: [ExplorationFooterComponent],
   exports: [ExplorationFooterComponent],

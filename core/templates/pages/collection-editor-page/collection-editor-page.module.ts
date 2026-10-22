@@ -42,14 +42,20 @@ import {CommonElementsModule} from 'components/common-layout-directives/common-e
 import {CommonModule} from '@angular/common';
 import {DirectivesModule} from 'directives/directives.module';
 import {FilteredChoicesFieldModule} from 'components/shared_parts/filtered-choices-field.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {MultiSelectionFieldModule} from 'components/shared_parts/multi-selection-field.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
-    NgbModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
     MultiSelectionFieldModule,
-    MaterialModule,
+    MatCardModule,
     FilteredChoicesFieldModule,
     DirectivesModule,
     CommonModule,

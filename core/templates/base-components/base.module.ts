@@ -21,7 +21,6 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CookieModule} from 'ngx-cookie';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DirectivesModule} from 'directives/directives.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -56,7 +55,7 @@ import {
 
 // Miscellaneous.
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {NgBootstrapModule} from 'modules/ng-boostrap.module';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {FeedbackModalComponent} from './feedback-modal.component';
 import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
@@ -75,8 +74,7 @@ import {RouterModule} from '@angular/router';
     I18nModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbModule,
-    NgBootstrapModule,
+    NgbDropdownModule,
     RouterModule,
     SharedPipesModule,
     MatIconModule,

@@ -24,7 +24,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {CustomizeInteractionModalModule} from 'components/shared_parts/customize-interaction-modal.module';
 import {DeleteInteractionModalModule} from 'components/shared_parts/delete-interaction-modal.module';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -33,7 +33,7 @@ import {MaterialModule} from 'modules/material.module';
     CustomizeInteractionModalModule,
     DeleteInteractionModalModule,
     DynamicContentModule,
-    MaterialModule,
+    MatCardModule,
   ],
   declarations: [StateInteractionEditorComponent],
   exports: [StateInteractionEditorComponent],

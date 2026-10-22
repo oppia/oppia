@@ -37,7 +37,7 @@ import {TopicHeaderComponent} from './topic-header/topic-header.component';
 import {TopicViewerContentComponent} from './topic-viewer-content/topic-viewer-content.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {MatCardModule} from '@angular/material/card';
-import {MaterialModule} from 'modules/material.module';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {StorySummaryTileModule} from 'components/shared_parts/story-summary-tile.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {SubtopicSummaryTileModule} from 'components/shared_parts/subtopic-summary-tile.module';
@@ -48,7 +48,7 @@ import {TranslateModule} from '@ngx-translate/core';
     SubtopicSummaryTileModule,
     StringUtilityPipesModule,
     StorySummaryTileModule,
-    MaterialModule,
+    MatTooltipModule,
     CommonModule,
     FormsModule,
     MatBottomSheetModule,

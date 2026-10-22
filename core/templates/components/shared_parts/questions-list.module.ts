@@ -22,7 +22,8 @@ import {QuestionsListComponent} from '../question-directives/questions-list/ques
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {ConfirmQuestionExitModalModule} from 'components/shared_parts/confirm-question-exit-modal.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {QuestionDifficultySelectorModule} from 'components/shared_parts/question-difficulty-selector.module';
 import {QuestionEditorModule} from 'components/shared_parts/question-editor.module';
 import {QuestionEditorSaveModalModule} from 'components/shared_parts/question-editor-save-modal.module';
@@ -35,7 +36,8 @@ import {SelectSkillModalModule} from 'components/shared_parts/select-skill-modal
     CommonModule,
     TranslateModule,
     ConfirmQuestionExitModalModule,
-    MaterialModule,
+    MatCardModule,
+    MatTooltipModule,
     QuestionDifficultySelectorModule,
     QuestionEditorModule,
     QuestionEditorSaveModalModule,

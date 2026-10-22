@@ -26,7 +26,7 @@ import {CardNavigationControlModule} from 'components/shared_parts/card-navigati
 import {CheckpointCelebrationFooterModule} from 'components/shared_parts/checkpoint-celebration-footer.module';
 import {ConversationDisplayModule} from 'components/shared_parts/conversation-display.module';
 import {LearnerAnswerInfoCardModule} from 'components/shared_parts/learner-answer-info-card.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {NewCorrectnessFooterModule} from 'components/shared_parts/new-correctness-footer.module';
 import {SupplementalCardModule} from 'components/shared_parts/supplemental-card.module';
 
@@ -39,7 +39,7 @@ import {SupplementalCardModule} from 'components/shared_parts/supplemental-card.
     CheckpointCelebrationFooterModule,
     ConversationDisplayModule,
     LearnerAnswerInfoCardModule,
-    MaterialModule,
+    MatButtonModule,
     NewCorrectnessFooterModule,
     SupplementalCardModule,
   ],

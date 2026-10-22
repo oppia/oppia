@@ -21,8 +21,9 @@ import {NgModule} from '@angular/core';
 import {ExplorationSummaryTileComponent} from '../summary-tile/exploration-summary-tile.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {SummarizeNonnegativeNumberPipeModule} from 'components/shared_parts/summarize-nonnegative-number-pipe.module';
 
@@ -30,8 +31,9 @@ import {SummarizeNonnegativeNumberPipeModule} from 'components/shared_parts/summ
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
-    NgbModule,
+    MatButtonModule,
+    MatCardModule,
+    NgbTooltipModule,
     StringUtilityPipesModule,
     SummarizeNonnegativeNumberPipeModule,
   ],

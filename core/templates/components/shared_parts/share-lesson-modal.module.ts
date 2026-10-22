@@ -21,11 +21,11 @@ import {NgModule} from '@angular/core';
 import {ShareLessonModalComponent} from '../../pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule, NgbModule],
+  imports: [CommonModule, TranslateModule, MatButtonModule, MatIconModule],
   declarations: [ShareLessonModalComponent],
   exports: [ShareLessonModalComponent],
 })

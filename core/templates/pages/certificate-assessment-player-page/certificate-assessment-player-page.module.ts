@@ -33,12 +33,12 @@ import {InteractionExtensionsModule} from 'interactions/interactions.module';
 
 import {BaseModule} from 'base-components/base.module';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 @NgModule({
   imports: [
     RichTextComponentsModule,
-    MaterialModule,
+    MatProgressSpinnerModule,
     DynamicContentModule,
     BaseModule,
     CommonModule,

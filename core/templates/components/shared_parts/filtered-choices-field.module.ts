@@ -22,10 +22,19 @@ import {FilteredChoicesFieldComponent} from '../filter-fields/filtered-choices-f
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, FormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
+  ],
   declarations: [FilteredChoicesFieldComponent],
   exports: [FilteredChoicesFieldComponent],
 })

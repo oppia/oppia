@@ -23,8 +23,8 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {AddOrUpdateSolutionModalModule} from 'components/shared_parts/add-or-update-solution-modal.module';
 import {DeleteSolutionModalModule} from 'components/shared_parts/delete-solution-modal.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatCardModule} from '@angular/material/card';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
 import {SolutionEditorModule} from 'components/shared_parts/solution-editor.module';
 
@@ -34,8 +34,9 @@ import {SolutionEditorModule} from 'components/shared_parts/solution-editor.modu
     TranslateModule,
     AddOrUpdateSolutionModalModule,
     DeleteSolutionModalModule,
-    MaterialModule,
-    NgbModule,
+    MatCardModule,
+    NgbModalModule,
+    NgbTooltipModule,
     ResponseHeaderModule,
     SolutionEditorModule,
   ],

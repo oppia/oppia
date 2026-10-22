@@ -51,8 +51,9 @@ import {RteHelperService} from 'services/rte-helper.service';
 import {BaseModule} from 'base-components/base.module';
 import {LazyLoadingModule} from 'components/shared_parts/lazy-loading.module';
 import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionSuggestionEditorModalModule} from 'components/shared_parts/question-suggestion-editor-modal.module';
 import {QuestionSuggestionReviewModalModule} from 'components/shared_parts/question-suggestion-review-modal.module';
 import {QuestionsOpportunitiesSelectDifficultyModalModule} from 'components/shared_parts/questions-opportunities-select-difficulty-modal.module';
@@ -72,8 +73,9 @@ import {UndoSnackbarModule} from 'components/shared_parts/undo-snackbar.module';
     QuestionsOpportunitiesSelectDifficultyModalModule,
     QuestionSuggestionReviewModalModule,
     QuestionSuggestionEditorModalModule,
-    NgbModule,
-    MaterialModule,
+    NgbPopoverModule,
+    MatButtonModule,
+    MatCardModule,
     LazyLoadingModule,
     BaseModule,
     CommonModule,

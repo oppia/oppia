@@ -30,9 +30,16 @@ import {PostCertificateOfferingResultModalComponent} from './post-certificate-of
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 import {FormsModule} from '@angular/forms';
 
-import {MaterialModule} from 'modules/material.module';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
-  imports: [MaterialModule, CommonModule, FormsModule, TranslateModule],
+  imports: [
+    MatIconModule,
+    MatProgressSpinnerModule,
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+  ],
   declarations: [
     CertificateOfferingDetailsComponent,
     CertificateOfferingProgressComponent,

@@ -18,7 +18,7 @@
 
 import {NgModule} from '@angular/core';
 
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {PencilCodeEditor} from './directives/oppia-interactive-pencil-code-editor.component';
 import {PencilCodeResetConfirmation} from './directives/pencil-code-reset-confirmation.component';
 import {ResponePencilCodeEditor} from './directives/oppia-response-pencil-code-editor.component';
@@ -33,7 +33,7 @@ import {CommonModule} from '@angular/common';
     SharedPipesModule,
     StringUtilityPipesModule,
     CommonModule,
-    MaterialModule,
+    MatButtonModule,
     TranslateModule,
   ],
   declarations: [

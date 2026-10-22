@@ -18,14 +18,13 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {DonationBoxComponent} from './donation-box/donation-box.component';
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 
 @NgModule({
-  imports: [CommonModule, NgbModule, TranslateModule],
+  imports: [CommonModule, TranslateModule],
   declarations: [
     DonationBoxComponent,
     DonationBoxModalComponent,

@@ -21,10 +21,11 @@ import {NgModule} from '@angular/core';
 import {RuleTypeSelector} from '../state-directives/rule-editor/rule-type-selector.directive';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule],
+  imports: [CommonModule, TranslateModule, MatFormFieldModule, MatSelectModule],
   declarations: [RuleTypeSelector],
   exports: [RuleTypeSelector],
 })

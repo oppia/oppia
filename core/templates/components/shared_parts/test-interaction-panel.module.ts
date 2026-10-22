@@ -22,14 +22,16 @@ import {TestInteractionPanel} from '../../pages/exploration-editor-page/editor-t
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
     DynamicContentModule,
-    MaterialModule,
+    MatButtonModule,
+    MatCardModule,
   ],
   declarations: [TestInteractionPanel],
   exports: [TestInteractionPanel],

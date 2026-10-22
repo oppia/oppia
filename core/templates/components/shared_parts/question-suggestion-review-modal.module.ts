@@ -22,7 +22,7 @@ import {QuestionSuggestionReviewModalComponent} from '../../pages/contributor-da
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionEditorModule} from 'components/shared_parts/question-editor.module';
 import {QuestionSuggestionEditorModalModule} from 'components/shared_parts/question-suggestion-editor-modal.module';
 
@@ -31,7 +31,8 @@ import {QuestionSuggestionEditorModalModule} from 'components/shared_parts/quest
     CommonModule,
     TranslateModule,
     FormsModule,
-    NgbModule,
+    NgbModalModule,
+    NgbTooltipModule,
     QuestionEditorModule,
     QuestionSuggestionEditorModalModule,
   ],

@@ -21,14 +21,14 @@ import {NgModule} from '@angular/core';
 import {StateSkillEditorComponent} from '../state-editor/state-skill-editor/state-skill-editor.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {SelectSkillModalModule} from 'components/shared_parts/select-skill-modal.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
+    MatCardModule,
     SelectSkillModalModule,
   ],
   declarations: [StateSkillEditorComponent],

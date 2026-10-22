@@ -25,7 +25,7 @@ import {AddHintModalModule} from 'components/shared_parts/add-hint-modal.module'
 import {DeleteHintModalModule} from 'components/shared_parts/delete-hint-modal.module';
 import {DeleteLastHintModalModule} from 'components/shared_parts/delete-last-hint-modal.module';
 import {HintEditorModule} from 'components/shared_parts/hint-editor.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
 
 @NgModule({
@@ -36,7 +36,7 @@ import {ResponseHeaderModule} from 'components/shared_parts/response-header.modu
     DeleteHintModalModule,
     DeleteLastHintModalModule,
     HintEditorModule,
-    MaterialModule,
+    MatCardModule,
     ResponseHeaderModule,
   ],
   declarations: [StateHintsEditorComponent],

@@ -42,8 +42,13 @@ import {CommonElementsModule} from 'components/common-layout-directives/common-e
 import {CommonModule} from '@angular/common';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {PreviewThumbnailModule} from 'components/shared_parts/preview-thumbnail.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SavePendingChangesModalModule} from 'components/shared_parts/save-pending-changes-modal.module';
@@ -65,8 +70,11 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     SavePendingChangesModalModule,
     RichTextComponentsModule,
     PreviewThumbnailModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatCardModule,
+    MatTooltipModule,
     FormsModule,
     DirectivesModule,
     CommonModule,

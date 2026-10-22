@@ -25,16 +25,16 @@ import {LearnerGroupOverviewComponent} from './edit-group/learner-group-overview
 import {LearnerGroupLearnerSpecificProgressComponent} from './edit-group/learner-group-learner-specific-progress.component';
 
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     StringUtilityPipesModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    MatExpansionModule,
     FormsModule,
     CommonModule,
   ],

@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
 import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
 import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
 import {ProgressBarModule} from 'components/shared_parts/progress-bar.module';
@@ -37,7 +37,7 @@ import {SkillMasteryModalModule} from 'components/shared_parts/skill-mastery-mod
     TranslateModule,
     AttributionGuideModule,
     ConversationSkinModule,
-    MaterialModule,
+    MatTooltipModule,
     NewConversationSkinModule,
     PlayerHeaderModule,
     ProgressBarModule,

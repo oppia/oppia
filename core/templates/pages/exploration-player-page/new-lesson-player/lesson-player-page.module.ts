@@ -21,7 +21,8 @@ import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {NewLessonPlayerPageComponent} from './lesson-player-page.component';
 import {NewLessonPlayerPageRoutingModule} from './lesson-player-page-routing.module';
 import {NewLessonPlayerPageRootComponent} from './lesson-player-page-root.component';
@@ -57,7 +58,7 @@ import {TakeBreakModalModule} from 'components/shared_parts/take-break-modal.mod
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
 import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
 import {PlayerHeaderModule} from 'components/shared_parts/player-header.module';
 import {ShareLessonModalModule} from 'components/shared_parts/share-lesson-modal.module';
@@ -73,7 +74,7 @@ import {TranslateModule} from '@ngx-translate/core';
     ShareLessonModalModule,
     PlayerHeaderModule,
     OnScreenKeyboardModule,
-    NgbModule,
+    NgbTooltipModule,
     NewConversationSkinModule,
     KeyboardShortcutHelpModalModule,
     FormsModule,
@@ -92,7 +93,8 @@ import {TranslateModule} from '@ngx-translate/core';
     MatButtonModule,
     MatBottomSheetModule,
     NgbModalModule,
-    MaterialModule,
+    MatProgressBarModule,
+    MatTooltipModule,
     NgbPopoverModule,
     ToastrModule,
     MatBottomSheetModule,

@@ -22,7 +22,6 @@ import {AddAnswerGroupModalComponent} from '../../pages/exploration-editor-page/
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {OutcomeDestinationEditorModule} from 'components/shared_parts/outcome-destination-editor.module';
 import {OutcomeFeedbackEditorModule} from 'components/shared_parts/outcome-feedback-editor.module';
 import {OutcomeIfStuckDestinationEditorModule} from 'components/shared_parts/outcome-if-stuck-destination-editor.module';
@@ -34,7 +33,6 @@ import {RuleEditorModule} from 'components/shared_parts/rule-editor.module';
     CommonModule,
     TranslateModule,
     FormsModule,
-    NgbModule,
     OutcomeDestinationEditorModule,
     OutcomeFeedbackEditorModule,
     OutcomeIfStuckDestinationEditorModule,

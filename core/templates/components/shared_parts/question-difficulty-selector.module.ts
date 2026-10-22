@@ -22,7 +22,8 @@ import {QuestionDifficultySelectorComponent} from '../question-difficulty-select
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatListModule} from '@angular/material/list';
+import {MatRadioModule} from '@angular/material/radio';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
@@ -30,7 +31,8 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     CommonModule,
     TranslateModule,
     FormsModule,
-    MaterialModule,
+    MatListModule,
+    MatRadioModule,
     RichTextComponentsModule,
   ],
   declarations: [QuestionDifficultySelectorComponent],

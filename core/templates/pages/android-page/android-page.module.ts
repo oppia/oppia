@@ -27,14 +27,12 @@ import {I18nModule} from 'i18n/i18n.module';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
     TranslateModule,
     CommonModule,
     HttpClientModule,

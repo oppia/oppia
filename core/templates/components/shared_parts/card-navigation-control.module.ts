@@ -21,14 +21,14 @@ import {NgModule} from '@angular/core';
 import {CardNavigationControlComponent} from '../../pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {ProgressTrackerModule} from 'components/shared_parts/progress-tracker.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
+    MatButtonModule,
     ProgressTrackerModule,
   ],
   declarations: [CardNavigationControlComponent],

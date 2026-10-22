@@ -22,7 +22,7 @@ import {DisplaySolutionModalComponent} from '../../pages/exploration-player-page
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
@@ -30,7 +30,7 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     CommonModule,
     TranslateModule,
     DynamicContentModule,
-    MaterialModule,
+    MatButtonModule,
     RichTextComponentsModule,
   ],
   declarations: [DisplaySolutionModalComponent],

@@ -48,14 +48,26 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
 import {RouterModule} from '@angular/router';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
     SharedFormsModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatDividerModule,
+    MatListModule,
+    MatSelectModule,
+    MatSlideToggleModule,
     BaseModule,
     CommonModule,
     ClipboardModule,

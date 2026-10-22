@@ -21,14 +21,14 @@ import {NgModule} from '@angular/core';
 import {CollectionSummaryTileComponent} from '../summary-tile/collection-summary-tile.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
+    MatCardModule,
     StringUtilityPipesModule,
   ],
   declarations: [CollectionSummaryTileComponent],

@@ -22,10 +22,17 @@ import {ExplorationTitleEditorComponent} from '../../pages/exploration-editor-pa
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, FormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
   declarations: [ExplorationTitleEditorComponent],
   exports: [ExplorationTitleEditorComponent],
 })

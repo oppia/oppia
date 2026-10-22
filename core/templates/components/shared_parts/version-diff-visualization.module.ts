@@ -22,7 +22,7 @@ import {VersionDiffVisualizationComponent} from '../version-diff-visualization/v
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {StateGraphVisualizationModule} from 'components/shared_parts/state-graph-visualization.module';
 
 @NgModule({
@@ -30,7 +30,7 @@ import {StateGraphVisualizationModule} from 'components/shared_parts/state-graph
     CommonModule,
     TranslateModule,
     CommonElementsModule,
-    MaterialModule,
+    MatCardModule,
     StateGraphVisualizationModule,
   ],
   declarations: [VersionDiffVisualizationComponent],

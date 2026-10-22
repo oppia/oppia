@@ -22,10 +22,23 @@ import {PracticeTabComponent} from '../../pages/topic-viewer-page/deprecations/p
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, FormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+  ],
   declarations: [PracticeTabComponent],
   exports: [PracticeTabComponent],
 })

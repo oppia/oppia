@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
 @NgModule({
@@ -32,7 +32,7 @@ import {SharedFormsModule} from 'components/forms/shared-forms.module';
     TranslateModule,
     DynamicContentModule,
     FormsModule,
-    MaterialModule,
+    MatButtonModule,
     SharedFormsModule,
   ],
   declarations: [AddOrUpdateSolutionModalComponent],

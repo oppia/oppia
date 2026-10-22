@@ -23,8 +23,8 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
 import {FeedbackPopupModule} from 'components/shared_parts/feedback-popup.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {RatingDisplayModule} from 'components/shared_parts/rating-display.module';
 import {RecommendationsModule} from 'components/recommendations/recommendations.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -35,8 +35,8 @@ import {SharedPipesModule} from 'filters/shared-pipes.module';
     TranslateModule,
     ExplorationSummaryTileModule,
     FeedbackPopupModule,
-    MaterialModule,
-    NgbModule,
+    MatButtonModule,
+    NgbPopoverModule,
     RatingDisplayModule,
     RecommendationsModule,
     SharedPipesModule,

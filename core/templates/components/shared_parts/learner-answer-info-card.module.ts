@@ -22,10 +22,10 @@ import {LearnerAnswerInfoCard} from '../../pages/exploration-player-page/current
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, FormsModule, MaterialModule],
+  imports: [CommonModule, TranslateModule, FormsModule, MatButtonModule],
   declarations: [LearnerAnswerInfoCard],
   exports: [LearnerAnswerInfoCard],
 })

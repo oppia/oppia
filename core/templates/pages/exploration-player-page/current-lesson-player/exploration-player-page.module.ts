@@ -26,7 +26,6 @@ import {LearnerLocalNavComponent} from './layout-directives/learner-local-nav.co
 import {FlagExplorationModalComponent} from './modals/flag-exploration-modal.component';
 import {ExplorationSuccessfullyFlaggedModalComponent} from './modals/exploration-successfully-flagged-modal.component';
 import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.component';
-import {MaterialModule} from 'modules/material.module';
 import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
@@ -58,7 +57,7 @@ import {DirectivesModule} from 'directives/directives.module';
 import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
 import {FeedbackPopupModule} from 'components/shared_parts/feedback-popup.module';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
@@ -66,7 +65,7 @@ import {TranslateModule} from '@ngx-translate/core';
     TranslateModule,
     TakeBreakModalModule,
     OnScreenKeyboardModule,
-    NgbModule,
+    NgbTooltipModule,
     KeyboardShortcutHelpModalModule,
     FormsModule,
     FeedbackPopupModule,
@@ -86,7 +85,6 @@ import {TranslateModule} from '@ngx-translate/core';
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
-    MaterialModule,
     NgbPopoverModule,
     ExplorationPlayerViewerCommonModule,
     ToastrModule,

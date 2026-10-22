@@ -21,11 +21,24 @@ import {NgModule} from '@angular/core';
 import {MultiSelectionFieldComponent} from '../filter-fields/multi-selection-field/multi-selection-field.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule,
+    ReactiveFormsModule,
+  ],
   declarations: [MultiSelectionFieldComponent],
   exports: [MultiSelectionFieldComponent],
 })

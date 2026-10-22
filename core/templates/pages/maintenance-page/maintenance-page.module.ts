@@ -27,7 +27,7 @@ import {CommonModule} from '@angular/common';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
@@ -35,7 +35,7 @@ import {TranslateModule} from '@ngx-translate/core';
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
+    MatCardModule,
     TranslateModule,
     CommonModule,
     RouterModule.forRoot([]),

@@ -27,13 +27,11 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
 
 @NgModule({
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
     TranslateModule,
     CommonModule,
     SharedPipesModule,

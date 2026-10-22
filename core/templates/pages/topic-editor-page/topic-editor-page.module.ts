@@ -87,8 +87,18 @@ import {QuestionsListSelectSkillAndDifficultyModalModule} from 'components/share
 import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatListModule} from '@angular/material/list';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
 import {PreviewThumbnailModule} from 'components/shared_parts/preview-thumbnail.module';
 import {QuestionsListModule} from 'components/shared_parts/questions-list.module';
@@ -114,8 +124,16 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     QuestionsListModule,
     PreviewThumbnailModule,
     PracticeTabModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatTooltipModule,
     DragDropModule,
     FormsModule,
     DirectivesModule,

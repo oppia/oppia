@@ -22,26 +22,24 @@ import {LibraryPageRootComponent} from './library-page-root.component';
 import {LibraryPageComponent} from './library-page.component';
 import {CommonModule} from '@angular/common';
 import {LibraryPageRoutingModule} from './library-page-routing.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomCardComponent} from './classroom-card/classroom-card.component';
 
 import {BaseModule} from 'base-components/base.module';
 import {CollectionSummaryTileModule} from 'components/shared_parts/collection-summary-tile.module';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
 import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    MaterialModule,
+    MatButtonModule,
     KeyboardShortcutHelpModalModule,
     ExplorationSummaryTileModule,
     CollectionSummaryTileModule,
     BaseModule,
     CommonModule,
     LibraryPageRoutingModule,
-    NgbModule,
   ],
   declarations: [
     LibraryFooterComponent,

@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {ContinueButtonModule} from 'components/shared_parts/continue-button.module';
 import {DirectivesModule} from 'directives/directives.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   imports: [
@@ -31,7 +31,7 @@ import {MaterialModule} from 'modules/material.module';
     TranslateModule,
     ContinueButtonModule,
     DirectivesModule,
-    MaterialModule,
+    MatButtonModule,
   ],
   declarations: [ProgressNavComponent],
   exports: [ProgressNavComponent],

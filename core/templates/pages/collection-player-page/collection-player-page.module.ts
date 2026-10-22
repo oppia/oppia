@@ -30,24 +30,24 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 
 import {CommonModule} from '@angular/common';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {TranslateModule} from '@ngx-translate/core';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 
 import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
 import {BaseModule} from 'base-components/base.module';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 @NgModule({
   imports: [
     SharingLinksModule,
-    NgbModule,
+    NgbTooltipModule,
     ExplorationSummaryTileModule,
     BaseModule,
     AttributionGuideModule,
     CommonModule,
-    MaterialModule,
+    MatCardModule,
     TranslateModule,
     BackgroundBannerModule,
     ToastrModule.forRoot(toastrConfig),

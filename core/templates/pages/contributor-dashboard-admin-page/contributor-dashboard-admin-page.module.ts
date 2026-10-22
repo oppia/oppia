@@ -40,12 +40,33 @@ import {TranslationConfigurationTabComponent} from './translation-configuration-
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatListModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
     CommonElementsModule,
     BaseModule,
     BackgroundBannerModule,

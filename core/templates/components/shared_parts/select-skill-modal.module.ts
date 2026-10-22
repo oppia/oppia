@@ -21,11 +21,16 @@ import {NgModule} from '@angular/core';
 import {SelectSkillModalComponent} from '../skill-selector/select-skill-modal.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {SkillSelectorModule} from 'components/shared_parts/skill-selector.module';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule, SkillSelectorModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    MatTooltipModule,
+    SkillSelectorModule,
+  ],
   declarations: [SelectSkillModalComponent],
   exports: [SelectSkillModalComponent],
 })

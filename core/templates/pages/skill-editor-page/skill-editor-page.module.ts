@@ -52,8 +52,12 @@ import {StaleTabInfoModalModule} from 'components/shared_parts/stale-tab-info-mo
 import {UnsavedChangesStatusInfoModalModule} from 'components/shared_parts/unsaved-changes-status-info-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatCardModule} from '@angular/material/card';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionsListModule} from 'components/shared_parts/questions-list.module';
 import {ReviewMaterialEditorModule} from 'components/shared_parts/review-material-editor.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
@@ -80,8 +84,10 @@ import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
     RichTextComponentsModule,
     ReviewMaterialEditorModule,
     QuestionsListModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatCardModule,
     FormsModule,
     DirectivesModule,
     ConfirmQuestionExitModalModule,

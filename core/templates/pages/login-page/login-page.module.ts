@@ -30,12 +30,12 @@ import {CommonModule} from '@angular/common';
 import {LoginPageRoutingModule} from './login-page-routing.module';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatSelectModule} from '@angular/material/select';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    MaterialModule,
+    MatSelectModule,
     BaseModule,
     CommonModule,
     MatAutocompleteModule,

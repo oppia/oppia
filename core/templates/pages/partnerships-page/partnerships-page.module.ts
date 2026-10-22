@@ -26,14 +26,18 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatExpansionModule} from '@angular/material/expansion';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
+    MatCardModule,
+    MatDividerModule,
+    MatExpansionModule,
     TranslateModule,
     CommonModule,
     PartnershipsPageRoutingModule,

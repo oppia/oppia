@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   imports: [
@@ -31,7 +31,7 @@ import {MaterialModule} from 'modules/material.module';
     TranslateModule,
     DirectivesModule,
     FormsModule,
-    MaterialModule,
+    MatButtonModule,
   ],
   declarations: [FeedbackPopupComponent],
   exports: [FeedbackPopupComponent],

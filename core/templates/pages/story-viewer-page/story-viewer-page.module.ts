@@ -27,12 +27,12 @@ import {StoryViewerPageRoutingModule} from './story-viewer-page-routing.module';
 import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    MaterialModule,
+    MatButtonModule,
     BaseModule,
     BackgroundBannerModule,
     AttributionGuideModule,

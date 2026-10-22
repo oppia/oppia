@@ -26,12 +26,12 @@ import {SignupPageRoutingModule} from './signup-page-routing.module';
 
 import {BaseModule} from 'base-components/base.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    MaterialModule,
+    MatCardModule,
     FormsModule,
     BaseModule,
     CommonModule,

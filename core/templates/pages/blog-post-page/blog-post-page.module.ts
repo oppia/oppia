@@ -22,7 +22,6 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {FormsModule} from '@angular/forms';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {BlogPostPageRootComponent} from './blog-post-page-root.component';
 import {BlogPostPageComponent} from './blog-post-page.component';
@@ -34,20 +33,21 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
 import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-display-components.module';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 @NgModule({
   imports: [
     SharingLinksModule,
     RichTextComponentsModule,
-    MaterialModule,
+    MatButtonModule,
+    MatCardModule,
     BaseModule,
     CommonModule,
     InfiniteScrollModule,
     BlogPostPageRoutingModule,
     FormsModule,
-    NgbModule,
     MatMenuModule,
     StringUtilityPipesModule,
     TranslateModule,

@@ -21,13 +21,12 @@ import {TeachPageComponent} from './teach-page.component';
 import {TeachPageRootComponent} from './teach-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TeachPageRoutingModule} from './teach-page-routing.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
-import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
@@ -35,11 +34,10 @@ import {TranslateModule} from '@ngx-translate/core';
     BaseModule,
     BackgroundBannerModule,
     FullExpandAccordionModule,
-    MaterialModule,
     TranslateModule,
     CommonModule,
     TeachPageRoutingModule,
-    NgbModule,
+    NgbCarouselModule,
     CampaignBannerModule,
   ],
   declarations: [TeachPageComponent, TeachPageRootComponent],

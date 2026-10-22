@@ -33,14 +33,14 @@ import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
 import {DirectivesModule} from 'directives/directives.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     PracticeTabModule,
-    MaterialModule,
+    MatCardModule,
     DirectivesModule,
     BaseModule,
     BackgroundBannerModule,

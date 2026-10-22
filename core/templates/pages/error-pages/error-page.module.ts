@@ -27,14 +27,12 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
     TranslateModule,
     CommonModule,
     RouterModule.forChild([

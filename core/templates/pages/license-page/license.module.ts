@@ -24,14 +24,12 @@ import {NgModule} from '@angular/core';
 
 import {BaseModule} from 'base-components/base.module';
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
-import {MaterialModule} from 'modules/material.module';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     BaseModule,
     BackgroundBannerModule,
-    MaterialModule,
     CommonModule,
     LicensePageRoutingModule,
     TranslateModule,

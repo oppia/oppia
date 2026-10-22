@@ -25,14 +25,14 @@ import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.c
 import {BlogDashboardNavbarBreadcrumbComponent} from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
 import {BlogPostEditorNavbarPreLogoActionComponent} from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 import {CommonModule} from '@angular/common';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
+    MatCardModule,
     RichTextComponentsModule,
     TranslateModule,
   ],

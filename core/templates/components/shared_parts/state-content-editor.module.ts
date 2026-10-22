@@ -21,8 +21,7 @@ import {NgModule} from '@angular/core';
 import {StateContentEditorComponent} from '../state-editor/state-content-editor/state-content-editor.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
@@ -30,8 +29,7 @@ import {SharedFormsModule} from 'components/forms/shared-forms.module';
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
-    NgbModule,
+    NgbTooltipModule,
     RichTextComponentsModule,
     SharedFormsModule,
   ],

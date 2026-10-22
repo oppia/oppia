@@ -25,8 +25,7 @@ import {AddAnswerGroupModalModule} from 'components/shared_parts/add-answer-grou
 import {AnswerGroupEditorModule} from 'components/shared_parts/answer-group-editor.module';
 import {DeleteAnswerGroupModalModule} from 'components/shared_parts/delete-answer-group-modal.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
 
 @NgModule({
@@ -37,8 +36,8 @@ import {ResponseHeaderModule} from 'components/shared_parts/response-header.modu
     AnswerGroupEditorModule,
     DeleteAnswerGroupModalModule,
     FormsModule,
-    MaterialModule,
-    NgbModule,
+    NgbModalModule,
+    NgbTooltipModule,
     ResponseHeaderModule,
   ],
   declarations: [StateResponsesComponent],

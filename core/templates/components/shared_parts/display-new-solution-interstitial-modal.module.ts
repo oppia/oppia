@@ -21,10 +21,10 @@ import {NgModule} from '@angular/core';
 import {DisplayNewSolutionInterstititalModalComponent} from '../../pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule],
+  imports: [CommonModule, TranslateModule, MatButtonModule],
   declarations: [DisplayNewSolutionInterstititalModalComponent],
   exports: [DisplayNewSolutionInterstititalModalComponent],
 })

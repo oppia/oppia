@@ -24,12 +24,12 @@ import {DeleteCertificateOfferingModalComponent} from 'components/certificate-as
 
 import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
     RouterModule,
-    MaterialModule,
+    MatProgressSpinnerModule,
     BaseModule,
     BackgroundBannerModule,
     CommonModule,

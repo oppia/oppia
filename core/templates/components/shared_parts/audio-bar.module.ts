@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
 @NgModule({
@@ -32,7 +32,7 @@ import {SharedFormsModule} from 'components/forms/shared-forms.module';
     TranslateModule,
     DirectivesModule,
     FormsModule,
-    NgbModule,
+    NgbTooltipModule,
     SharedFormsModule,
   ],
   declarations: [AudioBarComponent],

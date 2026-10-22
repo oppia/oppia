@@ -21,7 +21,7 @@ import {InfiniteScrollModule} from 'ngx-infinite-scroll';
 import {FormsModule} from '@angular/forms';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbPaginationModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {BlogHomePageRootComponent} from './blog-home-page-root.component';
 import {BlogHomePageComponent} from './blog-home-page.component';
@@ -33,16 +33,18 @@ import {BlogDisplayComponentsModule} from 'pages/blog-dashboard-page/blog-displa
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
   imports: [
-    MaterialModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
     BaseModule,
     CommonModule,
     InfiniteScrollModule,
     BlogHomePageRoutingModule,
     FormsModule,
-    NgbModule,
+    NgbPaginationModule,
     StringUtilityPipesModule,
     TranslateModule,
     ReactiveFormsModule,

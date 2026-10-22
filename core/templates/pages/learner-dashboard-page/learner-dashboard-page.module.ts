@@ -58,8 +58,16 @@ import {ContributorDashboardPageModule} from 'pages/contributor-dashboard-page/c
 import {DirectivesModule} from 'directives/directives.module';
 import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatRadioModule} from '@angular/material/radio';
+import {
+  NgbModalModule,
+  NgbPopoverModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
@@ -68,8 +76,14 @@ import {TranslateModule} from '@ngx-translate/core';
     TranslateModule,
     StringUtilityPipesModule,
     PracticeTabModule,
-    NgbModule,
-    MaterialModule,
+    NgbModalModule,
+    NgbPopoverModule,
+    NgbTooltipModule,
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatExpansionModule,
+    MatRadioModule,
     FormsModule,
     ExplorationSummaryTileModule,
     DirectivesModule,

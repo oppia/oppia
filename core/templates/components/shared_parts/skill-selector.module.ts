@@ -22,10 +22,19 @@ import {SkillSelectorComponent} from '../skill-selector/skill-selector.component
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatRadioModule} from '@angular/material/radio';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, FormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatRadioModule,
+  ],
   declarations: [SkillSelectorComponent],
   exports: [SkillSelectorComponent],
 })

@@ -38,12 +38,27 @@ import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-or
 
 import {BaseModule} from 'base-components/base.module';
 import {ImageUploaderModule} from 'components/shared_parts/image-uploader.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
     ImageUploaderModule,
     BaseModule,
     FormsModule,

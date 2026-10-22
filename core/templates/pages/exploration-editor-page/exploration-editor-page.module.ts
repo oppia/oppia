@@ -84,7 +84,11 @@ import {StateVersionHistoryComponent} from './editor-tab/state-version-history/s
 import {ExplorationEditorPageRootComponent} from './exploration-editor-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
@@ -209,7 +213,16 @@ import {DynamicContentModule} from 'components/interaction-display/dynamic-conte
 import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
 import {ExplorationObjectiveEditorModule} from 'components/shared_parts/exploration-objective-editor.module';
 import {ExplorationTitleEditorModule} from 'components/shared_parts/exploration-title-editor.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {NewConversationSkinModule} from 'components/shared_parts/new-conversation-skin.module';
 import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
 import {OppiaVisualizationSortedTilesModule} from 'components/shared_parts/oppia-visualization-sorted-tiles.module';
@@ -254,7 +267,16 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
     OppiaVisualizationClickHexbinsDirectiveModule,
     OnScreenKeyboardModule,
     NewConversationSkinModule,
-    MaterialModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatTooltipModule,
+    NgxMatSelectSearchModule,
     LostChangesModalModule,
     ExplorationTitleEditorModule,
     ExplorationSaveModalModule,
@@ -289,7 +311,9 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
         canActivate: [ExplorationEditorPageAuthGuard],
       },
     ]),
-    NgbModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
     InteractionExtensionsModule,
     MatAutocompleteModule,
     ReactiveFormsModule,

@@ -24,7 +24,11 @@ import {TranslateModule} from '@ngx-translate/core';
 import {ConfirmLeaveModalModule} from 'components/shared_parts/confirm-leave-modal.module';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModalModule,
+  NgbNavModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
 @NgModule({
@@ -34,7 +38,9 @@ import {SharedFormsModule} from 'components/forms/shared-forms.module';
     ConfirmLeaveModalModule,
     DirectivesModule,
     FormsModule,
-    NgbModule,
+    NgbModalModule,
+    NgbNavModule,
+    NgbPopoverModule,
     SharedFormsModule,
   ],
   declarations: [CustomizeInteractionModalComponent],

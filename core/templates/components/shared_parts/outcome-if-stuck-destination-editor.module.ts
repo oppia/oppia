@@ -23,7 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DirectivesModule} from 'directives/directives.module';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -31,7 +31,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     TranslateModule,
     DirectivesModule,
     FormsModule,
-    NgbModule,
+    NgbTooltipModule,
   ],
   declarations: [OutcomeIfStuckDestinationEditorComponent],
   exports: [OutcomeIfStuckDestinationEditorComponent],

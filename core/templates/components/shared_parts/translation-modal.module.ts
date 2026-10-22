@@ -24,7 +24,6 @@ import {TranslateModule} from '@ngx-translate/core';
 import {ConfirmFormulaAsTextModalModule} from 'components/shared_parts/confirm-formula-as-text-modal.module';
 import {ConfirmTranslationExitModalModule} from 'components/shared_parts/confirm-translation-exit-modal.module';
 import {LazyLoadingModule} from 'components/shared_parts/lazy-loading.module';
-import {MaterialModule} from 'modules/material.module';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
@@ -38,7 +37,6 @@ import {TranslationModalUneditedConfirmationModalModule} from 'components/shared
     ConfirmFormulaAsTextModalModule,
     ConfirmTranslationExitModalModule,
     LazyLoadingModule,
-    MaterialModule,
     OppiaCkEditorCopyToolBarModule,
     RichTextComponentsModule,
     SharedFormsModule,

@@ -19,12 +19,13 @@ import 'zone.js';
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {InteractiveImageClickInput} from './directives/oppia-interactive-image-click-input.component';
 import {ResponseImageClickInput} from './directives/oppia-response-image-click-input.component';
 import {ShortResponseImageClickInput} from './directives/oppia-short-response-image-click-input.component';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, MatButtonModule],
   declarations: [
     InteractiveImageClickInput,
     ResponseImageClickInput,

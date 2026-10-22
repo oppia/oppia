@@ -49,9 +49,9 @@ import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.mod
 import {DirectivesModule} from 'directives/directives.module';
 import {FilteredChoicesFieldModule} from 'components/shared_parts/filtered-choices-field.module';
 import {ImageUploaderModule} from 'components/shared_parts/image-uploader.module';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {MultiSelectionFieldModule} from 'components/shared_parts/multi-selection-field.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SkillSelectorModule} from 'components/shared_parts/skill-selector.module';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbModule} from 'components/shared_parts/topics-and-skills-dashboard-navbar-breadcrumb.module';
 import {TranslateModule} from '@ngx-translate/core';
@@ -63,9 +63,10 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     TopicsAndSkillsDashboardNavbarBreadcrumbModule,
     SkillSelectorModule,
     RteHelperModalModule,
-    NgbModule,
+    NgbModalModule,
+    NgbTooltipModule,
     MultiSelectionFieldModule,
-    MaterialModule,
+    MatCardModule,
     ImageUploaderModule,
     FilteredChoicesFieldModule,
     DirectivesModule,

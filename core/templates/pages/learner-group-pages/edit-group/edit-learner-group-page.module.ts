@@ -40,12 +40,13 @@ import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shar
 
 import {BaseModule} from 'base-components/base.module';
 import {FormsModule} from '@angular/forms';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
-    NgbModule,
+    NgbDropdownModule,
+    NgbModalModule,
     FormsModule,
     BaseModule,
     CommonModule,

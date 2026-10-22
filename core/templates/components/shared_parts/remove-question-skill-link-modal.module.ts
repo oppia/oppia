@@ -21,10 +21,10 @@ import {NgModule} from '@angular/core';
 import {RemoveQuestionSkillLinkModalComponent} from '../question-directives/modal-templates/remove-question-skill-link-modal.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule],
+  imports: [CommonModule, TranslateModule, MatProgressSpinnerModule],
   declarations: [RemoveQuestionSkillLinkModalComponent],
   exports: [RemoveQuestionSkillLinkModalComponent],
 })

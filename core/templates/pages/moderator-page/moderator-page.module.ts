@@ -27,12 +27,10 @@ import {ModeratorPageRootComponent} from './moderator-page-root.component';
 import {ModeratorAuthGuard} from './moderator-auth.guard';
 
 import {BaseModule} from 'base-components/base.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
     SharedFormsModule,
-    NgbModule,
     BaseModule,
     CommonModule,
     NgbNavModule,

@@ -21,7 +21,7 @@ import {NgModule} from '@angular/core';
 import {StateEditorComponent} from '../state-editor/state-editor.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatCardModule} from '@angular/material/card';
 import {StateContentEditorModule} from 'components/shared_parts/state-content-editor.module';
 import {StateHintsEditorModule} from 'components/shared_parts/state-hints-editor.module';
 import {StateInteractionEditorModule} from 'components/shared_parts/state-interaction-editor.module';
@@ -33,7 +33,7 @@ import {StateSolutionEditorModule} from 'components/shared_parts/state-solution-
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
+    MatCardModule,
     StateContentEditorModule,
     StateHintsEditorModule,
     StateInteractionEditorModule,

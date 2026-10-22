@@ -18,12 +18,12 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {FullExpandAccordionComponent} from './full-expand-accordion.component';
 
 @NgModule({
-  imports: [CommonModule, NgbModule, TranslateModule],
+  imports: [CommonModule, NgbCollapseModule, TranslateModule],
   declarations: [FullExpandAccordionComponent],
   exports: [FullExpandAccordionComponent],
 })

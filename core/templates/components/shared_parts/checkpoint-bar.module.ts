@@ -21,10 +21,10 @@ import {NgModule} from '@angular/core';
 import {CheckpointBarComponent} from '../checkpoint-bar/checkpoint-bar.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, MaterialModule],
+  imports: [CommonModule, TranslateModule, MatTooltipModule],
   declarations: [CheckpointBarComponent],
   exports: [CheckpointBarComponent],
 })

@@ -30,14 +30,12 @@ import {BlogAdminPageRootComponent} from './blog-admin-page-root.component';
 import {BlogAdminAuthGuard} from './blog-admin-auth.guard';
 
 import {BaseModule} from 'base-components/base.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
     SharedFormsModule,
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
     BaseModule,
     FormsModule,
     MatCardModule,

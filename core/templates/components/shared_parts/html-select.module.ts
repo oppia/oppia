@@ -21,14 +21,16 @@ import {NgModule} from '@angular/core';
 import {HtmlSelectComponent} from '../forms/custom-forms-directives/html-select.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
+    MatFormFieldModule,
+    MatSelectModule,
     RichTextComponentsModule,
   ],
   declarations: [HtmlSelectComponent],

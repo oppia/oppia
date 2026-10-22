@@ -40,12 +40,23 @@ import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voic
 
 import {BaseModule} from 'base-components/base.module';
 import {CommonModule} from '@angular/common';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTabsModule} from '@angular/material/tabs';
+import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
-    NgbModule,
-    MaterialModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    MatButtonModule,
+    MatListModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatTabsModule,
     CommonModule,
     BaseModule,
     FormsModule,

@@ -21,16 +21,16 @@ import {NgModule} from '@angular/core';
 import {AttributionGuideComponent} from '../common-layout-directives/common-elements/attribution-guide.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatButtonModule} from '@angular/material/button';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
-    MaterialModule,
-    NgbModule,
+    MatButtonModule,
+    NgbTooltipModule,
     SharingLinksModule,
   ],
   declarations: [AttributionGuideComponent],

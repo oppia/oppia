@@ -23,8 +23,8 @@ import {NgModule} from '@angular/core';
 import {SwitchContentLanguageRefreshRequiredModalComponent} from './modals/switch-content-language-refresh-required-modal.component';
 import {LessonInformationCardModalComponent} from './templates/lesson-information-card-modal.component';
 import {CopyUrlModule} from 'components/shared_parts/copy-url.module';
-import {MaterialModule} from 'modules/material.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatCardModule} from '@angular/material/card';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {ProfileLinkImageModule} from 'components/shared_parts/profile-link-image.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {SharingLinksModule} from 'components/shared_parts/sharing-links.module';
@@ -39,8 +39,8 @@ import {TranslateModule} from '@ngx-translate/core';
     SharingLinksModule,
     SharedPipesModule,
     ProfileLinkImageModule,
-    NgbModule,
-    MaterialModule,
+    NgbTooltipModule,
+    MatCardModule,
     CopyUrlModule,
     CommonModule,
   ],

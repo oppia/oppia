@@ -35,13 +35,19 @@ import {RteHelperService} from 'services/rte-helper.service';
 import {BaseModule} from 'base-components/base.module';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
 import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     TranslateModule,
     RteHelperModalModule,
-    MaterialModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDividerModule,
+    MatListModule,
     FormsModule,
     CommonModule,
     BaseModule,
