@@ -31,6 +31,8 @@ import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
+import {MatTabsModule} from '@angular/material/tabs';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {BlogCardComponent} from '../blog-card/blog-card.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -75,6 +77,8 @@ describe('Blog Card Preview Modal Component', () => {
         NgbModalModule,
         MatCardModule,
         MatIconModule,
+        MatTabsModule,
+        NoopAnimationsModule,
         RichTextComponentsModule,
       ],
       declarations: [
@@ -121,6 +125,7 @@ describe('Blog Card Preview Modal Component', () => {
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(expectedBlogPostSummary);
+    expect(component.publishedDateString).toBe('November 21, 2014');
   });
 
   it('should initialize correctly when blog post is published', () => {
@@ -145,5 +150,12 @@ describe('Blog Card Preview Modal Component', () => {
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(expectedBlogPostSummary);
+    expect(component.publishedDateString).toBe('November 21, 2014');
+  });
+
+  it('should format date string correctly', () => {
+    expect(component.getDateStringInWords('11/21/2014, 09:45:00')).toBe(
+      'November 21, 2014'
+    );
   });
 });

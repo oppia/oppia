@@ -1,14 +1,38 @@
 <button class="btn btn-secondary float-end e2e-test-close-preview-button" (click)="cancel()">
   <mat-icon>close</mat-icon>
 </button>
-<div class="oppia-thumbnail-picture-container">
-  <div class="my-5 mx-3">
-    <h3 class="e2e-test-modal-header">{{ 'I18N_BLOG_CARD_PREVIEW_HEADING' | translate }}</h3>
-    <h5 [innerHTML]="'I18N_BLOG_CARD_PREVIEW_CONTEXT' | translate: { link: blogHomePageLink }"></h5>
+<div class="oppia-blog-preview-container">
+  <div class="my-4 mx-3">
+    <h3 class="e2e-test-modal-header">{{ 'I18N_BLOG_PREVIEW_MODAL_HEADING' | translate }}</h3>
   </div>
 
-  <div class="modal-body oppia-blog-post-thumbnail">
-    <oppia-blog-card [blogPostSummary]="blogPostSummary">
-    </oppia-blog-card>
-  </div>
+  <mat-tab-group animationDuration="0ms" class="oppia-blog-preview-tabs">
+    <mat-tab label="{{ 'I18N_BLOG_POST_PREVIEW_TAB' | translate }}">
+      <div class="modal-body oppia-blog-post-full-preview e2e-test-blog-post-full-preview">
+        <h2 class="blog-post-preview-title">{{ blogPostData.title }}</h2>
+        <div class="blog-post-preview-meta mb-3">
+          <span class="blog-post-preview-author me-2">By {{ blogPostData.displayedAuthorName }}</span>
+          <span *ngIf="publishedDateString" class="blog-post-preview-date text-muted">{{ publishedDateString }}</span>
+        </div>
+        <div class="blog-post-preview-content mb-4">
+          <oppia-rte-output-display [rteString]="blogPostData.content" class="d-block">
+          </oppia-rte-output-display>
+        </div>
+        <div *ngIf="blogPostData.tags.length > 0" class="blog-post-preview-tags d-flex flex-wrap align-items-center">
+          <span class="fw-bold me-2">{{ 'I18N_BLOG_POST_PAGE_TAGS_HEADING' | translate }}:</span>
+          <span *ngFor="let tag of blogPostData.tags" class="blog-card-tag px-2 py-1 mx-1 my-1">
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="{{ 'I18N_BLOG_CARD_PREVIEW_TAB' | translate }}">
+      <div class="modal-body oppia-blog-post-thumbnail e2e-test-blog-card-preview">
+        <h5 class="my-3 mx-2" [innerHTML]="'I18N_BLOG_CARD_PREVIEW_CONTEXT' | translate: { link: blogHomePageLink }"></h5>
+        <oppia-blog-card [blogPostSummary]="blogPostSummary">
+        </oppia-blog-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>
