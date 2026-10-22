@@ -1092,7 +1092,6 @@ describe('Progress Tab Component', () => {
     ]);
   });
 
-
   it('should correctly calculate subtopic progress', () => {
     const mockSubtopics = component.partiallyLearntTopicsList[0].subtopics;
     const masteryWithValues = {1: 0.5};
