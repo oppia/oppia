@@ -11,7 +11,7 @@
               [ngClass]="{'btn-success': isSkillSaveable()}"
               (click)="saveChanges()"
               [disabled]="!isSkillSaveable()"
-              [style.pointerevents]="!isSkillSaveable() ? 'none' : 'auto'">
+              [style.pointer-events]="!isSkillSaveable() ? 'none' : 'auto'">
         <span *ngIf="!isSaveInProgress()">
           <span title="Publish Changes">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon">
