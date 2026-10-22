@@ -59,11 +59,11 @@ def _is_string(value: AndroidPlatformDataTypes) -> bool:
 ALLOWED_APP_VERSION_FLAVORS: List[str] = (
     constants.ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
 )
-APP_VERSION_WITH_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+APP_VERSION_WITH_SUFFIX_REGEXP: Pattern[str] = re.compile(
+    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_SUFFIX_REGEXP
 )
-APP_VERSION_WITHOUT_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
+APP_VERSION_WITHOUT_SUFFIX_REGEXP: Pattern[str] = re.compile(
+    constants.ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_SUFFIX_REGEXP
 )
 
 
@@ -134,12 +134,12 @@ class AndroidEvaluationContext:
                 'Invalid Android app version \'%s\', expected to be a '
                 'string.' % self._app_version
             )
-        if not APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(
+        if not APP_VERSION_WITHOUT_SUFFIX_REGEXP.fullmatch(
             self._app_version
-        ) and not APP_VERSION_WITH_HASH_REGEXP.fullmatch(self._app_version):
+        ) and not APP_VERSION_WITH_SUFFIX_REGEXP.fullmatch(self._app_version):
             raise utils.ValidationError(
                 'Invalid Android app version \'%s\', expected to match regexp '
-                '%s.' % (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
+                '%s.' % (self._app_version, APP_VERSION_WITH_SUFFIX_REGEXP)
             )
 
         if self._app_version_flavour not in ALLOWED_APP_VERSION_FLAVORS:
@@ -442,8 +442,8 @@ class AndroidPlatformParameterFilter:
                         )
                     )
             elif not (
-                APP_VERSION_WITHOUT_HASH_REGEXP.fullmatch(value)
-                or APP_VERSION_WITH_HASH_REGEXP.fullmatch(value)
+                APP_VERSION_WITHOUT_SUFFIX_REGEXP.fullmatch(value)
+                or APP_VERSION_WITH_SUFFIX_REGEXP.fullmatch(value)
             ):
                 raise utils.ValidationError(
                     'Invalid Android app version expression \'%s\'.' % value
