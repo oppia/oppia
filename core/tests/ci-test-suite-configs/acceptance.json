@@ -641,8 +641,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "topic-manager/manage-story-adventures",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/manage-story-adventures.spec.ts",
+      "name": "topic-manager/manage-story-modules",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/manage-story-modules.spec.ts",
       "framework": "puppeteer"
     },
     {

@@ -128,7 +128,7 @@ describe('TopicStorySectionBackendDataService', () => {
   const createStorySummarySpy = (
     nodeTitles: string[],
     nodes: jasmine.SpyObj<StoryNode>[],
-    arcs: object[] = []
+    modules: object[] = []
   ): jasmine.SpyObj<StorySummary> => {
     const storySummarySpy = jasmine.createSpyObj('StorySummary', [
       'getTitle',
@@ -137,7 +137,7 @@ describe('TopicStorySectionBackendDataService', () => {
       'getAllNodes',
       'getId',
       'getUrlFragment',
-      'getArcs',
+      'getModules',
       'isNodeCompleted',
       'getCompletedNodeTitles',
       'getVisitedChapterTitles',
@@ -149,7 +149,7 @@ describe('TopicStorySectionBackendDataService', () => {
     storySummarySpy.getAllNodes.and.returnValue(nodes);
     storySummarySpy.getId.and.returnValue('story_id_1');
     storySummarySpy.getUrlFragment.and.returnValue('story-url-fragment');
-    storySummarySpy.getArcs.and.returnValue(arcs);
+    storySummarySpy.getModules.and.returnValue(modules);
     storySummarySpy.isNodeCompleted.and.returnValue(false);
     storySummarySpy.getCompletedNodeTitles.and.returnValue([]);
     storySummarySpy.getVisitedChapterTitles.and.returnValue([]);
@@ -266,15 +266,15 @@ describe('TopicStorySectionBackendDataService', () => {
     );
   });
 
-  it('should build module groups from story arcs', () => {
+  it('should build module groups from story modules', () => {
     const node1 = createStoryNodeSpy('Lesson 1', 'Desc', 'exp_1', 'node_1');
     const node2 = createStoryNodeSpy('Lesson 2', 'Desc', 'exp_2', 'node_2');
     const storySummary = createStorySummarySpy(
       ['Lesson 1', 'Lesson 2'],
       [node1, node2],
       [
-        {title: 'Arc 1', description: 'Arc Desc', node_ids: ['node_1']},
-        {title: 'Arc 2', description: 'Arc Desc', node_ids: ['node_2']},
+        {title: 'Module 1', description: 'Module Desc', node_ids: ['node_1']},
+        {title: 'Module 2', description: 'Module Desc', node_ids: ['node_2']},
       ]
     );
     const lessonCards = service.buildLessonCards(
@@ -291,26 +291,26 @@ describe('TopicStorySectionBackendDataService', () => {
     );
 
     expect(groups.length).toBe(2);
-    expect(groups[0].moduleTitle).toBe('Arc 1');
-    expect(groups[0].moduleDescription).toBe('Arc Desc');
+    expect(groups[0].moduleTitle).toBe('Module 1');
+    expect(groups[0].moduleDescription).toBe('Module Desc');
     expect(groups[0].lessonCards.length).toBe(1);
     expect(groups[0].lessonCards[0].lessonNumber).toBe(1);
-    expect(groups[0].arcId).toBe('1');
-    expect(groups[1].arcId).toBe('2');
+    expect(groups[0].moduleId).toBe('1');
+    expect(groups[1].moduleId).toBe('2');
     expect(groups[0].hasPracticeQuestions).toBe(false);
   });
 
-  it('should return empty module groups when arcs are null', () => {
+  it('should return empty module groups when modules are null', () => {
     const node1 = createStoryNodeSpy('Lesson 1', 'Desc', 'exp_1', 'node_1');
     const storySummary = createStorySummarySpy(['Lesson 1'], [node1]);
-    storySummary.getArcs.and.returnValue(null);
+    storySummary.getModules.and.returnValue(null);
 
     const groups = service.buildModuleGroups([node1], storySummary, []);
 
     expect(groups).toEqual([]);
   });
 
-  it('should return empty module groups when arcs are empty', () => {
+  it('should return empty module groups when modules are empty', () => {
     const node1 = createStoryNodeSpy('Lesson 1', 'Desc', 'exp_1', 'node_1');
     const storySummary = createStorySummarySpy(['Lesson 1'], [node1], []);
 
@@ -319,7 +319,7 @@ describe('TopicStorySectionBackendDataService', () => {
     expect(groups).toEqual([]);
   });
 
-  it('should derive palette color by cycling the arc palette', () => {
+  it('should derive palette color by cycling the module palette', () => {
     expect(service.getModulePaletteColor(0)).toBeDefined();
     expect(service.getModulePaletteColor(1)).toBeDefined();
     expect(service.getModulePaletteColor(2)).toBeDefined();
@@ -432,13 +432,13 @@ describe('TopicStorySectionBackendDataService', () => {
     expect(service.getLessonPracticeUrl('1', '', 'topic')).toBe('#');
   });
 
-  it('should build an end of arc url', () => {
-    const url = service.getEndOfArcUrl('1', 'math', 'topic');
-    expect(url).toContain('/test/arc/1');
+  it('should build an end of module url', () => {
+    const url = service.getEndOfModuleUrl('1', 'math', 'topic');
+    expect(url).toContain('/test/module/1');
   });
 
-  it('should return # for end of arc url when fragments are missing', () => {
-    expect(service.getEndOfArcUrl('1', '', 'topic')).toBe('#');
+  it('should return # for end of module url when fragments are missing', () => {
+    expect(service.getEndOfModuleUrl('1', '', 'topic')).toBe('#');
   });
 
   it('should build a general practice url', () => {
