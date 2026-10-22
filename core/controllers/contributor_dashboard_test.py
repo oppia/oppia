@@ -1983,6 +1983,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
     def test_handler_skips_machine_translation_for_list_content(self) -> None:
+        """Test that list content is skipped while string content is translated."""
         translatable_contents = {
             'Introduction': {
                 'normalized_strings': translation_domain.TranslatableContent(

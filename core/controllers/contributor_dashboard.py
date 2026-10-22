@@ -1258,6 +1258,7 @@ class MachineTranslationStateTextsHandler(
                 content_id
             ].content_value
 
+            # Machine translation supports strings, not lists of rule text.
             if isinstance(source_text, list):
                 translated_texts[content_id] = None
                 continue
