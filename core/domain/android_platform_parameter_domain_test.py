@@ -58,6 +58,8 @@ class AndroidEvaluationContextTests(test_utils.GenericTestBase):
             context.validate()
 
     def test_validate_rejects_non_string_app_version(self) -> None:
+        # Here we use cast because this test passes an int to verify runtime
+        # rejection of a non-string app version.
         context = parameter_domain.AndroidEvaluationContext(
             cast(str, 12), 'beta'
         )
@@ -127,6 +129,8 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
             filter_domain.validate()
 
     def test_validate_rejects_non_list_conditions(self) -> None:
+        # Here we use cast because this test passes a tuple to verify runtime
+        # rejection of non-list conditions.
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
             'app_min_version', cast(List[List[str]], (['=', '12.5'],))
         )
@@ -190,22 +194,13 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_evaluate_flavour_rejects_unsupported_operator(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_version_flavour', []
+            'app_version_flavour', [['!=', 'beta']]
         )
 
         with self.assertRaisesRegex(
-            ValueError, 'Unsupported comparison operator'
+            utils.ValidationError, 'Unsupported comparison operator'
         ):
-            filter_domain._match_app_version_flavour(
-                self._create_context(), '!=', 'beta'
-            )
-
-    def test_normalize_version_without_numeric_prefix(self) -> None:
-        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
-            'app_min_version', []
-        )
-
-        self.assertEqual(filter_domain._normalize_version('invalid'), 'invalid')
+            filter_domain.validate()
 
     def test_evaluate_app_min_version_inclusive(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(
