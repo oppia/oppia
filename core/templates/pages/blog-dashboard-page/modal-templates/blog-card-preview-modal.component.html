@@ -3,7 +3,7 @@
 </button>
 <div class="oppia-blog-preview-container">
   <div class="my-4 mx-3">
-    <h3 class="e2e-test-modal-header">{{ 'I18N_BLOG_PREVIEW_MODAL_HEADING' | translate }}</h3>
+    <h3 class="e2e-test-modal-header">{{ 'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate }}</h3>
   </div>
 
   <mat-tab-group animationDuration="0ms" class="oppia-blog-preview-tabs">
@@ -27,7 +27,7 @@
       </div>
     </mat-tab>
 
-    <mat-tab label="{{ 'I18N_BLOG_CARD_PREVIEW_TAB' | translate }}">
+    <mat-tab label="{{ 'I18N_BLOG_CARD_PREVIEW_HEADING' | translate }}">
       <div class="modal-body oppia-blog-post-thumbnail e2e-test-blog-card-preview">
         <h5 class="my-3 mx-2" [innerHTML]="'I18N_BLOG_CARD_PREVIEW_CONTEXT' | translate: { link: blogHomePageLink }"></h5>
         <oppia-blog-card [blogPostSummary]="blogPostSummary">
