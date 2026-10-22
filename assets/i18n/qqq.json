@@ -887,7 +887,6 @@
   "I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON": "Text for card display button - allows user to view more cards",
   "I18N_LEARNER_DASHBOARD_CARD_TOPIC": "Topic or type of lesson (community lessons or explorations)",
   "I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION": "Text for the community lessons section in the learner dashboard.",
-  "I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "Text for the completed goals section in the learner dashboard.",
   "I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Text for the completed section in the learner dashboard.",
   "I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS": "Text for content toggle button - allows user to show less elements",
   "I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE": "Text for content toggle button - allows user to show more elements",
