@@ -18,6 +18,7 @@ suggestions.
 
 from __future__ import annotations
 
+import collections
 import datetime
 import heapq
 import logging
@@ -1677,6 +1678,31 @@ def get_translation_suggestions_in_review_by_entity_ids(
         get_suggestion_from_model(model) if model else None
         for model in suggestion_models_in_review
     ]
+
+
+def get_question_suggestions_in_review_count_by_skill_ids(
+    skill_ids: List[str],
+) -> Dict[str, int]:
+    """Returns the count of in-review question suggestions mapped by skill ID.
+
+    Args:
+        skill_ids: list(str). Skill IDs matching the target ID of the
+            question suggestions.
+
+    Returns:
+        dict(str, int). A dictionary mapping each skill ID to the count of its
+        in-review question suggestions.
+    """
+    if not skill_ids:
+        return {}
+    counts: Dict[str, int] = collections.defaultdict(int)
+    for (
+        model
+    ) in suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
+        skill_ids
+    ):
+        counts[model.target_id] += 1
+    return counts
 
 
 def get_suggestions_with_editable_explorations(
@@ -3413,14 +3439,19 @@ def update_translation_contribution_stats_at_submission(
     content_word_count = 0
     topic_id = _get_topic_id_of_translation_target(suggestion)
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
@@ -3580,16 +3611,20 @@ def update_translation_contribution_stats_at_review(
     content_word_count = 0
     topic_id = _get_topic_id_of_translation_target(suggestion)
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
-
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
@@ -3734,14 +3769,19 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
@@ -3903,7 +3943,9 @@ def update_question_contribution_stats_at_submission(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+        question_submitter_total_stat_model: Optional[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        ] = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
             suggestion.author_id
         )
 
@@ -4017,10 +4059,11 @@ def update_question_contribution_stats_at_review(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+        question_submitter_total_stat_model: Optional[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        ] = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
             suggestion.author_id
         )
-
         if question_submitter_total_stat_model is None:
             suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(  # pylint: disable=line-too-long
                 contributor_id=suggestion.author_id,
@@ -4126,10 +4169,11 @@ def update_question_review_stats(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_reviewer_total_stat_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
+        question_reviewer_total_stat_model: Optional[
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        ] = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
             suggestion.final_reviewer_id
         )
-
         if question_reviewer_total_stat_model is None:
             accepted_questions_count = 0
             accepted_questions_with_reviewer_edits_count = 0
@@ -4716,7 +4760,7 @@ def _generate_translation_contributor_certificate_data(
         from_date.strftime('%d %b %Y'),
         to_date.strftime('%d %b %Y'),
         signature,
-        str(hours_contributed),
+        hours_contributed,
         words_count,
         language_description,
         certificate_profile_name,
@@ -4787,7 +4831,7 @@ def _generate_question_contributor_certificate_data(
         from_date.strftime('%d %b %Y'),
         to_date.strftime('%d %b %Y'),
         signature,
-        str(hours_contributed),
+        hours_contributed,
         0,
         None,
         certificate_profile_name,
