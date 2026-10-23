@@ -98,6 +98,7 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.addUsernameInUsernameInputModal(
       questionReviewer.username ?? ''
     );
+    await questionCoordinator.expectQuestionRoleEditorModalToBeVisible();
 
     await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
       'Reviewer'
@@ -113,6 +114,7 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.addUsernameInUsernameInputModal(
       questionSubmitter.username ?? ''
     );
+    await questionCoordinator.expectQuestionRoleEditorModalToBeVisible();
     await questionCoordinator.expectScreenshotToMatch(
       'addQuestionRightsModal',
       __dirname
@@ -155,6 +157,7 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.addUsernameInUsernameInputModal(
       questionSubmitter.username ?? ''
     );
+    await questionCoordinator.expectQuestionRoleEditorModalToBeVisible();
     await questionCoordinator.expectScreenshotToMatch(
       'editQuestionRightsModalWithSubmitterChecked',
       __dirname
@@ -172,6 +175,7 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.addUsernameInUsernameInputModal(
       questionReviewer.username ?? ''
     );
+    await questionCoordinator.expectQuestionRoleEditorModalToBeVisible();
     await questionCoordinator.expectScreenshotToMatch(
       'editQuestionRightsModalWithReviewerChecked',
       __dirname

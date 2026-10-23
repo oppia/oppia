@@ -2522,6 +2522,21 @@ export class BaseUser {
   }
 
   /**
+   * Waits for all active modal and backdrop elements to be completely removed
+   * from the DOM, ensuring no modal overlay blocks user interactions.
+   * @param {number} timeout - The timeout in milliseconds. Default is 30000.
+   */
+  async waitForNoModals(timeout: number = 30000): Promise<void> {
+    const activeModalBackdropSelector =
+      'ngb-modal-window, ngb-modal-backdrop, .modal, .modal-backdrop';
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout},
+      activeModalBackdropSelector
+    );
+  }
+
+  /**
    * Function to expect the page to have no translation ids.
    */
   async expectPageHasNoTranslationIds(): Promise<void> {
