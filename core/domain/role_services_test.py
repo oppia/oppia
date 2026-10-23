@@ -70,6 +70,18 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
 
+    def test_web_release_coordinator_role_keeps_existing_id(self) -> None:
+        self.assertEqual(
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_RELEASE_COORDINATOR,
+        )
+        self.assertEqual(
+            role_services.HUMAN_READABLE_ROLES[
+                feconf.ROLE_ID_WEB_RELEASE_COORDINATOR
+            ],
+            'web release coordinator',
+        )
+
     def test_log_role_query(self) -> None:
         self.assertEqual(
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
