@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
