@@ -33,7 +33,7 @@ test.describe('Question Submitter', function () {
   let questionSubmitter: PracticeQuestionSubmitter;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(900000); // Setup takes longer than the default timeout.
+    test.setTimeout(testConstants.DEFAULT_SPEC_TIMEOUT_MSECS);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',

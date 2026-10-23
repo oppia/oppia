@@ -45,7 +45,7 @@ test.describe('Practice Question Submitter', function () {
   let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(900000); // Setup takes longer than the default timeout.
+    test.setTimeout(750000); // Setup takes longer than the default timeout.
     // Create users.
     questionSubmitter = await UserFactory.createNewUser(
       'questionSubmitter',
@@ -122,7 +122,6 @@ test.describe('Practice Question Submitter', function () {
   });
 
   test('should be able to check contribution stats', async function () {
-    test.setTimeout(600000);
     // Submit question suggestions.
     await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await questionSubmitter.switchToTabInContributionDashboard(

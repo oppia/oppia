@@ -48,7 +48,7 @@ test.describe('Practice Question Submitter', function () {
   let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(900000); // Setup takes longer than the default timeout.
+    test.setTimeout(600000); // Setup takes longer than the default timeout.
     // Create users.
     questionSubmitter = await UserFactory.createNewUser(
       'questionSubmitter',
@@ -124,7 +124,6 @@ test.describe('Practice Question Submitter', function () {
   });
 
   test('should be able to submit practice questions', async function () {
-    test.setTimeout(600000);
     // Go to the contribution dashboard.
     await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
 
@@ -258,7 +257,6 @@ test.describe('Practice Question Submitter', function () {
   });
 
   test('should be able to use all interactions in the question', async function () {
-    test.setTimeout(1500000); // Adds a question for each interaction.
     await questionSubmitter.switchToTabInContributionDashboard(
       'Submit Question'
     );
