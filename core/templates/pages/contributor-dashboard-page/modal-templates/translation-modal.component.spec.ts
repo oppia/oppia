@@ -1990,6 +1990,43 @@ describe('Translation Modal Component', () => {
       expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
     }));
 
+    it('should restore images at their original positions after translation', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate =
+        '<p>Before</p>' +
+        '<oppia-noninteractive-image filepath-with-value="image.png" ' +
+        'alt-with-value="&amp;quot;A red circle&amp;quot;"></oppia-noninteractive-image>' +
+        '<p>After</p>';
+      component.activeLanguageCode = 'es';
+      const translationSpy = spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text:
+            '<p>Antes</p><span>OPPIA_IMAGE_COMPONENT_0</span><p>Después</p>',
+          translation_provider: 'Google',
+        })
+      );
+
+      component.generateTranslation();
+      flushMicrotasks();
+
+      const htmlSentForTranslation = translationSpy.calls.mostRecent().args[0];
+      expect(htmlSentForTranslation).toContain('data-oppia-image-marker');
+      expect(htmlSentForTranslation).not.toContain(
+        '<oppia-noninteractive-image'
+      );
+      const translatedHtml = component.activeWrittenTranslation as string;
+      const imagePosition = translatedHtml.indexOf(
+        '<oppia-noninteractive-image'
+      );
+      expect(imagePosition).toBeGreaterThan(translatedHtml.indexOf('Antes'));
+      expect(imagePosition).toBeLessThan(translatedHtml.indexOf('Después'));
+      expect(translatedHtml).toContain('filepath-with-value="image.png"');
+      expect(translatedHtml).not.toContain('OPPIA_IMAGE_COMPONENT_0');
+    }));
+
     it('should ask before replacing text already entered by the contributor', fakeAsync(() => {
       component.activeDataFormat = 'html';
       component.textToTranslate = 'hello';
