@@ -103,7 +103,7 @@ export class BlogPostEditor extends BaseUser {
   async previewBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(previewBlogPostButtonSelector);
     await this.clickOnElementWithSelector(previewBlogPostButtonSelector);
-    await this.expectModalTitleToBe('Blog Card Preview');
+    await this.expectModalTitleToBe('Preview');
   }
 
   /**
