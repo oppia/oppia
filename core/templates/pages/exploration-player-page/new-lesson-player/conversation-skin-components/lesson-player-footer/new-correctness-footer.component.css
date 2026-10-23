@@ -83,23 +83,6 @@
   100% { opacity: 0; }
 }
 
-/* Correct answer confetti: pure CSS.
-   Like the celebration artwork, the confetti is fired from two cannons, here
-   the two sides of the correctness pill, aimed mostly upwards and a little
-   inwards so that the two sprays cross over the middle. The right cannon fires
-   first and the left one follows shortly after.
-
-   Every piece is one element. The rules below give each piece its own cannon,
-   throw, height, shape, colour and timing by combining cycles of different
-   lengths over the sibling index, so the burst looks random without any
-   script. A piece is animated on two layers so that the motions can overlap
-   like real paper:
-   - the piece itself travels: it is thrown sideways and decelerates (air
-     drag), goes up very quickly, hangs briefly at its peak and then falls at
-     an almost constant speed (like paper dragged by the air) all the way back
-     down past the pill;
-   - its ::before flutters: a sway, a spin and a 3D flip. */
-
 .confetti-stage {
   /* How high the burst can go, relative to the viewport. */
   --height: 760px;

@@ -191,9 +191,6 @@ export class CardInteractionControlsComponent {
     }
   }
 
-  // Returns whether the generic submit button should be disabled. This
-  // wraps the private currentInteractionService so the template does not
-  // need direct access to it.
   isSubmitButtonDisabled(): boolean {
     return (
       this.currentInteractionService.isSubmitButtonDisabled() ||

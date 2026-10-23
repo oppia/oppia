@@ -162,7 +162,6 @@ oppia-progress-tracker.sidebar-expanded {
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
-/* On small screens the sidebar does not take up any width. */
 @media (max-width: 767px) {
   oppia-progress-tracker,
   oppia-progress-tracker.sidebar-expanded {
