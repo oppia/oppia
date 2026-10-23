@@ -633,9 +633,7 @@ export class BaseUser {
         `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
       );
     }
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(toastMessageSelector);
-    }
+    await this.clickOnElementWithSelector(toastMessageSelector);
     await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
