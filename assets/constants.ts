@@ -6303,8 +6303,6 @@ export default {
 
   "MAX_QUESTIONS_PER_SKILL": 10,
 
-  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
-
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
@@ -6771,24 +6769,6 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Administrative panel for managing Oppia platform settings, users, and configurations."
-        }
-      ]
-    },
-    "REVIEW_TEST": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/review-test/:story_url_fragment",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
         }
       ]
     },
