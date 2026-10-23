@@ -20,11 +20,11 @@ import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ServicesConstants} from 'services/services.constants';
-import {
+import type {
   CustomizationArgsForRteType,
   CustomizationArgsSpecsType,
-  RteHelperModalComponent,
   RteComponentId,
+  RteHelperModalComponent,
 } from './rte-helper-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -69,30 +69,41 @@ export class RteHelperService {
     onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ): void {
     document.execCommand('enableObjectResizing', false);
-    const modalRef = this.modalService.open(RteHelperModalComponent, {
-      backdrop: 'static',
-    });
-    modalRef.componentInstance.componentIsNewlyCreated =
-      componentIsNewlyCreated;
-    modalRef.componentInstance.componentId = componentId;
-    modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
-    modalRef.componentInstance.attrsCustomizationArgsDict =
-      attrsCustomizationArgsDict;
-    modalRef.result.then(
-      result => {
-        if (onSubmitCallback) {
-          onSubmitCallback(result);
-        }
-      },
-      reason => {
-        if (onDismissCallback) {
-          // Treat non-boolean dismiss reasons (e.g. ESC) as cancel behavior.
-          // Existing widgets should stay, while newly-created ones should be
-          // removed.
-          onDismissCallback(
-            reason === true || (componentIsNewlyCreated && reason !== false)
-          );
-        }
+    // Load the RTE helper modal (and its form/schema dependencies) on demand
+    // so that they are not pulled into the shared chunk of pages that never
+    // open a customization modal.
+    import('./rte-helper-modal.component').then(
+      ({RteHelperModalComponent: RteHelperModalComponentClass}) => {
+        const modalRef = this.modalService.open(
+          RteHelperModalComponentClass as unknown as RteHelperModalComponent,
+          {
+            backdrop: 'static',
+          }
+        );
+        modalRef.componentInstance.componentIsNewlyCreated =
+          componentIsNewlyCreated;
+        modalRef.componentInstance.componentId = componentId;
+        modalRef.componentInstance.customizationArgSpecs =
+          customizationArgSpecs;
+        modalRef.componentInstance.attrsCustomizationArgsDict =
+          attrsCustomizationArgsDict;
+        modalRef.result.then(
+          result => {
+            if (onSubmitCallback) {
+              onSubmitCallback(result);
+            }
+          },
+          reason => {
+            if (onDismissCallback) {
+              // Treat non-boolean dismiss reasons (e.g. ESC) as cancel behavior.
+              // Existing widgets should stay, while newly-created ones should be
+              // removed.
+              onDismissCallback(
+                reason === true || (componentIsNewlyCreated && reason !== false)
+              );
+            }
+          }
+        );
       }
     );
   }
