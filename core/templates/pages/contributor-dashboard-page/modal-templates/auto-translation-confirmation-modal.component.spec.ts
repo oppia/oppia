@@ -21,6 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subject} from 'rxjs';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {AutoTranslationConfirmationModalComponent} from './auto-translation-confirmation-modal.component';
 
@@ -31,7 +32,10 @@ describe('AutoTranslationConfirmationModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AutoTranslationConfirmationModalComponent],
+      declarations: [
+        AutoTranslationConfirmationModalComponent,
+        MockTranslatePipe,
+      ],
       providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -87,7 +91,11 @@ describe('AutoTranslationConfirmationModalComponent', () => {
       '.oppia-auto-translation-comparison-panel'
     );
     expect(comparisonPanels.length).toBe(2);
-    expect(comparisonPanels[0].textContent).toContain('Your current text');
-    expect(comparisonPanels[1].textContent).toContain('Auto-generated text');
+    expect(comparisonPanels[0].textContent).toContain(
+      'I18N_MODAL_REPLACE_TRANSLATION_CURRENT_TEXT'
+    );
+    expect(comparisonPanels[1].textContent).toContain(
+      'I18N_MODAL_REPLACE_TRANSLATION_AUTO_GENERATED_TEXT'
+    );
   });
 });
