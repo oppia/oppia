@@ -65,6 +65,23 @@ export class InputResponsePairComponent {
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
+  private isLearnerInputWithAnswerDetails(
+    learnerInput: InputResponsePair['learnerInput']
+  ): learnerInput is {answerDetails: string} {
+    return (
+      typeof learnerInput === 'object' &&
+      learnerInput !== null &&
+      'answerDetails' in learnerInput
+    );
+  }
+
+  getLearnerInputAsString(): string {
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      return this.data.learnerInput.answerDetails;
+    }
+    return this.data.learnerInput;
+  }
+
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
       return this.data.oppiaResponse.includes('oppia-noninteractive-video');
@@ -101,7 +118,11 @@ export class InputResponsePairComponent {
     );
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+      this.convertAnswerToLocalFormat(
+        this.isLearnerInputWithAnswerDetails(this.data.learnerInput)
+          ? this.data.learnerInput.answerDetails
+          : this.data.learnerInput
+      ),
       interaction.id,
       interaction.customizationArgs
     );
@@ -115,13 +136,8 @@ export class InputResponsePairComponent {
     );
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
-    if (
-      typeof this.data.learnerInput === 'object' &&
-      this.data.learnerInput !== null &&
-      'answerDetails' in this.data.learnerInput
-    ) {
-      shortAnswerHtml = (this.data.learnerInput as {answerDetails: string})
-        .answerDetails;
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      shortAnswerHtml = this.data.learnerInput.answerDetails;
     } else if (
       this.data &&
       interaction.id &&
@@ -130,7 +146,7 @@ export class InputResponsePairComponent {
       ].needs_summary
     ) {
       shortAnswerHtml = this.explorationHtmlFormatterService.getShortAnswerHtml(
-        this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+        this.convertAnswerToLocalFormat(this.data.learnerInput),
         interaction.id,
         interaction.customizationArgs
       );
