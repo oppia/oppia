@@ -304,6 +304,14 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
+  private dismissWithCancel(): void {
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss('cancel');
+    } else {
+      this.ngbActiveModal.dismiss('cancel');
+    }
+  }
+
   onCustomizationArgsFormChange(value: {
     [key: number]: CustomizationArgsNameAndValueArray[number]['value'];
   }): void {
@@ -580,20 +588,12 @@ export class RteHelperModalComponent {
           'The rawLatex or svgFileName for a Math expression should not ' +
             'be empty.'
         );
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       if (!svgFile) {
         this.alertsService.addWarning('SVG file is missing.');
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       const resampledFile =
@@ -601,11 +601,7 @@ export class RteHelperModalComponent {
 
       if (!resampledFile) {
         this.alertsService.addWarning('Failed to process SVG file.');
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
 
@@ -628,11 +624,7 @@ export class RteHelperModalComponent {
             "and '+ z^2'",
           5000
         );
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       if (
@@ -661,11 +653,7 @@ export class RteHelperModalComponent {
         this.alertsService.addWarning(
           'Error: Could not retrieve entity type or entity ID.'
         );
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       this.assetsBackendApiService
@@ -693,11 +681,7 @@ export class RteHelperModalComponent {
             this.alertsService.addWarning(
               errorResponse.error || 'Error communicating with server.'
             );
-            if (this.rteHelperBottomSheetRef) {
-              this.rteHelperBottomSheetRef.dismiss('cancel');
-            } else {
-              this.ngbActiveModal.dismiss('cancel');
-            }
+            this.dismissWithCancel();
           }
         );
     } else {
