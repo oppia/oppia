@@ -41,16 +41,29 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
     def _migrate_legacy_model(
         self, legacy_model: config_models.PlatformParameterModel
     ) -> config_models.WebPlatformParameterConfigModel:
-        """Creates the web config model corresponding to a legacy model."""
+        """Returns the matching web config model, migrating it if necessary."""
         with datastore_services.get_ndb_context():
+            web_model_key = datastore_services.Key(
+                config_models.WebPlatformParameterConfigModel,
+                legacy_model.id,
+                namespace=legacy_model.key.namespace(),
+            )
+            existing_web_model = web_model_key.get()
+            if existing_web_model is not None:
+                return existing_web_model
+
             migrated_config = config_models.WebPlatformParameterConfigModel(
-                id=legacy_model.id,
+                key=web_model_key,
                 rules=legacy_model.rules,
                 rule_schema_version=legacy_model.rule_schema_version,
                 default_value=legacy_model.default_value,
-                version=legacy_model.version + 1,
+                version=legacy_model.version,
+                created_on=legacy_model.created_on,
+                last_updated=legacy_model.last_updated,
             )
-            migrated_config.update_timestamps()
+            migrated_config.update_timestamps(update_last_updated_time=False)
+            if self.DATASTORE_UPDATES_ALLOWED:
+                datastore_services.put_multi([migrated_config])
             return migrated_config
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -70,13 +83,6 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
             >> beam.Map(self._migrate_legacy_model)
         )
 
-        if self.DATASTORE_UPDATES_ALLOWED:
-            _ = (
-                migrated_models
-                | 'Put migrated WebPlatformParameterConfigModels'
-                >> ndb_io.PutModels()
-            )
-
         count_result = (
             migrated_models
             | 'Count migrated models' >> beam.combiners.Count.Globally()
@@ -85,7 +91,7 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
             | 'Format migrated model count'
             >> beam.Map(
                 lambda count: job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: %d.'
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: %d.'
                     % count
                 )
             )
@@ -96,7 +102,7 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
             | 'Log migrated model IDs'
             >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL: %s.'
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL: %s.'
                     % model.id
                 )
             )

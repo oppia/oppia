@@ -201,24 +201,34 @@ class Registry:
         updated_param.validate()
 
         model_instance = cls._to_web_platform_parameter_config_model(param)
+        legacy_model_instance = cls._to_legacy_platform_parameter_model(param)
         param.set_rules(new_rules)
         param.set_default_value(default_value)
         cls.parameter_registry[param.name] = param
 
-        model_instance.rules = [rule.to_dict() for rule in param.rules]
+        rule_dicts = [rule.to_dict() for rule in param.rules]
+        model_instance.rules = rule_dicts
         model_instance.default_value = default_value
+        legacy_model_instance.rules = rule_dicts
+        legacy_model_instance.default_value = default_value
+        commit_cmds = [
+            {
+                'cmd': (
+                    web_platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+                ),
+                'new_rules': new_rule_dicts,
+                'default_value': default_value,
+            }
+        ]
         model_instance.commit(
             committer_id,
             commit_message,
-            [
-                {
-                    'cmd': (
-                        web_platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
-                    ),
-                    'new_rules': new_rule_dicts,
-                    'default_value': default_value,
-                }
-            ],
+            commit_cmds,
+        )
+        legacy_model_instance.commit(
+            committer_id,
+            commit_message,
+            commit_cmds,
         )
 
         caching_services.delete_multi(
@@ -291,6 +301,10 @@ class Registry:
         parameter_model = config_models.WebPlatformParameterConfigModel.get(
             name, strict=False
         )
+        if parameter_model is None:
+            parameter_model = config_models.PlatformParameterModel.get(
+                name, strict=False
+            )
 
         if parameter_model:
             param_with_init_settings = cls.parameter_registry[name]
@@ -346,6 +360,9 @@ class Registry:
             param.name, strict=False
         )
         if model_instance is None:
+            legacy_model_instance = config_models.PlatformParameterModel.get(
+                param.name, strict=False
+            )
             model_instance = (
                 config_models.WebPlatformParameterConfigModel.create(
                     param.name,
@@ -354,6 +371,38 @@ class Registry:
                     default_value=param.default_value,
                 )
             )
+            if legacy_model_instance is not None:
+                model_instance.version = legacy_model_instance.version
+                model_instance.created_on = legacy_model_instance.created_on
+                model_instance.last_updated = legacy_model_instance.last_updated
+        return model_instance
+
+    @classmethod
+    def _to_legacy_platform_parameter_model(
+        cls, param: web_platform_parameter_domain.PlatformParameter
+    ) -> config_models.PlatformParameterModel:
+        """Returns the legacy platform parameter model for the given
+        parameter.
+        """
+        model_instance = config_models.PlatformParameterModel.get(
+            param.name, strict=False
+        )
+        if model_instance is None:
+            web_model_instance = (
+                config_models.WebPlatformParameterConfigModel.get(
+                    param.name, strict=False
+                )
+            )
+            model_instance = config_models.PlatformParameterModel.create(
+                param.name,
+                [rule.to_dict() for rule in param.rules],
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                param.default_value,
+            )
+            if web_model_instance is not None:
+                model_instance.version = web_model_instance.version
+                model_instance.created_on = web_model_instance.created_on
+                model_instance.last_updated = web_model_instance.last_updated
         return model_instance
 
 

@@ -24,6 +24,7 @@ from core import feconf, utils
 from core.domain import caching_services
 from core.domain import web_platform_parameter_domain as parameter_domain
 from core.domain import web_platform_parameter_registry as registry
+from core.storage.config import gae_models as config_models
 from core.tests import test_utils
 
 from typing import List
@@ -148,6 +149,27 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter = registry.Registry.get_web_platform_parameter(parameter_name)
         self.assertIsNotNone(parameter)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
+
+    def test_get_platform_parameter_falls_back_to_legacy_storage(self) -> None:
+        parameter_name = 'parameter_a'
+        self._create_example_parameter_with_name(parameter_name)
+        legacy_model = config_models.PlatformParameterModel.create(
+            param_name=parameter_name,
+            rule_dicts=[
+                {
+                    'filters': [],
+                    'value_when_matched': 'legacy value',
+                }
+            ],
+            rule_schema_version=1,
+            default_value='legacy default',
+        )
+        legacy_model.commit('committer_id', 'initial', [])
+
+        parameter = registry.Registry.get_web_platform_parameter(parameter_name)
+
+        self.assertEqual(parameter.default_value, 'legacy default')
+        self.assertEqual(parameter.rules[0].value_when_matched, 'legacy value')
 
     def test_get_non_existing_parameter_failure(self) -> None:
         with self.assertRaisesRegex(Exception, 'not found'):
@@ -303,6 +325,31 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNotNone(parameter_updated)
+        legacy_model = config_models.PlatformParameterModel.get(
+            parameter_name, strict=False
+        )
+        web_model = config_models.WebPlatformParameterConfigModel.get(
+            parameter_name
+        )
+        self.assertIsNotNone(legacy_model)
+        assert legacy_model is not None
+        expected_rules = [
+            {
+                'filters': [
+                    {
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']],
+                    }
+                ],
+                'value_when_matched': 'updated',
+            }
+        ]
+        self.assertEqual(
+            legacy_model.rules,
+            expected_rules,
+        )
+        self.assertEqual(legacy_model.default_value, 'default')
+        self.assertEqual(legacy_model.version, web_model.version)
 
     def test_default_value_return_from_parameter_registry_when_none_in_model(
         self,

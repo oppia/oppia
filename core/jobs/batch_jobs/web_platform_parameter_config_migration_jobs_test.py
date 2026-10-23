@@ -52,10 +52,10 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL: '
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL: '
                     'parameter_name.'
                 ),
             ]
@@ -65,7 +65,9 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
             'parameter_name'
         )
         self.assertIsNotNone(migrated_model)
-        self.assertEqual(migrated_model.version, legacy_model.version + 1)
+        self.assertEqual(migrated_model.version, legacy_model.version)
+        self.assertEqual(migrated_model.created_on, legacy_model.created_on)
+        self.assertEqual(migrated_model.last_updated, legacy_model.last_updated)
         self.assertEqual(
             migrated_model.rules,
             [{'filters': [], 'value_when_matched': False}],
@@ -74,6 +76,45 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
         self.assertFalse(migrated_model.default_value)
         self.assertIsNotNone(
             config_models.PlatformParameterModel.get('parameter_name')
+        )
+
+    def test_does_not_overwrite_existing_web_config(self) -> None:
+        parameter_name = 'existing_parameter_name'
+        legacy_model = config_models.PlatformParameterModel.create(
+            param_name=parameter_name,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=1,
+            default_value=False,
+        )
+        legacy_model.update_timestamps()
+        web_model = config_models.WebPlatformParameterConfigModel.create(
+            param_name=parameter_name,
+            rule_dicts=[{'filters': [], 'value_when_matched': True}],
+            rule_schema_version=1,
+            default_value=True,
+        )
+        web_model.update_timestamps()
+        self.put_multi([legacy_model, web_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL: '
+                    '%s.' % parameter_name
+                ),
+            ]
+        )
+
+        migrated_model = config_models.WebPlatformParameterConfigModel.get(
+            parameter_name
+        )
+        self.assertTrue(migrated_model.default_value)
+        self.assertEqual(
+            migrated_model.rules,
+            [{'filters': [], 'value_when_matched': True}],
         )
 
     def test_migrates_legacy_version_history(self) -> None:
@@ -95,10 +136,10 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL: '
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL: '
                     'parameter_name.'
                 ),
             ]
@@ -108,7 +149,7 @@ class MigrateWebPlatformParameterConfigJobTests(job_test_utils.JobTestBase):
             'parameter_name'
         )
         self.assertIsNotNone(migrated_model)
-        self.assertEqual(migrated_model.version, legacy_model.version + 1)
+        self.assertEqual(migrated_model.version, legacy_model.version)
         first_version = (
             config_models.WebPlatformParameterConfigModel.get_version(
                 'parameter_name', 1
@@ -145,10 +186,10 @@ class AuditMigrateWebPlatformParameterConfigJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL COUNT: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED WEB PLATFORM PARAMETER CONFIG MODEL: '
+                    'PROCESSED WEB PLATFORM PARAMETER CONFIG MODEL: '
                     'parameter_name.'
                 ),
             ]
