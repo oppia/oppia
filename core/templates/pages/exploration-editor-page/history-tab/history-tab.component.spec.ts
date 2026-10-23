@@ -32,7 +32,10 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {HistoryTabComponent} from './history-tab.component';
 import {HistoryTabBackendApiService} from '../services/history-tab-backend-api.service';
-import {CompareVersionsService} from './services/compare-versions.service';
+import {
+  CompareVersionsService,
+  CompareVersionData,
+} from './services/compare-versions.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {RouterService} from '../services/router.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -137,7 +140,7 @@ describe('History tab component', () => {
     component.diffData = {
       v1Metadata: null,
       v2Metadata: null,
-    };
+    } as CompareVersionData;
     component.compareVersionMetadata = {
       earlierVersion: {
         versionNumber: 2,
@@ -347,7 +350,7 @@ describe('History tab component', () => {
     component.diffData = {
       v1Metadata: null,
       v2Metadata: null,
-    };
+    } as CompareVersionData;
     component.showExplorationMetadataDiffModal();
 
     expect(spyObj).toHaveBeenCalled();
@@ -366,7 +369,7 @@ describe('History tab component', () => {
     component.diffData = {
       v1Metadata: null,
       v2Metadata: null,
-    };
+    } as CompareVersionData;
 
     component.showExplorationMetadataDiffModal();
     tick();
@@ -643,7 +646,10 @@ describe('History tab component', () => {
 
   it('should return when earlierIndex or laterIndex is null', fakeAsync(() => {
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({v1Metadata: null, v2Metadata: null})
+      Promise.resolve({
+        v1Metadata: null,
+        v2Metadata: null,
+      } as CompareVersionData)
     );
 
     component.selectedVersionsArray = [10, 20];
@@ -698,7 +704,10 @@ describe('History tab component', () => {
 
   it('should return when earlierVersion becomes undefined in promise callback', fakeAsync(() => {
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({v1Metadata: null, v2Metadata: null})
+      Promise.resolve({
+        v1Metadata: null,
+        v2Metadata: null,
+      } as CompareVersionData)
     );
 
     spyOn(component, 'getVersionHeader');

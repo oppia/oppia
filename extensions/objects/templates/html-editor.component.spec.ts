@@ -16,8 +16,6 @@
  * @fileoverview Unit test for HTML editor.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEditorComponent} from './html-editor.component';
@@ -48,5 +46,16 @@ describe('HtmlEditorComponent', () => {
 
     expect(component.value).toBe('test');
     expect(component.valueChanged.emit).toHaveBeenCalledWith('test');
+  });
+
+  it('should not update the value when the input is not an html string', () => {
+    spyOn(component.valueChanged, 'emit');
+
+    component.value = 'old';
+
+    component.updateValue(5);
+
+    expect(component.value).toBe('old');
+    expect(component.valueChanged.emit).not.toHaveBeenCalled();
   });
 });

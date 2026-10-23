@@ -247,33 +247,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     ['core/new_directory/new_file.ts'],
                 )
 
-    def test_load_exclude_paths_ignores_comments_and_blank_lines(self) -> None:
-        """Test that exclude paths are loaded without comments or blanks."""
-        with tempfile.NamedTemporaryFile(
-            mode='w', delete=False, encoding='utf-8'
-        ) as tmp_file:
-            tmp_file.write(
-                '# Ignore this comment.\n'
-                '\n'
-                'core/templates/a.component.ts\n'
-                'extensions/b.component.ts\n'
-            )
-            tmp_filepath = tmp_file.name
-
-        def cleanup_tmp_filepath() -> None:
-            if os.path.exists(tmp_filepath):
-                os.remove(tmp_filepath)
-
-        self.addCleanup(cleanup_tmp_filepath)
-
-        self.assertEqual(
-            run_typescript_checks.load_exclude_paths(tmp_filepath),
-            [
-                'core/templates/a.component.ts',
-                'extensions/b.component.ts',
-            ],
-        )
-
     def test_run_ngcc_succeeds(self) -> None:
         """Test that ngcc success does not exit."""
 
@@ -354,17 +327,12 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             template_config_path = os.path.join(
                 temp_dir, 'tsconfig-template-strict.json'
             )
-            exclude_paths_path = os.path.join(
-                temp_dir, 'template_strict_exclude_paths.txt'
-            )
             temp_template_config_path = os.path.join(
                 temp_dir, 'temp-tsconfig-template-strict.json'
             )
             compiled_js_dir = os.path.join(temp_dir, 'compiled_js', '')
             with open(template_config_path, 'w', encoding='utf-8') as f:
                 json.dump({'include': []}, f)
-            with open(exclude_paths_path, 'w', encoding='utf-8') as f:
-                f.write('extensions/excluded.component.ts\n')
             os.mkdir(os.path.dirname(compiled_js_dir))
 
             captured_include: List[str] = []
@@ -409,11 +377,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 ),
                 self.swap(
                     run_typescript_checks,
-                    'TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH',
-                    exclude_paths_path,
-                ),
-                self.swap(
-                    run_typescript_checks,
                     'TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH',
                     temp_template_config_path,
                 ),
@@ -439,7 +402,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 captured_include,
-                ['core/templates/a.component.ts', 'typings'],
+                [
+                    'core/templates/a.component.ts',
+                    'extensions/excluded.component.ts',
+                    'typings',
+                ],
             )
             self.assertFalse(os.path.exists(os.path.dirname(compiled_js_dir)))
             self.assertIn('Angular template compilation successful!', print_arr)
@@ -450,16 +417,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             template_config_path = os.path.join(
                 temp_dir, 'tsconfig-template-strict.json'
             )
-            exclude_paths_path = os.path.join(
-                temp_dir, 'template_strict_exclude_paths.txt'
-            )
             temp_template_config_path = os.path.join(
                 temp_dir, 'temp-tsconfig-template-strict.json'
             )
             with open(template_config_path, 'w', encoding='utf-8') as f:
                 json.dump({'include': []}, f)
-            with open(exclude_paths_path, 'w', encoding='utf-8') as f:
-                f.write('')
 
             class MockOutput:
                 def __init__(self) -> None:
@@ -499,11 +461,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     run_typescript_checks,
                     'TEMPLATE_STRICT_TSCONFIG_FILEPATH',
                     template_config_path,
-                ),
-                self.swap(
-                    run_typescript_checks,
-                    'TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH',
-                    exclude_paths_path,
                 ),
                 self.swap(
                     run_typescript_checks,
@@ -722,19 +679,21 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             'compile_and_check_typescript',
             mock_compile_and_check_typescript,
         )
+
+        def mock_compile_and_check_angular_templates(_config_path: str) -> None:
+            self.fail(
+                'Template strict checks should not run without --strict_checks.'
+            )
+
         compile_and_check_angular_templates_swap = self.swap(
             run_typescript_checks,
             'compile_and_check_angular_templates',
-            lambda _config_path: self.fail(
-                'Template strict checks should not run without --strict_checks.'
-            ),
+            mock_compile_and_check_angular_templates,
         )
 
-        with (
-            compile_and_check_typescript_swap,
-            compile_and_check_angular_templates_swap,
-        ):
-            run_typescript_checks.main(args=[])
+        with compile_and_check_typescript_swap:
+            with compile_and_check_angular_templates_swap:
+                run_typescript_checks.main(args=[])
 
     def test_config_path_when_strict_checks_arg_is_used(self) -> None:
         """Test if the config path is correct when strict checks arg is used."""
