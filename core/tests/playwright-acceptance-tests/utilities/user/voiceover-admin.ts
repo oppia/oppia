@@ -33,7 +33,7 @@ const languageAccentDropdownSelector =
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
-const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
+const voiceArtistUsernameInputBox = '.e2e-test-new-voice-artist-username';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
