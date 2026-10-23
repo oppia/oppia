@@ -20,14 +20,13 @@
     <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="javascript:void(0)"
-           class="nav-link navbar-tab e2e-test-main-tab"
-           [ngbTooltip]="'Editor'"
-           placement="{{countWarnings() ? 'left' : 'bottom'}}"
-           role="button"
-           aria-label="Exploration Editor Button">
+        <button type="button"
+                class="nav-link navbar-tab e2e-test-main-tab"
+                [ngbTooltip]="'Editor'"
+                placement="{{countWarnings() ? 'left' : 'bottom'}}"
+                aria-label="Exploration Editor Button">
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
-        </a>
+        </button>
         <div [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
              tabindex="0"
              (mouseover)="isWarningsAreShown(true)"
