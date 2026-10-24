@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for parameter name editor.
  */
 
-// @ts-nocheck
-
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ParameterNameEditorComponent} from './parameter-name-editor.component';
