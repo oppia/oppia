@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+import logging
+
 import core.storage.base_model.gae_models as base_models
 from core.platform import models
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -200,12 +202,129 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         Returns:
             FeatureFlagConfigModel. The created FeatureFlagConfigModel instance.
         """
-        feature_flag_entity = cls(
-            id=feature_flag_name,
-            force_enable_for_all_users=force_enable_for_all_users,
-            rollout_percentage=rollout_percentage,
-            user_group_ids=user_group_ids,
+        return cls.save_config(
+            feature_flag_name,
+            force_enable_for_all_users,
+            rollout_percentage,
+            user_group_ids,
         )
-        feature_flag_entity.update_timestamps()
-        feature_flag_entity.put()
-        return feature_flag_entity
+
+    @classmethod
+    def save_config(
+        cls,
+        feature_flag_name: str,
+        force_enable_for_all_users: bool,
+        rollout_percentage: int,
+        user_group_ids: List[str],
+    ) -> FeatureFlagConfigModel:
+        """Writes the legacy model first, then the secondary web model."""
+        legacy_model = cls.get(feature_flag_name, strict=False)
+        if legacy_model is None:
+            legacy_model = cls(id=feature_flag_name)
+        legacy_model.force_enable_for_all_users = force_enable_for_all_users
+        legacy_model.rollout_percentage = rollout_percentage
+        legacy_model.user_group_ids = user_group_ids
+        legacy_model.update_timestamps()
+        legacy_model.put()
+
+        try:
+            web_model = WebFeatureFlagConfigModel.get(
+                feature_flag_name, strict=False
+            )
+            if web_model is None:
+                web_model = WebFeatureFlagConfigModel(
+                    id=feature_flag_name,
+                    created_on=legacy_model.created_on,
+                    last_updated=legacy_model.last_updated,
+                )
+                web_model.update_timestamps(update_last_updated_time=False)
+            else:
+                web_model.update_timestamps()
+            web_model.force_enable_for_all_users = force_enable_for_all_users
+            web_model.rollout_percentage = rollout_percentage
+            web_model.user_group_ids = user_group_ids
+            web_model.put()
+        except Exception:
+            logging.exception(
+                'Failed to dual-write WebFeatureFlagConfigModel for %s after '
+                'successfully writing the legacy feature flag config.',
+                feature_flag_name,
+            )
+
+        return legacy_model
+
+
+class WebFeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
+    """A class that represents named dynamic web-feature-flag.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the web-feature-flag.
+    """
+
+    # Whether the web feature flag is force enabled for all the users.
+    force_enable_for_all_users = datastore_services.BooleanProperty(
+        default=False, indexed=True
+    )
+    # The percentage of logged-in users for which the web feature flag will
+    # be enabled. The value of this field should be between 0 and 100.
+    rollout_percentage = datastore_services.IntegerProperty(
+        default=0, indexed=True
+    )
+    # A list of IDs of user groups for which the web feature flag will be enabled.
+    user_group_ids = datastore_services.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """WebFeatureFlagConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'force_enable_for_all_users': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create(
+        cls,
+        web_feature_flag_name: str,
+        force_enable_for_all_users: bool,
+        rollout_percentage: int,
+        user_group_ids: List[str],
+    ) -> Optional[WebFeatureFlagConfigModel]:
+        """Creates both models, returning None if the secondary write fails.
+
+        Args:
+            web_feature_flag_name: str. The name of the web-feature-flag.
+            force_enable_for_all_users: bool. Whether to force-enable the
+                feature-flag for all the users.
+            rollout_percentage: int. The defined percentage of logged-in
+                users for which the feature should be enabled.
+            user_group_ids: List[str]. The list of ids of UserGroup objects.
+
+        Returns:
+            WebFeatureFlagConfigModel|None. The created web config, or None if
+            the secondary write failed after the legacy model was saved.
+        """
+        FeatureFlagConfigModel.save_config(
+            web_feature_flag_name,
+            force_enable_for_all_users,
+            rollout_percentage,
+            user_group_ids,
+        )
+        return cls.get(web_feature_flag_name, strict=False)

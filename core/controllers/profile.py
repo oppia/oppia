@@ -27,7 +27,6 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
-    feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
     role_services,
@@ -35,6 +34,7 @@ from core.domain import (
     summary_services,
     takeout_service,
     user_services,
+    web_feature_flag_services,
     wipeout_service,
 )
 
@@ -518,7 +518,7 @@ class SignupPage(
             'oppia-root.mainpage.html',
             values={
                 'OPPIA_FEATURE_FLAGS': (
-                    feature_flag_services.evaluate_all_feature_flag_configs(
+                    web_feature_flag_services.evaluate_all_web_feature_flag_configs(
                         self.user_id
                     )
                 ),

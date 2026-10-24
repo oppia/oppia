@@ -758,6 +758,8 @@
 /core/controllers/feature_flag*.py @oppia/core-reviewers
 /core/domain/platform_parameter*.py @oppia/core-reviewers
 /core/domain/feature_flag*.py @oppia/core-reviewers
+/core/domain/web_feature_flag*.py @oppia/core-reviewers
+/core/web_feature_flag*.py @oppia/core-reviewers
 /core/feature_flag*.py @oppia/core-reviewers
 /core/templates/domain/platform-parameter/ @oppia/core-reviewers
 /core/templates/domain/feature-flag/ @oppia/core-reviewers

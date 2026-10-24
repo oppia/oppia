@@ -20,9 +20,9 @@ from __future__ import annotations
 
 from core import utils
 from core.domain import (
-    feature_flag_services,
     machine_translation_services,
     translation_services,
+    web_feature_flag_services,
 )
 from core.tests import test_utils
 
@@ -49,7 +49,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         }
 
         self.feature_flag_swap = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             lambda *args, **kwargs: True,
         )
@@ -75,7 +75,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         self.login(self.CONTRIBUTOR_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             lambda *args, **kwargs: False,
         )
@@ -230,7 +230,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         }
 
         self.feature_flag_swap = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             lambda *args, **kwargs: True,
         )
@@ -271,7 +271,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             lambda *args, **kwargs: False,
         )
@@ -344,7 +344,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             lambda *args, **kwargs: False,
         )
