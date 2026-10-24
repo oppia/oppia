@@ -55,6 +55,11 @@
   text-decoration-color: #0859aa;
 }
 
+.license-term-link:focus-visible {
+  outline: 2px solid #0859aa;
+  outline-offset: 2px;
+}
+
 label.image-receiver-upload-label-button {
   background: grey;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #bfbfbf));
