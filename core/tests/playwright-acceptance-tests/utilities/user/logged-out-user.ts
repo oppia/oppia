@@ -270,7 +270,7 @@ const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
 const subheadingInParentsAndTeachersPageSelector =
   '.e2e-test-teach-page-subheading';
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
-const blogPageLink = testConstants.URLs.BlogPage;
+const blogPageLink = new URL(testConstants.URLs.Blog).pathname;
 const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
 const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
