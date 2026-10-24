@@ -1532,4 +1532,104 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     flush();
     expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
   }));
+
+  it('should dismiss the bottom sheet with cancel when the SVG file is missing', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    } as unknown as CustomizationArgsForRteType;
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ] as unknown as CustomizationArgsSpecsType;
+    spyOn(alertsService, 'addWarning');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: null,
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+
+    component.save();
+    flush();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'SVG file is missing.'
+    );
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet with cancel when the SVG file cannot be processed', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    } as unknown as CustomizationArgsForRteType;
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ] as unknown as CustomizationArgsSpecsType;
+    spyOn(alertsService, 'addWarning');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+
+    component.save();
+    flush();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to process SVG file.'
+    );
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet with cancel when the entity context is missing', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    } as unknown as CustomizationArgsForRteType;
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ] as unknown as CustomizationArgsSpecsType;
+    spyOn(alertsService, 'addWarning');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+
+    component.save();
+    flush();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Error: Could not retrieve entity type or entity ID.'
+    );
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
 });
