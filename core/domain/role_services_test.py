@@ -70,6 +70,64 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
 
+    def test_release_coordinator_roles_have_distinct_ids_and_actions(
+        self,
+    ) -> None:
+        self.assertEqual(
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
+            'WEB_RELEASE_COORDINATOR',
+        )
+        self.assertNotEqual(
+            feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
+        )
+        self.assertEqual(
+            role_services.HUMAN_READABLE_ROLES[
+                feconf.ROLE_ID_WEB_RELEASE_COORDINATOR
+            ],
+            'web release coordinator',
+        )
+        self.assertEqual(
+            role_services.HUMAN_READABLE_ROLES[
+                feconf.ROLE_ID_RELEASE_COORDINATOR
+            ],
+            'legacy release coordinator',
+        )
+        self.assertEqual(
+            role_services.HUMAN_READABLE_ROLES[
+                feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR
+            ],
+            'android release coordinator',
+        )
+        self.assertIn(
+            feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR,
+            role_services.UPDATABLE_ROLES,
+        )
+        self.assertIn(
+            feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR,
+            role_services.VIEWABLE_ROLES,
+        )
+        self.assertIn(
+            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            role_services.UPDATABLE_ROLES,
+        )
+        self.assertIn(
+            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            role_services.VIEWABLE_ROLES,
+        )
+        self.assertEqual(
+            role_services.get_all_actions(
+                [feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR]
+            ),
+            [],
+        )
+        self.assertCountEqual(
+            role_services.get_all_actions([feconf.ROLE_ID_RELEASE_COORDINATOR]),
+            role_services.get_all_actions(
+                [feconf.ROLE_ID_WEB_RELEASE_COORDINATOR]
+            ),
+        )
+
     def test_log_role_query(self) -> None:
         self.assertEqual(
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
