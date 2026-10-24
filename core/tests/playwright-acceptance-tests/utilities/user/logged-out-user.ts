@@ -2940,76 +2940,22 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  /**
-   * Types the given email into the newsletter input field (in the footer),
-   * clicks the Subscribe button, and waits for the thanks message.
-   * @param {string} email - The email to subscribe with.
-   */
-  async submitEmailForNewsletter(email: string): Promise<void> {
-    await this.waitForElementToBeClickable(newsletterEmailInputField);
-    await this.typeInInputField(newsletterEmailInputField, email);
-    await this.clickOnElementWithSelector(newsletterSubscribeButton);
-    await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
+  async clickOnTermsOfServiceLinkFooter(): Promise<void> {
+    const termsLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Terms of Service/i});
+    await termsLink.scrollIntoViewIfNeeded();
+    await termsLink.click();
   }
 
-  /**
-   * Checks that the "Thanks for subscribing!" message is shown after
-   * subscribing to the newsletter.
-   */
-  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
-    await this.expectTextContentToContain(
-      newsletterSubscriptionThanksMessage,
-      'Thanks for subscribing!'
-    );
-    showMessage('Subscribed to newsletter successfully');
-  }
-
-  /**
-   * Checks that the element with the given selector links to the expected
-   * external URL. The link is not opened, since it leads to an external site.
-   * @param {string} selector - The selector of the link.
-   * @param {string} expectedUrl - The expected href of the link.
-   */
-  async expectLinkToHaveHref(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
-    const url = await this.page.$eval(selector, element =>
-      element.getAttribute('href')
-    );
-    if (url !== expectedUrl) {
-      throw new Error(
-        `The ${selector} links to ${url}, expected ${expectedUrl}.`
-      );
-    }
-  }
-
-  /**
-   * Checks that the "Watch a video" button shown after subscribing to the
-   * newsletter has the correct link.
-   */
-  async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
-    await this.expectLinkToHaveHref(
-      watchAVideoButtonInThanksForSubscribe,
-      watchAVideoUrl
-    );
-    showMessage('The Watch a Video button has the right link.');
-  }
-
-  /**
-   * Checks that the "Read our blog" button shown after subscribing to the
-   * newsletter has the correct link.
-   */
-  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
-    await this.expectLinkToHaveHref(
-      readOurBlogButtonInThanksForSubscribe,
-      readBlogUrl
-    );
-    showMessage('The Read our blog button has the right link.');
+  async clickOnPrivacyPolicyLinkInFooter(): Promise<void> {
+    const privacyLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Privacy Policy/i});
+    await privacyLink.scrollIntoViewIfNeeded();
+    await privacyLink.click();
   }
 }
-
 export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
   return new LoggedOutUser(page);
 };
