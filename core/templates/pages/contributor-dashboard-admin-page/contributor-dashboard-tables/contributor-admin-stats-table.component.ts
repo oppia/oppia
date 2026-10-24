@@ -84,6 +84,9 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
+  isFetching: boolean = false;
+  lastFetchedTab: string | null = null;
+  lastFetchedFilter: ContributorAdminDashboardFilter | null = null;
   itemsPerPageChoice: number[] = [20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
@@ -294,6 +297,12 @@ export class ContributorAdminStatsTable implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.changesExist(changes)) {
+      if (
+        this.inputs.activeTab === this.lastFetchedTab &&
+        isEqual(this.inputs.filter, this.lastFetchedFilter)
+      ) {
+        return;
+      }
       this.loadingMessage = 'Loading';
       this.noDataMessage = '';
       this.refreshPagination();
@@ -381,6 +390,14 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   fetchContributorAdminStats(): void {
+    if (this.isFetching) {
+      return;
+    }
+    const currentTab = this.inputs.activeTab;
+    const currentFilter = this.inputs.filter;
+    this.isFetching = true;
+    this.lastFetchedTab = currentTab;
+    this.lastFetchedFilter = currentFilter;
     let contributionType: string = this.getContributionType(
       this.inputs.activeTab
     );
@@ -402,12 +419,17 @@ export class ContributorAdminStatsTable implements OnInit {
         this.tableCanShowMoreItems =
           this.getIndexOfLastItemOnPage() < this.allStats.length;
         this.loadingMessage = '';
+        this.isFetching = false;
         if (!this.hasSomeStats()) {
           this.noDataMessage = 'No statistics to display';
         } else {
           this.noDataMessage = '';
           this.updateColumns(contributionSubType);
         }
+      })
+      .catch(() => {
+        this.loadingMessage = '';
+        this.isFetching = false;
       });
   }
 
@@ -416,19 +438,21 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   displayContributorAdminStats(): void {
-    if (!this.hasSomeStats()) {
+    if (!this.hasSomeStats() && !this.isFetching) {
       this.fetchContributorAdminStats();
     } else {
       this.tableCanShowMoreItems =
         this.getIndexOfLastItemOnPage() < this.allStats.length;
       this.loadingMessage = '';
-      this.noDataMessage = '';
     }
   }
 
   refreshPagination(): void {
     this.loadingMessage = 'Loading';
+    this.noDataMessage = '';
     this.allStats = [];
+    this.lastFetchedTab = null;
+    this.lastFetchedFilter = null;
     this.goToPageNumber(0);
   }
 

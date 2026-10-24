@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * TC.1. Manage contributors' translation review rights.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -38,7 +39,9 @@ const LANGUAGE_SELECTOR_SELECTED = '.e2e-test-language-selector-selected';
 // the background layout is fully rendered before taking the modal screenshot.
 const NO_DATA_MESSAGE_SELECTOR = '.e2e-test-no-data-message';
 
-describe('Translation Coordinator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Translation Coordinator', function () {
   let translationCoordinator: TranslationCoordinator & ContributorAdmin;
   let translationSubmitter: ExplorationEditor &
     CurriculumAdmin &
@@ -48,10 +51,13 @@ describe('Translation Coordinator', function () {
   let translationReviewer2: TranslationReviewer & LoggedInUser & Contributor;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
+
     translationCoordinator = await UserFactory.createNewUser(
       'translationCoordinator',
       'translationCoordinator@example.com',
+      browser,
       [ROLES.TRANSLATION_COORDINATOR],
       ['en', 'hi']
     );
@@ -59,29 +65,45 @@ describe('Translation Coordinator', function () {
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'releaseCoordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
     await UserFactory.createNewUser(
       'translationReviewer1',
-      'translationReviewer1@example.com'
+      'translationReviewer1@example.com',
+      browser
     );
 
     translationReviewer2 = await UserFactory.createNewUser(
       'translationReviewer2',
       'translationReviewer2@example.com',
-      [ROLES.TRANSLATION_REVIEWER],
-      'hi'
+      browser
     );
 
     translationSubmitter = await UserFactory.createNewUser(
       'translationSubmitter',
       'translationSubmitter@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     // Turn on feature flag for new contributor admin dashboard.
     await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
+
+    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Reviewers'
+    );
+    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await translationCoordinator.addUsernameInUsernameInputModal(
+      'translationReviewer2'
+    );
+    await translationCoordinator.addLanguageInLanguageSelectorModal(
+      'hi',
+      'हिन्दी (Hindi)'
+    );
+    await translationCoordinator.closeLanguageSelectorModal();
 
     const explorationId =
       await translationSubmitter.createAndPublishExplorationWithCards(
@@ -92,7 +114,8 @@ describe('Translation Coordinator', function () {
     await translationSubmitter.createAndPublishTopic(
       'Fractions',
       'Basics of Fractions',
-      'fractions'
+      'fractions',
+      true
     );
 
     await translationSubmitter.createAndPublishStoryWithChapter(
@@ -110,7 +133,6 @@ describe('Translation Coordinator', function () {
     );
 
     // Navigate to contributor dashboard and submit one translation.
-    await translationSubmitter.navigateToLearnerDashboard();
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -154,9 +176,9 @@ describe('Translation Coordinator', function () {
     await translationReviewer2.submitTranslationReview('accept');
     await translationReviewer2.submitTranslationReview('accept', 'Looks good.');
     await translationReviewer2.expectReviewModalToBePresent(false);
-  }, 900000);
+  });
 
-  it('should be able to add language translation rights for a user', async function () {
+  test('should be able to add language translation rights for a user', async function () {
     // Navigate to the contributor dashboard admin page.
     await translationCoordinator.navigateToContributorDashboardAdminPage();
     await translationCoordinator.switchToTabInContributorAdminPage(
@@ -182,8 +204,7 @@ describe('Translation Coordinator', function () {
 
     await translationCoordinator.scrollToTopOfPage();
     await translationCoordinator.expectScreenshotToMatch(
-      'addTranslationRightsModal',
-      __dirname
+      'addTranslationRightsModal'
     );
 
     await translationCoordinator.addLanguageInLanguageSelectorModal(
@@ -192,6 +213,7 @@ describe('Translation Coordinator', function () {
     );
     await translationCoordinator.closeLanguageSelectorModal();
     await translationCoordinator.page.reload();
+    await translationCoordinator.waitForPageToFullyLoad();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
@@ -200,7 +222,7 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectNumberOfContributorsToBe(2);
   });
 
-  it('should filter translation submitters by last submitted date', async function () {
+  test('should filter translation submitters by last submitted date', async function () {
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Submitters'
     );
@@ -209,7 +231,7 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectNumberOfStatsRowsToBe(1);
   });
 
-  it('should be able to remove language translation rights for a user', async function () {
+  test('should be able to remove language translation rights for a user', async function () {
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
@@ -221,8 +243,7 @@ describe('Translation Coordinator', function () {
 
     await translationCoordinator.scrollToTopOfPage();
     await translationCoordinator.expectScreenshotToMatch(
-      'translationRightsModalWithHindiSelected',
-      __dirname
+      'translationRightsModalWithHindiSelected'
     );
 
     await translationCoordinator.removeLanguageFromLanguageSelectorModal(
@@ -230,6 +251,7 @@ describe('Translation Coordinator', function () {
     );
     await translationCoordinator.closeLanguageSelectorModal();
     await translationCoordinator.page.reload();
+    await translationCoordinator.waitForPageToFullyLoad();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
@@ -237,7 +259,7 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectNumberOfContributorsToBe(1);
   });
 
-  it('should show the Translation Coordinators tab with stats', async function () {
+  test('should show the Translation Coordinators tab with stats', async function () {
     await translationCoordinator.navigateToContributorDashboardAdminPage();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Coordinators'
@@ -245,7 +267,7 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectStatsTableToBeVisible();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
