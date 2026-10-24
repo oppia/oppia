@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Lint checks for python files."""
+"""Lint checks for css files."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ STYLELINT_CONFIG: Final = os.path.join('.stylelintrc')
 
 
 class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
-    """Manages all the third party Python linting functions."""
+    """Manages all the third party css linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyCSSLintChecksManager object.
