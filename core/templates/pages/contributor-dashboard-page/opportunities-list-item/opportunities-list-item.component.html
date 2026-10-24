@@ -146,7 +146,7 @@
          placement="bottom">
       <button class="e2e-test-opportunity-list-item-button"
               [ngClass]="{'oppia-opportunities-button': !opportunityButtonDisabled, 'oppia-opportunities-disabled-button': opportunityButtonDisabled}"
-              [hidden]="opportunityDataIsLoading || (correspondingOpportunityDeleted && !opportunity.allowViewingDeletedSkill)"
+              [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
               [disabled]="opportunityButtonDisabled"
               (click)="clickActionButton.emit(opportunity.id)">
         {{ opportunity?.actionButtonTitle }}
@@ -202,7 +202,7 @@
 
 <button *ngIf="!showOpportunityButton && onMobile && !opportunityDataIsLoading"
         class="oppia-opportunities-list-item oppia-button-list-item e2e-test-opportunity-list-item"
-        [hidden]="opportunityDataIsLoading || (correspondingOpportunityDeleted && !opportunity.allowViewingDeletedSkill)"
+        [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
         [disabled]="opportunityButtonDisabled"
         (click)="clickActionButton.emit(opportunity.id)">
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>

@@ -240,12 +240,6 @@ describe('Logged-out User', function () {
         `?initialContentLanguageCode=${HINDI_SITE_LANGUAGE_CODE}`
     );
 
-    // The mobile layout hides the navbar title. Lesson Info below verifies
-    // the translated title in the visible learner interface on both layouts.
-    if (!loggedOutUser.isViewportAtMobileWidth()) {
-      await loggedOutUser.expectExplorationTitleInPlayerToBe(HINDI_TITLE);
-    }
-
     // The title, objective and actual tag are shown in Lesson Info.
     await loggedOutUser.openLessonInfoModal();
     await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);

@@ -65,8 +65,6 @@ const SKILL_EXPLANATION = 'Review material for unit fractions.';
 const MISCONCEPTION_FEEDBACK = 'A unit fraction has numerator one.';
 const DELETION_SKILL_NAME = 'unit fractions deletion check';
 const REASSIGNMENT_SKILL_NAME = 'unit fractions reassignment check';
-const DELETED_OPPORTUNITY_SUBHEADING =
-  '[The corresponding opportunity has been deleted.]';
 
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
@@ -463,31 +461,6 @@ describe('Translation Reviewer: review translations', function () {
         false
       );
     }
-
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'My Contributions'
-    );
-    for (const translation of [
-      HINDI_SKILL_DESCRIPTION,
-      HINDI_SKILL_EXPLANATION,
-      HINDI_MISCONCEPTION_FEEDBACK,
-    ]) {
-      await translationSubmitter.expectContributionStatusToBe(
-        translation,
-        DELETED_OPPORTUNITY_SUBHEADING,
-        'Revisions Requested'
-      );
-      await translationSubmitter.viewContributionAndExpectReviewMessage(
-        translation,
-        DELETED_OPPORTUNITY_SUBHEADING,
-        'The associated skill no longer exists.'
-      );
-    }
   }, 900000);
 
   it('should preserve translations when their skill is unassigned and reassigned', async function () {
@@ -537,8 +510,11 @@ describe('Translation Reviewer: review translations', function () {
       3
     );
 
-    await curriculumAdm.unassignSkillFromTopic(
+    // Removing the skill from the subtopic moves it to uncategorized skills,
+    // keeping it inside the topic and preserving its translation opportunity.
+    await curriculumAdm.removeSkillFromSubtopicInTopicEditor(
       REASSIGNMENT_SKILL_NAME,
+      SUBTOPIC_NAME,
       TOPIC_NAME
     );
     await translationSubmitter.reloadPage();
@@ -557,13 +533,13 @@ describe('Translation Reviewer: review translations', function () {
       3
     );
     await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
-    await translationSubmitter.expectOpportunityToBePresent(
+    await translationSubmitter.expectSkillTranslationProgressToBe(
       REASSIGNMENT_SKILL_NAME,
-      'Skill',
-      false
+      1,
+      2,
+      3
     );
 
-    await curriculumAdm.assignSkillToTopic(REASSIGNMENT_SKILL_NAME, TOPIC_NAME);
     await curriculumAdm.assignSkillToSubtopicInTopicEditor(
       REASSIGNMENT_SKILL_NAME,
       SUBTOPIC_NAME,

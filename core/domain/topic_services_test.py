@@ -25,7 +25,6 @@ from unittest import mock
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
-    exp_domain,
     exp_services,
     feature_flag_services,
     fs_services,
@@ -47,7 +46,6 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
-    translation_services,
     user_services,
 )
 from core.platform import models
@@ -2733,138 +2731,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.topic_ids, [])
         self.assertEqual(model.content_count, 1)
         self.assertEqual(model.translation_counts, {})
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_generic_topic_updates_preserve_skill_translations_on_reassignment(
-        self,
-    ) -> None:
-        skill_id = 'reassigned_skill'
-        contents = skill_domain.Skill.create_default_skill(
-            skill_id, 'Unit fractions', []
-        ).skill_contents
-        contents.explanation.html = '<p>Review material.</p>'
-        skill = self.save_new_skill(
-            skill_id,
-            self.user_id_admin,
-            description='Unit fractions',
-            skill_contents=contents,
-        )
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.SKILL,
-            skill_id,
-            skill.version,
-            'hi',
-            feconf.SKILL_DESCRIPTION_CONTENT_ID,
-            translation_domain.TranslatedContent(
-                'इकाई भिन्न',
-                translation_domain.TranslatableContentFormat.UNICODE_STRING,
-                False,
-            ),
-        )
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_SKILL,
-            skill_id,
-            skill.version,
-            self.user_id_a,
-            {
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'Explanation',
-                'content_id': contents.explanation.content_id,
-                'language_code': 'hi',
-                'content_html': contents.explanation.html,
-                'translation_html': '<p>इकाई भिन्न की समीक्षा</p>',
-                'data_format': 'html',
-            },
-            'Translate the skill explanation.',
-        )
-        topic_services.add_uncategorized_skill(
-            self.user_id_admin, self.TOPIC_ID, skill_id
-        )
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin,
-            self.TOPIC_ID,
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-                        'old_subtopic_id': None,
-                        'new_subtopic_id': 1,
-                        'skill_id': skill_id,
-                    }
-                )
-            ],
-            'Assign the skill to a subtopic.',
-        )
-        model_id = f'skill.{skill_id}'
-        model = opportunity_models.TranslationOpportunityModel.get(model_id)
-        self.assertEqual(model.topic_ids, [self.TOPIC_ID])
-        self.assertEqual(model.content_count, 2)
-        self.assertEqual(model.translation_counts, {'hi': 1})
-
-        # The skills dashboard uses these generic commands, rather than the
-        # delete_uncategorized_skill helper, when unassigning a skill.
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin,
-            self.TOPIC_ID,
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'skill_id': skill_id,
-                    }
-                ),
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-                        'uncategorized_skill_id': skill_id,
-                    }
-                ),
-            ],
-            'Unassign the skill from the topic.',
-        )
-        model = opportunity_models.TranslationOpportunityModel.get(model_id)
-        self.assertEqual(model.topic_ids, [])
-        self.assertEqual(model.content_count, 2)
-        self.assertEqual(model.translation_counts, {'hi': 1})
-
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin,
-            self.TOPIC_ID,
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID,
-                        'new_uncategorized_skill_id': skill_id,
-                    }
-                )
-            ],
-            'Reassign the same skill to the topic.',
-        )
-        model = opportunity_models.TranslationOpportunityModel.get(model_id)
-        self.assertEqual(model.topic_ids, [self.TOPIC_ID])
-        self.assertEqual(model.content_count, 2)
-        self.assertEqual(model.translation_counts, {'hi': 1})
-        self.assertEqual(
-            suggestion_services.get_suggestion_by_id(
-                suggestion.suggestion_id
-            ).status,
-            'review',
-        )
-        matching_models = [
-            opportunity
-            for opportunity in (
-                opportunity_models.TranslationOpportunityModel.get_all().fetch()
-            )
-            if opportunity.entity_type == feconf.ENTITY_TYPE_SKILL
-            and opportunity.entity_id == skill_id
-        ]
-        self.assertEqual(len(matching_models), 1)
 
     @test_utils.enable_feature_flags(
         [

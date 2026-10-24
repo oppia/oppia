@@ -49,7 +49,6 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {ContributorDashboardConstants} from '../contributor-dashboard-page.constants';
 
 interface HTMLSchema {
   type: 'html';
@@ -285,14 +284,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   refreshActiveContributionState(): void {
     this.activeContribution = this.allContributions[this.activeSuggestionId];
 
-    // Resolved skill suggestions retain their source, translation and feedback
-    // after deletion. They can be viewed without allowing further review.
-    const canViewDeletedSkill =
-      !this.reviewable &&
-      this.activeContribution.suggestion.target_type ===
-        AppConstants.ENTITY_TYPE.SKILL &&
-      this.activeContribution.suggestion.status !== 'review';
-    if (this.activeContribution.details === null && !canViewDeletedSkill) {
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (this.activeContribution.details === null) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
@@ -301,10 +295,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
     );
-    if (this.activeContribution.details === null) {
-      this.subheading =
-        ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
-    } else if (
+    if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
