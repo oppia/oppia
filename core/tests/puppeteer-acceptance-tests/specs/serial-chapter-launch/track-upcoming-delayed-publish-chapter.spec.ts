@@ -102,11 +102,12 @@ describe('Logged-In Learner', function () {
       'Rounding Numbers part 1',
     ];
 
-    for (const chapter of placeValueChapters) {
+    for (const [index, chapter] of placeValueChapters.entries()) {
       const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
         chapter,
         'Algebra',
-        1
+        1,
+        index === 0
       );
       chapterIds.push(expId ?? '');
     }

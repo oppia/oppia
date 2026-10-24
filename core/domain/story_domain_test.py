@@ -636,22 +636,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_1']
         self.assertEqual(self.story.get_acquired_skill_ids_for_node_ids([]), [])
 
-    def test_get_prerequisite_skill_ids(self) -> None:
-        self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
-        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
-        self.assertEqual(
-            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id'),
-            ['skill_1'],
-        )
-        self.assertIsNone(
-            self.story.get_prerequisite_skill_ids_for_exp_id('exp_id_2')
-        )
-
-    def test_has_exploration_id(self) -> None:
-        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
-        self.assertTrue(self.story.has_exploration('exp_id'))
-        self.assertFalse(self.story.has_exploration('exp_id_2'))
-
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.

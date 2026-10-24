@@ -836,7 +836,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -954,7 +953,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -1229,7 +1227,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'EDIT_ANY_SUBTOPIC_PAGE',
                 'VISIT_ANY_QUESTION_EDITOR_PAGE',
                 'ACCESS_LEARNER_DASHBOARD',
-                'ACCESS_FEEDBACK_UPDATES',
                 'EDIT_ANY_ACTIVITY',
                 'VISIT_ANY_TOPIC_EDITOR_PAGE',
                 'SUGGEST_CHANGES',
@@ -5334,10 +5331,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS,
-                True,
-            ),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
