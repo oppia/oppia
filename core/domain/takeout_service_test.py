@@ -1441,6 +1441,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'android_platform_parameter_config_snapshot_metadata': {},
             'certificate_assessment_offering_snapshot_metadata': (
                 expected_certificate_assessment_offering_sm
             ),
@@ -2421,6 +2422,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'android_platform_parameter_config_snapshot_metadata': {},
             'certificate_assessment_offering_snapshot_metadata': (
                 expected_certificate_assessment_offering_sm
             ),
