@@ -212,6 +212,18 @@ const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
 
+// Newsletter selectors and URLs.
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
+const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
+const newsletterSubscriptionThanksMessage =
+  '.e2e-test-thanks-subscribe-message';
+const watchAVideoButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-watch-video-btn';
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
+const watchAVideoUrl = 'https://youtu.be/OConyxG7HaM';
+const readBlogUrl = testConstants.URLs.ReadBlogLink;
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
