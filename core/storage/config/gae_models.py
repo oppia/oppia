@@ -209,3 +209,92 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         feature_flag_entity.update_timestamps()
         feature_flag_entity.put()
         return feature_flag_entity
+
+
+class AndroidFeatureFlagConfigModel(base_models.BaseFeatureFlagConfigModel):
+    """A class that represents named dynamic android feature-flag.
+
+    The id is the name of the android feature-flag.
+    """
+
+    # State of the android feature flag. It can be either 'LIVE' or 'FINAL'.
+    # The 'LIVE' state indicates that the feature flag is configurable and can be updated.
+    # The 'FINAL' state indicates that the feature flag is locked and immutable.
+    state = datastore_services.StringProperty(required=True, indexed=True)
+    # Minimum Android app version for which the flag applies.
+    min_app_version = datastore_services.StringProperty(
+        default=None, indexed=True
+    )
+    # Maximum Android app version for which the flag applies.
+    max_app_version = datastore_services.StringProperty(
+        default=None, indexed=True
+    )
+    # The percentage of logged-in users for which the feature flag will
+    # be enabled. The value of this field should be between 0 and 100.
+    rollout_percentage = datastore_services.IntegerProperty(
+        default=0, indexed=True
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Android feature flags are not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'min_app_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'max_app_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create(
+        cls,
+        android_feature_flag_name: str,
+        state: str,
+        min_app_version: str,
+        max_app_version: str | None,
+        rollout_percentage: int,
+    ) -> AndroidFeatureFlagConfigModel:
+        """Creates an AndroidFeatureFlagConfigModel instance.
+
+        Args:
+            android_feature_flag_name: str. The name of the android feature-flag.
+            state: str. The lifecycle state of the feature flag. Allowed values
+                are:
+                - LIVE: The feature flag is configurable and may be updated.
+                - FINAL: The feature flag is locked and must not be modified.
+            min_app_version: str. The minimum Android app version for which the
+                feature flag applies.
+            max_app_version: Optional[str]. The maximum Android app version for
+                which the feature flag applies. If None, the flag applies to all
+                versions greater than or equal to min_app_version.
+            rollout_percentage: int. Percentage of users for which the feature
+                flag is enabled. Must be in the range [0, 100].
+
+        Returns:
+            AndroidFeatureFlagConfigModel. The created AndroidFeatureFlagConfigModel instance.
+        """
+        model = cls(
+            id=android_feature_flag_name,
+            state=state,
+            min_app_version=min_app_version,
+            max_app_version=max_app_version,
+            rollout_percentage=rollout_percentage,
+        )
+        model.update_timestamps()
+        model.put()
+        return model
