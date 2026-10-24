@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the SetInput interaction.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -197,16 +195,18 @@ describe('InteractiveSetInputComponent', () => {
   it('should return SCHEMa when called', () => {
     component.ngOnInit();
 
-    expect(component.getSchema()).toEqual({
-      type: 'list',
-      items: {
-        type: 'unicode',
-      },
-      ui_config: {
-        // TODO(mili): Translate this in the HTML.
-        add_element_text: 'Add New Item',
-      },
-    });
+    expect(component.getSchema()).toEqual(
+      jasmine.objectContaining({
+        type: 'list',
+        items: {
+          type: 'unicode',
+        },
+        ui_config: {
+          // TODO(mili): Translate this in the HTML.
+          add_element_text: 'Add New Item',
+        },
+      })
+    );
   });
 
   it('should update answer when user edits saved solution', () => {

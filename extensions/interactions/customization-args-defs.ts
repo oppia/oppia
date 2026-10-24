@@ -31,6 +31,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 export interface LabeledRegion {
   region: {
     area: number[][];
+    regionType?: string;
   };
   label: string;
 }
