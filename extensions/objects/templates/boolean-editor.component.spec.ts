@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for boolean editor.
  */
 
-// @ts-nocheck
-
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BooleanEditorComponent} from './boolean-editor.component';
 
@@ -42,7 +40,7 @@ describe('BooleanEditorComponent', () => {
 
     component.setValue(true);
 
-    expect(component.value).toBeTrue();
+    expect(component.value).toBe(true);
   });
 
   it('should set value as false when the user unchecks the checkbox', () => {
@@ -50,18 +48,22 @@ describe('BooleanEditorComponent', () => {
 
     component.setValue(false);
 
-    expect(component.value).toBeFalse();
+    expect(component.value).toBe(false);
   });
 
   it('should set value from the checkbox change event', () => {
     spyOn(component.valueChanged, 'emit');
     component.value = false;
 
-    component.onValueChange({
-      target: {checked: true},
-    } as Event);
+    const inputElement = document.createElement('input');
+    inputElement.type = 'checkbox';
+    inputElement.checked = true;
+    const event = new Event('change');
+    Object.defineProperty(event, 'target', {value: inputElement});
 
-    expect(component.value).toBeTrue();
+    component.onValueChange(event);
+
+    expect(component.value).toBe(true);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(true);
   });
 });
