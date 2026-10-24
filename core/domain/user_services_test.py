@@ -1467,7 +1467,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         #  Assigning multiple roles to blog editor.
         self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_RELEASE_COORDINATOR
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_WEB_RELEASE_COORDINATOR
         )
         self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
 
