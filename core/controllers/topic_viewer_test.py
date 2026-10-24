@@ -20,7 +20,6 @@ from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
-    platform_parameter_list,
     question_services,
     skill_services,
     state_domain,
@@ -32,6 +31,7 @@ from core.domain import (
     user_services,
     voiceover_domain,
     voiceover_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -227,14 +227,14 @@ class TopicPageDataHandlerTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_get_with_user_logged_in(self) -> None:

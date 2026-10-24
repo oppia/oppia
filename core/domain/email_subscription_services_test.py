@@ -21,8 +21,8 @@ from __future__ import annotations
 from core import feconf
 from core.domain import (
     email_subscription_services,
-    platform_parameter_list,
     subscription_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -71,18 +71,21 @@ class InformSubscribersTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'EMAIL_FOOTER'),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.EMAIL_FOOTER,
+                'EMAIL_FOOTER',
+            ),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]

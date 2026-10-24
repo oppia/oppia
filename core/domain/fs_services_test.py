@@ -24,8 +24,8 @@ from core.constants import constants
 from core.domain import (
     fs_services,
     image_services,
-    platform_parameter_list,
     user_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -423,7 +423,7 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
                 'test-url',
             ),
         ]

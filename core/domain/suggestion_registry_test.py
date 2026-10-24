@@ -30,7 +30,6 @@ from core.domain import (
     fs_services,
     html_validation_service,
     opportunity_services,
-    platform_parameter_list,
     question_domain,
     question_services,
     skill_services,
@@ -41,6 +40,7 @@ from core.domain import (
     translation_domain,
     translation_fetchers,
     user_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -4120,7 +4120,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]
@@ -4147,7 +4147,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]
@@ -4174,7 +4174,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]
@@ -4235,7 +4235,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]
@@ -4254,7 +4254,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]
@@ -4273,7 +4273,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+                web_platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
                 1,
             )  # pylint: disable=line-too-long
         ]

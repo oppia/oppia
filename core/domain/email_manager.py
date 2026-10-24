@@ -30,9 +30,6 @@ from core.domain import (
     email_services,
     general_feedback_domain,
     html_cleaner,
-    platform_parameter_list,
-    platform_parameter_registry,
-    platform_parameter_services,
     rights_domain,
     story_domain,
     subscription_services,
@@ -40,6 +37,9 @@ from core.domain import (
     taskqueue_services,
     topic_services,
     user_services,
+    web_platform_parameter_list,
+    web_platform_parameter_registry,
+    web_platform_parameter_services,
 )
 from core.platform import models
 
@@ -75,7 +75,7 @@ app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 secrets_services = models.Registry.import_secrets_services()
 
-PlatformParameterRegistry = platform_parameter_registry.Registry
+PlatformParameterRegistry = web_platform_parameter_registry.Registry
 
 
 NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -577,18 +577,18 @@ def get_rendered_email_footer() -> str:
     Returns:
         str. The rendered email footer.
     """
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
+    email_footer = (
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.EMAIL_FOOTER.value
+        )
     )
     assert isinstance(email_footer, str)
 
     if feconf.EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER not in email_footer:
         return email_footer
 
-    oppia_site_url_for_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
-        )
+    oppia_site_url_for_emails = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url_for_emails, str)
 
@@ -644,8 +644,8 @@ def _send_email(
 
     if sender_name is None:
         email_sender_name = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+            web_platform_parameter_services.get_web_platform_parameter_value(
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
             )
         )
         assert isinstance(email_sender_name, str)
@@ -747,16 +747,16 @@ def send_dummy_mail_to_admin(username: str) -> None:
     email_body = 'This is a test mail from %s.' % (username)
     email_subject = 'Test Mail'
     system_name_email = '%s <%s>' % (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
         ),
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         ),
     )
     admin_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(admin_email_address, str)
@@ -784,16 +784,16 @@ def send_mail_to_admin(email_subject: str, email_body: str) -> None:
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
     system_name_email = '%s <%s>' % (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
         ),
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         ),
     )
     admin_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(admin_email_address, str)
@@ -818,35 +818,35 @@ def send_post_signup_email(
     """
 
     email_subject_content_param_name = (
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
+        web_platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
     )
     email_subject_content = (
-        platform_parameter_services.get_platform_parameter_value(
+        web_platform_parameter_services.get_web_platform_parameter_value(
             email_subject_content_param_name
         )
     )
-    # Here we use assert because the get_platform_parameter_value returns
-    # value of type platform_parameter_domain.PlatformDataTypes and we
+    # Here we use assert because the get_web_platform_parameter_value returns
+    # value of type web_platform_parameter_domain.PlatformDataTypes and we
     # are sure that email_subject_content is of type str. This helps us
     # avoid the mypy error.
     assert isinstance(email_subject_content, str)
     email_body_content_param_name = (
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+        web_platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
     )
     email_body_content = (
-        platform_parameter_services.get_platform_parameter_value(
+        web_platform_parameter_services.get_web_platform_parameter_value(
             email_body_content_param_name
         )
     )
     assert isinstance(email_body_content, str)
     if not test_for_duplicate_email:
         email_subject_content_default_value = (
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 email_subject_content_param_name
             ).default_value
         )
         email_body_content_default_value = (
-            platform_parameter_registry.Registry.get_platform_parameter(
+            web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 email_body_content_param_name
             ).default_value
         )
@@ -877,8 +877,8 @@ def send_post_signup_email(
         email_footer,
     )
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -907,8 +907,8 @@ def get_moderator_unpublish_exploration_email() -> str:
     if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         return ''
 
-    unpublish_exp_email_html_body = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
+    unpublish_exp_email_html_body = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
     )
     # Ruling out the possibility of Any for mypy type checking.
     assert isinstance(unpublish_exp_email_html_body, str)
@@ -963,8 +963,8 @@ def send_moderator_action_email(
         email_footer,
     )
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(system_email_address, str)
@@ -1062,8 +1062,8 @@ def send_role_notification_email(
         email_footer,
     )
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -1123,8 +1123,8 @@ def send_emails_to_subscribers(
         recipient_list
     )
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -1154,10 +1154,8 @@ def _get_oppia_site_url_for_feedback_emails() -> str:
     Returns:
         str. The Oppia site URL configured for email notifications.
     """
-    oppia_site_url_for_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
-        )
+    oppia_site_url_for_emails = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url_for_emails, str)
     return oppia_site_url_for_emails
@@ -1525,8 +1523,8 @@ def send_feedback_submission_email(
         )
 
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(system_email_address, str)
@@ -1569,8 +1567,8 @@ def send_feedback_status_change_email(
     )
 
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(system_email_address, str)
@@ -1615,8 +1613,8 @@ def send_feedback_reply_email(
     )
 
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(system_email_address, str)
@@ -1702,8 +1700,8 @@ def send_feedback_message_email(
     )
 
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -1802,8 +1800,8 @@ def send_suggestion_email(
     )
     email_footer = get_rendered_email_footer()
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -1882,10 +1880,8 @@ def send_instant_feedback_message_email(
             message,
             email_footer,
         )
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
         _send_email(
@@ -1944,8 +1940,8 @@ def send_flag_exploration_email(
     )
 
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -2015,10 +2011,8 @@ def send_mail_to_onboard_new_reviewers(
             category,
             email_footer,
         )
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
         _send_email(
@@ -2075,10 +2069,8 @@ def send_mail_to_notify_users_to_review(
             category,
             email_footer,
         )
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
         _send_email(
@@ -2190,8 +2182,8 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+    if not web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
     ):
         logging.error(
             'The "notify_admins_suggestions_waiting_too_long" property '
@@ -2293,14 +2285,14 @@ def _send_suggestions_waiting_too_long_email(
         )
     )
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2350,8 +2342,8 @@ def send_reviewer_notifications(
         logging.error('This app cannot send emails to users.')
         return
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2383,10 +2375,8 @@ def send_reviewer_notifications(
                 _create_html_for_reviewable_suggestion_email_info(suggestion)
             )
 
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
 
@@ -2445,8 +2435,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+    if not web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
     ):
         logging.error(
             'The "enable_admin_notifications_for_reviewer_shortage" '
@@ -2466,8 +2456,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('There were no admins to notify.')
         return
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2581,14 +2571,14 @@ def _send_reviews_needed_email_to_admins(
         )
     )
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
     for index, admin_id in enumerate(admin_ids):
@@ -2648,8 +2638,8 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         ]
     )
 
-    if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+    if not web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
     ):
         logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
@@ -2681,14 +2671,14 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     email_footer = get_rendered_email_footer()
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2761,8 +2751,8 @@ def send_mail_to_notify_contributor_ranking_achievement(
         contributor_ranking_email_info.contributor_user_id
     ).can_receive_email_updates
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2796,10 +2786,8 @@ def send_mail_to_notify_contributor_ranking_achievement(
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
             )
 
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
 
@@ -2846,8 +2834,8 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     overdue_stories_html = ''
 
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    oppia_site_url = web_platform_parameter_services.get_web_platform_parameter_value(
+        web_platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
     )
     assert isinstance(oppia_site_url, str)
 
@@ -2903,14 +2891,14 @@ def send_reminder_mail_to_notify_curriculum_admins(
     email_body += 'Regards,<br> Oppia Foundation'
 
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
     system_email_name = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value
         )
     )
     assert isinstance(system_email_name, str)
@@ -2949,8 +2937,8 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
 
     email_body = email_body_template % user_email
     noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
     )
     assert isinstance(noreply_email_address, str)
@@ -3085,10 +3073,8 @@ def send_email_to_new_cd_user(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
         _send_email(
@@ -3179,10 +3165,8 @@ def send_email_to_removed_cd_user(
             rights_message,
             category_data['category'],
         )
-        noreply_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-            )
+        noreply_email_address = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
         )
         assert isinstance(noreply_email_address, str)
         _send_email(
@@ -3396,8 +3380,8 @@ def send_emails_to_voiceover_admins(
     )
 
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
 
@@ -3467,8 +3451,8 @@ def send_emails_to_voiceover_tech_leads(
     ]
 
     system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
         )
     )
 

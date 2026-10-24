@@ -22,7 +22,7 @@ import collections
 import enum
 
 from core import feconf, utils
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
 from typing import Dict, Final, List, Optional, Union
@@ -31,7 +31,7 @@ ServerMode = parameter_domain.ServerMode
 
 
 class DummyParamName(enum.Enum):
-    """Test class to mock platform_parameter_list.
+    """Test class to mock web_platform_parameter_list.
     ALL_PLATFORM_PARAMS_LIST
     """
 

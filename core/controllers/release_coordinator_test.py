@@ -24,8 +24,8 @@ from core.domain import (
     feature_flag_domain,
     feature_flag_registry,
     feature_flag_services,
-    platform_parameter_list,
     user_services,
+    web_platform_parameter_list,
 )
 from core.tests import test_utils
 
@@ -66,7 +66,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # address and hence cached.
         self.assertEqual(
             response['total_keys_stored'],
-            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1,
+            len(web_platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1,
         )
 
     def test_flush_memory_cache(self) -> None:
@@ -78,7 +78,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # address and hence cached.
         self.assertEqual(
             response['total_keys_stored'],
-            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1,
+            len(web_platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1,
         )
 
         self.delete_json('/memorycachehandler')
@@ -89,7 +89,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # cached.
         self.assertEqual(
             response['total_keys_stored'],
-            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST),
+            len(web_platform_parameter_list.ALL_PLATFORM_PARAMS_LIST),
         )
 
 
