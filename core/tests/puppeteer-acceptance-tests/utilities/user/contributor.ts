@@ -646,16 +646,16 @@ export class Contributor extends ExplorationEditor {
     count: number
   ): Promise<void> {
     await this.waitForOpportunitiesToLoad();
-    const actualCount = await this.page.$$eval(
-      opportunityItemSelector,
+    const actualCount = await this.page.evaluate(
       (
-        rows,
+        itemSelector: string,
         headingSelector: string,
         subheadingSelector: string,
         expectedHeading: string,
         expectedSubheading: string
-      ) =>
-        rows.filter(
+      ) => {
+        const rows = Array.from(document.querySelectorAll(itemSelector));
+        return rows.filter(
           row =>
             row.querySelector(headingSelector)?.getAttribute('title') ===
               expectedHeading &&
@@ -663,7 +663,9 @@ export class Contributor extends ExplorationEditor {
               .querySelector(subheadingSelector)
               ?.getAttribute('title')
               ?.includes(expectedSubheading)
-        ).length,
+        ).length;
+      },
+      opportunityItemSelector,
       opportunityItemHeadingSelector,
       opportunitySubHeadingSelector,
       heading,
