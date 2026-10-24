@@ -222,6 +222,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   // Initializes the exploration page using data from the backend.
   // Called on page load.
   initExplorationPage(): Promise<void> {
+    this.explorationEditorPageHasInitialized = false;
     this.editabilityService.lockExploration(true);
     this.modifyTranslationsFeatureFlagIsEnabled =
       this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
