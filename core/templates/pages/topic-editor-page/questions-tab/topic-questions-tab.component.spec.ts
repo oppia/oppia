@@ -199,12 +199,8 @@ describe('Topic questions tab', () => {
     expect(component.topicRights).toEqual(topicRights);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     expect(component.allSkillSummaries).toEqual(allSkillSummaries);
-    expect(component.getSkillsCategorizedByTopics).toBe(
-      categorizedSkillsDictData
-    );
-    expect(component.getUntriagedSkillSummaries).toBe(
-      untriagedSkillSummariesData
-    );
+    expect(component.skillsCategorizedByTopics).toBe(categorizedSkillsDictData);
+    expect(component.untriagedSkillSummaries).toBe(untriagedSkillSummariesData);
     expect(component.canEditQuestion).toBe(false);
   });
 
