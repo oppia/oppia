@@ -22,7 +22,7 @@ from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,8 +60,20 @@ class Registry:
         )
 
         if feature_flag_spec_values is not None:
+            if len(feature_flag_spec_values) > 2:
+                # Here we use cast because mypy does not narrow the tuple
+                # length based on the len() check.
+                feature_flag_spec_values_with_notes = cast(
+                    Tuple[str, feature_flag_domain.ServerMode, Optional[str]],
+                    feature_flag_spec_values,
+                )
+                developer_notes = feature_flag_spec_values_with_notes[2]
+            else:
+                developer_notes = None
             feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
-                feature_flag_spec_values[0], feature_flag_spec_values[1]
+                feature_flag_spec_values[0],
+                feature_flag_spec_values[1],
+                developer_notes,
             )
         else:
             raise Exception('Feature flag not found: %s.' % name)
