@@ -74,6 +74,9 @@ export class ExplorationInitializationService {
     ]).then(combinedData => {
       let explorationData = combinedData[0];
       let featuresData: ExplorationFeatures = combinedData[1];
+      const explorationVersion = explorationData.version;
+
+      this.pageContextService.setExplorationVersion(explorationVersion);
 
       this.explorationFeaturesService.init(
         {
@@ -84,7 +87,7 @@ export class ExplorationInitializationService {
       );
       this.explorationEngineService.init(
         explorationData,
-        null,
+        explorationVersion,
         null,
         null,
         [],
