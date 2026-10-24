@@ -1413,6 +1413,75 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Remove a skill from a subtopic in the topic editor page.
+   */
+  async removeSkillFromSubtopicInTopicEditor(
+    skillName: string,
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(subtopicReassignHeader);
+    }
+
+    await this.page.waitForSelector('.subtopic-name-card-header', {
+      visible: true,
+    });
+    await this.page.evaluate((targetSubtopic: string) => {
+      const headers = Array.from(
+        document.querySelectorAll('.subtopic-name-card-header')
+      ) as HTMLElement[];
+      const header = headers.find(el =>
+        el.textContent?.includes(targetSubtopic)
+      );
+      if (header) {
+        const card = header.closest('.subtopics-list-item');
+        if (card && !card.querySelector('.subtopic-skill')) {
+          header.click();
+        }
+      }
+    }, subtopicName);
+
+    await this.page.waitForSelector('.subtopic-skill', {visible: true});
+    await this.page.evaluate((targetSkill: string) => {
+      const skills = Array.from(
+        document.querySelectorAll('.subtopic-skill')
+      ) as HTMLElement[];
+      const matchedSkill = skills.find(el =>
+        el.textContent?.includes(targetSkill)
+      );
+      if (matchedSkill) {
+        const moreOptions = matchedSkill.querySelector(
+          'i.fa-ellipsis-v'
+        ) as HTMLElement;
+        if (moreOptions) {
+          moreOptions.click();
+        }
+      } else {
+        throw new Error(`Cannot find skill "${targetSkill}" in subtopic.`);
+      }
+    }, skillName);
+
+    await this.page.waitForSelector('.skill-edit-option', {visible: true});
+    await this.page.evaluate(() => {
+      const options = Array.from(
+        document.querySelectorAll('.skill-edit-option')
+      ) as HTMLElement[];
+      const removeOption = options.find(el =>
+        el.textContent?.includes('Remove from subtopic')
+      );
+      if (removeOption) {
+        removeOption.click();
+      } else {
+        throw new Error('Could not find "Remove from subtopic" option.');
+      }
+    });
+
+    await this.saveTopicDraft(topicName);
+  }
+
+  /**
    * Updates a rubric.
    * @param {string} difficulty - The difficulty level to update.
    * @param {string} explanation - The explanation to update.
