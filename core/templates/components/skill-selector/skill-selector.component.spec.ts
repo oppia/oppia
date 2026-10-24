@@ -128,6 +128,51 @@ describe('SkillSelectorComponent', () => {
     expect(component.checkTopicIsNotEmpty('topic2')).toBe(false);
   });
 
+  it('should only show filters containing skills that match the search', () => {
+    component.categorizedSkills = {
+      topic1: {
+        uncategorized: [],
+        subtopic1: [ShortSkillSummary.create('skill1', 'Addition')],
+      },
+      topic2: {
+        uncategorized: [],
+        subtopic2: [ShortSkillSummary.create('skill2', 'Multiplication')],
+      },
+    };
+    component.ngOnInit();
+
+    expect(component.visibleTopicFilterList).toEqual(component.topicFilterList);
+    expect(component.visibleSubTopicFilterDict).toEqual(
+      component.subTopicFilterDict
+    );
+
+    component.skillFilterText = 'Multiplication';
+    component.updateSkillsListOnSubtopicFilterChange();
+
+    expect(component.visibleTopicFilterList).toEqual([
+      component.topicFilterList[1],
+    ]);
+    expect(component.visibleSubTopicFilterDict).toEqual({
+      topic2: [component.subTopicFilterDict.topic2[1]],
+    });
+
+    component.subTopicFilterDict.topic2[1].checked = true;
+    component.skillFilterText = 'No matching skill';
+    component.updateSkillsListOnSubtopicFilterChange();
+
+    expect(component.visibleTopicFilterList).toEqual([]);
+    expect(component.visibleSubTopicFilterDict).toEqual({});
+
+    component.skillFilterText = '';
+    component.updateSkillsListOnSubtopicFilterChange();
+
+    expect(component.visibleTopicFilterList).toEqual(component.topicFilterList);
+    expect(component.visibleSubTopicFilterDict).toEqual(
+      component.subTopicFilterDict
+    );
+    expect(component.subTopicFilterDict.topic2[1].checked).toBe(true);
+  });
+
   it('should set selected skill Id when user clicks on radio button', () => {
     component.selectedSkill = 'skill1';
     spyOn(component.selectedSkillIdChange, 'emit');
