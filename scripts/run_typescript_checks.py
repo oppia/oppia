@@ -43,14 +43,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/statistics/learner-answer-info.model.ts',
     'core/templates/domain/topic/topic-update.service.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
-    'core/templates/pages/classroom-page/classroom-page.module.ts',
-    'core/templates/pages/collection-editor-page/editor-tab/collection-node-creator.component.ts',
-    'core/templates/pages/collection-player-page/collection-player-page.component.ts',
-    'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
-    'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
-    'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
-    'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
-    'core/templates/services/rte-helper-modal.component.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
@@ -83,31 +75,11 @@ STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
 TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'tsconfig-template-strict.json'
 TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-template-strict.json'
-TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH = os.path.join(
-    'scripts', 'template_strict_exclude_paths.txt'
-)
 TYPE_TESTS_TSCONFIG_FILEPATH = os.path.join('typings', 'tests', 'tsconfig.json')
 PREFIXES = ('core', 'extensions', 'typings')
 TEMPLATE_ERROR_FILEPATH_REGEX = re.compile(
     r'((?:core/templates|extensions)/[^\n:]+\.ts)'
 )
-
-
-def load_exclude_paths(filepath: str) -> List[str]:
-    """Loads a newline-delimited strict-check allowlist from a file.
-
-    Args:
-        filepath: str. The path of the allowlist file.
-
-    Returns:
-        List[str]. The allowlisted file paths.
-    """
-    with open(filepath, 'r', encoding='utf-8') as f:
-        return [
-            line.strip()
-            for line in f.readlines()
-            if line.strip() and not line.startswith('#')
-        ]
 
 
 def validate_compiled_js_dir() -> None:
@@ -227,7 +199,8 @@ def run_ngcc() -> None:
 def compile_temp_strict_template_tsconfig(
     config_path: str, error_messages: List[str]
 ) -> None:
-    """Compiles a strict Angular-template config for non-allowlisted files.
+    """Compiles a strict Angular-template config for files with template
+    errors.
 
     Args:
         config_path: str. The config that should be used to run the template
@@ -236,18 +209,9 @@ def compile_temp_strict_template_tsconfig(
             compiling the full strict template config.
     """
     errors = [x.strip() for x in error_messages]
-    files_with_errors = sorted(
+    files_not_template_strict = sorted(
         set(TEMPLATE_ERROR_FILEPATH_REGEX.findall('\n'.join(errors)))
     )
-
-    template_strict_exclude_paths = load_exclude_paths(
-        TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH
-    )
-    files_not_template_strict = [
-        filename
-        for filename in files_with_errors
-        if filename not in template_strict_exclude_paths
-    ]
     files_not_template_strict.append('typings')
 
     with open(TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
