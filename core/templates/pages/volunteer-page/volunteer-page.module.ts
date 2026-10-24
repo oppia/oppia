@@ -17,20 +17,27 @@
  */
 
 import {NgModule} from '@angular/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
 import {VolunteerPageComponent} from './volunteer-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {VolunteerPageRootComponent} from './volunteer-page-root.component';
 import {CommonModule} from '@angular/common';
 import {VolunteerPageRoutingModule} from './volunteer-page-routing.module';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {MatTabsModule} from '@angular/material/tabs';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    MatTabsModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     VolunteerPageRoutingModule,
-    NgbModule,
+    NgbCarouselModule,
     CampaignBannerModule,
   ],
   declarations: [VolunteerPageComponent, VolunteerPageRootComponent],

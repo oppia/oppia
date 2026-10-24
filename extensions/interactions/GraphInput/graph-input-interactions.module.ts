@@ -26,14 +26,14 @@ import {ResponseGraphInput} from './directives/oppia-response-graph-input.compon
 import {ShortResponseGraphInput} from './directives/oppia-short-response-graph-input.component';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {DirectivesModule} from 'directives/directives.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule,
+    MatButtonModule,
     DirectivesModule,
     SharedPipesModule,
     TranslateModule,

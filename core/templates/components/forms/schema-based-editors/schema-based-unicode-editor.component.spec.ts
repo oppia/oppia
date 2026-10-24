@@ -21,6 +21,7 @@ import {FormControl, FormsModule} from '@angular/forms';
 import {
   ComponentFixture,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   tick,
   waitForAsync,
@@ -108,6 +109,7 @@ describe('Schema Based Unicode Editor', () => {
     } as unknown as CodeMirror.Editor;
     spyOn(cm, 'replaceSelection');
     component.ngOnInit();
+    flushMicrotasks();
 
     component.registerOnTouched(null);
     let mockFunction = function (value: string) {
@@ -139,6 +141,7 @@ describe('Schema Based Unicode Editor', () => {
     ).and.returnValue(onSchemaBasedFormsShownEmitter);
 
     component.ngOnInit();
+    flushMicrotasks();
     tick(200);
 
     expect(component.codemirrorStatus).toBeTrue();

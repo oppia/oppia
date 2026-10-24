@@ -48,7 +48,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {ContentTranslationLanguageChangeService} from 'services/content-translation-language-change.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
@@ -216,7 +216,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private platformFeatureService: PlatformFeatureService,
     private languageBannerService: LanguageBannerService,
     private signInEventService: SignInEventService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private contentTranslationManagerService: ContentTranslationLanguageChangeService
   ) {}
 
   ngOnInit(): void {

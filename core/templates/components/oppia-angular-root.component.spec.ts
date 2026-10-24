@@ -118,8 +118,8 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should emit once ngAfterViewInit is called', () => {
-    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
-      () => {}
+    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(() =>
+      Promise.resolve()
     );
     component.ngOnInit();
     component.ngAfterViewInit();

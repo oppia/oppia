@@ -19,7 +19,6 @@
 import {ToastrModule} from 'ngx-toastr';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {RouterModule} from '@angular/router';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {SkillEditorNavbarBreadcrumbComponent} from 'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.component';
 import {DeleteMisconceptionModalComponent} from './modal-templates/delete-misconception-modal.component';
@@ -44,12 +43,59 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
 import {RteHelperService} from 'services/rte-helper.service';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {CommonModule} from '@angular/common';
+import {ConfirmQuestionExitModalModule} from 'components/shared_parts/confirm-question-exit-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {StaleTabInfoModalModule} from 'components/shared_parts/stale-tab-info-modal.module';
+import {UnsavedChangesStatusInfoModalModule} from 'components/shared_parts/unsaved-changes-status-info-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {FormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import {QuestionsListModule} from 'components/shared_parts/questions-list.module';
+import {ReviewMaterialEditorModule} from 'components/shared_parts/review-material-editor.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RubricsEditorModule} from 'components/shared_parts/rubrics-editor.module';
+import {SavePendingChangesModalModule} from 'components/shared_parts/save-pending-changes-modal.module';
+import {SelectSkillModalModule} from 'components/shared_parts/select-skill-modal.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SummaryListHeaderModule} from 'components/shared_parts/summary-list-header.module';
+import {SupplementalCardModule} from 'components/shared_parts/supplemental-card.module';
+import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    UnsavedChangesStatusInfoModalModule,
+    TutorCardModule,
+    SupplementalCardModule,
+    SummaryListHeaderModule,
+    StaleTabInfoModalModule,
+    SharedFormsModule,
+    SelectSkillModalModule,
+    SavePendingChangesModalModule,
+    RubricsEditorModule,
+    RteHelperModalModule,
+    RichTextComponentsModule,
+    ReviewMaterialEditorModule,
+    QuestionsListModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatCardModule,
+    FormsModule,
+    DirectivesModule,
+    ConfirmQuestionExitModalModule,
+    CommonModule,
+    CommonElementsModule,
+    BaseModule,
     DragDropModule,
     InteractionExtensionsModule,
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

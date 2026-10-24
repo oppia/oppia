@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {PreferencesPageComponent} from './preferences-page.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
@@ -31,13 +30,40 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
 import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
 import {RouterModule} from '@angular/router';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {FormsModule} from '@angular/forms';
+import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    StringUtilityPipesModule,
+    NgbModalModule,
+    MatAutocompleteModule,
+    MatCardModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
+    ImageReceiverModule,
+    FormsModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     NgbPopoverModule,
     RouterModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     PreferencesPageRoutingModule,
     Error404PageModule,
   ],

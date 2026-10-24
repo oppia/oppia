@@ -21,19 +21,38 @@ import {AboutPageComponent} from './about-page.component';
 import {AboutPageRootComponent} from './about-page-root.component';
 import {AboutPageRoutingModule} from './about-page-routing.module';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {BarChartComponent} from './charts/bar-chart.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbAccordionModule,
+  NgbCarouselModule,
+  NgbCollapseModule,
+  NgbModalModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 import {PartnershipsSectionComponent} from './partnerships-section/partnerships-section.component';
 import {CtaSectionComponent} from './cta-section/cta-section.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {FullExpandAccordionModule} from 'pages/about-page/accordion/full-expand-accordion.module';
+import {MatTabsModule} from '@angular/material/tabs';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    FullExpandAccordionModule,
+    MatTabsModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     AboutPageRoutingModule,
-    NgbModule,
+    NgbAccordionModule,
+    NgbCarouselModule,
+    NgbCollapseModule,
+    NgbModalModule,
     CampaignBannerModule,
   ],
   declarations: [

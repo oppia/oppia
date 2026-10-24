@@ -17,13 +17,21 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {Error404PageRootComponent} from './error-404-page-root.component';
 import {Error404PageRoutingModule} from './error-404-page-routing.module';
 import {Error404PageComponent} from './error-404-page.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
-  imports: [SharedComponentsModule, Error404PageRoutingModule],
+  imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    Error404PageRoutingModule,
+    TranslateModule,
+  ],
   declarations: [Error404PageComponent, Error404PageRootComponent],
   entryComponents: [Error404PageComponent, Error404PageRootComponent],
   exports: [Error404PageComponent, Error404PageRootComponent],

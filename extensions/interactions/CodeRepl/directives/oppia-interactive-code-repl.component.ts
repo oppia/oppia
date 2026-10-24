@@ -30,7 +30,6 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {Subscription} from 'rxjs';
 
 import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
@@ -59,7 +58,9 @@ export class InteractiveCodeReplComponent
   @Input() placeholderWithValue!: string;
   @Input() preCodeWithValue!: string;
   @Input() postCodeWithValue!: string;
-  @ViewChild(CodemirrorComponent) codeMirrorComponent!: CodemirrorComponent;
+  @ViewChild('codeMirror') codeMirrorComponent!: {
+    codeMirror: CodeMirror.Editor | undefined;
+  };
   componentSubscriptions = new Subscription();
   hasLoaded: boolean = true;
   code!: string;

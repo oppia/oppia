@@ -17,14 +17,23 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {PrivacyPageComponent} from './privacy-page.component';
 import {PrivacyPageRootComponent} from './privacy-page-root.component';
 import {CommonModule} from '@angular/common';
 import {PrivacyPageRoutingModule} from './privacy-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, PrivacyPageRoutingModule],
+  imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    CommonModule,
+    PrivacyPageRoutingModule,
+    TranslateModule,
+  ],
   declarations: [PrivacyPageRootComponent, PrivacyPageComponent],
   entryComponents: [PrivacyPageRootComponent, PrivacyPageComponent],
 })

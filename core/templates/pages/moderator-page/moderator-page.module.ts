@@ -20,17 +20,19 @@ import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import {ModeratorPageComponent} from './moderator-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ModeratorPageRootComponent} from './moderator-page-root.component';
 import {ModeratorAuthGuard} from './moderator-auth.guard';
 
+import {BaseModule} from 'base-components/base.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
+    SharedFormsModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     NgbNavModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

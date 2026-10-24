@@ -3,7 +3,7 @@
     <!-- This form is needed for submitting answer on hitting enter. -->
     <form (ngSubmit)="runAndSubmitCode(code)">
       <div class="code-repl-input-box">
-        <ngx-codemirror [options]="editorOptions"
+        <ngx-codemirror #codeMirror [options]="editorOptions"
                         [ngModel]="code"
                         [disabled]="!interactionIsActive"
                         [autoFocus]="true"
