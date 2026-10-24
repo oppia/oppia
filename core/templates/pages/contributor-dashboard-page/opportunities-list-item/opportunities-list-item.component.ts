@@ -35,6 +35,7 @@ export interface ExplorationOpportunity {
   heading?: string;
   actionButtonTitle?: string;
   translationWordCount?: number;
+  allowViewingDeletedSkill?: boolean;
   isPinned?: boolean;
   topicName: string;
 }

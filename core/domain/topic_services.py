@@ -1530,6 +1530,27 @@ def update_topic_and_subtopic_pages(
             updated_topic.id, updated_topic.name
         )
 
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        # Dashboard assignments use generic topic changes. Compare membership
+        # across the whole topic so moving between subtopics preserves its
+        # translation opportunity and pending suggestions.
+        old_skill_ids = set(old_topic.get_all_skill_ids())
+        new_skill_ids = set(updated_topic.get_all_skill_ids())
+        removed_skill_ids = sorted(old_skill_ids - new_skill_ids)
+        added_skill_ids = sorted(new_skill_ids - old_skill_ids)
+        if removed_skill_ids:
+            opportunity_services.remove_topic_from_translation_opportunities(
+                topic_id, {feconf.ENTITY_TYPE_SKILL: removed_skill_ids}
+            )
+        if added_skill_ids:
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_SKILL: added_skill_ids},
+                topic_ids=[topic_id],
+            )
+
 
 def delete_uncategorized_skill(
     user_id: str, topic_id: str, uncategorized_skill_id: str
@@ -1556,13 +1577,6 @@ def delete_uncategorized_skill(
         change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        opportunity_services.remove_topic_from_translation_opportunities(
-            topic_id, {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
-        )
 
 
 def add_uncategorized_skill(
@@ -1590,14 +1604,6 @@ def add_uncategorized_skill(
         change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
     )
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]},
-            topic_ids=[topic_id],
-        )
 
 
 def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:

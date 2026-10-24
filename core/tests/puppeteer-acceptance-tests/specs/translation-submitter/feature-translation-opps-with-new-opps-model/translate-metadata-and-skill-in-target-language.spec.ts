@@ -63,18 +63,21 @@ const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 // The content types as the translation modal spells them out to a contributor.
 const CONTENT_TYPE_TITLE = 'title';
 const CONTENT_TYPE_OBJECTIVE = 'objective';
+const CONTENT_TYPE_TAG = 'tag';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
+const CONTENT_TYPE_MISCONCEPTION_FEEDBACK = 'misconception feedback';
 
-// The skill's concept card explanation is built from its description by
-// createSkillForTopic, so the source text of the explanation item is known.
-const SKILL_EXPLANATION = `Review material text content for ${SKILL_NAME}.`;
+const SKILL_EXPLANATION = 'Review material for unit fractions.';
+const MISCONCEPTION_FEEDBACK = 'A unit fraction has numerator one.';
 
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE =
   'जन्मदिन के केक को बराबर हिस्सों में बाँटना सीखें और भिन्नों को समझें';
 const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न के लिए समीक्षा सामग्री।';
+const HINDI_TAG = 'भिन्नों';
+const HINDI_MISCONCEPTION_FEEDBACK = 'इकाई भिन्न का अंश एक होता है।';
 
 // A lesson title translation is capped at the width the lesson tile can show.
 // Anything longer is refused with the message below and the save button is
@@ -124,6 +127,14 @@ describe('Translation Submitter', function () {
       SUBTOPIC_NAME,
       SKILL_NAME
     );
+    await curriculumAdm.openSkillEditor(SKILL_NAME);
+    await curriculumAdm.updateReviewMaterial(SKILL_EXPLANATION);
+    await curriculumAdm.addMisconception(
+      'Unit fraction numerator',
+      'Learners may confuse the numerator and denominator.',
+      MISCONCEPTION_FEEDBACK
+    );
+    await curriculumAdm.publishUpdatedSkill('Add translatable skill content.');
 
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
@@ -135,7 +146,7 @@ describe('Translation Submitter', function () {
     await curriculumAdm.saveExplorationDraft();
 
     // The tag gives the lesson a tag metadata item to translate, alongside the
-    // title, objective and category items.
+    // title and objective items.
     const explorationId = await curriculumAdm.publishExplorationWithMetadata(
       EXPLORATION_TITLE,
       EXPLORATION_OBJECTIVE,
@@ -214,13 +225,19 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
     await translationSubmitter.expectNoTranslationErrors();
     await translationSubmitter.expectSaveTranslationButtonToBeEnabled();
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
+      'Submitted translation for review.'
+    );
 
     // The limit is the title's alone, so the same length is accepted for the
     // objective.
     await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_OBJECTIVE,
       MAX_ITEMS_TO_SKIP
+    );
+    await translationSubmitter.expectTranslationInstructionToBe(
+      CONTENT_TYPE_OBJECTIVE,
+      TRANSLATION_LANGUAGE
     );
     await translationSubmitter.expectTextToTranslateToBe(EXPLORATION_OBJECTIVE);
     await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
@@ -229,7 +246,19 @@ describe('Translation Submitter', function () {
     await translationSubmitter.saveTranslationAndMoveToNextItem(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
+    await translationSubmitter.skipToTranslationItemOfContentType(
+      CONTENT_TYPE_TAG,
+      MAX_ITEMS_TO_SKIP
+    );
+    await translationSubmitter.expectTranslationInstructionToBe(
+      CONTENT_TYPE_TAG,
+      TRANSLATION_LANGUAGE
+    );
+    await translationSubmitter.expectTextToTranslateToBe(EXPLORATION_TAG);
+    await translationSubmitter.typeTextInTranslationInput(HINDI_TAG);
+    await translationSubmitter.saveTranslationAndCloseModal(
+      'Submitted translation for review.'
+    );
   });
 
   it('should translate a skill', async function () {
@@ -241,7 +270,7 @@ describe('Translation Submitter', function () {
       SKILL_SUBHEADING
     );
 
-    // A skill's items are its description, then its concept card explanation.
+    // Reach each content type explicitly rather than relying on card order.
     await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_SKILL_DESCRIPTION,
       MAX_ITEMS_TO_SKIP
@@ -254,7 +283,9 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextInTranslationInput(
       HINDI_SKILL_DESCRIPTION
     );
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
+      'Submitted translation for review.'
+    );
 
     await translationSubmitter.skipToTranslationItemOfContentType(
       CONTENT_TYPE_SKILL_EXPLANATION,
@@ -266,37 +297,57 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.expectTextToTranslateToBe(SKILL_EXPLANATION);
     await translationSubmitter.typeTextForRTE(HINDI_SKILL_EXPLANATION);
-    await translationSubmitter.clickOnElementWithText('Save and close');
-
-    await translationSubmitter.expectToastMessage(
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.skipToTranslationItemOfContentType(
+      CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
+      MAX_ITEMS_TO_SKIP
+    );
+    await translationSubmitter.expectTranslationInstructionToBe(
+      CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
+      TRANSLATION_LANGUAGE
+    );
+    await translationSubmitter.expectTextToTranslateToBe(
+      MISCONCEPTION_FEEDBACK
+    );
+    await translationSubmitter.typeTextForRTE(HINDI_MISCONCEPTION_FEEDBACK);
+    await translationSubmitter.saveTranslationAndMoveToNextItem(
       'Submitted translation for review.'
     );
   });
 
-  it('should view the translation I submitted', async function () {
+  it('should view submitted metadata and skill translations', async function () {
     // The contributions list is filtered by the Content Type selector, which
     // the previous test left on "Skills". The selector is only shown on the
     // "Translate Text" tab, so it is reset here before switching across,
-    // otherwise this test would only ever see one of the two contributions.
+    // otherwise this test would only see the skill contributions.
     await translationSubmitter.selectContentTypeFilter(CONTENT_TYPE_FILTER.ALL);
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
 
-    // A metadata translation is listed against the lesson it belongs to.
-    await translationSubmitter.expectContributionStatusToBe(
-      HINDI_TITLE,
-      `${TOPIC_NAME} / ${CHAPTER_NAME}`,
-      'Awaiting review'
-    );
+    for (const translation of [HINDI_TITLE, HINDI_OBJECTIVE, HINDI_TAG]) {
+      await translationSubmitter.expectContributionStatusToBe(
+        translation,
+        `${TOPIC_NAME} / ${CHAPTER_NAME}`,
+        'Awaiting review'
+      );
+    }
 
     // A skill translation is listed under the skill's description rather than
     // under its id or a placeholder for a deleted opportunity.
-    await translationSubmitter.expectContributionStatusToBe(
+    for (const translation of [
       HINDI_SKILL_DESCRIPTION,
-      SKILL_NAME,
-      'Awaiting review'
-    );
+      HINDI_SKILL_EXPLANATION,
+      HINDI_MISCONCEPTION_FEEDBACK,
+    ]) {
+      await translationSubmitter.expectContributionStatusToBe(
+        translation,
+        SKILL_NAME,
+        'Awaiting review'
+      );
+    }
   });
 
   afterAll(async function () {

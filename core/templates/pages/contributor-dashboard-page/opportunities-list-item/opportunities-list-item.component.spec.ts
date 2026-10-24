@@ -129,6 +129,32 @@ describe('Opportunities List Item Component', () => {
         it('should initialize correspondingOpportunityDeleted to true', () => {
           expect(component.correspondingOpportunityDeleted).toBe(true);
         });
+
+        for (const mobile of [false, true]) {
+          it(
+            'should permit viewing a resolved deleted skill on ' +
+              (mobile ? 'mobile' : 'desktop'),
+            () => {
+              component.onMobile = mobile;
+              component.showOpportunityButton = !mobile;
+              component.opportunity.allowViewingDeletedSkill = true;
+              const action = spyOn(component.clickActionButton, 'emit');
+              fixture.detectChanges();
+              const target: HTMLButtonElement =
+                fixture.nativeElement.querySelector(
+                  mobile
+                    ? 'button.e2e-test-opportunity-list-item'
+                    : '.e2e-test-opportunity-list-item-button'
+                );
+              expect(target.hidden).toBeFalse();
+              target.click();
+              expect(action).toHaveBeenCalledWith('1');
+              component.opportunity.allowViewingDeletedSkill = false;
+              fixture.detectChanges();
+              expect(target.hidden).toBeTrue();
+            }
+          );
+        }
       }
     );
 

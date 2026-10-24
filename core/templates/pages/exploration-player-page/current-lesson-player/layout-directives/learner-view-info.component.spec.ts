@@ -42,6 +42,16 @@ import {SiteAnalyticsService} from '../../../../services/site-analytics.service'
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {LearnerViewInfoComponent} from './learner-view-info.component';
+import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
+
+class MockPlatformFeatureService {
+  status = {EnableTranslationOppsWithNewOppModels: {isEnabled: false}};
+}
 
 describe('Learner view info component', () => {
   let fixture: ComponentFixture<LearnerViewInfoComponent>;
@@ -54,6 +64,8 @@ describe('Learner view info component', () => {
   let urlService: UrlService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
+  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,6 +79,7 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
+        {provide: PlatformFeatureService, useClass: MockPlatformFeatureService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -85,6 +98,10 @@ describe('Learner view info component', () => {
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    learnerViewInfoBackendApiService = TestBed.inject(
+      LearnerViewInfoBackendApiService
+    );
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       ReadOnlyTopic.createFromBackendDict({
@@ -111,6 +128,121 @@ describe('Learner view info component', () => {
 
   afterEach(() => {
     componentInstance.ngOnDestory();
+  });
+
+  describe('accepted title translations', () => {
+    beforeEach(() => {
+      platformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      spyOn(urlService, 'getPathname').and.returnValue('/explore/expId');
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
+      spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(null);
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(componentInstance, 'getTopicUrl').and.returnValue(null);
+      spyOn(
+        readOnlyExplorationBackendApiService,
+        'fetchExplorationAsync'
+      ).and.resolveTo({
+        exploration: {title: 'Original title'},
+      } as FetchExplorationBackendResponse);
+    });
+
+    it('should show the accepted title instead of a bundled translation', fakeAsync(() => {
+      spyOn(
+        learnerViewInfoBackendApiService,
+        'fetchLearnerInfoAsync'
+      ).and.resolveTo({
+        summaries: [
+          {
+            title: 'पाई काटना',
+            translated_metadata_fields: [
+              TranslatableExplorationMetadataField.TITLE,
+            ],
+          } as LearnerExplorationSummaryBackendDict,
+        ],
+      });
+      const bundledTranslation = spyOn(
+        i18nLanguageCodeService,
+        'isHackyTranslationDisplayed'
+      ).and.returnValue(true);
+      componentInstance.ngOnInit();
+      tick();
+      expect(
+        learnerViewInfoBackendApiService.fetchLearnerInfoAsync
+      ).toHaveBeenCalledWith('["expId"]', 'true');
+      expect(componentInstance.explorationTitle).toBe('पाई काटना');
+      expect(
+        componentInstance.isHackyExpTitleTranslationDisplayed()
+      ).toBeFalse();
+      expect(bundledTranslation).not.toHaveBeenCalled();
+    }));
+
+    for (const summaries of [
+      [],
+      [
+        {
+          title: 'Current summary title',
+        } as LearnerExplorationSummaryBackendDict,
+      ],
+      [
+        {
+          title: 'Translated objective only',
+          translated_metadata_fields: [
+            TranslatableExplorationMetadataField.OBJECTIVE,
+          ],
+        } as LearnerExplorationSummaryBackendDict,
+      ],
+    ]) {
+      it(
+        'should retain the original title without an accepted title (' +
+          (summaries.length ? summaries[0].title : 'missing summary') +
+          ')',
+        fakeAsync(() => {
+          spyOn(
+            learnerViewInfoBackendApiService,
+            'fetchLearnerInfoAsync'
+          ).and.resolveTo({summaries});
+          componentInstance.ngOnInit();
+          tick();
+          expect(componentInstance.explorationTitle).toBe('Original title');
+          expect(componentInstance.hasTranslatedTitle).toBeFalse();
+        })
+      );
+    }
+
+    it('should retain the original title when summary loading fails', fakeAsync(() => {
+      spyOn(
+        learnerViewInfoBackendApiService,
+        'fetchLearnerInfoAsync'
+      ).and.rejectWith(new Error('Summary unavailable'));
+      componentInstance.ngOnInit();
+      tick();
+      expect(componentInstance.explorationTitle).toBe('Original title');
+    }));
+
+    for (const preview of ['version', 'draft']) {
+      it(
+        'should preserve the title of a ' + preview + ' preview',
+        fakeAsync(() => {
+          if (preview === 'version') {
+            (
+              urlService.getExplorationVersionFromUrl as jasmine.Spy
+            ).and.returnValue(1);
+          } else {
+            (urlService.getPidFromUrl as jasmine.Spy).and.returnValue(
+              'draftId'
+            );
+          }
+          spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync');
+          componentInstance.ngOnInit();
+          tick();
+          expect(componentInstance.explorationTitle).toBe('Original title');
+          expect(
+            learnerViewInfoBackendApiService.fetchLearnerInfoAsync
+          ).not.toHaveBeenCalled();
+        })
+      );
+    }
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {

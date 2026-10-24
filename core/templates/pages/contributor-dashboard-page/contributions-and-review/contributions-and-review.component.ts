@@ -97,6 +97,7 @@ export interface ContributionsSummary {
   actionButtonTitle: string;
   translationWordCount?: number;
   isPinned?: boolean;
+  allowViewingDeletedSkill?: boolean;
 }
 
 export interface Opportunity {
@@ -316,14 +317,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         | 'review'
         | 'accepted'
         | 'rejected';
-      const requiredData = {
+      const requiredData: ContributionsSummary = {
         id: suggestion.suggestion_id,
         heading: this.getTranslationSuggestionHeading(suggestion),
         subheading: subheading,
         labelText:
           // Missing exploration content means the translation suggestion is
           // now obsolete. See issue #16022.
-          suggestion.entity_content_html === null
+          suggestion.entity_content_html === null &&
+          suggestion.target_type !== AppConstants.ENTITY_TYPE.SKILL
             ? 'Obsolete'
             : this.SUGGESTION_LABELS[suggestionStatus].text,
         labelColor: this.SUGGESTION_LABELS[suggestionStatus].color,
@@ -336,6 +338,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
               )
             : undefined,
       };
+
+      if (
+        details === null &&
+        suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL &&
+        suggestion.status !== 'review'
+      ) {
+        requiredData.allowViewingDeletedSkill = true;
+      }
 
       translationContributionsSummaryList.push(requiredData);
     });
@@ -477,7 +487,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     ] as SuggestionDetails;
     const details = contribution.details as ContributionDetails;
     let subheading = '';
-    if (
+    if (details === null) {
+      subheading =
+        ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
+    } else if (
       contribution.suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
     ) {
       // A skill's opportunity carries its description rather than the topic

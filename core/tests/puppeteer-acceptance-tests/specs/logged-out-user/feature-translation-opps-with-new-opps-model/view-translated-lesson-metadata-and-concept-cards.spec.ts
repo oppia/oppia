@@ -60,19 +60,17 @@ const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 
 const CONTENT_TYPE_TITLE = 'title';
 const CONTENT_TYPE_OBJECTIVE = 'objective';
+const CONTENT_TYPE_TAG = 'tag';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
-// A suggestion row truncates its heading at 30 characters, and the heading is
-// the translation itself, so any translation looked up by heading below is
-// kept under that limit.
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर बाँटना सीखें';
-const HINDI_NO_TAGS_TEXT = 'कोई टैग्स नहीं जुड़े है।';
+const HINDI_TAG = 'भिन्नों';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
 
 const MAX_ITEMS_TO_SKIP = 15;
 
-// The lesson contributes a title and an objective and the skill contributes an
+// The lesson contributes a title, objective and tag, and the skill contributes an
 // explanation, so no list here holds more than a handful of suggestions. The
 // bound only exists so a modal that stops closing fails instead of looping.
 const MAX_SUGGESTIONS_TO_ACCEPT = 6;
@@ -120,6 +118,11 @@ describe('Logged-out User', function () {
       SUBTOPIC_NAME,
       SKILL_NAME
     );
+    await curriculumAdm.openSkillEditor(SKILL_NAME);
+    await curriculumAdm.updateReviewMaterial(
+      'Review material for unit fractions.'
+    );
+    await curriculumAdm.publishUpdatedSkill('Set concept-card explanation.');
 
     // The concept card link is what makes the skill's explanation reachable
     // from inside the lesson. It is added to the card content here because the
@@ -135,7 +138,8 @@ describe('Logged-out User', function () {
     explorationId = await curriculumAdm.publishExplorationWithMetadata(
       EXPLORATION_TITLE,
       EXPLORATION_OBJECTIVE,
-      'Mathematics'
+      'Mathematics',
+      'fractions'
     );
 
     await curriculumAdm.createAndPublishStoryWithChapter(
@@ -146,8 +150,7 @@ describe('Logged-out User', function () {
       TOPIC_NAME
     );
 
-    // Submit Hindi translations for the lesson title, the lesson objective and
-    // the skill explanation.
+    // Submit the three metadata items and the skill explanation from LO.4.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -176,7 +179,14 @@ describe('Logged-out User', function () {
     await translationSubmitter.saveTranslationAndMoveToNextItem(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
+    await translationSubmitter.skipToTranslationItemOfContentType(
+      CONTENT_TYPE_TAG,
+      MAX_ITEMS_TO_SKIP
+    );
+    await translationSubmitter.typeTextInTranslationInput(HINDI_TAG);
+    await translationSubmitter.saveTranslationAndCloseModal(
+      'Submitted translation for review.'
+    );
 
     await translationSubmitter.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.SKILLS
@@ -195,9 +205,10 @@ describe('Logged-out User', function () {
       'Submitted translation for review.'
     );
 
-    // Accept all three, since only an accepted translation reaches a learner.
+    // Only accepted translations are displayed to the learner.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
+    await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
 
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.LESSONS
@@ -229,12 +240,17 @@ describe('Logged-out User', function () {
         `?initialContentLanguageCode=${HINDI_SITE_LANGUAGE_CODE}`
     );
 
-    // 1. The lesson title, objective, and tags display in Hindi in the
-    // Lesson Info modal.
+    // The mobile layout hides the navbar title. Lesson Info below verifies
+    // the translated title in the visible learner interface on both layouts.
+    if (!loggedOutUser.isViewportAtMobileWidth()) {
+      await loggedOutUser.expectExplorationTitleInPlayerToBe(HINDI_TITLE);
+    }
+
+    // The title, objective and actual tag are shown in Lesson Info.
     await loggedOutUser.openLessonInfoModal();
     await loggedOutUser.expectLessonInfoModalHeaderToBe(HINDI_TITLE);
     await loggedOutUser.expectLessonInfoModalObjectiveToBe(HINDI_OBJECTIVE);
-    await loggedOutUser.expectLessonInfoModalTagsToBe(HINDI_NO_TAGS_TEXT);
+    await loggedOutUser.expectLessonInfoModalTagsToBe(HINDI_TAG);
     await loggedOutUser.closeLessonInfoModal();
 
     // The concept card displays the translated skill explanation in Hindi.

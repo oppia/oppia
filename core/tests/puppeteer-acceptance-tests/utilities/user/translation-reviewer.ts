@@ -119,12 +119,14 @@ export class TranslationReviewer extends BaseUser {
         for (const opportunityItemElement of opportunityItems) {
           const opportunityItemHeading = await opportunityItemElement.evaluate(
             (el: Element, sel: string) =>
+              el.querySelector(sel)?.getAttribute('title') ||
               el.querySelector(sel)?.textContent?.trim(),
             opportunityItemHeadingSelector
           );
           const opportunityItemSubHeading =
             await opportunityItemElement.evaluate(
               (el: Element, sel: string) =>
+                el.querySelector(sel)?.getAttribute('title') ||
                 el.querySelector(sel)?.textContent?.trim(),
               opportunitySubHeadingSelector
             );
@@ -290,6 +292,27 @@ export class TranslationReviewer extends BaseUser {
       `${reviewContentContainerSelector} ${translatedContentContainerSelector}`,
       expectedContent
     );
+  }
+
+  /**
+   * Checks the original source alongside the submitted translation.
+   * @param expectedContent - The source text of the suggestion.
+   */
+  async expectSourceContentInTranslationReviewToBe(
+    expectedContent: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      `${reviewContentContainerSelector} .float-start .oppia-suggestion-review-panel`,
+      expectedContent
+    );
+  }
+
+  /** Closes the review modal without resolving another suggestion. */
+  async closeTranslationReviewModal(): Promise<void> {
+    await this.clickOnElementWithSelector(
+      `${reviewModalContainerSelector} button[aria-label="Close"]`
+    );
+    await this.expectReviewModalToBePresent(false);
   }
 
   /**

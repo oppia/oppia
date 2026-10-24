@@ -665,8 +665,8 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
-   * Saves the current translation and waits for the modal to load the next
-   * item. Clicking save alone is not enough to move on, because the upload and
+   * Saves the current translation and waits for the next item or modal close.
+   * Clicking save alone is not enough to move on, because the upload and
    * the fetch that follows it are asynchronous, so a caller that read the
    * modal straight afterwards would still see the item it had just saved.
    * @param expectedToastMessage - The toast the save is expected to raise, if
@@ -675,18 +675,34 @@ export class TranslationSubmitter extends BaseUser {
    */
   async saveTranslationAndMoveToNextItem(
     expectedToastMessage?: string
-  ): Promise<void> {
+  ): Promise<boolean> {
     await this.expectElementToBeVisible(textToTranslateContainerSelector);
     const contentBeforeSave = await this.page.$eval(
       textToTranslateContainerSelector,
       el => el.textContent
     );
+    const moreItemsRemain = await this.isElementVisible(
+      skipTranslationButtonSelector,
+      true,
+      skipLinkProbeTimeoutMsecs
+    );
 
-    await this.expectElementToBeVisible(saveTranslationButtonSelector);
+    await this.expectTextContentToBe(
+      `${saveTranslationButtonSelector} span:not([hidden])`,
+      moreItemsRemain ? 'Save and translate another' : 'Save and close'
+    );
     await this.clickOnElementWithSelector(saveTranslationButtonSelector);
 
     if (expectedToastMessage) {
       await this.expectToastMessage(expectedToastMessage);
+    }
+
+    if (!moreItemsRemain) {
+      await this.expectElementToBeVisible(
+        translateTextModalHeaderContainerSelector,
+        false
+      );
+      return false;
     }
 
     // The source block is taken out of the DOM while the translation uploads,
@@ -701,6 +717,19 @@ export class TranslationSubmitter extends BaseUser {
       textToTranslateContainerSelector,
       contentBeforeSave ?? ''
     );
+    return true;
+  }
+
+  /**
+   * Submits one translation and returns to the opportunity list.
+   * @param expectedToastMessage - The expected submission confirmation.
+   */
+  async saveTranslationAndCloseModal(
+    expectedToastMessage: string
+  ): Promise<void> {
+    if (await this.saveTranslationAndMoveToNextItem(expectedToastMessage)) {
+      await this.closeTranslateTextModal();
+    }
   }
 
   /**

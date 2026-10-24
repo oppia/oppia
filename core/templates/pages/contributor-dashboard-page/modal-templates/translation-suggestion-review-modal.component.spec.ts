@@ -2075,6 +2075,44 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
+    it('should retain feedback when viewing a deleted skill translation', fakeAsync(() => {
+      const contribution = component.suggestionIdToContribution.suggestion_1;
+      contribution.details = null;
+      contribution.suggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      contribution.suggestion.entity_content_html = null;
+      spyOn(activeModal, 'close');
+      spyOn(component, '_getThreadMessagesAsync').and.callFake(async () => {
+        component.reviewer = 'Suggestion Bot';
+        component.reviewMessage = 'The associated skill no longer exists.';
+      });
+      component.ngOnInit();
+      tick();
+      expect(activeModal.close).not.toHaveBeenCalled();
+      expect(component.subheading).toBe(
+        '[The corresponding opportunity has been deleted.]'
+      );
+      expect(component.contentHtml).toEqual(
+        suggestion1.change_cmd.content_html
+      );
+      expect(component.translationHtml).toEqual(
+        suggestion1.change_cmd.translation_html
+      );
+      expect(component.reviewMessage).toBe(
+        'The associated skill no longer exists.'
+      );
+      expect(component.reviewable).toBeFalse();
+    }));
+
+    it('should close a deleted skill suggestion that is still pending review', () => {
+      const contribution = component.suggestionIdToContribution.suggestion_1;
+      contribution.details = null;
+      contribution.suggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      contribution.suggestion.status = 'review';
+      spyOn(activeModal, 'close');
+      component.ngOnInit();
+      expect(activeModal.close).toHaveBeenCalledWith([]);
+    });
+
     it('should initialize $scope properties after controller is initialized', fakeAsync(function () {
       const messages = [
         {

@@ -21,7 +21,10 @@ import {Component} from '@angular/core';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummaryBackendDict,
+  TranslatableExplorationMetadataField,
+} from 'domain/summary/learner-exploration-summary.model';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -34,6 +37,8 @@ import {
 } from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
+import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-learner-view-info',
@@ -46,6 +51,7 @@ export class LearnerViewInfoComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   explorationTitle!: string;
+  hasTranslatedTitle: boolean = false;
   explorationTitleTranslationKey!: string;
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
@@ -62,7 +68,9 @@ export class LearnerViewInfoComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +103,33 @@ export class LearnerViewInfoComponent {
       )
       .then(response => {
         this.explorationTitle = response.exploration.title;
+        // Summaries contain accepted metadata translations in the site
+        // language. Keep versioned and draft previews tied to their own title.
+        if (
+          this.platformFeatureService.status
+            .EnableTranslationOppsWithNewOppModels.isEnabled &&
+          this.urlService.getExplorationVersionFromUrl() === null &&
+          this.urlService.getPidFromUrl() === null
+        ) {
+          this.learnerViewInfoBackendApiService
+            .fetchLearnerInfoAsync(JSON.stringify([this.explorationId]), 'true')
+            .then(
+              summaryResponse => {
+                if (summaryResponse.summaries.length > 0) {
+                  const summary = summaryResponse.summaries[0];
+                  this.hasTranslatedTitle = (
+                    summary.translated_metadata_fields || []
+                  ).includes(TranslatableExplorationMetadataField.TITLE);
+                  if (this.hasTranslatedTitle) {
+                    this.explorationTitle = summary.title;
+                  }
+                }
+              },
+              () => {
+                // The original title remains available if its summary fails.
+              }
+            );
+        }
       });
     this.explorationTitleTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
@@ -165,8 +200,11 @@ export class LearnerViewInfoComponent {
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
-    return this.i18nLanguageCodeService.isHackyTranslationDisplayed(
-      this.explorationTitleTranslationKey
+    return (
+      !this.hasTranslatedTitle &&
+      this.i18nLanguageCodeService.isHackyTranslationDisplayed(
+        this.explorationTitleTranslationKey
+      )
     );
   }
 

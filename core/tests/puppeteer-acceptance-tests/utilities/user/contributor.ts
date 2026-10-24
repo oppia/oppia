@@ -35,7 +35,7 @@ const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
 const contributionTabClass = 'e2e-test-contribution-tab';
-const activeElementClass = 'e2e-test-active';
+const activeElementClass = 'oppia-contributions-active-navbar';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 const viewDropdownOptionClass = 'e2e-test-mobile-contribution-dropdown-option';
 const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
@@ -89,6 +89,31 @@ export enum CONTENT_TYPE_FILTER {
 
 export class Contributor extends ExplorationEditor {
   /**
+   * Waits for the active opportunity list to finish loading its data.
+   */
+  private async waitForOpportunitiesToLoad(): Promise<void> {
+    // Unrelated requests can keep the page busy after the list is ready.
+    // Wait for its loading placeholders instead of global network silence.
+    await this.page.waitForFunction(() => {
+      const lists = Array.from(
+        document.querySelectorAll('.oppia-opportunities-list')
+      ).filter(list => (list as HTMLElement).offsetParent !== null);
+      return (
+        lists.length > 0 &&
+        lists.every(list => {
+          const placeholder = list.querySelector(
+            '.e2e-test-opportunity-loading-placeholder'
+          );
+          return (
+            placeholder !== null &&
+            (placeholder as HTMLElement).offsetParent === null
+          );
+        })
+      );
+    });
+  }
+
+  /**
    * Checks if the active tab name is visible and matches the expected values.
    * @param tabName - The expected name of the active tab.
    */
@@ -129,7 +154,7 @@ export class Contributor extends ExplorationEditor {
     subheading: string,
     visible: boolean = true
   ): Promise<ElementHandle | null> {
-    await this.page.waitForNetworkIdle();
+    await this.waitForOpportunitiesToLoad();
 
     const translationOpportunitiesPreset = await this.isElementVisible(
       opportunityItemSelector
@@ -184,11 +209,13 @@ export class Contributor extends ExplorationEditor {
     for (const opportunityItemElement of opportunityItems) {
       const opportunityItemHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
+          el.querySelector(sel)?.getAttribute('title') ||
           el.querySelector(sel)?.textContent?.trim(),
         opportunityItemHeadingSelector
       );
       const opportunityItemSubHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
+          el.querySelector(sel)?.getAttribute('title') ||
           el.querySelector(sel)?.textContent?.trim(),
         opportunitySubHeadingSelector
       );
@@ -265,7 +292,11 @@ export class Contributor extends ExplorationEditor {
    * @param tabName - The name of the tab to navigate to.
    */
   async navigateToTabInMyContributions(
-    tabName: 'Contribution Stats' | 'Badges' | 'Review Questions'
+    tabName:
+      | 'Contribution Stats'
+      | 'Badges'
+      | 'Review Questions'
+      | 'Review Translations'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
@@ -301,7 +332,7 @@ export class Contributor extends ExplorationEditor {
 
       await element.click();
 
-      const xpathActive = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}") and contains(@class, ${activeElementClass})]`;
+      const xpathActive = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}") and contains(@class, '${activeElementClass}')]`;
       await this.page.waitForXPath(xpathActive);
     }
   }
@@ -601,6 +632,124 @@ export class Contributor extends ExplorationEditor {
       element.textContent?.trim()
     );
     expect(textContent).toBe(expectedStatus);
+  }
+
+  /**
+   * Checks how many rows have the given full heading and association.
+   * @param heading - The full row heading.
+   * @param subheading - The associated lesson or skill.
+   * @param count - The expected number of matching rows.
+   */
+  async expectOpportunityCountToBe(
+    heading: string,
+    subheading: string,
+    count: number
+  ): Promise<void> {
+    await this.waitForOpportunitiesToLoad();
+    const actualCount = await this.page.$$eval(
+      opportunityItemSelector,
+      (
+        rows,
+        headingSelector: string,
+        subheadingSelector: string,
+        expectedHeading: string,
+        expectedSubheading: string
+      ) =>
+        rows.filter(
+          row =>
+            row.querySelector(headingSelector)?.getAttribute('title') ===
+              expectedHeading &&
+            row
+              .querySelector(subheadingSelector)
+              ?.getAttribute('title')
+              ?.includes(expectedSubheading)
+        ).length,
+      opportunityItemHeadingSelector,
+      opportunitySubHeadingSelector,
+      heading,
+      subheading
+    );
+    expect(actualCount).toBe(count);
+  }
+
+  /**
+   * Opens a submitted contribution and checks its review feedback.
+   * @param heading - The submitted translation.
+   * @param subheading - The contribution's association or deleted placeholder.
+   * @param message - The expected review feedback.
+   */
+  async viewContributionAndExpectReviewMessage(
+    heading: string,
+    subheading: string,
+    message: string
+  ): Promise<void> {
+    const row = await this.expectOpportunityToBePresent(heading, subheading);
+    if (!row) {
+      throw new Error(`Contribution ${heading} was not found.`);
+    }
+    const target = this.isViewportAtMobileWidth()
+      ? row
+      : await row.$('.e2e-test-opportunity-list-item-button');
+    if (!target) {
+      throw new Error(`View button for ${heading} was not found.`);
+    }
+    await target.evaluate(el => (el as HTMLElement).click());
+    await this.expectTextContentToBe('.oppia-review-message', message);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-translation-review-modal button[aria-label="Close"]'
+    );
+    await this.expectElementToBeVisible(
+      '.e2e-test-translation-review-modal',
+      false
+    );
+  }
+
+  /**
+   * Checks one unique skill opportunity and its accepted and pending counts.
+   * @param skillName - The skill's description.
+   * @param accepted - Accepted translations.
+   * @param pending - Translations awaiting review.
+   * @param total - Total translatable fields.
+   */
+  async expectSkillTranslationProgressToBe(
+    skillName: string,
+    accepted: number,
+    pending: number,
+    total: number
+  ): Promise<void> {
+    await this.expectOpportunityToBePresent(skillName, 'Skill');
+    const rows = await this.page.$$(opportunityItemSelector);
+    const matchingRows: ElementHandle<Element>[] = [];
+    for (const row of rows) {
+      const heading = await row.$eval(opportunityItemHeadingSelector, el =>
+        el.getAttribute('title')
+      );
+      if (heading === skillName) {
+        matchingRows.push(row);
+      }
+    }
+    expect(matchingRows.length).toBe(1);
+    for (const [selector, count, label] of [
+      ['.progress-bar.bg-success', accepted, 'accepted'],
+      ['.progress-bar.bg-light-green', pending, 'awaiting review'],
+    ] as const) {
+      const segment = await matchingRows[0].$(selector);
+      if (!segment) {
+        throw new Error(`Progress segment ${selector} was not found.`);
+      }
+      await segment.hover();
+      await this.expectTextContentToBe(
+        '.tooltip-inner',
+        `${count}/${total} cards ${label}`
+      );
+      await this.page.mouse.move(0, 0);
+      await this.expectElementToBeVisible('.tooltip-inner', false);
+    }
+    const percentage = await matchingRows[0].$eval(
+      '.e2e-test-opportunity-list-item-progress-percentage',
+      el => el.textContent?.trim()
+    );
+    expect(percentage).toBe(`(${Math.floor((100 * accepted) / total)}%)`);
   }
 
   /**
