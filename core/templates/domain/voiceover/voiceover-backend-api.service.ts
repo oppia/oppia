@@ -41,11 +41,17 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+  learner_facing_language_accents: string[];
   autogeneratable_language_accent_codes: string[];
+  language_accent_code_to_beam_job_state: LanguageAccentCodeToBeamJobState;
 }
 
 interface EntityVoiceoversBulkBackendDict {
   entity_voiceovers_list: EntityVoiceoversBackendDict[];
+}
+
+interface UpdateLanguageCodesMappingBackendDict {
+  language_accent_code_to_beam_job_state: LanguageAccentCodeToBeamJobState;
 }
 
 interface CloudTaskRunBackendResponseDict {
@@ -58,6 +64,10 @@ export interface LanguageAccentToDescription {
 
 export interface LanguageAccentCodesToSupportsAutogeneration {
   [languageAccentCode: string]: boolean;
+}
+
+export interface LanguageAccentCodeToBeamJobState {
+  [languageAccentCode: string]: string;
 }
 
 export interface LanguageAccentMasterList {
@@ -73,7 +83,9 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
+  learnerFacingLanguageAccents: string[];
   autoGeneratableLanguageAccentCodes: string[];
+  languageAccentCodeToBeamJobState: LanguageAccentCodeToBeamJobState;
 }
 
 interface TokensWithDurationBackendType {
@@ -153,8 +165,12 @@ export class VoiceoverBackendApiService {
             resolve({
               languageAccentMasterList: response.language_accent_master_list,
               languageCodesMapping: response.language_codes_mapping,
+              learnerFacingLanguageAccents:
+                response.learner_facing_language_accents,
               autoGeneratableLanguageAccentCodes:
                 response.autogeneratable_language_accent_codes,
+              languageAccentCodeToBeamJobState:
+                response.language_accent_code_to_beam_job_state,
             });
           },
           errorResponse => {
@@ -165,18 +181,22 @@ export class VoiceoverBackendApiService {
   }
 
   async updateVoiceoverLanguageCodesMappingAsync(
-    languageCodesMapping: LanguageCodesMapping
-  ): Promise<void> {
+    languageCodesMapping: LanguageCodesMapping,
+    learnerFacingLanguageAccents: string[]
+  ): Promise<LanguageAccentCodeToBeamJobState> {
     return new Promise((resolve, reject) => {
       this.http
-        .put<void>(
+        .put<UpdateLanguageCodesMappingBackendDict>(
           VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
-          {language_codes_mapping: languageCodesMapping}
+          {
+            language_codes_mapping: languageCodesMapping,
+            learner_facing_language_accents: learnerFacingLanguageAccents,
+          }
         )
         .toPromise()
         .then(
           response => {
-            resolve(response);
+            resolve(response.language_accent_code_to_beam_job_state);
           },
           errorResopnse => {
             reject(errorResopnse?.error);

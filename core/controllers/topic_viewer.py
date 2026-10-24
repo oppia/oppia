@@ -205,6 +205,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             language_accent_mapping = (
                 voiceover_services.get_all_language_accent_codes_for_voiceovers()
             )
+            learner_facing_language_accents = set(
+                voiceover_services.get_learner_facing_language_accents()
+            )
 
             for exploration_id, exploration in explorations_by_id.items():
                 displayable_language_codes = (
@@ -247,6 +250,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         continue
 
                     accent_code = entity_voiceovers.language_accent_code
+                    if accent_code not in learner_facing_language_accents:
+                        continue
                     accent_root_code = _get_language_root_code(accent_code)
 
                     if accent_root_code in displayable_language_roots:

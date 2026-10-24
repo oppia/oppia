@@ -44,22 +44,92 @@ from core.domain import (
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Set, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, opportunity_models, voiceover_models
+    from mypy_imports import (
+        beam_job_models,
+        exp_models,
+        opportunity_models,
+        voiceover_models,
+    )
 
 (
+    beam_job_models,
     exp_models,
     opportunity_models,
     voiceover_models,
 ) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.OPPORTUNITY, models.Names.VOICEOVER]
+    [
+        models.Names.BEAM_JOB,
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.VOICEOVER,
+    ],
 )
 
 
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
+
+
+def save_language_accent_code_to_beam_job_run_model(
+    language_accent_code: str, beam_job_run_id: str
+) -> None:
+    """Saves the Beam job run ID for a language-accent code."""
+    existing_model = gae_models.LanguageAccentCodeToBeamJobRunModel.get(
+        language_accent_code,
+        strict=False,
+    )
+    if existing_model is not None:
+        existing_model.beam_job_run_id = beam_job_run_id
+        existing_model.update_timestamps()
+        existing_model.put()
+        return
+
+    language_accent_code_to_beam_job_run_model = (
+        gae_models.LanguageAccentCodeToBeamJobRunModel.create_new(
+            language_accent_code, beam_job_run_id
+        )
+    )
+    language_accent_code_to_beam_job_run_model.put()
+
+
+def get_language_accent_code_to_beam_job_run_status() -> Dict[str, str]:
+    """Returns the Beam job state for each language-accent code."""
+    language_accent_code_to_beam_job_run_models: Sequence[
+        gae_models.LanguageAccentCodeToBeamJobRunModel
+    ] = gae_models.LanguageAccentCodeToBeamJobRunModel.query().fetch()
+    language_accent_code_to_status: Dict[str, str] = {}
+    completed_models_to_delete = []
+
+    for (
+        language_accent_code_to_beam_job_run_model
+    ) in language_accent_code_to_beam_job_run_models:
+        beam_job_run_model = beam_job_models.BeamJobRunModel.get(
+            language_accent_code_to_beam_job_run_model.beam_job_run_id,
+            strict=False,
+        )
+        if beam_job_run_model is not None:
+            language_accent_code_to_status[
+                language_accent_code_to_beam_job_run_model.language_accent_code
+            ] = beam_job_run_model.latest_job_state
+
+            # Once voiceover generation has finished, we no longer need to
+            # track the beam job run for the language-accent code.
+            if (
+                beam_job_run_model.latest_job_state
+                == beam_job_models.BeamJobState.DONE.value
+            ):
+                completed_models_to_delete.append(
+                    language_accent_code_to_beam_job_run_model
+                )
+
+    gae_models.LanguageAccentCodeToBeamJobRunModel.delete_multi(
+        completed_models_to_delete
+    )
+
+    return language_accent_code_to_status
 
 
 def get_entity_voiceovers_from_model(
@@ -411,6 +481,20 @@ def get_all_language_accent_codes_for_voiceovers() -> (
     return language_codes_mapping
 
 
+def get_learner_facing_language_accents() -> List[str]:
+    """Returns the language-accent codes that are visible to learners.
+
+    Returns:
+        List[str]. The language-accent codes selected for learners.
+    """
+    policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+        voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+    )
+    if policy_model is None:
+        return []
+    return policy_model.learner_facing_language_accents
+
+
 def is_voiceover_autogeneration_using_cloud_service_enabled() -> bool:
     """The method verifies whether admins have enabled the configuration
     for generating voiceovers automatically using cloud service.
@@ -527,6 +611,7 @@ def save_entity_voiceovers(
 
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]],
+    learner_facing_language_accents: Optional[List[str]] = None,
 ) -> None:
     """The method saves the language-accent codes into the
     VoiceoverAutogenerationPolicyModel, which will be supported by
@@ -538,6 +623,9 @@ def save_language_accent_support(
             contains language_accent_codes as keys and booleans indicating
             whether it's possible to generate automatic voiceovers for this
             language-accent code as values.
+        learner_facing_language_accents: Optional[List[str]]. The language-
+            accent codes that should be available to learners. If not
+            specified, the currently stored list is preserved.
     """
     retrieved_voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
@@ -555,6 +643,10 @@ def save_language_accent_support(
     voiceover_autogeneration_policy_model.language_codes_mapping = (
         language_codes_mapping
     )
+    if learner_facing_language_accents is not None:
+        voiceover_autogeneration_policy_model.learner_facing_language_accents = (
+            learner_facing_language_accents
+        )
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
 

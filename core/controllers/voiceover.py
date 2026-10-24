@@ -57,16 +57,27 @@ class VoiceoverAdminDataHandler(
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers()
         )
+        learner_facing_language_accents = (
+            voiceover_services.get_learner_facing_language_accents()
+        )
 
         autogeneratable_language_accent_codes = (
             voiceover_services.get_autogeneratable_language_accent_codes()
+        )
+
+        language_accent_code_to_beam_job_state = (
+            voiceover_services.get_language_accent_code_to_beam_job_run_status()
         )
 
         self.values.update(
             {
                 'language_accent_master_list': language_accent_master_list,
                 'language_codes_mapping': language_codes_mapping,
+                'learner_facing_language_accents': (
+                    learner_facing_language_accents
+                ),
                 'autogeneratable_language_accent_codes': autogeneratable_language_accent_codes,
+                'language_accent_code_to_beam_job_state': language_accent_code_to_beam_job_state,
             }
         )
         self.render_json(self.values)
@@ -78,6 +89,7 @@ class PutLanguageCodesHandlerNormalizedPayloadDict(TypedDict):
     """
 
     language_codes_mapping: Dict[str, Dict[str, bool]]
+    learner_facing_language_accents: List[str]
 
 
 class VoiceoverLanguageCodesMappingHandler(
@@ -103,7 +115,13 @@ class VoiceoverLanguageCodesMappingHandler(
                         }
                     },
                 }
-            }
+            },
+            'learner_facing_language_accents': {
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'basestring'},
+                }
+            },
         }
     }
 
@@ -116,11 +134,16 @@ class VoiceoverLanguageCodesMappingHandler(
         language_codes_mapping = self.normalized_payload[
             'language_codes_mapping'
         ]
+        learner_facing_language_accents = self.normalized_payload[
+            'learner_facing_language_accents'
+        ]
 
         new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
             language_codes_mapping
         )
-        voiceover_services.save_language_accent_support(language_codes_mapping)
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping, learner_facing_language_accents
+        )
 
         if (
             new_accent_code
@@ -132,13 +155,25 @@ class VoiceoverLanguageCodesMappingHandler(
                 None,
             )
         ):
-            beam_job_services.run_beam_job(
+            beam_job_run = beam_job_services.run_beam_job(
                 job_class=(
                     synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
                 ),
                 parameterized_args={'language_accent_code': new_accent_code},
             )
+            voiceover_services.save_language_accent_code_to_beam_job_run_model(
+                new_accent_code, beam_job_run.job_id
+            )
 
+        # Return the latest beam job statuses so the UI can reflect the
+        # status of the newly triggered job right away.
+        self.values.update(
+            {
+                'language_accent_code_to_beam_job_state': (
+                    voiceover_services.get_language_accent_code_to_beam_job_run_status()
+                )
+            }
+        )
         self.render_json(self.values)
 
 

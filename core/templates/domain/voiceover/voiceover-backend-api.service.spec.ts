@@ -75,13 +75,17 @@ describe('Voiceover backend API service', function () {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      learnerFacingLanguageAccents: ['en-US'],
       autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
+      languageAccentCodeToBeamJobState: {'en-US': 'RUNNING'},
     };
 
     req.flush({
       language_accent_master_list: languageAccentMasterList,
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
       autogeneratable_language_accent_codes: ['en-US', 'hi-IN'],
+      language_accent_code_to_beam_job_state: {'en-US': 'RUNNING'},
     });
 
     flushMicrotasks();
@@ -127,9 +131,10 @@ describe('Voiceover backend API service', function () {
     };
     let payload = {
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
     };
     voiceoverBackendApiService
-      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping, ['en-US'])
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -138,11 +143,13 @@ describe('Voiceover backend API service', function () {
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({status: 200, statusText: 'Success.'});
+    req.flush({
+      language_accent_code_to_beam_job_state: {'en-US': 'RUNNING'},
+    });
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith({'en-US': 'RUNNING'});
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -183,9 +190,10 @@ describe('Voiceover backend API service', function () {
     };
     let payload = {
       language_codes_mapping: languageCodesMapping,
+      learner_facing_language_accents: ['en-US'],
     };
     voiceoverBackendApiService
-      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping, ['en-US'])
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(

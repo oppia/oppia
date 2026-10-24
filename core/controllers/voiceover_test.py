@@ -71,6 +71,10 @@ class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             json_response['language_codes_mapping'], language_codes_mapping
         )
+        self.assertEqual(json_response['learner_facing_language_accents'], [])
+        self.assertDictEqual(
+            json_response['language_accent_code_to_beam_job_state'], {}
+        )
 
         self.logout()
 
@@ -97,7 +101,13 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
             'en': {'en-US': True},
             'hi': {'hi-IN': False},
         }
-        payload = {'language_codes_mapping': expected_language_codes_mapping}
+        expected_learner_facing_language_accents = ['en-US']
+        payload = {
+            'language_codes_mapping': expected_language_codes_mapping,
+            'learner_facing_language_accents': (
+                expected_learner_facing_language_accents
+            ),
+        }
 
         self.put_json(
             feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
@@ -111,6 +121,10 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             language_codes_mapping, expected_language_codes_mapping
         )
+        self.assertEqual(
+            voiceover_services.get_learner_facing_language_accents(),
+            expected_learner_facing_language_accents,
+        )
 
         self.logout()
 
@@ -121,7 +135,10 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         invalid_language_codes_mapping = {'en': 'en-US'}
-        payload = {'language_codes_mapping': invalid_language_codes_mapping}
+        payload = {
+            'language_codes_mapping': invalid_language_codes_mapping,
+            'learner_facing_language_accents': [],
+        }
 
         response_dict = self.put_json(
             feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,

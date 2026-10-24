@@ -110,10 +110,13 @@ export class ContentLanguageSelectorComponent implements OnInit {
             response.languageAccentMasterList;
           this.voiceoverPlayerService.languageCodesMapping =
             response.languageCodesMapping;
+          this.voiceoverPlayerService.learnerFacingLanguageAccents =
+            response.learnerFacingLanguageAccents;
 
           this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
             this.selectedLanguageCode,
-            this.entityVoiceoversService.getLanguageAccentCodes()
+            this.entityVoiceoversService.getLanguageAccentCodes(),
+            true
           );
 
           this.audioPreloaderService.kickOffAudioPreloader(
@@ -136,7 +139,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
     this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
       this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
         newLanguageCode,
-        this.entityVoiceoversService.getLanguageAccentCodes()
+        this.entityVoiceoversService.getLanguageAccentCodes(),
+        true
       );
       this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
         this.entityVoiceoversService.getActiveEntityVoiceovers()
