@@ -89,6 +89,7 @@ export interface UpdatePreferenceDict {
 
 export interface UserContributionRightsDataBackendDict {
   can_review_translation_for_language_codes: string[];
+  can_submit_translation_for_language_codes: string[];
   can_review_voiceover_for_language_codes: string[];
   can_review_questions: boolean;
   can_suggest_questions: boolean;

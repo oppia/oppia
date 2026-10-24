@@ -163,6 +163,7 @@ export default {
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
     TRANSLATION_REVIEWER: 'translation reviewer',
+    TRANSLATION_SUBMITTER: 'translation submitter',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
     TECH_TEAM_LEAD: 'tech team lead',
   } as const,

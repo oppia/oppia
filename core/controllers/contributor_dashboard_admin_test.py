@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models, user_models
 
-(suggestion_models, user_models) = models.Registry.import_models(
+suggestion_models, user_models = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.USER]
 )
 
@@ -527,10 +527,19 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={'username': 'reviewer'}
         )
         self.assertEqual(
-            list(response.keys()), ['can_review_translation_for_language_codes']
+            sorted(response.keys()),
+            sorted(
+                [
+                    'can_review_translation_for_language_codes',
+                    'can_submit_translation_for_language_codes',
+                ]
+            ),
         )
         self.assertEqual(
             response['can_review_translation_for_language_codes'], []
+        )
+        self.assertEqual(
+            response['can_submit_translation_for_language_codes'], []
         )
 
         user_services.allow_user_to_review_translation_in_language(
@@ -543,7 +552,13 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={'username': 'reviewer'}
         )
         self.assertEqual(
-            list(response.keys()), ['can_review_translation_for_language_codes']
+            sorted(response.keys()),
+            sorted(
+                [
+                    'can_review_translation_for_language_codes',
+                    'can_submit_translation_for_language_codes',
+                ]
+            ),
         )
         self.assertEqual(
             response['can_review_translation_for_language_codes'], ['hi']
