@@ -16,6 +16,8 @@
 
 """Controllers for custom landing pages."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.controllers import acl_decorators, base

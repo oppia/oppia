@@ -14,6 +14,8 @@
 
 """Controller for initializing android specific structures."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

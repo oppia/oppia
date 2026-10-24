@@ -16,6 +16,8 @@
 
 """Jobs used for regenerating voiceovers for all the curated explorations."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections

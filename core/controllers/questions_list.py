@@ -14,6 +14,8 @@
 
 """Controllers for the questions list in topic editors and skill editors."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf

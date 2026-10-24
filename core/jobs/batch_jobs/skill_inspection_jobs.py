@@ -20,6 +20,8 @@ some topic/skill and deleted or merged to another skill B, A is
 called a hanging prerequisite.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs

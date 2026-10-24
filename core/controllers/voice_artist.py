@@ -16,6 +16,8 @@
 
 """Controllers for the translation changes."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import io

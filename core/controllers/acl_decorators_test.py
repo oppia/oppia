@@ -16,6 +16,8 @@
 
 """Tests for core.domain.acl_decorators."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

@@ -17,6 +17,8 @@
 """Jobs for rejecting translation suggestions for already translated
 content and deleting translations for invalid content ID."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core import feconf, utils

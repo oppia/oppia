@@ -14,6 +14,8 @@
 
 """Controllers for the contributor dashboard page."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

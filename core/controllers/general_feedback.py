@@ -14,6 +14,8 @@
 
 """Controllers for learner lesson feedback and platform issue report submissions."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import base64

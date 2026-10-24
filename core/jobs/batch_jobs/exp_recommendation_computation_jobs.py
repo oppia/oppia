@@ -16,6 +16,8 @@
 
 """Jobs that are run by CRON scheduler."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.domain import exp_domain, exp_fetchers, recommendations_services

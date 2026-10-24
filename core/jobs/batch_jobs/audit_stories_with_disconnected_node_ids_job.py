@@ -21,6 +21,8 @@ nodes which should have had "destination_node_ids" but do not
 have them.
 """
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 from core.jobs import base_jobs

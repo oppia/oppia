@@ -14,6 +14,8 @@
 
 """Tests for skill domain objects and methods defined on them."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import datetime

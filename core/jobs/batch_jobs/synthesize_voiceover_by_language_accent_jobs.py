@@ -17,6 +17,8 @@
 """Jobs used for regenerating voiceovers for all the curated explorations by
 language accent."""
 
+# pylint: disable=arguments-differ
+
 from __future__ import annotations
 
 import collections
