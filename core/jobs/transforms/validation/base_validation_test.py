@@ -614,13 +614,7 @@ class MockValidateCommitCmdsSchemaChangeDomain(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
 
-    # Here we use MyPy ignore because the signature of this method doesn't
-    # match with super class's `_get_change_domain_class()` method, because
-    # in super class's method we are returning Type[BaseChange] and here for
-    # testing purposes we are returning 'None'. So, due to this conflict in
-    # return types, a conflict in signatures occurred which causes MyPy to
-    # throw an error. Thus, to avoid the error, we used ignore here.
-    def _get_change_domain_class(self, _: base_models.BaseModel) -> None:  # type: ignore[override]
+    def _get_change_domain_class(self, _: base_models.BaseModel) -> None:
         """Method defined for testing purpose."""
         pass
 
