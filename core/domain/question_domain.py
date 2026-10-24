@@ -1305,7 +1305,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     # Dict[str, AllowedRuleSpecInputTypes] values which
                     # causes MyPy to throw `incompatible type` error. Thus
                     # to avoid the error, we used ignore here.
-                    elif interaction_id == 'SetInput':
+                    else:
+                        # The outer condition limits interaction_id to TextInput
+                        # or SetInput. Since TextInput is handled above, this
+                        # branch only handles SetInput.
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
@@ -1371,13 +1374,7 @@ class Question(translation_domain.BaseTranslatableObject):
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> List[List[str]]: ...
 
-        # Here we use MyPy ignore because MyPy expects a return value in
-        # every condition when we define a return type but here we are
-        # returning only in if-else conditions and we are not returning
-        # when none of the condition matches which causes MyPy to throw
-        # a 'Missing return statement' error. Thus to avoid the error,
-        # we used ignore here.
-        def migrate_rule_inputs_and_answers(  # type: ignore[return]
+        def migrate_rule_inputs_and_answers(
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict],
@@ -1432,9 +1429,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     )
                     for html in set_of_content_ids
                 ]
-            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here we use cast because this 'elif' condition forces value
-                # to have type List[List[str]].
+
+            else:
+                # Here we use cast because the two preceding conditions handle
+                # the other supported types, so value has type List[List[str]].
                 list_of_set_of_content_ids = cast(List[List[str]], value)
                 return [
                     migrate_rule_inputs_and_answers(
