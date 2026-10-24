@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import hashlib
-
 from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
@@ -196,10 +194,43 @@ def load_feature_flags_from_storage(
     return feature_flag_name_to_feature_flag_dict
 
 
+def _get_ids_of_user_groups_containing_user(
+    user_id: Optional[str],
+    feature_flags: List[feature_flag_domain.FeatureFlag],
+) -> Set[str]:
+    """Returns the ids of the user groups that the given user belongs to.
+
+    The datastore is only queried when the result can affect the evaluation
+    of at least one of the given feature flags, i.e. when the user is logged
+    in and at least one of the feature flags is enabled for some user groups.
+
+    Args:
+        user_id: str|None. The id of the user, or None if the user is logged
+            out.
+        feature_flags: list(FeatureFlag). The feature flags that will be
+            evaluated for the user.
+
+    Returns:
+        set(str). The ids of the user groups that the user belongs to, or an
+        empty set if they are not needed to evaluate the feature flags.
+    """
+    if user_id is None or not any(
+        feature_flag.feature_flag_config.user_group_ids
+        for feature_flag in feature_flags
+    ):
+        return set()
+
+    user_group_models: List[user_models.UserGroupModel] = list(
+        user_models.UserGroupModel.query(
+            user_models.UserGroupModel.user_ids == user_id
+        ).fetch()
+    )
+    return set(user_group_model.id for user_group_model in user_group_models)
+
+
 def is_feature_flag_enabled(
     feature_flag_name: str,
     user_id: Optional[str],
-    feature_flag: Optional[feature_flag_domain.FeatureFlag] = None,
 ) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
@@ -207,64 +238,15 @@ def is_feature_flag_enabled(
         feature_flag_name: str. The name of the feature flag that needs to
             be evaluated.
         user_id: str|None. The id of the user, if logged-out user then None.
-        feature_flag: FeatureFlag|None. The feature flag domain object.
-            If None, then this function is responsible for fetching the
-            feature flag.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.
     """
-    if feature_flag is None:
-        feature_flag = registry.Registry.get_feature_flag(feature_flag_name)
-
-    current_server = feature_flag_domain.get_server_mode()
-
-    if (
-        current_server == feature_flag_domain.ServerMode.TEST
-        and feature_flag.feature_flag_spec.feature_stage
-        == feature_flag_domain.ServerMode.DEV
-    ):
-        return False
-
-    if (
-        current_server == feature_flag_domain.ServerMode.PROD
-        and feature_flag.feature_flag_spec.feature_stage
-        in (
-            feature_flag_domain.ServerMode.DEV,
-            feature_flag_domain.ServerMode.TEST,
-        )
-    ):
-        return False
-
-    if feature_flag.feature_flag_config.force_enable_for_all_users:
-        return True
-
-    if user_id is not None:
-        user_group_models: List[user_models.UserGroupModel] = list(
-            user_models.UserGroupModel.query(
-                user_models.UserGroupModel.user_ids == user_id
-            ).fetch()
-        )
-
-        user_group_models_ids: Set[str] = set(
-            user_group_model.id for user_group_model in user_group_models
-        )
-
-        for user_group_id in feature_flag.feature_flag_config.user_group_ids:
-            if user_group_id in user_group_models_ids:
-                return True
-
-        salt = feature_flag_name.encode('utf-8')
-        hashed_user_id = hashlib.sha256(
-            user_id.encode('utf-8') + salt
-        ).hexdigest()
-        hash_value = int(hashed_user_id, 16)
-        mod_result = hash_value % 1000
-        threshold = (
-            feature_flag.feature_flag_config.rollout_percentage / 100
-        ) * 1000
-        return bool(mod_result < threshold)
-    return False
+    feature_flag = registry.Registry.get_feature_flag(feature_flag_name)
+    return feature_flag.is_enabled(
+        user_id,
+        _get_ids_of_user_groups_containing_user(user_id, [feature_flag]),
+    )
 
 
 def evaluate_all_feature_flag_configs(
@@ -279,13 +261,15 @@ def evaluate_all_feature_flag_configs(
         dict. The keys are the feature flag names and the values are boolean
         results of corresponding flags.
     """
-    result_dict = {}
     feature_flags = get_all_feature_flags()
-    for feature_flag in feature_flags:
-        feature_flag_status = is_feature_flag_enabled(
-            feature_flag.name, user_id, feature_flag=feature_flag
+    # The user groups are fetched once and reused for every feature flag,
+    # instead of being fetched again for each feature flag.
+    user_group_ids_of_user = _get_ids_of_user_groups_containing_user(
+        user_id, feature_flags
+    )
+    return {
+        feature_flag.name: feature_flag.is_enabled(
+            user_id, user_group_ids_of_user
         )
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(feature_flag_status, bool)
-        result_dict[feature_flag.name] = feature_flag_status
-    return result_dict
+        for feature_flag in feature_flags
+    }
