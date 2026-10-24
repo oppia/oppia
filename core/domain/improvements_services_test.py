@@ -41,7 +41,9 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     """Base class with helper methods for the improvements_services tests."""
 
     EXP_ID: Final = 'eid'
-    MOCK_DATE: Final = datetime.datetime(2020, 6, 15)
+    MOCK_DATE: Final = datetime.datetime(
+        2020, 6, 15, tzinfo=datetime.timezone.utc
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -509,7 +511,9 @@ class PutTasksTests(ImprovementsServicesTestBase):
 
     def test_put_for_tasks_entries_which_exist_updates_the_models(self) -> None:
         task_entry = self._new_open_task()
-        created_on = datetime.datetime(2020, 6, 15, 5)
+        created_on = datetime.datetime(
+            2020, 6, 15, 5, tzinfo=datetime.timezone.utc
+        )
         updated_on = created_on + datetime.timedelta(minutes=5)
 
         with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
@@ -538,7 +542,9 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self,
     ) -> None:
         task_entry = self._new_resolved_task()
-        created_on = datetime.datetime(2020, 6, 15, 5)
+        created_on = datetime.datetime(
+            2020, 6, 15, 5, tzinfo=datetime.timezone.utc
+        )
         updated_on = created_on + datetime.timedelta(minutes=5)
 
         with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
@@ -565,7 +571,9 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self,
     ) -> None:
         task_entry = self._new_open_task()
-        created_on = datetime.datetime(2020, 6, 15, 5)
+        created_on = datetime.datetime(
+            2020, 6, 15, 5, tzinfo=datetime.timezone.utc
+        )
         updated_on = created_on + datetime.timedelta(minutes=5)
 
         with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
