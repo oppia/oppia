@@ -22,9 +22,6 @@ export const QuestionDomainConstants = {
   QUESTION_CREATION_URL: '/question_editor_handler/create_new',
   QUESTION_SKILL_LINK_URL_TEMPLATE: '/manage_question_skill_link/<question_id>',
 
-  PRETEST_QUESTIONS_URL_TEMPLATE:
-    '/pretest_handler/<exploration_id>?story_url_fragment=<story_url_fragment>',
-
   QUESTION_PLAYER_URL_TEMPLATE:
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +
     '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>',
