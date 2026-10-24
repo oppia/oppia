@@ -596,7 +596,9 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             dict. Dictionary of the data from BlogAuthorDetailModel.
         """
 
-        author_model = cls.query(cls.author_id == user_id).get()
+        author_model: Optional[BlogAuthorDetailsModel] = cls.query(
+            cls.author_id == user_id
+        ).get()
         if author_model:
             return {
                 'displayed_author_name': author_model.displayed_author_name,
