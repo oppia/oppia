@@ -69,6 +69,7 @@ describe('ExplorationInitializationService', () => {
             'getExplorationVersion',
             'isInQuestionPlayerMode',
             'getPageContext',
+            'setExplorationVersion',
             'setQuestionPlayerIsOpen',
           ]),
         },
@@ -141,11 +142,18 @@ describe('ExplorationInitializationService', () => {
   });
 
   it('should initialize preview player when on exploration editor page', fakeAsync(() => {
+    const initializationCalls: string[] = [];
     pageContextService.isInExplorationEditorPage.and.returnValue(true);
     pageContextService.getExplorationId.and.returnValue('exp123');
+    pageContextService.setExplorationVersion.and.callFake(() => {
+      initializationCalls.push('setExplorationVersion');
+    });
+    explorationEngineService.init.and.callFake(() => {
+      initializationCalls.push('initExplorationEngine');
+    });
 
     editableBackendApi.fetchApplyDraftExplorationAsync.and.returnValue(
-      Promise.resolve({param_changes: [], states: {}})
+      Promise.resolve({param_changes: [], states: {}, version: 1})
     );
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
@@ -162,9 +170,14 @@ describe('ExplorationInitializationService', () => {
       {param_changes: [], states: {}},
       {}
     );
+    expect(pageContextService.setExplorationVersion).toHaveBeenCalledWith(1);
+    expect(initializationCalls).toEqual([
+      'setExplorationVersion',
+      'initExplorationEngine',
+    ]);
     expect(explorationEngineService.init).toHaveBeenCalledWith(
-      {param_changes: [], states: {}},
-      null,
+      {param_changes: [], states: {}, version: 1},
+      1,
       null,
       null,
       [],

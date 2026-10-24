@@ -546,6 +546,22 @@ describe('Exploration engine service ', () => {
     }
   );
 
+  it('should preserve the exploration version in the editor page', () => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      true
+    );
+    spyOn(urlService, 'getPathname').and.returnValue('/create/explorationId');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(false);
+    (urlService.getExplorationVersionFromUrl as jasmine.Spy).and.returnValue(
+      null
+    );
+    pageContextService.setExplorationVersion(3);
+
+    explorationEngineService.setExplorationProperties();
+
+    expect(pageContextService.getExplorationVersion()).toBe(3);
+  });
+
   it('should throw error if contentId is null in initial state when calling init', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
