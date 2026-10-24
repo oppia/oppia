@@ -107,6 +107,13 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * Switches to the blog card preview tab in the preview modal.
+   */
+  async switchToBlogCardPreviewTab(): Promise<void> {
+    await this.clickOnElementWithText('Blog Card Preview');
+  }
+
+  /**
    * Fills the bio in register modal shown when visiting blog dashboard for the
    * first time.
    * @param {string} bio: The bio to update with.

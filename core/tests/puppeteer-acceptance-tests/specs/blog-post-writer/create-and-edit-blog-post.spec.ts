@@ -139,6 +139,9 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.previewBlogPost();
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
+    // Switch to blog card preview tab to verify the link.
+    await blogPostWriter.switchToBlogCardPreviewTab();
+
     // Verify link in blog preview modal.
     await blogPostWriter.clickAndVerifyAnchorWithInnerText(
       '( link  )',
