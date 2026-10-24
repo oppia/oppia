@@ -18,14 +18,11 @@ from __future__ import annotations
 
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
-    feature_flag_services,
     learner_progress_services,
-    question_services,
-    skill_fetchers,
     story_domain,
     story_fetchers,
     story_services,
@@ -310,44 +307,11 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
         )
 
-        ready_for_review_test = False
         exp_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 next_exp_ids
             )
         )
-
-        # If there are no questions for any of the acquired skills that the
-        # learner has completed, do not show review tests.
-        acquired_skills = skill_fetchers.get_multi_skills(
-            story.get_acquired_skill_ids_for_node_ids(completed_node_ids)
-        )
-
-        acquired_skill_ids = [skill.id for skill in acquired_skills]
-        questions_available = (
-            len(
-                question_services.get_questions_by_skill_ids(
-                    1, acquired_skill_ids, False
-                )
-            )
-            > 0
-        )
-
-        learner_completed_story = len(completed_node_ids) == len(ordered_nodes)
-        learner_at_review_point_in_story = len(exp_summaries) != 0 and (
-            len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
-            == 0
-        )
-
-        # Gated Review Test redirection.
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
-            self.user_id,
-        ) and (
-            questions_available
-            and (learner_at_review_point_in_story or learner_completed_story)
-        ):
-            ready_for_review_test = True
 
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
@@ -385,7 +349,6 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json(
             {
                 'summaries': exp_summaries,
-                'ready_for_review_test': ready_for_review_test,
                 'next_node_id': next_node_id,
             }
         )
