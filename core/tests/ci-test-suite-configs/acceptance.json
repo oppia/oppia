@@ -206,9 +206,9 @@
       "framework": "playwright"
     },
     {
-      "name": "logged-in-user/manage-classroom-progress-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-classroom-progress-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "name": "logged-in-learner/manage-classroom-progress-in-learner-dashboard",
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-classroom-progress-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
