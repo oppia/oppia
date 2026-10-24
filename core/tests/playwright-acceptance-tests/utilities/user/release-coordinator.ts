@@ -16,7 +16,7 @@
  * @fileoverview Release coordinator users utility file.
  */
 
-import {Page} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -38,6 +38,22 @@ const enableFeatureSelector = '.e2e-test-value-selector';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
+   * Navigates to the Features tab on the Release Coordinator page.
+   */
+  async navigateToFeaturesTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavBar);
+      await this.clickOnElementWithSelector(mobileNavBar);
+      await this.expectElementToBeVisible(mobileFeaturesTab);
+      await this.clickOnElementWithSelector(mobileFeaturesTab);
+    } else {
+      await this.expectElementToBeVisible(featuresTab);
+      await this.clickOnElementWithSelector(featuresTab);
+    }
+    await this.expectElementToBeVisible(featureFlagDiv);
+  }
+
+  /**
    * This function enables a specific feature flag.
    * @param {string} featureName - The name of the feature flag to enable.
    * @param {boolean} enable - Whether to enable or disable the feature flag.
@@ -48,18 +64,7 @@ export class ReleaseCoordinator extends BaseUser {
   ): Promise<void> {
     try {
       await this.goto(releaseCoordinatorUrl);
-
-      if (this.isViewportAtMobileWidth()) {
-        await this.expectElementToBeVisible(mobileNavBar);
-        await this.clickOnElementWithSelector(mobileNavBar);
-        await this.expectElementToBeVisible(mobileFeaturesTab);
-        await this.clickOnElementWithSelector(mobileFeaturesTab);
-      } else {
-        await this.expectElementToBeVisible(featuresTab);
-        await this.clickOnElementWithSelector(featuresTab);
-      }
-
-      await this.expectElementToBeVisible(featureFlagDiv);
+      await this.navigateToFeaturesTab();
       const featureFlags = await this.page.$$(featureFlagDiv);
 
       for (let i = 0; i < featureFlags.length; i++) {
@@ -85,9 +90,7 @@ export class ReleaseCoordinator extends BaseUser {
           );
           await this.clickOnElement(saveButton);
 
-          await this.expectElementToBeVisible(
-            `${saveButtonSelector}[disabled]`
-          );
+          await this.expectFeatureFlagToBeEnabled(featureName, enable);
 
           showMessage(
             `Feature flag: "${featureName}" has been enabled successfully.`
@@ -104,6 +107,26 @@ export class ReleaseCoordinator extends BaseUser {
       );
       throw err;
     }
+  }
+
+  /**
+   * Verifies a feature flag's value and that its changes have been saved.
+   * @param {string} featureName - The name of the feature flag to check.
+   * @param {boolean} enabled - Whether the feature flag should be enabled.
+   */
+  async expectFeatureFlagToBeEnabled(
+    featureName: string,
+    enabled: boolean = true
+  ): Promise<void> {
+    const featureFlag = this.page.locator(featureFlagDiv).filter({
+      has: this.page.getByText(featureName, {exact: true}),
+    });
+    await expect(featureFlag.locator(enableFeatureSelector)).toHaveValue(
+      enabled ? '0: true' : '1: false'
+    );
+    // Other feature rows also have disabled Save buttons, so wait for this
+    // feature's save to finish before navigating away or closing the context.
+    await expect(featureFlag.locator(saveButtonSelector)).toBeDisabled();
   }
 }
 
