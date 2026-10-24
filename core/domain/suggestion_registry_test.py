@@ -1158,7 +1158,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.suggestion_dict: suggestion_registry.BaseSuggestionDict = {
+        self.suggestion_dict: suggestion_registry.TranslationSuggestionDict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
             'target_type': feconf.ENTITY_TYPE_EXPLORATION,
@@ -1186,6 +1186,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
             'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False,
+            'new_image_filenames': [],
         }
 
         opportunity_models.ExplorationOpportunitySummaryModel(
@@ -1203,6 +1204,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             ],
             language_codes_needing_voice_artists=['en'],
         ).put()
+
+    def test_to_dict_returns_dict_with_new_image_filenames(self) -> None:
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        suggestion_dict = suggestion.to_dict()
+
+        # The translation contains no images, so no new image filenames
+        # are added in the suggestion.
+        self.assertEqual(suggestion_dict['new_image_filenames'], [])
+        # Base suggestion fields are preserved by the override.
+        self.assertEqual(
+            suggestion_dict['suggestion_id'], 'exploration.exp1.thread1'
+        )
+        self.assertEqual(suggestion_dict['target_id'], 'exp1')
 
     def test_pre_update_validate_fails_for_invalid_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
