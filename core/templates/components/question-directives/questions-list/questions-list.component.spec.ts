@@ -50,6 +50,7 @@ import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionsListComponent} from './questions-list.component';
@@ -76,6 +77,34 @@ class MockUrlInterpolationService {
   interpolateUrl(value: string): string {
     return value;
   }
+}
+
+class MockWindowRef {
+  // This mock mirrors the real window so that services injected into this
+  // spec (for example WindowDimensionsService, which reads
+  // window.document.documentElement, and ImageLocalStorageService, which
+  // clears window.sessionStorage) keep behaving exactly as they do in
+  // production. Only `location` is replaced: QuestionsListComponent writes
+  // window.location.hash when the question editor is opened, and tests share
+  // a single browser page, so leaving that write to the real window would
+  // leak '#/questions#<id>' into every spec that runs afterwards.
+  nativeWindow = {
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    document: window.document,
+    sessionStorage: window.sessionStorage,
+    location: {
+      hash: '',
+      pathname: window.location.pathname,
+      search: window.location.search,
+      href: window.location.href,
+      origin: window.location.origin,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      host: window.location.host,
+      port: window.location.port,
+    },
+  };
 }
 
 describe('Questions List Component', () => {
@@ -115,6 +144,10 @@ describe('Questions List Component', () => {
         {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
         },
         PageContextService,
         QuestionValidationService,
