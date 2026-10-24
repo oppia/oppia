@@ -617,11 +617,15 @@ describe('Contributor stats component', () => {
         } as NgbModalRef;
       });
 
+      const refreshPaginationSpy = spyOn(component, 'refreshPagination');
+      const onRoleChangeSpy = spyOn(component.onRoleChange, 'emit');
       component.openRoleEditor('user1');
       tick();
 
       expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
       expect(removeRightsSpy).toHaveBeenCalled();
+      expect(refreshPaginationSpy).toHaveBeenCalled();
+      expect(onRoleChangeSpy).toHaveBeenCalled();
     })
   );
 

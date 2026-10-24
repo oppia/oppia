@@ -16,7 +16,14 @@
  * @fileoverview Component for the Contributor Admin Dashboard table.
  */
 
-import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
@@ -69,6 +76,7 @@ export class ContributorAdminStatsTable implements OnInit {
     activeTab: 'Translation Submitter',
     filter: ContributorAdminDashboardFilter.createDefault(),
   };
+  @Output() onRoleChange: EventEmitter<void> = new EventEmitter<void>();
 
   columnsToDisplay: string[] = [];
   allStats: ContributorStats[] = [];
@@ -200,13 +208,18 @@ export class ContributorAdminStatsTable implements OnInit {
         };
         modelRef.result.then(
           results => {
-            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
-              username,
-              results.isQuestionSubmitter,
-              results.isQuestionReviewer,
-              response.can_submit_questions,
-              response.can_review_questions
-            );
+            this.contributorDashboardAdminBackendApiService
+              .updateQuestionRightsAsync(
+                username,
+                results.isQuestionSubmitter,
+                results.isQuestionReviewer,
+                response.can_submit_questions,
+                response.can_review_questions
+              )
+              .then(() => {
+                this.refreshPagination();
+                this.onRoleChange.emit();
+              });
           },
           () => {
             // Note to developers:
