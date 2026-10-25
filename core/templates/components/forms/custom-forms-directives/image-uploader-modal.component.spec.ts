@@ -24,7 +24,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {of} from 'rxjs';
+import {Subject} from 'rxjs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, tick} from '@angular/core/testing';
 
@@ -32,7 +32,8 @@ describe('Image Uploader Modal', () => {
   let fixture: ComponentFixture<ImageUploaderModalComponent>;
   let componentInstance: ImageUploaderModalComponent;
   let windowDimensionsService: WindowDimensionsService;
-  let resizeEvent = new Event('resize');
+  let resizeEventSubject: Subject<Event>;
+  let fileReaderSpy: jasmine.Spy;
   const svgString =
     '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
     '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
@@ -48,6 +49,7 @@ describe('Image Uploader Modal', () => {
   }
 
   beforeEach(waitForAsync(() => {
+    resizeEventSubject = new Subject<Event>();
     TestBed.configureTestingModule({
       declarations: [ImageUploaderModalComponent, MockTranslatePipe],
       imports: [HttpClientTestingModule],
@@ -62,7 +64,7 @@ describe('Image Uploader Modal', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent),
+            getResizeEvent: () => resizeEventSubject.asObservable(),
           },
         },
       ],
@@ -90,6 +92,29 @@ describe('Image Uploader Modal', () => {
       previewImageUrl: '',
       previewTitle: '',
     };
+    const mockImage = document.createElement('img');
+    Object.defineProperty(mockImage, 'height', {value: 100});
+    Object.defineProperty(mockImage, 'width', {value: 100});
+    Object.defineProperty(mockImage, 'src', {
+      set() {
+        if (mockImage.onload) {
+          mockImage.onload(new Event('load'));
+        }
+      },
+    });
+    spyOn(window, 'Image').and.returnValue(mockImage);
+
+    fileReaderSpy = spyOn(FileReader.prototype, 'readAsDataURL').and.callFake(
+      function (this: FileReader) {
+        if (this.onload) {
+          this.onload({
+            target: {
+              result: 'data:image/svg+xml;base64,' + btoa(svgString),
+            },
+          } as ProgressEvent<FileReader>);
+        }
+      }
+    );
   });
 
   it('should create', () => {
@@ -135,33 +160,22 @@ describe('Image Uploader Modal', () => {
   });
 
   it('should handle image upload and confirm image', fakeAsync(() => {
+    spyOn(componentInstance, 'initializeCropper');
     const dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
     const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
       c.charCodeAt(0)
     );
     const file = new File([arrayBuffer], 'filename.png');
 
-    const fileReaderMock = {
-      readAsDataURL: jasmine.createSpy('readAsDataURL').and.callFake(function (
-        this: FileReader
-      ) {
-        const event = {
-          target: {result: 'base64ImageData'},
-        } as ProgressEvent<FileReader>;
-        if (this.onload) {
-          this.onload(event);
-        }
-      }),
-      addEventListener: jasmine.createSpy('addEventListener'),
-      removeEventListener: jasmine.createSpy('removeEventListener'),
-      onload: null as
-        | ((this: FileReader, ev: ProgressEvent<FileReader>) => void)
-        | null,
-    };
-
-    spyOn(window, 'FileReader').and.returnValue(
-      fileReaderMock as unknown as FileReader
-    );
+    const imageDataUrl = 'data:image/png;base64,' + dataBase64Mock;
+    fileReaderSpy.and.callFake(function (this: FileReader) {
+      const event = {
+        target: {result: imageDataUrl},
+      } as ProgressEvent<FileReader>;
+      if (this.onload) {
+        this.onload(event);
+      }
+    });
 
     componentInstance.onFileChanged(file);
     // Advance the virtual clock to process pending asynchronous operations like file reading.
@@ -171,7 +185,6 @@ describe('Image Uploader Modal', () => {
 
     expect(componentInstance.invalidImageWarningIsShown).toBe(false);
 
-    const imageDataUrl = 'base64ImageData';
     componentInstance.cropper = {
       getCroppedCanvas: () => {
         return {
@@ -211,8 +224,20 @@ describe('Image Uploader Modal', () => {
   );
 
   it('should remove invalid tags and attributes', fakeAsync(() => {
+    componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
     componentInstance.ngOnInit();
-    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+    const cleanSvg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
+    fileReaderSpy.and.callFake(function (this: FileReader) {
+      if (this.onload) {
+        this.onload({
+          target: {
+            result: 'data:image/svg+xml;base64,' + btoa(cleanSvg),
+          },
+        } as ProgressEvent<FileReader>);
+      }
+    });
+    let file = new File([cleanSvg], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
     fixture.detectChanges();
 
@@ -272,19 +297,133 @@ describe('Image Uploader Modal', () => {
 
   it('should not initialize cropper if croppableImageRef is null', fakeAsync(() => {
     spyOn(componentInstance, 'initializeCropper');
-    const mockCroppableImageRef = {nativeElement: {}} as ElementRef;
-    componentInstance.croppableImageRef = mockCroppableImageRef;
     componentInstance.imageUploaderParameters.imageName = 'Image';
     componentInstance.ngOnInit();
+    fixture.detectChanges();
+    Object.defineProperty(componentInstance, 'croppableImageRef', {
+      get: () => null,
+      set: () => {},
+      configurable: true,
+    });
+
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
-    fixture.detectChanges();
 
     componentInstance.onFileChanged(file);
     tick();
 
     expect(componentInstance.initializeCropper).not.toHaveBeenCalled();
   }));
+
+  it(
+    'should initialize cropper in onFileChanged if not thumbnail and' +
+      ' croppableImageRef is present',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'initializeCropper');
+      componentInstance.croppableImageRef = new ElementRef(
+        document.createElement('img')
+      );
+      componentInstance.imageUploaderParameters.imageName = 'Image';
+      componentInstance.ngOnInit();
+      let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+      componentInstance.invalidImageWarningIsShown = false;
+      fixture.detectChanges();
+
+      componentInstance.onFileChanged(file);
+      tick();
+
+      expect(componentInstance.initializeCropper).toHaveBeenCalled();
+    })
+  );
+
+  it('should not initialize cropper when croppableImageRef is not defined', () => {
+    componentInstance.croppableImageRef = undefined as never;
+    componentInstance.initializeCropper();
+    expect(componentInstance.cropper).toBeUndefined();
+  });
+
+  it('should get issue URL', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue(
+      'https://github.com/oppia/oppia/issues/new'
+    );
+    const invalidTagsAndAttrs = {tags: ['script'], attrs: ['onload']};
+    expect(componentInstance.getIssueURL(invalidTagsAndAttrs)).toBe(
+      'https://github.com/oppia/oppia/issues/new'
+    );
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
+  });
+
+  it('should check if there is more than one background color', () => {
+    componentInstance.imageUploaderParameters.allowedBgColors = ['#fff'];
+    expect(componentInstance.hasMoreThanOneBgColor()).toBeFalse();
+
+    componentInstance.imageUploaderParameters.allowedBgColors = [
+      '#fff',
+      '#000',
+    ];
+    expect(componentInstance.hasMoreThanOneBgColor()).toBeTrue();
+  });
+
+  it('should check if invalid tags or attributes are present', () => {
+    componentInstance.invalidTagsAndAttributes = {tags: [], attrs: []};
+    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeFalse();
+
+    componentInstance.invalidTagsAndAttributes = {tags: ['script'], attrs: []};
+    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeTrue();
+
+    componentInstance.invalidTagsAndAttributes = {tags: [], attrs: ['onerror']};
+    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeTrue();
+  });
+
+  it(
+    'should get trusted SVG resource URL when uploaded image is SVG and' +
+      ' not thumbnail',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'initializeCropper');
+      const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+      spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+        'trusted-svg-url'
+      );
+      componentInstance.imageUploaderParameters.imageName = 'Image';
+      fixture.detectChanges();
+
+      let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+      componentInstance.onFileChanged(file);
+      tick();
+
+      expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalled();
+      expect(componentInstance.uploadedImage).toBe('trusted-svg-url');
+    })
+  );
+
+  it('should handle viewDestroyedError when detectChanges throws', fakeAsync(() => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    spyOn(changeDetectorRef, 'detectChanges').and.throwError(
+      'Attempt to use a destroyed view: detectChanges thrown.'
+    );
+    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+
+    expect(() => {
+      componentInstance.onFileChanged(file);
+      tick();
+    }).not.toThrowError();
+  }));
+
+  it('should update windowIsNarrow on window resize', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    componentInstance.ngOnInit();
+    expect(componentInstance.windowIsNarrow).toBeFalse();
+
+    (windowDimensionsService.isWindowNarrow as jasmine.Spy).and.returnValue(
+      true
+    );
+    resizeEventSubject.next(new Event('resize'));
+    expect(componentInstance.windowIsNarrow).toBeTrue();
+  });
 
   it('should throw error if cropper is not initialized', () => {
     expect(() => {
@@ -295,16 +434,13 @@ describe('Image Uploader Modal', () => {
   it('should handle file read errors', fakeAsync(() => {
     spyOn(componentInstance, 'onInvalidImageLoaded');
     const file = new File([], 'invalid.png');
-    const reader = new FileReader();
 
-    spyOn(reader, 'readAsDataURL').and.callFake(function (this: FileReader) {
+    fileReaderSpy.and.callFake(function (this: FileReader) {
       const errorEvent = new ProgressEvent(
         'error'
       ) as ProgressEvent<FileReader>;
       this.onerror?.(errorEvent);
     });
-
-    spyOn(window, 'FileReader').and.returnValue(reader);
 
     componentInstance.onFileChanged(file);
     tick();
