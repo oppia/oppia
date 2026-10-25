@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for math expression content editor.
  */
 
-// @ts-nocheck
-
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   waitForAsync,
@@ -46,10 +44,7 @@ describe('MathExpressionContentEditorComponent', () => {
   let alertsService: AlertsService;
   let insertScriptService: InsertScriptService;
   let mockOnExternalRteSaveEventEmitter = new EventEmitter();
-  let svgElement: {
-    setAttribute: (txt: string, temp: string) => void;
-    outerHTML: string;
-  };
+  let svgElement: Element;
 
   const mockMathJaxHub = {
     Queue: (func: () => void) => {
@@ -155,12 +150,8 @@ describe('MathExpressionContentEditorComponent', () => {
       mathExpressionSvgIsBeingProcessed: false,
     };
     window.MathJax = mockMathJs as typeof MathJax;
-    svgElement = {
-      setAttribute: (txt: string, temp: string) => {
-        return;
-      },
-      outerHTML:
-        '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ' +
+    const doc = new DOMParser().parseFromString(
+      '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ' +
         'width="1.784ex" height="3.205ex" viewBox="0 -817.3 768 1379.7" ' +
         'role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" ' +
         'style="vertical-align: -1.306ex;"><g stroke="currentColor" ' +
@@ -192,15 +183,16 @@ describe('MathExpressionContentEditorComponent', () => {
         '379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 ' +
         '385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g>' +
         '</g></g></svg>',
-    };
-    spyOn(HTMLDivElement.prototype, 'getElementsByTagName')
-      // This throws "Argument of type 'HTMLElement[]' is not assignable
-      // to parameter of type 'HTMLCollectionOf<Element>'.
-      // Type 'HTMLElement[]' is missing the following properties from type
-      // 'HTMLCollectionOf<Element>': item, namedItem."
-      // We need to suppress this error because we need to return a mock element
-      // for testing purposes.
-      .and.returnValue([svgElement]);
+      'image/svg+xml'
+    );
+    svgElement = doc.documentElement;
+    const mockCollection = Object.assign([svgElement], {
+      item: (i: number) => (i === 0 ? svgElement : null),
+      namedItem: () => null,
+    }) as HTMLCollectionOf<Element>;
+    spyOn(HTMLDivElement.prototype, 'getElementsByTagName').and.returnValue(
+      mockCollection
+    );
     component.alwaysEditable = true;
   });
 
