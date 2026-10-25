@@ -978,9 +978,12 @@ describe('Conversation skin component', () => {
       initializeComponent();
       hintsAndSolutionManagerService.onHintConsumed.emit();
 
-      expect(
-        questionPlayerEngineService.recordHintUsed
-      ).toHaveBeenCalledOnceWith(question);
+      expect(questionPlayerEngineService.recordHintUsed).toHaveBeenCalledTimes(
+        1
+      );
+      expect(questionPlayerEngineService.recordHintUsed).toHaveBeenCalledWith(
+        question
+      );
       expect(
         questionPlayerEngineService.recordSolutionViewed
       ).not.toHaveBeenCalled();
@@ -995,7 +998,10 @@ describe('Conversation skin component', () => {
 
       expect(
         questionPlayerEngineService.recordSolutionViewed
-      ).toHaveBeenCalledOnceWith(question);
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        questionPlayerEngineService.recordSolutionViewed
+      ).toHaveBeenCalledWith(question);
       expect(questionPlayerEngineService.recordHintUsed).not.toHaveBeenCalled();
     }));
 
@@ -1016,9 +1022,12 @@ describe('Conversation skin component', () => {
       initializeComponent();
       conversationFlowService.onShowProgressModal.emit(true);
 
-      expect(
-        conversationFlowService.setHasFullyLoaded
-      ).toHaveBeenCalledOnceWith(true);
+      expect(conversationFlowService.setHasFullyLoaded).toHaveBeenCalledTimes(
+        1
+      );
+      expect(conversationFlowService.setHasFullyLoaded).toHaveBeenCalledWith(
+        true
+      );
     }));
 
     it('should reset the interaction and stuck state when a card opens', fakeAsync(() => {
