@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {expect, Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -1160,7 +1160,7 @@ export class ExplorationEditor extends BaseUser {
    * Returns the ID of the exploration currently open in the editor.
    */
   async getExplorationId(): Promise<string> {
-    await this.page.waitForURL(url => url.pathname.startsWith('/create/'));
+    await this.expectPageURLToContain(`${baseUrl}/create/`);
     return new URL(this.page.url()).pathname.split('/')[2];
   }
 
@@ -1173,14 +1173,10 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     // List view contains several links to the same exploration, so the first
     // matching link is sufficient in both list and card views.
-    const explorationLink = this.page
-      .locator(explorationDashboardLinkSelector(explorationId))
-      .first();
-    await explorationLink.waitFor({state: 'visible'});
-    await explorationLink.click();
-    await expect(this.page).toHaveURL(
-      url => url.pathname === `/create/${explorationId}`
+    await this.clickOnElementWithSelector(
+      `${explorationDashboardLinkSelector(explorationId)}:visible`
     );
+    await this.expectPageURLToContain(`/create/${explorationId}`);
     await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
@@ -1192,18 +1188,15 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
     if (
       this.isViewportAtMobileWidth() &&
-      !(await this.page.locator(mobileSaveChangesButtonSelector).isVisible())
+      !(await this.isElementVisible(mobileSaveChangesButtonSelector))
     ) {
       await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
     }
-    const saveButton = this.page.locator(
-      this.isViewportAtMobileWidth()
-        ? mobileSaveChangesButtonSelector
-        : saveChangesButton
-    );
-    await expect(saveButton).toBeVisible();
-    await expect(saveButton).toHaveText('Save Draft');
-    await expect(saveButton).toBeDisabled();
+    const saveButtonSelector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.expectElementToBeVisible(`${saveButtonSelector}[disabled]`);
+    await this.expectTextContentToBe(saveButtonSelector, 'Save Draft');
   }
 
   /**
@@ -1217,11 +1210,7 @@ export class ExplorationEditor extends BaseUser {
     // The editor router reads the hash on initialization. Changing only the
     // hash of an already loaded editor does not trigger that routing logic.
     await this.reloadPage();
-    await expect(this.page).toHaveURL(
-      url =>
-        url.pathname === `/create/${explorationId}` &&
-        url.hash.startsWith('#/gui/')
-    );
+    await this.expectPageURLToContain(`/create/${explorationId}#/gui/`);
     await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
@@ -1235,7 +1224,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     if (this.isViewportAtMobileWidth()) {
-      if (!(await this.page.locator(mobileNavbarDropdown).isVisible())) {
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.expectElementToBeVisible(mobileNavbarDropdown);
@@ -1356,9 +1345,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The expected card content.
    */
   async expectEditorCardContentToContain(content: string): Promise<void> {
-    await expect(this.page.locator(stateContentSelector)).toContainText(
-      content
-    );
+    await this.expectTextContentToContain(stateContentSelector, content);
   }
 
   /**

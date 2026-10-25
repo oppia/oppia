@@ -36,23 +36,18 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Lesson Creator', function () {
   let explorationEditor: ExplorationEditor;
+  let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string;
 
   test.beforeAll(async function ({browser}) {
-    const releaseCoordinator: ReleaseCoordinator =
-      await UserFactory.createNewUser(
-        'releaseCoordinator',
-        'release_coordinator@example.com',
-        browser,
-        [ROLES.RELEASE_COORDINATOR]
-      );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      browser,
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
     await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
-    await releaseCoordinator.reloadPage();
-    await releaseCoordinator.navigateToFeaturesTab();
-    await releaseCoordinator.expectFeatureFlagToBeEnabled(
-      IMPROVEMENTS_TAB_FEATURE_FLAG
-    );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     explorationEditor = await UserFactory.createNewUser(
@@ -63,8 +58,10 @@ test.describe('Lesson Creator', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(EXPLORATION_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.createMinimalExploration(
+      EXPLORATION_CONTENT,
+      INTERACTION_TYPES.END_EXPLORATION
+    );
     await explorationEditor.saveExplorationDraft();
     explorationId = await explorationEditor.getExplorationId();
   });
