@@ -32,7 +32,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, cast
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -1670,3 +1670,252 @@ class CollectionSummary:
             )
 
         self.contributor_ids = list(self.contributors_summary.keys())
+
+
+class CollectionCommitLogEntryDict(TypedDict):
+    """Dictionary representing a CollectionCommitLogEntry object."""
+
+    user_id: str
+    collection_id: str
+    commit_type: str
+    commit_message: str
+    # Here we use type Any because each commit command dict contains
+    # a 'cmd' string plus additional arguments whose types vary by
+    # command, so the values cannot be given a single specific type.
+    commit_cmds: List[Dict[str, Any]]
+    version: int
+    post_commit_status: str
+    post_commit_community_owned: bool
+    post_commit_is_private: bool
+
+
+class CollectionCommitLogEntry:
+    """Domain object for a single commit to a collection.
+
+    Mirrors core/storage/collection/gae_models.py::
+    CollectionCommitLogEntryModel, which adds only collection_id of its
+    own; the remaining properties come from
+    BaseCommitLogEntryModel. Its datastore id is of the form
+    'collection-[collection_id]-[version]'.
+    """
+
+    def __init__(
+        self,
+        created_on: Optional[datetime.datetime],
+        last_updated: Optional[datetime.datetime],
+        user_id: str,
+        collection_id: str,
+        commit_type: str,
+        commit_message: str,
+        # Here we use type Any because each commit command dict contains
+        # a 'cmd' string plus additional arguments whose types vary by
+        # command, so the values cannot be given a single specific type.
+        commit_cmds: List[Dict[str, Any]],
+        version: int,
+        post_commit_status: str,
+        post_commit_community_owned: bool,
+        post_commit_is_private: bool,
+    ) -> None:
+        """Constructs a CollectionCommitLogEntry domain object.
+
+        Args:
+            created_on: datetime. Date and time when the commit was
+                created.
+            last_updated: datetime. Date and time when the commit was
+                last updated.
+            user_id: str. The user who made the commit.
+            collection_id: str. The collection being edited.
+            commit_type: str. The type of commit: 'create', 'revert',
+                'edit' or 'delete'.
+            commit_message: str. A description of the changes made.
+                May be empty.
+            commit_cmds: list(dict). Commands describing the changes,
+                in enough detail to reconstruct the commit. Each dict
+                contains a 'cmd' key holding the command name.
+            version: int. The version of the collection after the
+                commit.
+            post_commit_status: str. The status of the collection
+                after the commit: 'private' or 'public'.
+            post_commit_community_owned: bool. Whether the collection
+                is community-owned after the commit.
+            post_commit_is_private: bool. Whether the collection is
+                private after the commit.
+        """
+        self.created_on = created_on
+        self.last_updated = last_updated
+        self.user_id = user_id
+        self.collection_id = collection_id
+        self.commit_type = commit_type
+        self.commit_message = commit_message
+        # Copy so later mutation of the caller's list/dicts cannot
+        # silently change this object. A non-list is stored as-is on
+        # purpose, so validate() can reject it.
+        self.commit_cmds = (
+            [dict(cmd) if isinstance(cmd, dict) else cmd for cmd in commit_cmds]
+            if isinstance(commit_cmds, list)
+            else commit_cmds
+        )
+        self.version = version
+        self.post_commit_status = post_commit_status
+        self.post_commit_community_owned = post_commit_community_owned
+        self.post_commit_is_private = post_commit_is_private
+
+    def to_dict(self) -> CollectionCommitLogEntryDict:
+        """Returns a dict representing this object.
+
+        Mirrors ExplorationCommitLogEntry.to_dict: created_on,
+        last_updated, user_id and commit_cmds handling follow the
+        same shape, except here user_id and commit_cmds ARE included
+        because #21970 requires the domain object to carry the full
+        validated state (unlike the exploration value object, which
+        omits them and adds a derived username).
+        """
+        return {
+            'user_id': self.user_id,
+            'collection_id': self.collection_id,
+            'commit_type': self.commit_type,
+            'commit_message': self.commit_message,
+            'commit_cmds': (
+                [
+                    dict(cmd) if isinstance(cmd, dict) else cmd
+                    for cmd in self.commit_cmds
+                ]
+                if isinstance(self.commit_cmds, list)
+                else self.commit_cmds
+            ),
+            'version': self.version,
+            'post_commit_status': self.post_commit_status,
+            'post_commit_community_owned': self.post_commit_community_owned,
+            'post_commit_is_private': self.post_commit_is_private,
+        }
+
+    @classmethod
+    def from_dict(
+        cls, entry_dict: CollectionCommitLogEntryDict
+    ) -> 'CollectionCommitLogEntry':
+        """Returns a CollectionCommitLogEntry domain object from a dict.
+
+        Timestamps are not carried in the dict (as in
+        ExplorationCommitLogEntry.to_dict), so they are None here.
+        """
+        return cls(
+            None,
+            None,
+            entry_dict['user_id'],
+            entry_dict['collection_id'],
+            entry_dict['commit_type'],
+            entry_dict['commit_message'],
+            entry_dict['commit_cmds'],
+            entry_dict['version'],
+            entry_dict['post_commit_status'],
+            entry_dict['post_commit_community_owned'],
+            entry_dict['post_commit_is_private'],
+        )
+
+    def validate(self) -> None:
+        """Validates all properties of this collection commit log entry.
+
+        This is the validate() promised in the approved design
+        proposal (oppia/oppia#21970, Ayaan's comment 6396956616,
+        approved by Naman3120-Web in 6400705884). Each check states
+        what "valid" means for that property, per seanlip's guidance.
+
+        Raises:
+            ValidationError. One or more attributes are not valid.
+        """
+        if not isinstance(self.user_id, str) or not (
+            utils.is_user_id_valid(
+                self.user_id,
+                allow_system_user_id=True,
+                allow_pseudonymous_id=True,
+            )
+        ):
+            raise utils.ValidationError(
+                'Expected user_id to be a valid Oppia user id '
+                '(uid_ or pid_ followed by 32 lowercase letters, or a '
+                'system user id), received %s' % self.user_id
+            )
+
+        if not isinstance(self.collection_id, str) or not (
+            re.match(r'^[A-Za-z0-9]{12}$', self.collection_id)
+        ):
+            raise utils.ValidationError(
+                'Expected collection_id to be a 12-character string '
+                'over [A-Za-z0-9], received %s' % self.collection_id
+            )
+
+        if self.commit_type not in (
+            feconf.COMMIT_TYPE_CREATE,
+            feconf.COMMIT_TYPE_REVERT,
+            feconf.COMMIT_TYPE_EDIT,
+            feconf.COMMIT_TYPE_DELETE,
+        ):
+            raise utils.ValidationError(
+                'Expected commit_type to be one of create, revert, '
+                'edit, delete, received %s' % self.commit_type
+            )
+
+        if not isinstance(self.commit_message, str):
+            raise utils.ValidationError(
+                'Expected commit_message to be a string, received %s'
+                % self.commit_message
+            )
+
+        if not isinstance(self.commit_cmds, list):
+            raise utils.ValidationError(
+                'Expected commit_cmds to be a list, received %s'
+                % self.commit_cmds
+            )
+        for cmd in self.commit_cmds:
+            if not isinstance(cmd, dict):
+                raise utils.ValidationError(
+                    'Expected each commit_cmd to be a dict, received %s' % cmd
+                )
+            cmd_name = cmd.get('cmd')
+            if not isinstance(cmd_name, str) or not cmd_name:
+                raise utils.ValidationError(
+                    'Expected each commit_cmd to have a non-empty '
+                    'string cmd, received %s' % cmd
+                )
+
+        if (
+            not isinstance(self.version, int)
+            or isinstance(self.version, bool)
+            or self.version <= 0
+        ):
+            raise utils.ValidationError(
+                'Expected version to be an int greater than 0, '
+                'received %s' % self.version
+            )
+
+        if self.post_commit_status not in (
+            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.ACTIVITY_STATUS_PUBLIC,
+        ):
+            raise utils.ValidationError(
+                'Expected post_commit_status to be private or public, '
+                'received %s' % self.post_commit_status
+            )
+
+        if not isinstance(self.post_commit_community_owned, bool):
+            raise utils.ValidationError(
+                'Expected post_commit_community_owned to be a bool, '
+                'received %s' % self.post_commit_community_owned
+            )
+        if not isinstance(self.post_commit_is_private, bool):
+            raise utils.ValidationError(
+                'Expected post_commit_is_private to be a bool, '
+                'received %s' % self.post_commit_is_private
+            )
+
+        # Logically connected properties, confirmed by Naman3120-Web
+        # in 6400705884: in real data these must always agree.
+        if (self.post_commit_status == constants.ACTIVITY_STATUS_PRIVATE) != (
+            self.post_commit_is_private
+        ):
+            raise utils.ValidationError(
+                'Expected post_commit_status and post_commit_is_private '
+                'to agree: is_private is True exactly when status is private; '
+                'received status=%s, is_private=%s'
+                % (self.post_commit_status, self.post_commit_is_private)
+            )

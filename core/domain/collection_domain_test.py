@@ -1462,3 +1462,130 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID, self.collection_summary.contributor_ids
         )
+
+
+class CollectionCommitLogEntryTests(test_utils.GenericTestBase):
+    """Tests for the CollectionCommitLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.entry = collection_domain.CollectionCommitLogEntry(
+            None,
+            None,
+            'uid_%s' % ('a' * 32),
+            'Ab3dEf6hIj9K',
+            'edit',
+            'Update the collection title.',
+            [{'cmd': 'edit_collection_property_title'}],
+            1,
+            'private',
+            False,
+            True,
+        )
+
+    def test_validation_passes_with_valid_properties(self) -> None:
+        self.entry.validate()
+
+    def test_to_dict_from_dict_roundtrip(self) -> None:
+        entry_dict = self.entry.to_dict()
+        rebuilt = collection_domain.CollectionCommitLogEntry.from_dict(
+            entry_dict
+        )
+        rebuilt.validate()
+        self.assertEqual(rebuilt.to_dict(), entry_dict)
+
+    def test_user_id_validation(self) -> None:
+        self.entry.user_id = 'not-a-user-id'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a valid'
+        ):
+            self.entry.validate()
+
+    def test_collection_id_validation(self) -> None:
+        self.entry.collection_id = 'short'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected collection_id to be a'
+        ):
+            self.entry.validate()
+
+    def test_commit_type_validation(self) -> None:
+        self.entry.commit_type = 'publish'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected commit_type to be one of'
+        ):
+            self.entry.validate()
+
+    def test_commit_message_validation(self) -> None:
+        # Here we use MyPy ignore because we intentionally assign an invalid value to test that validate() rejects it.
+        self.entry.commit_message = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected commit_message to be a'
+        ):
+            self.entry.validate()
+        # An empty message is allowed.
+        self.entry.commit_message = ''
+        self.entry.validate()
+
+    def test_commit_cmds_validation(self) -> None:
+        self.entry.commit_cmds = [{'cmd': ''}]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected each commit_cmd to have'
+        ):
+            self.entry.validate()
+        # Here we use MyPy ignore because we intentionally assign an invalid value to test that validate() rejects it.
+        self.entry.commit_cmds = 'not-a-list'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected commit_cmds to be a list'
+        ):
+            self.entry.validate()
+
+    def test_version_validation(self) -> None:
+        self.entry.version = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be an int greater than 0',
+        ):
+            self.entry.validate()
+        # bool is a subclass of int in Python and must not pass as 1.
+        self.entry.version = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be an int greater than 0',
+        ):
+            self.entry.validate()
+
+    def test_post_commit_status_validation(self) -> None:
+        self.entry.post_commit_status = 'draft'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected post_commit_status to be private or public',
+        ):
+            self.entry.validate()
+
+    def test_post_commit_flags_must_be_bools(self) -> None:
+        # Here we use MyPy ignore because we intentionally assign an invalid value to test that validate() rejects it.
+        self.entry.post_commit_community_owned = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected post_commit_community_owned to be a bool',
+        ):
+            self.entry.validate()
+
+    def test_status_and_is_private_must_agree(self) -> None:
+        # Status 'private' with is_private False disagrees.
+        self.entry.post_commit_is_private = False
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected post_commit_status and post_commit_is_private '
+            'to agree',
+        ):
+            self.entry.validate()
+        # Status 'public' with is_private True disagrees.
+        self.entry.post_commit_status = 'public'
+        self.entry.post_commit_is_private = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected post_commit_status and post_commit_is_private '
+            'to agree',
+        ):
+            self.entry.validate()
