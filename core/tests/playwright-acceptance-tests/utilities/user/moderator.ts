@@ -25,7 +25,17 @@ const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const commitRowSelector = '.e2e-test-commit-row';
+const commitTableHeaderRowSelector = '.e2e-test-commit-table-header-row';
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
+
+interface CommitProperties {
+  timestamp: string;
+  exploration: string;
+  category: string;
+  username: string;
+  commitMessage: string;
+  isCommunityOwned: string;
+}
 
 export class Moderator extends BaseUser {
   /**
@@ -39,42 +49,37 @@ export class Moderator extends BaseUser {
    * Function to view a specific recent commit.
    * @param {number} commitIndex - The index of the commit to view.
    */
-  private async getPropertiesOfCommit(commitIndex: number): Promise<{
-    timestamp: string;
-    exploration: string;
-    category: string;
-    username: string;
-    commitMessage: string;
-    isCommunityOwned: string;
-  }> {
-    await this.page.waitForSelector(commitRowSelector);
-    const commitRows = await this.page.$$(commitRowSelector);
-    if (commitRows.length === 0) {
-      throw new Error('No recent commits found');
-    }
+  private async getPropertiesOfCommit(
+    commitIndex: number
+  ): Promise<CommitProperties> {
+    const commitRows = this.page.locator(commitRowSelector);
+    const commitRowsLen = await commitRows.count();
+    expect(commitRowsLen).toBeGreaterThan(0);
 
     commitIndex -= 1; // Adjusting to 0-based index.
-
-    if (commitIndex < 0 || commitIndex >= commitRows.length) {
+    if (commitIndex < 0 || commitIndex >= commitRowsLen) {
       throw new Error('Invalid commit number');
     }
 
-    const row = commitRows[commitIndex];
-    const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
-    const exploration = await row.$eval(
-      'td:nth-child(2) a',
-      el => el.textContent
-    );
-    const category = await row.$eval('td:nth-child(3)', el => el.textContent);
-    const username = await row.$eval('td:nth-child(4)', el => el.textContent);
-    const commitMessage = await row.$eval(
-      'td:nth-child(5)',
-      el => el.textContent
-    );
-    const isCommunityOwned = await row.$eval(
-      'td:nth-child(6)',
-      el => el.textContent
-    );
+    const row = commitRows.nth(commitIndex);
+    const timestamp = await row
+      .locator('td:nth-child(1)')
+      .evaluate(el => el.textContent);
+    const exploration = await row
+      .locator('td:nth-child(2) a')
+      .evaluate(el => el.textContent);
+    const category = await row
+      .locator('td:nth-child(3)')
+      .evaluate(el => el.textContent);
+    const username = await row
+      .locator('td:nth-child(4)')
+      .evaluate(el => el.textContent);
+    const commitMessage = await row
+      .locator('td:nth-child(5)')
+      .evaluate(el => el.textContent);
+    const isCommunityOwned = await row
+      .locator('td:nth-child(6)')
+      .evaluate(el => el.textContent);
 
     if (
       !timestamp ||
@@ -102,15 +107,8 @@ export class Moderator extends BaseUser {
    * @param {number} expectedCount - The expected number of commits.
    */
   async expectNumberOfRecentCommits(expectedCount: number): Promise<void> {
-    await this.page.waitForSelector(commitRowSelector);
-    const commitRows = await this.page.$$(commitRowSelector);
-    const actualCount = commitRows.length;
-
-    if (actualCount !== expectedCount) {
-      throw new Error(
-        `Expected ${expectedCount} commits, but found ${actualCount}`
-      );
-    }
+    const commitRows = await this.page.locator(commitRowSelector);
+    await expect(commitRows).toHaveCount(expectedCount);
     showMessage('Recent commits count matches expected count.');
   }
 
@@ -121,13 +119,10 @@ export class Moderator extends BaseUser {
   async expectRecentCommitsTableToHaveColumns(
     columnNames: string[]
   ): Promise<void> {
-    const commitTableHeaderRowSelector = '.e2e-test-commit-table-header-row';
     await this.expectElementToBeVisible(commitTableHeaderRowSelector);
-
-    const commitTableColumnFields = await this.page.$$eval(
-      `${commitTableHeaderRowSelector} th`,
-      elements => elements.map(element => element.textContent)
-    );
+    const commitTableColumnFields = await this.page
+      .locator(`${commitTableHeaderRowSelector} th`)
+      .evaluateAll(elements => elements.map(element => element.textContent));
 
     for (const columnName of columnNames) {
       expect(commitTableColumnFields).toContain(columnName);
@@ -190,29 +185,20 @@ export class Moderator extends BaseUser {
   async clickOnExplorationLinkInRecentCommitsTable(
     commitIndex: number
   ): Promise<void> {
-    await this.page.waitForSelector(commitRowSelector);
-    const commitRows = await this.page.$$(commitRowSelector);
-    if (commitRows.length === 0) {
-      throw new Error('No recent commits found');
-    }
+    const commitRows = await this.page.locator(commitRowSelector);
+    const commitRowsLen = await commitRows.count();
+    expect(commitRowsLen).toBeGreaterThan(0);
 
     commitIndex -= 1; // Adjusting to 0-based index.
-
-    if (commitIndex < 0 || commitIndex >= commitRows.length) {
+    if (commitIndex < 0 || commitIndex >= commitRowsLen) {
       throw new Error('Invalid commit number');
     }
 
-    const row = commitRows[commitIndex];
-    const explorationElement = await row.$('td:nth-child(2) a');
+    const row = commitRows.nth(commitIndex);
+    const explorationElement = await row.locator('td:nth-child(2) a');
 
-    if (!explorationElement) {
-      throw new Error('Exploration link not found');
-    }
-
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: 'load'}),
-      explorationElement.click(),
-    ]);
+    explorationElement.click();
+    await this.page.waitForLoadState('load');
   }
 
   /**
@@ -243,11 +229,11 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
     await this.expectElementToBeVisible(selector);
-    const rowElements = await this.page.$$(selector);
-    const rawTimeValue1 = await rowElements[0].evaluate(el => {
+    const rowElements = await this.page.locator(selector);
+    const rawTimeValue1 = await rowElements.nth(0).evaluate(el => {
       return el.querySelector('td')?.textContent?.trim();
     });
-    const rawTimeValue2 = await rowElements[1].evaluate(el => {
+    const rawTimeValue2 = await rowElements.nth(1).evaluate(el => {
       return el.querySelector('td')?.textContent?.trim();
     });
     const time1 = this.parseLocaleAbbreviatedDatetimeString(
