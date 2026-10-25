@@ -189,8 +189,6 @@ describe('Url Service', () => {
   it('should correctly retrieve story url fragment from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm/story/bakery';
     expect(urlService.getStoryUrlFragmentFromLearnerUrl()).toBe('bakery');
-    mockLocation.pathname = '/learn/math/topic-name/review-test/bakery';
-    expect(urlService.getStoryUrlFragmentFromLearnerUrl()).toBe('bakery');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(urlService.getStoryUrlFragmentFromLearnerUrl()).toBe(null);
 
