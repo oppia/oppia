@@ -74,7 +74,7 @@ test.describe('Site Moderator', function () {
 
   test('should be able verify display of recent commits table', async function () {
     await siteModerator.navigateToModeratorPage();
-    await siteModerator.expectScreenshotToMatch('siteModeratorPage', __dirname);
+    await siteModerator.expectScreenshotToMatch('siteModeratorPage');
 
     await siteModerator.expectNumberOfRecentCommits(2);
     await siteModerator.expectRecentCommitsTableToHaveColumns([
