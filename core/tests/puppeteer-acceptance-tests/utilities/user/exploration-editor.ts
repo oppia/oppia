@@ -245,6 +245,8 @@ const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const stayInEditorButtonSelector = '.e2e-test-stay-in-editor-button';
+const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
@@ -2663,6 +2665,7 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    await this.dismissFeedbackPromptModalIfPresent();
     // Ensure the editor is fully loaded before attempting to navigate.
     await this.waitForPageToFullyLoad();
 
@@ -2916,7 +2919,11 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (goToFeedbackButton) {
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+      await this.waitForNetworkIdle();
+    } else if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.getElementInParent(
         mobileNavbarOptions
       ).catch(() => null);
@@ -2931,7 +2938,6 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
-
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
@@ -2981,6 +2987,27 @@ export class ExplorationEditor extends BaseUser {
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
     await this.dismissWelcomeModal(false);
+  }
+
+  /**
+   * Function to dismiss the feedback prompt modal if it is present.
+   */
+  async dismissFeedbackPromptModalIfPresent(): Promise<void> {
+    const stayInEditorButton = await this.page.$(stayInEditorButtonSelector);
+    if (stayInEditorButton) {
+      await this.clickOnElementWithSelector(stayInEditorButtonSelector);
+      await this.expectElementToBeVisible(stayInEditorButtonSelector, false);
+    }
+  }
+  /**
+   * Function to accept the feedback prompt modal if it is present.
+   */
+  async acceptFeedbackPromptModalIfPresent(): Promise<void> {
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (goToFeedbackButton) {
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+      await this.expectElementToBeVisible(goToFeedbackButtonSelector, false);
+    }
   }
 
   /**
@@ -4827,6 +4854,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
+    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
@@ -4956,6 +4984,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
+    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -8206,6 +8235,7 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the stats tab of the exploration editor.
    */
   async navigateToStatsTab(): Promise<void> {
+    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
       if (!mobileNavbarElement) {
