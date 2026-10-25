@@ -44,7 +44,7 @@
     <div *ngIf="skillSummaries.length > 0" class="modal-footer" >
       <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
       <button class="btn btn-success e2e-test-confirm-skill-button"
-              [disabled]="selectedSkillIds.length === 0"
+              [disabled]="selectedSkills.length === 0"
               (click)="goToNextStep()"> Next
       </button>
     </div>

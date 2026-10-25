@@ -92,8 +92,8 @@
     },
     {
       "name": "interested-parent/sign-up-for-oppias-newsletter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/sign-up-for-oppias-newsletter.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/sign-up-for-oppias-newsletter.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked",
@@ -212,8 +212,8 @@
     },
     {
       "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-links-on-get-started-page",
