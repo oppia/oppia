@@ -60,6 +60,13 @@ const ERROR_PAGE_SELECTOR = '.oppia-error-page-main-content';
 // The /error routes are themselves error pages, so the absence check below is
 // skipped for them.
 const ERROR_ROUTE_PREFIX = '/error';
+
+// The host element rendered by the iframed error page
+// (<oppia-error-iframed-page-root>). An embedded lesson that failed to load
+// renders this element instead of the generic error page, so it has to be
+// checked separately. The intentional /error/iframed audit is an error route and
+// is therefore skipped by the call site below.
+const IFRAMED_ERROR_PAGE_SELECTOR = 'oppia-error-iframed-page-root';
 // The single path whose landing URL is verified after the navigation below.
 // The signup page is only served to an account that has not completed
 // registration, so a registered account would be redirected away from it and
@@ -317,6 +324,18 @@ const assertErrorPageIsAbsent = async function (page, url) {
       `Lighthouse cannot audit ${url}: the ${ERROR_PAGE_SELECTOR} element is ` +
         'present in the DOM, which means the page rendered the Oppia error ' +
         'page instead of its content.'
+    );
+  }
+  const iframedErrorPageIsPresent = await page.evaluate(
+    selector => document.querySelector(selector) !== null,
+    IFRAMED_ERROR_PAGE_SELECTOR
+  );
+  if (iframedErrorPageIsPresent) {
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the ` +
+        `${IFRAMED_ERROR_PAGE_SELECTOR} element is present in the DOM, which ` +
+        'means the embedded lesson rendered the Oppia iframe error page ' +
+        'instead of its content.'
     );
   }
 };
