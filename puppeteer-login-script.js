@@ -66,6 +66,17 @@ const ERROR_ROUTE_PREFIX = '/error';
 // the audit would silently score the wrong page.
 const SIGNUP_PATH = '/signup';
 
+// Feature flags whose value has to differ between pages audited in the same
+// shard. Each flag is tracked here so it is only toggled when a page actually
+// needs a different value, and the release coordinator role (assigned in the
+// shard setup) is what authorises the toggle below.
+const NEW_LESSON_PLAYER_FLAG = 'new_lesson_player';
+const STORY_EDITOR_ARCS_FLAG = 'story_editor_arcs';
+const FEATURE_FLAG_STATES = {
+  [NEW_LESSON_PLAYER_FLAG]: false,
+  [STORY_EDITOR_ARCS_FLAG]: false,
+};
+
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
 var usernameInput = '.e2e-test-username-input';
@@ -105,6 +116,102 @@ const getAuditUsernameForUrl = function (url) {
   return pathname.startsWith('/learner-group/') ? 'username2' : 'username1';
 };
 
+/**
+ * Returns the CSRF token for the logged-in session, stripping the five-byte
+ * XSSI prefix that the backend adds to every JSON response.
+ *
+ * @param {puppeteer.Page} page - The page to issue the request from.
+ * @returns {Promise<string>} - The CSRF token.
+ */
+const getCsrfToken = async function (page) {
+  return page.evaluate(async () => {
+    const response = await fetch('/csrfhandler', {credentials: 'same-origin'});
+    const responseText = await response.text();
+    return JSON.parse(responseText.substring(5)).token;
+  });
+};
+
+/**
+ * Sets a feature flag's force-enable-for-all-users value through the release
+ * coordinator handler, which is the same endpoint the release coordinator page
+ * uses. The value is persisted to the shared datastore that the audit server
+ * reads.
+ *
+ * @param {puppeteer.Page} page - The page to issue the request from.
+ * @param {string} flagName - The feature flag name.
+ * @param {boolean} enabled - Whether the flag should be force-enabled.
+ */
+const setFeatureFlag = async function (page, flagName, enabled) {
+  const csrfToken = await getCsrfToken(page);
+  const succeeded = await page.evaluate(
+    async (csrfToken, flagName, enabled) => {
+      const response = await fetch('/feature_flags', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          csrf_token: csrfToken,
+          payload: JSON.stringify({
+            action: 'update_feature_flag',
+            feature_flag_name: flagName,
+            force_enable_for_all_users: enabled,
+            rollout_percentage: 0,
+            user_group_ids: [],
+          }),
+        }).toString(),
+      });
+      if (!response.ok) {
+        return false;
+      }
+      const body = await response.text();
+      try {
+        const parsed = JSON.parse(body.substring(5));
+        return !parsed.error;
+      } catch (error) {
+        return response.ok;
+      }
+    },
+    csrfToken,
+    flagName,
+    enabled
+  );
+  if (!succeeded) {
+    throw new Error(`Failed to set feature flag ${flagName} to ${enabled}.`);
+  }
+};
+
+/**
+ * Returns the feature flag values that the given audited URL requires, or an
+ * empty object when the URL does not care about either flag. Deriving the
+ * requirement from the URL (rather than from the page's position in its shard)
+ * keeps the toggle correct even if the shard ordering changes.
+ *
+ * @param {string} url - The audited URL.
+ * @returns {Object} - A map from flag name to the required boolean value.
+ */
+const getRequiredFeatureFlagStates = function (url) {
+  const pathname = new URL(url).pathname;
+  const states = {};
+  if (pathname.startsWith('/lesson') || pathname.startsWith('/embed/lesson')) {
+    states[NEW_LESSON_PLAYER_FLAG] = true;
+  } else if (
+    pathname.startsWith('/explore') ||
+    pathname.startsWith('/embed/exploration')
+  ) {
+    states[NEW_LESSON_PLAYER_FLAG] = false;
+  }
+  if (pathname.endsWith('/practice/session')) {
+    states[STORY_EDITOR_ARCS_FLAG] = false;
+  } else if (
+    /\/practice\/[^/]+$/.test(pathname) ||
+    pathname.endsWith('/mastery-challenge') ||
+    pathname.indexOf('/test/arc/') !== -1
+  ) {
+    states[STORY_EDITOR_ARCS_FLAG] = true;
+  }
+  return states;
+};
+
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(LOGIN_NAVIGATION_TIMEOUT_MS);
@@ -138,6 +245,16 @@ module.exports = async (browser, context) => {
       await setRole(page, 'BLOG_ADMIN');
     } else if (context.url.includes('blog-admin')) {
       await setRole(page, 'BLOG_ADMIN');
+    }
+  }
+  if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {
+    const requiredFlagStates = getRequiredFeatureFlagStates(context.url);
+    for (const flagName of Object.keys(requiredFlagStates)) {
+      const requiredValue = requiredFlagStates[flagName];
+      if (FEATURE_FLAG_STATES[flagName] !== requiredValue) {
+        await setFeatureFlag(page, flagName, requiredValue);
+        FEATURE_FLAG_STATES[flagName] = requiredValue;
+      }
     }
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);

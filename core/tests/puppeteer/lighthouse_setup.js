@@ -1393,24 +1393,20 @@ const shard2Setup = async function (browser, page) {
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
-  // (voiceover admin) role-gated pages, so these roles are assigned. Enabling
-  // the new_lesson_player feature flag below also requires the release
-  // coordinator role. Its other pages (classrooms, classroom, creator-dashboard,
-  // exploration-editor, exploration-player, exploration-player-embed,
-  // community-library, pending-account-deletion) are public or login-only, so no
-  // topic/story/skill generation is needed here.
+  // (voiceover admin) role-gated pages, so these roles are assigned. The
+  // release coordinator role is still assigned because the per-URL feature flag
+  // toggles in puppeteer-login-script.js need it. Its other pages (classrooms,
+  // classroom, creator-dashboard, exploration-editor, exploration-player,
+  // exploration-player-embed, community-library, pending-account-deletion) are
+  // public or login-only, so no topic/story/skill generation is needed here.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
   );
 
-  await logStep('enabling new lesson player feature flag', () =>
-    retryStep(
-      'enabling the new_lesson_player feature flag',
-      () => enableFeatureFlagForAllUsers(browser, page, 'new_lesson_player'),
-      2,
-      150000
-    )
-  );
+  // The new_lesson_player flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy exploration player pages
+  // (which need it disabled) and the new lesson player pages (which need it
+  // enabled) can both be audited in this shard.
   // The exploration editor setup creates the exploration that backs the
   // exploration-editor, exploration-player and exploration-player-embed pages.
   await logStep('exploration editor setup', () =>
@@ -1445,20 +1441,16 @@ const shard4Setup = async function (browser, page) {
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
   // topic/story/skill editors, the diagnostic test player page, and the
   // practice, node-practice, mastery-challenge and end-of-arc-test pages.
-  // Enabling the story_editor_arcs feature flag below requires the release
-  // coordinator role.
+  // The release coordinator role is still assigned because the per-URL feature
+  // flag toggles in puppeteer-login-script.js need it.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
 
-  await logStep('enabling story editor arcs feature flag', () =>
-    retryStep(
-      'enabling the story_editor_arcs feature flag',
-      () => enableFeatureFlagForAllUsers(browser, page, 'story_editor_arcs'),
-      2,
-      150000
-    )
-  );
+  // The story_editor_arcs flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy practice page (which needs
+  // it disabled) and the node-practice, mastery-challenge and end-of-arc-test
+  // pages (which need it enabled) can all be audited in this shard.
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
   // pages, and its story nodes back the node-practice page.
