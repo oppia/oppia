@@ -80,8 +80,9 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL: Final = 'remove_question_id_from_skill'
 # Prefix for skill IDs. This should not be changed -- doing so will result in
 # backwards-compatibility issues.
 _SKILL_ID_PREFIX: Final = 'skill'
-# Legacy collection and exploration IDs can have different lengths.
-_COLLECTION_PROGRESS_ID_REGEX: Final = r'[A-Za-z0-9]+'
+# Legacy collection and exploration IDs can contain underscores and have
+# different lengths.
+_COLLECTION_PROGRESS_ID_REGEX: Final = r'[A-Za-z0-9_]+'
 
 
 class CollectionProgressDict(TypedDict):
