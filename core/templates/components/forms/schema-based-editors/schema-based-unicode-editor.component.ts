@@ -137,6 +137,12 @@ export class SchemaBasedUnicodeEditor
     });
   }
 
+  // Loads the CodeMirror library on demand so that it is not pulled into the
+  // shared chunk of pages that never render a code editor.
+  async loadCodeMirrorLibrary(): Promise<void> {
+    await import('third-party-imports/codemirror.import');
+  }
+
   writeValue(value: string): void {
     this.localValue = value;
   }
@@ -169,7 +175,7 @@ export class SchemaBasedUnicodeEditor
 
       // Load the CodeMirror library on demand so that it is not pulled
       // into the shared chunk of pages that never render a code editor.
-      import('third-party-imports/codemirror.import').then(() => {
+      this.loadCodeMirrorLibrary().then(() => {
         // Flag that is flipped each time the codemirror view is
         // shown. (The codemirror instance needs to be refreshed
         // every time it is unhidden.)

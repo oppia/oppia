@@ -17,6 +17,7 @@
  */
 
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {RouterModule} from '@angular/router';
 import {StaleTabInfoModalModule} from 'components/shared_parts/stale-tab-info-modal.module';
 import {UnsavedChangesStatusInfoModalModule} from 'components/shared_parts/unsaved-changes-status-info-modal.module';
@@ -79,6 +80,7 @@ import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-edit
     DirectivesModule,
     CommonModule,
     CommonElementsModule,
+    DragDropModule,
     BaseModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

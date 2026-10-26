@@ -32,6 +32,7 @@ import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-mo
 import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
 import {TopicsDependencyGraphModalComponent} from './modals/topic-dependency-graph-viz-modal.component';
 import {CommonModule} from '@angular/common';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ClassroomAdminPageRootComponent} from './classroom-admin-page-root.component';
 import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
 import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
@@ -62,6 +63,7 @@ import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
     ImageUploaderModule,
     BaseModule,
     FormsModule,
+    DragDropModule,
     MatCardModule,
     CommonModule,
     MatTooltipModule,

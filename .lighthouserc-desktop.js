@@ -909,6 +909,10 @@ module.exports = {
         },
         {
           matchingUrlPattern: '^http://localhost:8181/maintenance$',
+          // The maintenance page is a plain page on the shared app shell.
+          // These thresholds are based on measurements taken with response
+          // compression, which matches the production Google Front End, and
+          // keep a wide margin over the measured desktop values.
           pagePerfThresholds: {
             fcp: 9000,
             speedIndex: 9000,

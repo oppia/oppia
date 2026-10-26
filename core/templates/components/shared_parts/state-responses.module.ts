@@ -18,6 +18,7 @@
  */
 
 import {NgModule} from '@angular/core';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {StateResponsesComponent} from '../state-editor/state-responses-editor/state-responses.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
@@ -31,6 +32,7 @@ import {ResponseHeaderModule} from 'components/shared_parts/response-header.modu
 @NgModule({
   imports: [
     CommonModule,
+    DragDropModule,
     TranslateModule,
     AddAnswerGroupModalModule,
     AnswerGroupEditorModule,

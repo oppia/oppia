@@ -18,6 +18,7 @@
  */
 
 import {NgModule} from '@angular/core';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {StateHintsEditorComponent} from '../state-editor/state-hints-editor/state-hints-editor.component';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
@@ -31,6 +32,7 @@ import {ResponseHeaderModule} from 'components/shared_parts/response-header.modu
 @NgModule({
   imports: [
     CommonModule,
+    DragDropModule,
     TranslateModule,
     AddHintModalModule,
     DeleteHintModalModule,

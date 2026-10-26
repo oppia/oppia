@@ -17,8 +17,14 @@
     "moduleResolution": "node",
     "outDir": "local_compiled_js_for_test",
     "paths": {
+      "actions/*": [
+        "extensions/actions/*"
+      ],
       "analytics-constants": [
         "assets/analytics-constants.json"
+      ],
+      "answer_summarizers/*": [
+        "extensions/answer_summarizers/*"
       ],
       "app-events/*": [
         "core/templates/app-events/*"
@@ -28,6 +34,9 @@
       ],
       "base-components/*": [
         "core/templates/base-components/*"
+      ],
+      "ckeditor_plugins/*": [
+        "extensions/ckeditor_plugins/*"
       ],
       "components/*": [
         "core/templates/components/*"
@@ -53,6 +62,9 @@
       "interactions/*": [
         "extensions/interactions/*"
       ],
+      "issues/*": [
+        "extensions/issues/*"
+      ],
       "modules/*": [
         "core/templates/modules/*"
       ],
@@ -61,6 +73,9 @@
       ],
       "pages/*": [
         "core/templates/pages/*"
+      ],
+      "path": [
+        "./node_modules/path-browserify"
       ],
       "rich_text_components/*": [
         "extensions/rich_text_components/*"
@@ -71,11 +86,26 @@
       "static/*": [
         "third_party/static/*"
       ],
+      "stream": [
+        "./node_modules/stream-browserify"
+      ],
       "tests/*": [
         "core/templates/tests/*"
       ],
+      "third-party-imports/*": [
+        "core/templates/third-party-imports/*"
+      ],
       "utility/*": [
         "core/templates/utility/*"
+      ],
+      "value_generators/*": [
+        "extensions/value_generators/*"
+      ],
+      "visualizations/*": [
+        "extensions/visualizations/*"
+      ],
+      "zlib": [
+        "./node_modules/browserify-zlib"
       ]
     },
     "resolveJsonModule": true,

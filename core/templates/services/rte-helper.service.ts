@@ -57,6 +57,15 @@ export class RteHelperService {
     return AppConstants.INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
   }
 
+  // Loads the RTE helper modal (and its form/schema dependencies) on demand
+  // so that they are not pulled into the shared chunk of pages that never
+  // open a customization modal.
+  loadRteHelperModalComponent(): Promise<
+    typeof import('./rte-helper-modal.component')
+  > {
+    return import('./rte-helper-modal.component');
+  }
+
   // The refocusFn arg is a function that restores focus to the text editor
   // after exiting the modal, and moves the cursor back to where it was
   // before the modal was opened.
@@ -69,10 +78,7 @@ export class RteHelperService {
     onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ): void {
     document.execCommand('enableObjectResizing', false);
-    // Load the RTE helper modal (and its form/schema dependencies) on demand
-    // so that they are not pulled into the shared chunk of pages that never
-    // open a customization modal.
-    import('./rte-helper-modal.component').then(
+    this.loadRteHelperModalComponent().then(
       ({RteHelperModalComponent: RteHelperModalComponentClass}) => {
         const modalRef = this.modalService.open(
           RteHelperModalComponentClass as unknown as RteHelperModalComponent,

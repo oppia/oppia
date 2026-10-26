@@ -26,6 +26,7 @@ import os
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import threading
@@ -538,6 +539,30 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
         self.assertEqual(list(popen_calls[0].kwargs.keys()), ['shell', 'env'])
+
+    def test_managed_gzip_proxy(self) -> None:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind(('127.0.0.1', 0))
+            port = sock.getsockname()[1]
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+        )
+
+        with servers.managed_gzip_proxy(upstream_port=1, port=port):
+            with socket.create_connection(
+                ('127.0.0.1', port), timeout=5
+            ) as connection:
+                connection.sendall(
+                    b'GET /text HTTP/1.1\r\nHost: localhost\r\n\r\n'
+                )
+                response = connection.recv(1024)
+
+            self.assertIn(b'502 Bad Gateway', response)
+
+        with self.assertRaisesRegex(
+            ConnectionRefusedError, 'Connection refused'
+        ):
+            socket.create_connection(('127.0.0.1', port), timeout=1)
 
     def test_managed_redis_server(self) -> None:
         original_os_remove = os.remove

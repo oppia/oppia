@@ -21,6 +21,7 @@ import {NgModule} from '@angular/core';
 import {AndroidPageComponent} from './android-page.component';
 import {AndroidPageRootComponent} from './android-page-root.component';
 import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 import {AndroidPageRoutingModule} from './android-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {I18nModule} from 'i18n/i18n.module';
@@ -35,6 +36,7 @@ import {TranslateModule} from '@ngx-translate/core';
     BackgroundBannerModule,
     TranslateModule,
     CommonModule,
+    FormsModule,
     HttpClientModule,
     AndroidPageRoutingModule,
     Error404PageModule,
