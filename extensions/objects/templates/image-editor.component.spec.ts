@@ -56,7 +56,7 @@ describe('ImageEditor', () => {
   let httpTestingController: HttpTestingController;
   let gifFrames: GifFramesService;
   let windowImageSpy: jasmine.Spy;
-  let mockEventTarget: HTMLElement;
+  let mockEventTarget: HTMLElement = document.createElement('div');
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -2626,7 +2626,7 @@ describe('ImageEditor', () => {
         },
       ];
 
-      let errorCaught!: Error;
+      let errorCaught: Error | null = null;
       spyOn(gifFrames, 'getFrames').and.returnValue({
         then: (callback: Function) => {
           const result = Promise.resolve(callback(frameData));
@@ -2653,8 +2653,8 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
       tick();
 
-      expect(errorCaught).toBeDefined();
-      expect(errorCaught.message).toBe('Could not get canvas context.');
+      expect(errorCaught).not.toBeNull();
+      expect(errorCaught?.message).toBe('Could not get canvas context.');
     })
   );
 

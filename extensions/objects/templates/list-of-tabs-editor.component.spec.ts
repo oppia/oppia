@@ -42,7 +42,7 @@ describe('ListOfTabsEditorComponent', () => {
 
     component.ngOnInit();
 
-    expect((component.value as string[]).length).toBe(0);
+    expect(component.value as string[]).toEqual([]);
     expect(component.valueChanged.emit).toHaveBeenCalledWith([]);
   });
 

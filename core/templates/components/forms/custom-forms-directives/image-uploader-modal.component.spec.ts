@@ -226,25 +226,20 @@ describe('Image Uploader Modal', () => {
   it('should remove invalid tags and attributes', fakeAsync(() => {
     componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
     componentInstance.ngOnInit();
-    const cleanSvg =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
-    fileReaderSpy.and.callFake(function (this: FileReader) {
-      if (this.onload) {
-        this.onload({
-          target: {
-            result: 'data:image/svg+xml;base64,' + btoa(cleanSvg),
-          },
-        } as ProgressEvent<FileReader>);
-      }
-    });
-    let file = new File([cleanSvg], 'test.svg', {type: 'image/svg+xml'});
+    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
     fixture.detectChanges();
 
     componentInstance.onFileChanged(file);
     tick();
 
-    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBe(false);
+    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBe(true);
+    expect(componentInstance.invalidTagsAndAttributes.tags).toContain('circel');
+    expect(componentInstance.invalidTagsAndAttributes.attrs).toContain(
+      'path:data-name'
+    );
+    expect(componentInstance.uploadedImage).not.toContain('circel');
+    expect(componentInstance.uploadedImage).not.toContain('data-name');
     expect(componentInstance.invalidImageWarningIsShown).toBe(false);
   }));
 
@@ -320,14 +315,14 @@ describe('Image Uploader Modal', () => {
       ' croppableImageRef is present',
     fakeAsync(() => {
       spyOn(componentInstance, 'initializeCropper');
-      componentInstance.croppableImageRef = new ElementRef(
-        document.createElement('img')
-      );
       componentInstance.imageUploaderParameters.imageName = 'Image';
       componentInstance.ngOnInit();
       let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
       componentInstance.invalidImageWarningIsShown = false;
       fixture.detectChanges();
+      componentInstance.croppableImageRef = new ElementRef(
+        document.createElement('img')
+      );
 
       componentInstance.onFileChanged(file);
       tick();
