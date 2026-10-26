@@ -183,9 +183,53 @@ class FilenameLinterTests(test_utils.LinterTestBase):
         self.assertTrue(result.failed)
         self.assertEqual(len(result.messages), len(paths))
 
+    def test_asset_filenames(self) -> None:
+        valid_paths = [
+            'assets/example.constants.ts',
+            'assets/example.constants.spec.ts',
+            'assets/templates/example.template.html',
+            'assets/styles/example.component.css',
+        ]
+        self.assertFalse(
+            filename_linter.check_filenames(
+                valid_paths, legacy_filenames={}
+            ).failed
+        )
+        invalid_paths = [
+            'assets/Bad_Name.constants.ts',
+            'assets/Bad_Name.constants.spec.ts',
+            'assets/templates/Bad_Name.template.html',
+            'assets/styles/Bad_Name.component.css',
+            'assets/example.constants.TS',
+            'assets/templates/example.template.HTML',
+            'assets/styles/example.component.CSS',
+        ]
+        result = filename_linter.check_filenames(invalid_paths)
+        self.assertTrue(result.failed)
+        self.assertEqual(len(result.messages), len(invalid_paths))
+
+    def test_legacy_asset_exception_is_exact(self) -> None:
+        legacy_path = 'assets/rich_text_components_definitions.ts'
+        self.assertTrue(
+            filename_linter.check_filenames(
+                [legacy_path], legacy_filenames={}
+            ).failed
+        )
+        self.assertFalse(filename_linter.check_filenames([legacy_path]).failed)
+        result = filename_linter.check_filenames(
+            [
+                'assets/new_rich_text_components_definitions.ts',
+                'assets/nested/rich_text_components_definitions.ts',
+            ]
+        )
+        self.assertTrue(result.failed)
+        self.assertEqual(len(result.messages), 2)
+
     def test_out_of_scope_paths_and_extensions(self) -> None:
         paths = [
-            'assets/rich_text_components_definitions.ts',
+            'assets-other/Bad_Name.component.ts',
+            'assets/Bad_Name.json',
+            'assets/Bad_Name.png',
             'src/main.ts',
             'scripts/Bad_Name.py',
             'core/tests/Bad_Name.ts',
@@ -342,7 +386,9 @@ class FilenameLinterTests(test_utils.LinterTestBase):
         self.assertEqual(
             result.messages,
             [
-                '%s --> TypeScript filenames: %s See scripts/linters/README.md.'
+                '%s --> TypeScript filenames: %s '
+                'See https://github.com/oppia/oppia/wiki/'
+                'The-File-Naming-Convention-and-Directory-Structure.'
                 % (path, filename_linter.FILENAME_RULES[0].description)
             ],
         )

@@ -72,7 +72,7 @@ class FilenameRule:
 
 
 KEBAB_CASE_REGEX: Final = r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*'
-FRONTEND_DIRECTORIES: Final = ('core/templates/', 'extensions/')
+FRONTEND_DIRECTORIES: Final = ('assets/', 'core/templates/', 'extensions/')
 TYPESCRIPT_ROLES: Final = (
     'component',
     'constants',
@@ -332,7 +332,8 @@ def check_filenames(
             if filepath in legacy_filenames:
                 continue
             errors.append(
-                '%s --> %s: %s See scripts/linters/README.md.'
+                '%s --> %s: %s See https://github.com/oppia/oppia/wiki/'
+                'The-File-Naming-Convention-and-Directory-Structure.'
                 % (filepath, rule.name, rule.description)
             )
 
