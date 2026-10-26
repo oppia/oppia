@@ -28,6 +28,8 @@ import {DeleteAnswerGroupModalModule} from 'components/shared_parts/delete-answe
 import {FormsModule} from '@angular/forms';
 import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {ResponseHeaderModule} from 'components/shared_parts/response-header.module';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 @NgModule({
   imports: [
@@ -43,6 +45,9 @@ import {ResponseHeaderModule} from 'components/shared_parts/response-header.modu
     ResponseHeaderModule,
   ],
   declarations: [StateResponsesComponent],
+  // StateResponsesComponent injects these pipes rather than only using them in
+  // its template, so they must be provided for dependency injection.
+  providers: [ParameterizeRuleDescriptionPipe, WrapTextWithEllipsisPipe],
   exports: [StateResponsesComponent],
 })
 export class StateResponsesModule {}

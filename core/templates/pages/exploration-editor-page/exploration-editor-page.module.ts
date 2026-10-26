@@ -233,6 +233,9 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
 import {DynamicComponentModule} from 'value_generators/templates/dynamic-component.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {StateEditorModule} from 'components/shared_parts/state-editor.module';
 import {StateGraphVisualizationModule} from 'components/shared_parts/state-graph-visualization.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -482,6 +485,7 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
     InternetConnectivityService,
     LanguageUtilService,
     LocalStorageService,
+    ParameterizeRuleDescriptionPipe,
     ParameterMetadataService,
     PlatformFeatureService,
     PopulateRuleContentIdsService,
@@ -509,6 +513,7 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
     TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,
+    TruncateInputBasedOnInteractionAnswerTypePipe,
     UrlInterpolationService,
     UserEmailPreferencesService,
     UserExplorationPermissionsService,
@@ -518,6 +523,7 @@ import {VersionDiffVisualizationModule} from 'components/shared_parts/version-di
     VersionHistoryService,
     VoiceoverBackendApiService,
     WindowDimensionsService,
+    WrapTextWithEllipsisPipe,
   ],
 })
 export class ExplorationEditorPageModule {}

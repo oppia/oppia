@@ -128,6 +128,20 @@ describe('OppiaAngularRootComponent', function () {
     expect(emitSpy).toHaveBeenCalled();
   });
 
+  it('should initialize CKEditor when an RTE is present', () => {
+    const ckEditorInitializerSpy = spyOn(
+      CkEditorInitializerService,
+      'ckEditorInitializer'
+    ).and.callFake(() => Promise.resolve());
+    spyOn(document, 'querySelector').and.returnValue(
+      document.createElement('div')
+    );
+
+    component.ngAfterViewInit();
+
+    expect(ckEditorInitializerSpy).toHaveBeenCalled();
+  });
+
   it('should detect change in direction', () => {
     const newDirection: Direction = 'rtl';
 

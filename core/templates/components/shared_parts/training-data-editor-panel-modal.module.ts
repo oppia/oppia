@@ -23,6 +23,7 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
 import {TestInteractionPanelModule} from 'components/shared_parts/test-interaction-panel.module';
+import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 
 @NgModule({
   imports: [
@@ -32,6 +33,9 @@ import {TestInteractionPanelModule} from 'components/shared_parts/test-interacti
     TestInteractionPanelModule,
   ],
   declarations: [TrainingDataEditorPanelComponent],
+  // The component injects this pipe rather than only using it in its template,
+  // so the pipe must be provided for dependency injection.
+  providers: [TruncateInputBasedOnInteractionAnswerTypePipe],
   exports: [TrainingDataEditorPanelComponent],
 })
 export class TrainingDataEditorPanelModalModule {}

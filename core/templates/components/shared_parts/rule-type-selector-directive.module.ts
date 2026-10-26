@@ -23,10 +23,14 @@ import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
+import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
 @NgModule({
   imports: [CommonModule, TranslateModule, MatFormFieldModule, MatSelectModule],
   declarations: [RuleTypeSelector],
+  // RuleTypeSelector injects ReplaceInputsWithEllipsesPipe rather than using
+  // it in its template, so the pipe must be provided for dependency injection.
+  providers: [ReplaceInputsWithEllipsesPipe],
   exports: [RuleTypeSelector],
 })
 export class RuleTypeSelectorDirectiveModule {}
