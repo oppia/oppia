@@ -1711,6 +1711,65 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assert_job_output_is_empty()
 
+    def test_skip_generation_if_translation_review_has_only_invalid_topics(
+        self,
+    ) -> None:
+        self.translation_review_model_with_invalid_topic.update_timestamps()
+
+        self.put_multi(
+            [
+                self.translation_review_model_with_invalid_topic,
+            ]
+        )
+
+        self.assert_job_output_is_empty()
+
+    def test_skip_generation_when_reviewed_topic_is_deleted(self) -> None:
+        # 1) Create a real topic via the service (sets up versioning
+        # correctly), mimicking a topic that a reviewer reviewed against.
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_to_delete',
+            'topic-to-delete-name',
+            'topic-to-delete',
+            'description',
+            'fragm',
+        )
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
+        # 2) Create a translation review stat that references that topic.
+        review_stat = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            id='es.reviewer_del.topic_to_delete',
+            language_code='es',
+            reviewer_user_id='reviewer_del',
+            topic_id='topic_to_delete',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT
+            ),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+            ),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT
+            ),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE,
+        )
+        review_stat.update_timestamps()
+        review_stat.put()
+
+        # 3) Delete the topic, mimicking a topic removed after the review
+        # was recorded.
+        topic_services.delete_topic(
+            feconf.SYSTEM_COMMITTER_ID, 'topic_to_delete'
+        )
+
+        # 4) The job should skip the now-invalid review stat and complete
+        # without raising 'min() arg is an empty sequence'.
+        self.assert_job_output_is_empty()
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -1894,6 +1953,13 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             edited_by_reviewer=False,
         ).put()
 
+        self.assert_job_output_is_empty()
+
+    def test_skip_audit_if_translation_review_has_only_invalid_topics(
+        self,
+    ) -> None:
+        self.translation_review_model_with_invalid_topic.update_timestamps()
+        self.put_multi([self.translation_review_model_with_invalid_topic])
         self.assert_job_output_is_empty()
 
 
@@ -3117,6 +3183,84 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 ),
             ]
         )
+
+    def test_translation_suggestion_without_contribution_stats_is_skipped(
+        self,
+    ) -> None:
+        # Create an exploration opportunity so that the translation suggestion
+        # is included in the validation pipeline.
+        exp_opportunity = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp_without_contribution_stats',
+            topic_id='topic_without_contribution_stats',
+            chapter_title='A chapter',
+            content_count=1,
+            story_id='story_without_contribution_stats',
+            story_title='A story',
+            topic_name='A topic',
+        )
+        exp_opportunity.update_timestamps()
+
+        # Create a suggestion without a corresponding
+        # TranslationContributionStatsModel or
+        # TranslationSubmitterTotalContributionStatsModel.
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id='translation_suggestion_without_stats',
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_without_contribution_stats',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='translation_author',
+            final_reviewer_id=None,
+            change_cmd={},
+            score_category='translation.hi',
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+
+        self.put_multi([exp_opportunity, suggestion])
+
+        self.assert_job_output_is([])
+
+    def test_question_suggestion_without_contribution_stats_is_skipped(
+        self,
+    ) -> None:
+        # Create a skill opportunity so that the question suggestion is included
+        # in the validation pipeline.
+        skill_opportunity = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='skill_without_contribution_stats',
+            skill_description='A skill without contribution stats',
+            question_count=1,
+        )
+        skill_opportunity.update_timestamps()
+
+        # Create a suggestion without a corresponding
+        # QuestionContributionStatsModel or
+        # QuestionSubmitterTotalContributionStatsModel.
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id='question_suggestion_without_stats',
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id='skill_without_contribution_stats',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='question_author',
+            final_reviewer_id=None,
+            change_cmd={},
+            score_category='question.skill_without_contribution_stats',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+
+        self.put_multi([skill_opportunity, suggestion])
+
+        self.assert_job_output_is([])
 
     def test_question_missing_total_emits_missing_log(self) -> None:
         # Test missing QuestionSubmitterTotalContributionStatsModel.
