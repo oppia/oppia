@@ -214,6 +214,8 @@ const revisionTabSelector = 'subtopics-list';
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const subtopicTitleInStudyTabSelector = '.subtopic-title';
 const newSubtopicViewerContainerSelector = '.new-subtopic-viewer-container';
+const studyGuideTitleSelector = `${newSubtopicViewerContainerSelector} .content-title`;
+const studyGuideSectionSelector = `${newSubtopicViewerContainerSelector} .card`;
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
@@ -2220,10 +2222,7 @@ export class LoggedOutUser extends BaseUser {
     studyGuideTitle: string,
     studyGuideSections: string[][]
   ): Promise<void> {
-    await this.expectTextContentToContain(
-      newSubtopicViewerContainerSelector,
-      studyGuideTitle
-    );
+    await this.expectTextContentToBe(studyGuideTitleSelector, studyGuideTitle);
 
     for (const [index, section] of studyGuideSections.entries()) {
       if (section.length !== 2) {
@@ -2233,12 +2232,13 @@ export class LoggedOutUser extends BaseUser {
         );
       }
       const [heading, content] = section;
-      await this.expectTextContentToContain(
-        newSubtopicViewerContainerSelector,
+      const sectionSelector = `${studyGuideSectionSelector}:nth-child(${index + 1})`;
+      await this.expectTextContentToBe(
+        `${sectionSelector} .card-title`,
         heading
       );
       await this.expectTextContentToContain(
-        newSubtopicViewerContainerSelector,
+        `${sectionSelector} .card-content`,
         content
       );
     }
