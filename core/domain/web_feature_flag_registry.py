@@ -36,6 +36,7 @@ WebFeatureNames = web_feature_flag_list.WebFeatureNames
 WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
     web_feature_flag_list.WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
+logger = logging.getLogger(__name__)
 
 
 class Registry:
@@ -132,7 +133,7 @@ class Registry:
         )
 
         if web_feature_flag_config_model is None:
-            logging.debug(
+            logger.debug(
                 'Flag config %s not found in WebFeatureFlagConfigModel, '
                 'falling back to legacy model.',
                 name,

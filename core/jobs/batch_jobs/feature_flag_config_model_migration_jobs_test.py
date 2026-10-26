@@ -106,13 +106,7 @@ class MigrateFeatureFlagConfigModelsJobTests(job_test_utils.JobTestBase):
         web_model.update_timestamps()
         web_model.put()
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED FEATURE FLAG CONFIG MODEL COUNT: 0.'
-                ),
-            ]
-        )
+        self.assert_job_output_is_empty()
 
         stored_web_model = config_models.WebFeatureFlagConfigModel.get(
             'feature_flag_a'
@@ -149,16 +143,13 @@ class AuditFeatureFlagConfigModelsMigrationJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'LEGACY FEATURE FLAG CONFIG MODEL COUNT: 1.'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'WEB FEATURE FLAG CONFIG MODEL COUNT: 0.'
+                    'MIGRATED FEATURE FLAG CONFIG MODEL: feature_flag_b'
                 ),
                 job_run_result.JobRunResult.as_stdout(
                     'MIGRATED FEATURE FLAG CONFIG MODEL COUNT: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED FEATURE FLAG CONFIG MODEL: feature_flag_b'
+                    'LEGACY FEATURE FLAG CONFIG MODEL COUNT: 1.'
                 ),
             ]
         )

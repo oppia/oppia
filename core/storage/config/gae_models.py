@@ -34,6 +34,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
+logger = logging.getLogger(__name__)
 
 
 class PlatformParameterSnapshotMetadataModel(
@@ -245,7 +246,7 @@ class FeatureFlagConfigModel(base_models.BaseModel):
             web_model.user_group_ids = user_group_ids
             web_model.put()
         except Exception:
-            logging.exception(
+            logger.exception(
                 'Failed to dual-write WebFeatureFlagConfigModel for %s after '
                 'successfully writing the legacy feature flag config.',
                 feature_flag_name,

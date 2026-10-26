@@ -46,20 +46,21 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
         legacy_model: config_models.FeatureFlagConfigModel,
     ) -> Iterable[config_models.WebFeatureFlagConfigModel]:
         """Yields a model only if it has not already been dual-written."""
+        model_id = legacy_model.key.id()
         with datastore_services.get_ndb_context():
             existing_model = config_models.WebFeatureFlagConfigModel.get_by_id(
-                legacy_model.id
+                model_id, use_cache=False
             )
             if existing_model is not None:
                 logging.info(
                     'Skipping migration for feature flag %s because '
                     'WebFeatureFlagConfigModel already exists.',
-                    legacy_model.id,
+                    model_id,
                 )
                 return
 
             migrated_config = config_models.WebFeatureFlagConfigModel(
-                id=legacy_model.id,
+                id=model_id,
                 force_enable_for_all_users=legacy_model.force_enable_for_all_users,
                 rollout_percentage=legacy_model.rollout_percentage,
                 user_group_ids=legacy_model.user_group_ids,
@@ -149,7 +150,7 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
             | 'Log migrated model IDs'
             >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED FEATURE FLAG CONFIG MODEL: %s' % model.id
+                    'MIGRATED FEATURE FLAG CONFIG MODEL: %s' % model.key.id()
                 )
             )
         )
