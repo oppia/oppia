@@ -256,12 +256,13 @@ module.exports = async (browser, context) => {
   }
   if (process.env.LIGHTHOUSE_SKIP_LOGIN !== '1') {
     const requiredFlagStates = getRequiredFeatureFlagStates(context.url);
+    // The flag value is set unconditionally (rather than only when it differs
+    // from an in-memory value), because the login script may run in a fresh
+    // process per audited URL while the flag's value persists in the datastore.
+    // Skipping the PUT when an in-memory value happened to match left the
+    // datastore in whatever state a previous page/process had set.
     for (const flagName of Object.keys(requiredFlagStates)) {
-      const requiredValue = requiredFlagStates[flagName];
-      if (FEATURE_FLAG_STATES[flagName] !== requiredValue) {
-        await setFeatureFlag(page, flagName, requiredValue);
-        FEATURE_FLAG_STATES[flagName] = requiredValue;
-      }
+      await setFeatureFlag(page, flagName, requiredFlagStates[flagName]);
     }
   }
   await seedBlankPagesForLighthouseRuns(browser, page, context);
