@@ -449,6 +449,29 @@ describe('Exploration save and publish buttons component', () => {
     expect(component.saveChanges).toHaveBeenCalled();
   }));
 
+  it(
+    'should open exploration save prompt modal again when reaching 50 ' +
+      'changes after saving',
+    fakeAsync(() => {
+      spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve(),
+      } as NgbModalRef);
+
+      component.saveIsInProcess = false;
+      component.getChangeListLength();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledTimes(1);
+      expect(component.isModalDisplayed).toBe(false);
+
+      component.getChangeListLength();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledTimes(2);
+    })
+  );
+
   it('should open a exploration save prompt modal only once', fakeAsync(() => {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
     spyOn(ngbModal, 'open').and.returnValue({

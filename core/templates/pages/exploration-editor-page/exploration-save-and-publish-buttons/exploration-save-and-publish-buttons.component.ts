@@ -185,6 +185,7 @@ export class ExplorationSaveAndPublishButtonsComponent
         () => {
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
+          this.isModalDisplayed = false;
         },
         () => {}
       );
