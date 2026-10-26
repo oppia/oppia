@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for drag and drop positive int editor.
  */
 
-// @ts-nocheck
-
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {DragAndDropPositiveIntEditorComponent} from './drag-and-drop-positive-int-editor.component';
 
@@ -76,7 +74,15 @@ describe('DragAndDropPositiveIntEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     component.value = 1;
 
-    component.onSelectionChange({target: {value: '3'}} as Event);
+    const selectElement = document.createElement('select');
+    const option = document.createElement('option');
+    option.value = '3';
+    selectElement.appendChild(option);
+    selectElement.value = '3';
+    const event = new Event('change');
+    Object.defineProperty(event, 'target', {value: selectElement});
+
+    component.onSelectionChange(event);
 
     expect(component.value).toBe(3);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(3);
