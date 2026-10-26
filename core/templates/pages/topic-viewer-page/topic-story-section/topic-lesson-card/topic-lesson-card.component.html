@@ -74,25 +74,6 @@
          [class.collapsed]="!isExpanded"
          [class.coming-soon-footer]="isComingSoonSectionCard">
       <div class="topic-lesson-card-actions">
-        <div class="topic-lesson-card-actions-left">
-          <span
-                class="topic-lesson-card-fallback-info-icon e2e-test-lesson-fallback-info-icon"
-                *ngIf="shouldShowFallbackCta() && !isComingSoonLesson"
-                [matTooltip]="getFallbackInfoTooltipText()"
-                tabindex="0">
-            <i class="material-icons">info_outline</i>
-          </span>
-          <topic-lesson-language-selector class="topic-lesson-language-selector"
-            *ngIf="shouldShowInfoIcon && !isComingSoonLesson"
-            [availableTextLanguageCodes]="availableTextLanguageCodes"
-            [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
-            [voiceoverLanguageAccentDescriptions]="availableVoiceoverLanguageAccentDescriptions"
-            [selectedTextLanguageCode]="selectedTextLanguageCode"
-            [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
-            (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
-            (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
-          </topic-lesson-language-selector>
-        </div>
         <div class="topic-lesson-card-actions-right">
           <div class="topic-lesson-card-secondary-buttons">
             <span class="topic-lesson-card-practice-button-wrapper"

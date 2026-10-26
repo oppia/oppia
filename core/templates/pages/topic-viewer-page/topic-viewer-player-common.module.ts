@@ -25,7 +25,6 @@ import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component'
 import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
-import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
 import {ModuleEndTestCardComponent} from './topic-story-section/module-end-test-card.component';
 import {ModuleCircleBadgeComponent} from './topic-story-section/module-circle-badge.component';
 import {ModuleNavigationComponent} from './topic-story-section/module-navigation.component';
@@ -52,7 +51,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
-    LanguageSelectorComponent,
     ModuleEndTestCardComponent,
     ModuleCircleBadgeComponent,
     ModuleNavigationComponent,
@@ -69,7 +67,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     ModuleEndTestCardComponent,
-    LanguageSelectorComponent,
     ModuleCircleBadgeComponent,
     ModuleNavigationComponent,
     MasteryChallengeCardComponent,
@@ -84,7 +81,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
-    LanguageSelectorComponent,
     ModuleEndTestCardComponent,
     ModuleCircleBadgeComponent,
     ModuleNavigationComponent,
