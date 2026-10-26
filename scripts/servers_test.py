@@ -68,6 +68,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def setUp(self) -> None:
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
+        self.exit_stack.enter_context(
+            common.swap_env('DATASTORE_EMULATOR_COMMAND', '')
+        )
 
     def tearDown(self) -> None:
         try:
@@ -459,6 +462,66 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn(
             'beta emulators datastore start', popen_calls[0].program_args
         )
+        self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+    def test_managed_cloud_datastore_emulator_with_custom_command(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        self.exit_stack.enter_context(
+            self.swap_managed_cloud_datastore_emulator_io_operations(False)
+        )
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+        )
+        self.exit_stack.enter_context(
+            common.swap_env(
+                'DATASTORE_EMULATOR_COMMAND',
+                '"/tmp/datastore emulator" --host-port 127.0.0.1:8089 '
+                '--no-store-on-disk',
+            )
+        )
+
+        self.exit_stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True)
+        )
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            [
+                '/tmp/datastore emulator',
+                '--host-port',
+                '127.0.0.1:8089',
+                '--no-store-on-disk',
+            ],
+        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': False})
+
+    def test_custom_datastore_command_is_ignored_for_persistent_data(
+        self,
+    ) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        self.exit_stack.enter_context(
+            self.swap_managed_cloud_datastore_emulator_io_operations(True)
+        )
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+        )
+        self.exit_stack.enter_context(
+            common.swap_env('DATASTORE_EMULATOR_COMMAND', 'custom-emulator')
+        )
+
+        self.exit_stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=False)
+        )
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn(
+            'beta emulators datastore start', popen_calls[0].program_args
+        )
+        self.assertNotIn('custom-emulator', popen_calls[0].program_args)
         self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 

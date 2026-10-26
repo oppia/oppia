@@ -85,6 +85,11 @@ jobs:
 
         id: run_backend_test_shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        env:
+          DATASTORE_EMULATOR_COMMAND: >-
+            docker run --rm --init --network host -e RUST_LOG=warn
+            guibeira/datastore-emulator:0.1.9
+            --host-port 127.0.0.1:8089 --no-store-on-disk
         run: python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ steps.run_backend_test_shard.outputs.WORKFLOW_STATUS == 'failure' && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}

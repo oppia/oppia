@@ -21,6 +21,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import shutil
 import signal
 import subprocess
@@ -295,24 +296,29 @@ def managed_cloud_datastore_emulator(
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT,
     )
-    emulator_args = [
-        common.GCLOUD_PATH,
-        'beta',
-        'emulators',
-        'datastore',
-        'start',
-        '--project',
-        common.DEV_PROJECT_ID,
-        '--data-dir',
-        common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
-        '--host-port',
-        emulator_hostport,
-        '--consistency=1.0',
-        '--quiet',
-    ]
+    emulator_command = os.environ.get('DATASTORE_EMULATOR_COMMAND', '')
+    use_custom_emulator = clear_datastore and bool(emulator_command)
+    if use_custom_emulator:
+        emulator_args = shlex.split(emulator_command)
+    else:
+        emulator_args = [
+            common.GCLOUD_PATH,
+            'beta',
+            'emulators',
+            'datastore',
+            'start',
+            '--project',
+            common.DEV_PROJECT_ID,
+            '--data-dir',
+            common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
+            '--host-port',
+            emulator_hostport,
+            '--consistency=1.0',
+            '--quiet',
+        ]
 
-    if clear_datastore:
-        emulator_args.append('--no-store-on-disk')
+        if clear_datastore:
+            emulator_args.append('--no-store-on-disk')
 
     with contextlib.ExitStack() as stack:
         data_dir_exists = os.path.exists(
@@ -325,13 +331,12 @@ def managed_cloud_datastore_emulator(
         elif not data_dir_exists:
             os.makedirs(common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
 
-        # OK to use shell=True here because we are passing string literals and
-        # constants, so there is no risk of a shell-injection attack.
+        # Custom commands run without a shell to preserve quoted arguments.
         proc = stack.enter_context(
             managed_process(
                 emulator_args,
                 human_readable_name='Cloud Datastore Emulator',
-                shell=True,
+                shell=not use_custom_emulator,
             )
         )
 
