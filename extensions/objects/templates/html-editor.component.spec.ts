@@ -16,8 +16,6 @@
  * @fileoverview Unit test for HTML editor.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEditorComponent} from './html-editor.component';

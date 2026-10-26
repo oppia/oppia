@@ -28,9 +28,12 @@ import {NumericInputCustomizationArgs} from 'interactions/customization-args-def
 import {NumericInputRulesService} from './numeric-input-rules.service';
 import {NumericInputValidationService} from './numeric-input-validation.service';
 import type {NumericInputAnswer} from 'interactions/answer-defs';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface NumericInputFormSchema {
-  type: string;
+  // The object literal in ngOnInit assigns 'float', so the type is fixed to
+  // the literal to keep the schema assignable to the Schema type.
+  type: 'float';
   ui_config: {};
 }
 
@@ -47,8 +50,11 @@ export class InteractiveNumericInput implements OnInit {
   @Input() savedSolution!: NumericInputAnswer;
   @Input() labelForFocusTarget!: string;
   // Answer is empty string if the user has not yet entered an answer. This is
-  // the case when the user has not yet clicked the submit button.
-  answer!: number | string;
+  // the case when the user has not yet clicked the submit button. The answer
+  // becomes null when the learner clears the input or types text that cannot
+  // be parsed as a number, so that a previously valid answer cannot be
+  // submitted after the input has been cleared or invalidated.
+  answer!: number | string | null;
   NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
   errorMessageI18nKey: string = '';
   requireNonnegativeInput: boolean = false;
@@ -76,7 +82,7 @@ export class InteractiveNumericInput implements OnInit {
     );
   }
 
-  submitAnswer(answer: number | string): void {
+  submitAnswer(answer: number | string | null): void {
     if (
       typeof answer !== 'number' &&
       this.currentInteractionService.showNoResponseError()
@@ -86,7 +92,10 @@ export class InteractiveNumericInput implements OnInit {
       return;
     }
 
-    if (this.isAnswerValid()) {
+    // The answer is only submitted when it is a valid number. The typeof
+    // check is redundant with isAnswerValid() at runtime, but it lets the
+    // compiler narrow the answer to a number before it is passed to onSubmit.
+    if (typeof answer === 'number' && this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
         answer,
         this.numericInputRulesService
@@ -101,11 +110,18 @@ export class InteractiveNumericInput implements OnInit {
     };
   }
 
-  onAnswerChange(answer: number | string): void {
-    if (this.answer === answer) {
+  onAnswerChange(answer: SchemaDefaultValue): void {
+    // The float editor emits null when the input is cleared or when it holds
+    // text that cannot be parsed as a number. Treat null (and any other
+    // unexpected value) as an empty/invalid answer so that a previously valid
+    // answer cannot be submitted after the input has been cleared or
+    // invalidated.
+    const newAnswer: number | string | null =
+      typeof answer === 'number' || typeof answer === 'string' ? answer : null;
+    if (this.answer === newAnswer) {
       return;
     }
-    this.answer = answer;
+    this.answer = newAnswer;
     this.errorMessageI18nKey = '';
     this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
     this.currentInteractionService.updateCurrentAnswer(this.answer);
