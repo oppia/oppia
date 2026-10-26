@@ -2626,7 +2626,7 @@ describe('ImageEditor', () => {
         },
       ];
 
-      let errorCaught: Error | null = null;
+      let errorCaught!: Error;
       spyOn(gifFrames, 'getFrames').and.returnValue({
         then: (callback: Function) => {
           const result = Promise.resolve(callback(frameData));
@@ -2653,8 +2653,8 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
       tick();
 
-      expect(errorCaught).not.toBeNull();
-      expect(errorCaught?.message).toBe('Could not get canvas context.');
+      expect(errorCaught).toBeDefined();
+      expect(errorCaught.message).toBe('Could not get canvas context.');
     })
   );
 
