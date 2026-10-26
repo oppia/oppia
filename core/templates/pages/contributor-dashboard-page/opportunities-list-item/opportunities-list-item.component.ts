@@ -222,7 +222,7 @@ export class OpportunitiesListItemComponent {
           this.opportunityButtonDisabled =
             this.disableButtonOnComplete &&
             (this.opportunity.translationsCount +
-              this.opportunity.inReviewCount >=
+              this.opportunity.inReviewCount ===
               maxTranslatableCards ||
               onlyReviewerCardsRemaining);
 
