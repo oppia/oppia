@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Main entry point for the Angular 11 test target.
+ * @fileoverview Main entry point for the Angular 12 test target.
  *
  * This file initializes the Angular testing environment, sets up the
  * jasmine reporter, and explicitly discovers all spec files under
@@ -38,7 +38,7 @@ import {
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 
-// Note: In Angular 11, the native @angular-devkit/build-angular:karma builder
+// Note: In Angular 12, the native @angular-devkit/build-angular:karma builder
 // still uses Webpack under the hood. We are required to have a custom main entry
 // point with require.context so that the builder can discover our tests and initialize
 // our custom Jasmine reporter. Once the codebase is upgraded to Angular 15+, we can

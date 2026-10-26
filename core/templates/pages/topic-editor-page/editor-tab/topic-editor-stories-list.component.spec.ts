@@ -202,6 +202,7 @@ describe('topicEditorStoriesList', () => {
       previousContainer: null!,
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
     component.drop(dropEvent);
 
