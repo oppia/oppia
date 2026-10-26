@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,30 +19,36 @@
  * IP.TP. Parent signs up for Oppia’s newsletter
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Parent', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Parent', function () {
   let interestedParent: LoggedOutUser;
 
-  beforeAll(async function () {
-    interestedParent = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    interestedParent = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it("should be able to sign up for the Oppia's newletter", async function () {
+  test("should be able to sign up for the Oppia's newletter", async function () {
     // Submit Email to the Newsletter Input Field.
     await interestedParent.submitEmailForNewsletter(
       'example.abc@domain.xyz.mn'
     );
+
     // Check for Thanks Message.
     await interestedParent.expectNewsletterSubscriptionThanksMessage();
+
     // Finds the Watch a video button and checks its link.
     await interestedParent.expectWatchAVideoButtonToHaveCorrectLink();
+
     // Finds the Read Blog button and checks its link.
     await interestedParent.expectReadBlogButtonToHaveCorrectLink();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
