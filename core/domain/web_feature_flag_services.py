@@ -175,54 +175,65 @@ def load_web_feature_flags_from_storage(
             web_feature_flag_names_list
         )
     )
-    legacy_feature_flag_config_models = (
-        config_models.FeatureFlagConfigModel.get_multi(
-            web_feature_flag_names_list
-        )
-    )
 
-    for index, web_feature_flag_config_model in enumerate(
-        web_feature_flag_config_models
+    # Identify missing flags that require legacy fallback lookup.
+    missing_indices: List[int] = [
+        idx
+        for idx, model in enumerate(web_feature_flag_config_models)
+        if model is None
+    ]
+
+    legacy_models_by_name: Dict[
+        str, Optional[config_models.FeatureFlagConfigModel]
+    ] = {}
+    if missing_indices:
+        missing_names = [
+            web_feature_flag_names_list[i] for i in missing_indices
+        ]
+        legacy_models = config_models.FeatureFlagConfigModel.get_multi(
+            missing_names
+        )
+        legacy_models_by_name = dict(zip(missing_names, legacy_models))
+
+    for name, web_model in zip(
+        web_feature_flag_names_list, web_feature_flag_config_models
     ):
-        feature_flag_config_model = web_feature_flag_config_model
-        if feature_flag_config_model is None:
-            web_feature_flag_name = web_feature_flag_names_list[index]
+        # Explicit Union annotation satisfies Mypy for both model types.
+        target_model: Union[
+            config_models.WebFeatureFlagConfigModel,
+            config_models.FeatureFlagConfigModel,
+            None,
+        ] = web_model
+
+        if target_model is None:
             logging.debug(
                 'Flag config %s not found in WebFeatureFlagConfigModel, '
                 'falling back to legacy model.',
-                web_feature_flag_name,
+                name,
             )
-            feature_flag_config_model = legacy_feature_flag_config_models[index]
+            target_model = legacy_models_by_name.get(name)
 
-        if feature_flag_config_model:
-            web_feature_flag_spec = _get_web_feature_flag_spec(
-                feature_flag_config_model.id
-            )
+        if target_model is not None:
+            flag_id = target_model.key.id()
+            web_feature_flag_spec = _get_web_feature_flag_spec(flag_id)
             web_feature_flag_config = (
                 web_feature_flag_domain.WebFeatureFlagConfig(
-                    feature_flag_config_model.force_enable_for_all_users,
-                    feature_flag_config_model.rollout_percentage,
-                    feature_flag_config_model.user_group_ids,
-                    feature_flag_config_model.last_updated,
+                    target_model.force_enable_for_all_users,
+                    target_model.rollout_percentage,
+                    target_model.user_group_ids,
+                    target_model.last_updated,
                 )
             )
 
-            web_feature_flag_name_to_feature_flag_dict[
-                feature_flag_config_model.id
-            ] = web_feature_flag_domain.FeatureFlag(
-                feature_flag_config_model.id,
-                web_feature_flag_spec,
-                web_feature_flag_config,
+            web_feature_flag_name_to_feature_flag_dict[flag_id] = (
+                web_feature_flag_domain.FeatureFlag(
+                    flag_id,
+                    web_feature_flag_spec,
+                    web_feature_flag_config,
+                )
             )
-
-    for web_feature_flag_name in web_feature_flag_names_list:
-        if (
-            web_feature_flag_name
-            not in web_feature_flag_name_to_feature_flag_dict
-        ):
-            web_feature_flag_name_to_feature_flag_dict[
-                web_feature_flag_name
-            ] = None
+        else:
+            web_feature_flag_name_to_feature_flag_dict[name] = None
 
     return web_feature_flag_name_to_feature_flag_dict
 

@@ -23,8 +23,16 @@ import enum
 from core import feconf, utils
 from core.constants import constants
 from core.domain import web_feature_flag_domain
+from core.platform import models
 from core.domain import web_feature_flag_registry as registry
 from core.tests import test_utils
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import config_models
+
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
+
 
 FeatureStages = web_feature_flag_domain.FeatureStages
 
@@ -60,7 +68,7 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
 
     def test_get_feature_flag_prefers_web_model(self) -> None:
-        legacy_model = registry.config_models.FeatureFlagConfigModel(
+        legacy_model = config_models.FeatureFlagConfigModel(
             id=WebFeatureNames.FEATURE_A.value,
             force_enable_for_all_users=False,
             rollout_percentage=10,
@@ -68,7 +76,7 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
         legacy_model.update_timestamps()
         legacy_model.put()
-        web_model = registry.config_models.WebFeatureFlagConfigModel(
+        web_model = config_models.WebFeatureFlagConfigModel(
             id=WebFeatureNames.FEATURE_A.value,
             force_enable_for_all_users=True,
             rollout_percentage=75,
@@ -93,7 +101,7 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
 
     def test_get_feature_flag_falls_back_to_legacy_model(self) -> None:
-        legacy_model = registry.config_models.FeatureFlagConfigModel(
+        legacy_model = config_models.FeatureFlagConfigModel(
             id=WebFeatureNames.FEATURE_A.value,
             force_enable_for_all_users=True,
             rollout_percentage=35,
@@ -167,8 +175,8 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
             )
 
             for model_class in (
-                registry.config_models.FeatureFlagConfigModel,
-                registry.config_models.WebFeatureFlagConfigModel,
+                config_models.FeatureFlagConfigModel,
+                config_models.WebFeatureFlagConfigModel,
             ):
                 stored_model = model_class.get(WebFeatureNames.FEATURE_A.value)
                 assert stored_model is not None

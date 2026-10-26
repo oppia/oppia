@@ -35,8 +35,11 @@ from typing import Tuple
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
+    from mypy_imports import config_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(user_models, config_models) = models.Registry.import_models(
+    [models.Names.USER, models.Names.CONFIG]
+)
 
 
 class WebFeatureNames(enum.Enum):
@@ -217,7 +220,7 @@ class WebFeatureFlagServiceTest(test_utils.GenericTestBase):
 
     def test_bulk_flag_loading_falls_back_to_legacy_model(self) -> None:
         with mock.patch.object(
-            feature_services.config_models.WebFeatureFlagConfigModel,
+            config_models.WebFeatureFlagConfigModel,
             'get_multi',
             return_value=[None],
         ):

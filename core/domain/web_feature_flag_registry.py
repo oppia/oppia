@@ -24,7 +24,7 @@ from core import web_feature_flag_list
 from core.domain import web_feature_flag_domain
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -125,12 +125,18 @@ class Registry:
             name: str. The name of the web feature flag.
 
         Returns:
-            WebFeatureFlagConfig|None. The loaded instance, None if it's not found
+            WebFeatureFlagConfig||None. The loaded instance, None if it's not found
             in storage.
         """
         web_feature_flag_config_model = (
             config_models.WebFeatureFlagConfigModel.get(name, strict=False)
         )
+
+        model_instance: Union[
+            config_models.FeatureFlagConfigModel,
+            config_models.WebFeatureFlagConfigModel,
+            None,
+        ]
 
         if web_feature_flag_config_model is None:
             logger.debug(
