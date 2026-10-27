@@ -50,6 +50,10 @@ class MigrateWebPlatformParameterConfigJob(base_jobs.JobBase):
             )
             existing_web_model = web_model_key.get()
             if existing_web_model is not None:
+                assert isinstance(
+                    existing_web_model,
+                    config_models.WebPlatformParameterConfigModel,
+                )
                 return existing_web_model
 
             migrated_config = config_models.WebPlatformParameterConfigModel(

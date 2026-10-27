@@ -211,7 +211,20 @@ class Registry:
         model_instance.default_value = default_value
         legacy_model_instance.rules = rule_dicts
         legacy_model_instance.default_value = default_value
-        commit_cmds = [
+        commit_cmds: List[
+            Dict[
+                str,
+                Union[
+                    str,
+                    bool,
+                    int,
+                    float,
+                    List[
+                        web_platform_parameter_domain.PlatformParameterRuleDict
+                    ],
+                ],
+            ]
+        ] = [
             {
                 'cmd': (
                     web_platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
@@ -298,7 +311,10 @@ class Registry:
             PlatformParameter|None. The loaded instance, None if it's not found
             in storage.
         """
-        parameter_model = config_models.WebPlatformParameterConfigModel.get(
+        parameter_model: Union[
+            Optional[config_models.WebPlatformParameterConfigModel],
+            Optional[config_models.PlatformParameterModel],
+        ] = config_models.WebPlatformParameterConfigModel.get(
             name, strict=False
         )
         if parameter_model is None:
