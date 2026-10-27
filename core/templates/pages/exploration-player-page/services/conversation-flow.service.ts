@@ -57,7 +57,6 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {UserService} from 'services/user.service';
 import {ExplorationRecommendationsService} from './exploration-recommendations.service';
 import {StoryViewerDomainConstants} from 'domain/story_viewer/story-viewer-domain.constants';
-import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -1138,19 +1137,7 @@ export class ConversationFlowService {
           storyUrlFragment,
           nodeId
         )
-        .then(returnObject => {
-          if (returnObject.readyForReviewTest) {
-            (
-              this.windowRef.nativeWindow as {location: string | Location}
-            ).location = this.urlInterpolationService.interpolateUrl(
-              TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE,
-              {
-                topic_url_fragment: topicUrlFragment,
-                classroom_url_fragment: classroomUrlFragment,
-                story_url_fragment: storyUrlFragment,
-              }
-            );
-          }
+        .then(() => {
           this.chapterProgressService.updateCompletedChaptersCount(true);
         });
     } else {

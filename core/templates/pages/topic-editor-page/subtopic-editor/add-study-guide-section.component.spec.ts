@@ -127,6 +127,22 @@ describe('Add Study Guide Section Modal Component', () => {
     expect(component.tempSectionContentHtml).toEqual('content');
   });
 
+  it('should reset heading to empty string for a non-string value', () => {
+    component.tempSectionHeadingPlaintext = 'heading';
+
+    component.updateLocalHeading(null);
+
+    expect(component.tempSectionHeadingPlaintext).toEqual('');
+  });
+
+  it('should reset content to empty string for a non-string value', () => {
+    component.tempSectionContentHtml = 'content';
+
+    component.updateLocalContent(null);
+
+    expect(component.tempSectionContentHtml).toEqual('');
+  });
+
   it('should check if section content length is exceeded', () => {
     component.tempSectionContentHtml = 'short content';
 
