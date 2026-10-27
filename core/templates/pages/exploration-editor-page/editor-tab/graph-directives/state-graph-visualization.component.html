@@ -68,7 +68,8 @@ with the same id on the page. -->
                  tabindex="0"
                  [attr.aria-label]="'Delete ' + getNodeTitle(node) + ' card'"
                  (keydown.enter)="onNodeDeletionClick(node.id)"
-                 (keydown.space)="$event.preventDefault(); onNodeDeletionClick(node.id)"
+                 (keydown.space)="$event.preventDefault()"
+                 (keyup.space)="onNodeDeletionClick(node.id)"
                  (click)="onNodeDeletionClick(node.id)">
                 <rect height="15" width="15" opacity="0" stroke-width="0"
                       [attr.x]="node.x0 + node.width" [attr.y]="node.y0"

@@ -125,7 +125,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       xLabel: 5,
       height: 10,
       width: 100,
-      id: 'node_1',
+      id: 'state_3',
       label: 'This is a label for node 3',
       reachableFromEnd: false,
       secondaryLabel: '2nd',
@@ -143,7 +143,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       xLabel: 5,
       height: 10,
       width: 100,
-      id: 'node_1',
+      id: 'state_4',
       label: 'This is a label for node 4',
       reachableFromEnd: true,
       secondaryLabel: '2nd',
@@ -333,7 +333,47 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
-  it('should allow deleting a card with Enter and Space', () => {
+  ['Enter', ' '].forEach(key => {
+    it(
+      'should delete the focused card once with ' +
+        (key === ' ' ? 'Space' : 'Enter'),
+      () => {
+        component.isEditable = true;
+        fixture.detectChanges();
+
+        const deleteButton: SVGGElement = fixture.nativeElement.querySelector(
+          '.e2e-test-delete-node'
+        );
+        const deleteStateSpy = spyOn(component.onDeleteFunction, 'emit');
+
+        expect(deleteButton.getAttribute('role')).toBe('button');
+        expect(deleteButton.getAttribute('tabindex')).toBe('0');
+        expect(deleteButton.getAttribute('aria-label')).toContain(
+          'Delete This is a label for node 3'
+        );
+        deleteButton.focus();
+        expect(document.activeElement).toBe(deleteButton);
+
+        const keyEvent = new KeyboardEvent('keydown', {
+          key,
+          bubbles: true,
+          cancelable: true,
+        });
+        deleteButton.dispatchEvent(keyEvent);
+
+        if (key === ' ') {
+          expect(keyEvent.defaultPrevented).toBe(true);
+          expect(deleteStateSpy).not.toHaveBeenCalled();
+          deleteButton.dispatchEvent(
+            new KeyboardEvent('keyup', {key, bubbles: true})
+          );
+        }
+        expect(deleteStateSpy).toHaveBeenCalledOnceWith('state_3');
+      }
+    );
+  });
+
+  it('should ignore other keys and support click activation on the control and its rectangle', () => {
     component.isEditable = true;
     fixture.detectChanges();
 
@@ -342,24 +382,19 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     );
     const deleteStateSpy = spyOn(component.onDeleteFunction, 'emit');
 
-    expect(deleteButton.getAttribute('role')).toBe('button');
-    expect(deleteButton.getAttribute('aria-label')).toContain('Delete');
-
     deleteButton.dispatchEvent(
-      new KeyboardEvent('keydown', {key: 'Enter', bubbles: true})
+      new KeyboardEvent('keydown', {key: 'Escape', bubbles: true})
     );
-    expect(deleteStateSpy).toHaveBeenCalled();
+    expect(deleteStateSpy).not.toHaveBeenCalled();
 
+    deleteButton.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+    expect(deleteStateSpy).toHaveBeenCalledOnceWith('state_3');
     deleteStateSpy.calls.reset();
-    const spaceEvent = new KeyboardEvent('keydown', {
-      key: ' ',
-      bubbles: true,
-      cancelable: true,
-    });
-    deleteButton.dispatchEvent(spaceEvent);
 
-    expect(deleteStateSpy).toHaveBeenCalled();
-    expect(spaceEvent.defaultPrevented).toBe(true);
+    deleteButton
+      .querySelector('rect')
+      .dispatchEvent(new MouseEvent('click', {bubbles: true}));
+    expect(deleteStateSpy).toHaveBeenCalledOnceWith('state_3');
   });
 
   it(
