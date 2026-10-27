@@ -130,7 +130,9 @@ export class SkillEditorNavabarComponent implements OnInit {
   getWarningsCount(): number {
     return this.skillEditorStateService.getSkillValidationIssues().length;
   }
-
+  getAllSkillWarnings(): string {
+    return this.skillEditorStateService.getSkillValidationIssues().join('\n');
+  }
   isSkillSaveable(): boolean {
     return this.getChangeListCount() > 0 && this.getWarningsCount() === 0;
   }
