@@ -195,6 +195,11 @@ export class CreateNewSubtopicModalComponent
     // thumbnail is uploaded here. It is uploaded immediately because the
     // parent topic already exists, so the subtopic change list can reference
     // the stored filename once the subtopic is created.
+    // The previously stored filename is cleared until the new upload
+    // succeeds, since the image uploader already previews the new image. This
+    // prevents creating the subtopic with a thumbnail that differs from the
+    // one shown, e.g. while the upload is in progress or if it fails.
+    this.updateSubtopicThumbnailFilename('');
     const entityType = this.pageContextService.getEntityType();
     const entityId = this.pageContextService.getEntityId();
     if (!entityType || !entityId) {

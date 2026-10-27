@@ -42,7 +42,7 @@ import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {of, throwError} from 'rxjs';
+import {Subject, of, throwError} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
@@ -656,6 +656,38 @@ describe('create new subtopic modal', function () {
       const addWarningSpy = spyOn(alertsService, 'addWarning');
 
       component.onImageSave(imageData);
+      tick();
+
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Could not upload the thumbnail.'
+      );
+      expect(component.editableThumbnailFilename).toBe('');
+    }));
+
+    it('should clear the stored thumbnail filename while the new thumbnail is being uploaded', () => {
+      component.editableThumbnailFilename = 'img_old.svg';
+      spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+        new Subject()
+      );
+
+      component.onImageSave(imageData);
+
+      expect(component.editableThumbnailFilename).toBe('');
+    });
+
+    it('should not keep the previous thumbnail if replacing it fails', fakeAsync(() => {
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+      postThumbnailFileSpy.and.returnValue(of({filename: 'img_new.svg'}));
+      component.onImageSave(imageData);
+      tick();
+      expect(component.editableThumbnailFilename).toBe('img_new.svg');
+
+      postThumbnailFileSpy.and.returnValue(throwError('Upload failed'));
+      const addWarningSpy = spyOn(alertsService, 'addWarning');
+      component.onImageSave({...imageData, filename: 'img_replacement.svg'});
       tick();
 
       expect(addWarningSpy).toHaveBeenCalledWith(
