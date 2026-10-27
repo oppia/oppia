@@ -16,15 +16,13 @@
  * @fileoverview Unit tests for State.
  */
 
-// @ts-nocheck
-
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {TestBed} from '@angular/core/testing';
 
 describe('State', () => {
   let stateObject: StateBackendDict;
-  let TextInputInteraction = {
+  let TextInputInteraction: StateBackendDict = {
     classifier_model_id: null,
     content: {
       html: '',
@@ -65,14 +63,10 @@ describe('State', () => {
       solution: null,
     },
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
-
-  type DefaultOutcome =
-    (typeof TextInputInteraction.interaction)['default_outcome'];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -185,8 +179,9 @@ describe('State', () => {
       'default_outcome_1'
     );
 
-    const outcome = stateObject.interaction.default_outcome as DefaultOutcome;
-    outcome.dest = stateName;
+    if (stateObject.interaction.default_outcome !== null) {
+      stateObject.interaction.default_outcome.dest = stateName;
+    }
 
     expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
   });
