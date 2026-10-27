@@ -18,7 +18,6 @@
 
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 import {NgbCarousel, NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DonatePageComponent} from './donate-page.component';
@@ -61,7 +60,6 @@ describe('Donate page', () => {
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
-
     TestBed.configureTestingModule({
       imports: [NgbModule],
       declarations: [DonatePageComponent, MockTranslatePipe],
@@ -80,7 +78,6 @@ describe('Donate page', () => {
     ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
     spyOn(ngbModal, 'open');
   });
 
@@ -124,20 +121,16 @@ describe('Donate page', () => {
     });
   });
 
-  it('should automatically rotate learner testimonials every 8 seconds', () => {
+  it('should set the learner carousel interval to 8 seconds', () => {
     fixture.detectChanges();
 
-    const carousel = fixture.debugElement.query(By.directive(NgbCarousel));
-
-    expect(carousel).not.toBeNull();
-    expect(carousel.componentInstance.interval).toBe(8000);
+    expect(component.learnerCarousel.interval).toBe(8000);
   });
 
   it('should move the correct testimonials carousel to the previous slide', () => {
     component.learnerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
 
     component.moveLearnerCarouselToPreviousSlide();
-
     expect(component.learnerCarousel.prev).toHaveBeenCalled();
   });
 
@@ -145,7 +138,6 @@ describe('Donate page', () => {
     component.learnerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
 
     component.moveLearnerCarouselToNextSlide();
-
     expect(component.learnerCarousel.next).toHaveBeenCalled();
   });
 
@@ -153,7 +145,6 @@ describe('Donate page', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-
     expect(component.isLanguageRTL()).toBeTrue();
   });
 
@@ -161,7 +152,6 @@ describe('Donate page', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       false
     );
-
     expect(component.isLanguageRTL()).toBeFalse();
   });
 });
