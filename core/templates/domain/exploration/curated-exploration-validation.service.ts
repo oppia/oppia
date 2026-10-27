@@ -19,10 +19,7 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryBackendDict,
-} from 'domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {
   ReadOnlyExplorationBackendApiService,
   FetchExplorationBackendResponse,
@@ -46,9 +43,8 @@ export class CuratedExplorationValidationService {
   async isExpPublishedAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummaryBackendApiService
       .loadPublicExplorationSummariesAsync([explorationId])
-      .then((response: ExplorationSummaryBackendDict) => {
-        let summaries = response.summaries;
-        return summaries.length === 1 && summaries[0] !== null;
+      .then(summaries => {
+        return summaries.length === 1;
       });
   }
 
@@ -56,8 +52,7 @@ export class CuratedExplorationValidationService {
   async isDefaultCategoryAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummaryBackendApiService
       .loadPublicExplorationSummariesAsync([explorationId])
-      .then((response: ExplorationSummaryBackendDict) => {
-        let summaries = response.summaries;
+      .then(summaries => {
         let isCategoryPresent = false;
         if (summaries.length === 1) {
           let category = summaries[0].category;

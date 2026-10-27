@@ -37,7 +37,10 @@ import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {ExplorationSummaryBackendApiService} from '../../../../domain/summary/exploration-summary-backend-api.service';
 import {EventEmitter} from '@angular/core';
-import {LearnerExplorationSummaryBackendDict} from '../../../../domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+} from '../../../../domain/summary/learner-exploration-summary.model';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
 import {LoggerService} from '../../../../services/contextual/logger.service';
 import {
@@ -280,43 +283,42 @@ describe('ExplorationFooterComponent', () => {
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync'
-      ).and.resolveTo({
-        summaries: [
-          {
-            activity_type: 'exploration',
-            category: 'Coding',
-            community_owned: true,
-            thumbnail_bg_color: '#a33f40',
-            title: 'Project Euler Problem 1',
-            num_views: 263,
-            tags: [],
-            human_readable_contributors_summary: {
-              contributor_1: {
-                num_commits: 1,
-              },
-              contributor_2: {
-                num_commits: 3,
-              },
-              contributor_3: {
-                num_commits: 2,
-              },
+      ).and.resolveTo([
+        LearnerExplorationSummary.createFromBackendDict({
+          activity_type: 'exploration',
+          category: 'Coding',
+          community_owned: true,
+          thumbnail_bg_color: '#a33f40',
+          title: 'Project Euler Problem 1',
+          num_views: 263,
+          tags: [],
+          human_readable_contributors_summary: {
+            contributor_1: {
+              num_commits: 1,
             },
-            status: 'public',
-            language_code: 'en',
-            last_updated_msec: 0,
-            objective: 'Solve problem 1 on the Project Euler site',
-            ratings: {
-              1: 0,
-              2: 0,
-              3: 0,
-              4: 0,
-              5: 0,
+            contributor_2: {
+              num_commits: 3,
             },
-            thumbnail_icon_url: '/subjects/Lightbulb.svg',
-            id: 'exp1',
+            contributor_3: {
+              num_commits: 2,
+            },
           },
-        ],
-      });
+          status: 'public',
+          language_code: 'en',
+          last_updated_msec: 0,
+          created_on_msec: 0,
+          objective: 'Solve problem 1 on the Project Euler site',
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+          },
+          thumbnail_icon_url: '/subjects/Lightbulb.svg',
+          id: 'exp1',
+        }),
+      ]);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(
           new UserInfo([], false, false, false, false, false, '', '', '', true)

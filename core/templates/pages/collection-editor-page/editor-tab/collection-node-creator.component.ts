@@ -72,19 +72,33 @@ export class CollectionNodeCreatorComponent {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummariesAsync([newExplorationId])
       .then(
-        responseObject => {
-          let summaries = responseObject.summaries;
+        summaries => {
           let summaryBackendObject: LearnerExplorationSummaryBackendDict | null =
             null;
+
           if (summaries.length !== 0 && summaries[0].id === newExplorationId) {
-            // Convert ExplorationSummaryDict to LearnerExplorationSummaryBackendDict
-            // by adding the missing required properties.
+            const summary = summaries[0];
+
             summaryBackendObject = {
-              ...summaries[0],
-              activity_type: 'exploration',
-              last_updated_msec: Date.now(),
-              ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-              created_on_msec: Date.now(),
+              category: summary.category,
+              community_owned: summary.communityOwned,
+              activity_type: summary.activityType,
+              last_updated_msec: summary.lastUpdatedMsec,
+              ratings: summary.ratings,
+              id: summary.id,
+              created_on_msec: summary.createdOnMsec,
+              human_readable_contributors_summary:
+                summary.humanReadableContributorsSummary,
+              language_code: summary.languageCode,
+              num_views: summary.numViews,
+              objective: summary.objective,
+              status: summary.status,
+              tags: summary.tags,
+              thumbnail_bg_color: summary.thumbnailBgColor,
+              thumbnail_icon_url: summary.thumbnailIconUrl,
+              title: summary.title,
+              visited_checkpoints_count: summary.visitedCheckpointsCount,
+              total_checkpoints_count: summary.totalCheckpointsCount,
             };
           }
 
