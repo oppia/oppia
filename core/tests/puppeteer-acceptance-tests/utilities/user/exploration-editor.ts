@@ -3769,6 +3769,16 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
     await this.waitForPageToFullyLoad();
+    // The form closes before the asynchronous role update finishes.
+    await this.page.waitForFunction(
+      (selector: string, expectedUsername: string) =>
+        Array.from(document.querySelectorAll(selector)).some(
+          element => element.textContent?.trim() === expectedUsername
+        ),
+      {},
+      ownersListSelector,
+      username
+    );
     showMessage(
       `${username} has been added as manager role (after form open).`
     );
