@@ -23,7 +23,6 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import './bar-chart.component.css';
 
 interface DataPoint {
   country: string;
@@ -43,8 +42,8 @@ interface ChartTick {
 })
 export class BarChartComponent implements OnInit, AfterViewInit {
   @Input() chartId!: string;
-  @Input() rawData!: DataPoint[];
-  @Input() ticks!: ChartTick[];
+  @Input() rawData!: readonly DataPoint[];
+  @Input() ticks!: readonly ChartTick[];
   @Input() barsColor!: string;
   @Input() annotationTextColor!: string;
   @Input() labelsColor!: string;
@@ -82,7 +81,7 @@ export class BarChartComponent implements OnInit, AfterViewInit {
       chartBarElements[i].setAttribute('style', `--size: ${size};`);
     }
     const tableElement = this.elementRef.nativeElement.getElementsByClassName(
-      'bar'
+      'oppia-bar-chart-table'
     )[0] as HTMLElement;
     tableElement.setAttribute('style', `--color: ${this.barsColor};`);
   }

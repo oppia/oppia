@@ -17,7 +17,6 @@
  */
 import {Component, Input} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import './classroom-button.component.css';
 @Component({
   selector: 'oppia-classroom-button',
   templateUrl: './classroom-button.component.html',

@@ -73,7 +73,6 @@ export interface CertificateAssessmentOfferingBackendDict {
   topic_data: CertificateAssessmentOfferingTopicData;
   demonstrates: string[];
   total_questions: number;
-  time_limit_in_minutes: number;
   async_status: string;
   version: number;
 }
@@ -82,6 +81,7 @@ export interface AvailableCertificateAssessmentOfferingBackendDict {
   certificate_id: string;
   title: string;
   attempt_status: string;
+  attempt_id: string | null;
   passed_on_date: number | null;
   failed_on_date: number | null;
 }
@@ -107,6 +107,7 @@ export class AvailableCertificateAssessmentOfferingData {
   _certificateId: string;
   _title: string;
   _attemptStatus: string;
+  _attemptId: string | null;
   _passedOnDate: number | null;
   _failedOnDate: number | null;
 
@@ -114,12 +115,14 @@ export class AvailableCertificateAssessmentOfferingData {
     certificateId: string,
     title: string,
     attemptStatus: string,
+    attemptId: string | null = null,
     passedOnDate: number | null = null,
     failedOnDate: number | null = null
   ) {
     this._certificateId = certificateId;
     this._title = title;
     this._attemptStatus = attemptStatus;
+    this._attemptId = attemptId;
     this._passedOnDate = passedOnDate;
     this._failedOnDate = failedOnDate;
   }
@@ -134,6 +137,10 @@ export class AvailableCertificateAssessmentOfferingData {
 
   get attemptStatus(): string {
     return this._attemptStatus;
+  }
+
+  get attemptId(): string | null {
+    return this._attemptId;
   }
 
   get passedOnDate(): number | null {
@@ -151,6 +158,7 @@ export class AvailableCertificateAssessmentOfferingData {
       availableCertificateAssessmentOfferingBackendDict.certificate_id,
       availableCertificateAssessmentOfferingBackendDict.title,
       availableCertificateAssessmentOfferingBackendDict.attempt_status,
+      availableCertificateAssessmentOfferingBackendDict.attempt_id,
       availableCertificateAssessmentOfferingBackendDict.passed_on_date,
       availableCertificateAssessmentOfferingBackendDict.failed_on_date
     );
@@ -164,7 +172,6 @@ export class CertificateAssessmentOfferingData {
   _classroomId: string;
   _topicData: CertificateAssessmentOfferingTopicData;
   _totalQuestions: number;
-  _timeLimitInMinutes: number;
   _demonstrates: string[];
   _asyncStatus: string;
   _version: number;
@@ -176,7 +183,6 @@ export class CertificateAssessmentOfferingData {
     classroomId: string,
     topicData: CertificateAssessmentOfferingTopicData,
     totalQuestions: number,
-    timeLimitInMinutes: number,
     demonstrates: string[],
     asyncStatus: string,
     version: number
@@ -187,7 +193,6 @@ export class CertificateAssessmentOfferingData {
     this._classroomId = classroomId;
     this._topicData = topicData;
     this._totalQuestions = totalQuestions;
-    this._timeLimitInMinutes = timeLimitInMinutes;
     this._demonstrates = demonstrates;
     this._asyncStatus = asyncStatus;
     this._version = version;
@@ -237,14 +242,6 @@ export class CertificateAssessmentOfferingData {
     this._totalQuestions = totalQuestions;
   }
 
-  get timeLimitInMinutes(): number {
-    return this._timeLimitInMinutes;
-  }
-
-  set timeLimitInMinutes(timeLimitInMinutes: number) {
-    this._timeLimitInMinutes = timeLimitInMinutes;
-  }
-
   get demonstrates(): string[] {
     return this._demonstrates;
   }
@@ -269,7 +266,6 @@ export class CertificateAssessmentOfferingData {
       '',
       {},
       0,
-      0,
       [],
       'Not_Ready',
       0
@@ -286,7 +282,6 @@ export class CertificateAssessmentOfferingData {
       certificateAssessmentOfferingBackendDict.classroom_id,
       certificateAssessmentOfferingBackendDict.topic_data,
       certificateAssessmentOfferingBackendDict.total_questions,
-      certificateAssessmentOfferingBackendDict.time_limit_in_minutes,
       certificateAssessmentOfferingBackendDict.demonstrates,
       certificateAssessmentOfferingBackendDict.async_status,
       certificateAssessmentOfferingBackendDict.version

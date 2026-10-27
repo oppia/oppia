@@ -96,6 +96,7 @@ describe('Admin roles tab component ', function () {
     platformParameters: [],
     skillList: [],
     storyList: [],
+    classroomList: [],
   };
 
   beforeEach(() => {

@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import './html-select.component.css';
 
 @Component({
   selector: 'oppia-html-select',

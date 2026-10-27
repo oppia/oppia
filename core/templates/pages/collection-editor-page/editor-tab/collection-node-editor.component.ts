@@ -24,7 +24,6 @@ import {Collection} from 'domain/collection/collection.model';
 import {AlertsService} from 'services/alerts.service';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
-import './collection-node-editor.component.css';
 
 @Component({
   selector: 'oppia-collection-node-editor',

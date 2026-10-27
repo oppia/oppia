@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, ViewEncapsulation} from '@angular/core';
-import './full-expand-accordion.component.css';
 import {AccordionPanelData} from '../data.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 

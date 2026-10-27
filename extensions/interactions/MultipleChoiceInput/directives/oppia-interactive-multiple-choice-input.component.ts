@@ -33,8 +33,6 @@ import {
   ChoiceWithIndex,
 } from './multiple-choice-input-ordered-choices-service';
 
-import '../static/multiple_choice_input.css';
-
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
   templateUrl: './multiple-choice-input-interaction.component.html',
@@ -121,13 +119,14 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     );
   }
 
-  selectAnswer(event: MouseEvent, answer: string | null): void {
+  selectAnswer(event: MouseEvent, answer: number | null): void {
     event.preventDefault();
     if (answer === null) {
       return;
     }
     this.errorMessageI18nKey = '';
-    this.answer = parseInt(answer, 10);
+    // The choice's originalIndex is already a number, so no parsing is needed.
+    this.answer = answer;
     this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 

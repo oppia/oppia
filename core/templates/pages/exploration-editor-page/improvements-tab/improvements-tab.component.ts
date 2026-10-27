@@ -30,7 +30,6 @@ import {
   StateTasks,
 } from 'services/exploration-improvements-task-registry.service';
 import {RouterService} from '../services/router.service';
-import './improvements-tab.component.css';
 
 @Component({
   selector: 'oppia-improvements-tab',

@@ -36,7 +36,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-content/topic-viewer-content.component';
-import './topic-viewer-page.component.css';
 
 @Component({
   selector: 'topic-viewer-page',

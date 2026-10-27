@@ -40,7 +40,6 @@ import {
 } from '@angular/animations';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
-import './progress-nav.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
@@ -146,6 +145,16 @@ export class ProgressNavComponent {
         }
       )
     );
+  }
+
+  getContinueButtonText(): string {
+    if (
+      !this.interactionCustomizationArgs ||
+      !('buttonText' in this.interactionCustomizationArgs)
+    ) {
+      return '';
+    }
+    return this.interactionCustomizationArgs.buttonText.value.unicode;
   }
 
   skipCurrentQuestion(): void {

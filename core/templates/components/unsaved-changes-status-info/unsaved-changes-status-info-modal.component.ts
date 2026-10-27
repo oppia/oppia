@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import './unsaved-changes-status-info-modal.component.css';
 
 @Component({
   selector: 'oppia-unsaved-changes-status-info-modal',

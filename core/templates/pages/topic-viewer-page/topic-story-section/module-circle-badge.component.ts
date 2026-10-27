@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import './module-circle-badge.component.css';
 
 @Component({
   selector: 'topic-module-circle-badge',

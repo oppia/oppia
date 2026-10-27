@@ -6303,8 +6303,6 @@ export default {
 
   "MAX_QUESTIONS_PER_SKILL": 10,
 
-  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
-
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
@@ -6774,24 +6772,6 @@ export default {
         }
       ]
     },
-    "REVIEW_TEST": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/review-test/:story_url_fragment",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
-        }
-      ]
-    },
     "SUBTOPIC_VIEWER": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
@@ -6868,7 +6848,7 @@ export default {
     },
     "COLLECTION_PLAYER": {
       "ROUTE": "collection/:collection_id",
-      "TITLE": "",
+      "TITLE": "I18N_COLLECTION_PLAYER_PAGE_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -7443,24 +7423,6 @@ export default {
         }
       ]
     },
-    "LIBRARY_SEARCH": {
-      "ROUTE": "search/find",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
-        }
-      ]
-    },
     "PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/session",
       "TITLE": "Practice Session Page",
@@ -7624,22 +7586,6 @@ export default {
         }
       ]
     },
-    "FEEDBACK_UPDATES": {
-      "ROUTE": "feedback-updates",
-      "TITLE": "Feedback Updates",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
-        }
-      ]
-    },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
       "TITLE": "I18N_PROFILE_PAGE_TITLE",
@@ -7743,24 +7689,6 @@ export default {
     },
     "BLOG_HOMEPAGE": {
       "ROUTE": "blog",
-      "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Read the latest on what's new and exciting with Oppia."
-        }
-      ]
-    },
-    "BLOG_HOMEPAGE_SEARCH": {
-      "ROUTE": "blog/search/find",
       "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
       "META": [
         {

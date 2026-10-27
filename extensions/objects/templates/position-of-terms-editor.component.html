@@ -1,5 +1,5 @@
 <select class="form-control" (ngModelChange)="onChangePosition($event)" [(ngModel)]="localValue.name">
-  <option *ngFor="let p of positionOfTerms" [value]="p.name" [selected]="p === localValue.name">
+  <option *ngFor="let p of positionOfTerms" [value]="p.name" [selected]="p.name === localValue.name">
     {{ p.humanReadableName }}
   </option>
 </select>

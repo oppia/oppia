@@ -32,14 +32,14 @@ import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import './hint-editor.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface HintFormSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -73,8 +73,8 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     return this.HINT_FORM_SCHEMA;
   }
 
-  updateHintContentHtml(value: string): void {
-    this.hint.hintContent._html = value;
+  updateHintContentHtml(value: SchemaDefaultValue): void {
+    this.hint.hintContent._html = typeof value === 'string' ? value : '';
   }
 
   openHintEditor(): void {

@@ -48,6 +48,7 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 import {VoiceoverBackendApiService} from '../../../../domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
@@ -58,6 +59,7 @@ import {PageContextService} from '../../../../services/page-context.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LoggerService} from '../../../../services/contextual/logger.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -82,6 +84,20 @@ class MockContentTranslationLanguageService {
 class MockI18nLanguageCodeService {
   getCurrentI18nLanguageCode() {
     return 'fr';
+  }
+}
+
+class MockEntityTranslationsService {
+  getEntityTranslationsAsync(languageCode: string) {
+    return Promise.resolve({
+      entityId: 'exp_1',
+      entityType: 'exploration',
+      entityVersion: 1,
+      languageCode: 'fr',
+      translationMapping: {},
+      getWrittenTranslation: () => null,
+      hasWrittenTranslation: () => false,
+    });
   }
 }
 
@@ -110,6 +126,7 @@ describe('Content language selector component', () => {
   let stateEditorService: StateEditorService;
   let loggerService: LoggerService;
   let urlInterpolationService: UrlInterpolationService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -131,6 +148,10 @@ describe('Content language selector component', () => {
         {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
+        },
+        {
+          provide: EntityTranslationsService,
+          useClass: MockEntityTranslationsService,
         },
       ],
     })
@@ -158,6 +179,9 @@ describe('Content language selector component', () => {
     pageContextService = TestBed.inject(PageContextService);
     loggerService = TestBed.inject(LoggerService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService
+    );
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -172,6 +196,34 @@ describe('Content language selector component', () => {
         {value: 'zh', displayed: '中文 (Chinese)'},
         {value: 'en', displayed: 'English'},
       ]);
+    }
+  );
+
+  it('should display translations for the initial content language', () => {
+    const displayTranslationsSpy = spyOn(
+      contentTranslationManagerService,
+      'displayTranslations'
+    );
+
+    component.ngOnInit();
+
+    expect(displayTranslationsSpy).toHaveBeenCalledWith('fr');
+  });
+
+  it(
+    'should not display translations when the initial content language is ' +
+      'not available in the exploration',
+    () => {
+      const displayTranslationsSpy = spyOn(
+        contentTranslationManagerService,
+        'displayTranslations'
+      );
+      windowRef.nativeWindow.location.href =
+        'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=hi';
+
+      component.ngOnInit();
+
+      expect(displayTranslationsSpy).not.toHaveBeenCalled();
     }
   );
 

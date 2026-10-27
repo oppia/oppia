@@ -40,8 +40,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {AppConstants} from 'app.constants';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 
-import './android-page.component.css';
-
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',

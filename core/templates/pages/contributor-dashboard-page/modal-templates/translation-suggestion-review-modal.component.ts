@@ -49,7 +49,6 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './translation-suggestion-review-modal.component.css';
 
 interface HTMLSchema {
   type: 'html';
@@ -97,7 +96,7 @@ export interface ActiveContributionDict {
   suggestion: ActiveSuggestionDict;
 }
 
-interface PendingSuggestionDict {
+export interface PendingSuggestionDict {
   target_id: string;
   suggestion_id: string;
   action_status: string;

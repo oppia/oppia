@@ -1340,13 +1340,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', self.target_id)]
         )[0]
 
-        reindexed_ids = []
-
-        def mock_index_explorations(ids: List[str]) -> None:
-            reindexed_ids.extend(ids)
-
-        index_counter = test_utils.CallCounter(mock_index_explorations)
-
         with (
             self.swap(
                 suggestion_registry.SuggestionTranslateContent,
@@ -1363,11 +1356,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'update_translation_opportunity_with_accepted_suggestion',
                 lambda *args: None,
             ),
-            self.swap(
-                exp_services,
-                'index_explorations_given_ids',
-                index_counter,
-            ),
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id,
@@ -1376,12 +1364,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'review message',
             )
 
-        self.assertEqual(index_counter.times_called, 1)
-        self.assertEqual(reindexed_ids, [self.target_id])
-
-    def test_accept_skill_translation_suggestion_does_not_reindex(self) -> None:
-        """Test that accepting a translation suggestion for a skill does not
-        trigger exploration reindexing.
+    def test_accept_skill_translation_suggestion(self) -> None:
+        """Test that accepting a translation suggestion for a skill
+        succeeds.
         """
         skill_id = skill_services.get_new_skill_id()
         skill_description = 'Skill Description'
@@ -1412,13 +1397,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', skill_id)]
         )[0]
 
-        reindexed_ids = []
-
-        def mock_index_explorations(ids: List[str]) -> None:
-            reindexed_ids.extend(ids)
-
-        index_counter = test_utils.CallCounter(mock_index_explorations)
-
         with (
             self.swap(
                 suggestion_registry.SuggestionTranslateContent,
@@ -1435,11 +1413,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'update_translation_opportunity_with_accepted_suggestion',
                 lambda *args: None,
             ),
-            self.swap(
-                exp_services,
-                'index_explorations_given_ids',
-                index_counter,
-            ),
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id,
@@ -1447,9 +1420,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.COMMIT_MESSAGE,
                 'review message',
             )
-
-        self.assertEqual(index_counter.times_called, 0)
-        self.assertEqual(reindexed_ids, [])
 
     def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
         self,
@@ -2358,8 +2328,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(truncated_updated.endswith('Extra text.'))
 
     def test_update_translation_suggestion_with_long_text(self) -> None:
-        original = f'{"A" * 50}DIFFERENT{"B" * 50}'
-        updated = f'{"A" * 50}CHANGED{"B" * 50}'
+        original = f'{'A' * 50}DIFFERENT{'B' * 50}'
+        updated = f'{'A' * 50}CHANGED{'B' * 50}'
 
         suggestion = self.create_translation_suggestion(original, original)
 
@@ -2494,14 +2464,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         )
         long_original_html = (
-            f'<p>{"a" * 250}</p>'
+            f'<p>{'a' * 250}</p>'
             '<oppia-noninteractive-image '
             'alt-with-value="Original Alt" '
             'caption-with-value="Original Caption" '
             'filepath-with-value="original.svg">'
             '</oppia-noninteractive-image>'
         )
-        long_updated_html = f'<p>{"b" * 250}</p>'
+        long_updated_html = f'<p>{'b' * 250}</p>'
         suggestion = self.create_translation_suggestion(
             long_original_html, long_original_html
         )
@@ -2925,6 +2895,25 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0].author_id, self.author_id_1)
         self.assertEqual(suggestions[0].language_code, 'en')
         self.assertEqual(suggestions[0].target_id, self.target_id_1)
+
+    def test_get_question_suggestions_in_review_count_by_skill_ids(
+        self,
+    ) -> None:
+        counts = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            ['skill_1', 'skill_2']
+        )
+        self.assertEqual(counts, {})
+        self.assertEqual(
+            suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+                []
+            ),
+            {},
+        )
+        self._create_question_suggestion_with_skill_id('skill_1')
+        counts = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            ['skill_1', 'skill_2']
+        )
+        self.assertEqual(counts, {'skill_1': 1})
 
     def test_get_by_target_id(self) -> None:
         queries = [
@@ -9684,7 +9673,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def _calculate_translation_contribution_hours(
         self, numer_of_words: int
-    ) -> str:
+    ) -> float:
         """Provides translatoin contribution hours when number of translated
         words are provided. We calculate the time taken to translate
         a word according to the following document.
@@ -9694,13 +9683,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             numer_of_words: int. The number of translated words.
 
         Returns:
-            str. A string that represent the translatoin contribution hours.
+            float. A float that represent the translatoin contribution hours.
         """
-        return str(round(numer_of_words / 300, 2))
+        return round(numer_of_words / 300, 2)
 
     def _calculate_question_contribution_hours(
         self, images_included: bool
-    ) -> str:
+    ) -> float:
         """Provides question contribution hours when number of questions
         are provided. We calculate the time taken to submit
         a question according to the following document.
@@ -9711,7 +9700,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 contains images.
 
         Returns:
-            str. A string that represent the question contribution hours.
+            float. A float that represent the question contribution hours.
         """
         minutes_contributed = 0
 
@@ -9719,7 +9708,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-        return str(round(minutes_contributed / 60, 2))
+        return round(minutes_contributed / 60, 2)
 
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = '%s%sEnglish' % (

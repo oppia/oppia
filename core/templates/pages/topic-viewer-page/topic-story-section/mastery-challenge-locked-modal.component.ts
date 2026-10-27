@@ -22,8 +22,6 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-import './mastery-challenge-locked-modal.component.css';
-
 @Component({
   selector: 'mastery-challenge-locked-modal',
   templateUrl: './mastery-challenge-locked-modal.component.html',

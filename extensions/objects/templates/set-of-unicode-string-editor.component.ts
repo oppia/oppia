@@ -31,9 +31,9 @@ import {
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface StringValidatorSchema {
-  type: string;
+  type: 'list';
   items: {
-    type: string;
+    type: 'unicode';
   };
   validators: {id: string}[];
 }

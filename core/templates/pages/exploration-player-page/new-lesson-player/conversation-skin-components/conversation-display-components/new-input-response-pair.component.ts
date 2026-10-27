@@ -34,7 +34,6 @@ import {NumberConversionService} from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 
-import './new-input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {animate, style, transition, trigger} from '@angular/animations';
@@ -105,6 +104,23 @@ export class NewInputResponsePairComponent {
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
+  private isLearnerInputWithAnswerDetails(
+    learnerInput: InputResponsePair['learnerInput']
+  ): learnerInput is {answerDetails: string} {
+    return (
+      typeof learnerInput === 'object' &&
+      learnerInput !== null &&
+      'answerDetails' in learnerInput
+    );
+  }
+
+  getLearnerInputAsString(): string {
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      return this.data.learnerInput.answerDetails;
+    }
+    return this.data.learnerInput;
+  }
+
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
       return this.data.oppiaResponse.includes('oppia-noninteractive-video');
@@ -141,7 +157,11 @@ export class NewInputResponsePairComponent {
     );
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+      this.convertAnswerToLocalFormat(
+        this.isLearnerInputWithAnswerDetails(this.data.learnerInput)
+          ? this.data.learnerInput.answerDetails
+          : this.data.learnerInput
+      ),
       interaction.id,
       interaction.customizationArgs
     );
@@ -158,9 +178,8 @@ export class NewInputResponsePairComponent {
     );
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
-    if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
-      shortAnswerHtml = (this.data.learnerInput as {answerDetails: string})
-        .answerDetails;
+    if (this.isLearnerInputWithAnswerDetails(this.data.learnerInput)) {
+      shortAnswerHtml = this.data.learnerInput.answerDetails;
     } else if (
       this.data &&
       interaction.id &&
@@ -169,7 +188,7 @@ export class NewInputResponsePairComponent {
       ].needs_summary
     ) {
       shortAnswerHtml = this.explorationHtmlFormatterService.getShortAnswerHtml(
-        this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+        this.convertAnswerToLocalFormat(this.data.learnerInput),
         interaction.id,
         interaction.customizationArgs
       );
