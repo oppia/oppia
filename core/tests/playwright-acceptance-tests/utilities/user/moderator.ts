@@ -107,7 +107,7 @@ export class Moderator extends BaseUser {
    * @param {number} expectedCount - The expected number of commits.
    */
   async expectNumberOfRecentCommits(expectedCount: number): Promise<void> {
-    const commitRows = await this.page.locator(commitRowSelector);
+    const commitRows = this.page.locator(commitRowSelector);
     await expect(commitRows).toHaveCount(expectedCount);
     showMessage('Recent commits count matches expected count.');
   }
@@ -185,7 +185,7 @@ export class Moderator extends BaseUser {
   async clickOnExplorationLinkInRecentCommitsTable(
     commitIndex: number
   ): Promise<void> {
-    const commitRows = await this.page.locator(commitRowSelector);
+    const commitRows = this.page.locator(commitRowSelector);
     const commitRowsLen = await commitRows.count();
     expect(commitRowsLen).toBeGreaterThan(0);
 
@@ -195,9 +195,9 @@ export class Moderator extends BaseUser {
     }
 
     const row = commitRows.nth(commitIndex);
-    const explorationElement = await row.locator('td:nth-child(2) a');
+    const explorationElement = row.locator('td:nth-child(2) a');
 
-    explorationElement.click();
+    await explorationElement.click();
     await this.page.waitForLoadState('load');
   }
 
@@ -229,7 +229,7 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
     await this.expectElementToBeVisible(selector);
-    const rowElements = await this.page.locator(selector);
+    const rowElements = this.page.locator(selector);
     const rawTimeValue1 = await rowElements.nth(0).evaluate(el => {
       return el.querySelector('td')?.textContent?.trim();
     });
