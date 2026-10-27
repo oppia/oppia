@@ -55,15 +55,15 @@ export class BlogCardPreviewModalComponent
       .replace(/<strong>(.*?)<\/strong>/g, ' ')
       .replace(/<h1>(.*?)<\/h1>/g, ' ');
     this.summaryContent = this.truncatePipe.transform(rawContent, 300);
-    let dateString;
+    let dateString = '';
     if (this.blogPostData.publishedOn) {
       dateString = this.blogPostData.publishedOn;
-    } else {
-      dateString = this.blogPostData.lastUpdated;
-    }
-
-    if (dateString) {
       this.publishedDateString = this.getDateStringInWords(dateString);
+    } else if (this.blogPostData.lastUpdated) {
+      dateString = this.blogPostData.lastUpdated;
+      this.publishedDateString = '';
+    } else {
+      this.publishedDateString = '';
     }
 
     this.blogPostSummary = new BlogPostSummary(
