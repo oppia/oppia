@@ -18,7 +18,7 @@
 
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {NgbCarousel, NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DonatePageComponent} from './donate-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
