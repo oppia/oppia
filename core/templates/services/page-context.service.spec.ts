@@ -615,6 +615,13 @@ describe('PageContext service', () => {
       ecs.removeCustomEntityContext();
       expect(PageContextService.customEntityContext).toBeNull();
     });
+
+    it('should get the custom entity context', () => {
+      expect(ecs.getCustomEntityContext()).toBeNull();
+      ecs.setCustomEntityContext('other', '100');
+      expect(ecs.getCustomEntityContext()?.getId()).toBe('100');
+      expect(ecs.getCustomEntityContext()?.getType()).toBe('other');
+    });
   });
 
   describe('behavior in exploration edge cases', () => {

@@ -29,6 +29,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveSkillreview} from './oppia-noninteractive-skillreview.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {PageContextService} from 'services/page-context.service';
+import {UrlService} from 'services/contextual/url.service';
 import {SimpleChanges} from '@angular/core';
 
 describe('NoninteractiveSkillreview', () => {
@@ -37,6 +38,7 @@ describe('NoninteractiveSkillreview', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let ngbModal: NgbModal;
   let pageContextService: PageContextService;
+  let urlService: UrlService;
 
   class mockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
@@ -65,6 +67,7 @@ describe('NoninteractiveSkillreview', () => {
 
   beforeEach(() => {
     pageContextService = TestBed.inject(PageContextService);
+    urlService = TestBed.inject(UrlService);
     ngbModal = TestBed.inject(NgbModal);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     fixture = TestBed.createComponent(NoninteractiveSkillreview);
@@ -72,6 +75,9 @@ describe('NoninteractiveSkillreview', () => {
 
     component.skillIdWithValue = 'skillId';
     component.textWithValue = 'concept card';
+    // The custom entity context is static, so it is cleared here to stop
+    // values set in other tests from leaking into this one.
+    pageContextService.removeCustomEntityContext();
   });
 
   it(
@@ -103,8 +109,8 @@ describe('NoninteractiveSkillreview', () => {
     expect(component.linkText).toBeUndefined();
   });
 
-  it('should open concept card when user clicks the link', () => {
-    spyOn(pageContextService, 'removeCustomEntityContext');
+  it('should open concept card when user clicks the link', fakeAsync(() => {
+    pageContextService.setCustomEntityContext('exploration', 'expId');
     let e = {
       currentTarget: {
         offsetParent: {
@@ -124,55 +130,79 @@ describe('NoninteractiveSkillreview', () => {
     });
 
     component.openConceptCard(e);
-
-    expect(modalSpy).toHaveBeenCalled();
-    expect(pageContextService.removeCustomEntityContext).not.toHaveBeenCalled();
-  });
-
-  it('should close concept card when user clicks the link', fakeAsync(() => {
-    spyOn(pageContextService, 'setCustomEntityContext');
-    spyOn(pageContextService, 'getEntityId').and.callFake(function () {
-      return 'InitialEntityId';
-    });
-    spyOn(pageContextService, 'getEntityType').and.callFake(function () {
-      return 'InitialEntityType';
-    });
-    spyOn(pageContextService, 'removeCustomEntityContext');
-    let e = {
-      currentTarget: {
-        offsetParent: {
-          dataset: {
-            ckeWidgetId: false,
-          },
-        },
-      },
-    } as unknown as MouseEvent;
-
-    ckEditorCopyContentService.copyModeActive = false;
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject('cancel'),
-      } as NgbModalRef;
-    });
-
-    component.openConceptCard(e);
     tick();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
-    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'InitialEntityType',
-      'InitialEntityId'
-    );
+    expect(pageContextService.getEntityType()).toBe('exploration');
+    expect(pageContextService.getEntityId()).toBe('expId');
   }));
 
+  it(
+    'should use the entity from the URL after closing the concept card if' +
+      ' there was no custom entity context before opening it',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/skillId');
+      const getHashSpy = spyOn(urlService, 'getHash').and.returnValue(
+        '#/questions#questionA'
+      );
+      let e = {
+        currentTarget: {
+          offsetParent: {
+            dataset: {
+              ckeWidgetId: false,
+            },
+          },
+        },
+      } as unknown as MouseEvent;
+
+      ckEditorCopyContentService.copyModeActive = false;
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject('cancel'),
+        } as NgbModalRef;
+      });
+
+      component.openConceptCard(e);
+      tick();
+      getHashSpy.and.returnValue('#/questions#questionB');
+
+      expect(pageContextService.getEntityId()).toBe('questionB');
+    })
+  );
+
+  it(
+    'should restore the previous custom entity context after closing the' +
+      ' concept card',
+    fakeAsync(() => {
+      pageContextService.setCustomEntityContext('exploration', 'expId');
+      let e = {
+        currentTarget: {
+          offsetParent: {
+            dataset: {
+              ckeWidgetId: false,
+            },
+          },
+        },
+      } as unknown as MouseEvent;
+
+      ckEditorCopyContentService.copyModeActive = false;
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject('cancel'),
+        } as NgbModalRef;
+      });
+
+      component.openConceptCard(e);
+      tick();
+
+      expect(pageContextService.getEntityType()).toBe('exploration');
+      expect(pageContextService.getEntityId()).toBe('expId');
+    })
+  );
+
   it('should not throw error when modal is dismissed with numeric value 0', fakeAsync(() => {
-    spyOn(pageContextService, 'setCustomEntityContext');
-    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
-    spyOn(pageContextService, 'getEntityType').and.returnValue(
-      'InitialEntityType'
-    );
     spyOn(pageContextService, 'removeCustomEntityContext');
 
     let e = {
@@ -199,18 +229,9 @@ describe('NoninteractiveSkillreview', () => {
     }).not.toThrowError();
 
     expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
-    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'InitialEntityType',
-      'InitialEntityId'
-    );
   }));
 
   it('should not throw error when modal is dismissed with numeric value 1', fakeAsync(() => {
-    spyOn(pageContextService, 'setCustomEntityContext');
-    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
-    spyOn(pageContextService, 'getEntityType').and.returnValue(
-      'InitialEntityType'
-    );
     spyOn(pageContextService, 'removeCustomEntityContext');
 
     let e = {
@@ -237,18 +258,9 @@ describe('NoninteractiveSkillreview', () => {
     }).not.toThrowError();
 
     expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
-    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'InitialEntityType',
-      'InitialEntityId'
-    );
   }));
 
   it('should not throw error when modal is dismissed with undefined', fakeAsync(() => {
-    spyOn(pageContextService, 'setCustomEntityContext');
-    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
-    spyOn(pageContextService, 'getEntityType').and.returnValue(
-      'InitialEntityType'
-    );
     spyOn(pageContextService, 'removeCustomEntityContext');
 
     let e = {
@@ -275,10 +287,6 @@ describe('NoninteractiveSkillreview', () => {
     }).not.toThrowError();
 
     expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
-    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'InitialEntityType',
-      'InitialEntityId'
-    );
   }));
 
   it(
