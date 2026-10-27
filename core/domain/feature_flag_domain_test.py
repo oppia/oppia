@@ -23,6 +23,8 @@ from core.constants import constants
 from core.domain import feature_flag_domain
 from core.tests import test_utils
 
+from typing import List, Optional
+
 
 class FeatureFlagSpecTests(test_utils.GenericTestBase):
     """Tests for FeatureFlagSpec."""
@@ -330,3 +332,138 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             '0 and 100 inclusive.',
         ):
             feature_flag.validate()
+
+
+class FeatureFlagIsEnabledTests(test_utils.GenericTestBase):
+    """Tests for FeatureFlag.is_enabled."""
+
+    def _create_feature_flag(
+        self,
+        feature_stage: feature_flag_domain.ServerMode,
+        force_enable_for_all_users: bool = False,
+        rollout_percentage: int = 0,
+        user_group_ids: Optional[List[str]] = None,
+        name: str = 'feature_a',
+    ) -> feature_flag_domain.FeatureFlag:
+        """Returns a FeatureFlag with the given stage and config."""
+        return feature_flag_domain.FeatureFlag(
+            name,
+            feature_flag_domain.FeatureFlagSpec('for test', feature_stage),
+            feature_flag_domain.FeatureFlagConfig(
+                force_enable_for_all_users,
+                rollout_percentage,
+                user_group_ids or [],
+                None,
+            ),
+        )
+
+    def test_dev_feature_is_disabled_on_test_server(self) -> None:
+        feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV, force_enable_for_all_users=True
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                self.assertFalse(feature_flag.is_enabled('user_id', set()))
+
+    def test_dev_and_test_features_are_disabled_on_prod_server(self) -> None:
+        dev_feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV, force_enable_for_all_users=True
+        )
+        test_feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.TEST, force_enable_for_all_users=True
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertFalse(dev_feature_flag.is_enabled('user_id', set()))
+                self.assertFalse(test_feature_flag.is_enabled('user_id', set()))
+
+    def test_prod_feature_is_enabled_on_prod_server_when_forced(self) -> None:
+        feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.PROD, force_enable_for_all_users=True
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertTrue(feature_flag.is_enabled('user_id', set()))
+
+    def test_force_enabled_feature_is_enabled_for_logged_out_user(
+        self,
+    ) -> None:
+        feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV, force_enable_for_all_users=True
+        )
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertTrue(feature_flag.is_enabled(None, set()))
+
+    def test_feature_is_disabled_for_logged_out_user_if_not_forced(
+        self,
+    ) -> None:
+        feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV,
+            rollout_percentage=100,
+            user_group_ids=['group_1'],
+        )
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertFalse(feature_flag.is_enabled(None, {'group_1'}))
+
+    def test_feature_is_enabled_only_for_users_in_its_user_groups(
+        self,
+    ) -> None:
+        feature_flag = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV,
+            user_group_ids=['group_1', 'group_2'],
+        )
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertTrue(
+                feature_flag.is_enabled('user_id', {'group_2', 'group_3'})
+            )
+            self.assertFalse(feature_flag.is_enabled('user_id', {'group_3'}))
+            self.assertFalse(feature_flag.is_enabled('user_id', set()))
+
+    def test_rollout_percentage_of_0_and_100(self) -> None:
+        feature_flag_at_0 = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV, rollout_percentage=0
+        )
+        feature_flag_at_100 = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV, rollout_percentage=100
+        )
+        with self.swap(constants, 'DEV_MODE', True):
+            for user_id in ['user_1', 'user_2', 'user_3']:
+                self.assertFalse(feature_flag_at_0.is_enabled(user_id, set()))
+                self.assertTrue(feature_flag_at_100.is_enabled(user_id, set()))
+
+    def test_rollout_result_is_stable_and_depends_on_feature_name(
+        self,
+    ) -> None:
+        user_ids = ['user_%s' % i for i in range(200)]
+        feature_flag_a = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV,
+            rollout_percentage=50,
+            name='feature_a',
+        )
+        feature_flag_b = self._create_feature_flag(
+            feature_flag_domain.ServerMode.DEV,
+            rollout_percentage=50,
+            name='feature_b',
+        )
+        with self.swap(constants, 'DEV_MODE', True):
+            results_a = [
+                feature_flag_a.is_enabled(user_id, set())
+                for user_id in user_ids
+            ]
+            results_b = [
+                feature_flag_b.is_enabled(user_id, set())
+                for user_id in user_ids
+            ]
+            self.assertEqual(
+                results_a,
+                [
+                    feature_flag_a.is_enabled(user_id, set())
+                    for user_id in user_ids
+                ],
+            )
+        # With a 50% rollout, some users are in the rollout and some are
+        # not, and the set of users differs between the two feature flags
+        # because the feature flag name is used as the salt.
+        self.assertIn(True, results_a)
+        self.assertIn(False, results_a)
+        self.assertNotEqual(results_a, results_b)
