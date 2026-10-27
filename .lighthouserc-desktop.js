@@ -914,11 +914,11 @@ module.exports = {
           // compression, which matches the production Google Front End, and
           // keep a wide margin over the measured desktop values.
           pagePerfThresholds: {
-            fcp: 9000,
-            speedIndex: 9000,
-            lcp: 18000,
-            tbt: 800,
-            cls: 1.5,
+            fcp: 4500,
+            speedIndex: 5000,
+            lcp: 7000,
+            tbt: 400,
+            cls: 0.15,
           },
           accessibilityMinScore: 0.9,
         },
