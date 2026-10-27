@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the user journey of adding a concept card
- * with workedexample to an exploration.
+ * @fileoverview Acceptance Test for the user journey of adding a concept card with workedexample to an exploration.
  */
 
 import {test} from '@playwright/test';

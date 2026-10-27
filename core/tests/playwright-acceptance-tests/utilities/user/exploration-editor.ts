@@ -155,6 +155,7 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
 
 const skillReviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewConceptCardLink = `${skillReviewComponent} .e2e-test-concept-card-link`;
 const skillReviewComponentModal =
   'oppia-noninteractive-skillreview-concept-card-modal';
 
@@ -1172,9 +1173,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to open the skill review component.
    */
   async clickOnSkillReviewComponent(): Promise<void> {
-    await this.clickOnElementWithSelector(
-      `${skillReviewComponent} .e2e-test-concept-card-link`
-    );
+    await this.clickOnElementWithSelector(skillReviewConceptCardLink);
     await this.expectElementToBeVisible(skillReviewComponentModal);
   }
 
