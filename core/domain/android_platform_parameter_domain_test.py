@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import re
+
 from core import feconf, utils
 from core.domain import android_platform_parameter_domain
 from core.tests import test_utils
@@ -177,6 +179,21 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
 
         filter_domain.validate()
 
+    def test_evaluate_raises_value_error_for_unsupported_flavour_operator(
+        self,
+    ) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_version_flavour', [['!=', 'beta']]
+        )
+        context = parameter_domain.AndroidEvaluationContext('12.5', 'beta')
+        expected_error = (
+            'Unsupported comparison operator \'!=\' for app_version_flavour '
+            'filter, expected one of [\'=\', \'<\', \'<=\', \'>\', \'>=\'].'
+        )
+
+        with self.assertRaisesRegex(ValueError, re.escape(expected_error)):
+            filter_domain.evaluate(context)
+
     def test_evaluate_flavour_comparison_operators(self) -> None:
         context = self._create_context(app_version_flavour='beta')
         cases = [
@@ -241,6 +258,27 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
         self.assertFalse(
             filter_domain.evaluate(
                 self._create_context('12.6-5f58b8fbeb-dev', 'dev')
+            )
+        )
+
+    def test_reject_wrong_format_app_max_version(self) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_max_version', [['=', '13']]
+        )
+
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.5-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertTrue(
+            filter_domain.evaluate(
+                self._create_context('12.4-5f58b8fbeb-dev', 'dev')
+            )
+        )
+        self.assertFalse(
+            filter_domain.evaluate(
+                self._create_context('13.6-5f58b8fbeb-dev', 'dev')
             )
         )
 
