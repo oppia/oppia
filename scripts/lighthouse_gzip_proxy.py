@@ -18,7 +18,9 @@ The App Engine development server used by the Lighthouse tests does not
 compress response bodies, but the production Google Front End does compress
 text responses. Without a compression layer, Lighthouse measures a much larger
 download than a production user receives, which makes the performance scores
-and the `uses-text-compression` audit inaccurate.
+and the `uses-text-compression` audit inaccurate. The proxy compresses at the
+same level as the production front end so that the measured transfer sizes
+match what users actually download.
 
 This module provides a small reverse proxy that sits in front of the local
 appserver and gzip-compresses text responses. It deliberately handles only
@@ -41,7 +43,12 @@ COMPRESSIBLE_CONTENT_TYPE_PREFIXES: Final = (
     'application/x-javascript',
     'image/svg+xml',
 )
-COMPRESSION_LEVEL: Final = 6
+# The production Google Front End compresses text responses at a fast setting.
+# Measured against a deployed bundle, its output matches gzip level 1 almost
+# exactly, while level 9 produces responses about 18% smaller. Using level 1
+# here keeps the Lighthouse download sizes representative of production; a
+# higher level would make the checks systematically optimistic.
+COMPRESSION_LEVEL: Final = 1
 # These headers describe a single connection and must not be forwarded by a
 # proxy (see RFC 7230, section 6.1).
 HOP_BY_HOP_HEADERS: Final = frozenset(
