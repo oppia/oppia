@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
-from typing import List, cast
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import collection_domain, collection_services
 from core.tests import test_utils
+
+from typing import List, cast
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -87,6 +87,7 @@ class CollectionProgressTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegex(
                     utils.ValidationError, 'Invalid user ID'
                 ):
+                    # Here we use cast because this test passes invalid ID types.
                     collection_domain.CollectionProgress(
                         cast(str, user_id), 'C1', []
                     ).validate()
@@ -97,6 +98,7 @@ class CollectionProgressTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegex(
                     utils.ValidationError, 'Invalid collection ID'
                 ):
+                    # Here we use cast because this test passes invalid ID types.
                     collection_domain.CollectionProgress(
                         self.USER_ID, cast(str, collection_id), []
                     ).validate()
@@ -106,6 +108,7 @@ class CollectionProgressTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected completed explorations to be a list',
         ):
+            # Here we use cast because this test passes a string instead of a list.
             collection_domain.CollectionProgress(
                 self.USER_ID, 'C1', cast(List[str], 'Exp1')
             ).validate()
@@ -116,6 +119,7 @@ class CollectionProgressTests(test_utils.GenericTestBase):
                     utils.ValidationError,
                     'Completed explorations must contain valid exploration IDs',
                 ):
+                    # Here we use cast because this test passes invalid ID types.
                     collection_domain.CollectionProgress(
                         self.USER_ID, 'C1', [cast(str, exploration_id)]
                     ).validate()

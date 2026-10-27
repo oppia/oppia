@@ -640,7 +640,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
 
     def test_save_collection_progress_rejects_invalid_ids(self) -> None:
         progress = collection_domain.CollectionProgress(
-            self.owner_id, 'invalid_id', []
+            self.owner_id, 'invalid-id', []
         )
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid collection ID'
