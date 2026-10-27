@@ -27,7 +27,7 @@ from core.platform import models
 from core.storage.config import gae_models as config_models
 
 import apache_beam as beam
-from typing import Iterable, List
+from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -44,9 +44,10 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
     def _migrate_legacy_model(
         self,
         legacy_model: config_models.FeatureFlagConfigModel,
-    ) -> Iterable[config_models.WebFeatureFlagConfigModel]:
-        """Yields a model only if it has not already been dual-written."""
+    ) -> List[config_models.WebFeatureFlagConfigModel]:
+        """Returns a list with the new model, or empty list if already migrated."""
         model_id = legacy_model.key.id()
+        migrated_models: List[config_models.WebFeatureFlagConfigModel] = []
         with datastore_services.get_ndb_context():
             existing_model = config_models.WebFeatureFlagConfigModel.get_by_id(
                 model_id, use_cache=False
@@ -57,7 +58,6 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                     'WebFeatureFlagConfigModel already exists.',
                     model_id,
                 )
-                yield from ()
             else:
                 migrated_config = config_models.WebFeatureFlagConfigModel(
                     id=model_id,
@@ -71,7 +71,8 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                 migrated_config.update_timestamps(
                     update_last_updated_time=False
                 )
-                yield migrated_config
+                migrated_models.append(migrated_config)
+        return migrated_models
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the migration from old to new feature flag config models."""
