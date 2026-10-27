@@ -170,8 +170,6 @@ describe('RTE display component', () => {
       '<div class="oppia-custom-div">' +
       '<p>Paragraph inside div</p>' +
       '</div>';
-    let rteComponentDe: DebugElement = fixture.debugElement;
-
     fixture.detectChanges();
     let changes: SimpleChanges = {
       rteString: {
@@ -188,12 +186,13 @@ describe('RTE display component', () => {
     flush();
     discardPeriodicTasks();
 
-    const divElement = rteComponentDe.query(By.css('div')).nativeElement;
-    expect(divElement).toBeDefined();
-    expect(divElement.classList.contains('oppia-custom-div')).toBeTrue();
-    const pElement = rteComponentDe.query(By.css('p')).nativeElement;
-    expect(pElement).toBeDefined();
-    expect(pElement.textContent).toBe('Paragraph inside div');
+    const divElement = fixture.debugElement.query(
+      By.css('div.oppia-custom-div')
+    );
+    expect(divElement).toBeTruthy();
+    const pElement = divElement.query(By.css('p'));
+    expect(pElement).toBeTruthy();
+    expect(pElement.nativeElement.textContent).toBe('Paragraph inside div');
   }));
 
   it('should report errors when parsing', fakeAsync(() => {
