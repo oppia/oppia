@@ -17,7 +17,7 @@
  *
  * This service identifies the context in which an exploration or question is being played.
  * It differentiates between various modes such as exploration, editor preview, question player,
- * pretest, diagnostic test, and story chapter modes.
+ * diagnostic test, and story chapter modes.
  */
 
 import {Injectable} from '@angular/core';
@@ -29,8 +29,6 @@ export enum EXPLORATION_MODE {
   DIAGNOSTIC_TEST_PLAYER = 'diagnostic_test_player',
   EXPLORATION = 'exploration',
   EDITOR_PREVIEW = 'editor_preview',
-  LESSON_PLAYER = 'lesson_player',
-  PRETEST = 'pretest',
   QUESTION_PLAYER = 'question_player',
   STORY_CHAPTER = 'story_chapter',
 }
@@ -75,18 +73,9 @@ export class ExplorationModeService {
     }
   }
 
-  getCurrentMode(): EXPLORATION_MODE {
-    return this.currentMode;
-  }
-
   setExplorationMode(): void {
     this.currentMode = EXPLORATION_MODE.EXPLORATION;
     this.currentEngineService.setExplorationEngineService();
-  }
-
-  setPretestMode(): void {
-    this.currentMode = EXPLORATION_MODE.PRETEST;
-    this.currentEngineService.setQuestionPlayerEngineService();
   }
 
   setQuestionPlayerMode(): void {
@@ -116,10 +105,7 @@ export class ExplorationModeService {
   }
 
   isInQuestionMode(): boolean {
-    return (
-      this.currentMode === EXPLORATION_MODE.PRETEST ||
-      this.currentMode === EXPLORATION_MODE.QUESTION_PLAYER
-    );
+    return this.currentMode === EXPLORATION_MODE.QUESTION_PLAYER;
   }
 
   isInQuestionPlayerMode(): boolean {
@@ -129,14 +115,13 @@ export class ExplorationModeService {
   isPresentingIsolatedQuestions(): boolean {
     // The method returns a boolean value by checking whether the current mode
     // is only presenting the questions or not.
-    // The diagnostic player mode, question player mode, and pretest mode are
-    // the ones in which only questions are presented to the learner, while in
-    // the exploration mode and story chapter mode the learning contents along
+    // The diagnostic player mode and question player mode are the ones in
+    // which only questions are presented to the learner, while in the
+    // exploration mode and story chapter mode the learning contents along
     // with questions are presented.
     if (
       this.currentMode === EXPLORATION_MODE.QUESTION_PLAYER ||
-      this.currentMode === EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER ||
-      this.currentMode === EXPLORATION_MODE.PRETEST
+      this.currentMode === EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER
     ) {
       return true;
     } else if (
