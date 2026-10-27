@@ -256,3 +256,36 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             ),
         ):
             parameter_services.get_web_platform_parameter_schema(parameter.name)
+
+    def test_create_client_context_returns_evaluation_context(self) -> None:
+        context = parameter_services.create_web_platform_parameter_evaluation_context_for_client(
+            {'platform_type': 'Web', 'app_version': '1.0.0'}
+        )
+        self.assertEqual(context.platform_type, 'Web')
+
+    def test_server_context_uses_release_branch_version(self) -> None:
+        with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            context = (
+                parameter_services._create_web_platform_parameter_evaluation_context_for_server()
+            )
+        self.assertEqual(context.app_version, '3.3.1')
+
+    def test_server_context_uses_hotfix_branch_version(self) -> None:
+        with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
+            context = (
+                parameter_services._create_web_platform_parameter_evaluation_context_for_server()
+            )
+        self.assertEqual(context.app_version, '3.3.1-hotfix-5')
+
+    def test_get_value_of_unknown_parameter_raises(self) -> None:
+        with self.assertRaisesRegex(
+            parameter_services.WebPlatformParameterNotFoundException,
+            'Unknown platform parameter: nonexistent.',
+        ):
+            parameter_services.get_web_platform_parameter_value('nonexistent')
+
+    def test_get_schema_with_unsupported_data_type_raises(self) -> None:
+        param_name = web_platform_parameter_list.ParamName.DUMMY_PARAMETER.value
+        with self.swap(parameter_services, 'DATA_TYPE_TO_SCHEMA_TYPE', {}):
+            with self.assertRaisesRegex(Exception, 'which is not valid'):
+                parameter_services.get_web_platform_parameter_schema(param_name)

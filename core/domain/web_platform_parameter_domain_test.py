@@ -272,6 +272,12 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         ):
             context.validate()
 
+    def test_validate_context_with_no_app_version_passes(self) -> None:
+        context = parameter_domain.EvaluationContext(
+            'Web', None, parameter_domain.ServerMode.DEV
+        )
+        context.validate()
+
 
 class PlatformParameterFilterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
@@ -1436,6 +1442,48 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid app version flavor \'invalid\''
         ):
             filter_domain.validate()
+
+    def test_version_filter_with_equal_versions(self) -> None:
+        context = parameter_domain.EvaluationContext(
+            'Android', '1.0.0', parameter_domain.ServerMode.DEV
+        )
+        lt_filter = parameter_domain.PlatformParameterFilter(
+            'app_version', [['<', '1.0.0']]
+        )
+        gt_filter = parameter_domain.PlatformParameterFilter(
+            'app_version', [['>', '1.0.0']]
+        )
+        self.assertFalse(lt_filter.evaluate(context))
+        self.assertFalse(gt_filter.evaluate(context))
+
+    def test_validate_filter_success_paths(self) -> None:
+        parameter_domain.PlatformParameterFilter(
+            'platform_type', [['=', 'Web']]
+        ).validate()
+        parameter_domain.PlatformParameterFilter(
+            'app_version_flavor', [['=', 'beta'], ['<', 'release']]
+        ).validate()
+        parameter_domain.PlatformParameterFilter(
+            'app_version', [['>=', '1.2.3']]
+        ).validate()
+
+    def test_validate_filter_with_empty_conditions(self) -> None:
+        for filter_type in (
+            'platform_type',
+            'app_version_flavor',
+            'app_version',
+            'server_mode',
+        ):
+            parameter_domain.PlatformParameterFilter(filter_type, []).validate()
+
+    def test_evaluate_filter_with_unhandled_type_returns_false(self) -> None:
+        context = parameter_domain.EvaluationContext(
+            'Web', None, parameter_domain.ServerMode.DEV
+        )
+        server_mode_filter = parameter_domain.PlatformParameterFilter(
+            'server_mode', [['=', 'dev']]
+        )
+        self.assertFalse(server_mode_filter.evaluate(context))
 
 
 class PlatformParameterRuleTests(test_utils.GenericTestBase):

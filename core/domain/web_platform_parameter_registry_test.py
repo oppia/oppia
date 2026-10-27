@@ -21,7 +21,7 @@ from __future__ import annotations
 import enum
 
 from core import feconf, utils
-from core.domain import caching_services
+from core.domain import caching_services, web_platform_parameter_list
 from core.domain import web_platform_parameter_domain as parameter_domain
 from core.domain import web_platform_parameter_registry as registry
 from core.storage.config import gae_models as config_models
@@ -488,3 +488,79 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'parameter_b': False,
             },
         )
+
+    def test_to_web_model_copies_metadata_from_legacy_model(self) -> None:
+        param = registry.Registry.get_web_platform_parameter(
+            web_platform_parameter_list.ParamName.DUMMY_PARAMETER.value
+        )
+        legacy_model = config_models.PlatformParameterModel.create(
+            param.name,
+            [],
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+            param.default_value,
+        )
+        legacy_model.update_timestamps()
+        config_models.PlatformParameterModel.put_multi([legacy_model])
+
+        web_model = registry.Registry._to_web_platform_parameter_config_model(
+            param
+        )
+
+        self.assertEqual(web_model.version, legacy_model.version)
+        self.assertEqual(web_model.created_on, legacy_model.created_on)
+
+    def test_to_legacy_model_copies_metadata_from_web_model(self) -> None:
+        param = registry.Registry.get_web_platform_parameter(
+            web_platform_parameter_list.ParamName.DUMMY_PARAMETER.value
+        )
+        web_model = config_models.WebPlatformParameterConfigModel.create(
+            param.name,
+            [],
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+            default_value=param.default_value,
+        )
+        web_model.update_timestamps()
+        config_models.WebPlatformParameterConfigModel.put_multi([web_model])
+
+        legacy_model = registry.Registry._to_legacy_platform_parameter_model(
+            param
+        )
+
+        self.assertEqual(legacy_model.version, web_model.version)
+        self.assertEqual(legacy_model.created_on, web_model.created_on)
+
+    def test_to_web_model_returns_existing_model(self) -> None:
+        param = registry.Registry.get_web_platform_parameter(
+            web_platform_parameter_list.ParamName.DUMMY_PARAMETER.value
+        )
+        web_model = config_models.WebPlatformParameterConfigModel.create(
+            param.name,
+            [],
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+            default_value=param.default_value,
+        )
+        web_model.update_timestamps()
+        config_models.WebPlatformParameterConfigModel.put_multi([web_model])
+
+        result = registry.Registry._to_web_platform_parameter_config_model(
+            param
+        )
+
+        self.assertEqual(result.id, param.name)
+
+    def test_to_legacy_model_returns_existing_model(self) -> None:
+        param = registry.Registry.get_web_platform_parameter(
+            web_platform_parameter_list.ParamName.DUMMY_PARAMETER.value
+        )
+        legacy_model = config_models.PlatformParameterModel.create(
+            param.name,
+            [],
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+            param.default_value,
+        )
+        legacy_model.update_timestamps()
+        config_models.PlatformParameterModel.put_multi([legacy_model])
+
+        result = registry.Registry._to_legacy_platform_parameter_model(param)
+
+        self.assertEqual(result.id, param.name)
