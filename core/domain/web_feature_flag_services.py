@@ -26,7 +26,7 @@ from core.domain import web_feature_flag_domain
 from core.domain import web_feature_flag_registry as registry
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Set
+from typing import Dict, List, Mapping, Optional, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

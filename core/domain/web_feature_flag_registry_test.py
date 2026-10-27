@@ -23,8 +23,8 @@ import enum
 from core import feconf, utils
 from core.constants import constants
 from core.domain import web_feature_flag_domain
-from core.platform import models
 from core.domain import web_feature_flag_registry as registry
+from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
@@ -174,18 +174,31 @@ class WebFeatureFlagRegistryTests(test_utils.GenericTestBase):
                 ['user_group_1', 'user_group_2', 'user_group_3'],
             )
 
-            for model_class in (
-                config_models.FeatureFlagConfigModel,
-                config_models.WebFeatureFlagConfigModel,
-            ):
-                stored_model = model_class.get(WebFeatureNames.FEATURE_A.value)
-                assert stored_model is not None
-                self.assertTrue(stored_model.force_enable_for_all_users)
-                self.assertEqual(stored_model.rollout_percentage, 100)
-                self.assertEqual(
-                    stored_model.user_group_ids,
-                    ['user_group_1', 'user_group_2', 'user_group_3'],
-                )
+            legacy_model = config_models.FeatureFlagConfigModel.get(
+                WebFeatureNames.FEATURE_A.value
+            )
+            assert isinstance(
+                legacy_model, config_models.FeatureFlagConfigModel
+            )
+            self.assertTrue(legacy_model.force_enable_for_all_users)
+            self.assertEqual(legacy_model.rollout_percentage, 100)
+            self.assertEqual(
+                legacy_model.user_group_ids,
+                ['user_group_1', 'user_group_2', 'user_group_3'],
+            )
+
+            web_model = config_models.WebFeatureFlagConfigModel.get(
+                WebFeatureNames.FEATURE_A.value
+            )
+            assert isinstance(
+                web_model, config_models.WebFeatureFlagConfigModel
+            )
+            self.assertTrue(web_model.force_enable_for_all_users)
+            self.assertEqual(web_model.rollout_percentage, 100)
+            self.assertEqual(
+                web_model.user_group_ids,
+                ['user_group_1', 'user_group_2', 'user_group_3'],
+            )
 
     def test_update_web_feature_flag(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:

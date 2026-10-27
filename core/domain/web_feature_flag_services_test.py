@@ -34,8 +34,7 @@ from typing import Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
-    from mypy_imports import config_models
+    from mypy_imports import config_models, user_models
 
 (user_models, config_models) = models.Registry.import_models(
     [models.Names.USER, models.Names.CONFIG]

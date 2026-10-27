@@ -57,6 +57,7 @@ class MigrateFeatureFlagConfigModelsJob(base_jobs.JobBase):
                     'WebFeatureFlagConfigModel already exists.',
                     model_id,
                 )
+                yield from ()
             else:
                 migrated_config = config_models.WebFeatureFlagConfigModel(
                     id=model_id,
