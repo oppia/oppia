@@ -62,15 +62,20 @@ with the same id on the page. -->
                   ⚠
                 </text>
               </g>
-              <g *ngIf="isEditable && node.canDelete" class="e2e-test-delete-node">
+              <g *ngIf="isEditable && node.canDelete"
+                 class="e2e-test-delete-node"
+                 role="button"
+                 tabindex="0"
+                 [attr.aria-label]="'Delete ' + getNodeTitle(node) + ' card'"
+                 (keydown.enter)="onNodeDeletionClick(node.id)"
+                 (keydown.space)="$event.preventDefault(); onNodeDeletionClick(node.id)"
+                 (click)="onNodeDeletionClick(node.id)">
                 <rect height="15" width="15" opacity="0" stroke-width="0"
                       [attr.x]="node.x0 + node.width" [attr.y]="node.y0"
                       transform="translate(0, -15)"
-                      class="clickable oppia-node-delete"
-                      (click)="onNodeDeletionClick(node.id)">
+                      class="clickable oppia-node-delete">
                 </rect>
-                <text [attr.aria-label]="'Delete ' + getNodeTitle(node) + ' card'" (keydown.enter)="onNodeDeletionClick(node.id)"
-                      tabindex="0" [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
+                <text [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
                   x
                 </text>
               </g>

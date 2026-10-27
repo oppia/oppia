@@ -333,6 +333,35 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
+  it('should allow deleting a card with Enter and Space', () => {
+    component.isEditable = true;
+    fixture.detectChanges();
+
+    const deleteButton = fixture.nativeElement.querySelector(
+      '.e2e-test-delete-node'
+    );
+    const deleteStateSpy = spyOn(component.onDeleteFunction, 'emit');
+
+    expect(deleteButton.getAttribute('role')).toBe('button');
+    expect(deleteButton.getAttribute('aria-label')).toContain('Delete');
+
+    deleteButton.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Enter', bubbles: true})
+    );
+    expect(deleteStateSpy).toHaveBeenCalled();
+
+    deleteStateSpy.calls.reset();
+    const spaceEvent = new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      cancelable: true,
+    });
+    deleteButton.dispatchEvent(spaceEvent);
+
+    expect(deleteStateSpy).toHaveBeenCalled();
+    expect(spaceEvent.defaultPrevented).toBe(true);
+  });
+
   it(
     'should check if can navigate to node whenever node id is equal to' +
       ' current state id',
