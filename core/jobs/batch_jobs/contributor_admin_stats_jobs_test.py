@@ -104,7 +104,9 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
     # Language code that would normally be derived from the question_dict in
     # the change_cmd.
     question_language_code = 'en'
-    mocked_current_time = datetime.datetime(2020, 6, 15, 5)
+    mocked_current_time = datetime.datetime(
+        2020, 6, 15, 5, tzinfo=datetime.timezone.utc
+    )
 
     def setUp(self) -> None:
         super().setUp()

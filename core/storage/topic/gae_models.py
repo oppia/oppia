@@ -370,13 +370,13 @@ class TopicSummaryModel(base_models.BaseModel):
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
     # topic *summary* model was last updated).
-    topic_model_last_updated = datastore_services.DateTimeProperty(
+    topic_model_last_updated = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # Time when the topic model was created (not to be confused
     # with created_on, which is the time when the topic *summary*
     # model was created).
-    topic_model_created_on = datastore_services.DateTimeProperty(
+    topic_model_created_on = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # The number of canonical stories that are part of this topic.

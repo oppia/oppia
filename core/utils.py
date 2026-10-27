@@ -651,7 +651,7 @@ def convert_string_to_naive_datetime_object(
 
 def get_current_utc_datetime() -> datetime.datetime:
     """Returns the current UTC datetime."""
-    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+    return datetime.datetime.now(datetime.timezone.utc)
 
 
 def get_current_utc_date() -> datetime.date:
