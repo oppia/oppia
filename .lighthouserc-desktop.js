@@ -32,14 +32,16 @@ const DESKTOP_SCREEN_EMULATION = {
   disabled: false,
 };
 
-// Throttling for a dense 4G desktop connection, matching the desktopDense4G
-// constants in Lighthouse's lantern simulation. The request latency and
-// throughput values are set to 0 (meaning unset) so that Lantern derives them
-// from rttMs and throughputKbps; otherwise the mobile defaults would persist
-// through the settings merge.
-const DESKTOP_THROTTLING = {
-  rttMs: 40,
-  throughputKbps: 10240,
+// Throttling for Lighthouse's "Regular 3G" network profile: 300 ms RTT and
+// 700 Kbps downlink, matching mobileRegular3G in Lighthouse's lantern
+// simulation. The CPU stays unthrottled because this suite represents
+// desktop-class hardware. The request latency and throughput values are set to
+// 0 (meaning unset) so that Lantern derives them from rttMs and
+// throughputKbps; otherwise the mobile defaults would persist through the
+// settings merge.
+const DESKTOP_3G_THROTTLING = {
+  rttMs: 300,
+  throughputKbps: 700,
   cpuSlowdownMultiplier: 1,
   requestLatencyMs: 0,
   downloadThroughputKbps: 0,
@@ -56,7 +58,7 @@ module.exports = {
       settings: {
         formFactor: 'desktop',
         screenEmulation: DESKTOP_SCREEN_EMULATION,
-        throttling: DESKTOP_THROTTLING,
+        throttling: DESKTOP_3G_THROTTLING,
         // Set to true so that Lighthouse uses the user agent associated with
         // the desktop form factor.
         emulatedUserAgent: true,
