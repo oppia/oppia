@@ -74,15 +74,10 @@ const IFRAMED_ERROR_PAGE_SELECTOR = 'oppia-error-iframed-page-root';
 const SIGNUP_PATH = '/signup';
 
 // Feature flags whose value has to differ between pages audited in the same
-// shard. Each flag is tracked here so it is only toggled when a page actually
-// needs a different value, and the release coordinator role (assigned in the
-// shard setup) is what authorises the toggle below.
+// shard. The release coordinator role (assigned in the shard setup) is what
+// authorises the per-URL toggle below.
 const NEW_LESSON_PLAYER_FLAG = 'new_lesson_player';
 const STORY_EDITOR_ARCS_FLAG = 'story_editor_arcs';
-const FEATURE_FLAG_STATES = {
-  [NEW_LESSON_PLAYER_FLAG]: false,
-  [STORY_EDITOR_ARCS_FLAG]: false,
-};
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
