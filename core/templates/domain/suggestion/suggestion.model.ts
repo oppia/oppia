@@ -37,6 +37,7 @@ export interface SuggestionBackendDict {
   author_name: string;
   change_cmd: SuggestionChangeBackendDict;
   last_updated_msecs: number;
+  new_image_filenames?: string[];
 }
 
 export class Suggestion {
@@ -51,6 +52,7 @@ export class Suggestion {
   newValue: SuggestionChangeValue;
   oldValue: SuggestionChangeValue;
   lastUpdatedMsecs: number;
+  newImageFilenames: string[];
 
   constructor(
     suggestionType: string,
@@ -63,7 +65,8 @@ export class Suggestion {
     stateName: string,
     newValue: SuggestionChangeValue,
     oldValue: SuggestionChangeValue,
-    lastUpdatedMsecs: number
+    lastUpdatedMsecs: number,
+    newImageFilenames: string[]
   ) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
@@ -76,6 +79,7 @@ export class Suggestion {
     this.newValue = newValue;
     this.oldValue = oldValue;
     this.lastUpdatedMsecs = lastUpdatedMsecs;
+    this.newImageFilenames = newImageFilenames;
   }
 
   static createFromBackendDict(
@@ -93,7 +97,8 @@ export class Suggestion {
       suggestionBackendDict.change_cmd.state_name,
       suggestionBackendDict.change_cmd.new_value,
       suggestionBackendDict.change_cmd.old_value,
-      suggestionBackendDict.last_updated_msecs
+      suggestionBackendDict.last_updated_msecs,
+      suggestionBackendDict.new_image_filenames || []
     );
   }
 
