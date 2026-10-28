@@ -871,7 +871,7 @@ export class BaseUser {
       await element.click();
       await element.evaluate(el => {
         (el as HTMLElement).focus();
-        document.execCommand('selectAll', false, null);
+        document.execCommand('selectAll', false);
       });
       await this.page.keyboard.press('Backspace');
     }
