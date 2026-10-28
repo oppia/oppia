@@ -13,37 +13,40 @@
 // limitations under the License.
 
 /**
- * @fileoverview Blog Post Editor users utility file.
+ * @fileoverview Blog post editor users utility file.
  */
 
-import {Page} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const blogTitleInput = 'input.e2e-test-blog-post-title-field';
-const blogBodyInput = 'div.e2e-test-rte';
-const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
-const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
+// URLs.
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
-const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
-const confirmButtonSelector = 'button.e2e-test-confirm-button';
-const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
-const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
+
 const blogPostThumbnailImage = testConstants.data.blogPostThumbnailImage;
-const toastWarningMessageSelector = 'div.e2e-test-toast-warning-message';
-const blogPostTitlePage = '.e2e-test-blog-post-title';
-const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
+// Selectors for the blog dashboard.
+const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
-
+const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
-
-const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
+const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 const publishedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 
-const tagSelector = '.e2e-test-blog-post-tags';
+// Selectors for the blog post editor.
+const blogTitleInput = 'input.e2e-test-blog-post-title-field';
+const blogBodyInput = 'div.e2e-test-rte';
 const editBlogSelector = '.e2e-test-content-button';
+const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
+const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
+const tagSelector = '.e2e-test-blog-post-tags';
+const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
+const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
+const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
+const confirmButtonSelector = 'button.e2e-test-confirm-button';
+const toastWarningMessageSelector = 'div.e2e-test-toast-warning-message';
+const blogPostTitlePage = '.e2e-test-blog-post-title';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -87,9 +90,49 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * Function for adding blog post author bio in blog dashboard.
+   */
+  async addUserBioInBlogDashboard(): Promise<void> {
+    const inputBar = await this.isElementVisible(blogAuthorBioField);
+    // It is used here to avoid filling the user bio each time. We fill it
+    // only once when the user is accessing the blog dashboard for the first
+    // time.
+    if (inputBar) {
+      await this.typeInInputField(usernameInputSelector, 'blogPostWriter');
+      await this.typeInInputField(blogAuthorBioField, 'Dummy-User-Bio');
+      await this.expectElementToBeClickable(authorBioSaveButton);
+      await this.clickOnElementWithSelector(authorBioSaveButton);
+      await this.expectElementToBeVisible(authorBioSaveButton, false);
+    }
+  }
+
+  /**
+   * Function for opening the blog editor page for a new blog post.
+   */
+  async openBlogEditorPage(): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
+    await this.expectPublishButtonToBeDisabled();
+  }
+
+  /**
+   * Function for checking that the publish button is disabled when the blog
+   * post data is not completely filled.
+   */
+  async expectPublishButtonToBeDisabled(): Promise<void> {
+    await this.expectElementToBeVisible(publishBlogPostButton);
+    await expect(this.page.locator(publishBlogPostButton)).toBeDisabled();
+    showMessage(
+      'Published button is disabled when blog post data is not completely' +
+        ' filled.'
+    );
+  }
+
+  /**
    * This is a composite function that can be used when a straightforward,
    * simple blog post publish is required. This function publishes a blog
    * post with the given title.
+   * @param {string} newBlogPostTitle - The title of the new blog post.
    */
   async publishNewBlogPost(newBlogPostTitle: string): Promise<void> {
     await this.clickOnElementWithSelector(newBlogPostButtonSelector);
@@ -111,9 +154,10 @@ export class BlogPostEditor extends BaseUser {
    * This function creates a new blog post with the given title. Unlike
    * publishNewBlogPost, this does not attempt to publish it, and is used to
    * verify that publishing a blog post with a duplicate title is blocked.
+   * @param {string} newBlogPostTitle - The title of the new blog post.
    */
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.clickOnElementWithText('NEW POST');
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
     await this.expectElementToBeClickable(publishBlogPostButton, false);
 
     await this.uploadBlogPostThumbnailImage();
@@ -127,15 +171,16 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function uploads a blog post thumbnail image.
+   * Function for uploading a thumbnail image for the blog post.
    * @param {string} imagePath - The path of the image to upload.
    */
-  private async uploadBlogPostThumbnailImage(
+  async uploadBlogPostThumbnailImage(
     imagePath: string = blogPostThumbnailImage
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(imagePath);
       await this.clickOnElementWithSelector(addThumbnailImageButton);
+
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
       await this.expectElementToBeVisible(thumbnailPhotoBox);
@@ -143,25 +188,30 @@ export class BlogPostEditor extends BaseUser {
       await this.uploadFile(imagePath);
       await this.waitForElementToStabilize(addThumbnailImageButton);
       await this.clickOnElementWithSelector(addThumbnailImageButton);
-      await this.expectElementToBeVisible(addThumbnailImageButton, false);
+      await this.page.waitForSelector('body.modal-open', {state: 'detached'});
     }
   }
 
   /**
-   * This function updates the title of the blog post.
+   * Function for updating the title of the blog post.
+   * @param {string} newBlogPostTitle - The new title of the blog post.
    */
-  private async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
+  async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(blogTitleInput);
     await this.clearAllTextFrom(blogTitleInput);
     await this.typeInInputField(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
-    await this.expectElementValueToBe(blogTitleInput, newBlogPostTitle);
+
+    await expect(this.page.locator(blogTitleInput)).toHaveValue(
+      newBlogPostTitle
+    );
   }
 
   /**
-   * This function updates the body text of the blog post.
+   * Function for updating the body text of the blog post.
+   * @param {string} newBodyText - The new body text of the blog post.
    */
-  private async updateBodyTextTo(newBodyText: string): Promise<void> {
+  async updateBodyTextTo(newBodyText: string): Promise<void> {
     if (!(await this.isElementVisible(blogBodyInput))) {
       await this.expectElementToBeVisible(editBlogSelector);
       await this.clickOnElementWithSelector(editBlogSelector);
@@ -169,23 +219,17 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(blogBodyInput);
     await this.clearAllTextFrom(blogBodyInput);
     await this.typeInInputField(blogBodyInput, newBodyText);
+
     await this.expectTextContentToBe(blogBodyInput, newBodyText);
   }
 
   /**
-   * This function saves the blog post body changes.
+   * Function for selecting or deselecting a tag of the blog post.
+   * @param {string} tag - The name of the tag.
+   * @param {boolean} shouldBePresent - Whether the tag should be selected
+   *     after clicking on it.
    */
-  private async saveBlogBodyChanges(): Promise<void> {
-    await this.expectElementToBeVisible(blogBodySaveButtonSelector);
-    await this.clickOnElementWithSelector(blogBodySaveButtonSelector);
-    await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
-  }
-
-  /**
-   * This function selects a tag for the blog post.
-   * @param {string} tag - The tag to select.
-   */
-  private async selectTag(tag: string): Promise<void> {
+  async selectTag(tag: string, shouldBePresent: boolean = true): Promise<void> {
     // If the viewport is mobile and the blog body is not in edit mode,
     // click on the edit button to open the edit mode, so tags can be added.
     if (
@@ -196,31 +240,36 @@ export class BlogPostEditor extends BaseUser {
       await this.clickOnElementWithSelector(editBlogSelector);
     }
     await this.expectElementToBeVisible(tagSelector);
-    const tagElements = await this.page.$$(tagSelector);
 
-    for (const tagElement of tagElements) {
-      const tagText = await this.page.evaluate(
-        (element: Element) => element.textContent?.trim(),
-        tagElement
-      );
-      if (tagText === tag) {
-        await tagElement.click();
-        await this.page.waitForFunction(
-          (element: HTMLElement | null) =>
-            element?.getAttribute('aria-pressed') === 'true',
-          await tagElement.$('button')
-        );
-        return;
-      }
-    }
+    const tagElement = this.page
+      .locator(tagSelector)
+      .filter({hasText: new RegExp(`^\\s*${tag}\\s*$`)})
+      .first();
+    await tagElement.click();
 
-    throw new Error(`Tag "${tag}" not found in the tag list.`);
+    await expect(tagElement.locator('button')).toHaveAttribute(
+      'aria-pressed',
+      shouldBePresent ? 'true' : 'false'
+    );
   }
 
   /**
-   * This function publishes the blog post.
+   * Function for saving the changes made to the blog post body.
+   * @param {boolean} skipVerification - Whether to skip verifying that the
+   *     save button is hidden after saving.
    */
-  private async publishTheBlogPost(): Promise<void> {
+  async saveBlogBodyChanges(skipVerification: boolean = false): Promise<void> {
+    await this.expectElementToBeVisible(blogBodySaveButtonSelector);
+    await this.clickOnElementWithSelector(blogBodySaveButtonSelector);
+    if (!skipVerification) {
+      await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
+    }
+  }
+
+  /**
+   * Function for publishing the blog post.
+   */
+  async publishTheBlogPost(): Promise<void> {
     await this.clickOnElementWithText('PUBLISH');
     await this.expectElementToBeVisible(confirmButtonSelector);
     await this.waitForElementToStabilize(confirmButtonSelector);
@@ -230,8 +279,19 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * Function for saving the blog post as a draft.
+   */
+  async saveTheDraftBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(saveDraftButtonSelector);
+    await this.clickOnElementWithSelector(saveDraftButtonSelector);
+
+    await expect(this.page.locator(saveDraftButtonSelector)).toBeDisabled();
+  }
+
+  /**
    * This function checks that the user is unable to publish a blog post,
    * because of the given warning message.
+   * @param {string} expectedWarningMessage - Expected toast warning message.
    */
   async expectUserUnableToPublishBlogPost(
     expectedWarningMessage: string
@@ -251,6 +311,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * This function checks the number of blog posts in the blog dashboard.
+   * @param {number} number - Expected number of blog posts.
    */
   async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
     await this.expectNumberOfElementsToBe(listOfBlogsInBlogDashboard, number);
@@ -269,6 +330,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * This function checks if the blog post with given title is published.
+   * @param {string} blogPostTitle - The title of the blog post to check.
    */
   async expectPublishedBlogPostWithTitleToBePresent(
     blogPostTitle: string
@@ -312,5 +374,6 @@ export class BlogPostEditor extends BaseUser {
   }
 }
 
-export const BlogPostEditorFactory = (page: Page): BlogPostEditor =>
-  new BlogPostEditor(page);
+export const BlogPostEditorFactory = (page: Page): BlogPostEditor => {
+  return new BlogPostEditor(page);
+};

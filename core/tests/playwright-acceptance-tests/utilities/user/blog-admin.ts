@@ -20,15 +20,15 @@ import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants, {BlogRoles} from '../common/test-constants';
 
-const roleUpdateUsernameInput = 'input#label-target-update-form-name';
-const roleUpdateRoleSelect = 'select#label-target-update-form-role-select';
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
+const roleSelectDropdown = 'select#label-target-update-form-role-select';
+const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const updateRoleButtonSelector = 'button.oppia-blog-admin-update-role-button';
 
 export class BlogAdmin extends BaseUser {
   /**
-   * Navigates to the blog admin page.
+   * This function navigates to the blog admin page.
    */
   async navigateToBlogAdminPage(): Promise<void> {
     await this.goto(blogAdminUrl);
@@ -41,11 +41,14 @@ export class BlogAdmin extends BaseUser {
     username: string,
     role: BlogRoles
   ): Promise<void> {
-    await this.select(roleUpdateRoleSelect, role);
+    await this.page.selectOption(roleSelectDropdown, role);
     await this.typeInInputField(roleUpdateUsernameInput, username);
     await this.clickOnElementWithSelector(updateRoleButtonSelector);
+
     await this.expectElementToBeClickable(updateRoleButtonSelector, false);
   }
 }
 
-export const BlogAdminFactory = (page: Page): BlogAdmin => new BlogAdmin(page);
+export const BlogAdminFactory = (page: Page): BlogAdmin => {
+  return new BlogAdmin(page);
+};
