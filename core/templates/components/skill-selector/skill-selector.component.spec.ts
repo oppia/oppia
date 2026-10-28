@@ -137,6 +137,7 @@ describe('SkillSelectorComponent', () => {
       topic2: {
         uncategorized: [],
         subtopic2: [ShortSkillSummary.create('skill2', 'Multiplication')],
+        subtopic3: [ShortSkillSummary.create('skill3', 'Subtraction')],
       },
     };
     component.ngOnInit();
