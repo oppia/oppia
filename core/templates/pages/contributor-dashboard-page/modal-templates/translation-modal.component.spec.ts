@@ -40,6 +40,7 @@ import {
   TranslationOpportunity,
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
@@ -139,6 +140,7 @@ describe('Translation Modal Component', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let userService: UserService;
+  let alertsService: AlertsService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalComponent>;
@@ -260,6 +262,7 @@ describe('Translation Modal Component', () => {
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
+    alertsService = TestBed.inject(AlertsService);
     wds = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     component.contentContainer = new ElementRef({offsetHeight: 150});
@@ -1822,6 +1825,7 @@ describe('Translation Modal Component', () => {
     }));
 
     it('should handle error when generating translation', fakeAsync(() => {
+      const alertsSpy = spyOn(alertsService, 'addWarning');
       component.activeDataFormat = 'html';
       component.textToTranslate = 'hello';
       component.activeLanguageCode = 'es';
@@ -1839,6 +1843,38 @@ describe('Translation Modal Component', () => {
         translateTextBackendApiService.getMachineTranslationAsync
       ).toHaveBeenCalledWith('hello', 'en', 'es');
       expect(component.isGeneratingTranslation).toBeFalse();
+      expect(alertsSpy).toHaveBeenCalledWith('Failed to generate translation.');
+    }));
+
+    it('should handle specific error message from backend when generating translation', fakeAsync(() => {
+      const alertsSpy = spyOn(alertsService, 'addWarning');
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(
+        Promise.reject({
+          error: {
+            error:
+              'You do not have permission to submit translations for this language.',
+          },
+        })
+      );
+
+      component.generateTranslation();
+
+      expect(component.isGeneratingTranslation).toBeTrue();
+      flushMicrotasks();
+
+      expect(
+        translateTextBackendApiService.getMachineTranslationAsync
+      ).toHaveBeenCalledWith('hello', 'en', 'es');
+      expect(component.isGeneratingTranslation).toBeFalse();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'You do not have permission to submit translations for this language.'
+      );
     }));
 
     it('should not generate translation if already generating', () => {
