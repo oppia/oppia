@@ -23,7 +23,6 @@ import {showMessage} from '../common/show-message';
 import {RTEEditor} from '../common/rte-editor';
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
-const blogUrl = testConstants.URLs.Blog;
 
 // Selectors — identical to the Puppeteer version because they share the same
 // Angular templates.
@@ -62,13 +61,6 @@ export class BlogPostEditor extends BaseUser {
    */
   async navigateToBlogDashboardPage(): Promise<void> {
     await this.goto(blogDashboardUrl);
-  }
-
-  /**
-   * Navigates to the blog page.
-   */
-  async navigateToBlogPage(): Promise<void> {
-    await this.goto(blogUrl);
   }
 
   /**
