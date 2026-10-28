@@ -142,6 +142,24 @@ export class ContributorAdminStatsTable implements OnInit {
     return lastContributedType;
   }
 
+  getLastContributedText(element: ContributorStats): string {
+    if (
+      'reviewedQuestionsCount' in element &&
+      element.reviewedQuestionsCount === 0
+    ) {
+      return 'N/A';
+    }
+    if (element.lastContributedInDays === 0) {
+      return 'Today';
+    }
+    return (
+      element.lastContributedInDays +
+      ' ' +
+      (element.lastContributedInDays === 1 ? 'day' : 'days') +
+      ' ago'
+    );
+  }
+
   getContributionCountLabel(activeTab: string): string {
     let contributionCountLabel: string = '';
 

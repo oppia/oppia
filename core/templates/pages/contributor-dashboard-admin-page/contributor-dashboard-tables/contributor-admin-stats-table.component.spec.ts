@@ -667,6 +667,62 @@ describe('Contributor stats component', () => {
     })
   );
 
+  it('should show N/A as last reviewed for question reviewers with no reviews', () => {
+    const reviewerStats = new QuestionReviewerStats(
+      'user1',
+      [],
+      0,
+      0,
+      0,
+      0,
+      'Oct 2026',
+      0
+    );
+
+    expect(component.getLastContributedText(reviewerStats)).toBe('N/A');
+  });
+
+  it('should show how long ago a question reviewer last reviewed', () => {
+    const reviewedToday = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      0
+    );
+    const reviewedOneDayAgo = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      1
+    );
+    const reviewedFiveDaysAgo = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      5
+    );
+
+    expect(component.getLastContributedText(reviewedToday)).toBe('Today');
+    expect(component.getLastContributedText(reviewedOneDayAgo)).toBe(
+      '1 day ago'
+    );
+    expect(component.getLastContributedText(reviewedFiveDaysAgo)).toBe(
+      '5 days ago'
+    );
+  });
+
   it(
     'should open question role editor modal and return true changed' +
       ' value of translation reviewer',
