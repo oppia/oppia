@@ -869,9 +869,10 @@ export class BaseUser {
       // cannot be cleared by setting their text directly without desyncing the
       // editor's internal model. Clear them with real keyboard events instead.
       await element.click();
-      await this.page.keyboard.down('Control');
-      await this.page.keyboard.press('A');
-      await this.page.keyboard.up('Control');
+      await element.evaluate(el => {
+        (el as HTMLElement).focus();
+        document.execCommand('selectAll', false);
+      });
       await this.page.keyboard.press('Backspace');
     }
   }
