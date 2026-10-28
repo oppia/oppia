@@ -76,6 +76,7 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     """A dictionary representation of client side SkillOpportunity object."""
 
     topic_name: str
+    questions_in_review_count: int
 
 
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -250,6 +251,7 @@ class ContributionOpportunitiesHandler(
                                 'question_count'
                             ],
                             'topic_name': topic_name,
+                            'questions_in_review_count': 0,
                         }
                         opportunities.append(client_side_skill_opportunity_dict)
             if (
@@ -259,6 +261,16 @@ class ContributionOpportunitiesHandler(
                 break
             skill_opportunities, cursor, more = (
                 opportunity_services.get_skill_opportunities(cursor)
+            )
+
+        skill_ids = [opp['id'] for opp in opportunities]
+        skill_id_to_in_review_count = suggestion_services.get_question_suggestions_in_review_count_by_skill_ids(
+            skill_ids
+        )
+
+        for opp in opportunities:
+            opp['questions_in_review_count'] = skill_id_to_in_review_count.get(
+                opp['id'], 0
             )
 
         return opportunities, cursor, more
@@ -1246,15 +1258,15 @@ class MachineTranslationStateTextsHandler(
                 content_id
             ].content_value
 
-            # Here we use MyPy ignore because the flag the
-            # get_and_cache_machine_translation is not written correctly and it
-            # only handles str.
-            # TODO(#16621): Fix get_and_cache_machine_translation to handle
-            # translatable content of rule_spec [list(str)].
-            translated_texts[
-                content_id
-            ] = translation_services.get_and_cache_machine_translation(
-                exp.language_code, target_language_code, source_text  # type: ignore[arg-type]
+            # Machine translation supports strings, not lists of rule text.
+            if isinstance(source_text, list):
+                translated_texts[content_id] = None
+                continue
+
+            translated_texts[content_id] = (
+                translation_services.get_and_cache_machine_translation(
+                    exp.language_code, target_language_code, source_text
+                )
             )
 
         self.values = {'translated_texts': translated_texts}

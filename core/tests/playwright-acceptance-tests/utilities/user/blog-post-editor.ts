@@ -36,6 +36,7 @@ const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
 const firstPostButtonSelector = '.e2e-test-first-post-button';
 const newPostButtonSelector = '.e2e-test-new-post-button';
+const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
@@ -68,6 +69,32 @@ export class BlogPostEditor extends BaseUser {
    */
   async navigateToBlogPage(): Promise<void> {
     await this.goto(blogUrl);
+  }
+
+  /**
+   * Function for adding blog post author bio in blog dashboard.
+   */
+  async addUserBioInBlogDashboard(): Promise<void> {
+    const inputBar = await this.isElementVisible(blogAuthorBioField);
+    // It is used here to avoid filling the user bio each time. We fill it
+    // only once when the user is accessing the blog dashboard for the first
+    // time.
+    if (inputBar) {
+      await this.typeInInputField(usernameInputSelector, 'blogPostWriter');
+      await this.typeInInputField(blogAuthorBioField, 'Dummy-User-Bio');
+      await this.expectElementToBeClickable(authorBioSaveButton);
+      await this.clickOnElementWithSelector(authorBioSaveButton);
+      await this.expectElementToBeVisible(authorBioSaveButton, false);
+    }
+  }
+
+  /**
+   * Function for opening the blog editor page for a new blog post.
+   */
+  async openBlogEditorPage(): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
+    await this.expectPublishButtonToBeDisabled();
   }
 
   /**
@@ -302,6 +329,18 @@ export class BlogPostEditor extends BaseUser {
       const element = document.querySelector(selector);
       return (element as HTMLButtonElement)?.disabled === true;
     }, saveDraftButtonSelector);
+  }
+
+  /**
+   * Function for publishing the blog post.
+   */
+  async publishTheBlogPost(): Promise<void> {
+    await this.clickOnElementWithText('PUBLISH');
+    await this.expectElementToBeVisible(confirmButtonSelector);
+    await this.waitForElementToStabilize(confirmButtonSelector);
+    await this.clickOnElementWithSelector(confirmButtonSelector);
+    await this.expectElementToBeVisible(confirmButtonSelector, false);
+    showMessage('Successfully published a blog post!');
   }
 
   /**
