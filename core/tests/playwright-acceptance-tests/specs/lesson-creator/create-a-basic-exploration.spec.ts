@@ -42,7 +42,6 @@ const LONG_CONTENT = Array.from({length: 15}, (_, i) => `Line ${i + 1}`).join(
 
 const FLOAT_FORM_INPUT_SELECTOR = '.e2e-test-float-form-input';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 test.describe.configure({mode: 'serial'});
 
 test.describe('Lesson Creator', function () {

@@ -84,7 +84,6 @@ const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
-const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 
 const toastMessage = '.e2e-test-toast-message';
@@ -187,7 +186,6 @@ const selfLoopWarningSelector = '.e2e-test-response-self-loop-warning';
 const previewTabButton = '.e2e-test-preview-tab';
 const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const stateNameInputSelector = '.e2e-test-state-name-input';
-const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
 const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 const stateNameSubmitButtonSelector = 'button.e2e-test-state-name-submit';
 const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
