@@ -44,10 +44,22 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_parameter_registry = (
-            registry.Registry.parameter_registry.copy()
+        self.swap_name_to_description_data_type_and_default = self.swap(
+            registry,
+            'PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT',
+            {
+                'parameter_a': (
+                    'for test',
+                    DataTypes.STRING,
+                    '111',
+                ),
+                'parameter_b': (
+                    'for test',
+                    DataTypes.BOOL,
+                    False,
+                ),
+            },
         )
-        registry.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
         parameter_names = ['parameter_a', 'parameter_b']
@@ -55,36 +67,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
             None,
             parameter_names,
-        )
-
-    def tearDown(self) -> None:
-        super().tearDown()
-
-        registry.Registry.parameter_registry = self.original_parameter_registry
-
-    def _create_example_parameter_with_name(self, name: str) -> None:
-        """Creates and returns an example parameter with the given name."""
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': name,
-                'description': 'for test',
-                'data_type': DataTypes.STRING.value,
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']],
-                            }
-                        ],
-                        'value_when_matched': '222',
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': '111',
-            }
         )
 
     def _create_dummy_platform_parameter(
@@ -119,14 +101,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 ParamName.PARAMETER_A, 'test', DataType.INVALID  # type: ignore[arg-type]
             )
 
-    def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
-        param_name = 'parameter_a'
-        self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegex(
-            Exception, 'Parameter with name %s already exists' % param_name
-        ):
-            self._create_example_parameter_with_name(param_name)
-
     def test_default_value_of_bool_platform_parameter(self) -> None:
         parameter = self._create_dummy_platform_parameter(DataTypes.BOOL)
         parameter.validate()
@@ -143,111 +117,42 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertEqual(parameter.default_value, 0)
 
     def test_get_platform_parameter(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-        parameter = registry.Registry.get_platform_parameter(parameter_name)
-        self.assertIsNotNone(parameter)
-        self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
+        with self.swap_name_to_description_data_type_and_default:
+            parameter = registry.Registry.get_platform_parameter('parameter_a')
+            self.assertIsNotNone(parameter)
+            self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
+            self.assertEqual(parameter.name, 'parameter_a')
+            self.assertEqual(parameter.default_value, '111')
 
     def test_get_non_existing_parameter_failure(self) -> None:
-        with self.assertRaisesRegex(Exception, 'not found'):
-            registry.Registry.get_platform_parameter('parameter_a')
+        with self.assertRaisesRegex(Exception, 'Platform parameter not found: non_existing'):
+            registry.Registry.get_platform_parameter('non_existing')
 
     def test_get_all_parameter_names(self) -> None:
-        parameter_names = ['parameter_a', 'parameter_b']
-        for parameter_name in parameter_names:
-            self._create_example_parameter_with_name(parameter_name)
-        self.assertEqual(
-            sorted(registry.Registry.get_all_platform_parameter_names()),
-            sorted(parameter_names),
-        )
+        with self.swap_name_to_description_data_type_and_default:
+            self.assertEqual(
+                sorted(registry.Registry.get_all_platform_parameter_names()),
+                ['parameter_a', 'parameter_b'],
+            )
 
     def test_memcache_is_set_after_getting(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
+        with self.swap_name_to_description_data_type_and_default:
+            parameter_name = 'parameter_a'
+            self.assertIsNone(
+                registry.Registry.load_platform_parameter_from_memcache(
+                    parameter_name
+                )
             )
-        )
-        registry.Registry.get_platform_parameter(parameter_name)
-        self.assertIsNotNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
+            registry.Registry.get_platform_parameter(parameter_name)
+            self.assertIsNotNone(
+                registry.Registry.load_platform_parameter_from_memcache(
+                    parameter_name
+                )
             )
-        )
 
     def test_update_parameter(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-
-        registry.Registry.update_platform_parameter(
-            parameter_name,
-            feconf.SYSTEM_COMMITTER_ID,
-            'commit message',
-            [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']],
-                            }
-                        ],
-                        'value_when_matched': 'updated',
-                    }
-                )
-            ],
-            'default',
-        )
-        parameter_updated = registry.Registry.get_platform_parameter(
-            parameter_name
-        )
-
-        self.assertEqual(parameter_updated.name, parameter_name)
-        self.assertEqual(len(parameter_updated.rules), 1)
-        self.assertEqual(
-            parameter_updated.rules[0].value_when_matched, 'updated'
-        )
-
-    def test_cached_value_is_invalidated_after_update(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-
-        registry.Registry.update_platform_parameter(
-            parameter_name,
-            feconf.SYSTEM_COMMITTER_ID,
-            'commit message',
-            [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']],
-                            }
-                        ],
-                        'value_when_matched': 'updated',
-                    }
-                )
-            ],
-            'default',
-        )
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
-            )
-        )
-
-    def test_update_parameter_with_invalid_rules_failure(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-
-        param = registry.Registry.get_platform_parameter(parameter_name)
-        param.validate()
-
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected string'):
+        with self.swap_name_to_description_data_type_and_default:
+            parameter_name = 'parameter_a'
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
@@ -261,50 +166,121 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                                     'conditions': [['=', 'Backend']],
                                 }
                             ],
-                            'value_when_matched': True,
+                            'value_when_matched': 'updated',
+                        }
+                    )
+                ],
+                'default',
+            )
+            parameter_updated = registry.Registry.get_platform_parameter(
+                parameter_name
+            )
+
+            self.assertEqual(parameter_updated.name, parameter_name)
+            self.assertEqual(len(parameter_updated.rules), 1)
+            self.assertEqual(
+                parameter_updated.rules[0].value_when_matched, 'updated'
+            )
+
+    def test_cached_value_is_invalidated_after_update(self) -> None:
+        with self.swap_name_to_description_data_type_and_default:
+            parameter_name = 'parameter_a'
+            registry.Registry.get_platform_parameter(parameter_name)
+            self.assertIsNotNone(
+                registry.Registry.load_platform_parameter_from_memcache(
+                    parameter_name
+                )
+            )
+
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    parameter_domain.PlatformParameterRule.from_dict(
+                        {
+                            'filters': [
+                                {
+                                    'type': 'platform_type',
+                                    'conditions': [['=', 'Backend']],
+                                }
+                            ],
+                            'value_when_matched': 'updated',
+                        }
+                    )
+                ],
+                'default',
+            )
+            self.assertIsNone(
+                registry.Registry.load_platform_parameter_from_memcache(
+                    parameter_name
+                )
+            )
+
+    def test_update_parameter_with_invalid_rules_failure(self) -> None:
+        with self.swap_name_to_description_data_type_and_default:
+            parameter_name = 'parameter_a'
+            param = registry.Registry.get_platform_parameter(parameter_name)
+            param.validate()
+
+            with self.assertRaisesRegex(utils.ValidationError, 'Expected string'):
+                registry.Registry.update_platform_parameter(
+                    parameter_name,
+                    feconf.SYSTEM_COMMITTER_ID,
+                    'commit message',
+                    [
+                        parameter_domain.PlatformParameterRule.from_dict(
+                            {
+                                'filters': [
+                                    {
+                                        'type': 'platform_type',
+                                        'conditions': [['=', 'Backend']],
+                                    }
+                                ],
+                                'value_when_matched': True,
+                            }
+                        )
+                    ],
+                    'default',
+                )
+
+    def test_updated_parameter_is_saved_in_storage(self) -> None:
+        with self.swap_name_to_description_data_type_and_default:
+            parameter_name = 'parameter_a'
+            self.assertIsNone(
+                registry.Registry.load_platform_parameter_from_storage(
+                    parameter_name
+                )
+            )
+
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    parameter_domain.PlatformParameterRule.from_dict(
+                        {
+                            'filters': [
+                                {
+                                    'type': 'platform_type',
+                                    'conditions': [['=', 'Backend']],
+                                }
+                            ],
+                            'value_when_matched': 'updated',
                         }
                     )
                 ],
                 'default',
             )
 
-    def test_updated_parameter_is_saved_in_storage(self) -> None:
-        parameter_name = 'parameter_a'
-        self._create_example_parameter_with_name(parameter_name)
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_storage(
-                parameter_name
-            )
-        )
-
-        registry.Registry.update_platform_parameter(
-            parameter_name,
-            feconf.SYSTEM_COMMITTER_ID,
-            'commit message',
-            [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']],
-                            }
-                        ],
-                        'value_when_matched': 'updated',
-                    }
+            parameter_updated = (
+                registry.Registry.load_platform_parameter_from_storage(
+                    parameter_name
                 )
-            ],
-            'default',
-        )
-
-        parameter_updated = (
-            registry.Registry.load_platform_parameter_from_storage(
-                parameter_name
             )
-        )
-        self.assertIsNotNone(parameter_updated)
+            self.assertIsNotNone(parameter_updated)
 
-    def test_default_value_return_from_parameter_registry_when_none_in_model(
+    def test_default_value_return_from_specs_when_none_in_model(
         self,
     ) -> None:
         def _mock_update_platform_parameter(
@@ -328,7 +304,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
             param.set_rules(new_rules)
             param.set_default_value(default_value)
-            registry.Registry.parameter_registry[param.name] = param
 
             model_instance.rules = [rule.to_dict() for rule in param.rules]
             model_instance.default_value = None
@@ -352,42 +327,42 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 [name],
             )
 
-        with self.swap(
-            registry.Registry,
-            'update_platform_parameter',
-            _mock_update_platform_parameter,
-        ):
-            parameter_name = 'parameter_b'
-            self._create_example_parameter_with_name(parameter_name)
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict(
-                        {
-                            'filters': [
-                                {
-                                    'type': 'platform_type',
-                                    'conditions': [['=', 'Backend']],
-                                }
-                            ],
-                            'value_when_matched': 'updated',
-                        }
-                    )
-                ],
-                'default',
-            )
-
-            parameter_storage = (
-                registry.Registry.load_platform_parameter_from_storage(
-                    parameter_name
+        with self.swap_name_to_description_data_type_and_default:
+            with self.swap(
+                registry.Registry,
+                'update_platform_parameter',
+                _mock_update_platform_parameter,
+            ):
+                parameter_name = 'parameter_b'
+                registry.Registry.update_platform_parameter(
+                    parameter_name,
+                    feconf.SYSTEM_COMMITTER_ID,
+                    'commit message',
+                    [
+                        parameter_domain.PlatformParameterRule.from_dict(
+                            {
+                                'filters': [
+                                    {
+                                        'type': 'platform_type',
+                                        'conditions': [['=', 'Backend']],
+                                    }
+                                ],
+                                'value_when_matched': True,
+                            }
+                        )
+                    ],
+                    True,
                 )
-            )
 
-        self.assertIsNotNone(parameter_storage)
-        assert parameter_storage is not None
-        self.assertEqual(parameter_storage.default_value, 'default')
+                parameter_storage = (
+                    registry.Registry.load_platform_parameter_from_storage(
+                        parameter_name
+                    )
+                )
+
+            self.assertIsNotNone(parameter_storage)
+            assert parameter_storage is not None
+            self.assertEqual(parameter_storage.default_value, False)
 
     def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
@@ -399,45 +374,11 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'server_mode': FeatureStages.DEV,
             },
         )
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': 'parameter_a',
-                'description': 'for test',
-                'data_type': DataTypes.STRING.value,
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Web']],
-                            }
-                        ],
-                        'value_when_matched': '222',
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': '333',
-            }
-        )
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': 'parameter_b',
-                'description': 'for test',
-                'data_type': DataTypes.BOOL.value,
-                'rules': [],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': False,
-            }
-        )
-
-        self.assertDictEqual(
-            registry.Registry.evaluate_all_platform_parameters(context),
-            {
-                'parameter_a': '222',
-                'parameter_b': False,
-            },
-        )
+        with self.swap_name_to_description_data_type_and_default:
+            self.assertDictEqual(
+                registry.Registry.evaluate_all_platform_parameters(context),
+                {
+                    'parameter_a': '111',
+                    'parameter_b': False,
+                },
+            )
