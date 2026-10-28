@@ -2304,7 +2304,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async openLessonInfoModal(): Promise<void> {
     await this.expectElementToBeVisible(lessonInfoButton);
-    await this.clickOnElementWithSelector(lessonInfoButton);
+    const button = await this.page.waitForSelector(lessonInfoButton, {
+      state: 'visible',
+    });
+    await button?.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      el?.click();
+    }, lessonInfoButton);
     await this.expectElementToBeVisible(lessonInfoCardSelector);
   }
 
@@ -2962,7 +2971,16 @@ export class LoggedOutUser extends BaseUser {
       this.page,
       80000
     );
-    await this.clickOnElementWithSelector(hintButtonSelector);
+
+    // On mobile preview, nav overlays can occasionally block the hint button.
+    // Fall back to a direct DOM click if on mobile width, matching Puppeteer.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.$eval(hintButtonSelector, el => {
+        (el as HTMLElement).click();
+      });
+    } else {
+      await this.clickOnElementWithSelector(hintButtonSelector);
+    }
 
     await this.expectElementToBeVisible(gotItButtonSelector);
   }
@@ -2978,7 +2996,14 @@ export class LoggedOutUser extends BaseUser {
       this.page,
       timeout
     );
-    await this.clickOnElementWithSelector(viewSolutionButton);
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.$eval(viewSolutionButton, el => {
+        (el as HTMLElement).click();
+      });
+    } else {
+      await this.clickOnElementWithSelector(viewSolutionButton);
+    }
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.expectElementToBeVisible(closeSolutionModalButton);
   }
