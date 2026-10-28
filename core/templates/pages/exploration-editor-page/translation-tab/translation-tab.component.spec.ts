@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for translationTab.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -220,12 +218,13 @@ describe('Translation tab component', () => {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      autoGeneratableLanguageAccentCodes: [],
     };
 
     spyOn(
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
-    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
+    ).and.resolveTo(voiceoverAdminDataResponse);
 
     explorationStatesService.init(
       {
