@@ -869,21 +869,11 @@ export class BaseUser {
       // cannot be cleared by setting their text directly without desyncing the
       // editor's internal model. Clear them with real keyboard events instead.
       await element.click();
-      // Select only this editor's contents without relying on platform-specific
-      // shortcut mappings, then let the editor process a real deletion event.
-      await element.evaluate(editor => {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(editor);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
+      await element.evaluate(el => {
+        (el as HTMLElement).focus();
+        document.execCommand('selectAll', false, null);
       });
       await this.page.keyboard.press('Backspace');
-      await this.page.waitForFunction(
-        (editor: Element) => editor.textContent?.trim() === '',
-        {},
-        element
-      );
     }
   }
 

@@ -232,19 +232,15 @@ describe('Translation Reviewer: review translations', function () {
     );
 
     await submitSkillTranslations(SKILL_NAME);
+  }, 2100000);
 
+  it('should review exploration metadata translations', async function () {
     // "Review Translations" is not a dashboard tab, it is the side navigation
     // item a reviewer already lands on when translations are their only review
     // right, so the dashboard opens on the list this spec reviews from.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
-  }, 2100000);
-
-  it('should review exploration metadata translations', async function () {
-    await translationReviewer.navigateToTabInMyContributions(
-      'Review Translations'
-    );
-    await translationReviewer.filterContentByTopic(TOPIC_NAME);
     await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
+    await translationReviewer.filterContentByTopic(TOPIC_NAME);
     await translationReviewer.selectContentTypeFilter(
       CONTENT_TYPE_FILTER.LESSONS
     );

@@ -292,11 +292,7 @@ export class Contributor extends ExplorationEditor {
    * @param tabName - The name of the tab to navigate to.
    */
   async navigateToTabInMyContributions(
-    tabName:
-      | 'Contribution Stats'
-      | 'Badges'
-      | 'Review Questions'
-      | 'Review Translations'
+    tabName: 'Contribution Stats' | 'Badges' | 'Review Questions'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
