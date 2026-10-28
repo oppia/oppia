@@ -143,11 +143,7 @@ export class ExplorationEngineService {
     if (explorationContext) {
       this._explorationId = this.pageContextService.getExplorationId();
       let version = this.urlService.getExplorationVersionFromUrl();
-      // Editor URLs do not contain an exploration version. The editor sets the
-      // version from its backend data, so it should not be cleared here.
-      if (!this.pageContextService.isInExplorationEditorPage()) {
-        this.pageContextService.setExplorationVersion(version);
-      }
+      this.pageContextService.setExplorationVersion(version);
 
       const pathSegment = this.urlService
         .getPathname()
