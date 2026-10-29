@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
@@ -70,8 +71,9 @@ class BaseValidationJob(base_jobs.JobBase):
         """Runs the validation job.
 
         Returns:
-            PCollection. A PCollection of JobRunResults, one per error type.
-            Each result has the error type, the total number of errors of that
+            PCollection. A PCollection of JobRunResults: one with the number of
+            models that were validated, and one per error type. Each error
+            result has the error type, the total number of errors of that
             type, and up to ERROR_TRUNCATION_LIMIT of the error messages.
         """
         all_models = self.pipeline | 'Get all models' >> (
@@ -102,12 +104,25 @@ class BaseValidationJob(base_jobs.JobBase):
         # representative sample of each error type is visible in the initial
         # set of logs, even if the total number of errors for a particular
         # type exceeds the truncation limit.
-        return (
+        error_results = (
             results
             | 'Group Errors by Type'
             >> beam.GroupBy(lambda error: type(error).__name__)
             | 'Extract Error Messages' >> beam.MapTuple(summarize_errors)
         )
+        # The number of validated models shows that the job ran on the
+        # expected data, even when it finds no errors.
+        validated_models_count = (
+            all_models
+            | 'Count Validated Models'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'VALIDATED MODELS'
+            )
+        )
+        return (
+            validated_models_count,
+            error_results,
+        ) | 'Combine Results' >> beam.Flatten()
 
     def get_model_class(self) -> Type[base_models.BaseModel]:
         """Provides the class of the models to be validated. Only models of

@@ -197,6 +197,9 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
+                job_run_result.JobRunResult.as_stdout(
+                    'VALIDATED MODELS SUCCESS: 1'
+                ),
                 job_run_result.JobRunResult.as_stderr(
                     'InconsistentTimestampsError (1 total):\n%s'
                     % (
@@ -217,6 +220,9 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
+                job_run_result.JobRunResult.as_stdout(
+                    'VALIDATED MODELS SUCCESS: 1'
+                ),
                 job_run_result.JobRunResult.as_stderr(
                     'BaseValidationError (1 total):\n%s'
                     % (
@@ -241,6 +247,9 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
+                job_run_result.JobRunResult.as_stdout(
+                    'VALIDATED MODELS SUCCESS: 1'
+                ),
                 job_run_result.JobRunResult.as_stderr(
                     'BaseValidationError (1 total):\n%s'
                     % (
@@ -266,7 +275,12 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([model])
 
-        self.assert_job_output_is([])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult.as_stdout('VALIDATED MODELS SUCCESS: 1')]
+        )
+
+    def test_run_with_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_truncation_of_messages(self) -> None:
         model1 = self.create_model(
@@ -284,6 +298,9 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
         with self.swap(base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2):
             self.assert_job_output_is(
                 [
+                    job_run_result.JobRunResult.as_stdout(
+                        'VALIDATED MODELS SUCCESS: 3'
+                    ),
                     job_run_result.JobRunResult.as_stderr(
                         'BaseValidationError (3 total):\n%s\n%s'
                         % (

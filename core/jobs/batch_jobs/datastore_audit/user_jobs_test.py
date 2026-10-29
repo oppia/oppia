@@ -51,6 +51,9 @@ class ExpUserLastPlaythroughModelValidationJobTests(
     LEARNER_EMAIL: Final = 'learner@example.com'
     LEARNER_USERNAME: Final = 'learner'
     RENAMED_STATE_NAME: Final = 'Renamed state'
+    VALIDATED_MODELS_RESULT: Final = job_run_result.JobRunResult.as_stdout(
+        'VALIDATED MODELS SUCCESS: 1'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -160,7 +163,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             ]
         )
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([self.VALIDATED_MODELS_RESULT])
 
     def test_valid_model_with_state_renamed_after_it_was_played(self) -> None:
         # The state is still called by its old name in version 1, which is
@@ -177,7 +180,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             ]
         )
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([self.VALIDATED_MODELS_RESULT])
 
     def test_invalid_domain_object(self) -> None:
         model = self._create_playthrough_model(last_played_exp_version=0)
@@ -194,6 +197,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
         # domain validation error is reported.
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     base_validation_errors.ModelDomainObjectValidateError(
                         model,
@@ -219,6 +223,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     base_validation_errors.ModelDomainObjectValidateError(
                         model,
@@ -244,6 +249,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.InvalidExpUserLastPlaythroughIdError(
                         model
@@ -266,6 +272,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
@@ -294,6 +301,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
@@ -323,6 +331,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.LastPlayedExpVersionTooHighError(
                         model, 2
@@ -350,6 +359,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.LastPlayedExpVersionNotFoundError(
                         model
@@ -376,6 +386,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.LastPlayedStateNotInExplorationError(
                         model
@@ -390,6 +401,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
@@ -411,6 +423,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
@@ -428,6 +441,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
+                self.VALIDATED_MODELS_RESULT,
                 self._get_job_result(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
