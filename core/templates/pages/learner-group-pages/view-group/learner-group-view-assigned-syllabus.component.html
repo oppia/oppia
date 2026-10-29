@@ -29,7 +29,7 @@
                 </div>
               </div>
               <span class="progress-text">
-                <span class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate"></span>
+                <span class="progress-translate">{{ 'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate }}</span>
                 {{ getProgressOfStory(storySummaries[getIndexToDisplay(displayedItem)]) }}%
               </span>
             </div>

@@ -4,19 +4,19 @@
       <!-- Add topic translation key to replace <topicName> in language constants so topic name is
         also translated in selected language -->
       <h1 class="tab-title e2e-test-topic-page-tab-title" tabindex="0">
-        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
-              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ 'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName} }}
         </span>
-        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
-              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicNameTranslationKey | translate}">
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ 'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicNameTranslationKey | translate} }}
         </span>
       </h1>
       <div class="subtopic-subheading" tabindex="0">
-        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
-              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ 'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName} }}
         </span>
-        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
-              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicNameTranslationKey | translate}">
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ 'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicNameTranslationKey | translate} }}
         </span>
       </div>
       <div class="subtopics-container">

@@ -15,8 +15,8 @@
         <span class="blog-author-name e2e-test-author-name">
           {{ authorName }}
         </span>
-        <span class="total-blog-post-number-display"
-              [innerHTML]="'I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY' | translate: {totalNumber: totalBlogPosts}">
+        <span class="total-blog-post-number-display">
+          {{ 'I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY' | translate: {totalNumber: totalBlogPosts} }}
         </span>
       </mat-card-title>
       <mat-card-subtitle class="mt-3 blog-author-bio"
