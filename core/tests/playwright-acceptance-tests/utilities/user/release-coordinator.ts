@@ -48,7 +48,6 @@ export class ReleaseCoordinator extends BaseUser {
   ): Promise<void> {
     try {
       await this.goto(releaseCoordinatorUrl);
-
       if (this.isViewportAtMobileWidth()) {
         await this.expectElementToBeVisible(mobileNavBar);
         await this.clickOnElementWithSelector(mobileNavBar);
@@ -58,7 +57,6 @@ export class ReleaseCoordinator extends BaseUser {
         await this.expectElementToBeVisible(featuresTab);
         await this.clickOnElementWithSelector(featuresTab);
       }
-
       await this.expectElementToBeVisible(featureFlagDiv);
       const featureFlags = await this.page.$$(featureFlagDiv);
 
@@ -85,8 +83,14 @@ export class ReleaseCoordinator extends BaseUser {
           );
           await this.clickOnElement(saveButton);
 
+          await this.expectElementValueToBe(
+            selectElement,
+            enable ? '0: true' : '1: false'
+          );
+          // Wait for the save button in this feature's row to become disabled.
+          // Other feature rows can already have disabled Save buttons.
           await this.expectElementToBeVisible(
-            `${saveButtonSelector}[disabled]`
+            `${featureFlagDiv}:has([data-feature-flag-id="${featureName}"]) ${saveButtonSelector}[disabled]`
           );
 
           showMessage(

@@ -19,6 +19,7 @@
  * LC.13. Check Improvements Tab
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
@@ -27,51 +28,66 @@ import {
 } from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
+const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
+const EXPLORATION_CONTENT = 'Test Exploration Content';
 
-describe('Lesson Creator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Lesson Creator', function () {
   let explorationEditor: ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
+  let explorationId: string;
 
-  beforeAll(async function () {
-    // Create releaseCoordinator to enable the feature flag.
+  test.beforeAll(async function ({browser}) {
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
-      [testConstants.Roles.RELEASE_COORDINATOR]
+      browser,
+      [ROLES.RELEASE_COORDINATOR]
     );
+
+    await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
+    await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationCreator',
-      'exploration_creator@example.com'
+      'exploration_creator@example.com',
+      browser
     );
-
-    // Enable the Improvements Tab feature flag.
-    await releaseCoordinator.navigateToReleaseCoordinatorPage();
-    await releaseCoordinator.navigateToFeaturesTab();
-    await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
-
-    // Create exploration "Test Exploration" and save as draft per CUJ.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Test Exploration Content');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.createMinimalExploration(
+      EXPLORATION_CONTENT,
+      INTERACTION_TYPES.END_EXPLORATION
+    );
     await explorationEditor.saveExplorationDraft();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    explorationId = await explorationEditor.getExplorationId();
+  });
 
-  it(
-    'should not see improvements tab in draft exploration',
-    async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+  test('should not see improvements tab in draft exploration', async function () {
+    await explorationEditor.expectExplorationToBeDraft();
+    await explorationEditor.expectImprovementsTabToBePresent(false);
 
-      // Improvements Tab should NOT be visible in a draft exploration.
-      await explorationEditor.expectImprovementsTabToBePresnt(false);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await explorationEditor.navigateToCreatorDashboardPage();
+    // Reopen the saved draft rather than creating a second exploration.
+    await explorationEditor.openExplorationFromCreatorDashboard(explorationId);
+    await explorationEditor.expectEditorCardContentToContain(
+      EXPLORATION_CONTENT
+    );
+    await explorationEditor.expectExplorationToBeDraft();
+    await explorationEditor.expectImprovementsTabToBePresent(false);
+  });
+
+  test('should return to editor tab when opening improvements tab in a draft exploration', async function () {
+    await explorationEditor.expectImprovementsTabToBeInaccessible();
+    await explorationEditor.expectEditorCardContentToContain(
+      EXPLORATION_CONTENT
+    );
+    await explorationEditor.expectExplorationToBeDraft();
+    await explorationEditor.expectImprovementsTabToBePresent(false);
+  });
 
   // TODO(#13352): Test improvements tab visibility in published explorations.
   // Blocked by #7327: Generating NeedsGuidingResponses tasks requires answer
@@ -79,7 +95,7 @@ describe('Lesson Creator', function () {
   // too costly to include in acceptance tests. This test covers the core
   // goal: improvements tab is hidden for draft explorations.
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
