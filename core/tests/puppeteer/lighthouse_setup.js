@@ -25,9 +25,34 @@ const ADMIN_URL = 'http://localhost:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const TOPIC_AND_SKILLS_DASHBOARD_URL =
   'http://localhost:8181/topics-and-skills-dashboard';
+const RELEASE_COORDINATOR_URL = 'http://localhost:8181/release-coordinator';
+const LOGOUT_URL = 'http://localhost:8181/logout';
+// The second account seeded as a learner of the learner group. The
+// learner-group-viewer page requires its user to be a learner, and the primary
+// test admin cannot be both the facilitator and a learner of the same group.
+const LEARNER_ACCOUNT_EMAIL = 'learner@example.com';
+const LEARNER_ACCOUNT_USERNAME = 'username2';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
+// Bounds every DOM wait that does not pass its own timeout, so a stuck page
+// fails the shard with a specific error instead of hanging until the CI step
+// times out.
+const SETUP_ACTION_TIMEOUT_MS = 60000;
+// Bounds navigations, which need more slack than DOM waits because the
+// emulated appserver and the development-mode bundles are slow to settle.
+const SETUP_NAVIGATION_TIMEOUT_MS = 120000;
+// Bounds the poll for a generated-data status message. Data generation writes
+// many entities and can legitimately take longer than a single DOM wait.
+const SETUP_STATUS_MESSAGE_TIMEOUT_MS = 120000;
+// Hard ceiling on the whole setup. If a defect slips past the per-action
+// timeouts, this aborts the shard well before the 45-minute CI step limit so
+// the failure is reported against the setup rather than the job timeout.
+const SETUP_WATCHDOG_MS = 20 * 60 * 1000;
+// The admin activities tab and the exploration editor render their progress
+// messages into these elements after a data-generation or save action.
+const statusMessageSelector = '.oppia-status-message-container';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
@@ -39,6 +64,8 @@ var topicId = 'Topic editor not loaded';
 var skillId = 'Skill editor not loaded';
 var storyId = 'Story editor not loaded';
 var blogUrlFragment = 'Blog post page not loaded';
+var learnerGroupUrl = 'Learner group not loaded';
+var feedbackReportId = 'Feedback report not created';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -101,6 +128,11 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var featuresTabSelector = '.e2e-test-features-tab';
+var featureFlagRowSelector = '.e2e-test-feature-flag';
+var featureFlagNameSelector = '.e2e-test-feature-name';
+var featureFlagValueSelector = '.e2e-test-value-selector';
+var featureFlagSaveButtonSelector = '.e2e-test-save-button';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
 var blogGenerateButton = '.e2e-test-generate-blog-post';
@@ -118,6 +150,9 @@ var generateExplorationsPublishInput = '#label-target-explorations-to-publish';
 var reloadExplorationButton = '.e2e-test-reload-exploration-button';
 var reloadExplorationRow = '.e2e-test-reload-exploration-row';
 var reloadExplorationTitle = '.e2e-test-reload-exploration-title';
+var reloadCollectionButton = '.e2e-test-reload-collection-button';
+var reloadCollectionRow = '.e2e-test-reload-collection-row';
+var reloadCollectionTitle = '.e2e-test-reload-collection-title';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
@@ -149,19 +184,98 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
-const login = async function (browser, page) {
+// Runs a setup step with a time limit, and retries it if it fails.
+//
+// Each attempt gets timeoutMs milliseconds. If the action throws, or takes
+// longer than that, the attempt counts as failed and we try again, up to
+// maxAttempts times.
+//
+// Why: Puppeteer functions like page.$$, page.evaluate and page.select have no
+// timeout of their own. If the browser renderer gets stuck, one of them can
+// wait forever and freeze the whole shard for the rest of the CI job. Giving
+// each attempt its own deadline (and retrying) means a brief hiccup either
+// clears on the retry or fails quickly with the step name, instead of hanging.
+const retryStep = async function (name, action, maxAttempts, timeoutMs) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let timeoutId = null;
+    const deadlinePromise = new Promise((resolve, reject) => {
+      timeoutId = setTimeout(
+        () =>
+          reject(new Error(`Step timed out after ${timeoutMs}ms: ${name}.`)),
+        timeoutMs
+      );
+    });
+    try {
+      lastError = null;
+      await Promise.race([action(), deadlinePromise]);
+      return;
+    } catch (error) {
+      lastError = error;
+      // eslint-disable-next-line no-console
+      console.log(
+        `Setup step failed on attempt ${attempt}/${maxAttempts}: ${name}`
+      );
+      // eslint-disable-next-line no-console
+      console.log(error);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+  throw lastError;
+};
+
+// Waits up to timeoutMs for the element matching selector to show
+// expectedText, checking once a second.
+//
+// The wait is time-limited on purpose: if the expected message never appears
+// (for example, because a save failed without reporting an error), the shard
+// fails right away with the text that was actually on the page. Otherwise this
+// would keep checking until the whole CI job gives up.
+const waitForStatusMessage = async function (
+  page,
+  selector,
+  expectedText,
+  timeoutMs
+) {
+  const deadline = Date.now() + timeoutMs;
+  let observedText = '';
+  while (Date.now() < deadline) {
+    // The page.evaluate call has no built-in timeout, so record whatever is on
+    // the page at each poll to make a timeout failure diagnosable.
+    observedText = await page.evaluate(sel => {
+      const element = document.querySelector(sel);
+      return element ? element.textContent.trim() : '';
+    }, selector);
+    if (observedText === expectedText) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  throw new Error(
+    `Timed out after ${timeoutMs}ms waiting for status message ` +
+      `"${expectedText}". Last observed text in ${selector}: ` +
+      `"${observedText}".`
+  );
+};
+
+const login = async function (
+  browser,
+  page,
+  email = 'testadmin@example.com',
+  username = 'username1'
+) {
   try {
-    // eslint-disable-next-line dot-notation
-    // networkidle0 can wait forever on the heavy /admin page when its
-    // background requests keep a connection open (seen as a local hang), so
-    // allow up to two connections and cap the wait to surface a hard error
+    // Puppeteer's networkidle0 can wait forever on the heavy /admin page when
+    // its background requests keep a connection open (seen as a local hang),
+    // so allow up to two connections and cap the wait to surface a hard error
     // instead of spinning silently.
     await page.goto(ADMIN_URL, {
       waitUntil: 'networkidle2',
       timeout: 60000,
     });
     await page.waitForSelector(emailInput, {visible: true});
-    await page.type(emailInput, 'testadmin@example.com');
+    await page.type(emailInput, email);
     await page.click(signInButton);
 
     let cookies = await page.cookies();
@@ -195,7 +309,7 @@ const login = async function (browser, page) {
       return;
     }
 
-    await usernameInputElement.type('username1');
+    await usernameInputElement.type(username);
     await Promise.all([
       page.waitForResponse(response =>
         response.url().includes('/usernamehandler/data')
@@ -217,6 +331,14 @@ const login = async function (browser, page) {
     console.log(e);
     process.exit(1);
   }
+};
+
+// Signs the current user out so that the next login can authenticate as a
+// different account. The logout page signs out of Firebase and then redirects,
+// so the navigation completes while still on the transient /logout url.
+const logout = async function (browser, page) {
+  await page.goto(LOGOUT_URL, {waitUntil: 'networkidle2', timeout: 60000});
+  await page.waitForTimeout(2000);
 };
 
 const setRole = async function (browser, page, role) {
@@ -305,7 +427,6 @@ const selectExplorationInCreationModal = async function (page) {
 
 const getExplorationEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createButtonSelector, {visible: true});
 
@@ -367,19 +488,12 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForSelector(saveDraftButton, {visible: true});
     await page.click(saveDraftButton);
 
-    const successMessage = 'Changes saved.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.e2e-test-toast-message'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      toastMessageSelector,
+      'Changes saved.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(publishExplorationButton);
@@ -430,7 +544,6 @@ const getExplorationEditorUrl = async function (browser, page) {
 
 const getTopicEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createTopicButtonSelector, {visible: true});
     await page.click(createTopicButtonSelector);
@@ -460,7 +573,6 @@ const getTopicEditorUrl = async function (browser, page) {
     await browser.pages();
 
     // Refresh page and click on topic link.
-    // eslint-disable-next-line dot-notation
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, {waitUntil: networkIdle});
     await page.waitForSelector(createdTopicLink, {visible: true});
     await page.click(createdTopicLink);
@@ -477,7 +589,6 @@ const getTopicEditorUrl = async function (browser, page) {
 
 const getStoryEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, {waitUntil: networkIdle});
     await page.waitForSelector(createStoryButtonSelector, {visible: true});
     await page.click(createStoryButtonSelector);
@@ -513,7 +624,6 @@ const getStoryEditorUrl = async function (browser, page) {
 
 const getSkillEditorUrl = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, {waitUntil: networkIdle});
     await page.waitForSelector(createSkillButtonSelector, {visible: true});
     await page.click(createSkillButtonSelector);
@@ -545,7 +655,6 @@ const getSkillEditorUrl = async function (browser, page) {
 
 const generateDataForTopicAndStoryPlayer = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -553,21 +662,13 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
-    const successMessage = 'Dummy new structures data generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy new structures data generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error(e);
     process.exit(1);
   }
@@ -575,7 +676,6 @@ const generateDataForTopicAndStoryPlayer = async function (browser, page) {
 
 const generateDataForClassroom = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -587,19 +687,12 @@ const generateDataForClassroom = async function (browser, page) {
     await page.type(generateClassroomCountInput, '1');
     await page.click(generateClassroomButton);
 
-    const successMessage = 'Dummy new classroom generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy new classroom generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
     await addThumbnailToTopic(page, 'Fraction');
     await addThumbnailToTopic(page, 'Addition');
     await addThumbnailToTopic(page, 'Subtraction');
@@ -614,7 +707,6 @@ const generateDataForClassroom = async function (browser, page) {
 
 const generateBareClassrooms = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -624,19 +716,12 @@ const generateBareClassrooms = async function (browser, page) {
     await page.waitForSelector(generateDefaultClassroomButton);
     await page.click(generateDefaultClassroomButton);
 
-    const successMessage = 'Dummy default classrooms generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy default classrooms generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -646,7 +731,6 @@ const generateBareClassrooms = async function (browser, page) {
 
 const generateDataForBlogPosts = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -660,24 +744,17 @@ const generateDataForBlogPosts = async function (browser, page) {
     for (let i = 0; i < 11; i++) {
       const blogGenerateButtons = await page.$$(blogGenerateButton);
       await blogGenerateButtons[i % blogGenerateButtons.length].click();
-      let statusMessage;
-      do {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        statusMessage = await page.evaluate(() => {
-          const statusMessageElement = document.querySelector(
-            '.oppia-status-message-container'
-          );
-          return statusMessageElement
-            ? statusMessageElement.textContent.trim()
-            : '';
-        });
-      } while (statusMessage !== successMessage);
+      await waitForStatusMessage(
+        page,
+        statusMessageSelector,
+        successMessage,
+        SETUP_STATUS_MESSAGE_TIMEOUT_MS
+      );
     }
 
     // Navigate to the blog homepage and open the first published blog post to
     // capture its URL fragment, which is needed for the blog post page
     // lighthouse check.
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/blog', {waitUntil: networkIdle});
     await page.waitForSelector('.e2e-test-blog-post-list .blog-card', {
       visible: true,
@@ -697,7 +774,6 @@ const generateDataForBlogPosts = async function (browser, page) {
 
 const generateDummyExplorations = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/activities', {
       waitUntil: networkIdle,
     });
@@ -717,19 +793,12 @@ const generateDummyExplorations = async function (browser, page) {
     );
     await generateButton.click();
 
-    const successMessage = 'Dummy explorations generated successfully.';
-    let statusMessage;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector(
-          '.oppia-status-message-container'
-        );
-        return statusMessageElement
-          ? statusMessageElement.textContent.trim()
-          : '';
-      });
-    } while (statusMessage !== successMessage);
+    await waitForStatusMessage(
+      page,
+      statusMessageSelector,
+      'Dummy explorations generated successfully.',
+      SETUP_STATUS_MESSAGE_TIMEOUT_MS
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -739,7 +808,6 @@ const generateDummyExplorations = async function (browser, page) {
 
 const reloadAllInteractionsExploration = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     // Like the login navigation, the admin activities tab can keep a
     // background connection open, so avoid networkidle0 which can wait
     // forever; allow up to two connections and cap the wait.
@@ -748,10 +816,15 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       timeout: 60000,
     });
 
-    // The reload button is guarded by a native confirm dialog. Without a
-    // dialog handler the page can block indefinitely waiting for it to be
-    // answered, so accept any dialog that appears before clicking.
-    page.on('dialog', async dialog => {
+    // The reload button opens a native confirm dialog. While that dialog is
+    // open, Puppeteer's page can wait forever, so we accept the first dialog
+    // that appears before clicking.
+    //
+    // The handler is added with page.once, so it fires only for that first
+    // dialog. A later reload step in the same session has no leftover handler
+    // that could accept a dialog twice, which Puppeteer rejects with
+    // "Cannot accept dialog which is already handled!".
+    page.once('dialog', async dialog => {
       await dialog.accept();
     });
 
@@ -782,9 +855,79 @@ const reloadAllInteractionsExploration = async function (browser, page) {
       );
     }
 
-    // The admin activities page shows a status message when the reload
-    // finishes. waitForFunction polls the message until it matches and throws
-    // on timeout, which replaces a manual retry loop with the same behavior.
+    // After the reload finishes, the admin activities page shows a status
+    // message. page.waitForFunction keeps checking that message until it reads
+    // 'Data reloaded successfully.' (once a second, up to two minutes) and
+    // throws if it never appears. That is the same job the old hand-written
+    // retry loop did, just with less code.
+    await page.waitForFunction(
+      () => {
+        const statusMessageElement = document.querySelector(
+          '.oppia-status-message-container'
+        );
+        return (
+          statusMessageElement &&
+          statusMessageElement.textContent.trim() ===
+            'Data reloaded successfully.'
+        );
+      },
+      {polling: 1000, timeout: 120000}
+    );
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const reloadDemoCollection = async function (browser, page) {
+  try {
+    await page.goto('http://localhost:8181/admin#/activities', {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
+
+    // The reload button opens a native confirm dialog. While that dialog is
+    // open, Puppeteer's page can wait forever, so we accept the first dialog
+    // that appears before clicking.
+    //
+    // The handler is added with page.once, so it fires only for that first
+    // dialog. A later reload step in the same session has no leftover handler
+    // that could accept a dialog twice, which Puppeteer rejects with
+    // "Cannot accept dialog which is already handled!".
+    page.once('dialog', async dialog => {
+      await dialog.accept();
+    });
+
+    await page.waitForSelector(reloadCollectionRow, {timeout: 60000});
+    const reloadButtons = await page.$$(reloadCollectionButton);
+    let reloadStarted = false;
+    for (let i = 0; i < reloadButtons.length; i++) {
+      const title = await page.evaluate(
+        (el, sel, titleSelector) =>
+          el.closest(sel).querySelector(titleSelector).textContent.trim(),
+        reloadButtons[i],
+        reloadCollectionRow,
+        reloadCollectionTitle
+      );
+      if (title === 'welcome_to_collections.yaml') {
+        await reloadButtons[i].click();
+        reloadStarted = true;
+        break;
+      }
+    }
+    if (!reloadStarted) {
+      throw new Error(
+        'The welcome_to_collections.yaml demo collection reload button was ' +
+          'not found.'
+      );
+    }
+
+    // After the reload finishes, the admin activities page shows a status
+    // message. page.waitForFunction keeps checking that message until it reads
+    // 'Data reloaded successfully.' (once a second, up to two minutes) and
+    // throws if it never appears. That is the same job the old hand-written
+    // retry loop did, just with less code.
     await page.waitForFunction(
       () => {
         const statusMessageElement = document.querySelector(
@@ -807,7 +950,6 @@ const reloadAllInteractionsExploration = async function (browser, page) {
 
 const enableDiagnosticTestForMathClassroom = async function (browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/classroom-admin', {
       waitUntil: networkIdle,
     });
@@ -839,11 +981,294 @@ const enableDiagnosticTestForMathClassroom = async function (browser, page) {
       {},
       classroomSaveButton
     );
-    await page.click(classroomSaveButton);
+
+    await page.$eval(classroomSaveButton, element => {
+      element.scrollIntoView({block: 'center', inline: 'center'});
+      element.click();
+    });
 
     // Wait for the classroom data to be saved and the editor to close.
     await page.waitForSelector(classroomNameView, {visible: true});
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+// Force-enables a feature flag for every user through the release coordinator
+// page. Page routes gated behind a flag render the error page while the flag is
+// disabled, and there is no other way to turn a flag on for the audit server,
+// so the setup has to enable it before the checks run. The setup server runs in
+// the DEV stage, where every feature flag is listed, and the flag config is
+// persisted to the shared datastore that the audit server later reads.
+//
+// The navigation waits for 'domcontentloaded' rather than 'networkidle0',
+// because the page opens on the beam jobs tab, whose component polls the
+// backend on an interval, so the network never goes idle and a networkidle0
+// wait always times out. The subsequent waits for the features tab and the
+// flag rows cover the page's asynchronous rendering.
+const enableFeatureFlagForAllUsers = async function (
+  browser,
+  page,
+  featureFlagName
+) {
+  // Saving a flag opens a native confirm dialog, and an unanswered dialog
+  // blocks the renderer, so the Puppeteer call that triggered it (and the
+  // navigation on a retry) never resolves. Accept dialogs for the duration of
+  // this step, and remove the handler at the end so a later step cannot
+  // double-accept one, which Puppeteer rejects with "Cannot accept dialog
+  // which is already handled!".
+  const acceptDialog = async dialog => {
+    await dialog.accept();
+  };
+  page.on('dialog', acceptDialog);
+  try {
+    await page.goto(RELEASE_COORDINATOR_URL, {
+      waitUntil: 'domcontentloaded',
+      timeout: 120000,
+    });
+    await page.waitForSelector(featuresTabSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+    await page.click(featuresTabSelector);
+    await page.waitForSelector(featureFlagRowSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+
+    const featureFlagRows = await page.$$(featureFlagRowSelector);
+    for (let i = 0; i < featureFlagRows.length; i++) {
+      const featureFlagNameElement = await featureFlagRows[i].$(
+        featureFlagNameSelector
+      );
+      if (featureFlagNameElement === null) {
+        continue;
+      }
+      const rowFeatureFlagName = await page.evaluate(
+        element => element.textContent.trim(),
+        featureFlagNameElement
+      );
+      if (rowFeatureFlagName !== featureFlagName) {
+        continue;
+      }
+
+      const valueSelector = await featureFlagRows[i].$(
+        featureFlagValueSelector
+      );
+      if (valueSelector === null) {
+        throw new Error(
+          `Value selector not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      // The force-enable select is bound with [ngValue], so "Yes" is rendered
+      // with the Angular-encoded option value "0: true".
+      await valueSelector.select('0: true');
+
+      const saveButton = await featureFlagRows[i].$(
+        featureFlagSaveButtonSelector
+      );
+      if (saveButton === null) {
+        throw new Error(
+          `Save button not found for feature flag: ${featureFlagName}.`
+        );
+      }
+      await saveButton.click();
+      await featureFlagRows[i].waitForSelector(
+        `${featureFlagSaveButtonSelector}[disabled]`,
+        {visible: true, timeout: 60000}
+      );
+      return;
+    }
+
+    throw new Error(`Feature flag not found: ${featureFlagName}.`);
+  } finally {
+    page.off('dialog', acceptDialog);
+  }
+};
+
+// Fetches the CSRF token that the frontend attaches to state-changing requests.
+// The token endpoint guards its JSON with a five-character XSSI prefix, so the
+// prefix is stripped before parsing.
+const getCsrfToken = async function (page) {
+  return page.evaluate(async () => {
+    const response = await fetch('/csrfhandler', {credentials: 'same-origin'});
+    const responseText = await response.text();
+    return JSON.parse(responseText.substring(5)).token;
+  });
+};
+
+// Creates a learner group as the logged-in facilitator and invites the given
+// learner, returning the new group id. The learner is invited rather than added
+// directly, because only accepting an invitation records the group on the
+// learner's own user model, which the learner group progress endpoints read.
+const createLearnerGroupAndInviteLearner = async function (
+  browser,
+  page,
+  title,
+  description,
+  invitedLearnerUsername
+) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const learnerGroupId = await page.evaluate(
+      async (csrfToken, title, description, invitedLearnerUsername) => {
+        const createResponse = await fetch('/create_learner_group_handler', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: new URLSearchParams({
+            csrf_token: csrfToken,
+            payload: JSON.stringify({
+              group_title: title,
+              group_description: description,
+            }),
+          }).toString(),
+        });
+        if (!createResponse.ok) {
+          return null;
+        }
+        // The server's render_json prefixes every JSON body with the
+        // five-byte XSSI prefix, which the Angular frontend strips in an HTTP
+        // interceptor but this raw fetch does not. Parsing the prefix as JSON
+        // throws "Unexpected token ) in JSON at position 0".
+        const createBody = JSON.parse(
+          (await createResponse.text()).substring(5)
+        );
+
+        const updateResponse = await fetch(
+          `/update_learner_group_handler/${createBody.id}`,
+          {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+              csrf_token: csrfToken,
+              payload: JSON.stringify({
+                group_title: title,
+                group_description: description,
+                learner_usernames: [],
+                invited_learner_usernames: [invitedLearnerUsername],
+                subtopic_page_ids: [],
+                story_ids: [],
+              }),
+            }).toString(),
+          }
+        );
+        return updateResponse.ok ? createBody.id : null;
+      },
+      csrfToken,
+      title,
+      description,
+      invitedLearnerUsername
+    );
+
+    if (!learnerGroupId) {
+      throw new Error('Failed to create the learner group.');
+    }
+    return learnerGroupId;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to create the learner group');
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+// Accepts the logged-in learner's invitation to the given group. Accepting is
+// what adds the group to the learner's own user model, so an invited-but-not-
+// accepted learner would break the learner-group-viewer page.
+const acceptLearnerGroupInvitation = async function (
+  browser,
+  page,
+  learnerGroupId,
+  learnerUsername
+) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const invitationAccepted = await page.evaluate(
+      async (csrfToken, learnerGroupId, learnerUsername) => {
+        const response = await fetch(
+          `/learner_group_learner_invitation_handler/${learnerGroupId}`,
+          {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+              csrf_token: csrfToken,
+              payload: JSON.stringify({
+                learner_username: learnerUsername,
+                is_invitation_accepted: 'true',
+                progress_sharing_permission: 'false',
+              }),
+            }).toString(),
+          }
+        );
+        return response.ok;
+      },
+      csrfToken,
+      learnerGroupId,
+      learnerUsername
+    );
+
+    if (!invitationAccepted) {
+      throw new Error('Failed to accept the learner group invitation.');
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to accept the learner group invitation');
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+// Creates a platform feedback report through the public submission endpoint so
+// that the technical feedback detail page has a real report to render. The page
+// is audited at /technical-feedback-dashboard/<team>/<report_id> and returns a
+// 404, which the browser logs as a console error, unless that report exists.
+// The backend derives the report's team from the first path segment of the
+// submitted page_url: segments in TECHNICAL_EXTERNAL_DASHBOARD_PATHS route to
+// "tech-external" and every other segment routes to "tech-internal". This
+// submits from a page that routes to "tech-internal", so the audited URL in
+// core/tests/lighthouse-pages.json uses that team.
+const createTechnicalFeedbackReport = async function (browser, page) {
+  try {
+    const csrfToken = await getCsrfToken(page);
+    const reportId = await page.evaluate(async csrfToken => {
+      const response = await fetch('/platform-feedback', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          csrf_token: csrfToken,
+          payload: JSON.stringify({
+            source: 'app',
+            report_message: 'Technical feedback report seeded for Lighthouse.',
+            page_url: 'http://localhost:8181/creator-dashboard',
+            include_technical_logs: false,
+          }),
+        }).toString(),
+      });
+      if (!response.ok) {
+        return null;
+      }
+      // The server's render_json prefixes every JSON body with the five-byte
+      // XSSI prefix, which the Angular frontend strips in an HTTP interceptor
+      // but this raw fetch does not.
+      const responseBody = JSON.parse((await response.text()).substring(5));
+      return responseBody.id;
+    }, csrfToken);
+
+    if (!reportId) {
+      throw new Error('Failed to create the technical feedback report.');
+    }
+    return reportId;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Failed to create the technical feedback report');
     // eslint-disable-next-line no-console
     console.log(e);
     process.exit(1);
@@ -924,7 +1349,6 @@ const setRoles = async function (browser, page, roles) {
     // session. Reloading the admin roles tab for each role used to repeat the
     // page load and the username look-up steps, so assigning roles no longer
     // performs one navigation per role.
-    // eslint-disable-next-line dot-notation
     await page.goto('http://localhost:8181/admin#/roles', {
       waitUntil: 'networkidle2',
       timeout: 60000,
@@ -969,16 +1393,22 @@ const shard2Setup = async function (browser, page) {
 const shard3Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 3 audits the classroom-admin (curriculum admin) and voiceover-admin
-  // (voiceover admin) role-gated pages, so these roles are assigned.
-  // Its other pages (classrooms, classroom, creator-dashboard,
-  // exploration-editor, exploration-player, community-library,
-  // pending-account-deletion) are public or login-only, so no topic/story/skill
-  // generation is needed here.
+  // (voiceover admin) role-gated pages, so these roles are assigned. The
+  // release coordinator role is still assigned because the per-URL feature flag
+  // toggles in puppeteer-login-script.js need it. Its other pages (classrooms,
+  // classroom, creator-dashboard, exploration-editor, exploration-player,
+  // exploration-player-embed, community-library, pending-account-deletion) are
+  // public or login-only, so no topic/story/skill generation is needed here.
   await logStep('assigning roles', () =>
-    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN'])
+    setRoles(browser, page, ['ADMIN', 'VOICEOVER_ADMIN', 'RELEASE_COORDINATOR'])
   );
+
+  // The new_lesson_player flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy exploration player pages
+  // (which need it disabled) and the new lesson player pages (which need it
+  // enabled) can both be audited in this shard.
   // The exploration editor setup creates the exploration that backs the
-  // exploration-editor and exploration-player pages.
+  // exploration-editor, exploration-player and exploration-player-embed pages.
   await logStep('exploration editor setup', () =>
     getExplorationEditorUrl(browser, page)
   );
@@ -995,6 +1425,11 @@ const shard3Setup = async function (browser, page) {
   await logStep('loading all-interactions exploration', () =>
     reloadAllInteractionsExploration(browser, page)
   );
+  // The demo collection backs the collection editor and collection player
+  // pages.
+  await logStep('reloading demo collection', () =>
+    reloadDemoCollection(browser, page)
+  );
   // Bare classrooms populate the /learn (classrooms) listing page.
   await logStep('generating bare classrooms', () =>
     generateBareClassrooms(browser, page)
@@ -1004,11 +1439,21 @@ const shard3Setup = async function (browser, page) {
 const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
-  // topic/story/skill editors, and the diagnostic test player page.
-  await logStep('assigning roles', () => setRoles(browser, page, ['ADMIN']));
+  // topic/story/skill editors, the diagnostic test player page, and the
+  // practice, node-practice, mastery-challenge and end-of-arc-test pages.
+  // The release coordinator role is still assigned because the per-URL feature
+  // flag toggles in puppeteer-login-script.js need it.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
+  );
+
+  // The story_editor_arcs flag is toggled per audited URL in
+  // puppeteer-login-script.js, so that the legacy practice page (which needs
+  // it disabled) and the node-practice, mastery-challenge and end-of-arc-test
+  // pages (which need it enabled) can all be audited in this shard.
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
-  // pages.
+  // pages, and its story nodes back the node-practice page.
   await logStep('generating topic and story data', () =>
     generateDataForTopicAndStoryPlayer(browser, page)
   );
@@ -1033,6 +1478,93 @@ const shard4Setup = async function (browser, page) {
   );
 };
 
+const shard5Setup = async function (browser, page) {
+  await logStep('logging in', () => login(browser, page));
+  // Shard 5 audits the technical-feedback dashboard and its detail page, which
+  // are gated on the ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD action
+  // (granted only by the TECH_TEAM_LEAD role, see role_services.py) and on the
+  // technical_feedback_dashboard_enabled feature flag. The facilitator
+  // dashboard and the learner group pages are gated on the
+  // learner_groups_are_enabled feature flag. Enabling either feature flag
+  // requires the RELEASE_COORDINATOR role, so all three roles are assigned
+  // here.
+  await logStep('assigning roles', () =>
+    setRoles(browser, page, ['TECH_TEAM_LEAD', 'RELEASE_COORDINATOR'])
+  );
+
+  await logStep('enabling learner groups feature flag', () =>
+    retryStep(
+      'enabling the learner_groups_are_enabled feature flag',
+      () =>
+        enableFeatureFlagForAllUsers(
+          browser,
+          page,
+          'learner_groups_are_enabled'
+        ),
+      2,
+      150000
+    )
+  );
+
+  await logStep('enabling technical feedback feature flag', () =>
+    retryStep(
+      'enabling the technical_feedback_dashboard_enabled feature flag',
+      () =>
+        enableFeatureFlagForAllUsers(
+          browser,
+          page,
+          'technical_feedback_dashboard_enabled'
+        ),
+      2,
+      150000
+    )
+  );
+  // The technical feedback detail page reads a single report by id, so a report
+  // is seeded here; without it the page renders a 404 and logs a browser
+  // console error. The submission endpoint is open access, so it is created
+  // here while the test admin is still logged in.
+  await logStep('creating technical feedback report', async () => {
+    feedbackReportId = await createTechnicalFeedbackReport(browser, page);
+  });
+  // The learner-group-editor page is gated on the logged-in user being a
+  // facilitator of the group and the learner-group-viewer page on that user
+  // being a learner of it. A single account cannot be both (the learner group
+  // validator forbids a facilitator from also being a learner), so a second
+  // account is registered here and audited on the viewer page by the per-url
+  // login script. Registering it first makes its username resolvable when the
+  // group invites it below.
+  await logStep('registering learner account', async () => {
+    await logout(browser, page);
+    await login(browser, page, LEARNER_ACCOUNT_EMAIL, LEARNER_ACCOUNT_USERNAME);
+  });
+  // The group is created by the test admin as its facilitator, then the learner
+  // account is invited. Accepting the invitation (below) records the group on
+  // the learner's own user model, which the viewer page reads.
+  let learnerGroupId = null;
+  await logStep('creating learner group', async () => {
+    await logout(browser, page);
+    await login(browser, page);
+    learnerGroupId = await createLearnerGroupAndInviteLearner(
+      browser,
+      page,
+      'Lighthouse learner group',
+      'Learner group seeded for the lighthouse checks.',
+      LEARNER_ACCOUNT_USERNAME
+    );
+    learnerGroupUrl = `http://localhost:8181/edit-learner-group/${learnerGroupId}`;
+  });
+  await logStep('accepting learner group invitation', async () => {
+    await logout(browser, page);
+    await login(browser, page, LEARNER_ACCOUNT_EMAIL, LEARNER_ACCOUNT_USERNAME);
+    await acceptLearnerGroupInvitation(
+      browser,
+      page,
+      learnerGroupId,
+      LEARNER_ACCOUNT_USERNAME
+    );
+  });
+};
+
 const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
@@ -1044,6 +1576,18 @@ const main = async function () {
     width: 1920,
     height: 1080,
   });
+  // Bound every wait and navigation that does not pass its own timeout so a
+  // single stuck step cannot stall the shard indefinitely.
+  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
+  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+  // Last-resort ceiling for the whole setup; see SETUP_WATCHDOG_MS.
+  const watchdogId = setTimeout(() => {
+    console.error(
+      `[lighthouse-setup] Setup exceeded the ${SETUP_WATCHDOG_MS}ms watchdog ` +
+        'and was aborted.'
+    );
+    process.exit(1);
+  }, SETUP_WATCHDOG_MS);
 
   var recorder = null;
   let record = process.argv[2] && process.argv[2] === '-record';
@@ -1073,14 +1617,15 @@ const main = async function () {
   }
 
   const shard = Number(process.env.LIGHTHOUSE_SHARD);
-  // Shards have dedicated, minimal setups. Shards 2, 3 and 4 seed the data
-  // their pages need; shard 1 audits only static, public pages, so it needs no
-  // setup at all.
+  // Shards have dedicated, minimal setups. Shards 2, 3, 4 and 5 assign the
+  // roles their pages need and seed any data those pages read; shard 1 audits
+  // only static, public pages, so it needs no setup at all.
   const shardSetupRunners = {
     1: async function () {},
     2: shard2Setup,
     3: shard3Setup,
     4: shard4Setup,
+    5: shard5Setup,
   };
   const runShardSetup = shardSetupRunners[shard];
   if (!runShardSetup) {
@@ -1101,11 +1646,14 @@ const main = async function () {
         ? 'data-player'
         : shard === 4
           ? 'editors'
-          : 'static';
+          : shard === 5
+            ? 'role-gated'
+            : 'static';
   const ranBlogSetup = setupKind === 'blog';
   const ranExplorationSetup =
     setupKind === 'data-player' || setupKind === 'blog';
   const ranTopicStorySkillSetup = setupKind === 'editors';
+  const ranRoleGatedSetup = setupKind === 'role-gated';
 
   await runShardSetup(browser, page);
 
@@ -1135,10 +1683,18 @@ const main = async function () {
   if (ranBlogSetup) {
     urls.push(`http://localhost:8181/blog/${blogUrlFragment}`);
   }
+  if (ranRoleGatedSetup) {
+    urls.push(learnerGroupUrl);
+    urls.push(
+      'http://localhost:8181/technical-feedback-dashboard/tech-internal/' +
+        feedbackReportId
+    );
+  }
   await process.stdout.write(urls.join('\n'));
   if (record) {
     await recorder.stop();
   }
+  clearTimeout(watchdogId);
   await page.close();
   process.exit(0);
 };

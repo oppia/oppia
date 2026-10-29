@@ -82,13 +82,6 @@ class LibraryIndexHandler(
             [constants.DEFAULT_LANGUAGE_CODE],
             display_in_language_code=display_in_language_code,
         )
-        top_rated_activity_summary_dicts = (
-            summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
-                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
-                display_in_language_code=display_in_language_code,
-            )
-        )
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
                 [constants.DEFAULT_LANGUAGE_CODE],
@@ -101,23 +94,6 @@ class LibraryIndexHandler(
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
-        if top_rated_activity_summary_dicts:
-            # Here we use MyPy ignore because here we are adding a new
-            # 'protractor_id' key on a TypedDict dictionary, and addition
-            # of any new key on typedDict is prohibited by MyPy.
-            summary_dicts_by_category.insert(
-                0,
-                {  # type: ignore[typeddict-item]
-                    'activity_summary_dicts': top_rated_activity_summary_dicts,
-                    'categories': [],
-                    'header_i18n_id': (
-                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
-                    ),
-                    'has_full_results_page': True,
-                    'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                    'protractor_id': 'top-rated',
-                },
-            )
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(
                 0,
@@ -137,89 +113,6 @@ class LibraryIndexHandler(
                 'activity_summary_dicts_by_category': (
                     summary_dicts_by_category
                 ),
-                'preferred_language_codes': preferred_language_codes,
-            }
-        )
-        self.render_json(self.values)
-
-
-class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of LibraryGroupIndexHandler's
-    normalized_request dictionary.
-    """
-
-    group_name: str
-    display_in_language_code: Optional[str]
-
-
-class LibraryGroupIndexHandler(
-    base.BaseHandler[
-        Dict[str, str], LibraryGroupIndexHandlerNormalizedRequestDict
-    ]
-):
-    """Provides data for categories such as top rated and recently published."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'group_name': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
-                        feconf.LIBRARY_GROUP_TOP_RATED,
-                    ],
-                }
-            },
-            'display_in_language_code': DISPLAY_IN_LANGUAGE_CODE_SCHEMA,
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests for group pages."""
-        # TODO(sll): Support index pages for other language codes.
-        assert self.normalized_request is not None
-        group_name = self.normalized_request['group_name']
-        display_in_language_code = self.normalized_request.get(
-            'display_in_language_code'
-        )
-        activity_list = []
-        header_i18n_id = ''
-
-        if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
-            recently_published_summary_dicts = (
-                summary_services.get_recently_published_exp_summary_dicts(
-                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE,
-                    display_in_language_code=display_in_language_code,
-                )
-            )
-            if recently_published_summary_dicts:
-                activity_list = recently_published_summary_dicts
-                header_i18n_id = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
-
-        else:
-            top_rated_activity_summary_dicts = (
-                summary_services.get_top_rated_exploration_summary_dicts(
-                    [constants.DEFAULT_LANGUAGE_CODE],
-                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
-                    display_in_language_code=display_in_language_code,
-                )
-            )
-            if top_rated_activity_summary_dicts:
-                activity_list = top_rated_activity_summary_dicts
-                header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
-
-        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
-        if self.user_id:
-            user_settings = user_services.get_user_settings(self.user_id)
-            preferred_language_codes = user_settings.preferred_language_codes
-
-        self.values.update(
-            {
-                'activity_list': activity_list,
-                'header_i18n_id': header_i18n_id,
                 'preferred_language_codes': preferred_language_codes,
             }
         )
