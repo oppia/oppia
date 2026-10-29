@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Blog post editor utility file for Playwright acceptance tests.
+ * @fileoverview Blog post editor users utility file.
  */
 
-import {Page, expect} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -27,6 +27,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 // Selectors — identical to the Puppeteer version because they share the same
 // Angular templates.
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
+const blogBodyInput = 'div.e2e-test-rte';
 const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
@@ -53,11 +54,12 @@ const editBlogSelector = '.e2e-test-content-button';
 const confirmButtonSelector = 'button.e2e-test-confirm-button';
 const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 const blogPostTitlePage = '.e2e-test-blog-post-title';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const photoUploadErrorSelector = '.e2e-test-upload-error';
 
 export class BlogPostEditor extends BaseUser {
   /**
-   * Navigates to the blog dashboard page.
+   * Function for navigating to the blog dashboard page.
    */
   async navigateToBlogDashboardPage(): Promise<void> {
     await this.goto(blogDashboardUrl);
@@ -178,7 +180,7 @@ export class BlogPostEditor extends BaseUser {
       await this.uploadFile(imagePath);
       await this.waitForElementToStabilize(addThumbnailImageButton);
       await this.clickOnElementWithSelector(addThumbnailImageButton);
-      await this.page.waitForSelector('body.modal-open', {state: 'hidden'});
+      await this.page.waitForSelector('body.modal-open', {state: 'detached'});
     }
   }
 
@@ -452,7 +454,6 @@ export class BlogPostEditor extends BaseUser {
    * Sets the body text of the blog post. Opens the edit mode first if needed.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
-    const blogBodyInput = 'div.e2e-test-rte';
     if (!(await this.isElementVisible(blogBodyInput))) {
       await this.expectElementToBeVisible(editBlogSelector);
       await this.clickOnElementWithSelector(editBlogSelector);
@@ -478,7 +479,6 @@ export class BlogPostEditor extends BaseUser {
    * Selects (or deselects) a tag in the blog editor.
    */
   async selectTag(tag: string, shouldBePresent: boolean = true): Promise<void> {
-    const blogBodyInput = 'div.e2e-test-rte';
     // On mobile the tag controls are inside the edit view.
     if (
       this.isViewportAtMobileWidth() &&
@@ -516,7 +516,6 @@ export class BlogPostEditor extends BaseUser {
    * Checks that the blog post with the given title appears on the blog page.
    */
   async expectBlogPostToBePresent(blogPostTitle: string): Promise<void> {
-    const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
     await this.expectElementToBeVisible(blogPostTitleSelector);
     const titles = await this.page.$$eval(blogPostTitleSelector, elements =>
       elements.map(el => el.textContent?.trim() ?? '')
@@ -530,5 +529,6 @@ export class BlogPostEditor extends BaseUser {
   }
 }
 
-export const BlogPostEditorFactory = (page: Page): BlogPostEditor =>
-  new BlogPostEditor(page);
+export const BlogPostEditorFactory = (page: Page): BlogPostEditor => {
+  return new BlogPostEditor(page);
+};
