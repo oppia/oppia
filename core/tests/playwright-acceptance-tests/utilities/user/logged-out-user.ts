@@ -3053,6 +3053,12 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  async clickOnTermsOfServiceLinkFooter(): Promise<void> {
+    const termsLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Terms of Service/i});
+    await termsLink.scrollIntoViewIfNeeded();
+    await termsLink.click();
   /**
    * Closes the mobile sidebar and waits for it to disappear.
    *
@@ -3615,16 +3621,12 @@ export class LoggedOutUser extends BaseUser {
     showMessage('The Watch a Video button has the right link.');
   }
 
-  /**
-   * Checks that the "Read our blog" button shown after subscribing to the
-   * newsletter has the correct link.
-   */
-  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
-    await this.expectLinkToHaveHref(
-      readOurBlogButtonInThanksForSubscribe,
-      readBlogUrl
-    );
-    showMessage('The Read our blog button has the right link.');
+  async clickOnPrivacyPolicyLinkInFooter(): Promise<void> {
+    const privacyLink = this.page
+      .locator('footer')
+      .getByRole('link', {name: /Privacy Policy/i});
+    await privacyLink.scrollIntoViewIfNeeded();
+    await privacyLink.click();
   }
 
   /**
@@ -3783,7 +3785,6 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 }
-
 export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
   return new LoggedOutUser(page);
 };
