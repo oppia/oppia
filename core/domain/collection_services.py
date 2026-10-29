@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import collections
 import copy
+import datetime
 import logging
 import os
 
@@ -1532,3 +1533,88 @@ def load_demo(collection_id: str) -> None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
+
+
+def get_collection_commit_log_entry_from_model(
+    commit_log_entry_model: collection_models.CollectionCommitLogEntryModel,
+) -> collection_domain.CollectionCommitLogEntry:
+    """Returns a CollectionCommitLogEntry domain object from a model.
+
+    This is the get/save conversion boundary: the only place in this
+    file that reads the storage model's fields directly.
+
+    Args:
+        commit_log_entry_model: CollectionCommitLogEntryModel. The
+            storage model instance.
+
+    Returns:
+        CollectionCommitLogEntry. The domain object.
+    """
+    return collection_domain.CollectionCommitLogEntry(
+        commit_log_entry_model.created_on,
+        commit_log_entry_model.last_updated,
+        commit_log_entry_model.user_id,
+        commit_log_entry_model.collection_id,
+        commit_log_entry_model.commit_type,
+        commit_log_entry_model.commit_message,
+        commit_log_entry_model.commit_cmds,
+        commit_log_entry_model.version,
+        commit_log_entry_model.post_commit_status,
+        commit_log_entry_model.post_commit_community_owned,
+        commit_log_entry_model.post_commit_is_private,
+    )
+
+
+def get_next_page_of_all_non_private_collection_commits(
+    page_size: int = feconf.COMMIT_LIST_PAGE_SIZE,
+    urlsafe_start_cursor: Optional[str] = None,
+    max_age: Optional[datetime.timedelta] = None,
+) -> Tuple[
+    List[collection_domain.CollectionCommitLogEntry],
+    Optional[str],
+    bool,
+]:
+    """Returns a page of non-private collection commits in reverse
+    time order, as domain objects (not storage models).
+
+    Mirrors exp_services.get_next_page_of_all_non_private_commits.
+
+    Args:
+        page_size: int. Number of commits in the page.
+        urlsafe_start_cursor: str. If this is not None, then the returned
+            commits start from cursor location. Otherwise they start from the
+            beginning of the list of commits.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the CollectionCommitLogEntry.
+
+    Returns:
+        tuple. A 3-tuple consisting of:
+            - list(CollectionCommitLogEntry). A list containing
+              CollectionCommitLogEntry domain objects.
+            - str. The position of the cursor.
+            - bool. indicating whether there are (likely) more results after
+              this batch. If False, there are no more results; if True, there
+              are probably more results.
+
+    Raises:
+        ValueError. The argument max_age is not datetime.timedelta or None.
+    """
+    if max_age is not None and not isinstance(max_age, datetime.timedelta):
+        raise ValueError(
+            'max_age must be a datetime.timedelta instance or None.'
+        )
+
+    results, new_urlsafe_start_cursor, more = (
+        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+            page_size, urlsafe_start_cursor, max_age=max_age
+        )
+    )
+
+    return (
+        [
+            get_collection_commit_log_entry_from_model(entry)
+            for entry in results
+        ],
+        new_urlsafe_start_cursor,
+        more,
+    )
