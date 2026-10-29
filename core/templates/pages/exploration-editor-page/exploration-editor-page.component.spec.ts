@@ -43,7 +43,6 @@ import {
   ExplorationFeaturesBackendApiService,
 } from 'services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
-import {InsertScriptService} from 'services/insert-script.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -303,17 +302,6 @@ describe('Exploration editor page component', () => {
         UrlInterpolationService,
         FocusManagerService,
         {
-          // Guard against the real service appending an external PencilCode
-          // script during ngOnInit. A cross-origin script error would surface
-          // as an opaque "Script error." and be reported against whichever
-          // spec happens to be running (see #26940).
-          provide: InsertScriptService,
-          useValue: jasmine.createSpyObj('InsertScriptService', [
-            'loadScript',
-            'hasScriptLoaded',
-          ]),
-        },
-        {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
@@ -415,6 +403,19 @@ describe('Exploration editor page component', () => {
     );
     spyOn(autosaveInfoModalsService, 'showLostChangesModal').and.stub();
     spyOn(autosaveInfoModalsService, 'isModalOpen').and.returnValue(false);
+
+    // Guard against the real InsertScriptService appending an external
+    // PencilCode script during ngOnInit. A cross-origin script error would
+    // surface as an opaque "Script error." and be reported against whichever
+    // spec happens to be running (see #26940). Only script elements are
+    // dropped; other elements are appended normally.
+    const realAppendChild = document.body.appendChild.bind(document.body);
+    spyOn(document.body, 'appendChild').and.callFake((node: Node) => {
+      if (node instanceof HTMLScriptElement) {
+        return node;
+      }
+      return realAppendChild(node);
+    });
 
     fixture.detectChanges();
   });

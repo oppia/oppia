@@ -34,10 +34,7 @@ import {MatAutocompleteHarness} from '@angular/material/autocomplete/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatCardModule} from '@angular/material/card';
-import {
-  MAT_DIALOG_DEFAULT_OPTIONS,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import {MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
@@ -117,16 +114,6 @@ describe('Beam Jobs Tab Component', () => {
               'getBeamJobRunOutput',
             ]
           ) as jasmine.SpyObj<ReleaseCoordinatorBackendApiService>,
-        },
-        // NOTE: Dialogs are disposed automatically when a navigation event
-        // (e.g. a hashchange caused by another spec mutating the shared
-        // window.location) is emitted, because MatDialogConfig.closeOnNavigation
-        // defaults to true. These tests do not exercise navigation, so we
-        // disable that behavior to keep the dialog open while the harness
-        // looks it up.
-        {
-          provide: MAT_DIALOG_DEFAULT_OPTIONS,
-          useValue: {closeOnNavigation: false},
         },
       ],
     });
