@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DonatePageComponent} from './donate-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -61,6 +61,7 @@ describe('Donate page', () => {
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [NgbModule],
       declarations: [DonatePageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
@@ -118,6 +119,12 @@ describe('Donate page', () => {
       size: 'xl',
       windowClass: 'donation-box-modal',
     });
+  });
+
+  it('should set the learner carousel interval to 8 seconds', () => {
+    fixture.detectChanges();
+
+    expect(component.learnerCarousel.interval).toBe(8000);
   });
 
   it('should move the correct testimonials carousel to the previous slide', () => {
