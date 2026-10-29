@@ -107,8 +107,10 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
-            'arcs': [
+            'modules': [
                 {
+                    # 'arc_default' is an opaque ID, not terminology, and
+                    # is deliberately not renamed.
                     'id': 'arc_default',
                     'title': 'All Chapters',
                     'description': '',
@@ -328,8 +330,10 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
-            'arcs': [
+            'modules': [
                 {
+                    # 'arc_default' is an opaque ID, not terminology, and
+                    # is deliberately not renamed.
                     'id': 'arc_default',
                     'title': 'All Chapters',
                     'description': '',
