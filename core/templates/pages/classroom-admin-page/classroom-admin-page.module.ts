@@ -22,7 +22,6 @@ import {MatCardModule} from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ClassroomAdminNavbarComponent} from './navbar/classroom-admin-navbar.component';
 import {ClassroomAdminPageComponent} from './classroom-admin-page.component';
 import {ToastrModule} from 'ngx-toastr';
@@ -33,18 +32,42 @@ import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-mo
 import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
 import {TopicsDependencyGraphModalComponent} from './modals/topic-dependency-graph-viz-modal.component';
 import {CommonModule} from '@angular/common';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ClassroomAdminPageRootComponent} from './classroom-admin-page-root.component';
 import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
 import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {ImageUploaderModule} from 'components/shared_parts/image-uploader.module';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {NgbDropdownModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
+    NgbDropdownModule,
+    NgbModalModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
+    ImageUploaderModule,
+    BaseModule,
     FormsModule,
+    DragDropModule,
     MatCardModule,
     CommonModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

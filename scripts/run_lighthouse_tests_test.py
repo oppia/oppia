@@ -114,6 +114,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'managed_dev_appserver',
             lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
         )
+        self.swap_gzip_proxy = self.swap(
+            servers,
+            'managed_gzip_proxy',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+        )
         with open('dummy-lighthouse-pages.json', 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
@@ -228,6 +233,103 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests.inject_entities_into_url(url, entities),
             expected_injected_url,
         )
+
+    def test_inject_entities_into_url_encodes_non_url_safe_entity(
+        self,
+    ) -> None:
+        # Feedback report IDs are base64 strings that can end in "=" padding.
+        # An unencoded "=" makes the Angular router stop matching the path
+        # segment, so the page audits an ID that does not exist.
+        entities = {'feedback_report_id': 'feedback.platform.YWJjZA=='}
+        url = (
+            'http://localhost:8181/technical-feedback-dashboard/'
+            'tech-internal/{{feedback_report_id}}'
+        )
+        expected_injected_url = (
+            'http://localhost:8181/technical-feedback-dashboard/'
+            'tech-internal/feedback.platform.YWJjZA%3D%3D'
+        )
+        self.assertEqual(
+            run_lighthouse_tests.inject_entities_into_url(url, entities),
+            expected_injected_url,
+        )
+
+    def test_get_entity_parses_supported_urls(self) -> None:
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/create/abc123'
+            ),
+            ('exploration_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/topic_editor/abc123'
+            ),
+            ('topic_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/story_editor/abc123'
+            ),
+            ('story_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/skill_editor/abc123'
+            ),
+            ('skill_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/blog/blog-fragment'
+            ),
+            ('blog_post_url_fragment', 'blog-fragment'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/technical-feedback-dashboard/'
+                'tech-internal/abc123'
+            ),
+            ('feedback_report_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/edit-learner-group/abc123'
+            ),
+            ('learner_group_id', 'abc123'),
+        )
+
+    def test_get_entity_strips_hash_fragment(self) -> None:
+        # Editor URLs are captured from page.url(), which the Angular router
+        # can leave with a trailing "#/" fragment. The fragment must not leak
+        # into the entity ID, otherwise it gets percent-encoded to "%23" and
+        # the audited URL points at a route that does not exist.
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/create/abc123#/'
+            ),
+            ('exploration_id', 'abc123'),
+        )
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/topic_editor/abc123#/'
+            ),
+            ('topic_id', 'abc123'),
+        )
+
+    def test_get_entity_strips_trailing_newline(self) -> None:
+        # The setup writes the URLs to stdout separated by newlines, so the
+        # line read back from the pipe keeps a trailing newline. It must not
+        # leak into the entity ID, otherwise it gets percent-encoded to "%0A".
+        self.assertEqual(
+            run_lighthouse_tests.get_entity(
+                'http://localhost:8181/edit-learner-group/abc123\n'
+            ),
+            ('learner_group_id', 'abc123'),
+        )
+
+    def test_get_entity_returns_none_for_non_url_line(self) -> None:
+        self.assertIsNone(run_lighthouse_tests.get_entity('not a url'))
 
     def test_get_lighthouse_pages_config(self) -> None:
         with self.lighthouse_pages_json_filepath_swap:
@@ -903,7 +1005,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
 
         with self.print_swap, swap_isdir:
-            with self.swap_dev_appserver:
+            with self.swap_dev_appserver, self.swap_gzip_proxy:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
@@ -932,6 +1034,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 self.assertEqual(
                                     os.environ['LIGHTHOUSE_URLS_TO_RUN'],
                                     expected_lighthouse_urls_to_run,
+                                )
+                                # Shard 1 has no login setup, so the login
+                                # script must be told to skip signing in.
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_SKIP_LOGIN'], '1'
                                 )
 
         self.assertIn(
@@ -978,7 +1085,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
 
         with self.print_swap, swap_isdir:
-            with self.swap_dev_appserver:
+            with self.swap_dev_appserver, self.swap_gzip_proxy:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, self.swap_ng_build:
                         with swap_build, swap_popen, swap_run_lighthouse_tests:
@@ -1011,6 +1118,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 self.assertEqual(
                                     os.environ['LIGHTHOUSE_URLS_TO_RUN'],
                                     expected_lighthouse_urls_to_run,
+                                )
+                                # Shard 1 has no login setup, so the login
+                                # script must be told to skip signing in.
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_SKIP_LOGIN'], '1'
                                 )
 
         self.assertIn(
@@ -1070,7 +1182,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
         with swap_popen, swap_isdir, swap_build:
-            with self.swap_dev_appserver:
+            with self.swap_dev_appserver, self.swap_gzip_proxy:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
@@ -1123,6 +1235,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'managed_dev_appserver',
             lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
         )
+        swap_gzip_proxy = self.swap(
+            servers,
+            'managed_gzip_proxy',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+        )
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests,
             'run_lighthouse_puppeteer_script',
@@ -1170,7 +1287,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
 
         with swap_popen, swap_isdir, swap_build:
-            with swap_dev_appserver:
+            with swap_dev_appserver, swap_gzip_proxy:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with swap_modify_constants, swap_write_hashes_json_file:
                         with self.swap_redis_server, swap_run_lighthouse_tests:
@@ -1186,6 +1303,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                             '--shard',
                                             '2',
                                         ]
+                                    )
+                                    # Shard 2 runs the login setup, so the login
+                                    # script must sign in as usual.
+                                    self.assertEqual(
+                                        os.environ['LIGHTHOUSE_SKIP_LOGIN'], '0'
                                     )
 
     def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(

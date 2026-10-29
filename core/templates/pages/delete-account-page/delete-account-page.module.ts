@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {DeleteAccountPageComponent} from './delete-account-page.component';
 import {DeleteAccountModalComponent} from './templates/delete-account-modal.component';
 import {DeleteAccountPageRootComponent} from './delete-account-page-root.component';
@@ -25,10 +24,17 @@ import {CommonModule} from '@angular/common';
 import {DeleteAccountPageRoutingModule} from './delete-account-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    FormsModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
-    SharedComponentsModule,
     DeleteAccountPageRoutingModule,
     Error404PageModule,
   ],

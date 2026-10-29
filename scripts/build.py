@@ -814,6 +814,15 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if not options.skip_ng_build:
             build_using_ng()
             sync_angular_css_hashes()
+            try:
+                import subprocess
+
+                subprocess.run(
+                    ['python', '-m', 'scripts.purge_css_after_build'],
+                    check=False,
+                )
+            except Exception:
+                pass
         # This must run after build_using_ng(), which uses Angular CLI's
         # default deleteOutputPath behavior to clear out the 'build/'
         # directory before writing its own output. Generating the package

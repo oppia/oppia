@@ -19,18 +19,25 @@
 import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {AndroidPageComponent} from './android-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {AndroidPageRootComponent} from './android-page-root.component';
 import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 import {AndroidPageRoutingModule} from './android-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {I18nModule} from 'i18n/i18n.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    TranslateModule,
     CommonModule,
+    FormsModule,
     HttpClientModule,
-    SharedComponentsModule,
     AndroidPageRoutingModule,
     Error404PageModule,
     I18nModule,

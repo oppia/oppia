@@ -23,10 +23,10 @@ import {FormsModule} from '@angular/forms';
 import {InteractiveFractionInputComponent} from './directives/oppia-interactive-fraction-input.component';
 import {ResponseFractionInput} from './directives/oppia-response-fraction-input.component';
 import {ShortResponseFractionInput} from './directives/oppia-short-response-fraction-input.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
+import {DirectivesModule} from 'directives/directives.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule],
+  imports: [TranslateModule, DirectivesModule, CommonModule, FormsModule],
   declarations: [
     InteractiveFractionInputComponent,
     ResponseFractionInput,

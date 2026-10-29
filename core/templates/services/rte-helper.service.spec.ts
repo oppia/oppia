@@ -25,6 +25,7 @@ import {
   RteComponentId,
   CustomizationArgsSpecsType,
   CustomizationArgsForRteType,
+  RteHelperModalComponent,
 } from './rte-helper-modal.component';
 import {AppConstants} from 'app.constants';
 
@@ -35,6 +36,11 @@ describe('Rte Helper Service', () => {
   beforeEach(() => {
     rteHelperService = TestBed.inject(RteHelperService);
     ngbModal = TestBed.inject(NgbModal);
+    // The RTE helper modal is loaded on demand in production, so it is stubbed
+    // here to keep the tests synchronous under fakeAsync.
+    spyOn(rteHelperService, 'loadRteHelperModalComponent').and.resolveTo({
+      RteHelperModalComponent,
+    });
   });
 
   it('should get rich text components', () => {
@@ -397,7 +403,7 @@ describe('Rte Helper Service', () => {
     ).toBe(false);
   });
 
-  it('should open customization modal', () => {
+  it('should open customization modal', fakeAsync(() => {
     var ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
       () =>
         ({
@@ -415,9 +421,10 @@ describe('Rte Helper Service', () => {
       submitCallBackSpy,
       dismissCallBackSpy
     );
+    tick();
 
     expect(ngbModalSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should open customization modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
@@ -543,4 +550,17 @@ describe('Rte Helper Service', () => {
 
     expect(dismissCallBackSpy).toHaveBeenCalledWith(false);
   }));
+});
+
+describe('Rte Helper Service dynamic imports', () => {
+  it('should load the rte helper modal component on demand', async () => {
+    const rteHelperService = TestBed.inject(RteHelperService);
+
+    const modalComponentModule =
+      await rteHelperService.loadRteHelperModalComponent();
+
+    expect(modalComponentModule.RteHelperModalComponent).toBe(
+      RteHelperModalComponent
+    );
+  });
 });

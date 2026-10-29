@@ -18,21 +18,17 @@
 
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-
-import {SharedComponentsModule} from 'components/shared-component.module';
-import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
-import {ToastrModule} from 'ngx-toastr';
-import {toastrConfig} from 'pages/oppia-root/app.module';
-import {MaintenancePageRootComponent} from './maintenance-page-root.component';
 import {CommonModule} from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
+
+import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
+import {MaintenancePageRootComponent} from './maintenance-page-root.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
-    RouterModule.forRoot([]),
-    SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig),
+    MatCardModule,
     RouterModule.forChild([
       {
         path: '',

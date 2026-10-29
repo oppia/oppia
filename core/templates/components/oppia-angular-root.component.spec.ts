@@ -118,14 +118,28 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should emit once ngAfterViewInit is called', () => {
-    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
-      () => {}
+    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(() =>
+      Promise.resolve()
     );
     component.ngOnInit();
     component.ngAfterViewInit();
     TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
 
     expect(emitSpy).toHaveBeenCalled();
+  });
+
+  it('should initialize CKEditor when an RTE is present', () => {
+    const ckEditorInitializerSpy = spyOn(
+      CkEditorInitializerService,
+      'ckEditorInitializer'
+    ).and.callFake(() => Promise.resolve());
+    spyOn(document, 'querySelector').and.returnValue(
+      document.createElement('div')
+    );
+
+    component.ngAfterViewInit();
+
+    expect(ckEditorInitializerSpy).toHaveBeenCalled();
   });
 
   it('should detect change in direction', () => {

@@ -18,17 +18,24 @@
 
 import {NgModule} from '@angular/core';
 
-import {MaterialModule} from 'modules/material.module';
+import {MatButtonModule} from '@angular/material/button';
 import {PencilCodeEditor} from './directives/oppia-interactive-pencil-code-editor.component';
 import {PencilCodeResetConfirmation} from './directives/pencil-code-reset-confirmation.component';
 import {ResponePencilCodeEditor} from './directives/oppia-response-pencil-code-editor.component';
 import {ShortResponePencilCodeEditor} from './directives/oppia-short-response-pencil-code-editor.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {CommonModule} from '@angular/common';
 
 @NgModule({
-  imports: [SharedPipesModule, CommonModule, MaterialModule, TranslateModule],
+  imports: [
+    SharedPipesModule,
+    StringUtilityPipesModule,
+    CommonModule,
+    MatButtonModule,
+    TranslateModule,
+  ],
   declarations: [
     PencilCodeEditor,
     PencilCodeResetConfirmation,

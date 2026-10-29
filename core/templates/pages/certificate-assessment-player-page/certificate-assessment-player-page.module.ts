@@ -21,7 +21,6 @@ import {NgModule} from '@angular/core';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {RouterModule} from '@angular/router';
 import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
@@ -32,12 +31,19 @@ import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/cert
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 @NgModule({
   imports: [
+    RichTextComponentsModule,
+    MatProgressSpinnerModule,
+    DynamicContentModule,
+    BaseModule,
     CommonModule,
     MatBottomSheetModule,
     InteractionExtensionsModule,
-    SharedComponentsModule,
     CertificateOfferingSharedModule,
     RouterModule.forChild([
       {

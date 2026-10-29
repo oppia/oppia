@@ -34,7 +34,6 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatTooltipModule} from '@angular/material/tooltip';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {BeamJobsTabComponent} from 'pages/release-coordinator-page/beam-jobs-tab/beam-jobs-tab.component';
 import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
 import {FeaturesTabComponent} from 'pages/release-coordinator-page/features-tab/features-tab.component';
@@ -48,8 +47,28 @@ import {ReleaseCoordinatorPageRoutingModule} from './release-coordinator-page-ro
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {RouterModule} from '@angular/router';
 
+import {BaseModule} from 'base-components/base.module';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
+    SharedFormsModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MatDividerModule,
+    MatListModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    BaseModule,
     CommonModule,
     ClipboardModule,
     FormsModule,
@@ -67,7 +86,6 @@ import {RouterModule} from '@angular/router';
     MatTableModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     RouterModule,
     ReleaseCoordinatorPageRoutingModule,
     Error404PageModule,

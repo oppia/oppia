@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
@@ -52,10 +51,47 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
 import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a-follow-up-note-modal.component';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {CollectionSummaryTileModule} from 'components/shared_parts/collection-summary-tile.module';
+import {ContributorDashboardPageModule} from 'pages/contributor-dashboard-page/contributor-dashboard-page.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {ExplorationSummaryTileModule} from 'components/shared_parts/exploration-summary-tile.module';
+import {FormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatRadioModule} from '@angular/material/radio';
+import {
+  NgbModalModule,
+  NgbPopoverModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import {PracticeTabModule} from 'components/shared_parts/practice-tab.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    StringUtilityPipesModule,
+    PracticeTabModule,
+    NgbModalModule,
+    NgbPopoverModule,
+    NgbTooltipModule,
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatExpansionModule,
+    MatRadioModule,
+    FormsModule,
+    ExplorationSummaryTileModule,
+    DirectivesModule,
+    ContributorDashboardPageModule,
+    CollectionSummaryTileModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
-    SharedComponentsModule,
     FeedbackSharedModule,
     LessonCardModule,
     MatDialogModule,
