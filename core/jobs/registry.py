@@ -114,6 +114,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     missing_translation_images_repair_jobs,
 )
+from core.jobs.batch_jobs.datastore_audit import (  # pylint: disable=unused-import  # isort: skip
+    user_jobs,
+)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
