@@ -8,11 +8,11 @@
               [class.expanded]="sidebarIsExpanded">
         <div *ngIf="!sidebarIsExpanded">
           <i class="fa fa-lg fa-chevron-left"></i>
-          {{ 'I18N_LESSON_PLAYER_OPEN_SIDEBAR' | translate }}
+          {{ 'I18N_LESSON_PLAYER_SIDEBAR' | translate }}
         </div>
         <div *ngIf="sidebarIsExpanded" class="expanded-sidebar-label">
           <i class="fa fa-lg fa-chevron-right lesson-player-sidebar-chevron"></i>
-          {{ 'I18N_LESSON_PLAYER_CLOSE_SIDEBAR' | translate }}
+          {{ 'I18N_LESSON_PLAYER_SIDEBAR' | translate }}
         </div>
       </button>
       <div *ngIf="sidebarIsExpanded">
