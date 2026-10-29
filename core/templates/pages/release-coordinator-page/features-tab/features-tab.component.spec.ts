@@ -118,6 +118,7 @@ describe('Release coordinator page feature tab', function () {
           rollout_percentage: 0,
           user_group_ids: [],
           last_updated: null,
+          developer_notes: 'Dummy developer notes for testing.',
         }),
       ],
       serverStage: 'dev',
@@ -147,6 +148,9 @@ describe('Release coordinator page feature tab', function () {
     expect(component.featureFlagViewModels.length).toBe(1);
     expect(component.featureFlagViewModels[0].name).toEqual(
       'dummy_feature_flag_for_e2e_tests'
+    );
+    expect(component.featureFlagViewModels[0].developerNotes).toEqual(
+      'Dummy developer notes for testing.'
     );
   });
 

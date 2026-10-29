@@ -220,6 +220,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': None,
             },
             {
                 'name': FeatureNames.FEATURE_TWO.value,
@@ -229,6 +230,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': None,
             },
             {
                 'name': FeatureNames.FEATURE_THREE.value,
@@ -238,6 +240,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': 'feature flag three notes',
             },
         ]
         feature_flag_name_enums = [
@@ -267,6 +270,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_THREE.value: (
                     'feature flag three',
                     FeatureStages.DEV,
+                    'feature flag three notes',
                 ),
             },
         )
