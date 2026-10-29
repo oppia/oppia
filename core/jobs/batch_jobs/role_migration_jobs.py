@@ -43,14 +43,22 @@ class MigrateWebReleaseCoordinatorRoleJob(base_jobs.JobBase):
         self, user_model: user_models.UserSettingsModel
     ) -> bool:
         """Checks whether a user has the legacy release coordinator role."""
-        return user_model.role == feconf.ROLE_ID_RELEASE_COORDINATOR
+        if feconf.ROLE_ID_RELEASE_COORDINATOR in user_model.roles:
+            return True
+        return False
 
     def _migrate_role(
         self, user_model: user_models.UserSettingsModel
     ) -> user_models.UserSettingsModel:
         """Updates a user's legacy role to the web release coordinator role."""
         with datastore_services.get_ndb_context():
-            user_model.role = feconf.ROLE_ID_WEB_RELEASE_COORDINATOR
+            current_roles = [
+                role
+                for role in user_model.roles
+                if role != feconf.ROLE_ID_RELEASE_COORDINATOR
+            ]
+            current_roles.append(feconf.ROLE_ID_WEB_RELEASE_COORDINATOR)
+            user_model.roles = current_roles
             user_model.update_timestamps()
         return user_model
 
