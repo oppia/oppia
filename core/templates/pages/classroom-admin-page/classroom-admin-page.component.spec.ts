@@ -1328,6 +1328,7 @@ describe('Classroom Admin Page component ', () => {
     const event = {
       previousIndex: 1,
       currentIndex: 2,
+      dropPoint: {x: 0, y: 0},
     } as CdkDragDrop<string[]>;
     component.drop(event);
 

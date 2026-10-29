@@ -41,7 +41,7 @@ import {
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {CardInteractionControlsComponent} from './card-interaction-controls.component';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 
 describe('Card interaction controls component', () => {
   let fixture: ComponentFixture<CardInteractionControlsComponent>;
