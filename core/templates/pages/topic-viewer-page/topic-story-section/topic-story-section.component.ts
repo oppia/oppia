@@ -20,18 +20,15 @@ import {
   Component,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   SimpleChanges,
 } from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {Subscription} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {StorySummary} from 'domain/story/story-summary.model';
-import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {TopicStorySectionBackendDataService} from 'pages/topic-viewer-page/services/topic-story-section-backend-data.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -80,9 +77,7 @@ interface ModuleNavigationGroupData {
   templateUrl: './topic-story-section.component.html',
   styleUrls: ['./topic-story-section.component.css'],
 })
-export class TopicStorySectionComponent
-  implements OnInit, OnChanges, OnDestroy
-{
+export class TopicStorySectionComponent implements OnInit, OnChanges {
   @Input() storySummary!: StorySummary;
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
@@ -141,7 +136,6 @@ export class TopicStorySectionComponent
 
   private practiceAvailabilityRequestId: number = 0;
   practiceAvailabilityPending: Promise<void> | null = null;
-  private directiveSubscriptions: Subscription = new Subscription();
 
   isModuleExpanded(index: number): boolean {
     return this._expandedModuleIndices.has(index);
@@ -624,7 +618,6 @@ export class TopicStorySectionComponent
   constructor(
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private topicStorySectionBackendDataService: TopicStorySectionBackendDataService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
@@ -636,15 +629,6 @@ export class TopicStorySectionComponent
 
   ngOnInit(): void {
     this.populateFromInputs();
-    this.directiveSubscriptions.add(
-      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
-        this.topicSessionFallbackLanguageService.clearSelection();
-      })
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

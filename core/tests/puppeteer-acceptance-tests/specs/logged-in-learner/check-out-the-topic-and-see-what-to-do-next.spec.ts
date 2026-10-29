@@ -42,13 +42,6 @@
  * - Confirming skip marks earlier arcs as skipped with SKIPPED badge.
  * - Skipped arc cards show "Start" / "Resume" CTA to revisit.
  * - Smooth-scroll navigates to the selected Arc without reloading the page.
- * - Language selector with text and voiceover dropdowns on chapter cards.
- * - Language fallback info tooltip shows when lesson is not in preferred language.
- * - Language auto-selection waterfall: i18n -> session fallback -> English.
- * - Session persistence of language choice within a tab.
- * - Voiceover dropdown is filtered to be compatible with the selected text
- *   language and enables/disables accordingly.
- * - Starting a lesson uses the selected text and voiceover languages in the URL.
  * - Story card with title and Study Skills CTA.
  * - Footer with Contact Us link.
  */
@@ -60,7 +53,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 
 const SPEC_TIMEOUT_MSECS = 6000000;
 const ROLES = testConstants.Roles;
@@ -68,7 +60,6 @@ const ROLES = testConstants.Roles;
 describe('Logged-in Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  let voiceoverAdmin: VoiceoverAdmin;
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let loggedInLearner2: LoggedInUser & LoggedOutUser;
 
@@ -84,13 +75,6 @@ describe('Logged-in Learner', function () {
       'release_coord_topic_page@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-
-    voiceoverAdmin = await UserFactory.createNewUser(
-      'voiceoverAdm',
-      'voiceover_admin_topic_page@example.com',
-      [ROLES.VOICEOVER_ADMIN]
-    );
-    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
     await releaseCoordinator.enableFeatureFlag('redesigned_topic_viewer_page');
     await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
@@ -395,96 +379,11 @@ describe('Logged-in Learner', function () {
         __dirname
       );
 
-      // The language selector only renders on chapters whose exploration has
-      // translations other than English, which in this topic is only the first
-      // chapter. The language checks therefore run while the first chapter is
-      // still the active (uncompleted) lesson.
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectStoryCardToBeVisible();
-      await loggedInLearner.expectStoryTitleToContain('The Fraction Journey');
-      // The CUJ Language Selector requires text and voiceover language
-      // selectors to render on chapter cards whose exploration has
-      // translations other than English.
-      await loggedInLearner.expectScreenshotToMatch(
-        'languageStoryCard',
-        __dirname
-      );
-
-      await loggedInLearner.expectLessonLanguageSelectorToBeVisible();
-      // The language selector renders a dropdown for selecting the text
-      // language on the active chapter card.
-      await loggedInLearner.expectScreenshotToMatch(
-        'languageSelectorOnLessonCard',
-        __dirname
-      );
-
-      await loggedInLearner.expectDefaultTextLanguageToBeSelected();
-
-      await loggedInLearner.expectFallbackInfoTooltipToBeShown();
-
-      await loggedInLearner.expectSessionLanguageToMatchSelectedLanguage();
-
-      await loggedInLearner.clearSessionLanguage();
-      await loggedInLearner.setSiteLanguageInLocalStorage('pt-br');
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectFallbackInfoIconToBeVisible();
-      await loggedInLearner.expectSelectedTextLanguageToBe('en');
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.reloadTopicPage();
-      await loggedInLearner.expectTextLanguageToBeSelected('hi');
-
-      await loggedInLearner.directlySetSavedSessionLanguageToUnavailable('es');
-      await loggedInLearner.reloadTopicPage();
-      await loggedInLearner.expectSelectedTextLanguageToBe('en');
-      await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(true);
-      await loggedInLearner.expectFallbackInfoIconToBeVisible();
-      // The CUJ Language Fallback requires an info tooltip to render when
-      // the lesson is not available in the preferred language, and the
-      // voiceover dropdown to be disabled.
-      await loggedInLearner.expectScreenshotToMatch(
-        'languageEnglishNoVoiceoverFallback',
-        __dirname
-      );
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.expectVoiceoverLanguageDropdownToBeDisabled(false);
-      await loggedInLearner.expectSelectedVoiceoverLanguageToBe('hi-IN');
-      // The CUJ Voiceover Dropdown requires the dropdown to be filtered to
-      // compatible languages and auto-select a matching voiceover when the
-      // text language is changed.
-      await loggedInLearner.expectScreenshotToMatch(
-        'languageHindiVoiceoverSelected',
-        __dirname
-      );
-
-      await loggedInLearner.selectLessonTextLanguage('hi');
-      await loggedInLearner.startActiveChapterAndExpectLanguageParamsInStartUrl(
-        'hi',
-        'hi-IN'
-      );
-
-      await loggedInLearner.openTopicPage('math', 'fractions');
-      await loggedInLearner.expectStudySkillsCtaToBeVisible();
-
-      await loggedInLearner.expectNewLessonBadgeToBeVisible();
-
-      await loggedInLearner.scrollMasteryChallengeCardIntoView();
-      await loggedInLearner.expectMasteryChallengeCardToBeVisible();
-      await loggedInLearner.expectMasteryChallengeTitleToBeVisible();
-      await loggedInLearner.expectMasteryChallengeButtonToBeVisible();
-
-      // Restore the default site language and clear the persisted lesson
-      // language so that the remaining sections (which do not test language
-      // handling) run against the same English topic page as the baseline
-      // screenshots.
-      await loggedInLearner.clearSessionLanguage();
-      await loggedInLearner.setSiteLanguageInLocalStorage('en');
-      await loggedInLearner.openTopicPage('math', 'fractions');
-
       await loggedInLearner.expectActiveChapterCardToShowStartAndSecondaryActions(
         2
       );
       // The next uncompleted chapter renders in the expanded state with its
-      // Play, Practice, and Study Guide actions after the language checks.
+      // Play, Practice, and Study Guide actions.
       await loggedInLearner.expectScreenshotToMatch(
         'chapterActiveCardWithActions',
         __dirname
