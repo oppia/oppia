@@ -165,6 +165,36 @@ describe('RTE display component', () => {
     expect(link.innerHTML.replace(/\s/g, '')).toEqual('Oppia');
   }));
 
+  it('should display content inside a div tag', fakeAsync(() => {
+    let rteString =
+      '<div class="oppia-custom-div">' +
+      '<p>Paragraph inside div</p>' +
+      '</div>';
+    fixture.detectChanges();
+    let changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: rteString,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    };
+    component.rteString = rteString;
+    component.ngOnChanges(changes);
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    flush();
+    discardPeriodicTasks();
+
+    const divElement = fixture.debugElement.query(
+      By.css('div.oppia-custom-div')
+    );
+    expect(divElement).toBeTruthy();
+    const pElement = divElement.query(By.css('p'));
+    expect(pElement).toBeTruthy();
+    expect(pElement.nativeElement.textContent).toBe('Paragraph inside div');
+  }));
+
   it('should report errors when parsing', fakeAsync(() => {
     spyOn(rteParserService, 'constructFromDomParser').and.throwError('error');
     spyOn(
