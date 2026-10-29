@@ -27,6 +27,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
+    email_services,
     feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
@@ -577,6 +578,7 @@ class SignupHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
+        server_can_send_emails = email_services.is_email_sending_allowed()
         self.render_json(
             {
                 'has_agreed_to_latest_terms': bool(
