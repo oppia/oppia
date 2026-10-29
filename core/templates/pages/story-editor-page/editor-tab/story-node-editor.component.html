@@ -63,6 +63,12 @@
                 <em>Please enter a valid exploration id.</em>
               </span>
             </form>
+            <span class="oppia-input-box-subtitle" *ngIf="currentExplorationId">
+              <i>
+                Visit the exploration at:
+                <a [href]="getExplorationEditorUrl(currentExplorationId)" target="_blank" rel="noopener">{{ getExplorationEditorUrl(currentExplorationId) }}</a>
+              </i>
+            </span>
           </div>
           <div class="story-node-planned-publication-date" *ngIf="isSerialChapterFeatureFlagEnabled()">
             <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
