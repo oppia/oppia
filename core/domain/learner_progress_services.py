@@ -270,6 +270,7 @@ def _save_last_playthrough_information(
         last_playthrough_information: ExpUserLastPlaythrough. The last
             playthrough information domain object to be saved in the datastore.
     """
+    last_playthrough_information.validate()
     last_playthrough_information_model = (
         user_models.ExpUserLastPlaythroughModel(
             id=last_playthrough_information.id,
