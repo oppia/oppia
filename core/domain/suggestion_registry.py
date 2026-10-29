@@ -21,7 +21,7 @@ from __future__ import annotations
 import copy
 import datetime
 
-from core import feconf, utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -790,6 +790,27 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Translation exceeds the allowed character limit. The translation '
                 'for the above content must be %s characters or fewer.'
                 % feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
+
+        topic_metadata_limits = {
+            feconf.TOPIC_NAME_CONTENT_ID: (
+                android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+            ),
+            feconf.TOPIC_DESCRIPTION_CONTENT_ID: (
+                android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION
+            ),
+        }
+        limit = topic_metadata_limits.get(self.change_cmd.content_id)
+        if (
+            self.target_type == feconf.ENTITY_TYPE_TOPIC
+            and limit is not None
+            and isinstance(self.change_cmd.translation_html, str)
+            and len(self.change_cmd.translation_html) > limit
+        ):
+            raise utils.ValidationError(
+                'Translation exceeds the allowed character limit. The '
+                'translation for the above content must be %s characters '
+                'or fewer.' % limit
             )
 
     def pre_update_validate(

@@ -122,6 +122,49 @@ def add_new_translation(
     model.put()
 
 
+def carry_forward_topic_translations(
+    old_topic: topic_domain.Topic, updated_topic: topic_domain.Topic
+) -> None:
+    """Copies topic translations to the next version, marking changed text stale."""
+    old_contents = (
+        old_topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    updated_contents = (
+        updated_topic.get_translatable_contents_collection().content_id_to_translatable_content
+    )
+    models = []
+    for (
+        entity_translation
+    ) in translation_fetchers.get_all_entity_translations_for_entity(
+        feconf.TranslatableEntityType.TOPIC,
+        old_topic.id,
+        old_topic.version,
+    ):
+        for content_id in list(entity_translation.translations):
+            if content_id not in updated_contents:
+                del entity_translation.translations[content_id]
+            elif (
+                content_id not in old_contents
+                or old_contents[content_id].content_value
+                != updated_contents[content_id].content_value
+            ):
+                entity_translation.translations[content_id].needs_update = True
+        models.append(
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.ENTITY_TYPE_TOPIC,
+                updated_topic.id,
+                updated_topic.version,
+                entity_translation.language_code,
+                entity_translation.to_dict()['translations'],
+            )
+        )
+    if models:
+        translation_models.EntityTranslationsModel.update_timestamps_multi(
+            models
+        )
+        translation_models.EntityTranslationsModel.put_multi(models)
+
+
 def _apply_changes(
     entity_translation: translation_domain.EntityTranslation,
     translation_changes: List[exp_domain.ExplorationChange],
