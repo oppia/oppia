@@ -87,8 +87,13 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectCardContentToBe(FIRST_CARD_QUESTION);
 
       await explorationEditor.updateCardContent(LONG_CONTENT);
-
       await explorationEditor.expectCardHeightLimitWarningToBeVisible();
+
+      await explorationEditor.updateCardContent(FIRST_CARD_QUESTION);
+      await explorationEditor.expectCardContentToBe(FIRST_CARD_QUESTION);
+
+      // Restore the original content for the following tests.
+      await explorationEditor.updateCardContent(LONG_CONTENT);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
