@@ -268,6 +268,7 @@ span.sort-questions-select .sort-options {
   justify-content: flex-end;
   margin-right: 15px;
   margin-top: 20px;
+  min-height: 38px;
 }
 
 .oppia-language-selector-container .oppia-language-selector {

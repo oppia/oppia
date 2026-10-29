@@ -48,6 +48,7 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
+    Set,
     TypedDict,
     TypeVar,
     Union,
@@ -1001,6 +1002,8 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
     limit: int
     offset: int
     sort_key: str
+    topic_name: Optional[str]
+    language_code: Optional[str]
 
 
 class UserSubmittedSuggestionsHandler(
@@ -1044,8 +1047,54 @@ class UserSubmittedSuggestionsHandler(
                 'schema': {'type': 'basestring'},
                 'choices': feconf.SUGGESTIONS_SORT_KEYS,
             },
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                },
+                'default_value': None,
+            },
         }
     }
+
+    def _get_exploration_ids_for_topic(
+        self, topic_name: Optional[str]
+    ) -> Optional[Set[str]]:
+        """Returns exploration IDs linked to topic_name, or None to skip
+        topic filtering.
+        """
+        if (
+            topic_name is None
+            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid'
+            )
+        opportunity_summaries = opportunity_services.get_exploration_opportunity_summaries_by_topic_id(
+            topic.id
+        )
+        return {summary.id for summary in opportunity_summaries}
+
+    def _filter_suggestions_by_topic(
+        self,
+        suggestions: Sequence[suggestion_registry.BaseSuggestion],
+        allowed_target_ids: Optional[Set[str]],
+    ) -> Sequence[suggestion_registry.BaseSuggestion]:
+        """Keeps suggestions whose target_id is in allowed_target_ids."""
+        if allowed_target_ids is None:
+            return suggestions
+        return [
+            suggestion
+            for suggestion in suggestions
+            if suggestion.target_id in allowed_target_ids
+        ]
 
     @acl_decorators.can_suggest_changes
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -1063,6 +1112,11 @@ class UserSubmittedSuggestionsHandler(
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
+        topic_name = self.normalized_request.get('topic_name')
+        language_code = self.normalized_request.get('language_code')
+        allowed_target_ids = None
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            allowed_target_ids = self._get_exploration_ids_for_topic(topic_name)
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
                 self.user_id,
@@ -1071,6 +1125,7 @@ class UserSubmittedSuggestionsHandler(
                 offset,
                 sort_key,
                 target_type=self._get_target_type_filter(target_type),
+                language_code=language_code,
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -1080,9 +1135,12 @@ class UserSubmittedSuggestionsHandler(
             # will be of type 'SuggestionTranslateContent'. So, to narrow
             # down the type from Sequence[BaseSuggestion] to Sequence[
             # SuggestionTranslateContent], we have used cast here.
+            raw_suggestions = suggestions
             translatable_suggestions = cast(
                 Sequence[suggestion_registry.SuggestionTranslateContent],
-                suggestions,
+                self._filter_suggestions_by_topic(
+                    raw_suggestions, allowed_target_ids
+                ),
             )
             suggestions_with_translatable_exps = (
                 suggestion_services.get_suggestions_with_editable_explorations(
@@ -1090,13 +1148,13 @@ class UserSubmittedSuggestionsHandler(
                 )
             )
             while (
-                len(translatable_suggestions) > 0
+                len(raw_suggestions) > 0
                 and len(suggestions_with_translatable_exps) == 0
             ):
                 # If all of the fetched suggestions are filtered out, then keep
                 # fetching until we have some suggestions to return or there
                 # are no more results.
-                translatable_suggestions, next_offset = (
+                raw_suggestions, next_offset = (
                     suggestion_services.get_submitted_suggestions_by_offset(
                         self.user_id,
                         feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1104,7 +1162,18 @@ class UserSubmittedSuggestionsHandler(
                         next_offset,
                         sort_key,
                         target_type=self._get_target_type_filter(target_type),
+                        language_code=language_code,
                     )
+                )
+                # Here we use cast because this loop only fetches translation
+                # suggestions, so the type can be narrowed from
+                # Sequence[BaseSuggestion] to
+                # Sequence[SuggestionTranslateContent].
+                translatable_suggestions = cast(
+                    Sequence[suggestion_registry.SuggestionTranslateContent],
+                    self._filter_suggestions_by_topic(
+                        raw_suggestions, allowed_target_ids
+                    ),
                 )
                 suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
                     translatable_suggestions
