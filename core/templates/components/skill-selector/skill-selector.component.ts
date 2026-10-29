@@ -200,13 +200,13 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   updateVisibleFilterLists(): void {
-    if (this.skillFilterText === '') {
+    if (this.skillFilterText.trim() === '') {
       this.visibleTopicFilterList = this.topicFilterList;
       this.visibleSubTopicFilterDict = this.subTopicFilterDict;
       return;
     }
 
-    let matchingSubtopics: {[topicName: string]: Set<string>} = {};
+    let matchingSubtopics = new Map<string, Set<string>>();
     for (let topicName in this.categorizedSkills) {
       let matchingNames = new Set<string>();
       for (let subtopicName in this.categorizedSkills[topicName]) {
@@ -216,16 +216,16 @@ export class SkillSelectorComponent implements OnInit {
         }
       }
       if (matchingNames.size) {
-        matchingSubtopics[topicName] = matchingNames;
+        matchingSubtopics.set(topicName, matchingNames);
       }
     }
 
-    this.visibleTopicFilterList = this.topicFilterList.filter(
-      topic => matchingSubtopics[topic.topicName] !== undefined
+    this.visibleTopicFilterList = this.topicFilterList.filter(topic =>
+      matchingSubtopics.has(topic.topicName)
     );
     this.visibleSubTopicFilterDict = {};
     for (let topicName in this.subTopicFilterDict) {
-      let matchingNames = matchingSubtopics[topicName];
+      const matchingNames = matchingSubtopics.get(topicName);
       if (matchingNames) {
         this.visibleSubTopicFilterDict[topicName] = this.subTopicFilterDict[
           topicName
@@ -243,7 +243,7 @@ export class SkillSelectorComponent implements OnInit {
     });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(
       skills,
-      searchText
+      searchText.trim()
     );
     return input.filter(val => {
       return filteredSkills.includes(val.description);
@@ -258,7 +258,7 @@ export class SkillSelectorComponent implements OnInit {
       });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(
       skills,
-      searchText
+      searchText.trim()
     );
     return this.untriagedSkillSummaries.filter(val => {
       return filteredSkills.includes(val.description);
