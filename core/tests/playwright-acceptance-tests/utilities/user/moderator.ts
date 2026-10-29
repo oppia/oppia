@@ -245,7 +245,6 @@ export class Moderator extends BaseUser {
 
     expect(time1).toBeGreaterThanOrEqual(time2);
   }
-
 }
 
 export let ModeratorFactory = (page: Page): Moderator => {
