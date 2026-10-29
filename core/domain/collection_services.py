@@ -476,6 +476,90 @@ def get_collection_titles_and_categories(
     return result
 
 
+def get_collection_progress_from_model(
+    progress_model: user_models.CollectionProgressModel,
+) -> collection_domain.CollectionProgress:
+    """Returns a collection progress domain object from its storage model.
+
+    Args:
+        progress_model: CollectionProgressModel. The stored progress.
+
+    Returns:
+        CollectionProgress. The corresponding domain object.
+    """
+    return collection_domain.CollectionProgress(
+        progress_model.user_id,
+        progress_model.collection_id,
+        list(progress_model.completed_explorations),
+    )
+
+
+def get_collection_progress(
+    user_id: str, collection_id: str
+) -> Optional[collection_domain.CollectionProgress]:
+    """Returns a user's progress in a collection, if it exists.
+
+    Args:
+        user_id: str. ID of the user.
+        collection_id: str. ID of the collection.
+
+    Returns:
+        CollectionProgress|None. The user's progress, if stored.
+    """
+    progress_model = user_models.CollectionProgressModel.get(
+        user_id, collection_id
+    )
+    return (
+        get_collection_progress_from_model(progress_model)
+        if progress_model is not None
+        else None
+    )
+
+
+def get_collection_progress_multi(
+    user_id: str, collection_ids: List[str]
+) -> List[Optional[collection_domain.CollectionProgress]]:
+    """Returns collection progress objects in the order of collection IDs.
+
+    Args:
+        user_id: str. ID of the user.
+        collection_ids: list(str). IDs of the collections.
+
+    Returns:
+        list(CollectionProgress|None). Progress for each collection.
+    """
+    progress_models = user_models.CollectionProgressModel.get_multi(
+        user_id, collection_ids
+    )
+    return [
+        (
+            get_collection_progress_from_model(progress_model)
+            if progress_model is not None
+            else None
+        )
+        for progress_model in progress_models
+    ]
+
+
+def save_collection_progress(
+    progress: collection_domain.CollectionProgress,
+) -> None:
+    """Validates and stores a user's progress in a collection.
+
+    Args:
+        progress: CollectionProgress. The progress to save.
+    """
+    progress.validate()
+    progress_model = user_models.CollectionProgressModel.get_or_create(
+        progress.user_id, progress.collection_id
+    )
+    progress_model.completed_explorations = list(
+        progress.completed_explorations
+    )
+    progress_model.update_timestamps()
+    progress_model.put()
+
+
 def get_completed_exploration_ids(
     user_id: str, collection_id: str
 ) -> List[str]:
@@ -501,18 +585,8 @@ def get_completed_exploration_ids(
         the sake of this call, so it returns an empty list, indicating that no
         progress has yet been made.
     """
-    progress_model = user_models.CollectionProgressModel.get(
-        user_id, collection_id
-    )
-    if progress_model:
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. So, once we have proper return type we can remove
-        # this explicit declaration of type.
-        exploration_ids: List[str] = progress_model.completed_explorations
-        return exploration_ids
-    else:
-        return []
+    progress = get_collection_progress(user_id, collection_id)
+    return progress.completed_explorations if progress is not None else []
 
 
 def get_explorations_completed_in_collections(
@@ -528,16 +602,14 @@ def get_explorations_completed_in_collections(
         list(list(str)). List of the exploration ids completed in each
         collection.
     """
-    progress_models = user_models.CollectionProgressModel.get_multi(
-        user_id, collection_ids
-    )
+    progress_objects = get_collection_progress_multi(user_id, collection_ids)
 
     exploration_ids_completed_in_collections = []
 
-    for progress_model in progress_models:
-        if progress_model:
+    for progress in progress_objects:
+        if progress is not None:
             exploration_ids_completed_in_collections.append(
-                progress_model.completed_explorations
+                progress.completed_explorations
             )
         else:
             exploration_ids_completed_in_collections.append([])
@@ -610,14 +682,15 @@ def record_played_exploration_in_collection_context(
         collection_id: str. ID of the given collection.
         exploration_id: str. ID of the given exploration.
     """
-    progress_model = user_models.CollectionProgressModel.get_or_create(
-        user_id, collection_id
-    )
+    progress = get_collection_progress(user_id, collection_id)
+    if progress is None:
+        progress = collection_domain.CollectionProgress(
+            user_id, collection_id, []
+        )
 
-    if exploration_id not in progress_model.completed_explorations:
-        progress_model.completed_explorations.append(exploration_id)
-        progress_model.update_timestamps()
-        progress_model.put()
+    if exploration_id not in progress.completed_explorations:
+        progress.completed_explorations.append(exploration_id)
+        save_collection_progress(progress)
 
 
 def get_collection_summary_dicts_from_models(
