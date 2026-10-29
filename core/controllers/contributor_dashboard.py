@@ -19,14 +19,13 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     exp_domain,
     exp_fetchers,
-    feature_flag_services,
     opportunity_domain,
     opportunity_services,
     skill_domain,
@@ -39,6 +38,7 @@ from core.domain import (
     translation_fetchers,
     translation_services,
     user_services,
+    web_feature_flag_services,
 )
 
 from typing import (
@@ -363,8 +363,8 @@ class ContributionOpportunitiesHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -570,8 +570,8 @@ class ReviewableOpportunitiesHandlerV2(
     def get(self) -> None:
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -700,8 +700,8 @@ class TranslatableContentsHandlerV2(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -1113,8 +1113,8 @@ class OpportunitiesCountHandler(
         Raises:
             NotFoundException. The opportunity_type is not valid.
         """
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
+        if not web_feature_flag_services.is_feature_flag_enabled(
+            web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION.value,
             self.user_id,
         ):
             raise self.NotFoundException
@@ -1130,8 +1130,8 @@ class OpportunitiesCountHandler(
             if language_code is None:
                 raise self.InvalidInputException('language_code is required')
 
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            if web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
                 self.user_id,
             ):
                 count = opportunity_services.get_translation_opportunities_count_with_new_models(

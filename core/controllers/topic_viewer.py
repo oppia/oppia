@@ -18,14 +18,13 @@ from __future__ import annotations
 
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
     exp_fetchers,
-    feature_flag_services,
     skill_services,
     story_domain,
     story_fetchers,
@@ -33,6 +32,7 @@ from core.domain import (
     topic_services,
     translation_services,
     voiceover_services,
+    web_feature_flag_services,
 )
 
 from typing import Dict, List, Optional, Sequence, TypedDict, cast
@@ -103,9 +103,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
-        are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
-            None,
+        are_story_arcs_enabled = (
+            web_feature_flag_services.is_feature_flag_enabled(
+                web_feature_flag_list.WebFeatureNames.STORY_EDITOR_ARCS.value,
+                None,
+            )
         )
 
         canonical_story_dicts: List[StoryResponseDict] = []

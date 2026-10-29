@@ -71,6 +71,7 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/takeout_service_test.py',
     'core/domain/question_fetchers_test.py',
     'core/domain/event_services_test.py',
+    'core/jobs/batch_jobs/feature_flag_config_model_migration_jobs.py',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')

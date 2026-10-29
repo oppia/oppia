@@ -37,7 +37,7 @@ import string
 import unittest
 
 import main
-from core import feature_flag_list, feconf, schema_utils, utils
+from core import feconf, schema_utils, utils, web_feature_flag_list
 from core.constants import constants
 from core.controllers import base
 from core.domain import (
@@ -50,8 +50,6 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    feature_flag_domain,
-    feature_flag_services,
     interaction_registry,
     object_registry,
     param_domain,
@@ -76,6 +74,8 @@ from core.domain import (
     topic_services,
     translation_domain,
     user_services,
+    web_feature_flag_domain,
+    web_feature_flag_services,
 )
 from core.platform import models
 from core.platform.taskqueue import cloud_tasks_emulator
@@ -293,14 +293,14 @@ def generate_random_hexa_str() -> str:
 
 @contextlib.contextmanager
 def swap_is_feature_flag_enabled_function(
-    feature_flag_names: List[feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.WebFeatureNames],
 ) -> Iterator[None]:
     """Mocks is_feature_flag_enabled function within the context of a
     'with' statement. is_feature_flag_enabled will return True for all
     the features present in feature_flag_names.
 
     Args:
-        feature_flag_names: List[FeatureNames]. The name of the feature
+        feature_flag_names: List[WebFeatureNames]. The name of the feature
             flags for which the value should be returned as True.
 
     Yields:
@@ -311,7 +311,7 @@ def swap_is_feature_flag_enabled_function(
         feature_flag_name: str,
         user_id: Optional[str] = None,  # pylint: disable=unused-argument
         feature_flag: Optional[  # pylint: disable=unused-argument
-            feature_flag_domain.FeatureFlag
+            web_feature_flag_domain.FeatureFlag
         ] = None,
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
@@ -333,10 +333,10 @@ def swap_is_feature_flag_enabled_function(
         )
 
     original_is_feature_flag_enabled = getattr(
-        feature_flag_services, 'is_feature_flag_enabled'
+        web_feature_flag_services, 'is_feature_flag_enabled'
     )
     setattr(
-        feature_flag_services,
+        web_feature_flag_services,
         'is_feature_flag_enabled',
         mock_is_feature_flag_enabled,
     )
@@ -344,14 +344,14 @@ def swap_is_feature_flag_enabled_function(
         yield
     finally:
         setattr(
-            feature_flag_services,
+            web_feature_flag_services,
             'is_feature_flag_enabled',
             original_is_feature_flag_enabled,
         )
 
 
 def enable_feature_flags(
-    feature_flag_names: List[feature_flag_list.FeatureNames],
+    feature_flag_names: List[web_feature_flag_list.WebFeatureNames],
 ) -> Callable[
     [Callable[..., _GenericHandlerFunctionReturnType]],
     Callable[..., _GenericHandlerFunctionReturnType],
@@ -360,7 +360,7 @@ def enable_feature_flags(
     scope of the test.
 
     Args:
-        feature_flag_names: List[feature_flag_list.FeatureNames]. The list
+        feature_flag_names: List[web_feature_flag_list.WebFeatureNames]. The list
             of the names of the feature flags that will be enabled.
 
     Returns:

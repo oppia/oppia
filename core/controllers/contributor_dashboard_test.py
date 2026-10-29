@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import unittest.mock
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     change_domain,
@@ -3053,7 +3053,7 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_200_when_feature_flag_enabled(self) -> None:
@@ -3067,7 +3067,7 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_opportunities(self) -> None:
@@ -3090,7 +3090,7 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_400_for_missing_required_params(self) -> None:
@@ -3120,7 +3120,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_200_when_feature_flag_enabled(self) -> None:
@@ -3132,7 +3132,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_reviewable_opportunities(self) -> None:
@@ -3197,7 +3197,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_400_for_invalid_topic_name(self) -> None:
@@ -3209,7 +3209,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_empty_opportunities_when_logged_out(self) -> None:
@@ -3222,7 +3222,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_handles_language_code_none(self) -> None:
@@ -3304,7 +3304,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_filters_opportunities_by_topic_name(self) -> None:
@@ -3416,7 +3416,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_handles_empty_topic_name(self) -> None:
@@ -3490,7 +3490,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_every_entity_type_when_no_entity_type_is_given(
@@ -3625,7 +3625,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_400_for_invalid_entity_id(self) -> None:
@@ -3638,7 +3638,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_200_for_exploration(self) -> None:
@@ -3651,7 +3651,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_correct_fields_for_translatable_contents(
@@ -3678,7 +3678,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_200_for_skill(self) -> None:
@@ -3691,7 +3691,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_400_for_topic(self) -> None:
@@ -3707,7 +3707,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_returns_400_for_story(self) -> None:
@@ -3723,7 +3723,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_filters_out_in_review_suggestions(self) -> None:
@@ -3781,7 +3781,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_filters_out_already_translated_contents(self) -> None:
@@ -3824,7 +3824,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_handler_filters_out_list_formats_for_non_reviewer(self) -> None:
@@ -3941,14 +3941,14 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_skill_opportunities_count(self) -> None:
         response = self.get_json('/opportunitiescounthandler/skill')
         self.assertEqual(response['total_count'], 1)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_translation_opportunities_count(self) -> None:
         response = self.get_json(
@@ -3958,8 +3958,8 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION,
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+            web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION,
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
         ]
     )
     def test_get_translation_opportunities_count_with_new_models(self) -> None:
@@ -3970,7 +3970,7 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['total_count'], 0)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_translation_count_missing_language_code(self) -> None:
         self.get_json(
@@ -3978,7 +3978,7 @@ class OpportunitiesCountHandlerTest(test_utils.GenericTestBase):
         )
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_DROPDOWN_PAGINATION]
+        [web_feature_flag_list.WebFeatureNames.ENABLE_DROPDOWN_PAGINATION]
     )
     def test_get_invalid_opportunity_type(self) -> None:
         self.get_json(
