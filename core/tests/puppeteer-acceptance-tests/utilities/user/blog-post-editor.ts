@@ -64,6 +64,8 @@ const editBlogBodySelector = '.e2e-test-ck-editor';
 const blogTitleHelpSelector = '.e2e-test-blog-title-help';
 const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
 const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
+const blogPostFullPreviewSelector = '.e2e-test-blog-post-full-preview';
+const blogCardPreviewSelector = '.e2e-test-blog-card-preview';
 const gridViewButtonSelector = '.e2e-test-tiles-view-button';
 const listViewButtonSelector = '.e2e-test-list-view-button';
 const editBlogPostBtnSelector = '.e2e-test-edit-blog-post-button';
@@ -104,6 +106,7 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(previewBlogPostButtonSelector);
     await this.clickOnElementWithSelector(previewBlogPostButtonSelector);
     await this.expectModalTitleToBe('Preview');
+    await this.expectElementToBeVisible(blogPostFullPreviewSelector);
   }
 
   /**
@@ -111,6 +114,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async switchToBlogCardPreviewTab(): Promise<void> {
     await this.clickOnElementWithText('Blog Card Preview');
+    await this.expectElementToBeVisible(blogCardPreviewSelector);
   }
 
   /**
