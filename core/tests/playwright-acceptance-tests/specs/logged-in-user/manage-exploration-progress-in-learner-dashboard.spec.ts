@@ -23,7 +23,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
 
@@ -32,7 +31,6 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-  let releaseCoordinator: ReleaseCoordinator;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(600000);
@@ -41,17 +39,6 @@ test.describe('Logged-in User', function () {
       'curriculumAdmin@example.com',
       browser,
       [ROLES.CURRICULUM_ADMIN]
-    );
-
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      browser,
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
     );
 
     const explorationTitles = [
