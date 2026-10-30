@@ -39,6 +39,7 @@ const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
 const errorModalSelector = '.oppia-error-modal-window';
+const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 
 export class Moderator extends BaseUser {
   /**
@@ -304,6 +305,11 @@ export class Moderator extends BaseUser {
     );
     await this.clickAndWaitForNavigation(title);
 
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (goToFeedbackButton) {
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+    }
+
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector
     );
@@ -416,6 +422,11 @@ export class Moderator extends BaseUser {
       explorationID
     );
     await this.clickAndWaitForNavigation(explorationID as string);
+
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (goToFeedbackButton) {
+      await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
+    }
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector

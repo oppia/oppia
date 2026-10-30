@@ -78,6 +78,7 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -128,6 +129,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   checkRevertExplorationValidUrl: string = '';
   explorationDownloadUrl: string = '';
   improvementsTabIsEnabled: boolean = false;
+  feedbackPromptModalHasBeenShown: boolean = false;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
@@ -362,9 +364,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         (!currentStateName ||
           !explorationData.states.hasOwnProperty(currentStateName))
       ) {
-        if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
-          this.routerService.navigateToFeedbackTab();
-        }
+        this.maybeShowFeedbackPromptModal();
       }
 
       if (this.modifyTranslationsFeatureFlagIsEnabled) {
@@ -828,6 +828,42 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
   isImprovementsTabEnabled(): boolean {
     return this.improvementsTabIsEnabled;
+  }
+
+  maybeShowFeedbackPromptModal(): void {
+    const openThreadsCount =
+      this.threadDataBackendApiService.getOpenThreadsCount();
+
+    if (
+      openThreadsCount === 0 ||
+      !this.isModalOpenable ||
+      this.feedbackPromptModalHasBeenShown
+    ) {
+      return;
+    }
+
+    this.feedbackPromptModalHasBeenShown = true;
+    this.isModalOpenable = false;
+
+    const modalRef = this.ngbModal.open(FeedbackPromptModalComponent, {
+      backdrop: 'static',
+      keyboard: false,
+      windowClass: 'oppia-confirm-or-cancel-modal',
+    });
+
+    if (modalRef.componentInstance) {
+      modalRef.componentInstance.openThreadsCount = openThreadsCount;
+    }
+
+    modalRef.result.then(
+      () => {
+        this.routerService.navigateToFeedbackTab();
+        this.isModalOpenable = true;
+      },
+      () => {
+        this.isModalOpenable = true;
+      }
+    );
   }
 
   ngOnDestroy(): void {
