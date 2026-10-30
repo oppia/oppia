@@ -25,12 +25,7 @@ jobs:
               repo: context.repo.repo,
               pull_number: pr.number
             });
-            const prDescription = pullRequest.body;
-
-            if (!prDescription) {
-              core.setFailed("The PR description is missing or does not meet the required format.");
-              return;
-            }
+            const prDescription = pullRequest.body || '';
 
             const requiredSections = [
                 '## Overview',
