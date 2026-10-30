@@ -411,7 +411,7 @@ describe('Edit Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(
+    ).and.callFake(() =>
       Promise.reject(new Error('Failed to update certificate.'))
     );
     const alertsSpy = spyOn(alertsService, 'addWarning');
@@ -434,7 +434,7 @@ describe('Edit Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.reject('Failed to update certificate.'));
+    ).and.callFake(() => Promise.reject('Failed to update certificate.'));
     const alertsSpy = spyOn(alertsService, 'addWarning');
     const routerSpy = spyOn(router, 'navigate');
 

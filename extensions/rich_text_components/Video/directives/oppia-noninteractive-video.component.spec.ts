@@ -68,6 +68,18 @@ describe('NoninteractiveVideo', () => {
 
     fixture = TestBed.createComponent(NoninteractiveVideo);
     component = fixture.componentInstance;
+    // Prevent the real YouTube iframe API script from being appended. A
+    // cross-origin script error would otherwise surface as an opaque
+    // "Script error." and be reported against an unrelated spec (see #26940).
+    // Only script elements are dropped; other elements are appended normally
+    // so that the test harness can still insert the fixture into the body.
+    const realAppendChild = document.body.appendChild.bind(document.body);
+    spyOn(document.body, 'appendChild').and.callFake((node: Node) => {
+      if (node instanceof HTMLScriptElement) {
+        return node;
+      }
+      return realAppendChild(node);
+    });
     component.autoplayWithValue = 'true';
     component.endWithValue = '100';
     component.startWithValue = '20';
