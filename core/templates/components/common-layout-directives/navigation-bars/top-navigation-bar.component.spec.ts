@@ -245,6 +245,20 @@ describe('TopNavigationBarComponent', () => {
     })
   );
 
+  it('should close the sidebar only when a resize makes the window wide', () => {
+    const isWindowNarrow = spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(component, 'truncateNavbar').and.stub();
+    component.ngOnInit();
+    component.toggleSidebar(new Event('click'));
+
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeTrue();
+
+    isWindowNarrow.and.returnValue(false);
+    mockResizeEmitter.emit();
+    expect(component.isSidebarShown()).toBeFalse();
+  });
+
   it("should show Oppia's logos", () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
       '/assets/images/logo/288x128_logo_white.webp'
