@@ -11,6 +11,10 @@ p.footer-donate-volunteer a {
   text-decoration: underline;
 }
 
+p.footer-donate-volunteer a:focus {
+  outline: 2px solid #fff;
+}
+
 @media (max-width: 600px) {
   p.footer-donate-volunteer,
   p.footer-donate-volunteer a {

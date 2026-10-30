@@ -41,6 +41,7 @@ import {
 } from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Rule, RuleInputs, RuleInputTypes} from 'domain/exploration/rule.model';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe implements PipeTransform {
@@ -714,6 +715,37 @@ describe('Rule Editor Component', () => {
     component.onSelectNewRuleType('Contains');
     flush();
   }));
+
+  it('should get rule description choice list and first choice text', () => {
+    component.ruleDescriptionChoices = [
+      {id: '1', val: 'string choice'},
+      {id: '2', val: 42},
+    ];
+
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('string choice');
+
+    component.ruleDescriptionChoices = [{id: '1', val: 7}];
+    expect(component.getFirstRuleDescriptionChoiceText()).toBe('7');
+  });
+
+  it('should get and set rule input values', () => {
+    const item = {
+      type: 'html',
+      varName: 'x',
+      text: '',
+    };
+    const initialInput = {x: 'old_val'};
+    component.rule = new Rule('ImageClick', {x: initialInput}, {x: 'String'});
+
+    expect(component.getRuleInputAsString(item)).toBe(String(initialInput));
+    expect(component.getRuleInputValue(item) as InteractionRuleInputs).toBe(
+      initialInput
+    );
+
+    const newInput = {x: 'new_val'};
+    component.setRuleInputValue(newInput, item);
+    expect(component.rule.inputs.x).toBe(newInput);
+  });
 
   it('should unsubscribe on destroy', () => {
     component.rule = new Rule(

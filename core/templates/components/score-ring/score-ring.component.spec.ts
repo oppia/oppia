@@ -84,31 +84,17 @@ describe('Score Ring Component', () => {
 
   it('should get score ring color', () => {
     component.score = 35;
-    component.testIsPassed = true;
 
     expect(component.getScoreRingColor()).toEqual(
-      component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR
-    );
-
-    component.testIsPassed = false;
-
-    expect(component.getScoreRingColor()).toEqual(
-      component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR
+      component.SCORE_COLORS.PASSED_COLOR
     );
   });
 
   it('should get score outer ring color', () => {
     component.score = 35;
-    component.testIsPassed = true;
 
     expect(component.getScoreOuterRingColor()).toEqual(
-      component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER
-    );
-
-    component.testIsPassed = false;
-
-    expect(component.getScoreOuterRingColor()).toEqual(
-      component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER
+      component.SCORE_COLORS.PASSED_COLOR_OUTER
     );
   });
 
