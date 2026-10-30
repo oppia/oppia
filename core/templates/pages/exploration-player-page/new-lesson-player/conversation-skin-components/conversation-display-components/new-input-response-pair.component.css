@@ -264,3 +264,21 @@
     width: 64px;
   }
 }
+
+@media (max-width: 768px) {
+  /* Same 20px inset the blue question content has inside the card. */
+  .answer-wrapper {
+    padding-right: 20px;
+  }
+
+  .feedback-wrapper .conversation-skin-oppia-avatar,
+  .feedback-wrapper .left-side-curve,
+  .answer-wrapper .right-side-curve,
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    display: none;
+  }
+
+  .conversation-skin-learner-answer-container {
+    border-radius: 0;
+  }
+}

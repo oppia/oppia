@@ -331,7 +331,7 @@ input.form-control:focus {
   
 
   .oppia-learner-view-card {
-    margin-left: 40px;
+    margin-left: 0;
     margin-right: 0;
     margin-top: 30px;
     padding-bottom: 30px;
@@ -359,7 +359,7 @@ input.form-control:focus {
   }
 
   .oppia-learner-view-card {
-    margin-left: 55px;
+    margin-left: 0;
     margin-right: 0;
     margin-top: 30px;
     padding-bottom: 30px;
@@ -395,5 +395,19 @@ input.form-control:focus {
 @media (min-width: 1024px) {
   .supplemental-history-response {
     width: 75%;
+  }
+}
+
+/* On screens up to 768px the card spans the full width, like the current
+   lesson player, so there is no room for the avatar and the bubble tail. */
+@media (max-width: 768px) {
+  .oppia-learner-view-card .conversation-skin-oppia-avatar,
+  .oppia-learner-view-card .left-side-curve {
+    display: none;
+  }
+
+  .conversation-skin-oppia-completed-state-card,
+  .oppia-learner-view-card-top-section {
+    border-radius: 0;
   }
 }

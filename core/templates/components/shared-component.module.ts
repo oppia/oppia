@@ -226,7 +226,6 @@ import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-pl
 import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
 import {CheckpointBarComponent} from './checkpoint-bar/checkpoint-bar.component';
-import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 
@@ -315,7 +314,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
-    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
@@ -470,7 +468,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
-    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -647,7 +644,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
-    SaveProgressModalComponent,
     ProgressTrackerComponent,
     CheckpointBarComponent,
     ContinueButtonComponent,
