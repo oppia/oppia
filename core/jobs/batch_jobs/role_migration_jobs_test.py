@@ -48,13 +48,13 @@ class MigrateWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
             user_models.UserSettingsModel,
             id='legacy_user',
             email='legacy@example.com',
-            role=feconf.ROLE_ID_RELEASE_COORDINATOR,
+            roles=[feconf.ROLE_ID_RELEASE_COORDINATOR],
         )
         android_user = self.create_model(
             user_models.UserSettingsModel,
             id='android_user',
             email='android@example.com',
-            role=feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR,
+            roles=[feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR],
         )
         self.put_multi([legacy_user, android_user])
 
@@ -75,15 +75,15 @@ class MigrateWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
         migrated_user = user_models.UserSettingsModel.get_by_id('legacy_user')
         self.assertIsNotNone(migrated_user)
         assert migrated_user is not None
-        self.assertEqual(
-            migrated_user.role, feconf.ROLE_ID_WEB_RELEASE_COORDINATOR
+        self.assertIn(
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR, migrated_user.roles
         )
 
         unchanged_user = user_models.UserSettingsModel.get_by_id('android_user')
         self.assertIsNotNone(unchanged_user)
         assert unchanged_user is not None
-        self.assertEqual(
-            unchanged_user.role, feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR
+        self.assertIn(
+            feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR, unchanged_user.roles
         )
 
 
@@ -102,7 +102,7 @@ class AuditWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
             user_models.UserSettingsModel,
             id='legacy_user',
             email='legacy@example.com',
-            role=feconf.ROLE_ID_RELEASE_COORDINATOR,
+            roles=[feconf.ROLE_ID_RELEASE_COORDINATOR],
         )
         self.put_multi([user])
 
@@ -125,6 +125,4 @@ class AuditWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
         unchanged_user = user_models.UserSettingsModel.get_by_id('legacy_user')
         self.assertIsNotNone(unchanged_user)
         assert unchanged_user is not None
-        self.assertEqual(
-            unchanged_user.role, feconf.ROLE_ID_RELEASE_COORDINATOR
-        )
+        self.assertIn(feconf.ROLE_ID_RELEASE_COORDINATOR, unchanged_user.roles)
