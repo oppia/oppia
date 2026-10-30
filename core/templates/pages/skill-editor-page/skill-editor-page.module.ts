@@ -17,6 +17,7 @@
  */
 
 import {ToastrModule} from 'ngx-toastr';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {RouterModule} from '@angular/router';
 import {SharedComponentsModule} from 'components/shared-component.module';
@@ -51,6 +52,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     InteractionExtensionsModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
+    MatTooltipModule,
     RouterModule.forChild([
       {
         path: '',
