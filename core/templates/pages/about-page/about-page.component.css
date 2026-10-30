@@ -345,7 +345,8 @@
   }
 
   .about-page .oppia-about-impact-bar-chart-container {
-    width: 80%;
+    margin: 0;
+    width: 100%;
   }
 }
 
