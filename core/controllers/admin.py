@@ -39,12 +39,7 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     opportunity_services,
-)
-from core.domain import platform_parameter_domain as parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services as parameter_services
-from core.domain import (
+    platform_parameter_list,
     question_domain,
     question_services,
     recommendations_services,
@@ -71,6 +66,9 @@ from core.domain import (
     voiceover_services,
     wipeout_service,
 )
+from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services as parameter_services
 
 from typing import Callable, Dict, List, Optional, TypedDict, Union, cast
 

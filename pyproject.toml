@@ -5,3 +5,58 @@ extend-exclude = '''
     scripts/linters/test_files/*
     | stubs/*
 '''
+
+[tool.ruff]
+line-length = 80
+extend-exclude = [
+    "scripts/linters/test_files",
+    "stubs",
+]
+
+[tool.ruff.format]
+quote-style = "preserve"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+    "I",
+]
+
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "first-party",
+    "third-party",
+    "local-folder",
+]
+known-third-party = [
+    "apache_beam",
+    "backports.functools_lru_cache",
+    "browsermobproxy",
+    "cloudstorage",
+    "contextlib2",
+    "firebase_admin",
+    "google.api_core",
+    "google.appengine",
+    "google.cloud",
+    "google.protobuf",
+    "mapreduce",
+    "mock",
+    "mutagen",
+    "pipeline",
+    "psutil",
+    "pylatexenc",
+    "pylint",
+    "requests",
+    "requests_mock",
+    "selenium",
+    "six",
+    "skulpt",
+    "typing",
+    "webapp2",
+    "webapp2_extras",
+    "webtest",
+    "yaml",
+]

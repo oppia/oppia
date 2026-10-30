@@ -22,8 +22,9 @@ import ast
 import io
 import os
 import re
+import subprocess
+import sys
 
-import isort.api
 import pycodestyle
 from pylint import lint
 from pylint.reporters import text
@@ -155,20 +156,31 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             check.
         """
         name = 'Import order'
-        error_messages = []
+        error_messages: List[str] = []
         files_to_check = self.all_filepaths
-        failed = False
-        stdout = io.StringIO()
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False.
-                if not isort.api.check_file(filepath, show_diff=True):
-                    failed = True
+        if not files_to_check:
+            return concurrent_task_utils.TaskResult(
+                name, False, error_messages, error_messages
+            )
 
-            if failed:
-                error_message = stdout.getvalue()
-                error_messages.append(error_message)
+        proc = subprocess.run(
+            [
+                sys.executable,
+                '-m',
+                'ruff',
+                'check',
+                '--select',
+                'I',
+                *files_to_check,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        failed = proc.returncode != 0
+        if failed:
+            error_message = f'{proc.stdout}{proc.stderr}'
+            error_messages.append(error_message)
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages
