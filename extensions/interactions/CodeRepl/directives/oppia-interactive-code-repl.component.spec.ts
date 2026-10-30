@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the InteractiveCodeRepl response component.
  */
 
-// @ts-nocheck
-
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {
   waitForAsync,
@@ -277,7 +275,7 @@ describe('InteractiveCodeReplComponent', () => {
     // This throws "Argument of type '() => Promise<never>' is not assignable
     // to parameter of type 'never'" We need to suppress this error because the
     // the error case needs to be tested.
-    spyOn(Sk.misceval, 'asyncToPromise').and.callFake(() => {
+    (spyOn(Sk.misceval, 'asyncToPromise') as jasmine.Spy).and.callFake(() => {
       return Promise.reject('Error');
     });
     spyOn(component, 'sendResponse').and.callThrough();
