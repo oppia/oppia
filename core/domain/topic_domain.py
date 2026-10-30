@@ -39,7 +39,7 @@ from core.domain import (
     translation_domain,
 )
 
-from typing import Dict, Final, List, Literal, Optional, TypedDict
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1166,7 +1166,9 @@ class Topic(translation_domain.BaseTranslatableObject):
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def get_translatable_contents_collection(
-        self, override_metadata_feature_flag: bool = False
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Returns the topic name and description as translatable metadata."""
         collection = translation_domain.TranslatableContentsCollection()

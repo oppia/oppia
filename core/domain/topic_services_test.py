@@ -203,6 +203,31 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(opportunity.content_count, 2)
         self.assertEqual(opportunity.translation_counts['hi'], 1)
 
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                        'old_value': updated_topic.description,
+                        'new_value': '',
+                    }
+                )
+            ],
+            'Clear topic description.',
+        )
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            self.TOPIC_ID,
+            updated_topic.version,
+            'hi',
+        ).translations
+        self.assertIn(feconf.TOPIC_NAME_CONTENT_ID, translations)
+        self.assertNotIn(feconf.TOPIC_DESCRIPTION_CONTENT_ID, translations)
+
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS

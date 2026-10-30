@@ -132,7 +132,7 @@ def carry_forward_topic_translations(
     updated_contents = (
         updated_topic.get_translatable_contents_collection().content_id_to_translatable_content
     )
-    models = []
+    translation_models_to_save = []
     for (
         entity_translation
     ) in translation_fetchers.get_all_entity_translations_for_entity(
@@ -149,7 +149,7 @@ def carry_forward_topic_translations(
                 != updated_contents[content_id].content_value
             ):
                 entity_translation.translations[content_id].needs_update = True
-        models.append(
+        translation_models_to_save.append(
             translation_models.EntityTranslationsModel.create_new(
                 feconf.ENTITY_TYPE_TOPIC,
                 updated_topic.id,
@@ -158,11 +158,13 @@ def carry_forward_topic_translations(
                 entity_translation.to_dict()['translations'],
             )
         )
-    if models:
+    if translation_models_to_save:
         translation_models.EntityTranslationsModel.update_timestamps_multi(
-            models
+            translation_models_to_save
         )
-        translation_models.EntityTranslationsModel.put_multi(models)
+        translation_models.EntityTranslationsModel.put_multi(
+            translation_models_to_save
+        )
 
 
 def _apply_changes(
