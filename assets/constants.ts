@@ -6223,11 +6223,13 @@ export default {
   "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
   "CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION": "submit_translation",
   "CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER": "voiceover",
   "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "question",
   "CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION": "submit_question",
   "CD_USER_RIGHTS_CATEGORIES": [
     "translation",
+    "submit_translation",
     "question",
     "voiceover",
     "submit_question"

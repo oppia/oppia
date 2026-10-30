@@ -68,8 +68,8 @@
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
-            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
-              + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
+            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!isCoordinatorTab()">
+              + ADD {{ isSubmitterTab() ? 'SUBMITTER' : 'REVIEWER' }}
             </button>
           </div>
           <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
@@ -132,8 +132,8 @@
       </div>
       <div class="filter-container">
         <div class="add-rights-button-container">
-          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) && !isCoordinatorTab()">
-            + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
+          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!isCoordinatorTab()">
+            + ADD {{ isSubmitterTab() ? 'SUBMITTER' : 'REVIEWER' }}
           </button>
         </div>
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
