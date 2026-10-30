@@ -946,6 +946,11 @@ export class CurriculumAdmin extends TopicManager {
       );
       await this.clickOnElementWithSelector(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
+      await this.expectToastMessage('Changes Saved.');
+
+      await this.page.waitForSelector('.e2e-test-loading-fullpage', {
+        hidden: true,
+      });
     }
   }
 
