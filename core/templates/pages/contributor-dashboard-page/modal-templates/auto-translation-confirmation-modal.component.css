@@ -1,0 +1,19 @@
+.oppia-auto-translation-comparison {
+  display: flex;
+  gap: 16px;
+}
+
+.oppia-auto-translation-comparison-panel {
+  border: 1px solid #ddd;
+  flex: 1;
+  max-height: 50vh;
+  min-width: 0;
+  overflow: auto;
+  padding: 12px;
+}
+
+@media screen and (max-width: 767px) {
+  .oppia-auto-translation-comparison {
+    flex-direction: column;
+  }
+}
