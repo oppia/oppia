@@ -2356,12 +2356,7 @@ describe('State translation component', () => {
           },
         } as Outcome;
 
-        const result = component.summarizeDefaultOutcome(
-          outcome,
-          '',
-          0,
-          true
-        );
+        const result = component.summarizeDefaultOutcome(outcome, '', 0, true);
 
         expect(result).toBe('');
       });
