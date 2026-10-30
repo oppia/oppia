@@ -2919,7 +2919,17 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
-    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    let goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
+    if (!goToFeedbackButton) {
+      try {
+        goToFeedbackButton = await this.page.waitForSelector(
+          goToFeedbackButtonSelector,
+          {visible: true, timeout: 2500}
+        );
+      } catch {
+        goToFeedbackButton = null;
+      }
+    }
     if (goToFeedbackButton) {
       await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
       await this.waitForNetworkIdle();
@@ -2993,20 +3003,30 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss the feedback prompt modal if it is present.
    */
   async dismissFeedbackPromptModalIfPresent(): Promise<void> {
-    const stayInEditorButton = await this.page.$(stayInEditorButtonSelector);
-    if (stayInEditorButton) {
+    try {
+      await this.page.waitForSelector(stayInEditorButtonSelector, {
+        visible: true,
+        timeout: 2500,
+      });
       await this.clickOnElementWithSelector(stayInEditorButtonSelector);
       await this.expectElementToBeVisible(stayInEditorButtonSelector, false);
+    } catch {
+      // Modal is not present, continue.
     }
   }
   /**
    * Function to accept the feedback prompt modal if it is present.
    */
   async acceptFeedbackPromptModalIfPresent(): Promise<void> {
-    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
-    if (goToFeedbackButton) {
+    try {
+      await this.page.waitForSelector(goToFeedbackButtonSelector, {
+        visible: true,
+        timeout: 2500,
+      });
       await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
       await this.expectElementToBeVisible(goToFeedbackButtonSelector, false);
+    } catch {
+      // Modal is not present, continue.
     }
   }
 
