@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the States.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
@@ -75,6 +73,8 @@ describe('States', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: null,
     });
 
     newState = {
