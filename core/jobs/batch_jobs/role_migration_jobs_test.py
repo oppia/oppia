@@ -43,11 +43,13 @@ class MigrateWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_migrates_legacy_role_and_preserves_other_roles(self) -> None:
-        legacy_user = self.create_model(
+    def test_migrates_release_coordinator_role_and_preserves_other_roles(
+        self,
+    ) -> None:
+        release_coordinator_user = self.create_model(
             user_models.UserSettingsModel,
-            id='legacy_user',
-            email='legacy@example.com',
+            id='release_coordinator_user',
+            email='release_coordinator@example.com',
             roles=[feconf.ROLE_ID_RELEASE_COORDINATOR],
         )
         android_user = self.create_model(
@@ -56,14 +58,14 @@ class MigrateWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
             email='android@example.com',
             roles=[feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR],
         )
-        self.put_multi([legacy_user, android_user])
+        self.put_multi([release_coordinator_user, android_user])
 
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
                     stdout=(
                         'Migrated release coordinator role: '
-                        'user_id=legacy_user'
+                        'user_id=release_coordinator_user'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -72,7 +74,9 @@ class MigrateWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        migrated_user = user_models.UserSettingsModel.get_by_id('legacy_user')
+        migrated_user = user_models.UserSettingsModel.get_by_id(
+            'release_coordinator_user'
+        )
         self.assertIsNotNone(migrated_user)
         assert migrated_user is not None
         self.assertIn(
@@ -97,11 +101,11 @@ class AuditWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_audits_legacy_role_without_migrating(self) -> None:
+    def test_audits_release_coordinator_role_without_migrating(self) -> None:
         user = self.create_model(
             user_models.UserSettingsModel,
-            id='legacy_user',
-            email='legacy@example.com',
+            id='release_coordinator_user',
+            email='release_coordinator@example.com',
             roles=[feconf.ROLE_ID_RELEASE_COORDINATOR],
         )
         self.put_multi([user])
@@ -110,19 +114,19 @@ class AuditWebReleaseCoordinatorRoleJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stdout=(
-                        'User has legacy release coordinator role: '
-                        'user_id=legacy_user'
+                        'User has release coordinator role: '
+                        'user_id=release_coordinator_user'
                     )
                 ),
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'users_with_legacy_release_coordinator_role_count: 1'
-                    )
+                    stdout=('users_with_release_coordinator_role_count: 1')
                 ),
             ]
         )
 
-        unchanged_user = user_models.UserSettingsModel.get_by_id('legacy_user')
+        unchanged_user = user_models.UserSettingsModel.get_by_id(
+            'release_coordinator_user'
+        )
         self.assertIsNotNone(unchanged_user)
         assert unchanged_user is not None
         self.assertIn(feconf.ROLE_ID_RELEASE_COORDINATOR, unchanged_user.roles)

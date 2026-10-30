@@ -91,7 +91,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             role_services.HUMAN_READABLE_ROLES[
                 feconf.ROLE_ID_RELEASE_COORDINATOR
             ],
-            'legacy release coordinator',
+            'release coordinator',
         )
         self.assertEqual(
             role_services.HUMAN_READABLE_ROLES[

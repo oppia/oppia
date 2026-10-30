@@ -170,7 +170,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_MODERATOR: 'moderator',
     feconf.ROLE_ID_QUESTION_ADMIN: 'question admin',
     feconf.ROLE_ID_ANDROID_RELEASE_COORDINATOR: 'android release coordinator',
-    feconf.ROLE_ID_RELEASE_COORDINATOR: 'legacy release coordinator',
+    feconf.ROLE_ID_RELEASE_COORDINATOR: 'release coordinator',
     feconf.ROLE_ID_WEB_RELEASE_COORDINATOR: 'web release coordinator',
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager',
     feconf.ROLE_ID_TRANSLATION_ADMIN: 'translation admin',

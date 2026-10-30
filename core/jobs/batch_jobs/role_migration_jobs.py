@@ -39,10 +39,10 @@ class MigrateWebReleaseCoordinatorRoleJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = True
 
-    def _has_legacy_role(
+    def _has_release_coordinator_role(
         self, user_model: user_models.UserSettingsModel
     ) -> bool:
-        """Checks whether a user has the legacy release coordinator role."""
+        """Checks whether a user has the release coordinator role."""
         if feconf.ROLE_ID_RELEASE_COORDINATOR in user_model.roles:
             return True
         return False
@@ -50,7 +50,7 @@ class MigrateWebReleaseCoordinatorRoleJob(base_jobs.JobBase):
     def _migrate_role(
         self, user_model: user_models.UserSettingsModel
     ) -> user_models.UserSettingsModel:
-        """Updates a user's legacy role to the web release coordinator role."""
+        """Updates a user's release coordinator role to the web release coordinator role."""
         with datastore_services.get_ndb_context():
             current_roles = [
                 role
@@ -64,20 +64,20 @@ class MigrateWebReleaseCoordinatorRoleJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of role migration results."""
-        users_with_legacy_role = (
+        users_with_release_coordinator_role = (
             self.pipeline
             | 'Get all UserSettingsModels'
             >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=False)
             )
-            | 'Filter users with legacy release coordinator role'
-            >> beam.Filter(self._has_legacy_role)
+            | 'Filter users with release coordinator role'
+            >> beam.Filter(self._has_release_coordinator_role)
         )
 
         outputs = []
         if self.DATASTORE_UPDATES_ALLOWED:
             migrated_users = (
-                users_with_legacy_role
+                users_with_release_coordinator_role
                 | 'Migrate release coordinator role'
                 >> beam.Map(self._migrate_role)
             )
@@ -111,23 +111,23 @@ class MigrateWebReleaseCoordinatorRoleJob(base_jobs.JobBase):
             outputs.extend([migration_logs, migration_count, put_results])
         else:
             audit_logs = (
-                users_with_legacy_role
-                | 'Log users with legacy release coordinator role'
+                users_with_release_coordinator_role
+                | 'Log users with release coordinator role'
                 >> beam.Map(
                     lambda model: job_run_result.JobRunResult.as_stdout(
-                        'User has legacy release coordinator role: '
+                        'User has release coordinator role: '
                         'user_id=%s' % model.id
                     )
                 )
             )
             audit_count = (
-                users_with_legacy_role
-                | 'Count users with legacy release coordinator role'
+                users_with_release_coordinator_role
+                | 'Count users with release coordinator role'
                 >> beam.combiners.Count.Globally().with_defaults(0)
-                | 'Report users with legacy release coordinator role count'
+                | 'Report users with release coordinator role count'
                 >> beam.Map(
                     lambda count: job_run_result.JobRunResult.as_stdout(
-                        'users_with_legacy_release_coordinator_role_count: '
+                        'users_with_release_coordinator_role_count: '
                         '%s' % count
                     )
                 )
