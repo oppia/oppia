@@ -100,6 +100,20 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+const saveExplorationModalContainerSelector =
+  '.e2e-test-save-exploration-modal-container';
+const saveDraftTitleSelector = '.e2e-test-save-draft-heading';
+const publishMetadataExplorationHeaderSelector =
+  '.e2e-test-metadata-modal-header';
+const metadataModalCategorySelect =
+  'mat-select.e2e-test-exploration-category-dropdown';
+const metadataModalLanguageSelect =
+  '.e2e-test-exploration-language-select-modal';
+const addListEntryButtonSelector = '.e2e-test-add-list-entry';
+const textInputFieldSelector = '.e2e-test-text-input';
+const commonModalBodySelector = '.e2e-test-modal-body';
+const shareExplorationLinkSelector = '.e2e-test-progress-id';
+
 const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
@@ -1284,6 +1298,278 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Expands the navigation bar in mobile view if it is not already expanded.
+   * Does nothing on desktop.
+   */
+  private async openMobileNavbarIfNeeded(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+    const navbarOptions = await this.page.$(mobileNavbarOptions);
+    if (!navbarOptions) {
+      await this.expectElementToBeVisible(mobileOptionsButtonSelector);
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+    }
+  }
+
+  /**
+   * Clicks the option whose trimmed text exactly matches the given text.
+   * @param {string} optionSelector - The selector of the options to search.
+   * @param {string} text - The exact text of the option to click.
+   */
+  private async clickOptionWithExactText(
+    optionSelector: string,
+    text: string
+  ): Promise<void> {
+    const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const option = this.page
+      .locator(optionSelector)
+      .filter({hasText: new RegExp(`^\\s*${escapedText}\\s*$`)})
+      .first();
+    await option.waitFor({state: 'visible'});
+    await option.click();
+  }
+
+  /**
+   * Function to open the save draft modal from the navigation bar.
+   */
+  async clickOnSaveDraftButton(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openMobileNavbarIfNeeded();
+      await this.expectElementToBeVisible(
+        `${mobileSaveChangesButtonSelector}:not([disabled])`
+      );
+      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector, {
+        force: true,
+      });
+    } else {
+      await this.expectElementToBeVisible(
+        `${saveChangesButton}:not([disabled])`
+      );
+      await this.clickOnElementWithSelector(saveChangesButton);
+    }
+    await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
+  }
+
+  /**
+   * Function to check the title of the save draft modal.
+   * @param {string} title - The expected title.
+   */
+  async expectSaveDraftModalTitleToBe(title: string): Promise<void> {
+    await this.expectTextContentToBe(saveDraftTitleSelector, title);
+  }
+
+  /**
+   * Function to fill in the commit message in the save draft modal.
+   * @param {string} description - The commit message.
+   */
+  async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
+    await this.expectElementToBeVisible(commitMessageSelector);
+    await this.clickOnElementWithSelector(commitMessageSelector);
+    await this.typeInInputField(commitMessageSelector, description);
+    await this.expectElementValueToBe(commitMessageSelector, description);
+  }
+
+  /**
+   * Function to confirm saving the draft in the save draft modal.
+   */
+  async clickOnSaveDraftButtonInSaveDraftModal(): Promise<void> {
+    await this.expectElementToBeVisible(`${saveDraftButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(saveDraftButton);
+    await this.expectElementToBeVisible(saveDraftButton, false);
+
+    // Toast message confirms that the draft has been saved.
+    await this.expectElementToBeVisible(toastMessage);
+    await this.expectElementToBeVisible(toastMessage, false);
+    showMessage('Draft saved from the save draft modal.');
+  }
+
+  /**
+   * Function to check whether the save draft button in the navigation bar
+   * is disabled.
+   * @param {boolean} disabled - Whether the button should be disabled.
+   */
+  async expectSaveDraftButtonToBeDisabled(
+    disabled: boolean = true
+  ): Promise<void> {
+    await this.openMobileNavbarIfNeeded();
+    const selector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.page.waitForFunction(
+      ({selector, disabled}: {selector: string; disabled: boolean}) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLButtonElement | null)?.disabled === disabled;
+      },
+      {selector, disabled}
+    );
+    showMessage(
+      `Save draft button is ${disabled ? 'disabled' : 'enabled'} as expected.`
+    );
+  }
+
+  /**
+   * Function to add recommended explorations in the End Exploration
+   * interaction's customization modal, and save the interaction.
+   * @param {string[]} explorationIds - The IDs of the recommended
+   *     explorations (at most 3).
+   */
+  async customizeEndExplorationInteraction(
+    explorationIds: string[]
+  ): Promise<void> {
+    if (explorationIds.length > 3) {
+      throw new Error(
+        'The maximum number of explorations that can be selected is 3.'
+      );
+    }
+
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    const inputFields = this.page.locator(
+      `${customizeInteractionBodySelector} ${textInputFieldSelector}`
+    );
+    for (const explorationId of explorationIds) {
+      const countBefore = await inputFields.count();
+      await this.clickOnElementWithSelector(addListEntryButtonSelector);
+      await this.page.waitForFunction(
+        ({selector, count}: {selector: string; count: number}) =>
+          document.querySelectorAll(selector).length > count,
+        {
+          selector: `${customizeInteractionBodySelector} ${textInputFieldSelector}`,
+          count: countBefore,
+        }
+      );
+      const lastInputField = inputFields.last();
+      await lastInputField.fill(explorationId);
+      await lastInputField.evaluate((element, value) => {
+        if ((element as HTMLInputElement).value.trim() !== value) {
+          throw new Error(`Input value is not "${value}".`);
+        }
+      }, explorationId);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(saveInteractionButton, false);
+  }
+
+  /**
+   * Function to open the publish exploration modal from the navigation bar.
+   */
+  async clickOnPublishExplorationButton(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openMobileNavbarIfNeeded();
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobilePublishButtonSelector);
+    } else {
+      await this.expectElementToBeVisible(publishExplorationButtonSelector);
+      await this.clickOnElementWithSelector(publishExplorationButtonSelector);
+    }
+    await this.expectElementToBeVisible(
+      publishMetadataExplorationHeaderSelector
+    );
+  }
+
+  /**
+   * Function to check the header of the publish exploration modal.
+   * @param {string} expectedHeader - The expected header text.
+   */
+  async expectHeaderInPublishExplorationModalToBe(
+    expectedHeader: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      publishMetadataExplorationHeaderSelector,
+      expectedHeader
+    );
+  }
+
+  /**
+   * Function to fill in the exploration details in the publish exploration
+   * modal.
+   * @param {string} explorationTitle - The title of the exploration.
+   * @param {string} goal - The goal of the exploration.
+   * @param {string} category - The category of the exploration.
+   * @param {string} language - The language of the exploration.
+   * @param {string[]} tags - The tags of the exploration.
+   */
+  async fillExplorationMetadataDetails(
+    explorationTitle: string,
+    goal: string,
+    category: string,
+    language: string,
+    tags: string[]
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(explorationTitleInput);
+    await this.typeInInputField(explorationTitleInput, explorationTitle);
+    await this.expectElementValueToBe(explorationTitleInput, explorationTitle);
+
+    await this.clickOnElementWithSelector(explorationGoalInput);
+    await this.typeInInputField(explorationGoalInput, goal);
+    await this.expectElementValueToBe(explorationGoalInput, goal);
+
+    await this.clickOnElementWithSelector(explorationCategoryDropdown);
+    await this.clickOptionWithExactText(
+      '.e2e-test-exploration-category-selector-choice',
+      category
+    );
+    await this.expectTextContentToContain(
+      metadataModalCategorySelect,
+      category
+    );
+
+    await this.clickOnElementWithSelector(metadataModalLanguageSelect);
+    await this.clickOptionWithExactText('mat-option', language);
+    await this.expectTextContentToContain(
+      metadataModalLanguageSelect,
+      language
+    );
+
+    for (const tag of tags) {
+      await this.typeInInputField(tagsField, tag);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+
+  /**
+   * Function to save the exploration details in the publish exploration
+   * modal.
+   */
+  async clickOnSaveChangesButtonInPublishModal(): Promise<void> {
+    await this.expectElementToBeVisible(saveExplorationChangesButton);
+    await this.clickOnElementWithSelector(saveExplorationChangesButton);
+    await this.expectElementToBeVisible(saveExplorationChangesButton, false);
+  }
+
+  /**
+   * Function to confirm publishing the exploration.
+   */
+  async clickOnPublishButtonInPublishModal(): Promise<void> {
+    await this.expectElementToBeVisible(explorationConfirmPublishButton);
+    await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+    await this.expectElementToBeVisible(explorationConfirmPublishButton, false);
+  }
+
+  /**
+   * Function to check that the body of the open modal contains the given text.
+   * @param {string} expectedText - The text the modal body should contain.
+   */
+  async expectModalContentToContain(expectedText: string): Promise<void> {
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Function to check that the share link shown after publishing points to
+   * the exploration player.
+   */
+  async expectShareExplorationLinkToBeValid(): Promise<void> {
+    await this.expectTextContentToContain(
+      shareExplorationLinkSelector,
+      testConstants.URLs.BaseExplorationPlayer
+    );
   }
 
   /**

@@ -19,20 +19,24 @@
  * EC. Navigation Bar Header.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -40,16 +44,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.dismissWelcomeModal();
   });
 
-  it('should be able to save draft', async function () {
+  test('should be able to save draft', async function () {
     await explorationEditor.updateCardContent('Hello, World!');
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
     await explorationEditor.clickOnSaveDraftButton();
     await explorationEditor.expectSaveDraftModalTitleToBe('Save Draft');
-
     await explorationEditor.fillDescriptionInSaveDraftModal('First Commit!');
     await explorationEditor.clickOnSaveDraftButtonInSaveDraftModal();
-
     await explorationEditor.expectSaveDraftButtonToBeDisabled();
 
     explorationId = await explorationEditor.publishExplorationWithMetadata(
@@ -59,7 +60,7 @@ describe('Exploration Editor', function () {
     );
   });
 
-  it('should be able to publish an exploration', async function () {
+  test('should be able to publish an exploration', async function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
@@ -71,8 +72,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (End Exploration)'
     );
-
     await explorationEditor.customizeEndExplorationInteraction([explorationId]);
+
     await explorationEditor.clickOnSaveDraftButton();
     await explorationEditor.fillDescriptionInSaveDraftModal('First Commit!');
     await explorationEditor.clickOnSaveDraftButtonInSaveDraftModal();
@@ -88,13 +89,11 @@ describe('Exploration Editor', function () {
       'Ásụ̀sụ́ Ìgbò (Igbo)',
       ['algebra']
     );
-
     await explorationEditor.clickOnSaveChangesButtonInPublishModal();
     await explorationEditor.expectModalTitleToBe('Publish Exploration');
     await explorationEditor.expectModalContentToContain(
       "Congratulations, you're about to publish an exploration!"
     );
-
     await explorationEditor.clickOnPublishButtonInPublishModal();
     await explorationEditor.expectModalTitleToBe('Awesome!');
     await explorationEditor.expectModalContentToContain(
@@ -105,7 +104,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectShareExplorationLinkToBeValid();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
