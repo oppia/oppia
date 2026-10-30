@@ -321,6 +321,58 @@ describe('Feedback Tab Component', () => {
     expect(component.feedbackMessage.status).toBe('review');
   }));
 
+  it('should get the state name of an active feedback thread', () => {
+    component.activeThread = FeedbackThread.createFromBackendDict({
+      status: 'open',
+      subject: '',
+      summary: '',
+      original_author_username: 'Username1',
+      last_updated_msecs: 0,
+      message_count: 1,
+      state_name: 'Introduction',
+      thread_id: '1',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: '',
+    });
+
+    expect(component.getActiveThreadStateName()).toBe('Introduction');
+  });
+
+  it('should not get the state name of an active suggestion thread', () => {
+    component.activeThread = SuggestionThread.createFromBackendDicts(
+      {
+        status: 'review',
+        subject: '',
+        summary: '',
+        original_author_username: 'Username1',
+        last_updated_msecs: 0,
+        message_count: 1,
+        thread_id: '1',
+        state_name: '',
+        last_nonempty_message_author: '',
+        last_nonempty_message_text: '',
+      },
+      {
+        suggestion_type: 'edit_exploration_state_content',
+        suggestion_id: '1',
+        target_type: '',
+        target_id: '',
+        status: '',
+        author_name: '',
+        change_cmd: {
+          state_name: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
+          content_id: '',
+        },
+        last_updated_msecs: 0,
+      }
+    );
+
+    expect(component.getActiveThreadStateName()).toBeNull();
+  });
+
   it('should throw error when trying to add message to non-existent thread', () => {
     expect(() => {
       component.addNewMessage('', 'Text', 'Open');
