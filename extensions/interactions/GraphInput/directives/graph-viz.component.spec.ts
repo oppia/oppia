@@ -889,6 +889,7 @@ describe('GraphVizComponent', () => {
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-cursor-for-add-node');
 
+    const container = document.createElement('div');
     const buttonElements = [
       document.createElement('button'),
       document.createElement('button'),
@@ -896,10 +897,12 @@ describe('GraphVizComponent', () => {
 
     buttonElements[0].classList.add('graph-button');
     buttonElements[1].classList.add('graph-button');
+    container.appendChild(buttonElements[0]);
+    container.appendChild(buttonElements[1]);
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
     spyOn(document, 'querySelectorAll').and.returnValue(
-      buttonElements as unknown as NodeListOf<Element>
+      container.querySelectorAll('.graph-button')
     );
 
     spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
@@ -936,6 +939,7 @@ describe('GraphVizComponent', () => {
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-cursor-for-add-node');
 
+    const container = document.createElement('div');
     const buttonElements = [
       document.createElement('button'),
       document.createElement('button'),
@@ -943,10 +947,12 @@ describe('GraphVizComponent', () => {
 
     buttonElements[0].classList.add('graph-button');
     buttonElements[1].classList.add('graph-button');
+    container.appendChild(buttonElements[0]);
+    container.appendChild(buttonElements[1]);
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
     spyOn(document, 'querySelectorAll').and.returnValue(
-      buttonElements as unknown as NodeListOf<Element>
+      container.querySelectorAll('.graph-button')
     );
 
     spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
@@ -2208,12 +2214,12 @@ describe('GraphVizComponent', () => {
     'should set selected edge weight to an empty string when' +
       ' null is passed',
     () => {
-      component.selectedEdgeWeightValue = 0;
+      component.selectedEdgeWeightValue = '1';
       spyOnProperty(component, 'selectedEdgeWeight', 'set').and.callThrough();
 
       component.selectedEdgeWeight = null;
 
-      expect(component.selectedEdgeWeightValue as string | number).toBe('');
+      expect(component.selectedEdgeWeightValue).toBe('');
     }
   );
 

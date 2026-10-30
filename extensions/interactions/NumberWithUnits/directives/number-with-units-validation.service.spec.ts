@@ -318,29 +318,23 @@ describe('NumberWithUnitsValidationService', () => {
   );
 
   it('should throw error when rule equivalency check fails', () => {
-    spyOn(NumberWithUnits, 'fromDict').and.returnValue({
-      type: 'real',
-      real: 0.0,
-      fraction: new Fraction(false, 0, 0, 1),
-      // This throws "Type null is not assignable to type
-      // 'string'." We need to suppress this error
-      // because of the need to test validations. This
-      // function is not used in the validations.
-      // @ts-ignore
-      toMathjsCompatibleString: () => {
-        return null;
-      },
-      toDict: () => {
-        let tmp = new NumberWithUnits(
-          'real',
-          2.02,
-          new Fraction(false, 0, 0, 1),
-          Units.fromRawInputString('m / s^2')
-        );
+    const dummyNumberWithUnits = new NumberWithUnits(
+      'real',
+      2.02,
+      new Fraction(false, 0, 0, 1),
+      Units.fromRawInputString('m / s^2')
+    );
 
-        return tmp.toDict();
-      },
-    } as unknown as NumberWithUnits);
+    spyOn(NumberWithUnits, 'fromDict').and.returnValue(dummyNumberWithUnits);
+    // This throws "Type null is not assignable to type
+    // 'string'." We need to suppress this error
+    // because of the need to test validations. This
+    // function is not used in the validations.
+    // @ts-ignore
+    spyOn(dummyNumberWithUnits, 'toMathjsCompatibleString').and.returnValue(
+      null
+    );
+
     answerGroups[0].rules = [
       equivalentToTwoByThreeRule,
       equivalentToTwoThousandRule,
