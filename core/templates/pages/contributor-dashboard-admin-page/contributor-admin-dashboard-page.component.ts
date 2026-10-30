@@ -23,6 +23,9 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  Input,
+  OnChanges,
+  SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -89,7 +92,11 @@ export const PICK_FORMATS = {
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class ContributorAdminDashboardPageComponent implements OnInit {
+export class ContributorAdminDashboardPageComponent
+  implements OnInit, OnChanges
+{
+  @Input() showTranslationConfigurationTab: boolean = false;
+
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
 
@@ -101,6 +108,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   TAB_NAME_TRANSLATION_COORDINATOR: string = 'Translation Coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
+  TAB_NAME_TRANSLATION_CONFIGURATION: string = 'Translation Configuration';
   ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
@@ -135,6 +143,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     private modalService: NgbModal,
     private alertsService: AlertsService
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.showTranslationConfigurationTab) {
+      this.syncTranslationConfigurationTab();
+    }
+  }
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
@@ -199,6 +213,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                 this.TAB_NAME_QUESTION_COORDINATOR
               );
             }
+
+            this.syncTranslationConfigurationTab();
 
             this.createFilter();
 
@@ -358,6 +374,31 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   updateSelectedContributionType(selectedContributionType: string): void {
     this.selectedContributionType = selectedContributionType;
     this.setActiveTab(selectedContributionType);
+  }
+
+  private syncTranslationConfigurationTab(): void {
+    const tabIndex = this.CONTRIBUTION_TYPES.indexOf(
+      this.TAB_NAME_TRANSLATION_CONFIGURATION
+    );
+    if (this.showTranslationConfigurationTab && tabIndex === -1) {
+      this.CONTRIBUTION_TYPES.push(this.TAB_NAME_TRANSLATION_CONFIGURATION);
+      if (!this.selectedContributionType) {
+        this.selectedContributionType = this.TAB_NAME_TRANSLATION_CONFIGURATION;
+        this.activeTab = this.TAB_NAME_TRANSLATION_CONFIGURATION;
+      }
+      return;
+    }
+
+    if (!this.showTranslationConfigurationTab && tabIndex !== -1) {
+      this.CONTRIBUTION_TYPES.splice(tabIndex, 1);
+      if (
+        this.selectedContributionType ===
+        this.TAB_NAME_TRANSLATION_CONFIGURATION
+      ) {
+        this.selectedContributionType = this.CONTRIBUTION_TYPES[0] || '';
+        this.activeTab = this.selectedContributionType;
+      }
+    }
   }
 
   openUsernameInputModal(): void {
