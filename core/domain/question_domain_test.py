@@ -2361,7 +2361,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 53)
 
-    def test_question_state_dict_conversion_noop_branches(self) -> None:
+    def test_question_state_dict_conversion_no_op_branches(self) -> None:
         conversion_versions = [
             31,
             32,
@@ -2427,6 +2427,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 34)
 
+        self.assertEqual(test_value['state_schema_version'], 35)
         self.assertEqual(
             test_value['state']['interaction']['id'], 'AlgebraicExpressionInput'
         )
@@ -2454,6 +2455,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(invalid_test_value, 34)
 
+        self.assertEqual(invalid_test_value['state_schema_version'], 35)
         self.assertEqual(
             invalid_test_value['state']['interaction']['id'],
             'MathExpressionInput',
@@ -2482,6 +2484,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 35)
 
+        self.assertEqual(test_value['state_schema_version'], 36)
         self.assertIn(
             'placeholder',
             test_value['state']['interaction']['customization_args'],
@@ -2506,6 +2509,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 36)
 
+        self.assertEqual(test_value['state_schema_version'], 37)
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'
@@ -2547,6 +2551,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 40)
 
+        self.assertEqual(test_value['state_schema_version'], 41)
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'
@@ -2585,6 +2590,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
             question_domain.Question.update_state_from_model(test_value, 41)
 
+            self.assertEqual(test_value['state_schema_version'], 42)
             self.assertIsNone(test_value['state']['interaction']['solution'])
 
     def test_question_state_dict_conversion_from_v49_with_empty_group(
@@ -2615,6 +2621,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 49)
 
+        self.assertEqual(test_value['state_schema_version'], 50)
         self.assertEqual(
             len(test_value['state']['interaction']['answer_groups']), 1
         )
@@ -2631,6 +2638,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_domain.Question.update_state_from_model(test_value, 50)
 
+        self.assertEqual(test_value['state_schema_version'], 51)
         self.assertIsNone(test_value['state']['interaction']['default_outcome'])
 
     def test_question_state_dict_conversions_from_v53_to_v57(self) -> None:
@@ -2655,6 +2663,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
 
         question_domain.Question.update_state_from_model(test_value, 53)
+        self.assertEqual(test_value['state_schema_version'], 54)
         self.assertEqual(
             test_value['state']['interaction']['customization_args'][
                 'catchMisspellings'
@@ -2690,15 +2699,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         next_content_id_index = (
             question_domain.Question.update_state_from_model(test_value, 54)
         )
+        self.assertEqual(test_value['state_schema_version'], 55)
         self.assertIsInstance(next_content_id_index, int)
         self.assertNotIn('written_translations', test_value['state'])
 
         question_domain.Question.update_state_from_model(test_value, 55)
+        self.assertEqual(test_value['state_schema_version'], 56)
         self.assertEqual(
             test_value['state']['inapplicable_skill_misconception_ids'], []
         )
 
         question_domain.Question.update_state_from_model(test_value, 56)
+        self.assertEqual(test_value['state_schema_version'], 57)
         self.assertNotIn('recorded_voiceovers', test_value['state'])
 
 
