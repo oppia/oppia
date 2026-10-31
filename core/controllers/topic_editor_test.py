@@ -21,7 +21,6 @@ import os
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
-    platform_parameter_list,
     skill_services,
     story_domain,
     story_fetchers,
@@ -31,6 +30,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_services,
+    web_platform_parameter_list,
 )
 from core.storage.user import gae_models as user_models
 from core.tests import test_utils
@@ -932,14 +932,14 @@ class TopicEditorTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_editable_topic_handler_get(self) -> None:
@@ -1065,14 +1065,14 @@ class TopicEditorTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_editable_topic_handler_put(self) -> None:
@@ -1545,14 +1545,14 @@ class TopicPublishSendMailHandlerTests(
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_send_mail(self) -> None:

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for platform parameters."""
+"""Domain objects for web platform parameters."""
 
 from __future__ import annotations
 

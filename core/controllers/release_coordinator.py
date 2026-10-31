@@ -197,7 +197,7 @@ class FeatureFlagsHandler(
         self.render_json(
             {
                 'feature_flags': feature_flags_dict,
-                'server_stage': feature_flag_domain.get_server_mode().value,
+                'server_stage': feature_flag_domain.get_web_platform_parameter_server_mode().value,
                 'user_group_dicts': user_group_dicts,
             }
         )

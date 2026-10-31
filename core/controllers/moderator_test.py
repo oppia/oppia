@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list, rights_manager, user_services
+from core.domain import (
+    rights_manager,
+    user_services,
+    web_platform_parameter_list,
+)
 from core.tests import test_utils
 
 from typing import Final
@@ -456,12 +460,12 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
+                web_platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
                 'I\'m writing to inform you that '
                 'I have unpublished the above exploration.',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
