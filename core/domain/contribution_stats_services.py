@@ -23,9 +23,11 @@ from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
+    from mypy_imports import suggestion_models, user_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models, user_models) = models.Registry.import_models(
+    [models.Names.SUGGESTION, models.Names.USER]
+)
 
 
 def get_translation_submitter_total_stats_from_model(
@@ -411,12 +413,19 @@ def get_question_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
+    reviewer_user_ids = (
+        user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
+    )
+    if not reviewer_user_ids:
+        return ([], 0, False)
+
     question_reviewer_models, next_offset, more = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
             max_days_since_last_activity=max_days_since_last_activity,
+            reviewer_user_ids=reviewer_user_ids,
         )
     )
 
