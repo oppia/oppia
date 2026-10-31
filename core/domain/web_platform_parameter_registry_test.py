@@ -21,8 +21,9 @@ from __future__ import annotations
 import enum
 
 from core import feconf, utils
-from core.domain import caching_services, web_platform_parameter_list
+from core.domain import caching_services
 from core.domain import web_platform_parameter_domain as parameter_domain
+from core.domain import web_platform_parameter_list
 from core.domain import web_platform_parameter_registry as registry
 from core.storage.config import gae_models as config_models
 from core.tests import test_utils
@@ -502,7 +503,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         legacy_model.update_timestamps()
         config_models.PlatformParameterModel.put_multi([legacy_model])
 
-        web_model = registry.Registry._to_web_platform_parameter_config_model(
+        web_model = registry.Registry._to_web_platform_parameter_config_model(  # pylint: disable=protected-access
             param
         )
 
@@ -522,7 +523,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         web_model.update_timestamps()
         config_models.WebPlatformParameterConfigModel.put_multi([web_model])
 
-        legacy_model = registry.Registry._to_legacy_platform_parameter_model(
+        legacy_model = registry.Registry._to_legacy_platform_parameter_model(  # pylint: disable=protected-access
             param
         )
 
@@ -542,7 +543,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         web_model.update_timestamps()
         config_models.WebPlatformParameterConfigModel.put_multi([web_model])
 
-        result = registry.Registry._to_web_platform_parameter_config_model(
+        result = registry.Registry._to_web_platform_parameter_config_model(  # pylint: disable=protected-access
             param
         )
 
@@ -561,6 +562,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         legacy_model.update_timestamps()
         config_models.PlatformParameterModel.put_multi([legacy_model])
 
-        result = registry.Registry._to_legacy_platform_parameter_model(param)
+        result = registry.Registry._to_legacy_platform_parameter_model(
+            param
+        )  # pylint: disable=protected-access
 
         self.assertEqual(result.id, param.name)

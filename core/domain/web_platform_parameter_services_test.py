@@ -265,15 +265,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_server_context_uses_release_branch_version(self) -> None:
         with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            # Calling protected method directly for unit testing.
             context = (
-                parameter_services._create_web_platform_parameter_evaluation_context_for_server()
+                parameter_services._create_web_platform_parameter_evaluation_context_for_server()  # pylint: disable=protected-access
             )
         self.assertEqual(context.app_version, '3.3.1')
 
     def test_server_context_uses_hotfix_branch_version(self) -> None:
         with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
+            # Calling protected method directly for unit testing.
             context = (
-                parameter_services._create_web_platform_parameter_evaluation_context_for_server()
+                parameter_services._create_web_platform_parameter_evaluation_context_for_server()  # pylint: disable=protected-access
             )
         self.assertEqual(context.app_version, '3.3.1-hotfix-5')
 
