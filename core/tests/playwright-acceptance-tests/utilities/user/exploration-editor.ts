@@ -974,22 +974,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Selects the mat-option whose trimmed text exactly matches the given text
-   * in the mat-select that is currently open.
-   * @param {string} text - The exact text of the option to select.
-   */
-  private async selectOpenMatOptionWithExactText(text: string): Promise<void> {
-    const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const option = this.page
-      .locator('mat-option')
-      .filter({hasText: new RegExp(`^\\s*${escapedText}\\s*$`)})
-      .first();
-    await option.waitFor({state: 'visible'});
-    await option.click();
-    await this.expectElementToBeVisible('mat-option', false);
-  }
-
-  /**
    * Function to open the "Controls" section in the settings tab, which
    * contains the delete exploration button.
    */
@@ -1042,7 +1026,7 @@ export class ExplorationEditor extends BaseUser {
   async selectCategory(category: string): Promise<void> {
     await this.expectElementToBeVisible(settingsCategorySelect);
     await this.clickOnElementWithSelector(settingsCategorySelect);
-    await this.selectOpenMatOptionWithExactText(category);
+    await this.selectMatOption(category, true);
     await this.expectSelectedCategoryToBe(category);
   }
 
@@ -1064,7 +1048,7 @@ export class ExplorationEditor extends BaseUser {
   async selectFirstCard(cardName: string): Promise<void> {
     await this.expectElementToBeVisible(settingsFirstCardSelect);
     await this.clickOnElementWithSelector(settingsFirstCardSelect);
-    await this.selectOpenMatOptionWithExactText(cardName);
+    await this.selectMatOption(cardName, true);
     await this.expectSelectedFirstCardToBe(cardName);
   }
 
@@ -1170,7 +1154,7 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(newMemberUsernameInput, username);
     await this.expectElementValueToBe(newMemberUsernameInput, username);
     await this.clickOnElementWithSelector(newMemberRoleSelect);
-    await this.selectOpenMatOptionWithExactText(roleOption);
+    await this.selectMatOption(roleOption, true);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
