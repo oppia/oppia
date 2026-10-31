@@ -39,6 +39,7 @@ import {PlaythroughService} from 'services/playthrough.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationModeService} from './exploration-mode.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 @Injectable({
   providedIn: 'root',
@@ -56,7 +57,8 @@ export class ExplorationInitializationService {
     private playthroughService: PlaythroughService,
     private numberAttemptsService: NumberAttemptsService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationModeService: ExplorationModeService
+    private explorationModeService: ExplorationModeService,
+    private entityTranslationsService: EntityTranslationsService
   ) {}
 
   private initExplorationPreviewPlayer(
@@ -82,13 +84,22 @@ export class ExplorationInitializationService {
         },
         featuresData
       );
+      const explorationLanguageCode = explorationData.language_code;
+      let displayableLanguageCodes = [
+        ...(explorationData.displayable_language_codes || []),
+        ...Object.keys(
+          this.entityTranslationsService.languageCodeToLatestEntityTranslations
+        ),
+      ].filter(languageCode => languageCode !== explorationLanguageCode);
+      displayableLanguageCodes = Array.from(new Set(displayableLanguageCodes));
+
       this.explorationEngineService.init(
         explorationData,
+        explorationData.version,
         null,
-        null,
-        null,
-        [],
-        [],
+        explorationData.auto_tts_enabled,
+        explorationData.preferred_language_codes || [],
+        displayableLanguageCodes,
         callback
       );
       this.numberAttemptsService.reset();

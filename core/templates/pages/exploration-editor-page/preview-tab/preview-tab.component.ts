@@ -48,6 +48,7 @@ import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-dr
 import {ChangeListService} from '../services/change-list.service';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -81,7 +82,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private entityVoiceoversService: EntityVoiceoversService,
     private conversationFlowService: ConversationFlowService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private entityTranslationsService: EntityTranslationsService
   ) {}
 
   getManualParamChanges(
@@ -155,17 +157,27 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
       this.explorationInitStateNameService.savedMemento;
     setTimeout(() => {
       const explorationId = this.pageContextService.getExplorationId();
-
       this.editableExplorationBackendApiService
         .fetchApplyDraftExplorationAsync(explorationId)
         .then(returnDict => {
+          const explorationLanguageCode = returnDict.language_code;
+          let displayableLanguageCodes = [
+            ...(returnDict.displayable_language_codes || []),
+            ...Object.keys(
+              this.entityTranslationsService
+                .languageCodeToLatestEntityTranslations
+            ),
+          ].filter(languageCode => languageCode !== explorationLanguageCode);
+          displayableLanguageCodes = Array.from(
+            new Set(displayableLanguageCodes)
+          );
           this.explorationEngineService.init(
             returnDict,
-            0,
+            returnDict.version,
             null,
-            false,
-            [],
-            [],
+            returnDict.auto_tts_enabled,
+            returnDict.preferred_language_codes || [],
+            displayableLanguageCodes,
             () => {
               this.loadPreviewState(initStateNameForPreview, []);
             }
