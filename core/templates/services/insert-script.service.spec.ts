@@ -15,7 +15,6 @@
 /**
  * @fileoverview test for insert script service
  */
-// @ts-nocheck
 
 import {RendererFactory2} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
@@ -52,18 +51,14 @@ describe('InsertScriptService', () => {
   });
 
   it('should not reload script if already loaded', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
     spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          mockScriptElement.onload?.(new Event('load'));
         }, 10);
+        return node;
       }
     );
 
@@ -79,18 +74,14 @@ describe('InsertScriptService', () => {
   });
 
   it('should not create new script element if script is still loading', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
     const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          mockScriptElement.onload?.(new Event('load'));
         }, 10);
+        return node;
       }
     );
 
@@ -108,20 +99,16 @@ describe('InsertScriptService', () => {
   });
 
   it('should handle script load error correctly', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
 
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
 
     spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onerror?.(new ErrorEvent('error'));
+          mockScriptElement.onerror?.(new ErrorEvent('error'));
         }, 10);
+        return node;
       }
     );
 
@@ -146,32 +133,25 @@ describe('InsertScriptService', () => {
   });
 
   it('should return false for unknown scripts', () => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-    spyOn(document.body, 'appendChild').and.callFake(() => {});
+    spyOn(document.body, 'appendChild').and.callFake(
+      <T extends Node>(node: T): T => node
+    );
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
     expect(result).toBe(false);
   });
 
   it('should load TURNSTILE script correctly', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
 
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
     spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          mockScriptElement.onload?.(new Event('load'));
         }, 10);
+        return node;
       }
     );
 
@@ -189,19 +169,15 @@ describe('InsertScriptService', () => {
   });
 
   it('should load MATHJAX script correctly', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
 
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
     spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          mockScriptElement.onload?.(new Event('load'));
         }, 10);
+        return node;
       }
     );
 
@@ -216,18 +192,14 @@ describe('InsertScriptService', () => {
   });
 
   it('should insert script into html', (done: DoneFn) => {
-    const mockScriptElement: Partial<HTMLScriptElement> = {
-      onload: null,
-      onerror: null,
-      src: '',
-      setAttribute: () => {},
-    };
+    const mockScriptElement = document.createElement('script');
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
     spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+      <T extends Node>(node: T): T => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          mockScriptElement.onload?.(new Event('load'));
         }, 10);
+        return node;
       }
     );
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);

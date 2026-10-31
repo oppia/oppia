@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for Chapter-progress-loader Service.
  */
 
-// @ts-nocheck
-
+import {UserInfo} from 'domain/user/user-info.model';
 import {TestBed} from '@angular/core/testing';
 import {
   ChapterProgressLoaderService,
@@ -26,6 +25,12 @@ import {
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {UserService} from 'services/user.service';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
+
+const createUserInfo = function (username: string | null): UserInfo {
+  const userInfo = UserInfo.createDefault();
+  spyOn(userInfo, 'getUsername').and.returnValue(username);
+  return userInfo;
+};
 
 describe('ChapterProgressLoaderService', () => {
   let service: ChapterProgressLoaderService;
@@ -65,7 +70,7 @@ describe('ChapterProgressLoaderService', () => {
   describe('loadChapterProgressForStory', () => {
     it('should fetch and cache chapter progress for a story', async () => {
       userService.getUserInfoAsync.and.returnValue(
-        Promise.resolve({getUsername: () => 'test_user'})
+        Promise.resolve(createUserInfo('test_user'))
       );
       storyViewerBackendApiService.fetchProgressInStoriesChapters.and.returnValue(
         Promise.resolve([mockChapterProgress])
@@ -91,7 +96,7 @@ describe('ChapterProgressLoaderService', () => {
 
     it('should map chapter progress using exploration id from backend', async () => {
       userService.getUserInfoAsync.and.returnValue(
-        Promise.resolve({getUsername: () => 'test_user'})
+        Promise.resolve(createUserInfo('test_user'))
       );
 
       const progressForExp2 = new ChapterProgressSummary('exp2', 4, 1, false);
@@ -112,7 +117,7 @@ describe('ChapterProgressLoaderService', () => {
 
     it('should handle missing username', async () => {
       userService.getUserInfoAsync.and.returnValue(
-        Promise.resolve({getUsername: () => null})
+        Promise.resolve(createUserInfo(null))
       );
       await service.loadChapterProgressForStory('story1', ['exp1']);
       expect(service.getChapterProgressSummary('exp1')).toBeNull();
@@ -193,7 +198,7 @@ describe('ChapterProgressLoaderService', () => {
 
   it('should log an error if fetchProgressInStoriesChapters fails', async () => {
     userService.getUserInfoAsync.and.returnValue(
-      Promise.resolve({getUsername: () => 'test_user'})
+      Promise.resolve(createUserInfo('test_user'))
     );
     storyViewerBackendApiService.fetchProgressInStoriesChapters.and.returnValue(
       Promise.reject('API error')
