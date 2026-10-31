@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import copy
 import datetime
+import enum
 import re
 
 from core import feconf, schema_utils, utils
@@ -83,6 +84,14 @@ CMD_ADD_QUESTION_SKILL: Final = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL: Final = 'remove_question_skill'
 
 CMD_CREATE_NEW: Final = 'create_new'
+
+
+class _RuleInputMigrationType(enum.Enum):
+    """Supported rule input types for the v41-to-v42 migration."""
+
+    HTML_CONTENT_ID = 'TranslatableHtmlContentId'
+    HTML_CONTENT_ID_SET = 'SetOfTranslatableHtmlContentIds'
+    HTML_CONTENT_ID_SET_LIST = 'ListOfSetsOfTranslatableHtmlContentIds'
 
 
 class QuestionChange(change_domain.BaseChange):
@@ -1305,7 +1314,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     # Dict[str, AllowedRuleSpecInputTypes] values which
                     # causes MyPy to throw `incompatible type` error. Thus
                     # to avoid the error, we used ignore here.
-                    elif interaction_id == 'SetInput':
+                    else:
+                        # The outer condition limits interaction_id to TextInput
+                        # or SetInput. Since TextInput is handled above, this
+                        # branch only handles SetInput.
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
@@ -1352,33 +1364,27 @@ class Question(translation_domain.BaseTranslatableObject):
 
         @overload
         def migrate_rule_inputs_and_answers(
-            new_type: str,
+            new_type: _RuleInputMigrationType,
             value: str,
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> str: ...
 
         @overload
         def migrate_rule_inputs_and_answers(
-            new_type: str,
+            new_type: _RuleInputMigrationType,
             value: List[str],
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> List[str]: ...
 
         @overload
         def migrate_rule_inputs_and_answers(
-            new_type: str,
+            new_type: _RuleInputMigrationType,
             value: List[List[str]],
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> List[List[str]]: ...
 
-        # Here we use MyPy ignore because MyPy expects a return value in
-        # every condition when we define a return type but here we are
-        # returning only in if-else conditions and we are not returning
-        # when none of the condition matches which causes MyPy to throw
-        # a 'Missing return statement' error. Thus to avoid the error,
-        # we used ignore here.
-        def migrate_rule_inputs_and_answers(  # type: ignore[return]
-            new_type: str,
+        def migrate_rule_inputs_and_answers(
+            new_type: _RuleInputMigrationType,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict],
         ) -> Union[List[List[str]], List[str], str]:
@@ -1390,7 +1396,7 @@ class Question(translation_domain.BaseTranslatableObject):
             content_ids for equality.
 
             Args:
-                new_type: str. The type to migrate to.
+                new_type: RuleInputMigrationType. The type to migrate to.
                 value: *. The value to migrate.
                 choices: list(dict). The list of subtitled html dicts to extract
                     content ids from.
@@ -1417,28 +1423,33 @@ class Question(translation_domain.BaseTranslatableObject):
                 # non-matching html.
                 return feconf.INVALID_CONTENT_ID
 
-            if new_type == 'TranslatableHtmlContentId':
+            if new_type == _RuleInputMigrationType.HTML_CONTENT_ID:
                 # Here 'TranslatableHtmlContentId' can only be of str type, thus
                 # to narrow down the type we used assert here.
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
-            elif new_type == 'SetOfTranslatableHtmlContentIds':
+            elif new_type == _RuleInputMigrationType.HTML_CONTENT_ID_SET:
                 # Here we use cast because this 'elif' condition forces value
                 # to have type List[str].
                 set_of_content_ids = cast(List[str], value)
                 return [
                     migrate_rule_inputs_and_answers(
-                        'TranslatableHtmlContentId', html, choices
+                        _RuleInputMigrationType.HTML_CONTENT_ID,
+                        html,
+                        choices,
                     )
                     for html in set_of_content_ids
                 ]
-            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here we use cast because this 'elif' condition forces value
-                # to have type List[List[str]].
+
+            else:
+                # Here we use cast because the two preceding conditions handle
+                # the other supported types, so value has type List[List[str]].
                 list_of_set_of_content_ids = cast(List[List[str]], value)
                 return [
                     migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentIds', html_set, choices
+                        _RuleInputMigrationType.HTML_CONTENT_ID_SET,
+                        html_set,
+                        choices,
                     )
                     for html_set in list_of_set_of_content_ids
                 ]
@@ -1473,7 +1484,7 @@ class Question(translation_domain.BaseTranslatableObject):
                         list_of_html_contents.append(html_content)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
-                            'SetOfTranslatableHtmlContentIds',
+                            _RuleInputMigrationType.HTML_CONTENT_ID_SET,
                             list_of_html_contents,
                             choices,
                         )
@@ -1492,7 +1503,7 @@ class Question(translation_domain.BaseTranslatableObject):
                         list_of_html_content_list.append(html_content_list)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
-                            'ListOfSetsOfTranslatableHtmlContentIds',
+                            _RuleInputMigrationType.HTML_CONTENT_ID_SET_LIST,
                             list_of_html_content_list,
                             choices,
                         )
@@ -1520,7 +1531,7 @@ class Question(translation_domain.BaseTranslatableObject):
                             assert isinstance(html_content, str)
                             list_of_html_contents.append(html_content)
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                            'SetOfTranslatableHtmlContentIds',
+                            _RuleInputMigrationType.HTML_CONTENT_ID_SET,
                             list_of_html_contents,
                             choices,
                         )
@@ -1547,7 +1558,7 @@ class Question(translation_domain.BaseTranslatableObject):
                                     html_content_list
                                 )
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                                'ListOfSetsOfTranslatableHtmlContentIds',
+                                _RuleInputMigrationType.HTML_CONTENT_ID_SET_LIST,
                                 list_of_html_content_list,
                                 choices,
                             )
@@ -1563,7 +1574,7 @@ class Question(translation_domain.BaseTranslatableObject):
                             # formatted as str type.
                             assert isinstance(rule_inputs['x'], str)
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                                'TranslatableHtmlContentId',
+                                _RuleInputMigrationType.HTML_CONTENT_ID,
                                 rule_inputs['x'],
                                 choices,
                             )
@@ -1581,7 +1592,7 @@ class Question(translation_domain.BaseTranslatableObject):
                                 assert isinstance(rule_input_value, str)
                                 rule_inputs[rule_input_name] = (
                                     migrate_rule_inputs_and_answers(
-                                        'TranslatableHtmlContentId',
+                                        _RuleInputMigrationType.HTML_CONTENT_ID,
                                         rule_input_value,
                                         choices,
                                     )
