@@ -186,13 +186,15 @@ describe('RTE display component', () => {
     flush();
     discardPeriodicTasks();
 
-    const divElement = fixture.debugElement.query(
-      By.css('div.oppia-custom-div')
+    const divElement: HTMLElement = fixture.nativeElement.querySelector(
+      'div.oppia-custom-div'
     );
-    expect(divElement).toBeTruthy();
-    const pElement = divElement.query(By.css('p'));
-    expect(pElement).toBeTruthy();
-    expect(pElement.nativeElement.textContent).toBe('Paragraph inside div');
+    expect(divElement).not.toBeNull();
+    expect(divElement.classList.contains('oppia-custom-div')).toBe(true);
+
+    const pElement: HTMLElement = divElement.querySelector('p');
+    expect(pElement).not.toBeNull();
+    expect(pElement.textContent.trim()).toBe('Paragraph inside div');
   }));
 
   it('should report errors when parsing', fakeAsync(() => {
