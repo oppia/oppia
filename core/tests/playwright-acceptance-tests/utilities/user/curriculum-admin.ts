@@ -111,6 +111,25 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Function to create a topic with a linked skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   * @param {boolean} isFirstTopic - Whether this is the first topic being created.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string,
+    isFirstTopic: boolean = false
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-'),
+      isFirstTopic
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
+  }
+
+  /**
    * Enables diagnostic test for a classroom.
    * @param {string} classroomName - The name of the classroom.
    */
