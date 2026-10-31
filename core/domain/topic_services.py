@@ -47,6 +47,7 @@ from core.domain import (
     suggestion_services,
     topic_domain,
     topic_fetchers,
+    translation_services,
     user_domain,
     user_services,
 )
@@ -120,6 +121,13 @@ def _create_topic(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
     generate_topic_summary(topic.id)
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
+        )
 
 
 def find_superseded_skill_in_topic(
@@ -1415,6 +1423,7 @@ def _save_topic(
             % (topic_model.version, topic.version)
         )
 
+    old_topic = topic_fetchers.get_topic_by_id(topic.id, version=topic.version)
     topic_model_to_commit = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model_to_commit.commit(committer_id, commit_message, change_dicts)
@@ -1422,6 +1431,14 @@ def _save_topic(
         caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id]
     )
     topic.version += 1
+    translation_services.carry_forward_topic_translations(old_topic, topic)
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
+        )
 
 
 def update_topic_and_subtopic_pages(
@@ -2001,6 +2018,9 @@ def delete_topic(
         opportunity_services.delete_exploration_opportunities_corresponding_to_topic(
             topic_id
         )
+    )
+    opportunity_services.delete_translation_opportunities(
+        {feconf.ENTITY_TYPE_TOPIC: [topic_id]}
     )
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,

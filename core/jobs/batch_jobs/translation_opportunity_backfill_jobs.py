@@ -69,11 +69,13 @@ if MYPY:  # pragma: no cover
 )
 datastore_services = models.Registry.import_datastore_services()
 
-# The domain objects a translation opportunity can be built from. Both extend
-# translation_domain.BaseTranslatableObject, and both expose the version,
+# The domain objects a translation opportunity can be built from. All extend
+# translation_domain.BaseTranslatableObject, and expose the version,
 # language_code, get_content_count() and get_translation_count() members the
 # shared code below reads.
-TranslatableEntity = Union[exp_domain.Exploration, skill_domain.Skill]
+TranslatableEntity = Union[
+    exp_domain.Exploration, skill_domain.Skill, topic_domain.Topic
+]
 
 # One element of the CoGroupByKey over an entity ID: the topic IDs the entity
 # belongs to, the entity's own domain object, and its translation models.
@@ -659,6 +661,75 @@ class BackfillSkillOpportunityModelJob(
 
 class AuditBackfillSkillOpportunityModelJob(BackfillSkillOpportunityModelJob):
     """Audit job for BackfillSkillOpportunityModelJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return self._run_audit()
+
+
+class BackfillTopicTranslationOpportunityModelJob(
+    BackfillTranslationOpportunityModelJobBase
+):
+    """Backfills translation opportunities for existing topics."""
+
+    ENTITY_TYPE = feconf.TranslatableEntityType.TOPIC
+    RESULT_LABEL_PREFIX = 'TOPIC TRANSLATION OPPORTUNITY MODEL'
+    MISSING_ENTITY_ERROR = 'Missing TopicModel'
+
+    def _compute_translation_opportunities(
+        self,
+    ) -> beam.PCollection[
+        result.Result[opportunity_models.TranslationOpportunityModel, str]
+    ]:
+        """Computes topic opportunities using the topic as its own subject."""
+        topics = (
+            self.pipeline
+            | 'Get all TopicModels for translation opportunities'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+            | 'Get topics for translation opportunities'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
+        )
+        topic_ids = topics | 'Map topic to its own topic ID' >> beam.Map(
+            lambda topic: (topic.id, topic.id)
+        )
+        entities = topics | 'Map topic to entity' >> beam.Map(
+            lambda topic: (topic.id, topic)
+        )
+        translations = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels for topics'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter topic translations'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.TOPIC.value
+            )
+            | 'Map topic translation to topic ID'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+        grouped_data = {
+            'topic_ids': topic_ids,
+            'entity': entities,
+            'translations': translations,
+        } | 'Group by topic ID' >> beam.CoGroupByKey()
+        return (
+            grouped_data
+            | 'Create Topic TranslationOpportunityModels'
+            >> beam.Map(self._create_translation_opportunity)
+        )
+
+
+class AuditBackfillTopicTranslationOpportunityModelJob(
+    BackfillTopicTranslationOpportunityModelJob
+):
+    """Audits topic translation opportunities without writing models."""
 
     DATASTORE_UPDATES_ALLOWED = False
 

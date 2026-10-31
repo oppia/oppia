@@ -407,6 +407,10 @@ EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
 
+# Content IDs for topic metadata translations.
+TOPIC_NAME_CONTENT_ID = 'topic_name'
+TOPIC_DESCRIPTION_CONTENT_ID = 'topic_description'
+
 # Character limit for exploration title translation.
 EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT = 36
 

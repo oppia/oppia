@@ -33,6 +33,7 @@ from core.domain import (
     skill_fetchers,
     suggestion_registry,
     suggestion_services,
+    topic_domain,
     topic_fetchers,
     topic_services,
     translation_domain,
@@ -711,7 +712,9 @@ class TranslatableContentsHandlerV2(
         language_code = self.normalized_request['language_code']
 
         domain_object: Optional[
-            Union[exp_domain.Exploration, skill_domain.Skill]
+            Union[
+                exp_domain.Exploration, skill_domain.Skill, topic_domain.Topic
+            ]
         ] = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             domain_object = exp_fetchers.get_exploration_by_id(
@@ -719,6 +722,10 @@ class TranslatableContentsHandlerV2(
             )
         elif entity_type == feconf.ENTITY_TYPE_SKILL:
             domain_object = skill_fetchers.get_skill_by_id(
+                entity_id, strict=False
+            )
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            domain_object = topic_fetchers.get_topic_by_id(
                 entity_id, strict=False
             )
         else:
@@ -732,11 +739,9 @@ class TranslatableContentsHandlerV2(
                 'Invalid entity_id: %s' % entity_id
             )
 
-        suggestions = []
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
-                entity_id, language_code
-            )
+        suggestions = suggestion_services.get_translation_suggestions_in_review_by_entity_ids(
+            [entity_id], language_code
+        )
 
         entity_translations = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(entity_type),
@@ -787,12 +792,13 @@ class TranslatableContentsHandlerV2(
 
             # Skip content that already has a suggestion in review to
             # prevent duplicate translation submissions.
-            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                if any(
-                    s.change_cmd.content_id == content.content_id
-                    for s in suggestions
-                ):
-                    continue
+            if any(
+                isinstance(s, suggestion_registry.SuggestionTranslateContent)
+                and s.target_type == entity_type
+                and s.change_cmd.content_id == content.content_id
+                for s in suggestions
+            ):
+                continue
 
             content_dict = {
                 'content_id': content.content_id,

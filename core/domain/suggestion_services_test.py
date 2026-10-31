@@ -47,6 +47,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -871,6 +872,111 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
         )
+
+    def test_create_and_accept_topic_name_translation_suggestion(self) -> None:
+        topic = self.save_new_topic(
+            'topic_translation_test',
+            self.author_id,
+            name='Topic to translate',
+            description='Description to translate',
+        )
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_TOPIC: [topic.id]}, topic_ids=[topic.id]
+        )
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_TOPIC,
+            topic.id,
+            topic.version,
+            self.author_id,
+            change_dict,
+            'Topic name translation',
+        )
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id,
+            self.reviewer_id,
+            'UNUSED_COMMIT_MESSAGE',
+            'Accepted topic translation',
+        )
+        translated_content = translation_services.get_up_to_date_translation(
+            translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.TOPIC,
+                topic.id,
+                topic.version,
+                'hi',
+            ),
+            feconf.TOPIC_NAME_CONTENT_ID,
+        )
+        self.assertEqual(translated_content, 'Translated topic name')
+
+    def test_rejects_topic_translation_with_outdated_source(self) -> None:
+        topic = self.save_new_topic(
+            'outdated_topic_translation',
+            self.author_id,
+            name='Current topic name',
+            description='Current topic description',
+        )
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Old topic name',
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'The Topic content has changed since this translation was submitted.',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                topic.id,
+                topic.version,
+                self.author_id,
+                change_dict,
+                'Outdated topic translation',
+            )
+
+    def test_rejects_topic_name_translation_over_character_limit(self) -> None:
+        topic = self.save_new_topic(
+            'long_topic_translation',
+            self.author_id,
+            name='Topic name',
+            description='Topic description',
+        )
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': topic.name,
+            'translation_html': 'T' * 40,
+            'data_format': 'unicode',
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'translation for the above content must be 39 characters or fewer',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                topic.id,
+                topic.version,
+                self.author_id,
+                change_dict,
+                'Long topic name translation',
+            )
 
     @test_utils.enable_feature_flags(
         [
