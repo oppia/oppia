@@ -562,8 +562,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         legacy_model.update_timestamps()
         config_models.PlatformParameterModel.put_multi([legacy_model])
 
-        result = registry.Registry._to_legacy_platform_parameter_model(
+        result = registry.Registry._to_legacy_platform_parameter_model(  # pylint: disable=protected-access
             param
-        )  # pylint: disable=protected-access
+        )
 
         self.assertEqual(result.id, param.name)
