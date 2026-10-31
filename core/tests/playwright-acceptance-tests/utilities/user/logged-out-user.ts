@@ -30,6 +30,11 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const contactUrl = testConstants.URLs.Contact;
+const partnershipsUrl = testConstants.URLs.Partnerships;
+const volunteerUrl = testConstants.URLs.Volunteer;
+
+const emailLinkSelector = '.oppia-contact-mail';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -3974,6 +3979,73 @@ export class LoggedOutUser extends BaseUser {
     ) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
+  }
+
+  /**
+   * Function to navigate to the Contact Us page.
+   */
+  async navigateToContactUsPage(): Promise<void> {
+    await this.goto(contactUrl);
+  }
+
+  /**
+   * Clicks the "DONATE TODAY" button on the Contact Us page and checks that
+   * it navigates to the donate URL.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we wait only for the 'load' event.
+   */
+  async clickDonateTodayButtonInContactUsPage(): Promise<void> {
+    await this.clickAndWaitForNavigation('DONATE TODAY', false, 60000, 'load');
+    await this.expectPageURLToContain(donateUrl);
+  }
+
+  /**
+   * Clicks the "BECOME A PARTNER" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A PARTNER',
+      partnershipsUrl,
+      false
+    );
+  }
+
+  /**
+   * Clicks the "BECOME A VOLUNTEER" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickVolunteerButtonInContactUsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A VOLUNTEER',
+      volunteerUrl,
+      false
+    );
+  }
+
+  /**
+   * Checks the admin email link in the Contact Us page and verifies
+   * that it contains the correct mail URL.
+   */
+  async verifyAdminEmailLinkInContactUsPage(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      emailLinkSelector,
+      'admin@oppia.org',
+      'https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org'
+    );
+  }
+
+  /**
+   * Checks the second press email link in the Contact Us page and verifies
+   * that it contains the correct mail URL.
+   */
+  async verifyPressEmailLinkInContactUsPage(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      emailLinkSelector,
+      'press@oppia.org',
+      'https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org'
+    );
   }
 }
 
