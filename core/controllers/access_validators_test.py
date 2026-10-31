@@ -1380,7 +1380,7 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
     def test_guest_user_does_not_pass_validation(self) -> None:

@@ -657,6 +657,7 @@ class BaseHandler(
         return (
             self.current_user_is_super_admin
             or feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles
+            or feconf.ROLE_ID_WEB_RELEASE_COORDINATOR in self.roles
         )
 
     def _is_requested_path_currently_accessible_to_user(self) -> bool:
