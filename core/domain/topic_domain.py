@@ -1168,7 +1168,8 @@ class Topic(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         # Here we use type Any because the keyword arguments vary
         # depending on the specific translatable object subclass.
-        self, **kwargs: Any
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Returns the topic name and description as translatable metadata."""
         collection = translation_domain.TranslatableContentsCollection()
