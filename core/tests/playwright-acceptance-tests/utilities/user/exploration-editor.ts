@@ -1508,22 +1508,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Selects the mat-option whose text exactly matches the given value. This is
-   * used instead of selectMatOption() because history tab options are numbers,
-   * and a substring match would pick "18" when selecting "1".
-   * @param {string} value - The exact text of the option to select.
-   */
-  private async selectMatOptionWithExactText(value: string): Promise<void> {
-    const option = this.page
-      .locator('mat-option')
-      .filter({hasText: new RegExp(`^\\s*${value}\\s*$`)})
-      .first();
-    await option.waitFor({state: 'visible'});
-    await option.click();
-    await this.expectElementToBeVisible('mat-option', false);
-  }
-
-  /**
    * Function to filter the history list by username.
    * @param {string} username - The username to filter by. An empty string
    *     clears the filter.
@@ -1577,7 +1561,7 @@ export class ExplorationEditor extends BaseUser {
       : historyPaginationDesktopSelector;
     await this.expectElementToBeVisible(selector);
     await this.clickOnElementWithSelector(selector);
-    await this.selectMatOptionWithExactText(itemsPerPage.toString());
+    await this.selectMatOption(itemsPerPage.toString(), true);
     await this.expectTextContentToContain(selector, itemsPerPage.toString());
   }
 
@@ -1592,12 +1576,12 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(firstVersionComparisonSelect);
     await this.clickOnElementWithSelector(firstVersionComparisonSelect);
-    await this.selectMatOptionWithExactText(version1);
+    await this.selectMatOption(version1, true);
     await this.expectTextContentToBe(firstVersionComparisonSelect, version1);
 
     await this.expectElementToBeVisible(secondVersionComparisonSelect);
     await this.clickOnElementWithSelector(secondVersionComparisonSelect);
-    await this.selectMatOptionWithExactText(version2);
+    await this.selectMatOption(version2, true);
     await this.expectTextContentToBe(secondVersionComparisonSelect, version2);
   }
 
