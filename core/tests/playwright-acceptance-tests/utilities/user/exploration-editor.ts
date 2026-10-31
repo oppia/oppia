@@ -220,6 +220,30 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 
 const addTitleBar = 'input#explorationTitle';
 
+// Settings tab selectors.
+const settingsGoalInput = '.e2e-test-exploration-objective-input';
+const settingsGoalWarningSelector = '.e2e-test-exploration-objective-warning';
+const settingsCategorySelect =
+  'mat-select.e2e-test-exploration-category-dropdown';
+const settingsFirstCardSelect = '.e2e-test-initial-state-select';
+const settingsTagsInput = 'input.e2e-test-chip-list-tags';
+const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
+const dismissPreviewSummaryButton =
+  'button.e2e-test-close-preview-summary-modal';
+const textToSpeechToggle = 'label.e2e-test-on-off-switch';
+const textToSpeechCheckbox = '#text-speech-switch';
+const editRolesButton = '.e2e-test-edit-roles';
+const newMemberUsernameInput = '#newMemberUsername';
+const newMemberRoleSelect = 'mat-select.e2e-test-role-select';
+const collaboratorRoleOption = 'Collaborator (can make changes)';
+const playtesterRoleOption = 'Playtester (can give feedback)';
+const saveRoleButton = 'button.e2e-test-save-role';
+const deleteExplorationButton = '.e2e-test-delete-exploration-button';
+const confirmDeleteExplorationButton =
+  '.e2e-test-really-delete-exploration-button';
+const creatorDashboardContainerSelector =
+  '.e2e-test-creator-dashboard-container';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Navigate to creator dashboard page.
@@ -947,6 +971,237 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(sectionHeaderSelector);
     await this.clickOnElementWithSelector(sectionHeaderSelector);
     await this.expectElementToBeVisible(sectionContentSelector);
+  }
+
+  /**
+   * Function to open the "Controls" section in the settings tab, which
+   * contains the delete exploration button.
+   */
+  async openExplorationControlDropdown(): Promise<void> {
+    await this.expandSettingsTabSection('Controls');
+    await this.expectElementToBeVisible(deleteExplorationButton);
+  }
+
+  /**
+   * Function to update the goal of the exploration in the settings tab.
+   * @param {string} goal - The new goal.
+   */
+  async updateGoalTo(goal: string): Promise<void> {
+    await this.expectElementToBeVisible(settingsGoalInput);
+    await this.clearAllTextFrom(settingsGoalInput);
+    await this.typeInInputField(settingsGoalInput, goal);
+    await this.page.keyboard.press('Tab');
+    await this.expectGoalToBe(goal);
+    showMessage(`Goal has been updated to ${goal}.`);
+  }
+
+  /**
+   * Function to check the title of the exploration in the settings tab.
+   * @param {string} expectedTitle - The expected title.
+   */
+  async expectTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementValueToBe(addTitleBar, expectedTitle);
+  }
+
+  /**
+   * Function to check the goal of the exploration in the settings tab.
+   * @param {string} expectedGoal - The expected goal.
+   */
+  async expectGoalToBe(expectedGoal: string): Promise<void> {
+    await this.expectElementValueToBe(settingsGoalInput, expectedGoal);
+  }
+
+  /**
+   * Function to check whether the "goal is too short" warning is visible.
+   * @param {boolean} visible - Whether the warning should be visible.
+   */
+  async expectGoalWarningToBeVisible(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(settingsGoalWarningSelector, visible);
+  }
+
+  /**
+   * Function to select the category of the exploration in the settings tab.
+   * @param {string} category - The category to select.
+   */
+  async selectCategory(category: string): Promise<void> {
+    await this.expectElementToBeVisible(settingsCategorySelect);
+    await this.clickOnElementWithSelector(settingsCategorySelect);
+    await this.selectMatOption(category, true);
+    await this.expectSelectedCategoryToBe(category);
+  }
+
+  /**
+   * Function to check the selected category in the settings tab.
+   * @param {string} expectedCategory - The expected category.
+   */
+  async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
+    await this.expectTextContentToBe(
+      `${settingsCategorySelect} .mat-select-value`,
+      expectedCategory
+    );
+  }
+
+  /**
+   * Function to select the first card of the exploration in the settings tab.
+   * @param {string} cardName - The name of the card.
+   */
+  async selectFirstCard(cardName: string): Promise<void> {
+    await this.expectElementToBeVisible(settingsFirstCardSelect);
+    await this.clickOnElementWithSelector(settingsFirstCardSelect);
+    await this.selectMatOption(cardName, true);
+    await this.expectSelectedFirstCardToBe(cardName);
+  }
+
+  /**
+   * Function to check the selected first card in the settings tab.
+   * @param {string} expectedCardName - The expected card name.
+   */
+  async expectSelectedFirstCardToBe(expectedCardName: string): Promise<void> {
+    await this.expectTextContentToBe(settingsFirstCardSelect, expectedCardName);
+  }
+
+  /**
+   * Function to add tags to the exploration in the settings tab.
+   * @param {string[]} tagNames - The tags to add.
+   */
+  async addTags(tagNames: string[]): Promise<void> {
+    await this.expectElementToBeVisible(settingsTagsInput);
+    for (const tagName of tagNames) {
+      await this.clickOnElementWithSelector(settingsTagsInput);
+      await this.typeInInputField(settingsTagsInput, tagName.toLowerCase());
+      await this.page.keyboard.press('Tab');
+    }
+    await this.expectTagsToMatch(tagNames);
+  }
+
+  /**
+   * Function to check that the exploration has the given tags. Tags are
+   * converted to lowercase by the tags input, so they're compared in
+   * lowercase.
+   * @param {string[]} expectedTags - The expected tags.
+   */
+  async expectTagsToMatch(expectedTags: string[]): Promise<void> {
+    const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
+    try {
+      await this.page.waitForFunction((expected: string[]) => {
+        const observedTags = Array.from(
+          document.querySelectorAll('mat-chip')
+        ).map(chip =>
+          (
+            chip.querySelector('.mat-chip-remove')?.previousSibling
+              ?.textContent ?? ''
+          ).trim()
+        );
+        return expected.every(tag => observedTags.includes(tag));
+      }, lowercaseExpectedTags);
+    } catch (error) {
+      throw new Error(
+        `Not all tags were added. Expected: ${lowercaseExpectedTags.join(', ')}.`
+      );
+    }
+    showMessage('All expected tags were added successfully.');
+  }
+
+  /**
+   * Function to open the preview of the exploration summary card.
+   */
+  async previewSummary(): Promise<void> {
+    await this.expectElementToBeVisible(previewSummaryButton);
+    await this.clickOnElementWithSelector(previewSummaryButton);
+    await this.expectElementToBeVisible(dismissPreviewSummaryButton);
+  }
+
+  /**
+   * Function to close the preview of the exploration summary card.
+   */
+  async closePreviewSummary(): Promise<void> {
+    await this.clickOnElementWithSelector(dismissPreviewSummaryButton);
+    await this.expectElementToBeVisible(dismissPreviewSummaryButton, false);
+  }
+
+  /**
+   * Function to enable automatic text-to-speech in the advanced features
+   * section of the settings tab.
+   */
+  async enableAutomaticTextToSpeech(): Promise<void> {
+    await this.expandSettingsTabSection('Advanced Features');
+    await this.expectElementToBeVisible(textToSpeechToggle);
+    await this.clickOnElementWithSelector(textToSpeechToggle);
+    await this.page.waitForFunction(
+      (selector: string) =>
+        (document.querySelector(selector) as HTMLInputElement | null)
+          ?.checked === true,
+      textToSpeechCheckbox
+    );
+    showMessage('Automatic Text-to-Speech is enabled.');
+  }
+
+  /**
+   * Adds a user to the exploration with the given role from the roles
+   * section of the settings tab.
+   * @param {string} username - The username of the user.
+   * @param {string} roleOption - The text of the role option to select.
+   */
+  private async assignUserToRole(
+    username: string,
+    roleOption: string
+  ): Promise<void> {
+    await this.expandSettingsTabSection('Roles');
+    await this.expectElementToBeVisible(editRolesButton);
+    await this.clickOnElementWithSelector(editRolesButton);
+    await this.expectElementToBeVisible(newMemberUsernameInput);
+    await this.clickOnElementWithSelector(newMemberUsernameInput);
+    await this.typeInInputField(newMemberUsernameInput, username);
+    await this.expectElementValueToBe(newMemberUsernameInput, username);
+    await this.clickOnElementWithSelector(newMemberRoleSelect);
+    await this.selectMatOption(roleOption, true);
+    await this.waitForElementToStabilize(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await this.expectElementToBeVisible(saveRoleButton, false);
+  }
+
+  /**
+   * Function to add a user as a collaborator of the exploration.
+   * @param {string} username - The username of the user.
+   */
+  async assignUserToCollaboratorRole(username: string): Promise<void> {
+    await this.assignUserToRole(username, collaboratorRoleOption);
+    showMessage(`${username} has been added as a collaborator.`);
+  }
+
+  /**
+   * Function to add a user as a playtester of the exploration.
+   * @param {string} username - The username of the user.
+   */
+  async assignUserToPlaytesterRole(username: string): Promise<void> {
+    await this.assignUserToRole(username, playtesterRoleOption);
+    showMessage(`${username} has been added as a playtester.`);
+  }
+
+  /**
+   * Function to click the delete exploration button in the settings tab.
+   */
+  async clickOnDeleteExplorationButton(): Promise<void> {
+    await this.openExplorationControlDropdown();
+    await this.clickOnElementWithSelector(deleteExplorationButton);
+    await this.expectElementToBeVisible(confirmDeleteExplorationButton);
+  }
+
+  /**
+   * Function to confirm deleting the exploration in the delete modal.
+   */
+  async confirmDeleteExplorationButton(): Promise<void> {
+    await this.expectElementToBeVisible(confirmDeleteExplorationButton);
+    await this.clickOnElementWithSelector(confirmDeleteExplorationButton);
+    await this.expectElementToBeVisible(confirmDeleteExplorationButton, false);
+  }
+
+  /**
+   * Function to check that the user is on the creator dashboard.
+   */
+  async expectToBeInCreatorDashboard(): Promise<void> {
+    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+    await this.expectPageURLToContain(creatorDashboardPage);
   }
 
   /**
