@@ -1316,24 +1316,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Clicks the option whose trimmed text exactly matches the given text.
-   * @param {string} optionSelector - The selector of the options to search.
-   * @param {string} text - The exact text of the option to click.
-   */
-  private async clickOptionWithExactText(
-    optionSelector: string,
-    text: string
-  ): Promise<void> {
-    const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const option = this.page
-      .locator(optionSelector)
-      .filter({hasText: new RegExp(`^\\s*${escapedText}\\s*$`)})
-      .first();
-    await option.waitFor({state: 'visible'});
-    await option.click();
-  }
-
-  /**
    * Function to open the save draft modal from the navigation bar.
    */
   async clickOnSaveDraftButton(): Promise<void> {
@@ -1509,17 +1491,14 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementValueToBe(explorationGoalInput, goal);
 
     await this.clickOnElementWithSelector(explorationCategoryDropdown);
-    await this.clickOptionWithExactText(
-      '.e2e-test-exploration-category-selector-choice',
-      category
-    );
+    await this.selectMatOption(category, true);
     await this.expectTextContentToContain(
       metadataModalCategorySelect,
       category
     );
 
     await this.clickOnElementWithSelector(metadataModalLanguageSelect);
-    await this.clickOptionWithExactText('mat-option', language);
+    await this.selectMatOption(language, true);
     await this.expectTextContentToContain(
       metadataModalLanguageSelect,
       language
