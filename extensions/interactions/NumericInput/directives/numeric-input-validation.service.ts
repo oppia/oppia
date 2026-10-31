@@ -251,29 +251,70 @@ export class NumericInputValidationService {
   // Returns 'undefined' when no error occurs.
   validateNumericString(
     value: string,
-    decimalSeparator: string
+    decimalSeparator: string,
+    requireNonnegativeInput: boolean = false,
+    allowExponentialNotation: boolean = true
   ): string | undefined {
     value = value.toString().trim();
-    const invalidChars = /[^0-9e.,-]/g;
+
+    let allowedCharsRegExpSet = '0-9.,e\\-';
+
+    if (requireNonnegativeInput && !allowExponentialNotation) {
+      allowedCharsRegExpSet = '0-9.,';
+    } else if (requireNonnegativeInput) {
+      allowedCharsRegExpSet = '0-9.,e';
+    } else if (!allowExponentialNotation) {
+      allowedCharsRegExpSet = '0-9.,\\-';
+    }
+
+    const invalidChars = new RegExp(`[^${allowedCharsRegExpSet}]`, 'g');
+
+    let invalidCharMessage = 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
+
+    if (requireNonnegativeInput && !allowExponentialNotation) {
+      invalidCharMessage =
+        'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS_NO_EXPONENT';
+    } else if (requireNonnegativeInput) {
+      invalidCharMessage =
+        'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
+    } else if (!allowExponentialNotation) {
+      invalidCharMessage =
+        'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
+    }
+
+    if (value.match(invalidChars)) {
+      return invalidCharMessage;
+    }
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;
     const extraMinus = /-.*-/g;
     const extraExponent = /e.*e/g;
 
-    if (value.match(invalidChars)) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
-    } else if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
+    if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';
-    } else if (value.match(twoDecimals)) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL';
-    } else if (value.includes('-') && !value.match(trailingMinus)) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING';
-    } else if (value.includes('-') && value.match(extraMinus)) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS';
-    } else if (value.includes('e') && value.match(extraExponent)) {
-      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT';
     }
+
+    if (value.match(twoDecimals)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL';
+    }
+
+    if (!requireNonnegativeInput && value.includes('-')) {
+      if (!value.match(trailingMinus)) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING';
+      }
+      if (value.match(extraMinus)) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS';
+      }
+    }
+
+    if (allowExponentialNotation && value.includes('e')) {
+      if (value.match(extraExponent)) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT';
+      }
+    }
+
+    return undefined;
   }
 
   // Returns 'undefined' when no error occurs.
