@@ -164,6 +164,18 @@ export class Contributor extends ExplorationEditor {
   ): Promise<ElementHandle<Element> | null> {
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
+      const isVisible = await opportunityItemElement.evaluate((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        return (
+          !htmlEl.closest('[hidden]') &&
+          getComputedStyle(htmlEl).display !== 'none' &&
+          getComputedStyle(htmlEl).visibility !== 'hidden'
+        );
+      });
+      if (!isVisible) {
+        continue;
+      }
+
       const opportunityItemHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
           el.querySelector(sel)?.textContent?.trim(),
@@ -200,25 +212,34 @@ export class Contributor extends ExplorationEditor {
 
     // Handle the case where no translation opportunity is expected.
     if (!visible) {
-      await this.waitForOpportunityListToStabilize();
+      const scanningTimeout = Date.now() + 30000;
+      while (Date.now() < scanningTimeout) {
+        await this.waitForOpportunityListToStabilize();
+        const opportunityItemElement = await this.findOpportunityItem(
+          heading,
+          subheading
+        );
+        if (opportunityItemElement === null) {
+          showMessage(
+            `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+          );
+          return null;
+        }
+        await this.page.waitForTimeout(200);
+      }
+
       const opportunityItemElement = await this.findOpportunityItem(
         heading,
         subheading
       );
-      if (opportunityItemElement !== null) {
-        const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-          (el: Element, sel: string) =>
-            el.querySelector(sel)?.textContent?.trim(),
-          opportunitySubHeadingSelector
-        );
-        throw new Error(
-          `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-        );
-      }
-      showMessage(
-        `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+      const opportunityItemSubHeading = await opportunityItemElement?.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
       );
-      return null;
+      throw new Error(
+        `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading || subheading} was found.`
+      );
     }
 
     // The opportunity list can be refreshed after it has been rendered (see
@@ -488,6 +509,7 @@ export class Contributor extends ExplorationEditor {
    * @param {string} topicName - The name of the topic to filter by.
    */
   async filterContentByTopic(topicName: string): Promise<void> {
+    await this.waitForOpportunityListToStabilize();
     await this.clickOnElementWithSelector(topicSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
@@ -511,6 +533,7 @@ export class Contributor extends ExplorationEditor {
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, topicName);
+    await this.waitForOpportunityListToStabilize();
   }
 
   /**
