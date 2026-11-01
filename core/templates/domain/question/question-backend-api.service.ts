@@ -69,21 +69,33 @@ export class QuestionBackendApiService {
   private _fetchQuestions(
     skillIds: string[],
     questionCount: number,
+    page: number | undefined,
     questionsSortedByDifficulty: boolean,
     successCallback: (value: QuestionBackendDict[]) => void,
     errorCallback: (reason: string) => void
   ): void {
     if (
-      !this.validateRequestParameters(skillIds, questionCount, errorCallback)
+      !this.validateRequestParameters(
+        skillIds,
+        questionCount,
+        page,
+        errorCallback
+      )
     ) {
       return;
     }
+    // Only request a specific page when one is explicitly provided. Without
+    // a page the backend keeps its random-sampling behavior for practice, so
+    // the page-less URL template is used.
     var questionDataUrl = this.urlInterpolationService.interpolateUrl(
-      QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE,
+      page === undefined
+        ? QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE
+        : QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE_WITH_PAGE,
       {
         skill_ids: skillIds.join(','),
         question_count: questionCount.toString(),
         fetch_by_difficulty: questionsSortedByDifficulty.toString(),
+        page: page === undefined ? '' : page.toString(),
       }
     );
     this.http
@@ -172,6 +184,7 @@ export class QuestionBackendApiService {
   private validateRequestParameters(
     skillIds: string[],
     questionCount: number,
+    page: number | undefined,
     errorCallback: (reason: string) => void
   ): boolean {
     if (!this.isListOfStrings(skillIds)) {
@@ -181,6 +194,11 @@ export class QuestionBackendApiService {
 
     if (!this.isInt(questionCount) || questionCount <= 0) {
       errorCallback('Question count has to be a positive integer');
+      return false;
+    }
+
+    if (page !== undefined && (!this.isInt(page) || page < 0)) {
+      errorCallback('Page has to be a non-negative integer');
       return false;
     }
 
@@ -217,12 +235,14 @@ export class QuestionBackendApiService {
   async fetchQuestionsAsync(
     skillIds: string[],
     questionCount: number,
-    questionsSortedByDifficulty: boolean
+    questionsSortedByDifficulty: boolean,
+    page?: number
   ): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchQuestions(
         skillIds,
         questionCount,
+        page,
         questionsSortedByDifficulty,
         resolve,
         reject
