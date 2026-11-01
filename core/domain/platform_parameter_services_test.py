@@ -53,10 +53,40 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.original_parameter_registry = (
-            registry.Registry.parameter_registry.copy()
+        updated_specs = dict(
+            platform_parameter_list
+            .PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
         )
-        registry.Registry.parameter_registry.clear()
+        updated_specs.update({
+            'param_a': (
+                'Parameter named a',
+                platform_parameter_domain.DataTypes.STRING,
+                '',
+            ),
+            'param_b': (
+                'Parameter named b',
+                platform_parameter_domain.DataTypes.BOOL,
+                False,
+            ),
+            'param_c': (
+                'Parameter named c',
+                platform_parameter_domain.DataTypes.NUMBER,
+                0,
+            ),
+        })
+
+        self.swap_platform_parameter_specs = self.swap(
+            registry,
+            'PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT',
+            updated_specs,
+        )
+        self.swap_platform_parameter_specs_list = self.swap(
+            platform_parameter_list,
+            'PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT',
+            updated_specs,
+        )
+        self.swap_platform_parameter_specs.__enter__()
+        self.swap_platform_parameter_specs_list.__enter__()
 
         # Parameter names that might be used in following tests.
         self.param_names = ['param_a', 'param_b', 'param_c']
@@ -103,8 +133,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
     def tearDown(self) -> None:
+        self.swap_platform_parameter_specs_list.__exit__(None, None, None)
+        self.swap_platform_parameter_specs.__exit__(None, None, None)
         super().tearDown()
-        registry.Registry.parameter_registry = self.original_parameter_registry
 
     def test_get_all_platform_parameters_dicts(self) -> None:
         expected_dicts = [
