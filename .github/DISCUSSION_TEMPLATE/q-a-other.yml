@@ -28,6 +28,7 @@ body:
         Add any other information that might be helpful.
 
         Before posting, please also review:
+        https://github.com/oppia/oppia/wiki/Debugging-Docs
         https://github.com/oppia/oppia/wiki/Get-help#how-to-ask-good-questions
   validations:
     required: false
