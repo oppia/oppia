@@ -504,24 +504,33 @@ export class TranslationSubmitter extends BaseUser {
     // Get the opportunity item element.
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
+      const {headingTitle, headingText, subheadingTitle, subheadingText} =
+        await opportunityItemElement.evaluate(
+          (el: Element, headingSel: string, subheadingSel: string) => {
+            const headingEl = el.querySelector(headingSel);
+            const subheadingEl = el.querySelector(subheadingSel);
+            return {
+              headingTitle: headingEl?.getAttribute('title')?.trim(),
+              headingText: headingEl?.textContent?.trim(),
+              subheadingTitle: subheadingEl?.getAttribute('title')?.trim(),
+              subheadingText: subheadingEl?.textContent?.trim(),
+            };
+          },
+          opportunityItemHeadingSelector,
+          opportunitySubHeadingSelector
+        );
+
+      const matchesHeading =
+        headingTitle === heading || headingText === heading;
+      const matchesSubheading = Boolean(
+        (subheadingTitle && subheadingTitle.includes(subheading)) ||
+          (subheadingText && subheadingText.includes(subheading))
       );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
+      if (matchesHeading && matchesSubheading) {
         if (!visible) {
           throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+            `Failure: Translation opportunity for ${heading} in ${subheadingTitle || subheadingText} was found.`
           );
         }
         return opportunityItemElement;

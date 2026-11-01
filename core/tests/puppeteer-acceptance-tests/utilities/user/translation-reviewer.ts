@@ -117,24 +117,30 @@ export class TranslationReviewer extends BaseUser {
         const opportunityItems = await this.page.$$(opportunityItemSelector);
 
         for (const opportunityItemElement of opportunityItems) {
-          const opportunityItemHeading = await opportunityItemElement.evaluate(
-            (el: Element, sel: string) =>
-              el.querySelector(sel)?.getAttribute('title') ||
-              el.querySelector(sel)?.textContent?.trim(),
-            opportunityItemHeadingSelector
-          );
-          const opportunityItemSubHeading =
+          const {headingTitle, headingText, subheadingTitle, subheadingText} =
             await opportunityItemElement.evaluate(
-              (el: Element, sel: string) =>
-                el.querySelector(sel)?.getAttribute('title') ||
-                el.querySelector(sel)?.textContent?.trim(),
+              (el: Element, headingSel: string, subheadingSel: string) => {
+                const headingEl = el.querySelector(headingSel);
+                const subheadingEl = el.querySelector(subheadingSel);
+                return {
+                  headingTitle: headingEl?.getAttribute('title')?.trim(),
+                  headingText: headingEl?.textContent?.trim(),
+                  subheadingTitle: subheadingEl?.getAttribute('title')?.trim(),
+                  subheadingText: subheadingEl?.textContent?.trim(),
+                };
+              },
+              opportunityItemHeadingSelector,
               opportunitySubHeadingSelector
             );
 
-          if (
-            opportunityItemHeading === heading &&
-            opportunityItemSubHeading?.includes(subheading)
-          ) {
+          const matchesHeading =
+            headingTitle === heading || headingText === heading;
+          const matchesSubheading = Boolean(
+            (subheadingTitle && subheadingTitle.includes(subheading)) ||
+              (subheadingText && subheadingText.includes(subheading))
+          );
+
+          if (matchesHeading && matchesSubheading) {
             opportunityItem = opportunityItemElement;
             break;
           }

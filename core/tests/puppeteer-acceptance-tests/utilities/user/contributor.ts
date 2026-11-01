@@ -207,26 +207,33 @@ export class Contributor extends ExplorationEditor {
     // Get the opportunity item element.
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.getAttribute('title') ||
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.getAttribute('title') ||
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
+      const {headingTitle, headingText, subheadingTitle, subheadingText} =
+        await opportunityItemElement.evaluate(
+          (el: Element, headingSel: string, subheadingSel: string) => {
+            const headingEl = el.querySelector(headingSel);
+            const subheadingEl = el.querySelector(subheadingSel);
+            return {
+              headingTitle: headingEl?.getAttribute('title')?.trim(),
+              headingText: headingEl?.textContent?.trim(),
+              subheadingTitle: subheadingEl?.getAttribute('title')?.trim(),
+              subheadingText: subheadingEl?.textContent?.trim(),
+            };
+          },
+          opportunityItemHeadingSelector,
+          opportunitySubHeadingSelector
+        );
+
+      const matchesHeading =
+        headingTitle === heading || headingText === heading;
+      const matchesSubheading = Boolean(
+        (subheadingTitle && subheadingTitle.includes(subheading)) ||
+          (subheadingText && subheadingText.includes(subheading))
       );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
+      if (matchesHeading && matchesSubheading) {
         if (!visible) {
           throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+            `Failure: Translation opportunity for ${heading} in ${subheadingTitle || subheadingText} was found.`
           );
         }
         return opportunityItemElement;
@@ -651,15 +658,22 @@ export class Contributor extends ExplorationEditor {
         expectedSubheading: string
       ) => {
         const rows = Array.from(document.querySelectorAll(itemSelector));
-        return rows.filter(
-          row =>
-            row.querySelector(headingSelector)?.getAttribute('title') ===
-              expectedHeading &&
-            row
-              .querySelector(subheadingSelector)
-              ?.getAttribute('title')
-              ?.includes(expectedSubheading)
-        ).length;
+        return rows.filter(row => {
+          const headingEl = row.querySelector(headingSelector);
+          const subheadingEl = row.querySelector(subheadingSelector);
+          const headingTitle = headingEl?.getAttribute('title')?.trim();
+          const headingText = headingEl?.textContent?.trim();
+          const subheadingTitle = subheadingEl?.getAttribute('title')?.trim();
+          const subheadingText = subheadingEl?.textContent?.trim();
+
+          const matchesHeading =
+            headingTitle === expectedHeading || headingText === expectedHeading;
+          const matchesSubheading = Boolean(
+            (subheadingTitle && subheadingTitle.includes(expectedSubheading)) ||
+              (subheadingText && subheadingText.includes(expectedSubheading))
+          );
+          return matchesHeading && matchesSubheading;
+        }).length;
       },
       opportunityItemSelector,
       opportunityItemHeadingSelector,
@@ -719,10 +733,14 @@ export class Contributor extends ExplorationEditor {
     const rows = await this.page.$$(opportunityItemSelector);
     const matchingRows: ElementHandle<Element>[] = [];
     for (const row of rows) {
-      const heading = await row.$eval(opportunityItemHeadingSelector, el =>
-        el.getAttribute('title')
+      const headingMatches = await row.$eval(
+        opportunityItemHeadingSelector,
+        (el, expected) =>
+          el.getAttribute('title')?.trim() === expected ||
+          el.textContent?.trim() === expected,
+        skillName
       );
-      if (heading === skillName) {
+      if (headingMatches) {
         matchingRows.push(row);
       }
     }
