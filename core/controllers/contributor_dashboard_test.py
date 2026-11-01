@@ -160,6 +160,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -171,6 +172,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -182,6 +184,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'translation_missing_reasons': {},
             'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
@@ -759,6 +762,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 language_codes_needing_voice_artists=['en'],
                 language_codes_with_assigned_voice_artists=[],
                 translation_in_review_counts={},
+                translation_missing_reasons={},
             ),
             '1': None,
             '2': opportunity_domain.ExplorationOpportunitySummary(
@@ -774,6 +778,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 language_codes_needing_voice_artists=['en'],
                 language_codes_with_assigned_voice_artists=[],
                 translation_in_review_counts={},
+                translation_missing_reasons={},
             ),
         }
 
@@ -797,6 +802,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -808,6 +814,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -876,6 +883,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             language_codes_needing_voice_artists=['en'],
             language_codes_with_assigned_voice_artists=[],
             translation_in_review_counts={},
+            translation_missing_reasons={},
             is_pinned=True,
         )
 
@@ -901,6 +909,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': True,
             }
@@ -912,6 +921,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'translation_missing_reasons': {},
                 'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
@@ -1180,6 +1190,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'translation_missing_reasons': {},
                     'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
@@ -1299,6 +1310,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'translation_missing_reasons': {},
                     'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
@@ -1584,31 +1596,40 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         mock_get_translatable_text_return_value = {
             'Introduction': {
-                'content_01': translation_domain.TranslatableContent(
-                    content_id='content_01',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                'content_01': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_01',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                        ),
+                        content_value=['string1', 'string2', 'string3'],
                     ),
-                    content_value=['string1', 'string2', 'string3'],
+                    translation_domain.TranslationStatus.NEW,
                 ),
-                'content_02': translation_domain.TranslatableContent(
-                    content_id='content_02',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                'content_02': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_02',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                        ),
+                        content_value=['string1', 'string2', 'string3'],
                     ),
-                    content_value=['string1', 'string2', 'string3'],
+                    translation_domain.TranslationStatus.NEW,
                 ),
             },
             'End State': {
-                'content_03': translation_domain.TranslatableContent(
-                    content_id='content_03',
-                    content_type=translation_domain.ContentType.CONTENT,
-                    content_format=(
-                        translation_domain.TranslatableContentFormat.HTML
+                'content_03': translation_domain.PendingTranslationContent(
+                    translation_domain.TranslatableContent(
+                        content_id='content_03',
+                        content_type=translation_domain.ContentType.CONTENT,
+                        content_format=(
+                            translation_domain.TranslatableContentFormat.HTML
+                        ),
+                        content_value='<p>Not a list content.</p>',
                     ),
-                    content_value='<p>Not a list content.</p>',
+                    translation_domain.TranslationStatus.NEW,
                 )
             },
         }
@@ -1639,6 +1660,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                             'content_type': 'content',
                             'interaction_id': None,
                             'rule_type': None,
+                            'status': 'new',
                         }
                     }
                 },
@@ -1683,6 +1705,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None,
+                        'status': 'new',
                     }
                 },
                 'End State': {
@@ -1693,6 +1716,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None,
+                        'status': 'new',
                     }
                 },
             },
@@ -1736,10 +1760,99 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None,
+                        'status': 'new',
                     }
                 }
             },
         }
+        self.assertEqual(output, expected_output)
+
+    def test_handler_returns_update_needed_for_changed_source_content(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': 'add_written_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0',
+            1,
+            self.owner_id,
+            change_dict,
+            'description',
+        )
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id,
+            self.admin_id,
+            'Accepting suggestion',
+            '',
+        )
+
+        exp_services.update_exploration(
+            self.owner_id,
+            '0',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>A content to translate.</p>',
+                        },
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+                        'content_id': 'content_0',
+                    }
+                ),
+            ],
+            'Changes content.',
+        )
+
+        output = self.get_json(
+            '/gettranslatabletexthandler',
+            params={'language_code': 'hi', 'exp_id': '0'},
+        )
+
+        expected_output = {
+            'version': 2,
+            'state_names_to_content_id_mapping': {
+                'Introduction': {
+                    'content_0': {
+                        'content_value': ('<p>A content to translate.</p>'),
+                        'content_id': 'content_0',
+                        'content_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None,
+                        'status': 'update',
+                    }
+                },
+                'End State': {
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
+                        'content_type': 'content',
+                        'interaction_id': None,
+                        'rule_type': None,
+                        'status': 'new',
+                    }
+                },
+            },
+        }
+
         self.assertEqual(output, expected_output)
 
 
@@ -3079,6 +3192,7 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         response = self.get_json(
@@ -3178,6 +3292,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         # The signup() helper temporarily logs in as the newly created user;
@@ -3291,6 +3406,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -3395,6 +3511,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -3474,6 +3591,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -3529,6 +3647,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         # A skill with a reviewable translation suggestion of its own, so the
@@ -3560,6 +3679,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)

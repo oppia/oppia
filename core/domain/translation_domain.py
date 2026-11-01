@@ -84,6 +84,100 @@ class TranslatableContentDict(TypedDict):
     rule_type: Optional[str]
 
 
+class TranslationStatus(enum.Enum):
+    """Enum for translation status types."""
+
+    NEW = 'new'
+    UPDATE_NEEDED = 'update'
+
+
+class PendingTranslationDict(TranslatableContentDict):
+    """Dictionary representing PendingTranslationContent object."""
+
+    status: str
+
+
+class PendingTranslationContent:
+    """PendingTranslationContent wraps a TranslatableContent and its status."""
+
+    def __init__(
+        self,
+        translatable_content: TranslatableContent,
+        status: TranslationStatus,
+    ) -> None:
+        """Constructs a PendingTranslationContent domain object.
+
+        Args:
+            translatable_content: TranslatableContent. The translatable content.
+            status: TranslationStatus. The status of the translation.
+        """
+        self.translatable_content = translatable_content
+        self.status = status
+
+    @property
+    def content_value(self) -> feconf.ContentValueType:
+        """Returns the content value of the translatable content.
+
+        Returns:
+            ContentValueType. The content value.
+        """
+        return self.translatable_content.content_value
+
+    @property
+    def content_id(self) -> str:
+        """Returns the content id of the translatable content.
+
+        Returns:
+            str. The content id.
+        """
+        return self.translatable_content.content_id
+
+    @property
+    def content_type(self) -> ContentType:
+        """Returns the content type of the translatable content.
+
+        Returns:
+            ContentType. The content type.
+        """
+        return self.translatable_content.content_type
+
+    @property
+    def content_format(self) -> TranslatableContentFormat:
+        """Returns the content format of the translatable content.
+
+        Returns:
+            TranslatableContentFormat. The content format.
+        """
+        return self.translatable_content.content_format
+
+    def is_data_format_list(self) -> bool:
+        """Checks whether the content is of a list type.
+
+        Returns:
+            bool. Whether the content is a list.
+        """
+        return self.translatable_content.is_data_format_list()
+
+    def to_dict(self) -> PendingTranslationDict:
+        """Returns the dict representation of PendingTranslationContent object.
+
+        Returns:
+            PendingTranslationDict. The dict representation of
+            PendingTranslationContent.
+        """
+        content_dict = self.translatable_content.to_dict()
+        pending_dict: PendingTranslationDict = {
+            'content_id': content_dict['content_id'],
+            'content_value': content_dict['content_value'],
+            'content_type': content_dict['content_type'],
+            'content_format': content_dict['content_format'],
+            'interaction_id': content_dict['interaction_id'],
+            'rule_type': content_dict['rule_type'],
+            'status': self.status.value,
+        }
+        return pending_dict
+
+
 class TranslatableContent:
     """TranslatableContent represents a content of a translatable object which
     can be translated into multiple languages.
@@ -328,8 +422,8 @@ class BaseTranslatableObject:
         self,
         entity_translation: Union[EntityTranslation, None] = None,
         override_metadata_feature_flag: bool = False,
-    ) -> Dict[str, TranslatableContent]:
-        """Returns a list of TranslatableContent instances which need new or
+    ) -> Dict[str, PendingTranslationContent]:
+        """Returns a list of PendingTranslationContent instances which need new or
         updated translations.
 
         Args:
@@ -339,7 +433,7 @@ class BaseTranslatableObject:
                 metadata feature flag check.
 
         Returns:
-            list(TranslatableContent). Returns a list of TranslatableContent.
+            dict(str, PendingTranslationContent). Returns a dict of PendingTranslationContent.
         """
         if entity_translation is None:
             entity_translation = EntityTranslation.create_empty(
@@ -366,13 +460,17 @@ class BaseTranslatableObject:
             ):
                 content_id_to_translatable_content[
                     translatable_content.content_id
-                ] = translatable_content
+                ] = PendingTranslationContent(
+                    translatable_content, TranslationStatus.NEW
+                )
             elif entity_translation.translations[
                 translatable_content.content_id
             ].needs_update:
                 content_id_to_translatable_content[
                     translatable_content.content_id
-                ] = translatable_content
+                ] = PendingTranslationContent(
+                    translatable_content, TranslationStatus.UPDATE_NEEDED
+                )
 
         return content_id_to_translatable_content
 

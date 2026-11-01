@@ -361,9 +361,58 @@ def get_translation_counts(
     }
 
 
+def get_translation_missing_reasons(
+    exploration: exp_domain.Exploration,
+    new_translation_models: Optional[
+        List[translation_models.EntityTranslationsModel]
+    ] = None,
+) -> Dict[str, List[str]]:
+    """Returns a dict mapping language codes to a list of missing reasons
+    ('new' or 'update') for that language.
+
+    Args:
+        exploration: Exploration. The Exploration object.
+        new_translation_models: list(EntityTranslationsModel)|None. Optional list of
+            new translation models that haven't been saved to the datastore yet.
+
+    Returns:
+        dict(str, list(str)). A dict mapping language code to reasons.
+    """
+    if new_translation_models is not None:
+        entity_translations = [
+            translation_fetchers.get_entity_translation_from_model(model)
+            for model in new_translation_models
+            if model.entity_id == exploration.id
+        ]
+    else:
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exploration.id,
+                exploration.version,
+            )
+        )
+
+    missing_reasons = {}
+    for entity_translation in entity_translations:
+        reasons: set[str] = set()
+        for state in exploration.states.values():
+            pending_contents = state.get_all_contents_which_need_translations(
+                entity_translation
+            ).values()
+            for content in pending_contents:
+                reasons.add(content.status.value)
+        if reasons:
+            missing_reasons[entity_translation.language_code] = sorted(
+                list(reasons)
+            )
+
+    return missing_reasons
+
+
 def get_translatable_text(
     exploration: exp_domain.Exploration, language_code: str
-) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
+) -> Dict[str, Dict[str, translation_domain.PendingTranslationContent]]:
     """Returns all the contents which needs translation in the given
     language.
 
@@ -373,8 +422,8 @@ def get_translatable_text(
             required.
 
     Returns:
-        dict(str, list(TranslatableContent)). A dict with state names
-        as keys and a list of TranslatableContent as values.
+        dict(str, dict(str, PendingTranslationContent)). A dict with state names
+        as keys and a dict mapping content IDs to PendingTranslationContent as values.
     """
     entity_translations = translation_fetchers.get_entity_translation(
         feconf.TranslatableEntityType.EXPLORATION,
