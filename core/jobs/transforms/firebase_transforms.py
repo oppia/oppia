@@ -21,9 +21,18 @@ from __future__ import annotations
 from collections import abc
 
 from core.jobs.types import firebase_domain
+from core.platform import models
 
 import apache_beam as beam
 from typing import TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models, user_models
+
+auth_models, user_models = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.USER]
+)
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -226,3 +235,61 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             f'Oppia users ({user_ids=!r}) are sharing the same Firebase '
             f'account ({auth_id=!r})'
         )
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class ZipUserSettingsAndUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
+    """Groups UserAuthDetailsModels and UserSettingsModels by their user ID.
+
+    This transform expects a tuple of PCollections with exactly 2 elements: the
+    first is a PCollection[UserAuthDetailsModel] and the second is a
+    PCollection[UserSettingsModel]. Both models are keyed by the user's ID, so
+    each output element pairs a user ID with all of the models belonging to it.
+    """
+
+    def expand(
+        self,
+        model_pairs: tuple[
+            beam.PCollection[auth_models.UserAuthDetailsModel],
+            beam.PCollection[user_models.UserSettingsModel],
+        ],
+    ) -> beam.PCollection[
+        tuple[
+            str,
+            tuple[
+                abc.Iterable[auth_models.UserAuthDetailsModel],
+                abc.Iterable[user_models.UserSettingsModel],
+            ],
+        ]
+    ]:
+        """Groups the input pair of model collections by user ID.
+
+        Args:
+            model_pairs: tuple. The pair of model collections to be grouped. The
+                first PCollection holds UserAuthDetailsModels and the second
+                holds UserSettingsModels.
+
+        Returns:
+            PCollection. The (user_id, (user_auth_details_models,
+            user_settings_models)) pairs. Either iterable may be empty when a
+            user is missing the corresponding model.
+        """
+
+        user_auth_details_models, user_settings_models = model_pairs
+
+        keyed_user_auth_details_models = (
+            user_auth_details_models
+            | 'Get UserAuthDetailsModels keyed with id'
+            >> beam.Map(lambda m: (m.id, m))
+        )
+
+        keyed_user_settings_models = (
+            user_settings_models
+            | 'Get UserSettingsModels keyed with id'
+            >> beam.Map(lambda m: (m.id, m))
+        )
+
+        return (
+            keyed_user_auth_details_models,
+            keyed_user_settings_models,
+        ) | 'Group models by user id' >> beam.CoGroupByKey()

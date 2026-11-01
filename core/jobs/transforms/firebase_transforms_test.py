@@ -21,8 +21,17 @@ from __future__ import annotations
 from core.jobs import job_test_utils
 from core.jobs.transforms import firebase_transforms
 from core.jobs.types import firebase_domain
+from core.platform import models
 
 import apache_beam as beam
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models, user_models
+
+auth_models, user_models = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.USER]
+)
 
 TAG_OK = firebase_transforms.DiffFirebaseRecords.TAG_OK
 TAG_ADD = firebase_transforms.DiffFirebaseRecords.TAG_ADD
@@ -235,3 +244,140 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             diffs[TAG_OPPIA] | beam.Map(lambda err: (TAG_OPPIA, err)),
             diffs[TAG_FIREBASE] | beam.Map(lambda err: (TAG_FIREBASE, err)),
         ) | beam.Flatten()
+
+
+class ZipUserSettingsAndUserAuthDetailsModelsTests(
+    job_test_utils.PipelinedTestBase
+):
+    """Pipeline tests for ZipUserSettingsAndUserAuthDetailsModels."""
+
+    def test_zip_with_no_models_produces_no_output(self) -> None:
+        self.assert_pcoll_empty(self.run_zip([], []))
+
+    def test_zip_with_both_models_groups_them_by_user_id(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_zip(
+                [
+                    self.create_model(
+                        auth_models.UserAuthDetailsModel,
+                        id='uid_a',
+                        firebase_auth_id='fb_a',
+                    )
+                ],
+                [
+                    self.create_model(
+                        user_models.UserSettingsModel,
+                        id='uid_a',
+                        email='a@a.com',
+                    )
+                ],
+            ),
+            [('uid_a', ['fb_a'], ['a@a.com'])],
+        )
+
+    def test_zip_with_only_auth_details_model_groups_it_alone(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_zip(
+                [
+                    self.create_model(
+                        auth_models.UserAuthDetailsModel,
+                        id='uid_a',
+                        firebase_auth_id='fb_a',
+                    )
+                ],
+                [],
+            ),
+            [('uid_a', ['fb_a'], [])],
+        )
+
+    def test_zip_with_only_settings_model_groups_it_alone(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_zip(
+                [],
+                [
+                    self.create_model(
+                        user_models.UserSettingsModel,
+                        id='uid_a',
+                        email='a@a.com',
+                    )
+                ],
+            ),
+            [('uid_a', [], ['a@a.com'])],
+        )
+
+    def test_zip_with_multiple_users_groups_each_by_user_id(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_zip(
+                [
+                    self.create_model(
+                        auth_models.UserAuthDetailsModel,
+                        id='uid_a',
+                        firebase_auth_id='fb_a',
+                    ),
+                    self.create_model(
+                        auth_models.UserAuthDetailsModel,
+                        id='uid_b',
+                        firebase_auth_id='fb_b',
+                    ),
+                ],
+                [
+                    self.create_model(
+                        user_models.UserSettingsModel,
+                        id='uid_a',
+                        email='a@a.com',
+                    ),
+                    self.create_model(
+                        user_models.UserSettingsModel,
+                        id='uid_c',
+                        email='c@c.com',
+                    ),
+                ],
+            ),
+            [
+                ('uid_a', ['fb_a'], ['a@a.com']),
+                ('uid_b', ['fb_b'], []),
+                ('uid_c', [], ['c@c.com']),
+            ],
+        )
+
+    def run_zip(
+        self,
+        user_auth_details_models: list[auth_models.UserAuthDetailsModel],
+        user_settings_models: list[user_models.UserSettingsModel],
+    ) -> beam.PCollection[tuple[str, list[str], list[str]]]:
+        """Runs the zip and summarizes each group into comparable values.
+
+        Each emitted element is a (user_id, firebase_auth_ids, emails) triple,
+        where firebase_auth_ids comes from the grouped UserAuthDetailsModels
+        and emails comes from the grouped UserSettingsModels.
+
+        Args:
+            user_auth_details_models: list(UserAuthDetailsModel). The auth
+                details models to zip.
+            user_settings_models: list(UserSettingsModel). The settings models
+                to zip.
+
+        Returns:
+            PCollection. The summarized (user_id, firebase_auth_ids, emails)
+            triples.
+        """
+        return (
+            (
+                self.pipeline
+                | 'Create UserAuthDetailsModels'
+                >> beam.Create(user_auth_details_models),
+                self.pipeline
+                | 'Create UserSettingsModels'
+                >> beam.Create(user_settings_models),
+            )
+            | 'Zip models'
+            >> firebase_transforms.ZipUserSettingsAndUserAuthDetailsModels()
+            | 'Summarize grouped models'
+            >> beam.MapTuple(
+                lambda user_id, grouped: (
+                    user_id,
+                    [m.firebase_auth_id for m in grouped[0]],
+                    [m.email for m in grouped[1]],
+                )
+            )
+        )
