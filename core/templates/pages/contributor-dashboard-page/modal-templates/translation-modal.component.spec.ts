@@ -59,7 +59,9 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
+import {AutoTranslationConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/auto-translation-confirmation-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -320,7 +322,7 @@ describe('Translation Modal Component', () => {
     );
   });
 
-  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
+  it('should mark a required component type as reviewed when its modal opens', fakeAsync(() => {
     // eslint-disable-next-line dot-notation
     spyOn(component['rteHelperService'], 'openCustomizationModal');
     component.ngOnInit();
@@ -335,16 +337,19 @@ describe('Translation Modal Component', () => {
       version: 1,
     });
     tick();
+    component.rteComponentsRequiringReview = ['image', 'workedexample'];
 
-    // Check initial state.
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+    expect(component.unconfirmedRteComponentLabels).toEqual([
+      'image',
+      'worked example',
+    ]);
 
     // Call the intercepted function with a non-image component.
     // eslint-disable-next-line dot-notation
     component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+    expect(component.reviewedRteComponents).toEqual([]);
 
-    // Call the intercepted function with the 'image' component.
+    // Call the intercepted function with a required component.
     // eslint-disable-next-line dot-notation
     component['rteHelperService'].openCustomizationModal(
       false,
@@ -352,7 +357,22 @@ describe('Translation Modal Component', () => {
       [],
       {}
     );
-    expect(component.hasAltTextModalBeenOpened).toBeTrue();
+    expect(component.reviewedRteComponents).toEqual(['image']);
+    expect(component.unconfirmedRteComponentLabels).toEqual(['worked example']);
+
+    // Opening the remaining required component should clear the helper text.
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(
+      false,
+      'workedexample',
+      [],
+      {}
+    );
+    expect(component.unconfirmedRteComponentLabels).toEqual([]);
+    expect(component.reviewedRteComponentLabels).toEqual([
+      'image',
+      'worked example',
+    ]);
   }));
 
   it('should wrap text with ellipsis when text is too long', () => {
@@ -388,6 +408,47 @@ describe('Translation Modal Component', () => {
     component.updateHtml('old');
     expect(component.activeWrittenTranslation).toEqual('old');
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
+  });
+
+  describe('translation editor selection', () => {
+    it('should save the current editor range before opening a popup', () => {
+      const clonedRange = {};
+      const range = {
+        cloneRange: jasmine
+          .createSpy('cloneRange')
+          .and.returnValue(clonedRange),
+      };
+      const selection = {
+        rangeCount: 1,
+        getRangeAt: jasmine.createSpy('getRangeAt').and.returnValue(range),
+      };
+      mockWindow.getSelection = jasmine
+        .createSpy('getSelection')
+        .and.returnValue(selection);
+
+      component.saveTranslationEditorSelection();
+
+      expect(selection.getRangeAt).toHaveBeenCalledWith(0);
+      expect(range.cloneRange).toHaveBeenCalled();
+      // eslint-disable-next-line dot-notation
+      expect(component['translationEditorSelection']).toBe(clonedRange);
+    });
+
+    it('should clear the saved range when there is no current selection', () => {
+      const selection = {
+        rangeCount: 0,
+        getRangeAt: jasmine.createSpy('getRangeAt'),
+      };
+      mockWindow.getSelection = jasmine
+        .createSpy('getSelection')
+        .and.returnValue(selection);
+
+      component.saveTranslationEditorSelection();
+
+      expect(selection.getRangeAt).not.toHaveBeenCalled();
+      // eslint-disable-next-line dot-notation
+      expect(component['translationEditorSelection']).toBeNull();
+    });
   });
 
   it('should invoke change detection when set of strings is updated', () => {
@@ -1773,11 +1834,121 @@ describe('Translation Modal Component', () => {
     });
   });
 
-  describe('when checking for validation errors with auto-translated images', () => {
-    it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
-      component.hasImageInAutoTranslation = true;
-      component.hasAltTextModalBeenOpened = false;
+  describe('when checking for auto-translation component review errors', () => {
+    it('should block submission until all required component types are reviewed', () => {
+      component.rteComponentsRequiringReview = ['image', 'workedexample'];
+      component.reviewedRteComponents = ['image'];
       expect(component.hasSubmitValidationErrors()).toBe(true);
+
+      component.reviewedRteComponents = ['image', 'workedexample'];
+      expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+
+    it('should clear review requirements when the source item changes', () => {
+      component.autoGeneratedTranslation = '<p>Generated</p>';
+      component.isTranslationAutoGenerated = true;
+      component.rteComponentsRequiringReview = ['image'];
+      component.reviewedRteComponents = ['image'];
+
+      component.updateActiveState({
+        text: 'Next source text',
+        more: true,
+        status: 'pending',
+        translation: '',
+        dataFormat: 'html',
+      });
+
+      expect(component.autoGeneratedTranslation).toBe('');
+      expect(component.isTranslationAutoGenerated).toBeFalse();
+      expect(component.rteComponentsRequiringReview).toEqual([]);
+      expect(component.reviewedRteComponents).toEqual([]);
+    });
+
+    it('should list the text-bearing component types in source content', () => {
+      const sourceHtml =
+        '<oppia-noninteractive-image alt-with-value="&amp;quot;Image alt&amp;quot;" ' +
+        'caption-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>' +
+        '<oppia-noninteractive-workedexample question-with-value="&amp;quot;Question&amp;quot;" ' +
+        'answer-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-workedexample>' +
+        '<oppia-noninteractive-skillreview text-with-value="&amp;quot;Concept card&amp;quot;">' +
+        '</oppia-noninteractive-skillreview>' +
+        '<oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:' +
+        '&amp;quot;x&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">' +
+        '</oppia-noninteractive-math>';
+
+      const componentIds =
+        // eslint-disable-next-line dot-notation
+        component['getRteComponentsWithNonemptyTextFields'](sourceHtml);
+
+      expect(componentIds).toEqual([
+        'image',
+        'workedexample',
+        'skillreview',
+        'math',
+      ]);
+    });
+
+    it('should not require review when component text fields are empty', () => {
+      const sourceHtml =
+        '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" ' +
+        'caption-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>' +
+        '<oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;">' +
+        '</oppia-noninteractive-link>';
+
+      expect(
+        // eslint-disable-next-line dot-notation
+        component['getRteComponentsWithNonemptyTextFields'](sourceHtml)
+      ).toEqual([]);
+    });
+
+    it('should find text-bearing nested and other RTE components', () => {
+      const htmlEscaperService = TestBed.inject(HtmlEscaperService);
+      const nestedImageHtml =
+        '<oppia-noninteractive-image alt-with-value="' +
+        htmlEscaperService.objToEscapedJson('Nested image text') +
+        '"></oppia-noninteractive-image>';
+      const collapsibleContent =
+        '<oppia-noninteractive-collapsible content-with-value="' +
+        htmlEscaperService.objToEscapedJson(nestedImageHtml) +
+        '"></oppia-noninteractive-collapsible>';
+      const tabsContent =
+        '<oppia-noninteractive-tabs tab_contents-with-value="' +
+        htmlEscaperService.objToEscapedJson([
+          {title: '', content: '<p>Tab text</p>'},
+        ]) +
+        '"></oppia-noninteractive-tabs>';
+      const sourceHtml =
+        '<oppia-noninteractive-link text-with-value="' +
+        htmlEscaperService.objToEscapedJson('Link text') +
+        '"></oppia-noninteractive-link>' +
+        '<oppia-noninteractive-math math_content-with-value="' +
+        htmlEscaperService.objToEscapedJson({
+          raw_latex: 'x + y',
+          svg_filename: '',
+        }) +
+        '"></oppia-noninteractive-math>' +
+        collapsibleContent +
+        tabsContent;
+
+      const componentIds =
+        // eslint-disable-next-line dot-notation
+        component['getRteComponentsWithNonemptyTextFields'](sourceHtml);
+
+      expect(componentIds).toEqual([
+        'image',
+        'link',
+        'math',
+        'collapsible',
+        'tabs',
+      ]);
+      component.rteComponentsRequiringReview = componentIds;
+      expect(component.unconfirmedRteComponentLabels).toEqual([
+        'image',
+        'link',
+        'math formula',
+        'collapsible',
+        'tabs',
+      ]);
     });
   });
 
@@ -1845,6 +2016,92 @@ describe('Translation Modal Component', () => {
       ).toHaveBeenCalledWith('hello', 'en', 'es');
       expect(component.isGeneratingTranslation).toBeFalse();
       expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
+    }));
+
+    it('should ask before replacing text already entered by the contributor', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      component.activeWrittenTranslation = '<p>My translation</p>';
+      mockWindow.document = {querySelector: () => null};
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text: '<p>Generated translation</p>',
+          translation_provider: 'Google',
+        })
+      );
+      const replacementModal = {
+        componentInstance: {},
+        result: Promise.resolve('replace'),
+      };
+      const openModalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        replacementModal as NgbModalRef
+      );
+
+      component.generateTranslation();
+      flushMicrotasks();
+
+      expect(openModalSpy).toHaveBeenCalledWith(
+        AutoTranslationConfirmationModalComponent,
+        {size: 'xl', centered: true}
+      );
+      expect(component.activeWrittenTranslation).toBe(
+        '<p>Generated translation</p>'
+      );
+    }));
+
+    it('should preserve text already entered when the contributor keeps it', fakeAsync(() => {
+      component.activeDataFormat = 'html';
+      component.textToTranslate = 'hello';
+      component.activeLanguageCode = 'es';
+      component.activeWrittenTranslation = '<p>My translation</p>';
+      const editor = document.createElement('div');
+      editor.className = 'oppia-rte-resizer';
+      const editorText = document.createTextNode('My translation');
+      editor.appendChild(editorText);
+      const editorRange = document.createRange();
+      editorRange.setStart(editorText, 3);
+      editorRange.collapse(true);
+      const editorSelection = {
+        rangeCount: 1,
+        getRangeAt: jasmine
+          .createSpy('getRangeAt')
+          .and.returnValue(editorRange),
+        removeAllRanges: jasmine.createSpy('removeAllRanges'),
+        addRange: jasmine.createSpy('addRange'),
+      };
+      mockWindow.document = {querySelector: () => editor};
+      mockWindow.getSelection = jasmine
+        .createSpy('getSelection')
+        .and.returnValue(editorSelection);
+      spyOn(editor, 'focus');
+      // eslint-disable-next-line dot-notation
+      component['translationEditorSelection'] = editorRange;
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          translated_text: '<p>Generated translation</p>',
+          translation_provider: 'Google',
+        })
+      );
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve('keep'),
+      } as NgbModalRef);
+
+      component.generateTranslation();
+      flushMicrotasks();
+
+      expect(component.activeWrittenTranslation).toBe('<p>My translation</p>');
+      expect(component.isTranslationAutoGenerated).toBeFalse();
+      expect(editor.focus).toHaveBeenCalled();
+      expect(editorSelection.removeAllRanges).toHaveBeenCalled();
+      expect(editorSelection.addRange).toHaveBeenCalledWith(editorRange);
     }));
 
     it('should handle error when generating translation', fakeAsync(() => {
