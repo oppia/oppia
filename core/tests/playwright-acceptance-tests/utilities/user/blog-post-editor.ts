@@ -39,6 +39,7 @@ const listViewButtonSelector = '.e2e-test-list-view-button';
 const editBlogPostBtnSelector = '.e2e-test-edit-blog-post-button';
 const deleteBlogPostBtnSelector =
   '.cdk-overlay-pane .e2e-test-delete-blog-post-button';
+const blogPostEditBoxSelector = '.e2e-test-blog-post-edit-box';
 const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 const blogPostTitlePage = '.e2e-test-blog-post-title';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
@@ -470,7 +471,7 @@ export class BlogPostEditor extends BaseUser {
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
         await allDraftBlogPosts[i].$eval(
-          '.e2e-test-blog-post-edit-box',
+          blogPostEditBoxSelector,
           element => (element as HTMLElement).click()
         );
         await this.clickOnElementWithSelector(editBlogPostBtnSelector);
@@ -499,7 +500,7 @@ export class BlogPostEditor extends BaseUser {
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
         await this.clickOnElementWithSelector(
-          '.e2e-test-blog-post-edit-box',
+          blogPostEditBoxSelector,
           {},
           allDraftBlogPosts[i]
         );
