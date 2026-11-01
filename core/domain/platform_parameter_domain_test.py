@@ -111,6 +111,20 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
 class EvaluationContextTests(test_utils.GenericTestBase):
     """Test for the EvaluationContext."""
 
+    def test_validate_with_none_app_version_passes_without_exception(
+        self,
+    ) -> None:
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'platform_type': 'Web',
+                'app_version': None,
+            },
+            {
+                'server_mode': ServerMode.DEV,
+            },
+        )
+        context.validate()
+
     def test_create_context_from_dict_returns_correct_instance(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -275,6 +289,14 @@ class EvaluationContextTests(test_utils.GenericTestBase):
 
 class PlatformParameterFilterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
+
+    def test_validate_app_version_flavor_filter_with_valid_flavor_passes(
+        self,
+    ) -> None:
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
+            {'type': 'app_version_flavor', 'conditions': [['=', 'beta']]}
+        )
+        filter_domain.validate()
 
     def _create_example_context(
         self,
