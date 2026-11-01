@@ -15,9 +15,8 @@
 /**
  * @fileoverview Unit tests for RequestInterceptorService.
  */
-// @ts-nocheck
 
-import {TestBed} from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -62,15 +61,16 @@ describe('Request Interceptor Service', () => {
     httpTestingController.verify();
   });
 
-  it('should expect request body to be a FormData constructor', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should expect request body to be a FormData constructor', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .post('/api', {data: 'test'})
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     let req = httpTestingController.expectOne('/api');
     let reqCSFR = httpTestingController.expectOne('/csrfhandler');
     expect(req.request.method).toEqual('POST');
@@ -78,17 +78,18 @@ describe('Request Interceptor Service', () => {
     expect(reqCSFR.request.method).toEqual('GET');
     req.flush({data: 'test'});
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
-  });
+  }));
 
-  it('should modify http requests body when they are intercepted', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should modify http requests body when they are intercepted', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .patch('/api', {data: 'test'})
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     let req = httpTestingController.expectOne('/api');
     let reqCSRF = httpTestingController.expectOne('/csrfhandler');
     expect(req.request.method).toEqual('PATCH');
@@ -101,12 +102,12 @@ describe('Request Interceptor Service', () => {
       source: document.URL,
       payload: JSON.stringify({data: 'test'}),
     });
-  });
+  }));
 
-  it('should not handle http requests when the body is null', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should not handle http requests when the body is null', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .get('/api')
@@ -115,6 +116,7 @@ describe('Request Interceptor Service', () => {
       .patch('/api2', {data: 'test'})
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     let req = httpTestingController.expectOne('/api');
     let req2 = httpTestingController.expectOne('/api2');
     let reqCSRF = httpTestingController.expectOne('/csrfhandler');
@@ -132,7 +134,7 @@ describe('Request Interceptor Service', () => {
       source: document.URL,
       payload: JSON.stringify({data: 'test'}),
     });
-  });
+  }));
 
   it('should throw error if csrf Token is not initialised', () => {
     spyOn(csrfTokenService, 'initializeToken').and.callFake(() => {
@@ -242,10 +244,10 @@ describe('Request Interceptor Service', () => {
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
   });
 
-  it('should not throw error if null param in POST request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should not throw error if null param in POST request', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .post(
@@ -255,16 +257,17 @@ describe('Request Interceptor Service', () => {
       )
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     const req = httpTestingController.expectOne('/api?key=null');
     req.flush({data: 'test'});
     let reqCSFR = httpTestingController.expectOne('/csrfhandler');
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
-  });
+  }));
 
-  it('should not throw error if null param in PUT request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should not throw error if null param in PUT request', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .put(
@@ -274,16 +277,17 @@ describe('Request Interceptor Service', () => {
       )
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     const req = httpTestingController.expectOne('/api?key=null');
     req.flush({data: 'test'});
     let reqCSFR = httpTestingController.expectOne('/csrfhandler');
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
-  });
+  }));
 
-  it('should not throw error if null param in PATCH request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
-      'sample-csrf-token',
-    ]);
+  it('should not throw error if null param in PATCH request', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     httpClient
       .patch(
@@ -293,9 +297,10 @@ describe('Request Interceptor Service', () => {
       )
       .subscribe(async response => expect(response).toBeTruthy());
 
+    flushMicrotasks();
     const req = httpTestingController.expectOne('/api?key=null');
     req.flush({data: 'test'});
     let reqCSFR = httpTestingController.expectOne('/csrfhandler');
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
-  });
+  }));
 });
