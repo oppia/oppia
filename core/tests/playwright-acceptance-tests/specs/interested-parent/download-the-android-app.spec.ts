@@ -19,24 +19,27 @@
  * IP.TP. Parent downloads the Android app
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Parent', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Parent', function () {
   let interestedParent: LoggedOutUser;
 
-  beforeAll(async function () {
-    interestedParent = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    interestedParent = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it('should be able to download the mobile app', async function () {
-    await interestedParent.navigateToSplashPage();
+  test('should be able to download the mobile app', async function () {
+    await interestedParent.navigateToSplashPageAsLoggedOutUser();
     await interestedParent.clickGetAndroidAppButtonInSplashPage();
 
     await interestedParent.clickOnPlayStoreImageInAndroidPageAndVerifyNavigation();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

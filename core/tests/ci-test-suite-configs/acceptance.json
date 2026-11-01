@@ -82,8 +82,8 @@
     },
     {
       "name": "interested-parent/download-the-android-app",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/download-the-android-app.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/download-the-android-app.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/learn-about-the-organization",
