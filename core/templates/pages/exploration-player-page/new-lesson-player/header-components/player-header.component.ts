@@ -31,6 +31,14 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UserService} from 'services/user.service';
+import {LessonExitService} from './lesson-exit.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {
+  LessonExitModalComponent,
+  LessonExitModalResult,
+} from './lesson-exit-modal.component';
 
 enum PageContextConstants {
   EXPLORATION_PAGE = 'exploration',
@@ -73,7 +81,11 @@ export class PlayerHeaderComponent {
     private mobileMenuService: MobileMenuService,
     private router: Router,
     private windowRef: WindowRef,
-    private accessValidationBackendApiService: AccessValidationBackendApiService
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
+    private ngbModal: NgbModal,
+    private userService: UserService,
+    private lessonExitService: LessonExitService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
@@ -229,36 +241,82 @@ export class PlayerHeaderComponent {
     );
   }
 
-  closePlayer(): void {
+  async closePlayer(): Promise<void> {
+    if (this.explorationContext !== PageContextConstants.EXPLORATION_PAGE) {
+      this.closeNonLessonPlayer();
+      return;
+    }
+
+    const userInfo = await this.userService.getUserInfoAsync();
+    const isLoggedIn = userInfo.isLoggedIn();
+    const username = userInfo.getUsername() || '';
+
+    // Logged-in learners can opt out of the modal. Logged-out learners can't,
+    // since the modal is where they are offered to save their progress.
+    if (isLoggedIn && this.lessonExitService.isExitModalHidden(username)) {
+      this.exitLesson();
+      return;
+    }
+
+    const modalRef = this.ngbModal.open(LessonExitModalComponent, {
+      backdrop: true,
+    });
+    modalRef.componentInstance.isLoggedIn = isLoggedIn;
+
+    modalRef.result.then(
+      (result: LessonExitModalResult) => {
+        if (result.action === 'sign-in') {
+          this.signInToSaveProgress();
+          return;
+        }
+        if (result.dontShowAgain) {
+          this.lessonExitService.hideExitModal(username);
+        }
+        this.exitLesson();
+      },
+      () => {
+        // The learner dismissed the modal, which means they stay in the lesson.
+      }
+    );
+  }
+
+  private exitLesson(): void {
+    this.router.navigateByUrl(this.lessonExitService.getExitUrl());
+  }
+
+  // Sends a logged-out learner to sign in. The intent is stored first because
+  // the lesson player reloads after sign-in and needs to know that the learner
+  // left through the exit modal (see NewConversationSkinComponent).
+  private signInToSaveProgress(): void {
+    this.lessonExitService.saveSignInIntent(this.explorationId);
+    this.preventPageUnloadEventService.removeListener();
+    this.userService.getLoginUrlAsync().then(
+      loginUrl => {
+        if (loginUrl) {
+          this.windowRef.nativeWindow.location.href = loginUrl;
+        } else {
+          this.windowRef.nativeWindow.location.reload();
+        }
+      },
+      () => {
+        this.lessonExitService.clearSignInIntent();
+      }
+    );
+  }
+
+  // Practice sessions and diagnostic tests keep the original confirmation.
+  private closeNonLessonPlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
     const confirmed = this.confirmExit();
-    if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
-      if (this.isLinkedToTopic) {
-        if (confirmed) {
-          this.router.navigate([
-            'learn',
-            this.classroomUrlFragment,
-            this.topicUrlFragment,
-            'story',
-            this.storyUrlFragment,
-          ]);
-        }
-      } else {
-        if (confirmed) {
-          this.router.navigate(['community-library']);
-        }
-      }
-    } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
-      const targetPath = pathnameArray.slice(1, 4);
-      if (confirmed) {
-        this.router.navigate(targetPath);
-      }
+    if (!confirmed) {
+      return;
+    }
+    if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
+      this.router.navigate(pathnameArray.slice(1, 4));
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
-      if (confirmed) {
-        this.router.navigate(['learn', this.classroomUrlFragment]);
-      }
+      this.router.navigate(['learn', this.classroomUrlFragment]);
     }
   }
 }

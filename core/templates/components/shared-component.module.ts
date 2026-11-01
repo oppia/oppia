@@ -228,6 +228,7 @@ import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson
 import {CheckpointBarComponent} from './checkpoint-bar/checkpoint-bar.component';
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
+import {LessonExitModalComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/lesson-exit-modal.component';
 
 @NgModule({
   imports: [
@@ -295,6 +296,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     PlayerHeaderComponent,
+    LessonExitModalComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -451,6 +453,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     PlayerHeaderComponent,
+    LessonExitModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,

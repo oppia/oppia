@@ -59,6 +59,7 @@ import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
+import {LessonExitService} from '../header-components/lesson-exit.service';
 import {MessengerService} from '../../../../services/messenger.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {UserService} from '../../../../services/user.service';
@@ -1546,6 +1547,103 @@ describe('New Conversation skin component', () => {
       ).toHaveBeenCalled();
     })
   );
+
+  describe('exit started from the exit modal before signing in', () => {
+    let lessonExitService: LessonExitService;
+
+    const setUpInit = (isLoggedIn: boolean): void => {
+      lessonExitService = TestBed.inject(LessonExitService);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo(
+            [],
+            false,
+            false,
+            false,
+            false,
+            false,
+            '',
+            '',
+            '',
+            isLoggedIn
+          )
+        )
+      );
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+        null
+      );
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(
+        localStorageService,
+        'getUniqueProgressIdOfLoggedOutLearner'
+      ).and.returnValue(null);
+      spyOn(componentInstance, 'initializePage');
+      spyOn(preventPageUnloadEventService, 'removeListener');
+    };
+
+    it('should leave for the topic page after a curated lesson learner signs in', fakeAsync(() => {
+      setUpInit(true);
+      spyOn(lessonExitService, 'consumeSignInIntent').and.returnValue({
+        explorationId: 'exp_id',
+        destinationUrl: '/learn/math/fractions/story',
+        createdAtMsec: Date.now(),
+      });
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(lessonExitService.consumeSignInIntent).toHaveBeenCalledWith(
+        'exp_id'
+      );
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.href).toBe(
+        '/learn/math/fractions/story'
+      );
+      expect(componentInstance.initializePage).not.toHaveBeenCalled();
+    }));
+
+    it('should leave for the learner dashboard after a community lesson learner signs in', fakeAsync(() => {
+      setUpInit(true);
+      spyOn(lessonExitService, 'consumeSignInIntent').and.returnValue({
+        explorationId: 'exp_id',
+        destinationUrl: '/learner-dashboard',
+        createdAtMsec: Date.now(),
+      });
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(windowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+      expect(componentInstance.initializePage).not.toHaveBeenCalled();
+    }));
+
+    it('should keep playing when there is no pending exit intent', fakeAsync(() => {
+      setUpInit(true);
+      spyOn(lessonExitService, 'consumeSignInIntent').and.returnValue(null);
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(componentInstance.initializePage).toHaveBeenCalled();
+    }));
+
+    it('should discard the intent when the learner is still logged out', fakeAsync(() => {
+      setUpInit(false);
+      spyOn(lessonExitService, 'clearSignInIntent');
+      spyOn(lessonExitService, 'consumeSignInIntent');
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
+      expect(lessonExitService.consumeSignInIntent).not.toHaveBeenCalled();
+      expect(componentInstance.initializePage).toHaveBeenCalled();
+    }));
+  });
 
   it('should show alert when collection summaries are not loaded', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(

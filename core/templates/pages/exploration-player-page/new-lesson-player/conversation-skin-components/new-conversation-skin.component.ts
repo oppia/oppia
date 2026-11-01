@@ -39,6 +39,7 @@ import {QuestionPlayerEngineService} from '../../services/question-player-engine
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
+import {LessonExitService} from '../header-components/lesson-exit.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -134,6 +135,7 @@ export class NewConversationSkinComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
+    private lessonExitService: LessonExitService,
     private currentEngineService: CurrentEngineService,
     private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private windowDimensionsService: WindowDimensionsService,
@@ -335,6 +337,20 @@ export class NewConversationSkinComponent {
           pid
         );
         this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+      }
+
+      if (this.isLoggedIn) {
+        const exitIntent = this.lessonExitService.consumeSignInIntent(
+          this.explorationId
+        );
+        if (exitIntent) {
+          this.preventPageUnloadEventService.removeListener();
+          this.windowRef.nativeWindow.location.href = exitIntent.destinationUrl;
+          return;
+        }
+      } else {
+        // The learner came back without signing in, so the intent is void.
+        this.lessonExitService.clearSignInIntent();
       }
 
       this.cardAnimationService.adjustPageHeightOnresize();

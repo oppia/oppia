@@ -49,6 +49,11 @@ import {AccessValidationBackendApiService} from '../../../oppia-root/routing/acc
 import {CapitalizePipe} from '../../../../filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from '../../../../domain/classroom/classroom-backend-api.service';
 import {StoryViewerBackendApiService} from '../../../../domain/story_viewer/story-viewer-backend-api.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UserService} from '../../../../services/user.service';
+import {PreventPageUnloadEventService} from '../../../../services/prevent-page-unload-event.service';
+import {LessonExitService} from './lesson-exit.service';
+import {LessonExitModalComponent} from './lesson-exit-modal.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -67,6 +72,35 @@ class MockWindowRef {
 
 class MockRouter {
   navigate = jasmine.createSpy('navigate');
+  navigateByUrl = jasmine.createSpy('navigateByUrl');
+}
+
+class MockUserService {
+  isLoggedIn = false;
+  username: string | null = null;
+  getUserInfoAsync = jasmine.createSpy('getUserInfoAsync').and.callFake(() =>
+    Promise.resolve({
+      isLoggedIn: () => this.isLoggedIn,
+      getUsername: () => this.username,
+    })
+  );
+  getLoginUrlAsync = jasmine
+    .createSpy('getLoginUrlAsync')
+    .and.returnValue(Promise.resolve('/login?return_url=/lesson/expId'));
+}
+
+class MockLessonExitService {
+  getExitUrl = jasmine.createSpy('getExitUrl').and.returnValue('/exit-url');
+  isExitModalHidden = jasmine
+    .createSpy('isExitModalHidden')
+    .and.returnValue(false);
+  hideExitModal = jasmine.createSpy('hideExitModal');
+  saveSignInIntent = jasmine.createSpy('saveSignInIntent');
+  clearSignInIntent = jasmine.createSpy('clearSignInIntent');
+}
+
+class MockPreventPageUnloadEventService {
+  removeListener = jasmine.createSpy('removeListener');
 }
 
 class MockAccessValidationBackendApiService {
@@ -134,6 +168,12 @@ describe('Lesson player header component', () => {
         MobileMenuService,
         {provide: WindowRef, useValue: windowRefInstance},
         {provide: Router, useClass: MockRouter},
+        {provide: UserService, useClass: MockUserService},
+        {provide: LessonExitService, useClass: MockLessonExitService},
+        {
+          provide: PreventPageUnloadEventService,
+          useClass: MockPreventPageUnloadEventService,
+        },
         {
           provide: AccessValidationBackendApiService,
           useClass: MockAccessValidationBackendApiService,
@@ -568,54 +608,175 @@ describe('Lesson player header component', () => {
   });
 
   describe('closePlayer', () => {
-    it('should navigate to story page for linked exploration when confirmed', () => {
+    let ngbModal: NgbModal;
+    let userService: MockUserService;
+    let lessonExitService: MockLessonExitService;
+    let preventPageUnloadEventService: MockPreventPageUnloadEventService;
+    let modalResult: Promise<unknown>;
+    let modalComponentInstance: {isLoggedIn?: boolean};
+
+    beforeEach(() => {
+      ngbModal = TestBed.inject(NgbModal);
+      userService = TestBed.inject(UserService) as unknown as MockUserService;
+      lessonExitService = TestBed.inject(
+        LessonExitService
+      ) as unknown as MockLessonExitService;
+      preventPageUnloadEventService = TestBed.inject(
+        PreventPageUnloadEventService
+      ) as unknown as MockPreventPageUnloadEventService;
+      componentInstance.explorationId = 'expId';
       componentInstance.explorationContext =
         componentInstance.explorationContextConstants.EXPLORATION_PAGE;
-      componentInstance.isLinkedToTopic = true;
-      componentInstance.classroomUrlFragment = 'classroom1';
-      componentInstance.topicUrlFragment = 'topic1';
-      componentInstance.storyUrlFragment = 'story1';
-      spyOn(componentInstance, 'confirmExit').and.returnValue(true);
-
-      componentInstance.closePlayer();
-
-      expect(router.navigate).toHaveBeenCalledWith([
-        'learn',
-        'classroom1',
-        'topic1',
-        'story',
-        'story1',
-      ]);
+      modalComponentInstance = {};
+      modalResult = Promise.resolve({action: 'exit', dontShowAgain: false});
+      spyOn(ngbModal, 'open').and.callFake(
+        () =>
+          ({
+            componentInstance: modalComponentInstance,
+            result: modalResult,
+          }) as never
+      );
     });
 
-    it('should not navigate when user cancels for linked exploration', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
-      componentInstance.isLinkedToTopic = true;
-      spyOn(componentInstance, 'confirmExit').and.returnValue(false);
+    it('should open the exit modal for a logged-in learner', fakeAsync(() => {
+      userService.isLoggedIn = true;
 
       componentInstance.closePlayer();
+      tick();
 
-      expect(router.navigate).not.toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalledWith(LessonExitModalComponent, {
+        backdrop: true,
+      });
+      expect(modalComponentInstance.isLoggedIn).toBeTrue();
+    }));
 
-    it('should navigate to community library for non-linked exploration when confirmed', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
-      componentInstance.isLinkedToTopic = false;
-      spyOn(componentInstance, 'confirmExit').and.returnValue(true);
+    it('should open the exit modal for a logged-out learner', fakeAsync(() => {
+      userService.isLoggedIn = false;
 
       componentInstance.closePlayer();
+      tick();
 
-      expect(router.navigate).toHaveBeenCalledWith(['community-library']);
-    });
+      expect(modalComponentInstance.isLoggedIn).toBeFalse();
+    }));
+
+    it('should navigate to the exit url when the learner confirms', fakeAsync(() => {
+      componentInstance.closePlayer();
+      tick();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/exit-url');
+      expect(lessonExitService.hideExitModal).not.toHaveBeenCalled();
+    }));
+
+    it("should remember 'don't show again' for a logged-in learner", fakeAsync(() => {
+      userService.isLoggedIn = true;
+      userService.username = 'learner';
+      modalResult = Promise.resolve({action: 'exit', dontShowAgain: true});
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.hideExitModal).toHaveBeenCalledWith('learner');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/exit-url');
+    }));
+
+    it('should use an empty username when the user has none', fakeAsync(() => {
+      userService.isLoggedIn = true;
+      userService.username = null;
+      modalResult = Promise.resolve({action: 'exit', dontShowAgain: true});
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.hideExitModal).toHaveBeenCalledWith('');
+    }));
+
+    it('should skip the modal for a logged-in learner who opted out', fakeAsync(() => {
+      userService.isLoggedIn = true;
+      userService.username = 'learner';
+      lessonExitService.isExitModalHidden.and.returnValue(true);
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.isExitModalHidden).toHaveBeenCalledWith(
+        'learner'
+      );
+      expect(ngbModal.open).not.toHaveBeenCalled();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/exit-url');
+    }));
+
+    it('should never skip the modal for a logged-out learner', fakeAsync(() => {
+      userService.isLoggedIn = false;
+      lessonExitService.isExitModalHidden.and.returnValue(true);
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should exit without saving for a logged-out learner', fakeAsync(() => {
+      modalResult = Promise.resolve({
+        action: 'exit-without-saving',
+        dontShowAgain: false,
+      });
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/exit-url');
+      expect(userService.getLoginUrlAsync).not.toHaveBeenCalled();
+    }));
+
+    it('should stay in the lesson when the modal is dismissed', fakeAsync(() => {
+      modalResult = Promise.reject('dismissed');
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+      expect(userService.getLoginUrlAsync).not.toHaveBeenCalled();
+    }));
+
+    it('should save progress intent and redirect to sign in', fakeAsync(() => {
+      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.saveSignInIntent).toHaveBeenCalledWith('expId');
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.href).toBe(
+        '/login?return_url=/lesson/expId'
+      );
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+    }));
+
+    it('should reload when no sign in url is returned', fakeAsync(() => {
+      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
+      userService.getLoginUrlAsync.and.returnValue(Promise.resolve(''));
+      mockWindowRef.nativeWindow.location.reload = jasmine.createSpy('reload');
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    }));
+
+    it('should clear the intent when fetching the sign in url fails', fakeAsync(() => {
+      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
+      userService.getLoginUrlAsync.and.returnValue(Promise.reject('offline'));
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
+    }));
 
     it('should navigate to practice page parent for practice session when confirmed', () => {
       mockWindowRef.setPathname('/learn/classroom1/topic1/practice');
       componentInstance.explorationContext =
         componentInstance.explorationContextConstants.PRACTICE_PAGE;
-      componentInstance.classroomUrlFragment = 'classroom1';
-      componentInstance.topicUrlFragment = 'topic1';
       spyOn(componentInstance, 'confirmExit').and.returnValue(true);
 
       componentInstance.closePlayer();
@@ -625,6 +786,7 @@ describe('Lesson player header component', () => {
         'classroom1',
         'topic1',
       ]);
+      expect(ngbModal.open).not.toHaveBeenCalled();
     });
 
     it('should navigate to classroom page for diagnostic test when confirmed', () => {
@@ -639,7 +801,7 @@ describe('Lesson player header component', () => {
       expect(router.navigate).toHaveBeenCalledWith(['learn', 'classroom1']);
     });
 
-    it('should not navigate when user cancels for any context', () => {
+    it('should not navigate when user cancels for practice or diagnostic', () => {
       componentInstance.explorationContext =
         componentInstance.explorationContextConstants.DIAGNOSTIC_PAGE;
       spyOn(componentInstance, 'confirmExit').and.returnValue(false);
