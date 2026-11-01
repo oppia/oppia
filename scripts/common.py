@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import enum
 import errno
 import getpass
 import io
@@ -38,6 +39,58 @@ from typing import Dict, Final, Generator, List, Literal, Optional, Tuple, Union
 
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
+
+class LogType(enum.Enum):
+    """Enum for terminal log message types with associated ANSI color codes."""
+
+    INFO = '\033[94m'
+    ERROR = '\033[91m'
+    SUCCESS = '\033[92m'
+    WARNING = '\033[93m'
+
+
+# Keywords that trigger automatic color detection in log_to_terminal() when
+# no explicit LogType is provided.
+_ERROR_KEYWORDS: Final = ('error', 'fail', 'exception', 'traceback')
+_WARNING_KEYWORDS: Final = ('warning', 'warn')
+_SUCCESS_KEYWORDS: Final = ('success', 'passed', 'done', 'completed')
+
+# ANSI escape sequence for resetting all text formatting.
+ANSI_RESET_CODE: Final = '\033[0m'
+
+
+def log_to_terminal(
+    message: str, message_type: Optional[LogType] = None
+) -> None:
+    """Prints a message to the terminal with optional color formatting.
+
+    If message_type is provided, the message is printed in the color
+    corresponding to that LogType. If message_type is not provided, the
+    function auto-detects keywords in the message (e.g. 'error', 'warning',
+    'success') and applies the appropriate color. If no keyword matches, the
+    message is printed without any color formatting.
+
+    Args:
+        message: str. The message to print.
+        message_type: Optional[LogType]. The log type that determines the
+            color of the message. If None, auto-detection based on keywords
+            is used.
+    """
+    if message_type is None:
+        message_lower = message.lower()
+        if any(keyword in message_lower for keyword in _ERROR_KEYWORDS):
+            message_type = LogType.ERROR
+        elif any(keyword in message_lower for keyword in _WARNING_KEYWORDS):
+            message_type = LogType.WARNING
+        elif any(keyword in message_lower for keyword in _SUCCESS_KEYWORDS):
+            message_type = LogType.SUCCESS
+
+    if message_type is not None:
+        print('%s%s%s' % (message_type.value, message, ANSI_RESET_CODE))
+    else:
+        print(message)
+
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
