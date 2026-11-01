@@ -162,6 +162,20 @@ const editWorkedExampleModalQuestionRte =
 const editWorkedExampleModalAnswerRte =
   '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
 const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
+const subtopicStudyGuideHeadingField =
+  '.e2e-test-new-subtopic-study-guide-section-heading-field';
+const subtopicStudyGuideContentField =
+  '.e2e-test-create-subtopic-page-content-rich-text-editor';
+const showStudyGuideSectionsList = '.e2e-test-show-study-guide-sections-list';
+const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
+const addStudyGuideSectionModalHeading =
+  '.e2e-test-add-study-guide-section-modal-heading-field';
+const addStudyGuideSectionModalContent =
+  '.e2e-test-add-study-guide-section-modal-content-field';
+const addStudyGuideSectionModalSaveButton =
+  '.e2e-test-add-study-guide-section-modal-save-button';
+const studyGuideSectionTileSelector = (sectionIndex: number): string =>
+  `.e2e-test-study-guide-section-${sectionIndex}`;
 
 export class TopicManager extends BaseUser {
   /**
@@ -661,6 +675,123 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Inserts a worked example ("Type the number one" / "1") into the rich text
+   * editor that is currently open.
+   */
+  async insertWorkedExampleInOpenRte(): Promise<void> {
+    await this.clickOnElementWithSelector(insertWorkedExampleButton);
+    await this.expectElementToBeVisible(editWorkedExampleModalQuestionRte);
+    await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+    await this.typeInInputField(
+      editWorkedExampleModalQuestionRte,
+      'Type the number one'
+    );
+    await this.expectElementToBeVisible(editWorkedExampleModalAnswerRte);
+    await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+    await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+    await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
+    await this.clickOnElementWithSelector(rteComponentSaveButton);
+    await this.expectElementToBeVisible(rteComponentSaveButton, false);
+  }
+
+  /**
+   * Creates a subtopic whose study guide has one initial section. This
+   * requires the "show_restructured_study_guides" feature flag to be enabled,
+   * since the heading and content fields only exist in that version of the
+   * create subtopic modal. The topic draft is not saved.
+   * @param {string} title - The title of the subtopic.
+   * @param {string} urlFragment - The url fragment of the subtopic.
+   * @param {string} heading - The heading of the first study guide section.
+   * @param {string} content - The content of the first study guide section.
+   * @param {string} topicName - The name of the topic the subtopic belongs to.
+   * @param {boolean} addWorkedExample - Whether to add a worked example to the
+   * first section.
+   */
+  async createSubtopicWithStudyGuideForTopic(
+    title: string,
+    urlFragment: string,
+    heading: string,
+    content: string,
+    topicName: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(subtopicReassignHeader);
+    }
+    await this.clickOnElementWithSelector(addSubtopicButton);
+    await this.typeInInputField(subtopicTitleField, title);
+    await this.expectElementToBeVisible(subtopicUrlFragmentField);
+    await this.typeInInputField(subtopicUrlFragmentField, urlFragment);
+
+    await this.expectElementToBeVisible(subtopicStudyGuideHeadingField);
+    await this.typeInInputField(subtopicStudyGuideHeadingField, heading);
+    await this.clickOnElementWithSelector(subtopicStudyGuideContentField);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, content);
+    if (addWorkedExample) {
+      await this.insertWorkedExampleInOpenRte();
+    }
+
+    await this.clickOnElementWithSelector(subtopicPhotoBoxButton);
+    await this.expectElementToBeVisible(photoUploadModal);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.expectElementToBeVisible(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(uploadPhotoButton);
+    await this.expectElementToBeVisible(photoUploadModal, false);
+
+    await this.clickOnElementWithSelector(createSubtopicButton);
+    await this.expectElementToBeVisible(modalDiv, false);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(showStudyGuideSectionsList);
+    }
+    await this.expectElementToBeVisible(studyGuideSectionTileSelector(0));
+    showMessage(`Subtopic ${title} with a study guide is created.`);
+  }
+
+  /**
+   * Adds a section to the study guide of the subtopic that is currently open
+   * in the subtopic editor.
+   * @param {string} sectionHeading - The heading of the new section.
+   * @param {string} sectionContent - The content of the new section.
+   * @param {number} currentNumberOfSections - How many sections the study
+   * guide has before this one is added.
+   */
+  async addSubtopicStudyGuideSection(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addStudyGuideSectionButton);
+    await this.expectElementToBeVisible(addStudyGuideSectionModalHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalContent);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, sectionContent);
+    await this.clickOnElementWithSelector(addStudyGuideSectionModalSaveButton);
+    await this.expectElementToBeVisible(
+      addStudyGuideSectionModalSaveButton,
+      false
+    );
+
+    // Section tiles are 0-indexed, so the new section's index equals the
+    // number of sections that existed before it.
+    const newSectionTile = studyGuideSectionTileSelector(
+      currentNumberOfSections
+    );
+    if (!(await this.isElementVisible(newSectionTile))) {
+      throw new Error(
+        `Study guide section "${sectionHeading}" was not added. Expected ` +
+          `${newSectionTile} to be visible after saving the new section.`
+      );
+    }
+    showMessage(`Study guide section ${sectionHeading} is added.`);
+  }
+
+  /**
    * Create a subtopic as a curriculum admin.
    * @param {string} title - The title of the Subtopic.
    * @param {string} urlFragment - The url fragment of the Subtopic.
@@ -844,18 +975,7 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(richTextAreaField);
     await this.typeInInputField(richTextAreaField, reviewMaterial);
     if (addWorkedExample) {
-      await this.clickOnElementWithSelector(insertWorkedExampleButton);
-      await this.expectElementToBeVisible(editWorkedExampleModalQuestionRte);
-      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.typeInInputField(
-        editWorkedExampleModalQuestionRte,
-        'Type the number one'
-      );
-      await this.expectElementToBeVisible(editWorkedExampleModalAnswerRte);
-      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
-      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
-      await this.clickOnElementWithSelector(rteComponentSaveButton);
+      await this.insertWorkedExampleInOpenRte();
     }
     await this.expectElementToBeVisible(
       `${confirmSkillCreationButton}:not([disabled])`
