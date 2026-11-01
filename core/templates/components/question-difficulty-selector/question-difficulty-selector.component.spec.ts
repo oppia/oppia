@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatRadioChange, _MatRadioButtonBase} from '@angular/material/radio';
+import {Rubric} from 'domain/skill/rubric.model';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {QuestionDifficultySelectorComponent} from './question-difficulty-selector.component';
 
@@ -68,18 +67,18 @@ describe('QuestionDifficultySelectorComponent', () => {
     component.skillWithDifficulty = new SkillDifficulty('skill_1', '', 0.6);
     component.skillIdToRubricsObject = {
       skill_1: [
-        {
+        Rubric.createFromBackendDict({
           difficulty: 'easy',
           explanations: ['Explanation'],
-        } as never,
+        }),
       ],
     };
 
     expect(component.getRubricsForSkill()).toEqual([
-      {
+      Rubric.createFromBackendDict({
         difficulty: 'easy',
         explanations: ['Explanation'],
-      },
+      }),
     ]);
   });
 });
