@@ -62,6 +62,8 @@ export interface ExplorationBackendDict {
   next_content_id_index: number;
   edits_allowed?: boolean;
   exploration_metadata: ExplorationMetadataBackendDict;
+  displayable_language_codes?: string[];
+  preferred_language_codes?: string[];
 }
 
 export class Exploration extends BaseTranslatableObject {
