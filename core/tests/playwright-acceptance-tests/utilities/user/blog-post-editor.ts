@@ -229,6 +229,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Fills the bio in the register modal shown when first visiting the blog
    * dashboard.
+   * @param {string} bio - The bio to enter in the register modal.
    */
   async updateUserBioInRegisterModal(bio: string): Promise<void> {
     await this.expectElementToBeVisible(blogAuthorBioField);
@@ -240,6 +241,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Fills the username in the register modal shown when first visiting the
    * blog dashboard.
+   * @param {string} username - The username to enter in the register modal.
    */
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameInputSelector);
@@ -260,6 +262,8 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Checks the disabled/enabled state of the Save button in the profile
    * register modal.
+   * @param {'disabled' | 'enabled' | 'hidden'} status - The expected state of
+   *     the register button.
    */
   async expectRegisterButtonToBe(
     status: 'disabled' | 'enabled' | 'hidden'
@@ -275,6 +279,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Checks whether the "+ Blog Post" (new post) button is visible.
+   * @param {boolean} visible - Whether the button should be visible.
    */
   async expectNewBlogPostButtonToBeVisible(
     visible: boolean = true
@@ -284,6 +289,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Checks whether the "Create new blog post" (first post) button is visible.
+   * @param {boolean} visible - Whether the button should be visible.
    */
   async expectFirstBlogPostButtonToBeVisible(
     visible: boolean = true
@@ -313,6 +319,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Checks the error message that appears when an invalid image is uploaded.
+   * @param {string} expectedMessage - The expected error message.
    */
   async expectPhotoUploadErrorMessageToBe(
     expectedMessage: string
@@ -326,6 +333,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Checks that the title validation help text contains the given string.
+   * @param {string} helpText - The expected help text.
    */
   async expectBlogTitleHelpToContain(helpText: string): Promise<void> {
     await this.expectElementToBeVisible(blogTitleHelpSelector);
@@ -410,6 +418,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Checks that the currently selected tab header in the blog dashboard
    * matches the given text (e.g. 'DRAFTS (1)').
+   * @param {string} expectedHeader - The expected tab header text.
    */
   async expectCurrentMatTabHeaderToBe(expectedHeader: string): Promise<void> {
     const activeTabSelector = '.mat-tab-label-active .mat-tab-label-content';
@@ -435,6 +444,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Clicks the tiles-view or list-view toggle button and verifies the
    * corresponding container becomes visible.
+   * @param {'tiles' | 'list'} view - The view mode to switch to.
    */
   async changeBlogPostViewTo(view: 'tiles' | 'list'): Promise<void> {
     const selector = `.e2e-test-${view}-view-button`;
@@ -447,6 +457,8 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Clicks the edit (three-dots) menu for a draft post with the given title
    * and then clicks the Edit button.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post to
+   *     edit.
    */
   async editDraftBlogPostWithTitle(draftBlogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(listOfBlogsInBlogDashboard);
@@ -472,6 +484,8 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Deletes the draft blog post with the given title via its three-dots menu.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post to
+   *     delete.
    */
   async deleteDraftBlogPostWithTitle(
     draftBlogPostTitle: string
@@ -505,6 +519,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * Checks that the blog post with the given title appears on the blog page.
+   * @param {string} blogPostTitle - The title of the blog post to check for.
    */
   async expectBlogPostToBePresent(blogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(blogPostTitleSelector);
