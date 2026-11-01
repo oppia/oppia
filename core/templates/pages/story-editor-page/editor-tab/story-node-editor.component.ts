@@ -35,9 +35,11 @@ import {
   TopicsAndSkillsDashboardBackendApiService,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
@@ -133,7 +135,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     private storyUpdateService: StoryUpdateService,
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
   ) {}
 
   isSerialChapterFeatureFlagEnabled(): boolean {
@@ -192,6 +196,18 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   getSkillEditorUrl(skillId: string): string {
     return '/skill_editor/' + skillId;
+  }
+
+  // An absolute URL is returned because it is also shown as the link
+  // text, so that the full address of the exploration editor is
+  // visible to the user.
+  getExplorationEditorUrl(explorationId: string): string {
+    return (
+      this.windowRef.nativeWindow.location.origin +
+      this.urlInterpolationService.interpolateUrl('/create/<exploration_id>', {
+        exploration_id: explorationId,
+      })
+    );
   }
 
   getSkillsDescription(
