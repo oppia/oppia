@@ -61,10 +61,8 @@ import {CurrentEngineService} from './current-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {LearnerParamsService} from './learner-params.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryDict,
-} from '../../../domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from '../../../domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
@@ -1073,11 +1071,7 @@ describe('Conversation flow service', () => {
     spyOn(
       explorationSummaryBackendApiService,
       'loadPublicExplorationSummariesAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        summaries: [{} as ExplorationSummaryDict],
-      })
-    );
+    ).and.returnValue(Promise.resolve([{} as LearnerExplorationSummary]));
     spyOn(
       refresherExplorationConfirmationModalService,
       'displayRedirectConfirmationModal'

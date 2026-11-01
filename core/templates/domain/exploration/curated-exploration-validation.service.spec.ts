@@ -23,16 +23,17 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {CuratedExplorationValidationService} from 'domain/exploration/curated-exploration-validation.service';
-import {
-  ExplorationSummaryBackendDict,
-  ExplorationSummaryDict,
-} from 'domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Curated exploration validation service', () => {
   let curatedExplorationValidationService: CuratedExplorationValidationService;
   let httpTestingController: HttpTestingController;
-  let validExpResultsWithCustomCategory: ExplorationSummaryBackendDict;
-  let validExpResultsWithDefaultCategory: ExplorationSummaryBackendDict;
+  let validExpResultsWithCustomCategory: {
+    summaries: LearnerExplorationSummaryBackendDict[];
+  };
+  let validExpResultsWithDefaultCategory: {
+    summaries: LearnerExplorationSummaryBackendDict[];
+  };
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
 
@@ -77,9 +78,7 @@ describe('Curated exploration validation service', () => {
           thumbnail_icon_url: '/subjects/Lightbulb.svg',
           community_owned: true,
           title: 'Test of all interactions',
-          num_total_threads: 0,
-          num_open_threads: 0,
-        } as ExplorationSummaryDict,
+        },
       ],
     };
     validExpResultsWithDefaultCategory = {
@@ -107,9 +106,7 @@ describe('Curated exploration validation service', () => {
           thumbnail_icon_url: '/subjects/Lightbulb.svg',
           community_owned: true,
           title: 'Test of all interactions',
-          num_total_threads: 0,
-          num_open_threads: 0,
-        } as ExplorationSummaryDict,
+        },
       ],
     };
   });
@@ -141,26 +138,18 @@ describe('Curated exploration validation service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     // The service should respond false when the summaries array
-    // contains null.
-    curatedExplorationValidationService
-      .isExpPublishedAsync('0')
-      .then(successHandler, failHandler);
-    req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({summaries: [null]});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(false);
-    expect(failHandler).not.toHaveBeenCalled();
-
-    // The service should respond false when the summaries array
     // contains more than one element.
     curatedExplorationValidationService
       .isExpPublishedAsync('0')
       .then(successHandler, failHandler);
     req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({summaries: ['exp1', 'exp2']});
+    req.flush({
+      summaries: [
+        validExpResultsWithCustomCategory.summaries[0],
+        validExpResultsWithDefaultCategory.summaries[0],
+      ],
+    });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);

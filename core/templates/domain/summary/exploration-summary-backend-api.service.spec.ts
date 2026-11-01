@@ -25,6 +25,10 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
@@ -105,14 +109,36 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should load public exploration summaries from backend', fakeAsync(() => {
     const explorationIds = ['0', '1', '2'];
-    const sampleResults = [
+    const sampleResults: LearnerExplorationSummaryBackendDict[] = [
       {
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '0',
+        last_updated_msec: 1000,
+        created_on_msec: 500,
+        num_views: 10,
+        objective: 'Objective 1',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
       },
     ];
+
+    const expectedResults = sampleResults.map(summary =>
+      LearnerExplorationSummary.createFromBackendDict(summary)
+    );
 
     const requestUrl =
       '/explorationsummarieshandler/data?' +
@@ -127,30 +153,70 @@ describe('Exploration Summary Backend Api Service', () => {
 
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleResults);
+    req.flush({summaries: sampleResults});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    expect(successHandler).toHaveBeenCalledWith(expectedResults);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
   it('should load public and private exploration summaries from backend', fakeAsync(() => {
     const explorationIds = ['0', '1', '2'];
-    const sampleResults = [
+    const sampleResults: LearnerExplorationSummaryBackendDict[] = [
       {
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '0',
+        last_updated_msec: 1000,
+        created_on_msec: 500,
+        num_views: 10,
+        objective: 'Objective 1',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
       },
       {
         title: 'Title 2',
         category: 'Category 2',
         status: 'private',
         language_code: 'en',
+        activity_type: 'exploration',
+        community_owned: false,
+        human_readable_contributors_summary: {},
+        id: '1',
+        last_updated_msec: 2000,
+        created_on_msec: 1000,
+        num_views: 20,
+        objective: 'Objective 2',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        thumbnail_bg_color: '#ffffff',
+        thumbnail_icon_url: '/icon.svg',
       },
     ];
+
+    const expectedResults = sampleResults.map(summary =>
+      LearnerExplorationSummary.createFromBackendDict(summary)
+    );
 
     const requestUrl =
       '/explorationsummarieshandler/data?' +
@@ -165,11 +231,11 @@ describe('Exploration Summary Backend Api Service', () => {
 
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleResults);
+    req.flush({summaries: sampleResults});
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    expect(successHandler).toHaveBeenCalledWith(expectedResults);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

@@ -43,10 +43,9 @@ export class AttributionService {
         this.pageContextService.getExplorationId(),
       ])
       .then(
-        responseObject => {
-          let summaries = responseObject.summaries;
+        summaries => {
           let contributorSummary = summaries.length
-            ? summaries[0].human_readable_contributors_summary
+            ? summaries[0].humanReadableContributorsSummary
             : ({} as HumanReadableContributorsSummary);
           this.authors = Object.keys(contributorSummary).sort(
             (contributorUsername1, contributorUsername2) => {
