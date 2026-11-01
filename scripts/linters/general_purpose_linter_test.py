@@ -585,6 +585,42 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('General purpose lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
+    def test_package_json_changed_without_yarn_lock_fails(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['package.json'], FILE_CACHE
+        )
+        lint_task_report = linter.check_yarn_lock_updated_with_package_json()
+
+        self.assert_same_list_elements(
+            [
+                'package.json was changed, but yarn.lock was not. Please update '
+                'yarn.lock whenever package.json is changed.'
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Yarn lock update', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_package_json_and_yarn_lock_changed_passes(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['package.json', 'yarn.lock'], FILE_CACHE
+        )
+        lint_task_report = linter.check_yarn_lock_updated_with_package_json()
+
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Yarn lock update', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_yarn_lock_check_ignores_unrelated_files(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['README.md'], FILE_CACHE
+        )
+        lint_task_report = linter.check_yarn_lock_updated_with_package_json()
+
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Yarn lock update', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
     def test_file_with_no_newline_at_eof(self) -> None:
         temp_file = tempfile.NamedTemporaryFile(
             mode='w+', suffix='.py', delete=False
