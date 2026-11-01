@@ -52,8 +52,8 @@
     },
     {
       "name": "interested-partner-organization/view-the-blog",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
@@ -62,13 +62,13 @@
     },
     {
       "name": "interested-donor/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-donor/make-a-donation",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/make-a-donation.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-donor/make-a-donation.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/attempt-to-contact-the-organization",
@@ -87,13 +87,13 @@
     },
     {
       "name": "interested-parent/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/sign-up-for-oppias-newsletter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/sign-up-for-oppias-newsletter.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/sign-up-for-oppias-newsletter.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked",
@@ -187,8 +187,8 @@
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/view-subtopic-study-guides",
@@ -212,8 +212,8 @@
     },
     {
       "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-links-on-get-started-page",
