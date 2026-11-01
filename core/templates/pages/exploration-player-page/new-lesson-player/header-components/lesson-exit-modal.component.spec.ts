@@ -159,16 +159,18 @@ describe('Lesson exit modal in a bottom sheet', () => {
   let fixture: ComponentFixture<LessonExitModalComponent>;
   let component: LessonExitModalComponent;
   let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
-  let keydownEvents: Subject<{key: string}>;
+  let keydownEvents: Subject<KeyboardEvent>;
   let sheetData: {isLoggedIn: boolean};
 
   beforeEach(waitForAsync(() => {
-    keydownEvents = new Subject<{key: string}>();
+    keydownEvents = new Subject<KeyboardEvent>();
     sheetData = {isLoggedIn: false};
+
     bottomSheetRef = jasmine.createSpyObj<MatBottomSheetRef>(
       'MatBottomSheetRef',
       ['dismiss', 'keydownEvents']
     );
+
     bottomSheetRef.keydownEvents.and.returnValue(keydownEvents.asObservable());
 
     TestBed.configureTestingModule({
@@ -195,7 +197,7 @@ describe('Lesson exit modal in a bottom sheet', () => {
 
     fixture.detectChanges();
 
-    expect(component.isLoggedIn).toBeTrue();
+    expect(component.isLoggedIn).toBe(true);
     expect(query('.e2e-test-lesson-exit-saved-text')).not.toBeNull();
     expect(query('.e2e-test-lesson-exit-lost-text')).toBeNull();
   });
@@ -205,7 +207,7 @@ describe('Lesson exit modal in a bottom sheet', () => {
 
     fixture.detectChanges();
 
-    expect(component.isLoggedIn).toBeFalse();
+    expect(component.isLoggedIn).toBe(false);
     expect(query('.e2e-test-lesson-exit-lost-text')).not.toBeNull();
   });
 
@@ -246,7 +248,7 @@ describe('Lesson exit modal in a bottom sheet', () => {
   it('should dismiss the sheet when Escape is pressed', () => {
     fixture.detectChanges();
 
-    keydownEvents.next({key: 'Escape'});
+    keydownEvents.next(new KeyboardEvent('keydown', {key: 'Escape'}));
 
     expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   });

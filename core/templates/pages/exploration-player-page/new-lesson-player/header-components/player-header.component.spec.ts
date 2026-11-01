@@ -60,9 +60,11 @@ import {LessonExitModalComponent} from './lesson-exit-modal.component';
 
 class MockWindowRef {
   nativeWindow = {
+    innerWidth: 1024,
     location: {
       pathname: '/explore/expId',
       href: '',
+      reload: jasmine.createSpy('reload'),
     },
     confirm: jasmine.createSpy('confirm').and.returnValue(true),
     gtag: jasmine.createSpy('gtag'),
@@ -641,6 +643,7 @@ describe('Lesson player header component', () => {
     let userService: MockUserService;
     let lessonExitService: MockLessonExitService;
     let preventPageUnloadEventService: MockPreventPageUnloadEventService;
+    let localStorageService: LocalStorageService;
     let modalResult: Promise<unknown>;
     let modalComponentInstance: {isLoggedIn?: boolean};
 
@@ -653,6 +656,7 @@ describe('Lesson player header component', () => {
       preventPageUnloadEventService = TestBed.inject(
         PreventPageUnloadEventService
       ) as unknown as MockPreventPageUnloadEventService;
+      localStorageService = TestBed.inject(LocalStorageService);
       componentInstance.explorationId = 'expId';
       componentInstance.explorationContext =
         componentInstance.explorationContextConstants.EXPLORATION_PAGE;
@@ -665,6 +669,17 @@ describe('Lesson player header component', () => {
             result: modalResult,
           }) as never
       );
+      // The sign in flow saves logged-out progress first, which loads the
+      // latest exploration. Without this stub the call goes to the real
+      // service and never resolves under HttpClientTestingModule.
+      spyOn(
+        readOnlyExplorationBackendApiService,
+        'loadLatestExplorationAsync'
+      ).and.returnValue(Promise.resolve({version: 7} as never));
+    });
+
+    afterEach(() => {
+      localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
     });
 
     it('should open the exit modal for a logged-in learner', fakeAsync(() => {
@@ -674,9 +689,9 @@ describe('Lesson player header component', () => {
       tick();
 
       expect(ngbModal.open).toHaveBeenCalledWith(LessonExitModalComponent, {
-        backdrop: true,
+        backdrop: 'static',
       });
-      expect(modalComponentInstance.isLoggedIn).toBeTrue();
+      expect(modalComponentInstance.isLoggedIn).toBe(true);
     }));
 
     it('should open the exit modal for a logged-out learner', fakeAsync(() => {
@@ -685,7 +700,7 @@ describe('Lesson player header component', () => {
       componentInstance.closePlayer();
       tick();
 
-      expect(modalComponentInstance.isLoggedIn).toBeFalse();
+      expect(modalComponentInstance.isLoggedIn).toBe(false);
     }));
 
     it('should navigate to the exit url when the learner confirms', fakeAsync(() => {
@@ -758,7 +773,9 @@ describe('Lesson player header component', () => {
     }));
 
     it('should stay in the lesson when the modal is dismissed', fakeAsync(() => {
-      modalResult = Promise.reject('dismissed');
+      modalResult = new Promise((_, reject) => {
+        setTimeout(() => reject('dismissed'), 0);
+      });
 
       componentInstance.closePlayer();
       tick();
@@ -768,7 +785,10 @@ describe('Lesson player header component', () => {
     }));
 
     it('should save progress intent and redirect to sign in', fakeAsync(() => {
-      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
+      modalResult = Promise.resolve({
+        action: 'sign-in',
+        dontShowAgain: false,
+      });
 
       componentInstance.closePlayer();
       tick();
@@ -784,7 +804,6 @@ describe('Lesson player header component', () => {
     describe('saving logged-out progress before signing in', () => {
       let checkpointProgressService: MockCheckpointProgressService;
       let editableApi: MockEditableExplorationBackendApiService;
-      let localStorageService: LocalStorageService;
 
       beforeEach(() => {
         checkpointProgressService = TestBed.inject(
@@ -793,20 +812,11 @@ describe('Lesson player header component', () => {
         editableApi = TestBed.inject(
           EditableExplorationBackendApiService
         ) as unknown as MockEditableExplorationBackendApiService;
-        localStorageService = TestBed.inject(LocalStorageService);
         localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
         modalResult = Promise.resolve({
           action: 'sign-in',
           dontShowAgain: false,
         });
-        spyOn(
-          readOnlyExplorationBackendApiService,
-          'loadLatestExplorationAsync'
-        ).and.returnValue(Promise.resolve({version: 7} as never));
-      });
-
-      afterEach(() => {
-        localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
       });
 
       it('should record the reached checkpoint and keep the progress id', fakeAsync(() => {
@@ -878,8 +888,8 @@ describe('Lesson player header component', () => {
       }));
 
       it('should still send the learner to sign in if saving fails', fakeAsync(() => {
-        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
-          Promise.reject('server error')
+        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.callFake(
+          () => Promise.reject('server error')
         );
 
         componentInstance.closePlayer();
@@ -894,8 +904,8 @@ describe('Lesson player header component', () => {
       }));
 
       it('should not leave an exit intent behind if saving fails', fakeAsync(() => {
-        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
-          Promise.reject('server error')
+        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.callFake(
+          () => Promise.reject('server error')
         );
 
         componentInstance.closePlayer();
@@ -907,9 +917,11 @@ describe('Lesson player header component', () => {
     });
 
     it('should reload when no sign in url is returned', fakeAsync(() => {
-      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
+      modalResult = Promise.resolve({
+        action: 'sign-in',
+        dontShowAgain: false,
+      });
       userService.getLoginUrlAsync.and.returnValue(Promise.resolve(''));
-      mockWindowRef.nativeWindow.location.reload = jasmine.createSpy('reload');
 
       componentInstance.closePlayer();
       tick();
@@ -918,8 +930,13 @@ describe('Lesson player header component', () => {
     }));
 
     it('should clear the intent when fetching the sign in url fails', fakeAsync(() => {
-      modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
-      userService.getLoginUrlAsync.and.returnValue(Promise.reject('offline'));
+      modalResult = Promise.resolve({
+        action: 'sign-in',
+        dontShowAgain: false,
+      });
+      userService.getLoginUrlAsync.and.callFake(() =>
+        Promise.reject('offline')
+      );
 
       componentInstance.closePlayer();
       tick();
