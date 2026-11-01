@@ -28,7 +28,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {ContributorAdminDashboardPageComponent} from './contributor-admin-dashboard-page.component';
 import {UserService} from 'services/user.service';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, QueryList} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {
   CommunityContributionStatsBackendDict,
@@ -63,6 +63,7 @@ describe('Contributor dashboard Admin page', () => {
   let fetchContributorAdminStatsSpy: jasmine.Spy;
   let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
+  let fetchCommunityStatsSpy: jasmine.Spy;
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
     true,
@@ -309,7 +310,7 @@ describe('Contributor dashboard Admin page', () => {
 
   describe('when user is logged in', () => {
     beforeEach(() => {
-      spyOn(
+      fetchCommunityStatsSpy = spyOn(
         contributorDashboardAdminStatsBackendApiService,
         'fetchCommunityStats'
       ).and.returnValue(
@@ -696,6 +697,71 @@ describe('Contributor dashboard Admin page', () => {
         expect(removeRightsSpy).toHaveBeenCalled();
       })
     );
+
+    it('should refresh stats tables when question role editor modal is saved', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      const refreshPaginationSpy = spyOn(
+        ContributorAdminStatsTable.prototype,
+        'refreshPagination'
+      );
+      const mockStatsTable = Object.create(
+        ContributorAdminStatsTable.prototype
+      );
+      const queryList = new QueryList<ContributorAdminStatsTable>();
+      queryList.reset([mockStatsTable]);
+      component.statsTables = queryList;
+      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      fixture.detectChanges();
+
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'updateQuestionRightsAsync'
+      ).and.returnValue(Promise.resolve());
+
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: false,
+          can_review_questions: true,
+          can_review_translation_for_language_codes: ['en'],
+          can_review_voiceover_for_language_codes: [],
+        })
+      );
+      spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: false,
+          }),
+        } as NgbModalRef;
+      });
+
+      component.openRoleEditor('user1');
+      tick();
+
+      expect(refreshPaginationSpy).toHaveBeenCalled();
+    }));
+
+    it('should refresh community stats', fakeAsync(() => {
+      fetchCommunityStatsSpy.and.returnValue(
+        Promise.resolve({
+          question_reviewers_count: 5,
+          translation_reviewers_count: {en: 3},
+        } as CommunityContributionStatsBackendDict)
+      );
+
+      component.refreshCommunityStats();
+      tick();
+
+      expect(component.questionReviewersCount).toBe(5);
+      expect(component.translationReviewersCountByLanguage).toEqual({en: 3});
+    }));
 
     it(
       'should open question role editor modal and return changed' +

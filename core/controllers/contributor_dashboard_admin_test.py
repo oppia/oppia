@@ -815,6 +815,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN
         )
+        user_services.add_user_role(
+            self.contributor_id, feconf.ROLE_ID_QUESTION_ADMIN
+        )
 
         user_1_settings = user_services.create_new_user(
             'auth_id_1', 'user1@example.com'
@@ -910,6 +913,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         user_services.add_user_role(
             user_ids[3], feconf.ROLE_ID_QUESTION_COORDINATOR
         )
+
+        user_services.allow_user_to_review_question(user_1_settings.user_id)
+        user_services.allow_user_to_review_question(user_2_settings.user_id)
+        user_services.allow_user_to_review_question(user_3_settings.user_id)
+        user_services.allow_user_to_review_question(user_4_settings.user_id)
 
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
@@ -1575,6 +1583,32 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['stats'][1]['contributor_name'], 'user2')
         self.assertEqual(response['next_offset'], 4)
         self.assertEqual(response['more'], False)
+        self.logout()
+
+    def test_question_reviewer_stats_excludes_revoked_reviewer(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review',
+            {'page_size': 10, 'offset': 0, 'topic_ids': []},
+        )
+        contributor_names = [
+            stat['contributor_name'] for stat in response['stats']
+        ]
+        self.assertIn('user4', contributor_names)
+
+        self.delete_json(
+            '/contributionrightshandler/question',
+            params={'username': 'user4'},
+        )
+
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review',
+            {'page_size': 10, 'offset': 0, 'topic_ids': []},
+        )
+        contributor_names = [
+            stat['contributor_name'] for stat in response['stats']
+        ]
+        self.assertNotIn('user4', contributor_names)
         self.logout()
 
     def test_get_translation_coordinator_stats(self) -> None:
