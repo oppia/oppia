@@ -827,11 +827,12 @@ def apply_change_list(
                     collection.update_language_code(
                         edit_collection_property_language_code_cmd.new_value
                     )
-                elif (
-                    change.property_name
-                    == collection_domain.COLLECTION_PROPERTY_TAGS
-                ):
-                    # Here we use cast because this 'elif' condition forces
+                else:
+                    assert (
+                        change.property_name
+                        == collection_domain.COLLECTION_PROPERTY_TAGS
+                    )
+                    # Here we use cast because the assertion forces
                     # change to have type EditCollectionPropertyTagsCmd.
                     edit_collection_property_tags_cmd = cast(
                         collection_domain.EditCollectionPropertyTagsCmd, change
@@ -1221,11 +1222,11 @@ def update_collection(
         and committer_id != feconf.MIGRATION_BOT_USER_ID
     ):
         user_settings = user_services.get_user_settings(committer_id)
-        if user_settings is not None:
-            user_settings.update_first_contribution_msec(
-                utils.get_current_time_in_millisecs()
-            )
-            user_services.save_user_settings(user_settings)
+
+        user_settings.update_first_contribution_msec(
+            utils.get_current_time_in_millisecs()
+        )
+        user_services.save_user_settings(user_settings)
 
 
 def regenerate_collection_summary_with_new_contributor(

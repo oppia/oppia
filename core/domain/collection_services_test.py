@@ -26,8 +26,10 @@ from core.constants import constants
 from core.domain import (
     collection_domain,
     collection_services,
+    exp_services,
     rights_domain,
     rights_manager,
+    subscription_services,
     user_services,
 )
 from core.platform import models
@@ -96,6 +98,61 @@ class MockCollectionModel(collection_models.CollectionModel):
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     """Tests query methods."""
+
+    def test_get_new_collection_id(self) -> None:
+        collection_id = collection_services.get_new_collection_id()
+
+        self.assertIsInstance(collection_id, str)
+        self.assertTrue(collection_id)
+
+    def test_get_collection_summaries_matching_ids(self) -> None:
+        self.save_new_default_collection('A', self.owner_id, title='TitleA')
+
+        summaries = collection_services.get_collection_summaries_matching_ids(
+            ['A', 'missing_collection']
+        )
+
+        self.assertEqual(len(summaries), 2)
+        summary = summaries[0]
+        assert summary is not None
+        self.assertEqual(summary.id, 'A')
+        self.assertEqual(summary.title, 'TitleA')
+        self.assertIsNone(summaries[1])
+
+    def test_get_collection_summaries_subscribed_to(self) -> None:
+        self.save_new_default_collection('A', self.owner_id, title='TitleA')
+        subscription_services.subscribe_to_collection(self.owner_id, 'A')
+        subscription_services.subscribe_to_collection(
+            self.owner_id, 'missing_collection'
+        )
+
+        summaries = collection_services.get_collection_summaries_subscribed_to(
+            self.owner_id
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0].id, 'A')
+        self.assertEqual(summaries[0].title, 'TitleA')
+
+    def test_get_collection_summaries_where_user_has_role(self) -> None:
+        self.save_new_default_collection('A', self.owner_id, title='TitleA')
+
+        summaries = (
+            collection_services.get_collection_summaries_where_user_has_role(
+                self.owner_id
+            )
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0].id, 'A')
+        self.assertEqual(summaries[0].title, 'TitleA')
+
+        self.assertEqual(
+            collection_services.get_collection_summaries_where_user_has_role(
+                self.viewer_id
+            ),
+            [],
+        )
 
     def test_get_collection_titles_and_categories(self) -> None:
         self.assertEqual(
@@ -558,6 +615,24 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             'collection_id [{\'cmd\': \'invalid command\'}]',
         )
 
+    def test_apply_change_list_ignores_legacy_skill_command(self) -> None:
+        collection = self.save_new_default_collection(
+            'A', self.owner_id, title='TitleA'
+        )
+        original_contents = collection.to_dict()
+
+        updated_collection = collection_services.apply_change_list(
+            'A',
+            [
+                {
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                    'name': 'Legacy skill',
+                }
+            ],
+        )
+
+        self.assertEqual(updated_collection.to_dict(), original_contents)
+
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a
@@ -611,6 +686,20 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
                 ],
                 'Added new exploration',
             )
+
+    def test_get_valid_completed_exploration_ids(self) -> None:
+        self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_0)
+        self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_1)
+
+        collection = collection_services.get_collection_by_id(self.COL_ID_0)
+        collection.delete_node(self.EXP_ID_1)
+
+        self.assertEqual(
+            collection_services.get_valid_completed_exploration_ids(
+                self.owner_id, collection
+            ),
+            [self.EXP_ID_0],
+        )
 
     def test_get_completed_exploration_ids(self) -> None:
         # There should be no exception if the user or collection do not exist;
@@ -1178,6 +1267,40 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID
         )
 
+    def test_publish_collection_skips_missing_contributor_profile(self) -> None:
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.owner_id)
+        summary = collection_services.get_collection_summary_by_id(
+            self.COLLECTION_0_ID
+        )
+        assert summary is not None
+        summary.contributor_ids.append('missing_user')
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_summary_by_id', summary
+        ):
+            collection_services.publish_collection_and_update_user_profiles(
+                self.owner, self.COLLECTION_0_ID
+            )
+
+        self.assertTrue(
+            rights_manager.is_collection_public(self.COLLECTION_0_ID)
+        )
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNotNone(user_settings.first_contribution_msec)
+
+    def test_publish_collection_and_update_user_profiles(self) -> None:
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.owner_id)
+
+        collection_services.publish_collection_and_update_user_profiles(
+            self.owner, self.COLLECTION_0_ID
+        )
+
+        self.assertTrue(
+            rights_manager.is_collection_public(self.COLLECTION_0_ID)
+        )
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNotNone(user_settings.first_contribution_msec)
+
     def test_publish_collection_and_update_user_profiles_raises_when_no_summary(
         self,
     ) -> None:
@@ -1317,6 +1440,21 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
 
 class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
+
+    def test_loading_demo_reuses_existing_explorations(self) -> None:
+        collection_id = next(iter(feconf.DEMO_COLLECTIONS))
+        collection_services.load_demo(collection_id)
+
+        with self.swap_to_always_raise(
+            exp_services,
+            'load_demo',
+            Exception('Existing explorations should not be reloaded.'),
+        ):
+            collection_services.load_demo(collection_id)
+
+        collection = collection_services.get_collection_by_id(collection_id)
+        self.assertEqual(collection.id, collection_id)
+        collection.validate()
 
     def test_loading_and_validation_and_deletion_of_demo_collections(
         self,
