@@ -71,7 +71,8 @@
         "core.jobs.io.firebase_io_test",
         "core.jobs.types.firebase_domain_test",
         "core.jobs.batch_jobs.firebase_server_sync_jobs_test",
-        "core.jobs.transforms.firebase_transforms_test"
+        "core.jobs.transforms.firebase_transforms_test",
+        "core.jobs.batch_jobs.user_auth_details_repair_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
