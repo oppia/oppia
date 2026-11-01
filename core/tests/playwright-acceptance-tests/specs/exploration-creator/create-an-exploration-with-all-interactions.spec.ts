@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  * EC. Create an Exploration using all interactions.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const CARD_NAMES = {
-  FIRST: 'Introduction',
   SECOND: '2nd Card',
   THIRD: '3rd Card',
   FOURTH: '4th Card',
@@ -45,13 +43,16 @@ const CARD_NAMES = {
   SIXTEENTH: '16th Card',
 };
 
-describe('Exploration Editor', function () {
-  let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
+test.describe.configure({mode: 'serial'});
 
-  beforeAll(async function () {
+test.describe('Exploration Editor', function () {
+  let explorationEditor: ExplorationEditor;
+
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -59,7 +60,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.dismissWelcomeModal();
   });
 
-  it('should be able to use "Continue Button" interaction', async function () {
+  test('should be able to use "Continue Button" interaction', async function () {
     // Update the card content.
     await explorationEditor.updateCardContent('Click on the button.');
     await explorationEditor.expectCardContentToBe('Click on the button.');
@@ -92,7 +93,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectSelfLoopWarningToBeVisible(false);
   });
 
-  it('should be able to use "Multiple Choice" interaction', async function () {
+  test('should be able to use "Multiple Choice" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
 
     // Update the card content.
@@ -123,12 +124,12 @@ describe('Exploration Editor', function () {
       'Wrong.'
     );
     await explorationEditor.addHintToState('Try Google Search.');
-    await explorationEditor.expectHintsToConatin('Try Google Search.');
+    await explorationEditor.expectHintsToContain('Try Google Search.');
 
     await explorationEditor.saveExplorationDraft();
   });
 
-  it('should be able to use "Number Input" interaction', async function () {
+  test('should be able to use "Number Input" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
 
     // Update card content.
@@ -172,7 +173,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
   });
 
-  it('should be able to use "Text Input" interaction', async function () {
+  test('should be able to use "Text Input" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
     await explorationEditor.expectCardContentToBe(
@@ -210,7 +211,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
   });
 
-  it('should be able to use "Image Region" interaction', async function () {
+  test('should be able to use "Image Region" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter an image region.');
     // Add an image region interaction. Also, check for all modals -- Choose Interaction,
@@ -225,7 +226,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
   });
 
-  it('should be able to use "Item Selection" interaction', async function () {
+  test('should be able to use "Item Selection" interaction', async function () {
     // Add a item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
     // Add Item Selection interaction. Also, check for modal "Choose Interaction"
@@ -265,7 +266,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
   });
 
-  it('should be able to use "Drag and Drop Sort" interaction', async function () {
+  test('should be able to use "Drag and Drop Sort" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Arrange in Ascending Order');
     // Add Drag and Drop Sort interaction. Also, check for modals "Choose Interaction"
@@ -311,7 +312,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
   });
 
-  it('should be able to use "Fraction Input" interaction', async function () {
+  test('should be able to use "Fraction Input" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
     // Add Fraction Input interaction. Also, check for modal "Choose Interaction"
@@ -355,7 +356,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
   });
 
-  it('should be able to use "Set Input" interaction', async function () {
+  test('should be able to use "Set Input" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
     // Update card content.
     await explorationEditor.updateCardContent('Enter a set.');
@@ -394,7 +395,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
   });
 
-  it('should be able to use "Numeric Expression" interaction', async function () {
+  test('should be able to use "Numeric Expression" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
     // Add Numeric Expression interaction.
@@ -428,7 +429,7 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
-    await explorationEditor.addNumbericInteractionSolutionToState(
+    await explorationEditor.addNumericInteractionSolutionToState(
       'sqrt2',
       'as given in the question.'
     );
@@ -438,10 +439,10 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.TWELFTH);
   });
 
-  it('should be able to use "Algebric Expression" intreaction', async function () {
+  test('should be able to use "Algebraic Expression" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a algebric expression.');
-    // Add Algebric Expression interaction.
+    // Add Algebraic Expression interaction.
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
       false
@@ -449,14 +450,14 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Algebraic Expression Input)'
     );
-    // Customize Algebric Expression interaction.
-    await explorationEditor.customizeAlgebricExpressionInputInteraction(
+    // Customize Algebraic Expression interaction.
+    await explorationEditor.customizeAlgebraicExpressionInputInteraction(
       'ab',
       false
     );
     await explorationEditor.expectModalTitleToBe('Add Response');
     // Add feedback for correct answer.
-    await explorationEditor.updateAlgebricExpressionLearnerAnswerInResponseModal(
+    await explorationEditor.updateAlgebraicExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
       'a+b'
     );
@@ -473,7 +474,7 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
-    await explorationEditor.addAlgebricExpressionSolutionToState(
+    await explorationEditor.addAlgebraicExpressionSolutionToState(
       'a+b',
       'as given in the question.'
     );
@@ -483,7 +484,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.THIRTEENTH);
   });
 
-  it('should be able to use "Math Equation" interaction', async function () {
+  test('should be able to use "Math Equation" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a math equation.');
     // Add Math Equation interaction.
@@ -495,7 +496,7 @@ describe('Exploration Editor', function () {
       'Customize Interaction (Math Equation Input)'
     );
     // Customize Math Equation interaction.
-    await explorationEditor.customizeAlgebricExpressionInputInteraction(
+    await explorationEditor.customizeAlgebraicExpressionInputInteraction(
       'xyz',
       false
     );
@@ -527,7 +528,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTEENTH);
   });
 
-  it('should be able to use "Number With Units" interaction', async function () {
+  test('should be able to use "Number With Units" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a number with units.');
     // Add Number With Units interaction.
@@ -564,7 +565,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTEENTH);
   });
 
-  it('should be able to use "Ratio Expression Input" interaction', async function () {
+  test('should be able to use "Ratio Expression Input" interaction', async function () {
     // Update card content.
     await explorationEditor.updateCardContent('Enter a ratio expression.');
     // Add Ratio Expression Input interaction.
@@ -599,7 +600,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
