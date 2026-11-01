@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for FeedbackScreenshotStagingService.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
@@ -38,14 +36,14 @@ describe('FeedbackScreenshotStagingService', () => {
   let imageHeight: number;
   let imageWidth: number;
   let imageShouldFail: boolean;
-  let originalImage: typeof Image;
-
-  class MockFileReader {
-    result = fileReaderResult;
+  class MockFileReader extends FileReader {
+    get result(): string | null {
+      return fileReaderResult;
+    }
     onload: (() => void) | null = null;
     onerror: (() => void) | null = null;
 
-    readAsDataURL(file: File): void {
+    readAsDataURL(file: Blob): void {
       if (fileReaderShouldFail) {
         if (this.onerror !== null) {
           this.onerror();
@@ -59,22 +57,27 @@ describe('FeedbackScreenshotStagingService', () => {
     }
   }
 
-  class MockImage {
-    height = imageHeight;
-    width = imageWidth;
-    onload: (() => void) | null = null;
-    onerror: (() => void) | null = null;
+  class MockImage extends Image {
+    get height(): number {
+      return imageHeight;
+    }
+    get width(): number {
+      return imageWidth;
+    }
+    onload: ((this: GlobalEventHandlers, ev: Event) => void) | null = null;
+    onerror: OnErrorEventHandler = null;
 
     set src(url: string) {
+      const event = new Event('load');
       if (imageShouldFail) {
         if (this.onerror !== null) {
-          this.onerror();
+          this.onerror(event);
         }
         return;
       }
 
       if (this.onload !== null) {
-        this.onload();
+        this.onload(event);
       }
     }
   }
@@ -89,8 +92,6 @@ describe('FeedbackScreenshotStagingService', () => {
     );
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
-    originalImage = window.Image;
-
     fileReaderResult = PREVIEW_DATA_URL;
     fileReaderShouldFail = false;
     imageHeight = 40;
@@ -98,16 +99,7 @@ describe('FeedbackScreenshotStagingService', () => {
     imageShouldFail = false;
 
     spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
-
-    // This throws "Type 'typeof MockImage' is not assignable to type 'typeof
-    // Image'.". We need to suppress this error because 'HTMLImageElement' has
-    // browser properties that are not needed here.
-    // @ts-expect-error
-    window.Image = MockImage;
-  });
-
-  afterEach(() => {
-    window.Image = originalImage;
+    spyOn(window, 'Image').and.returnValue(new MockImage());
   });
 
   it('should stage a screenshot and resolve with filename and previewDataUrl', fakeAsync(() => {
