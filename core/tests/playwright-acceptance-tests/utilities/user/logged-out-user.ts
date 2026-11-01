@@ -213,7 +213,6 @@ const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
-const blogUrl = testConstants.URLs.Blog;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
@@ -302,6 +301,41 @@ const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
+
+// Footer and Teach page navigation selectors.
+
+const footerVersionInfoSelector = '.e2e-test-footer-version-info';
+const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
+const teachUrl = testConstants.URLs.Teach;
+const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
+
+// Parents and Teachers Page.
+const subheadingInParentsAndTeachersPageSelector =
+  '.e2e-test-teach-page-subheading';
+const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
+const blogPageLink = new URL(testConstants.URLs.Blog).pathname;
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
+const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
+const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
+const lessonCreatorLinkedinButtonInTeachPage =
+  '.e2e-test-teach-page-linkedin-button';
+const creatorsCarouselNamesInTeachPage = testConstants.TeachPageCreatorsNames;
+const creatorsCarouselSelectorInTeachPage =
+  '.e2e-test-teach-page-creators-carousel';
+const creatorsCarouselPrevButton =
+  '.e2e-test-teach-page-creators-carousel-prev-btn';
+const creatorsCarouselNextButton =
+  '.e2e-test-teach-page-creators-carousel-next-btn';
+const creatorsCarouselNameInTeachPage =
+  '.e2e-test-teach-page-lesson-creator-name';
+const lessonCreationSectionInTeachPage =
+  '.e2e-test-teach-page-lesson-creation-section';
+const lessonCreationAccordionExpandButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel-title';
+const lessonCreationAccordionCloseButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel button';
+const lessonCreationAccordionPanelContentInTeachPage =
+  '.e2e-test-teach-page-lesson-panel .panel-content';
 
 // Newsletter selectors and URLs.
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
@@ -3052,6 +3086,164 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Verifies that the footer version info matches the expected pattern.
+   * @param {RegExp} pattern - The regular expression pattern to match against the version text.
+   */
+  async expectFooterVersionToMatchPattern(pattern: RegExp): Promise<void> {
+    await this.expectElementToBeVisible(footerVersionInfoSelector);
+    const versionText = (
+      (await this.page.locator(footerVersionInfoSelector).textContent()) ?? ''
+    ).trim();
+
+    if (!pattern.test(versionText)) {
+      throw new Error(
+        `Footer version text "${versionText}" does not match expected pattern ${pattern}`
+      );
+    }
+
+    showMessage(`Footer version verified: ${versionText}`);
+  }
+
+  /**
+   * Function to click the Teach button in the About Menu on navbar
+   * and check if it opens the Teach page.
+   */
+  async clickTeachButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarTeachButton,
+        teachUrl
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabTeachButton,
+        teachUrl
+      );
+    }
+  }
+
+  /**
+   * Validates that a given subheading text appears on the Parents and Teachers page.
+   *
+   * @param subheading - The expected subheading text to be found.
+   */
+  async subheadingInParentsAndTeachersPageToContain(
+    subheading: string
+  ): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      subheadingInParentsAndTeachersPageSelector,
+      subheading
+    );
+  }
+
+  /**
+   * Checks that the "Check out our guide" button in the Teach page links to
+   * the Parents and Teachers guide.
+   */
+  async verifyGuideButtonInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(guideButtonInTeachPage);
+    await expect(this.page.locator(guideButtonInTeachPage)).toHaveAttribute(
+      'href',
+      parentsTeachersGuideUrl
+    );
+  }
+
+  /**
+   * Checks that the "Check out our blog" button in the Teach page links to
+   * the blog page.
+   */
+  async clickAndVerifyBlogButtonInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogButtonInTeachPage);
+    await expect(this.page.locator(blogButtonInTeachPage)).toHaveAttribute(
+      'href',
+      blogPageLink
+    );
+  }
+
+  /**
+   * Checks that the first LinkedIn button in the Teach page links to the
+   * corresponding lesson creator's LinkedIn profile. The link is not opened,
+   * since LinkedIn requires users to log in before showing profile pages.
+   */
+  async clickLinkedInButtonInTeachPage(): Promise<void> {
+    const firstLinkedInButton = this.page
+      .locator(lessonCreatorLinkedinButtonInTeachPage)
+      .first();
+    await expect(firstLinkedInButton).toBeVisible();
+    await expect(firstLinkedInButton).toHaveAttribute(
+      'href',
+      lessonCreatorLinkedInUrl
+    );
+  }
+
+  /**
+   * Verifies the lesson creators carousel in the Teach page: the first
+   * creator is shown, and on mobile, "next" shows the second creator and
+   * "prev" goes back to the first.
+   */
+  async expectLessonCreatorsCarouselToBeFunctionalInTeachPage(): Promise<void> {
+    const firstName = creatorsCarouselNamesInTeachPage[0];
+    const secondName = creatorsCarouselNamesInTeachPage[1];
+
+    await this.expectElementToBeVisible(creatorsCarouselSelectorInTeachPage);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      firstName
+    );
+
+    if (!this.isViewportAtMobileWidth()) {
+      // The carousel displays all creators at once in desktop view as it has
+      // enough space.
+      return;
+    }
+
+    await this.clickOnElementWithSelector(creatorsCarouselNextButton);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      secondName
+    );
+
+    await this.clickOnElementWithSelector(creatorsCarouselPrevButton);
+    await this.expectTextContentToContain(
+      creatorsCarouselNameInTeachPage,
+      firstName
+    );
+    showMessage(
+      'The lesson creators carousel in teach page is working correctly.'
+    );
+  }
+
+  /**
+   * Verifies that the expand button of the Lesson Creation Steps accordion in
+   * the Teach page opens the panel content and the close button closes it.
+   */
+  async expectLessonCreationStepsAccordionToBeFunctionalInTeachPage(): Promise<void> {
+    await this.expectElementToBeVisible(lessonCreationSectionInTeachPage);
+
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionExpandButtonInTeachPage
+    );
+    await this.expectElementToBeVisible(
+      lessonCreationAccordionPanelContentInTeachPage
+    );
+    showMessage('Lesson Creation accordion expand button is working correctly');
+
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionCloseButtonInTeachPage
+    );
+    await this.expectElementToBeVisible(
+      lessonCreationAccordionPanelContentInTeachPage,
+      false
+    );
+    showMessage('Lesson Creation accordion close button is working correctly');
   }
 
   /**
