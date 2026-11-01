@@ -663,6 +663,36 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model2 in question_skill_links)
         self.assertTrue(questionskilllink_model4 in question_skill_links)
 
+    def test_get_question_skill_links_based_on_difficulty_deduplicates(
+        self,
+    ) -> None:
+        # Both questions are linked to both skills, so every link fetched for
+        # skill_id2 refers to a question that was already picked for
+        # skill_id1, and none of them should be returned again.
+        question_skill_link_models = [
+            question_models.QuestionSkillLinkModel.create(
+                question_id, skill_id, 0.5
+            )
+            for skill_id in ['skill_id1', 'skill_id2']
+            for question_id in ['question_id1', 'question_id2']
+        ]
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            question_skill_link_models
+        )
+
+        question_skill_links = question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill(  # pylint: disable=line-too-long
+            4, ['skill_id1', 'skill_id2'], 0.5
+        )
+
+        self.assertEqual(len(question_skill_links), 2)
+        self.assertEqual(
+            sorted(link.question_id for link in question_skill_links),
+            ['question_id1', 'question_id2'],
+        )
+        self.assertEqual(
+            {link.skill_id for link in question_skill_links}, {'skill_id1'}
+        )
+
     def test_get_random_question_skill_links_based_on_difficulty(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
