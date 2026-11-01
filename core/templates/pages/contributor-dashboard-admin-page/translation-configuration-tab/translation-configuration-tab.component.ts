@@ -18,7 +18,7 @@
  * translation providers and toggle the master automatic translation flag.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslationProviderOption} from 'domain/contributor_dashboard/contributor-dashboard-admin-summary.model';
@@ -38,6 +38,8 @@ interface LanguageOption {
   styleUrls: ['./translation-configuration-tab.component.css'],
 })
 export class TranslationConfigurationTabComponent implements OnInit {
+  @Input() useLegacyAdminSpacing: boolean = false;
+
   providerMapping: Record<string, string> = {};
   isAutomaticTranslationEnabled: boolean = false;
 
@@ -112,7 +114,11 @@ export class TranslationConfigurationTabComponent implements OnInit {
   }
 
   async addMapping(): Promise<void> {
-    if (!this.selectedLanguage || !this.selectedProvider) {
+    if (
+      !this.isAutomaticTranslationEnabled ||
+      !this.selectedLanguage ||
+      !this.selectedProvider
+    ) {
       return;
     }
     this.providerMapping = {
@@ -127,6 +133,10 @@ export class TranslationConfigurationTabComponent implements OnInit {
   }
 
   async removeMapping(languageCode: string): Promise<void> {
+    if (!this.isAutomaticTranslationEnabled) {
+      return;
+    }
+
     const updated = {...this.providerMapping};
     delete updated[languageCode];
     this.providerMapping = updated;

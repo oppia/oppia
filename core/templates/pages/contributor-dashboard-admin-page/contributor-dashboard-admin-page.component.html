@@ -5,12 +5,10 @@
 </div>
 <br>
 
-<div *ngIf="isAutoTranslationEnabled && UserIsTranslationAdmin" class="oppia-contributor-dashboard-admin-page-tabs-container">
-  <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
-</div>
-
 <div *ngIf="isNewUiEnabled">
-  <contributor-admin-dashboard-page></contributor-admin-dashboard-page>
+  <contributor-admin-dashboard-page
+    [showTranslationConfigurationTab]="isAutoTranslationEnabled && UserIsTranslationAdmin">
+  </contributor-admin-dashboard-page>
 </div>
 
 <div class="oppia-contributor-dashboard-admin-page-tabs-container" *ngIf="!isNewUiEnabled">
@@ -206,7 +204,11 @@
     </form>
   </mat-card>
 
-  <mat-card class="oppia-page-card oppia-long-text" *ngIf="UserIsTranslationAdmin">
+  <mat-card class="oppia-page-card oppia-long-text"
+            [class.oppia-auto-translation-config-follows]="
+              isAutoTranslationEnabled && UserIsTranslationAdmin
+            "
+            *ngIf="UserIsTranslationAdmin">
     <form class="form-horizontal"
           (ngSubmit)="submitViewTranslationContributionStatsForm(formData.viewTranslationContributionStats)">
       <legend class="text-center">View Translation Contribution Stats</legend>
@@ -254,4 +256,15 @@
       </table>
     </div>
   </mat-card>
+</div>
+
+<div
+  *ngIf="
+    !isNewUiEnabled &&
+    isAutoTranslationEnabled &&
+    UserIsTranslationAdmin
+  ">
+  <oppia-translation-configuration-tab
+    [useLegacyAdminSpacing]="true">
+  </oppia-translation-configuration-tab>
 </div>
