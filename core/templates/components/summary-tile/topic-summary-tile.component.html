@@ -21,10 +21,11 @@
         {{ topicNameTranslationKey | translate }}
       </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}
-      <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
+      <span>
+        {{ 'I18N_COUNT_OF_LESSONS' | translate: {
           lessonCountValue: topicSummary.getTotalPublishedNodeCount(),
           messageFormat: true
-        }">
+        } }}
       </span>
     </div>
   </a>

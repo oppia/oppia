@@ -93,11 +93,13 @@
           </button>
         </div>
         <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
-          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE } }}
           </em>
         </span>
         <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
-          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE }">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE } }}
           </em>
         </span>
         <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="!isTitlePatternValid()">

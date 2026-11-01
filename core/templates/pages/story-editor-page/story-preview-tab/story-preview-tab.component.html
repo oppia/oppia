@@ -20,7 +20,7 @@
         <div [class.node-disabled]="!node.getPublishedStatus()">
           <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)" tabindex="0">
             <span class="oppia-chapter-title" aria-live="assertive">
-              <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{ node.getTitle() }}
+              <span>{{ 'I18N_TOPIC_VIEWER_CHAPTER' | translate }}</span> {{i + 1}}: {{ node.getTitle() }}
             </span>
             <div class="oppia-story-viewer-card-content">
               <svg width="320"
@@ -94,7 +94,7 @@
         </div>
         <div class="story-text" aria-hidden="true">
           <span dir="ltr" class="oppia-chapter-title">
-            <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}:
+            <span>{{ 'I18N_TOPIC_VIEWER_CHAPTER' | translate }}</span> {{i + 1}}:
             <span [attr.dir]="'auto'">{{node.getTitle()}}</span>
           </span>
           <div class="oppia-story-viewer-mobile-card-description-box">
