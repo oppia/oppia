@@ -54,7 +54,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         updated_specs = dict(
-            platform_parameter_list.PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
+            platform_parameter_list
+            .PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
         )
         updated_specs.update({
             'param_a': (

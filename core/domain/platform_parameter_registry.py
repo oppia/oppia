@@ -38,7 +38,8 @@ if MYPY:  # pragma: no cover
 
 ParamName = platform_parameter_list.ParamName
 PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT = (
-    platform_parameter_list.PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
+    platform_parameter_list
+    .PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
 )
 
 
@@ -86,7 +87,9 @@ class Registry:
                 for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT
             ]
             raise Exception(
-                "Unsupported data type '%s', must be one of %s." % (data_type.value, allowed_data_types)
+                'Unsupported data type \'%s\', must be one of %s.' % (
+                    data_type.value, allowed_data_types
+                )
             )
 
         param_dict: platform_parameter_domain.PlatformParameterDict = {
@@ -279,9 +282,8 @@ class Registry:
 
         if parameter_model:
             param_spec = (
-                PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT.get(
-                    name
-                )
+                PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
+                .get(name)
             )
             if param_spec is None:
                 raise Exception('Platform parameter not found: %s.' % name)

@@ -125,7 +125,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self.assertEqual(parameter.default_value, '111')
 
     def test_get_non_existing_parameter_failure(self) -> None:
-        with self.assertRaisesRegex(Exception, 'Platform parameter not found: non_existing'):
+        with self.assertRaisesRegex(
+            Exception, 'Platform parameter not found: non_existing'
+        ):
             registry.Registry.get_platform_parameter('non_existing')
 
     def test_get_all_parameter_names(self) -> None:
@@ -223,7 +225,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             param = registry.Registry.get_platform_parameter(parameter_name)
             param.validate()
 
-            with self.assertRaisesRegex(utils.ValidationError, 'Expected string'):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Expected string'
+            ):
                 registry.Registry.update_platform_parameter(
                     parameter_name,
                     feconf.SYSTEM_COMMITTER_ID,

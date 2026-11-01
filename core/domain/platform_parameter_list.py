@@ -135,7 +135,8 @@ PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT: Dict[
         'if emails should not be sent.',
         platform_parameter_domain.DataTypes.STRING,
         (
-            "I'm writing to inform you that I have unpublished the above exploration."
+            'I\'m writing to inform you that I have unpublished the above '
+            'exploration.'
         ),
     ),
     ParamName.EMAIL_SENDER_NAME.value: (
@@ -186,18 +187,26 @@ PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT: Dict[
         False,
     ),
     ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value: (
-        'The maximum number of tags that can be selected to categorize the blog '
-        'post',
+        'The maximum number of tags that can be selected to categorize the '
+        'blog post',
         platform_parameter_domain.DataTypes.NUMBER,
         10,
     ),
-    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value: (
-        'The bounce-rate a state must exceed to create a new improvements task.',
+    (
+        ParamName
+        .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
+    ): (
+        'The bounce-rate a state must exceed to create a new improvements '
+        'task.',
         platform_parameter_domain.DataTypes.NUMBER,
         0.20,
     ),
-    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value: (
-        'The bounce-rate a state must fall under to discard its improvement task.',
+    (
+        ParamName
+        .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value
+    ): (
+        'The bounce-rate a state must fall under to discard its '
+        'improvement task.',
         platform_parameter_domain.DataTypes.NUMBER,
         0.20,
     ),
