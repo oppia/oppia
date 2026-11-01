@@ -22,7 +22,6 @@ import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
 import {NavigationUtils} from '../common/navigation-utils';
 
-const baseURL = testConstants.URLs.BaseURL;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;

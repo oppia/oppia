@@ -1,9 +1,31 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * VA.MA. Assign, unassign voiceover artists to an exploration
+ */
+
 import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-// import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {NavigationUtils} from '../../utilities/common/navigation-utils';
+import {ExplorationEditorUtils} from '../../utilities/common/exploration-editor-utils';
 
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
@@ -63,8 +85,10 @@ test.describe('Voiceover Admin', function () {
   });
 
   test('should be able to add voiceover artist to an exploration', async function () {
-    await voiceoverAdmin.navigateToExplorationEditor(explorationId);
-    await voiceoverAdmin.dismissWelcomeModal();
+    const navigationUtils = new NavigationUtils(voiceoverAdmin);
+    const explorationEditor = new ExplorationEditorUtils(voiceoverAdmin);
+    await navigationUtils.navigateToExplorationEditor(explorationId);
+    await explorationEditor.dismissWelcomeModal();
     await voiceoverAdmin.navigateToExplorationSettingsTab();
     await voiceoverAdmin.expectVoiceoverArtistsListToBeEmpty();
 
@@ -82,10 +106,6 @@ test.describe('Voiceover Admin', function () {
       invalidIdErrorToastMessage
     );
     await voiceoverAdmin.closeErrorModal();
-    // await voiceoverAdmin.expectToSeeErrorToastMessage(
-    //   invalidIdErrorToastMessage
-    // );
-    // await voiceoverAdmin.closeToastMessage();
     await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
 
     // Add a valid user as a voiceover artist.

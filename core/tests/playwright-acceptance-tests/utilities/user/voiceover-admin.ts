@@ -20,10 +20,7 @@ import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
-import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
-import {NavigationUtils} from '../common/navigation-utils';
 
-const baseURL = testConstants.URLs.BaseURL;
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
@@ -109,7 +106,7 @@ export class VoiceoverAdmin extends BaseUser {
         await this.waitForPageToFullyLoad();
       }
 
-      // Open all available dropdowns because they are closed by default
+      // Open all available dropdowns because they are closed by default.
       const dropdowns = [
         basicSettingsDropdown,
         advanceSettingsDropdown,
@@ -140,26 +137,6 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToVoiceoverAdminPage(): Promise<void> {
     await this.goto(voiceoverAdminURL);
-  }
-
-  /**
-   * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
-   */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorUtils(this);
-    await explorationEditor.dismissWelcomeModal(failIfMissing);
-  }
-
-  /**
-   * Function to navigate to exploration editor.
-   * @param explorationUrl - url of the exploration.
-   */
-  async navigateToExplorationEditor(
-    explorationId: string | null
-  ): Promise<void> {
-    const navigationUtils = new NavigationUtils(this);
-    await navigationUtils.navigateToExplorationEditor(explorationId);
   }
 
   /**
