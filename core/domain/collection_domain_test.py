@@ -23,6 +23,8 @@ from core.constants import constants
 from core.domain import collection_domain, collection_services
 from core.tests import test_utils
 
+from typing import List, cast
+
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
 # methods tested below.
@@ -44,6 +46,91 @@ title: A title
     )
     % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 )
+
+
+class CollectionProgressTests(test_utils.GenericTestBase):
+    """Tests validation and serialization of collection progress."""
+
+    USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+
+    def test_valid_progress_and_dict_round_trip(self) -> None:
+        progress = collection_domain.CollectionProgress(
+            self.USER_ID, 'Collection123', ['Exp1', 'exp2']
+        )
+        progress.validate()
+        progress_dict = progress.to_dict()
+        self.assertEqual(
+            collection_domain.CollectionProgress.from_dict(
+                progress_dict
+            ).to_dict(),
+            progress_dict,
+        )
+        progress_dict['completed_explorations'].append('Exp3')
+        self.assertEqual(progress.completed_explorations, ['Exp1', 'exp2'])
+
+        collection_domain.CollectionProgress(self.USER_ID, 'C1', []).validate()
+        collection_domain.CollectionProgress(
+            self.USER_ID, 'col_1', ['exp_1']
+        ).validate()
+
+    def test_system_and_pseudonymous_user_ids_are_valid(self) -> None:
+        collection_domain.CollectionProgress(
+            feconf.SYSTEM_COMMITTER_ID, 'C1', []
+        ).validate()
+        collection_domain.CollectionProgress(
+            'pid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH), 'C1', []
+        ).validate()
+
+    def test_invalid_user_ids_are_rejected(self) -> None:
+        for user_id in [None, '', 'invalid', f'{self.USER_ID}extra']:
+            with self.subTest(user_id=user_id):
+                with self.assertRaisesRegex(
+                    utils.ValidationError, 'Invalid user ID'
+                ):
+                    # Here we use cast because this test passes invalid ID types.
+                    collection_domain.CollectionProgress(
+                        cast(str, user_id), 'C1', []
+                    ).validate()
+
+    def test_invalid_collection_ids_are_rejected(self) -> None:
+        for collection_id in [None, '', 'id-1', 'é']:
+            with self.subTest(collection_id=collection_id):
+                with self.assertRaisesRegex(
+                    utils.ValidationError, 'Invalid collection ID'
+                ):
+                    # Here we use cast because this test passes invalid ID types.
+                    collection_domain.CollectionProgress(
+                        self.USER_ID, cast(str, collection_id), []
+                    ).validate()
+
+    def test_invalid_completed_explorations_are_rejected(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected completed explorations to be a list',
+        ):
+            # Here we use cast because this test passes a string instead of a list.
+            collection_domain.CollectionProgress(
+                self.USER_ID, 'C1', cast(List[str], 'Exp1')
+            ).validate()
+
+        for exploration_id in [None, '', 'exp-1', 'é']:
+            with self.subTest(exploration_id=exploration_id):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Completed explorations must contain valid exploration IDs',
+                ):
+                    # Here we use cast because this test passes invalid ID types.
+                    collection_domain.CollectionProgress(
+                        self.USER_ID, 'C1', [cast(str, exploration_id)]
+                    ).validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Completed explorations must not contain duplicate IDs',
+        ):
+            collection_domain.CollectionProgress(
+                self.USER_ID, 'C1', ['Exp1', 'Exp1']
+            ).validate()
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):

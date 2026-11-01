@@ -80,6 +80,113 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL: Final = 'remove_question_id_from_skill'
 # Prefix for skill IDs. This should not be changed -- doing so will result in
 # backwards-compatibility issues.
 _SKILL_ID_PREFIX: Final = 'skill'
+# Legacy collection and exploration IDs can contain underscores and have
+# different lengths.
+_COLLECTION_PROGRESS_ID_REGEX: Final = r'[A-Za-z0-9_]+'
+
+
+class CollectionProgressDict(TypedDict):
+    """Dictionary representation of a user's progress in a collection."""
+
+    user_id: str
+    collection_id: str
+    completed_explorations: List[str]
+
+
+class CollectionProgress:
+    """Tracks the explorations a user completed within a collection."""
+
+    def __init__(
+        self,
+        user_id: str,
+        collection_id: str,
+        completed_explorations: List[str],
+    ) -> None:
+        """Initializes a collection progress domain object.
+
+        Args:
+            user_id: str. ID of the user.
+            collection_id: str. ID of the collection.
+            completed_explorations: list(str). IDs of completed explorations.
+        """
+        self.user_id = user_id
+        self.collection_id = collection_id
+        self.completed_explorations = completed_explorations
+
+    def to_dict(self) -> CollectionProgressDict:
+        """Returns a dictionary representation of the progress."""
+        return {
+            'user_id': self.user_id,
+            'collection_id': self.collection_id,
+            'completed_explorations': list(self.completed_explorations),
+        }
+
+    @classmethod
+    def from_dict(
+        cls, progress_dict: CollectionProgressDict
+    ) -> CollectionProgress:
+        """Creates a collection progress domain object from a dictionary.
+
+        Args:
+            progress_dict: CollectionProgressDict. The progress data.
+
+        Returns:
+            CollectionProgress. The corresponding domain object.
+        """
+        return cls(
+            progress_dict['user_id'],
+            progress_dict['collection_id'],
+            list(progress_dict['completed_explorations']),
+        )
+
+    def validate(self) -> None:
+        """Checks the user, collection, and completed exploration IDs.
+
+        Raises:
+            ValidationError. One or more progress fields are invalid.
+        """
+        if not isinstance(self.user_id, str) or not (
+            utils.is_user_id_valid(
+                self.user_id,
+                allow_system_user_id=True,
+                allow_pseudonymous_id=True,
+            )
+            and (
+                self.user_id in feconf.SYSTEM_USERS
+                or re.fullmatch(feconf.USER_ID_REGEX, self.user_id)
+                or re.fullmatch(feconf.PSEUDONYMOUS_ID_REGEX, self.user_id)
+            )
+        ):
+            raise utils.ValidationError('Invalid user ID: %s' % self.user_id)
+
+        if not isinstance(self.collection_id, str) or not re.fullmatch(
+            _COLLECTION_PROGRESS_ID_REGEX, self.collection_id
+        ):
+            raise utils.ValidationError(
+                'Invalid collection ID: %s' % self.collection_id
+            )
+
+        if not isinstance(self.completed_explorations, list):
+            raise utils.ValidationError(
+                'Expected completed explorations to be a list, received %s'
+                % self.completed_explorations
+            )
+
+        if any(
+            not isinstance(exploration_id, str)
+            or not re.fullmatch(_COLLECTION_PROGRESS_ID_REGEX, exploration_id)
+            for exploration_id in self.completed_explorations
+        ):
+            raise utils.ValidationError(
+                'Completed explorations must contain valid exploration IDs.'
+            )
+
+        if len(self.completed_explorations) != len(
+            set(self.completed_explorations)
+        ):
+            raise utils.ValidationError(
+                'Completed explorations must not contain duplicate IDs.'
+            )
 
 
 class CollectionChange(change_domain.BaseChange):
