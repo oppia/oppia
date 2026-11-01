@@ -37,7 +37,7 @@ const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
 const contributionTabClass = 'e2e-test-contribution-tab';
-const activeElementClass = 'e2e-test-active';
+const activeElementClass = 'oppia-contributions-active-navbar';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 const viewDropdownOptionClass = 'e2e-test-mobile-contribution-dropdown-option';
 const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
@@ -69,7 +69,52 @@ const featuredLanguageExplainationSelector =
 const languageDropdownToggleArrowSelector =
   '.e2e-test-language-dropdown-toggle-arrow';
 
+const entityTypeSelector = '.e2e-test-entity-type-selector';
+const selectedEntityTypeSelector = '.e2e-test-entity-type-selector-selected';
+const entityTypeOptionSelector = '.e2e-test-entity-type-selector-option';
+
+// How long to wait when checking whether the "Content Type" dropdown is
+// already open. The dropdown is toggled by a local click with no network call
+// behind it, so this only has to cover a render, and keeping it well below the
+// default probe timeout keeps the common closed case cheap.
+const dropdownStateProbeTimeoutMsecs = 2000;
+
+/**
+ * The options offered by the "Content Type" filter on the "Translate Text" and
+ * "Review Translations" tabs.
+ */
+export enum CONTENT_TYPE_FILTER {
+  ALL = 'All',
+  LESSONS = 'Lessons',
+  SKILLS = 'Skills',
+}
+
 export class Contributor extends ExplorationEditor {
+  /**
+   * Waits for the active opportunity list to finish loading its data.
+   */
+  private async waitForOpportunitiesToLoad(): Promise<void> {
+    // Unrelated requests can keep the page busy after the list is ready.
+    // Wait for its loading placeholders instead of global network silence.
+    await this.page.waitForFunction(() => {
+      const lists = Array.from(
+        document.querySelectorAll('.oppia-opportunities-list')
+      ).filter(list => (list as HTMLElement).offsetParent !== null);
+      return (
+        lists.length > 0 &&
+        lists.every(list => {
+          const placeholder = list.querySelector(
+            '.e2e-test-opportunity-loading-placeholder'
+          );
+          return (
+            placeholder !== null &&
+            (placeholder as HTMLElement).offsetParent === null
+          );
+        })
+      );
+    });
+  }
+
   /**
    * Checks if the active tab name is visible and matches the expected values.
    * @param tabName - The expected name of the active tab.
@@ -164,21 +209,30 @@ export class Contributor extends ExplorationEditor {
   ): Promise<ElementHandle<Element> | null> {
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
+      const {headingTitle, headingText, subheadingTitle, subheadingText} =
+        await opportunityItemElement.evaluate(
+          (el: Element, headingSel: string, subheadingSel: string) => {
+            const headingEl = el.querySelector(headingSel);
+            const subheadingEl = el.querySelector(subheadingSel);
+            return {
+              headingTitle: headingEl?.getAttribute('title')?.trim(),
+              headingText: headingEl?.textContent?.trim(),
+              subheadingTitle: subheadingEl?.getAttribute('title')?.trim(),
+              subheadingText: subheadingEl?.textContent?.trim(),
+            };
+          },
+          opportunityItemHeadingSelector,
+          opportunitySubHeadingSelector
+        );
+
+      const matchesHeading =
+        headingTitle === heading || headingText === heading;
+      const matchesSubheading = Boolean(
+        (subheadingTitle && subheadingTitle.includes(subheading)) ||
+          (subheadingText && subheadingText.includes(subheading))
       );
 
-      if (
-        opportunityItemHeading === heading &&
-        opportunityItemSubHeading?.includes(subheading)
-      ) {
+      if (matchesHeading && matchesSubheading) {
         return opportunityItemElement;
       }
     }
@@ -344,7 +398,7 @@ export class Contributor extends ExplorationEditor {
 
       await element.click();
 
-      const xpathActive = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}") and contains(@class, ${activeElementClass})]`;
+      const xpathActive = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}") and contains(@class, '${activeElementClass}')]`;
       await this.page.waitForXPath(xpathActive);
     }
   }
@@ -545,9 +599,19 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Tab ${tabName} not found.`);
     }
 
-    // Click on the tab.
-    await this.waitForElementToBeClickable(tabElement);
-    await tabElement.click();
+    // The tab is a list item and its click handler sits on the link inside it,
+    // so the link is what has to be clicked.
+    const tabLink = await tabElement.$('a');
+    if (!tabLink) {
+      throw new Error(`Tab ${tabName} has no link to click.`);
+    }
+
+    // The click is dispatched on the link rather than made natively because
+    // Puppeteer re-centres a target before dispatching a mouse event, which at
+    // mobile width parks the tab under the sticky navigation bar and delivers
+    // the click to the bar instead.
+    await this.waitForElementToStabilize(tabLink);
+    await tabLink.evaluate(el => (el as HTMLElement).click());
 
     // Verify tab is active.
     if (tabName !== 'My Contributions') {
@@ -634,6 +698,137 @@ export class Contributor extends ExplorationEditor {
       element.textContent?.trim()
     );
     expect(textContent).toBe(expectedStatus);
+  }
+
+  /**
+   * Checks how many rows have the given full heading and association.
+   * @param heading - The full row heading.
+   * @param subheading - The associated lesson or skill.
+   * @param count - The expected number of matching rows.
+   */
+  async expectOpportunityCountToBe(
+    heading: string,
+    subheading: string,
+    count: number
+  ): Promise<void> {
+    await this.waitForOpportunitiesToLoad();
+    const actualCount = await this.page.evaluate(
+      (
+        itemSelector: string,
+        headingSelector: string,
+        subheadingSelector: string,
+        expectedHeading: string,
+        expectedSubheading: string
+      ) => {
+        const rows = Array.from(document.querySelectorAll(itemSelector));
+        return rows.filter(row => {
+          const headingEl = row.querySelector(headingSelector);
+          const subheadingEl = row.querySelector(subheadingSelector);
+          const headingTitle = headingEl?.getAttribute('title')?.trim();
+          const headingText = headingEl?.textContent?.trim();
+          const subheadingTitle = subheadingEl?.getAttribute('title')?.trim();
+          const subheadingText = subheadingEl?.textContent?.trim();
+
+          const matchesHeading =
+            headingTitle === expectedHeading || headingText === expectedHeading;
+          const matchesSubheading = Boolean(
+            (subheadingTitle && subheadingTitle.includes(expectedSubheading)) ||
+              (subheadingText && subheadingText.includes(expectedSubheading))
+          );
+          return matchesHeading && matchesSubheading;
+        }).length;
+      },
+      opportunityItemSelector,
+      opportunityItemHeadingSelector,
+      opportunitySubHeadingSelector,
+      heading,
+      subheading
+    );
+    expect(actualCount).toBe(count);
+  }
+
+  /**
+   * Opens a submitted contribution and checks its review feedback.
+   * @param heading - The submitted translation.
+   * @param subheading - The contribution's association or deleted placeholder.
+   * @param message - The expected review feedback.
+   */
+  async viewContributionAndExpectReviewMessage(
+    heading: string,
+    subheading: string,
+    message: string
+  ): Promise<void> {
+    const row = await this.expectOpportunityToBePresent(heading, subheading);
+    if (!row) {
+      throw new Error(`Contribution ${heading} was not found.`);
+    }
+    const target = this.isViewportAtMobileWidth()
+      ? row
+      : await row.$('.e2e-test-opportunity-list-item-button');
+    if (!target) {
+      throw new Error(`View button for ${heading} was not found.`);
+    }
+    await target.evaluate(el => (el as HTMLElement).click());
+    await this.expectTextContentToBe('.oppia-review-message', message);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-translation-review-modal button[aria-label="Close"]'
+    );
+    await this.expectElementToBeVisible(
+      '.e2e-test-translation-review-modal',
+      false
+    );
+  }
+
+  /**
+   * Checks one unique skill opportunity and its accepted and pending counts.
+   * @param skillName - The skill's description.
+   * @param accepted - Accepted translations.
+   * @param pending - Translations awaiting review.
+   * @param total - Total translatable fields.
+   */
+  async expectSkillTranslationProgressToBe(
+    skillName: string,
+    accepted: number,
+    pending: number,
+    total: number
+  ): Promise<void> {
+    await this.expectOpportunityToBePresent(skillName, 'Skill');
+    const rows = await this.page.$$(opportunityItemSelector);
+    const matchingRows: ElementHandle<Element>[] = [];
+    for (const row of rows) {
+      const headingMatches = await row.$eval(
+        opportunityItemHeadingSelector,
+        (el, expected) =>
+          el.getAttribute('title')?.trim() === expected ||
+          el.textContent?.trim() === expected,
+        skillName
+      );
+      if (headingMatches) {
+        matchingRows.push(row);
+      }
+    }
+    expect(matchingRows.length).toBe(1);
+    for (const [selector, count, label] of [
+      ['.progress-bar.bg-success', accepted, 'accepted'],
+      ['.progress-bar.bg-light-green', pending, 'awaiting review'],
+    ] as const) {
+      const segment = await matchingRows[0].$(selector);
+      if (!segment) {
+        throw new Error(`Progress segment ${selector} was not found.`);
+      }
+      await segment.hover();
+      await this.expectTextContentToBe(
+        '.tooltip-inner',
+        `${count}/${total} cards ${label}`
+      );
+      await this.page.mouse.move(0, 0);
+      await this.expectElementToBeVisible('.tooltip-inner', false);
+    }
+    const percentage = await matchingRows[0].$eval(
+      '.e2e-test-opportunity-list-item-progress-percentage',
+      el => el.textContent?.trim()
+    );
+    expect(percentage).toBe(`(${Math.floor((100 * accepted) / total)}%)`);
   }
 
   /**
@@ -763,6 +958,132 @@ export class Contributor extends ExplorationEditor {
    */
   async expectQuestionInReviewModalToBe(question: string): Promise<void> {
     await this.expectTextContentToBe(rteDisplaySelector, question);
+  }
+
+  /**
+   * Selects an option in the "Content Type" filter.
+   * @param contentType - The content type to filter the opportunity list by.
+   */
+  async selectContentTypeFilter(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.openContentTypeFilterDropdown();
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    for (const option of await this.page.$$(entityTypeOptionSelector)) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contentType) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Content type option ${contentType} not found.`);
+    }
+
+    // The option is dispatched on the element for the same reason the toggle
+    // is. A native click re-centres the option first, which at mobile width
+    // puts it under the sticky navigation bar, and the click then lands on the
+    // bar instead. The dropdown closes on that outside click without the
+    // option ever being selected.
+    await optionElement.evaluate(el => (el as HTMLElement).click());
+
+    // Verify the option is selected.
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
+  }
+
+  /**
+   * Opens the "Content Type" dropdown, unless it is already open. The control
+   * toggles, so clicking it when the options are already showing would close
+   * them again.
+   */
+  private async openContentTypeFilterDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(selectedEntityTypeSelector);
+    const dropdownIsOpen = await this.isElementVisible(
+      entityTypeOptionSelector,
+      true,
+      dropdownStateProbeTimeoutMsecs
+    );
+    if (dropdownIsOpen) {
+      return;
+    }
+    await this.clickContentTypeFilterToggle();
+  }
+
+  /**
+   * Clicks the control that opens and closes the "Content Type" dropdown.
+   */
+  private async clickContentTypeFilterToggle(): Promise<void> {
+    // At mobile width the filter row sits under the sticky navigation bar.
+    // Puppeteer scrolls a target back to the centre of the viewport before it
+    // dispatches a mouse event, which parks the control under that bar and
+    // delivers the click to the bar instead, so the click is dispatched on the
+    // control itself where it cannot be intercepted.
+    const toggle = await this.page.waitForSelector(selectedEntityTypeSelector);
+    if (!toggle) {
+      throw new Error('The content type filter was not found.');
+    }
+    await this.waitForElementToStabilize(toggle);
+    await toggle.evaluate(el => (el as HTMLElement).click());
+  }
+
+  /**
+   * Checks that the "Content Type" filter offers exactly the expected options.
+   * The dropdown is closed again afterwards, so that the filter is left as it
+   * was found.
+   * @param expectedOptions - The options the dropdown should offer, in order.
+   */
+  async expectContentTypeFilterOptionsToBe(
+    expectedOptions: CONTENT_TYPE_FILTER[]
+  ): Promise<void> {
+    await this.openContentTypeFilterDropdown();
+
+    await this.expectElementToBeVisible(entityTypeOptionSelector);
+    const options = await this.page.$$eval(entityTypeOptionSelector, elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+
+    if (options.length !== expectedOptions.length) {
+      throw new Error(
+        `Expected the content type filter to offer ${expectedOptions.length} ` +
+          `options, but it offered ${options.length}: ${options}.`
+      );
+    }
+    for (let i = 0; i < expectedOptions.length; i++) {
+      if (options[i] !== expectedOptions[i]) {
+        throw new Error(
+          `Expected content type option ${i} to be "${expectedOptions[i]}", ` +
+            `but it was "${options[i]}".`
+        );
+      }
+    }
+    await this.clickContentTypeFilterToggle();
+    await this.expectElementToBeVisible(entityTypeOptionSelector, false);
+    showMessage(
+      `Success: The content type filter offers exactly ${expectedOptions}.`
+    );
+  }
+
+  /**
+   * Checks whether the "Content Type" filter is shown on the active tab.
+   * @param visible - Whether the filter should be shown.
+   */
+  async expectContentTypeFilterToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(entityTypeSelector, visible);
+  }
+
+  /**
+   * Checks that the "Content Type" filter currently shows the given option.
+   * @param contentType - The option the filter is expected to show.
+   */
+  async expectSelectedContentTypeFilterToBe(
+    contentType: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    await this.expectTextContentToBe(selectedEntityTypeSelector, contentType);
   }
 }
 

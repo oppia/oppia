@@ -108,6 +108,8 @@ const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const subtopicNameSelector = '.e2e-test-subtopic-name';
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const mobileSubtopicContentSelector = '.e2e-test-mobile-subtopic-content';
+const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
 const assignSubtopicButton = '.e2e-test-assign-subtopic';
 
 const skillsTab = 'a.e2e-test-skills-tab';
@@ -660,9 +662,7 @@ export class CurriculumAdmin extends TopicManager {
     addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.page.waitForSelector(addSkillButton);
     await this.clickOnElementWithSelector(addSkillButton);
     await this.fillSkillInfoAndSubmit(
@@ -836,6 +836,19 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Opens the subtopics accordion on mobile if it is not already open.
+   */
+  private async openSubtopicsSectionOnMobile(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(mobileSubtopicContentSelector))) {
+        await this.expectElementToBeVisible(subtopicReassignHeader);
+        await this.clickOnElementWithSelector(subtopicReassignHeader);
+        await this.expectElementToBeVisible(mobileSubtopicContentSelector);
+      }
+    }
+  }
+
+  /**
    * Open the topic editor page for a topic.
    */
   async openTopicEditor(topicName: string): Promise<void> {
@@ -868,6 +881,7 @@ export class CurriculumAdmin extends TopicManager {
     ]);
 
     expect(this.page.url()).toContain('/topic_editor/');
+    await this.expectElementToBeVisible(topicEditorContainerSelector);
   }
 
   /**
@@ -961,9 +975,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.clickOnElementWithSelector(addSubtopicButton);
     await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
@@ -1009,9 +1021,7 @@ export class CurriculumAdmin extends TopicManager {
     addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
     await this.clickOnElementWithSelector(addSubtopicButton);
     await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
@@ -1347,9 +1357,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
-    }
+    await this.openSubtopicsSectionOnMobile();
 
     await this.page.waitForSelector('div.e2e-test-skill-item', {visible: true});
     await this.page.evaluate(
@@ -1409,6 +1417,73 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(changeSubtopicAssignmentModal, {
       hidden: true,
     });
+    await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Remove a skill from a subtopic in the topic editor page.
+   */
+  async removeSkillFromSubtopicInTopicEditor(
+    skillName: string,
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.openSubtopicsSectionOnMobile();
+
+    await this.page.waitForSelector('.subtopic-name-card-header', {
+      visible: true,
+    });
+    await this.page.evaluate((targetSubtopic: string) => {
+      const headers = Array.from(
+        document.querySelectorAll('.subtopic-name-card-header')
+      ) as HTMLElement[];
+      const header = headers.find(el =>
+        el.textContent?.includes(targetSubtopic)
+      );
+      if (header) {
+        const card = header.closest('.subtopics-list-item');
+        if (card && !card.querySelector('.subtopic-skill')) {
+          header.click();
+        }
+      }
+    }, subtopicName);
+
+    await this.page.waitForSelector('.subtopic-skill', {visible: true});
+    await this.page.evaluate((targetSkill: string) => {
+      const skills = Array.from(
+        document.querySelectorAll('.subtopic-skill')
+      ) as HTMLElement[];
+      const matchedSkill = skills.find(el =>
+        el.textContent?.includes(targetSkill)
+      );
+      if (matchedSkill) {
+        const moreOptions = matchedSkill.querySelector(
+          'i.fa-ellipsis-v'
+        ) as HTMLElement;
+        if (moreOptions) {
+          moreOptions.click();
+        }
+      } else {
+        throw new Error(`Cannot find skill "${targetSkill}" in subtopic.`);
+      }
+    }, skillName);
+
+    await this.page.waitForSelector('.skill-edit-option', {visible: true});
+    await this.page.evaluate(() => {
+      const options = Array.from(
+        document.querySelectorAll('.skill-edit-option')
+      ) as HTMLElement[];
+      const removeOption = options.find(el =>
+        el.textContent?.includes('Remove from subtopic')
+      );
+      if (removeOption) {
+        removeOption.click();
+      } else {
+        throw new Error('Could not find "Remove from subtopic" option.');
+      }
+    });
+
     await this.saveTopicDraft(topicName);
   }
 
