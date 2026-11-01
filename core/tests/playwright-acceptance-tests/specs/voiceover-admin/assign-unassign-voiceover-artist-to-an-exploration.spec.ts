@@ -1,29 +1,9 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
- *
- * VA.MA. Assign, unassign voiceover artists to an exploration
- */
-
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+// import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
@@ -32,31 +12,32 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-// The backend 400 error is a known consequence of adding an invalid user ID.
-// By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
-// The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  new RegExp(
-    'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
-  ),
-  new RegExp('Sorry, we could not find the specified user.'),
-]);
+// ConsoleReporter.setConsoleErrorsToIgnore([
+//   new RegExp(
+//     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
+//   ),
+//   new RegExp('Sorry, we could not find the specified user.'),
+// ]);
 
-describe('Voiceover Admin', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
   let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
       'voiceover_admin@example.com',
+      browser,
       [ROLES.VOICEOVER_ADMIN]
     );
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -76,11 +57,12 @@ describe('Voiceover Admin', function () {
 
     await UserFactory.createNewUser(
       'voiceoverartist',
-      'voiceoverartist@example.com'
+      'voiceoverartist@example.com',
+      browser
     );
   });
 
-  it('should be able to add voiceover artist to an exploration', async function () {
+  test('should be able to add voiceover artist to an exploration', async function () {
     await voiceoverAdmin.navigateToExplorationEditor(explorationId);
     await voiceoverAdmin.dismissWelcomeModal();
     await voiceoverAdmin.navigateToExplorationSettingsTab();
@@ -100,6 +82,10 @@ describe('Voiceover Admin', function () {
       invalidIdErrorToastMessage
     );
     await voiceoverAdmin.closeErrorModal();
+    // await voiceoverAdmin.expectToSeeErrorToastMessage(
+    //   invalidIdErrorToastMessage
+    // );
+    // await voiceoverAdmin.closeToastMessage();
     await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
 
     // Add a valid user as a voiceover artist.
@@ -111,14 +97,14 @@ describe('Voiceover Admin', function () {
     await voiceoverAdmin.expectVoiceoverArtistsListContains('voiceoverartist');
   });
 
-  it('should be able to remove voiceover artist from an exploration', async function () {
+  test('should be able to remove voiceover artist from an exploration', async function () {
     await voiceoverAdmin.removeVoiceoverArtist('voiceoverartist');
     await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
       'voiceoverartist'
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
