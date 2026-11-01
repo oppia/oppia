@@ -218,6 +218,12 @@ const subtopicTitleInStudyTabSelector = '.subtopic-title';
 const newSubtopicViewerContainerSelector = '.new-subtopic-viewer-container';
 const studyGuideTitleSelector = `${newSubtopicViewerContainerSelector} .content-title`;
 const studyGuideSectionSelector = `${newSubtopicViewerContainerSelector} .card`;
+const studyGuideSectionHeaderSelector = '.e2e-test-study-guide-section-header';
+const studyGuideSectionTitleSelector = '.e2e-test-study-guide-section-title';
+const studyGuideSectionContentSelector =
+  '.e2e-test-study-guide-section-content';
+const highlightedStudyGuideSectionSelector =
+  '.e2e-test-highlighted-study-guide-section';
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
@@ -2400,6 +2406,92 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(expandWorkedExampleButton);
     await this.clickOnElementWithSelector(expandWorkedExampleButton);
     await this.expectElementToBeVisible(collapseWorkedExampleButton);
+  }
+
+  /**
+   * Clicks the title of a section of the open study guide, to expand it if it
+   * is collapsed or to collapse it if it is expanded.
+   * @param {string} sectionHeading - The heading of the section.
+   */
+  async toggleStudyGuideSection(sectionHeading: string): Promise<void> {
+    const sectionHeaderButton = this.page
+      .locator(studyGuideSectionSelector)
+      .filter({
+        has: this.page.locator(studyGuideSectionTitleSelector, {
+          hasText: sectionHeading,
+        }),
+      })
+      .locator(studyGuideSectionHeaderSelector);
+    const wasExpanded =
+      (await sectionHeaderButton.getAttribute('aria-expanded')) === 'true';
+
+    await sectionHeaderButton.click();
+
+    await expect(sectionHeaderButton).toHaveAttribute(
+      'aria-expanded',
+      wasExpanded ? 'false' : 'true'
+    );
+    showMessage(
+      `Study guide section "${sectionHeading}" is ` +
+        `${wasExpanded ? 'collapsed' : 'expanded'}.`
+    );
+  }
+
+  /**
+   * Checks that only the given sections of the open study guide are expanded
+   * (i.e. show their content), and that all the other sections are collapsed.
+   * @param {string[]} expandedSectionHeadings - The headings of the sections
+   * that should be expanded, in the order in which they appear.
+   */
+  async expectExpandedStudyGuideSectionsToBe(
+    expandedSectionHeadings: string[]
+  ): Promise<void> {
+    const expandedSections = this.page.locator(studyGuideSectionSelector, {
+      has: this.page.locator(studyGuideSectionContentSelector),
+    });
+    await expect(
+      expandedSections.locator(studyGuideSectionTitleSelector)
+    ).toHaveText(expandedSectionHeadings);
+    await expect(
+      this.page.locator(
+        `${studyGuideSectionHeaderSelector}[aria-expanded="true"]`
+      )
+    ).toHaveCount(expandedSectionHeadings.length);
+    showMessage(
+      `Expanded study guide sections are: ${expandedSectionHeadings.join(', ')}.`
+    );
+  }
+
+  /**
+   * Checks which section of the open study guide is highlighted.
+   * @param {string | null} sectionHeading - The heading of the section that
+   * should be highlighted, or null if no section should be highlighted.
+   */
+  async expectHighlightedStudyGuideSectionToBe(
+    sectionHeading: string | null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(studyGuideSectionSelector);
+    await expect(
+      this.page
+        .locator(highlightedStudyGuideSectionSelector)
+        .locator(studyGuideSectionTitleSelector)
+    ).toHaveText(sectionHeading === null ? [] : [sectionHeading]);
+    showMessage(
+      `Highlighted study guide section is: ${sectionHeading ?? 'none'}.`
+    );
+  }
+
+  /**
+   * Reopens the current study guide through a link to one of its sections.
+   * @param {number} sectionNumber - The position of the section in the study
+   * guide, starting from 1.
+   */
+  async openCurrentStudyGuideAtSection(sectionNumber: number): Promise<void> {
+    const studyGuideUrl = new URL(this.page.url());
+    studyGuideUrl.search = `?section=${sectionNumber}`;
+    await this.goto(studyGuideUrl.toString());
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(newSubtopicViewerContainerSelector);
   }
 
   /**

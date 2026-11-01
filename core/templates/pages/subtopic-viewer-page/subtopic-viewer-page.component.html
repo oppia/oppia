@@ -37,11 +37,19 @@
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
     <div class="content">
-      <div class="card" *ngFor="let section of sections">
-        <div class="card-header">
-          <h3 class="card-title">{{ section.heading.unicode }}</h3>
-        </div>
-        <div class="card-content">
+      <div class="card e2e-test-study-guide-section"
+           *ngFor="let section of sections; let i = index"
+           [ngClass]="{'card-highlighted e2e-test-highlighted-study-guide-section': isSectionHighlighted(i)}">
+        <h3 class="card-header">
+          <button type="button"
+                  class="card-header-button e2e-test-study-guide-section-header"
+                  [attr.aria-expanded]="isSectionExpanded(i)"
+                  (click)="toggleSection(i)">
+            <span class="card-title e2e-test-study-guide-section-title">{{ section.heading.unicode }}</span>
+            <i class="material-icons card-chevron" [ngClass]="{'card-chevron-expanded': isSectionExpanded(i)}" aria-hidden="true">expand_more</i>
+          </button>
+        </h3>
+        <div *ngIf="isSectionExpanded(i)" class="card-content e2e-test-study-guide-section-content">
           <oppia-rte-output-display [rteString]="section.content.html">
           </oppia-rte-output-display>
         </div>
