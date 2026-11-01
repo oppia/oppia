@@ -33,6 +33,9 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from 'services/user.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {LessonExitService} from './lesson-exit.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {
@@ -85,7 +88,10 @@ export class PlayerHeaderComponent {
     private ngbModal: NgbModal,
     private userService: UserService,
     private lessonExitService: LessonExitService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private localStorageService: LocalStorageService,
+    private checkpointProgressService: CheckpointProgressService
   ) {}
 
   ngOnInit(): void {
@@ -284,23 +290,55 @@ export class PlayerHeaderComponent {
     this.router.navigateByUrl(this.lessonExitService.getExitUrl());
   }
 
-  // Sends a logged-out learner to sign in. The intent is stored first because
-  // the lesson player reloads after sign-in and needs to know that the learner
-  // left through the exit modal (see NewConversationSkinComponent).
-  private signInToSaveProgress(): void {
-    this.lessonExitService.saveSignInIntent(this.explorationId);
+  private async signInToSaveProgress(): Promise<void> {
     this.preventPageUnloadEventService.removeListener();
-    this.userService.getLoginUrlAsync().then(
-      loginUrl => {
-        if (loginUrl) {
-          this.windowRef.nativeWindow.location.href = loginUrl;
-        } else {
-          this.windowRef.nativeWindow.location.reload();
-        }
-      },
-      () => {
-        this.lessonExitService.clearSignInIntent();
+    try {
+      await this.saveLoggedOutProgress();
+      this.lessonExitService.saveSignInIntent(this.explorationId);
+    } catch (e) {
+      // We still let the learner sign in, but without an exit intent: nothing
+      // was saved, so the player must not send them away as if it had been.
+      this.lessonExitService.clearSignInIntent();
+    }
+    try {
+      const loginUrl = await this.userService.getLoginUrlAsync();
+      if (loginUrl) {
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      } else {
+        this.windowRef.nativeWindow.location.reload();
       }
+    } catch (e) {
+      this.lessonExitService.clearSignInIntent();
+    }
+  }
+
+  // Records the checkpoint the logged-out learner has reached and keeps the
+  // resulting unique progress id in local storage.
+  private async saveLoggedOutProgress(): Promise<void> {
+    this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+    let checkpointStateName: string;
+    try {
+      checkpointStateName =
+        this.checkpointProgressService.getMostRecentlyReachedCheckpoint();
+    } catch (e) {
+      // No checkpoint has been reached yet, so there is no progress to save.
+      return;
+    }
+    const response =
+      await this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
+        this.explorationId
+      );
+    if (!response.version) {
+      return;
+    }
+    const progress =
+      await this.editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        this.explorationId,
+        response.version,
+        checkpointStateName
+      );
+    this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+      progress.unique_progress_url_id
     );
   }
 

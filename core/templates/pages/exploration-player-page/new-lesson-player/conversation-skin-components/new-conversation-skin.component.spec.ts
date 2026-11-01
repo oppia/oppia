@@ -1631,6 +1631,61 @@ describe('New Conversation skin component', () => {
       expect(componentInstance.initializePage).toHaveBeenCalled();
     }));
 
+    it('should stay in the lesson and keep the id when syncing progress fails', fakeAsync(() => {
+      setUpInit(true);
+      (
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner as jasmine.Spy
+      ).and.returnValue('abcdef');
+      spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
+      spyOn(
+        editableExplorationBackendApiService,
+        'changeLoggedOutProgressToLoggedInProgressAsync'
+      ).and.returnValue(Promise.reject('server error'));
+      spyOn(lessonExitService, 'consumeSignInIntent').and.returnValue({
+        explorationId: 'exp_id',
+        destinationUrl: '/learner-dashboard',
+        createdAtMsec: Date.now(),
+      });
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(
+        localStorageService.removeUniqueProgressIdOfLoggedOutLearner
+      ).not.toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.href).not.toBe(
+        '/learner-dashboard'
+      );
+      expect(componentInstance.initializePage).toHaveBeenCalled();
+    }));
+
+    it('should sync the saved progress before leaving for the destination', fakeAsync(() => {
+      setUpInit(true);
+      (
+        localStorageService.getUniqueProgressIdOfLoggedOutLearner as jasmine.Spy
+      ).and.returnValue('abcdef');
+      spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
+      const syncSpy = spyOn(
+        editableExplorationBackendApiService,
+        'changeLoggedOutProgressToLoggedInProgressAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(lessonExitService, 'consumeSignInIntent').and.returnValue({
+        explorationId: 'exp_id',
+        destinationUrl: '/learner-dashboard',
+        createdAtMsec: Date.now(),
+      });
+
+      componentInstance.ngOnInit();
+      flushMicrotasks();
+
+      expect(syncSpy).toHaveBeenCalledWith('exp_id', 'abcdef');
+      expect(
+        localStorageService.removeUniqueProgressIdOfLoggedOutLearner
+      ).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.href).toBe('/learner-dashboard');
+      expect(componentInstance.initializePage).not.toHaveBeenCalled();
+    }));
+
     it('should discard the intent when the learner is still logged out', fakeAsync(() => {
       setUpInit(false);
       spyOn(lessonExitService, 'clearSignInIntent');

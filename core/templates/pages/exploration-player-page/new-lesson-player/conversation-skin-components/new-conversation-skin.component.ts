@@ -331,19 +331,28 @@ export class NewConversationSkinComponent {
 
       let pid =
         this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
+      let progressIsSynced = true;
+
       if (pid && this.isLoggedIn && this.explorationId) {
-        await this.editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(
-          this.explorationId,
-          pid
-        );
-        this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+        try {
+          await this.editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(
+            this.explorationId,
+            pid
+          );
+          this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+        } catch (e) {
+          // Keep the id in local storage so the next load can retry, and keep
+          // going so that a failed sync never leaves the learner on a blank
+          // loading screen.
+          progressIsSynced = false;
+        }
       }
 
       if (this.isLoggedIn) {
         const exitIntent = this.lessonExitService.consumeSignInIntent(
           this.explorationId
         );
-        if (exitIntent) {
+        if (exitIntent && progressIsSynced) {
           this.preventPageUnloadEventService.removeListener();
           this.windowRef.nativeWindow.location.href = exitIntent.destinationUrl;
           return;

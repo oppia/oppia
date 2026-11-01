@@ -52,6 +52,9 @@ import {StoryViewerBackendApiService} from '../../../../domain/story_viewer/stor
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '../../../../services/user.service';
 import {PreventPageUnloadEventService} from '../../../../services/prevent-page-unload-event.service';
+import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
+import {LocalStorageService} from '../../../../services/local-storage.service';
+import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {LessonExitService} from './lesson-exit.service';
 import {LessonExitModalComponent} from './lesson-exit-modal.component';
 
@@ -97,6 +100,24 @@ class MockLessonExitService {
   hideExitModal = jasmine.createSpy('hideExitModal');
   saveSignInIntent = jasmine.createSpy('saveSignInIntent');
   clearSignInIntent = jasmine.createSpy('clearSignInIntent');
+}
+
+class MockCheckpointProgressService {
+  checkpoint: string | null = 'Mid';
+  getMostRecentlyReachedCheckpoint = jasmine
+    .createSpy('getMostRecentlyReachedCheckpoint')
+    .and.callFake(() => {
+      if (this.checkpoint === null) {
+        throw new Error('Last completed checkpoint is not set.');
+      }
+      return this.checkpoint;
+    });
+}
+
+class MockEditableExplorationBackendApiService {
+  recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner = jasmine
+    .createSpy('recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+    .and.returnValue(Promise.resolve({unique_progress_url_id: 'pid123'}));
 }
 
 class MockPreventPageUnloadEventService {
@@ -170,6 +191,14 @@ describe('Lesson player header component', () => {
         {provide: Router, useClass: MockRouter},
         {provide: UserService, useClass: MockUserService},
         {provide: LessonExitService, useClass: MockLessonExitService},
+        {
+          provide: CheckpointProgressService,
+          useClass: MockCheckpointProgressService,
+        },
+        {
+          provide: EditableExplorationBackendApiService,
+          useClass: MockEditableExplorationBackendApiService,
+        },
         {
           provide: PreventPageUnloadEventService,
           useClass: MockPreventPageUnloadEventService,
@@ -750,6 +779,134 @@ describe('Lesson player header component', () => {
         '/login?return_url=/lesson/expId'
       );
       expect(router.navigateByUrl).not.toHaveBeenCalled();
+    }));
+
+    describe('saving logged-out progress before signing in', () => {
+      let checkpointProgressService: MockCheckpointProgressService;
+      let editableApi: MockEditableExplorationBackendApiService;
+      let localStorageService: LocalStorageService;
+
+      beforeEach(() => {
+        checkpointProgressService = TestBed.inject(
+          CheckpointProgressService
+        ) as unknown as MockCheckpointProgressService;
+        editableApi = TestBed.inject(
+          EditableExplorationBackendApiService
+        ) as unknown as MockEditableExplorationBackendApiService;
+        localStorageService = TestBed.inject(LocalStorageService);
+        localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+        modalResult = Promise.resolve({
+          action: 'sign-in',
+          dontShowAgain: false,
+        });
+        spyOn(
+          readOnlyExplorationBackendApiService,
+          'loadLatestExplorationAsync'
+        ).and.returnValue(Promise.resolve({version: 7} as never));
+      });
+
+      afterEach(() => {
+        localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
+      });
+
+      it('should record the reached checkpoint and keep the progress id', fakeAsync(() => {
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
+        ).toHaveBeenCalledWith('expId', 7, 'Mid');
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe('pid123');
+        expect(mockWindowRef.nativeWindow.location.href).toBe(
+          '/login?return_url=/lesson/expId'
+        );
+      }));
+
+      it('should replace a stale progress id with a fresh one', fakeAsync(() => {
+        localStorageService.updateUniqueProgressIdOfLoggedOutLearner('old');
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
+        ).toHaveBeenCalledWith('expId', 7, 'Mid');
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe('pid123');
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe('old');
+      }));
+
+      it('should drop a stale progress id when there is nothing to save', fakeAsync(() => {
+        localStorageService.updateUniqueProgressIdOfLoggedOutLearner('old');
+        checkpointProgressService.checkpoint = null;
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe(null);
+        expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+      }));
+
+      it('should skip saving when no checkpoint has been reached', fakeAsync(() => {
+        checkpointProgressService.checkpoint = null;
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
+        ).not.toHaveBeenCalled();
+        expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+      }));
+
+      it('should skip saving when the exploration has no version', fakeAsync(() => {
+        (
+          readOnlyExplorationBackendApiService.loadLatestExplorationAsync as jasmine.Spy
+        ).and.returnValue(Promise.resolve({version: null}));
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
+        ).not.toHaveBeenCalled();
+        expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+      }));
+
+      it('should still send the learner to sign in if saving fails', fakeAsync(() => {
+        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
+          Promise.reject('server error')
+        );
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe(null);
+        expect(mockWindowRef.nativeWindow.location.href).toBe(
+          '/login?return_url=/lesson/expId'
+        );
+      }));
+    });
+
+    it('should not leave an exit intent behind if saving fails', fakeAsync(() => {
+      editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
+        Promise.reject('server error')
+      );
+
+      componentInstance.closePlayer();
+      tick();
+
+      expect(lessonExitService.saveSignInIntent).not.toHaveBeenCalled();
+      expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
     }));
 
     it('should reload when no sign in url is returned', fakeAsync(() => {
