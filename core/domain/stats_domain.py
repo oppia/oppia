@@ -28,8 +28,8 @@ from core.constants import constants
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import action_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
+    action_registry,  # pylint: disable=invalid-import-from
     customization_args_util,
     exp_domain,
     interaction_registry,

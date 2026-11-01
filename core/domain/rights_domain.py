@@ -18,8 +18,10 @@ from __future__ import annotations
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import user_services  # pylint: disable=invalid-import-from
-from core.domain import change_domain
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    user_services,
+)
 
 from typing import List, Optional, TypedDict
 
