@@ -13,42 +13,80 @@
 // limitations under the License.
 
 /**
- * @fileoverview Blog Admin users utility file.
+ * @fileoverview Utility methods for a blog admin in Playwright acceptance tests.
  */
-
-import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants, {BlogRoles} from '../common/test-constants';
+import {showMessage} from '../common/show-message';
+import {Page} from '@playwright/test';
 
-const blogAdminUrl = testConstants.URLs.BlogAdmin;
+const roleInput = 'input#label-target-update-form-name';
+const editorInput = 'input#label-target-form-reviewer-username';
+const limitInput = 'input#float-input';
+const adminUrl = testConstants.URLs.BlogAdmin;
 
-const roleSelectDropdown = 'select#label-target-update-form-role-select';
-const roleUpdateUsernameInput = 'input#label-target-update-form-name';
-const updateRoleButtonSelector = 'button.oppia-blog-admin-update-role-button';
+const updateBtn = 'button.oppia-blog-admin-update-role-button';
+const removeBtn = 'button.oppia-blog-admin-remove-blog-editor-button';
+
+const saveTxt = 'Save';
 
 export class BlogAdmin extends BaseUser {
-  /**
-   * This function navigates to the blog admin page.
-   */
   async navigateToBlogAdminPage(): Promise<void> {
-    await this.goto(blogAdminUrl);
+    await this.goto(adminUrl);
   }
 
-  /**
-   * This function assigns a user with a role from the blog admin page.
-   */
   async assignUserToRoleFromBlogAdminPage(
-    username: string,
+    user: string,
     role: BlogRoles
   ): Promise<void> {
-    await this.page.selectOption(roleSelectDropdown, role);
-    await this.typeInInputField(roleUpdateUsernameInput, username);
-    await this.clickOnElementWithSelector(updateRoleButtonSelector);
+    await this.page.selectOption(
+      'select#label-target-update-form-role-select',
+      role
+    );
+    await this.typeInInputField(roleInput, user);
+    await this.clickOnElementWithSelector(updateBtn);
+    await this.expectElementToBeClickable(updateBtn, false);
+  }
 
-    await this.expectElementToBeClickable(updateRoleButtonSelector, false);
+  async removeBlogEditorRoleFromUsername(user: string): Promise<void> {
+    await this.goto(adminUrl);
+    await this.typeInInputField(editorInput, user);
+    await this.clickOnElementWithSelector(removeBtn);
+    await this.expectElementToBeClickable(removeBtn, false);
+  }
+
+  async setMaximumTagLimitTo(limit: number): Promise<void> {
+    await this.expectElementToBeVisible(limitInput);
+    await this.clearAllTextFrom(limitInput);
+    await this.typeInInputField(limitInput, limit.toString());
+    await this.clickOnElementWithText(saveTxt);
+
+    const msg1 = this.page.getByText('Saving...');
+    await msg1.waitFor({state: 'visible'});
+
+    const msg2 = this.page.getByText('Data saved successfully.');
+    await msg2.waitFor({state: 'visible'});
+
+    showMessage(`Successfully updated the tag limit to ${limit}!`);
+  }
+
+  async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
+    await this.expectElementToBeVisible(limitInput);
+    const val = await this.page.locator(limitInput).inputValue();
+    if (parseInt(val) === limit) {
+      throw new Error(`Maximum tag limit is already ${limit}!`);
+    }
+    showMessage(`Maximum tag limit is not ${limit}!`);
+  }
+
+  async expectMaximumTagLimitToBe(limit: number): Promise<void> {
+    await this.expectElementToBeVisible(limitInput);
+    const val = await this.page.locator(limitInput).inputValue();
+    if (parseInt(val) !== limit) {
+      throw new Error(`Maximum tag limit is not ${limit}!`);
+    }
+    showMessage(`Maximum tag is currently ${limit}!`);
   }
 }
 
-export const BlogAdminFactory = (page: Page): BlogAdmin => {
-  return new BlogAdmin(page);
-};
+export let BlogAdminFactory = (page: Page): BlogAdmin => new BlogAdmin(page);
