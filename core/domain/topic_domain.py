@@ -1232,7 +1232,7 @@ class Topic:
     def from_dict(
         cls,
         topic_dict: TopicDict,
-        topic_version: int = 0,
+        topic_version: int = feconf.INITIAL_ENTITY_VERSION,
         topic_created_on: Optional[datetime.datetime] = None,
         topic_last_updated: Optional[datetime.datetime] = None,
     ) -> Topic:
@@ -1804,7 +1804,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             1,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             '',
             False,

@@ -2138,7 +2138,7 @@ class Story:
     def from_dict(
         cls,
         story_dict: StoryDict,
-        story_version: int = 0,
+        story_version: int = feconf.INITIAL_ENTITY_VERSION,
         story_created_on: Optional[datetime.datetime] = None,
         story_last_updated: Optional[datetime.datetime] = None,
     ) -> Story:
@@ -2239,7 +2239,7 @@ class Story:
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE,
             corresponding_topic_id,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
             url_fragment,
             str(meta_tag_content),
         )
