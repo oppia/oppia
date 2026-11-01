@@ -223,6 +223,10 @@ export class PageContextService {
     PageContextService.customEntityContext = null;
   }
 
+  getCustomEntityContext(): EntityContext | null {
+    return PageContextService.customEntityContext;
+  }
+
   getEntityId(): string {
     if (PageContextService.customEntityContext !== null) {
       return PageContextService.customEntityContext.getId();

@@ -30,6 +30,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
+import {UrlService} from 'services/contextual/url.service';
 import {AppConstants} from 'app.constants';
 
 describe('SkillSelectorEditorComponent', () => {
@@ -37,6 +38,7 @@ describe('SkillSelectorEditorComponent', () => {
   let fixture: ComponentFixture<SkillSelectorEditorComponent>;
   let skillBackendApiService: SkillBackendApiService;
   let pageContextService: PageContextService;
+  let urlService: UrlService;
   let fetchAllSkillsEmitter = new EventEmitter();
 
   let skills = [
@@ -126,11 +128,15 @@ describe('SkillSelectorEditorComponent', () => {
 
   beforeEach(() => {
     pageContextService = TestBed.inject(PageContextService);
+    urlService = TestBed.inject(UrlService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     fixture = TestBed.createComponent(SkillSelectorEditorComponent);
     component = fixture.componentInstance;
 
     component.value = 'skillId';
+    // The custom entity context is static, so it is cleared here to stop
+    // values set in other tests from leaking into this one.
+    pageContextService.removeCustomEntityContext();
   });
 
   afterEach(() => {
@@ -180,19 +186,33 @@ describe('SkillSelectorEditorComponent', () => {
   });
 
   it(
-    'should restore custom entity for images of question-editor' +
-      'when component is destroyed',
+    'should restore the previous custom entity context when the component' +
+      ' is destroyed',
     () => {
-      spyOn(pageContextService, 'setCustomEntityContext');
+      pageContextService.setCustomEntityContext('question', 'questionId');
 
-      component.initialEntityId = 'exampleEntityId';
-      component.initialEntityType = 'exampleEntityType';
+      component.ngOnInit();
       component.ngOnDestroy();
 
-      expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
-        'exampleEntityType',
-        'exampleEntityId'
+      expect(pageContextService.getEntityType()).toBe('question');
+      expect(pageContextService.getEntityId()).toBe('questionId');
+    }
+  );
+
+  it(
+    'should use the entity from the URL after the component is destroyed' +
+      ' if there was no custom entity context when it was initialised',
+    () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/skillId');
+      const getHashSpy = spyOn(urlService, 'getHash').and.returnValue(
+        '#/questions#questionA'
       );
+
+      component.ngOnInit();
+      component.ngOnDestroy();
+      getHashSpy.and.returnValue('#/questions#questionB');
+
+      expect(pageContextService.getEntityId()).toBe('questionB');
     }
   );
 

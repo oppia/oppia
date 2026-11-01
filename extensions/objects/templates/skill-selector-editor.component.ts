@@ -29,6 +29,7 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillBackendDict} from 'domain/skill/skill.model.ts';
+import {EntityContext} from 'domain/utilities/entity-context.model';
 import {PageContextService} from 'services/page-context.service';
 
 @Component({
@@ -43,8 +44,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
-  initialEntityId!: string;
-  initialEntityType?: string;
+  initialCustomEntityContext: EntityContext | null = null;
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
@@ -88,8 +88,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.showLoading = true;
     this.skills = [];
-    this.initialEntityId = this.pageContextService.getEntityId();
-    this.initialEntityType = this.pageContextService.getEntityType();
+    this.initialCustomEntityContext =
+      this.pageContextService.getCustomEntityContext();
     if (this.value) {
       this.pageContextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL,
@@ -115,19 +115,22 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pageContextService.removeCustomEntityContext();
     /**
-     * Restore the entity context to that of the state before the skill selector
-     * editor was initialized. This prevents change of context issues in calling
-     * components once the editor is closed, e.g. uploading images in the
-     * question editor.
-     * See issue #16985 for detailed discussion.
+     * Restore exactly the custom entity context that existed before the skill
+     * selector editor was initialized, e.g. so that images uploaded in the
+     * question editor afterwards are saved to the right entity (see issue
+     * #16985). If there was none, remove it so that the entity context is
+     * derived from the URL again; otherwise it would stay pinned to the
+     * current entity (e.g. the previously opened question) after navigating
+     * elsewhere.
      */
-    if (this.initialEntityId && this.initialEntityType) {
+    if (this.initialCustomEntityContext) {
       this.pageContextService.setCustomEntityContext(
-        this.initialEntityType,
-        this.initialEntityId
+        this.initialCustomEntityContext.getType(),
+        this.initialCustomEntityContext.getId()
       );
+    } else {
+      this.pageContextService.removeCustomEntityContext();
     }
   }
 }
