@@ -1257,9 +1257,24 @@ export class BaseUser {
   /**
    * Selects the mat-option with the given value.
    * @param value The value of the mat-option to select.
+   * @param exactMatch Whether the option text must match the value exactly
+   *     instead of just containing it (e.g. so that "1" doesn't select "18").
    */
-  async selectMatOption(value: string): Promise<void> {
-    await this.clickOnElementWithSelectorAndText('mat-option', value);
+  async selectMatOption(
+    value: string,
+    exactMatch: boolean = false
+  ): Promise<void> {
+    if (exactMatch) {
+      const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const option = this.page
+        .locator('mat-option')
+        .filter({hasText: new RegExp(`^\\s*${escapedValue}\\s*$`)})
+        .first();
+      await option.waitFor({state: 'visible'});
+      await option.click();
+    } else {
+      await this.clickOnElementWithSelectorAndText('mat-option', value);
+    }
     await this.expectElementToBeVisible('mat-option', false);
   }
 
