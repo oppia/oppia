@@ -63,6 +63,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -131,6 +133,8 @@ class MockPlatformFeatureService {
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
+  let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
+  let computeGraphService: jasmine.SpyObj<ComputeGraphService>;
   let translateTextService: TranslateTextService;
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let translationLanguageService: TranslationLanguageService;
@@ -181,6 +185,22 @@ describe('Translation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
+    readOnlyExplorationBackendApiService = jasmine.createSpyObj(
+      'ReadOnlyExplorationBackendApiService',
+      ['fetchExplorationAsync']
+    );
+    readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
+      Promise.resolve({
+        exploration: {init_state_name: 'stateName1', states: {}},
+      })
+    );
+    computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
+      'computeBfsTraversalOfStates',
+    ]);
+    computeGraphService.computeBfsTraversalOfStates.and.returnValue([
+      'stateName1',
+      'stateName2',
+    ]);
     mockModalRef = new MockConfirmTranslationExitModal();
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -237,6 +257,14 @@ describe('Translation Modal Component', () => {
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
+        },
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useValue: readOnlyExplorationBackendApiService,
+        },
+        {
+          provide: ComputeGraphService,
+          useValue: computeGraphService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
