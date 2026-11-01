@@ -470,9 +470,8 @@ export class BlogPostEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
-        await allDraftBlogPosts[i].$eval(
-          blogPostEditBoxSelector,
-          element => (element as HTMLElement).click()
+        await allDraftBlogPosts[i].$eval(blogPostEditBoxSelector, element =>
+          (element as HTMLElement).click()
         );
         await this.clickOnElementWithSelector(editBlogPostBtnSelector);
         return;
