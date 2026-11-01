@@ -1,0 +1,27 @@
+body:
+- type: textarea
+  id: goal
+  attributes:
+    label: What are you trying to find or understand?
+    description: "Please describe the feature, component, file, or part of the codebase you are trying to locate or understand."
+  validations:
+    required: true
+- type: textarea
+  id: investigation
+  attributes:
+    label: What have you already investigated?
+    description: "Please describe the files, directories, documentation, searches, or approaches you have already tried."
+  validations:
+    required: true
+- type: textarea
+  id: context
+  attributes:
+    label: Additional context
+    description: |
+        Add any other information that might help others point you in the right direction.
+
+        Before posting, please also review:
+        https://github.com/oppia/oppia/wiki/Debugging-Docs
+        https://github.com/oppia/oppia/wiki/Get-help#how-to-ask-good-questions
+  validations:
+    required: false

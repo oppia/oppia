@@ -1,0 +1,34 @@
+body:
+- type: textarea
+  id: question
+  attributes:
+    label: What is your question?
+    description: "Please describe your question as clearly and specifically as possible."
+  validations:
+    required: true
+- type: textarea
+  id: context
+  attributes:
+    label: Context
+    description: "Please provide any relevant context, steps, or examples that will help others understand your question."
+  validations:
+    required: true
+- type: textarea
+  id: approaches
+  attributes:
+    label: What have you already tried?
+    description: "Please describe what you have already tried and any conclusions you have drawn."
+  validations:
+    required: false
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional information
+    description: |
+        Add any other information that might be helpful.
+
+        Before posting, please also review:
+        https://github.com/oppia/oppia/wiki/Debugging-Docs
+        https://github.com/oppia/oppia/wiki/Get-help#how-to-ask-good-questions
+  validations:
+    required: false
