@@ -16,7 +16,7 @@
  * @fileoverview Component for the new lesson player header
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -31,7 +31,12 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -42,6 +47,8 @@ import {
   LessonExitModalComponent,
   LessonExitModalResult,
 } from './lesson-exit-modal.component';
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 enum PageContextConstants {
   EXPLORATION_PAGE = 'exploration',
@@ -91,7 +98,9 @@ export class PlayerHeaderComponent {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private localStorageService: LocalStorageService,
-    private checkpointProgressService: CheckpointProgressService
+    private checkpointProgressService: CheckpointProgressService,
+    private windowDimensionsService: WindowDimensionsService,
+    @Optional() private bottomSheet: MatBottomSheet
   ) {}
 
   ngOnInit(): void {
@@ -264,26 +273,50 @@ export class PlayerHeaderComponent {
       return;
     }
 
+    const modalOrSheetRef = this.openExitModal(isLoggedIn);
+    const onResult = (result: LessonExitModalResult): void => {
+      if (result.action === 'sign-in') {
+        this.signInToSaveProgress();
+        return;
+      }
+      if (result.dontShowAgain) {
+        this.lessonExitService.hideExitModal(username);
+      }
+      this.exitLesson();
+    };
+
+    if ('result' in modalOrSheetRef) {
+      modalOrSheetRef.result.then(onResult, () => {
+        // The learner dismissed the modal, which means they stay in the lesson.
+      });
+    } else {
+      modalOrSheetRef.afterDismissed().subscribe(result => {
+        // A dismissed bottom sheet gives back 'cancel' or nothing, not a
+        // result object, which also means the learner stays in the lesson.
+        if (result && typeof result === 'object') {
+          onResult(result);
+        }
+      });
+    }
+  }
+
+  private openExitModal(
+    isLoggedIn: boolean
+  ): NgbModalRef | MatBottomSheetRef<LessonExitModalComponent> {
+    if (this.isMobileScreenSize()) {
+      return this.bottomSheet.open(LessonExitModalComponent, {
+        data: {isLoggedIn: isLoggedIn},
+      });
+    }
     const modalRef = this.ngbModal.open(LessonExitModalComponent, {
-      backdrop: true,
+      backdrop: 'static',
     });
     modalRef.componentInstance.isLoggedIn = isLoggedIn;
+    return modalRef;
+  }
 
-    modalRef.result.then(
-      (result: LessonExitModalResult) => {
-        if (result.action === 'sign-in') {
-          this.signInToSaveProgress();
-          return;
-        }
-        if (result.dontShowAgain) {
-          this.lessonExitService.hideExitModal(username);
-        }
-        this.exitLesson();
-      },
-      () => {
-        // The learner dismissed the modal, which means they stay in the lesson.
-      }
-    );
+  isMobileScreenSize(): boolean {
+    return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
   }
 
   private exitLesson(): void {

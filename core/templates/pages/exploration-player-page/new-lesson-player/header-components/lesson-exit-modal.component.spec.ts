@@ -20,6 +20,11 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LessonExitModalComponent} from './lesson-exit-modal.component';
 
@@ -147,5 +152,102 @@ describe('Lesson exit modal', () => {
 
       expect(ngbActiveModal.dismiss).toHaveBeenCalled();
     });
+  });
+});
+
+describe('Lesson exit modal in a bottom sheet', () => {
+  let fixture: ComponentFixture<LessonExitModalComponent>;
+  let component: LessonExitModalComponent;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownEvents: Subject<{key: string}>;
+  let sheetData: {isLoggedIn: boolean};
+
+  beforeEach(waitForAsync(() => {
+    keydownEvents = new Subject<{key: string}>();
+    sheetData = {isLoggedIn: false};
+    bottomSheetRef = jasmine.createSpyObj<MatBottomSheetRef>(
+      'MatBottomSheetRef',
+      ['dismiss', 'keydownEvents']
+    );
+    bottomSheetRef.keydownEvents.and.returnValue(keydownEvents.asObservable());
+
+    TestBed.configureTestingModule({
+      imports: [FormsModule],
+      declarations: [LessonExitModalComponent, MockTranslatePipe],
+      providers: [
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {provide: MAT_BOTTOM_SHEET_DATA, useValue: sheetData},
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LessonExitModalComponent);
+    component = fixture.componentInstance;
+  });
+
+  const query = (selector: string): HTMLElement | null =>
+    fixture.nativeElement.querySelector(selector);
+
+  it('should read the login state from the bottom sheet data', () => {
+    sheetData.isLoggedIn = true;
+
+    fixture.detectChanges();
+
+    expect(component.isLoggedIn).toBeTrue();
+    expect(query('.e2e-test-lesson-exit-saved-text')).not.toBeNull();
+    expect(query('.e2e-test-lesson-exit-lost-text')).toBeNull();
+  });
+
+  it('should show the logged-out body when the learner is logged out', () => {
+    sheetData.isLoggedIn = false;
+
+    fixture.detectChanges();
+
+    expect(component.isLoggedIn).toBeFalse();
+    expect(query('.e2e-test-lesson-exit-lost-text')).not.toBeNull();
+  });
+
+  it('should dismiss the sheet with the result when the learner chooses', () => {
+    sheetData.isLoggedIn = false;
+    fixture.detectChanges();
+
+    (query('.e2e-test-lesson-exit-sign-in') as HTMLElement).click();
+
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      action: 'sign-in',
+      dontShowAgain: false,
+    });
+  });
+
+  it('should report dontShowAgain for a logged-in learner', () => {
+    sheetData.isLoggedIn = true;
+    fixture.detectChanges();
+    component.dontShowAgain = true;
+
+    component.close('exit');
+
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      action: 'exit',
+      dontShowAgain: true,
+    });
+  });
+
+  it('should dismiss the sheet when the learner stays', () => {
+    sheetData.isLoggedIn = false;
+    fixture.detectChanges();
+
+    (query('.e2e-test-lesson-exit-stay') as HTMLElement).click();
+
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
+  it('should dismiss the sheet when Escape is pressed', () => {
+    fixture.detectChanges();
+
+    keydownEvents.next({key: 'Escape'});
+
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   });
 });

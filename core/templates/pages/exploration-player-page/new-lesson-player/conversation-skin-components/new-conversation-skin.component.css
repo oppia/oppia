@@ -173,9 +173,9 @@ oppia-card-navigation-control {
 @media (min-width: 769px) and (max-width: 1023px) {
   .new-conversation-skin-cards-container {
     display: block;
-    padding-top: 56px;
     padding-left: 80px;
     padding-right: 80px;
+    padding-top: 56px;
   }
 
   .new-conversation-skin-tutor-card-container {

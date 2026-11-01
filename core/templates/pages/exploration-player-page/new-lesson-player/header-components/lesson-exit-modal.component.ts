@@ -17,8 +17,12 @@
  * the lesson player.
  */
 
-import {Component} from '@angular/core';
+import {Component, Inject, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 export type LessonExitAction = 'exit' | 'sign-in' | 'exit-without-saving';
@@ -34,14 +38,26 @@ export interface LessonExitModalResult {
   styleUrls: ['./lesson-exit-modal.component.css'],
 })
 export class LessonExitModalComponent extends ConfirmOrCancelModal {
-  // This property is set by the opener through componentInstance, so we
-  // need a non-null assertion here. For more information see
+  // On desktop this is set by the opener through componentInstance; on mobile
+  // it comes from the bottom sheet data. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   isLoggedIn!: boolean;
   dontShowAgain = false;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() ngbActiveModal: NgbActiveModal,
+    @Optional() bottomSheetRef: MatBottomSheetRef,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data: {isLoggedIn: boolean} | null
+  ) {
+    super(ngbActiveModal, bottomSheetRef);
+  }
+
+  ngOnInit(): void {
+    if (this.data) {
+      this.isLoggedIn = this.data.isLoggedIn;
+    }
   }
 
   close(action: LessonExitAction): void {
@@ -51,6 +67,7 @@ export class LessonExitModalComponent extends ConfirmOrCancelModal {
       // modal is the only place a logged-out learner is offered to save.
       dontShowAgain: this.isLoggedIn && this.dontShowAgain,
     };
-    this.ngbActiveModal.close(result);
+    // Closes the modal or dismisses the bottom sheet, with the result.
+    this.confirm(result);
   }
 }

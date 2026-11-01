@@ -1,7 +1,8 @@
+/* stylelint-disable selector-pseudo-element-no-unknown */
 .audio-progress-bar ::ng-deep .mat-slider-track-fill,
 .audio-progress-bar ::ng-deep .mat-slider-thumb,
 .audio-progress-bar ::ng-deep .mat-slider-thumb-label {
-  background: #0F766E !important;
+  background: #0f766e !important;
 }
 
 .oppia-new-audio-bar {

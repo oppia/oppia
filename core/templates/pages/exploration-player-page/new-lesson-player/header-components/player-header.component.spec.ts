@@ -836,9 +836,6 @@ describe('Lesson player header component', () => {
         expect(
           localStorageService.getUniqueProgressIdOfLoggedOutLearner()
         ).toBe('pid123');
-        expect(
-          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
-        ).toBe('old');
       }));
 
       it('should drop a stale progress id when there is nothing to save', fakeAsync(() => {
@@ -895,19 +892,19 @@ describe('Lesson player header component', () => {
           '/login?return_url=/lesson/expId'
         );
       }));
+
+      it('should not leave an exit intent behind if saving fails', fakeAsync(() => {
+        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
+          Promise.reject('server error')
+        );
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(lessonExitService.saveSignInIntent).not.toHaveBeenCalled();
+        expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
+      }));
     });
-
-    it('should not leave an exit intent behind if saving fails', fakeAsync(() => {
-      editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.returnValue(
-        Promise.reject('server error')
-      );
-
-      componentInstance.closePlayer();
-      tick();
-
-      expect(lessonExitService.saveSignInIntent).not.toHaveBeenCalled();
-      expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
-    }));
 
     it('should reload when no sign in url is returned', fakeAsync(() => {
       modalResult = Promise.resolve({action: 'sign-in', dontShowAgain: false});
