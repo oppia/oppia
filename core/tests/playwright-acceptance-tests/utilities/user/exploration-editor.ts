@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, Locator, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -25,6 +25,7 @@ import {RTEEditor} from '../common/rte-editor';
 import * as fs from 'fs';
 import * as path from 'path';
 import {StateEditorUtils} from '../common/state-editor-utils';
+import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -108,7 +109,32 @@ const floatFormInput = '.e2e-test-float-form-input';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
 const textInputInteractionOption =
   'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
+const textInputField = '.e2e-test-text-input';
 const intEditorField = '.e2e-test-editor-int';
+const interactionPreviewSelector = '.e2e-test-interaction-preview';
+const interactionSelector = '.e2e-test-interaction';
+const deleteInteractionButtonSelector = '.e2e-test-delete-interaction';
+const cardContentSelector =
+  '.e2e-test-state-editor .e2e-test-state-content-display';
+const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
+const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
+const editOutcomeDestPencilButtonSelector =
+  '.e2e-test-edit-outcome-dest-pencil-button';
+const stateNodeSelector = '.e2e-test-node-label';
+const closeModalButtonSelector = '.e2e-test-modal-close-button';
+const currentHintSummarySelector =
+  '.e2e-test-current-hint-box .e2e-test-response-summary';
+const currentSolutionSummarySelector =
+  '.e2e-test-oppia-solution-tab .e2e-test-response-summary';
+const ruleEditorSelector = 'oppia-rule-editor';
+const algebraicExpressionEditorSelector = '.e2e-test-guppy-div';
+const numberWithUnitsEditorSelector = 'number-with-units-editor';
+const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
+const customCharactersSelector = '.e2e-test-custom-letters';
+const selfLoopWarningSelector = '.e2e-test-response-self-loop-warning';
+const uploadImageButtonSelector = '.e2e-test-upload-image';
+const useUploadedImageButtonSelector = '.e2e-test-use-image';
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
@@ -407,6 +433,58 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(addInteractionModalSelector, false);
     }
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Adds a Multiple Choice interaction with the supplied options.
+   */
+  private async replaceRichTextEditorContents(
+    editors: Locator,
+    values: string[]
+  ): Promise<void> {
+    for (const [index, value] of values.entries()) {
+      const editor = editors.nth(index);
+      await editor.click();
+      await this.page.keyboard.press('Control+A');
+      await this.page.keyboard.press('Backspace');
+      await this.page.keyboard.type(value);
+      await expect(editor).toHaveText(value);
+    }
+  }
+
+  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
+    await this.expectElementToBeVisible(loadingFullPageOverlaySelector, false);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.expectModalTitleToBe('Choose Interaction');
+    await this.expectElementToBeVisible('css=.tab-pane.active.show');
+    const interactionTile = this.page.locator(
+      `${customizeInteractionBodySelector} .e2e-test-interaction-tile-MultipleChoiceInput`
+    );
+    await interactionTile.waitFor({state: 'visible'});
+    await interactionTile.click();
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Multiple Choice)'
+    );
+    const customizationBody = this.page.locator(
+      customizeInteractionBodySelector
+    );
+    const optionEditors = customizationBody.locator(stateContentInputField);
+    for (
+      let index = await optionEditors.count();
+      index < options.length;
+      index++
+    ) {
+      await customizationBody.locator(addResponseOptionButton).click();
+    }
+    if ((await optionEditors.count()) !== options.length) {
+      throw new Error(
+        `Expected ${options.length} multiple-choice options, found ${await optionEditors.count()}.`
+      );
+    }
+    await this.replaceRichTextEditorContents(optionEditors, options);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
   }
 
   /**
@@ -1026,18 +1104,42 @@ export class ExplorationEditor extends BaseUser {
    * @param {boolean} retry - Whether to retry navigation if it fails (default: true).
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
-    let elements;
+    const headingName = !cardName.trimEnd().endsWith('...')
+      ? cardName
+      : cardName.trimEnd().slice(0, -3);
+
+    const currentCardHeading = await this.page
+      .locator(currentCardNameContainerSelector)
+      .textContent()
+      .catch(() => null);
+    if (currentCardHeading?.includes(headingName)) {
+      if (this.isViewportAtMobileWidth()) {
+        const graphModal = this.page.locator(
+          explorationStateGraphModalSelector
+        );
+        if (await graphModal.isVisible().catch(() => false)) {
+          await this.clickOnElementWithSelector(closeModalButtonSelector);
+          await this.expectElementToBeVisible(
+            explorationStateGraphModalSelector,
+            false
+          );
+        }
+      }
+      return;
+    }
+
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
       // resize button.
-      const stateGraphModalIsOpen = await this.page.$(
-        explorationStateGraphModalSelector
-      );
+      const graphModal = this.page.locator(explorationStateGraphModalSelector);
+      const stateGraphModalIsOpen = await graphModal
+        .isVisible()
+        .catch(() => false);
       if (!stateGraphModalIsOpen) {
         // Wait for any blocking modal to close first before clicking the
         // resize button.
-        const blockingModal = await this.page.$('div.modal-content');
-        if (blockingModal) {
+        const blockingModal = this.page.locator('div.modal-content');
+        if (await blockingModal.isVisible().catch(() => false)) {
           await this.expectElementToBeVisible('div.modal-content', false);
         }
         await this.expectElementToBeVisible(mobileStateGraphResizeButton);
@@ -1055,45 +1157,29 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(explorationStateGraphModalSelector);
     }
     await this.expectElementToBeVisible(scopedStateNodeGroupSelector);
-    elements = await this.page.$$(scopedStateNodeGroupSelector);
-
-    const cardNames = await Promise.all(
-      elements.map(element =>
-        element.$eval(
-          '.e2e-test-node-label',
-          node => node.textContent?.trim() || ''
-        )
-      )
-    );
-    const cardIndex = cardNames.indexOf(cardName);
+    const stateNodeGroups = this.page.locator(scopedStateNodeGroupSelector);
+    const cardNames = (
+      await stateNodeGroups.locator('.e2e-test-node-label').allTextContents()
+    ).map(cardName => cardName.trim());
+    let cardIndex = cardNames.indexOf(cardName);
+    if (cardIndex === -1) {
+      const truncatedCardName =
+        cardName.length > 15 ? `${cardName.slice(0, 12)}...` : cardName;
+      cardIndex = cardNames.indexOf(truncatedCardName);
+    }
 
     if (cardIndex === -1) {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
-    if (!nodeGroup) {
-      throw new Error(`Could not find card button for card: ${cardName}`);
-    }
-
     // Click on the node background rect which has the click handler.
-    const nodeBackground = await this.getElementInParent(
-      '.e2e-test-node-background',
-      nodeGroup
-    );
-    if (!nodeBackground) {
-      throw new Error(
-        `Could not find clickable background for card: ${cardName}`
-      );
-    }
-    await nodeBackground.evaluate(el =>
-      el.scrollIntoView({block: 'center', inline: 'center'})
-    );
-    await this.clickOnElement(nodeBackground);
+    const nodeBackground = stateNodeGroups
+      .nth(cardIndex)
+      .locator('.e2e-test-node-background');
+    await nodeBackground.waitFor({state: 'visible'});
+    await nodeBackground.scrollIntoViewIfNeeded();
+    await nodeBackground.click();
 
-    const headingName = !cardName.trimEnd().endsWith('...')
-      ? cardName
-      : cardName.trimEnd().slice(0, -3);
     try {
       await this.page.waitForFunction(
         ({selector, value}: {selector: string; value: string}) => {
@@ -1102,6 +1188,12 @@ export class ExplorationEditor extends BaseUser {
         },
         {selector: currentCardNameContainerSelector, value: headingName}
       );
+      if (this.isViewportAtMobileWidth()) {
+        await this.expectElementToBeVisible(
+          explorationStateGraphModalSelector,
+          false
+        );
+      }
     } catch (error) {
       if (retry) {
         showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
@@ -1491,6 +1583,719 @@ export class ExplorationEditor extends BaseUser {
       await publishExploration();
       return await confirmPublish();
     }
+  }
+
+  /**
+   * Verifies that the current card content matches the expected text.
+   */
+  async expectCardContentToBe(expectedContent: string): Promise<void> {
+    await this.expectTextContentToBe(cardContentSelector, expectedContent);
+  }
+
+  /**
+   * Verifies that the card content edit pencil is visible.
+   */
+  async expectEditCardContentPencilButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(editCardContentButtonSelector);
+  }
+
+  /**
+   * Verifies that the interaction preview card is visible.
+   */
+  async expectInteractionPreviewCardToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(interactionPreviewSelector);
+  }
+
+  /**
+   * Verifies that the remove interaction button is visible.
+   */
+  async expectRemoveInteractionButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(deleteInteractionButtonSelector);
+  }
+
+  /**
+   * Verifies the currently selected destination for the active outcome.
+   */
+  async expectCurrentOutcomeDestinationToBe(
+    expectedDestination: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      currentOutcomeDestinationSelector,
+      expectedDestination
+    );
+  }
+
+  /**
+   * Verifies that the outcome destination edit pencil is visible.
+   */
+  async expectEditOutcomeDestPencilButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(editOutcomeDestPencilButtonSelector);
+  }
+
+  /**
+   * Verifies that the exploration graph contains the specified card.
+   */
+  async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    if (isMobile) {
+      const graphModal = this.page.locator(explorationStateGraphModalSelector);
+      if (!(await graphModal.isVisible().catch(() => false))) {
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
+      await this.expectElementToBeVisible(explorationStateGraphModalSelector);
+    }
+
+    const selector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeSelector}`
+      : stateNodeSelector;
+    await this.expectElementToBeVisible(
+      isMobile
+        ? `${explorationStateGraphModalSelector} .e2e-test-node`
+        : '.e2e-test-node'
+    );
+    const truncatedName =
+      cardName.length > 15 ? `${cardName.slice(0, 12)}...` : cardName;
+    await this.page.waitForFunction(
+      ({
+        nodeSelector,
+        name,
+        truncated,
+      }: {
+        nodeSelector: string;
+        name: string;
+        truncated: string;
+      }) => {
+        const labels = Array.from(document.querySelectorAll(nodeSelector)).map(
+          label => label.textContent?.trim()
+        );
+        return labels.includes(name) || labels.includes(truncated);
+      },
+      {nodeSelector: selector, name: cardName, truncated: truncatedName}
+    );
+
+    if (isMobile) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Verifies that the add-response modal header has the expected text.
+   */
+  async expectAddResponseModalHeaderToBe(
+    expectedHeader: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(
+      responseModalHeaderSelector,
+      expectedHeader
+    );
+  }
+
+  /**
+   * Verifies that the expected hint is listed on the current card.
+   */
+  async expectHintsToContain(expectedHint: string): Promise<void> {
+    await this.expectElementToBeVisible(currentHintSummarySelector);
+    const hints = await this.page
+      .locator(currentHintSummarySelector)
+      .allTextContents();
+    if (!hints.map(hint => hint.trim()).includes(expectedHint)) {
+      throw new Error(`Expected hint "${expectedHint}" was not found.`);
+    }
+  }
+
+  /**
+   * Verifies that the expected solution is listed on the current card.
+   */
+  async expectSolutionsToContain(expectedSolution: string): Promise<void> {
+    await this.expectElementToBeVisible(currentSolutionSummarySelector);
+    const solutions = await this.page
+      .locator(currentSolutionSummarySelector)
+      .allTextContents();
+    if (
+      !solutions.map(solution => solution.trim()).includes(expectedSolution)
+    ) {
+      throw new Error(`Expected solution "${expectedSolution}" was not found.`);
+    }
+  }
+
+  /**
+   * Verifies that the self-loop warning has the expected visibility.
+   */
+  async expectSelfLoopWarningToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selfLoopWarningSelector, visible);
+  }
+
+  /**
+   * Clicks the interaction preview to open its customization or response modal.
+   */
+  async clickOnTestExploration(): Promise<void> {
+    // The interaction preview itself is covered by the clickable overlay that
+    // opens customization, so click their shared wrapper to target that overlay.
+    await this.clickOnElementWithSelector(interactionSelector);
+    await this.page.waitForFunction(selector => {
+      const title = document.querySelector(selector)?.textContent ?? '';
+      return (
+        title.includes('Customize Interaction') ||
+        title.includes('Add Response')
+      );
+    }, commonModalTitleSelector);
+  }
+
+  /**
+   * Customizes the text input interaction.
+   */
+  async customizeTextInputInteraction(
+    placeholderText?: string,
+    heightInRows?: string,
+    catchMisspellings?: boolean
+  ): Promise<void> {
+    const inputs = this.page.locator(
+      `${customizeInteractionBodySelector} input`
+    );
+    await inputs.first().waitFor({state: 'visible'});
+    if (placeholderText) {
+      await inputs.nth(0).fill(placeholderText);
+    }
+    if (heightInRows) {
+      await inputs.nth(1).fill(heightInRows);
+    }
+    if (catchMisspellings !== undefined) {
+      if (catchMisspellings) {
+        await inputs.nth(2).check();
+      } else {
+        await inputs.nth(2).uncheck();
+      }
+    }
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes the item-selection options and selection limits.
+   */
+  async customizeItemSelectionInteraction(
+    options: string[],
+    minimumNumberOfSelections?: number,
+    maximumNumberOfSelections?: number
+  ): Promise<void> {
+    const body = this.page.locator(customizeInteractionBodySelector);
+    const inputs = body.locator('input');
+    if (minimumNumberOfSelections !== undefined) {
+      await inputs.nth(0).fill(String(minimumNumberOfSelections));
+    }
+    if (maximumNumberOfSelections !== undefined) {
+      await inputs.nth(1).fill(String(maximumNumberOfSelections));
+    }
+
+    const optionEditors = body.locator(stateContentInputField);
+    for (
+      let index = await optionEditors.count();
+      index < options.length;
+      index++
+    ) {
+      await body.locator(addResponseOptionButton).click();
+    }
+    await this.replaceRichTextEditorContents(optionEditors, options);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes the drag-and-drop sort options.
+   */
+  async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
+    const body = this.page.locator(customizeInteractionBodySelector);
+    const optionEditors = body.locator(stateContentInputField);
+    for (
+      let index = await optionEditors.count();
+      index < options.length;
+      index++
+    ) {
+      await body.locator(addResponseOptionButton).click();
+    }
+    await this.replaceRichTextEditorContents(optionEditors, options);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes fraction input options.
+   */
+  async customizeFractionInputInteraction(
+    simplestForm: boolean,
+    improperFraction: boolean,
+    integerPart: boolean,
+    placeholder?: string
+  ): Promise<void> {
+    const inputs = this.page.locator(
+      `${customizeInteractionBodySelector} input`
+    );
+    await inputs.nth(0).waitFor({state: 'visible'});
+    const checkBoxes = this.page.locator(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`
+    );
+    for (const [index, shouldBeChecked] of [
+      simplestForm,
+      improperFraction,
+      integerPart,
+    ].entries()) {
+      if (shouldBeChecked) {
+        await checkBoxes.nth(index).check();
+      } else {
+        await checkBoxes.nth(index).uncheck();
+      }
+    }
+    if (placeholder) {
+      await inputs.nth(3).fill(placeholder);
+    }
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes the set input's add-item label.
+   */
+  async customizeSetInputInteraction(customLabel: string): Promise<void> {
+    await this.page
+      .locator(`${customizeInteractionBodySelector} input`)
+      .first()
+      .fill(customLabel);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes the numeric expression interaction.
+   */
+  async customizeNumericExpressionInputInteraction(
+    placeholderText: string,
+    representDivisionUsingFraction: boolean
+  ): Promise<void> {
+    const inputs = this.page.locator(
+      `${customizeInteractionBodySelector} input`
+    );
+    await inputs.nth(0).fill(placeholderText);
+    if (representDivisionUsingFraction) {
+      await inputs.nth(1).check();
+    } else {
+      await inputs.nth(1).uncheck();
+    }
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Customizes the algebraic-expression and math-equation quick-access keys.
+   */
+  async customizeAlgebraicExpressionInputInteraction(
+    quickAccessCharacters: string,
+    representDivisionUsingFraction: boolean
+  ): Promise<void> {
+    await this.page.keyboard.type(quickAccessCharacters);
+    await expect(
+      this.page
+        .locator(
+          `${customizeInteractionBodySelector} ${customCharactersSelector}`
+        )
+        .locator('div')
+    ).toHaveText(quickAccessCharacters.split(''));
+    const divisionCheckBox = this.page.locator(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`
+    );
+    if (representDivisionUsingFraction) {
+      await divisionCheckBox.check();
+    } else {
+      await divisionCheckBox.uncheck();
+    }
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  /**
+   * Adds an Image Region interaction with the established image fixture.
+   */
+  async addImageInteraction(
+    feedback: string = 'Correct!',
+    nextCard?: string
+  ): Promise<void> {
+    await this.addInteraction('Image Region', false);
+    await this.clickOnElementWithSelector(uploadImageButtonSelector);
+    await this.uploadFile(imageToUpload);
+    await this.clickOnElementWithSelector(useUploadedImageButtonSelector);
+    const imageAreaSelection = new ImageAreaSelection(this.page);
+    await imageAreaSelection.selectArea(5, 50, 90, 45);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    await this.expectModalTitleToBe('Add Response');
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
+  }
+
+  /**
+   * Selects a response rule by its visible label.
+   */
+  private async updateRuleInResponseModalTo(rule: string): Promise<void> {
+    const responseBody = this.page.locator(responseModalBodySelector);
+    const ruleSelect = responseBody.locator('mat-select').first();
+    await ruleSelect.waitFor({state: 'visible'});
+    await ruleSelect.click();
+    const ruleOption = this.page.locator('mat-option').filter({hasText: rule});
+    await ruleOption.first().waitFor({state: 'visible'});
+    await ruleOption.first().click();
+    await this.expectTextContentToContain(
+      `${responseModalBodySelector} mat-select`,
+      rule
+    );
+  }
+
+  /**
+   * Gets the active rule editor in the response modal.
+   */
+  private async getResponseRuleEditor(): Promise<Locator> {
+    const editor = this.page
+      .locator(responseModalBodySelector)
+      .locator(ruleEditorSelector);
+    await editor.waitFor({state: 'visible'});
+    return editor;
+  }
+
+  /**
+   * Dismisses the math keyboard when it is open on a mobile viewport.
+   */
+  private async dismissMathKeyboardIfVisible(): Promise<void> {
+    const hideKeyboardButton = this.page.locator('.e2e-test-osk-hide-button');
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await hideKeyboardButton.isVisible().catch(() => false))
+    ) {
+      await hideKeyboardButton.click();
+      await hideKeyboardButton.waitFor({state: 'hidden'});
+    }
+  }
+
+  /**
+   * Waits until a locator's bounds stop moving.
+   */
+  private async waitForLocatorToStabilize(locator: Locator): Promise<void> {
+    let previousBox = await locator.boundingBox();
+    if (!previousBox) {
+      throw new Error('Could not get bounds for a sortable item.');
+    }
+    const startTime = Date.now();
+    while (Date.now() - startTime < 5000) {
+      await this.page.waitForTimeout(100);
+      const currentBox = await locator.boundingBox();
+      if (!currentBox) {
+        throw new Error('Could not get bounds for a sortable item.');
+      }
+      if (
+        Math.abs(previousBox.x - currentBox.x) < 1 &&
+        Math.abs(previousBox.y - currentBox.y) < 1
+      ) {
+        return;
+      }
+      previousBox = currentBox;
+    }
+    throw new Error('Sortable item bounds did not stabilize.');
+  }
+
+  /**
+   * Updates the selected options in an Item Selection response rule.
+   */
+  async updateItemSelectionLearnersAnswerInResponseModal(
+    rule: string,
+    options: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const responseBody = this.page.locator(responseModalBodySelector);
+    for (const optionText of options) {
+      const option = responseBody
+        .locator('mat-checkbox')
+        .filter({hasText: optionText});
+      await option.waitFor({state: 'visible'});
+      const checkBox = option.locator('input[type="checkbox"]');
+      if (!(await checkBox.isChecked())) {
+        await option.locator('.mat-checkbox-inner-container').click();
+      }
+      await expect(checkBox).toBeChecked();
+    }
+  }
+
+  /**
+   * Sets the expected sequence in a Drag And Drop Sort response rule.
+   */
+  async updateDragAndDropSortLearnersAnswerInResponseModal(
+    rule: string,
+    answerOrder: number[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const selects = this.page
+      .locator(responseModalBodySelector)
+      .locator(ruleEditorSelector)
+      .locator('select');
+    if ((await selects.count()) !== answerOrder.length) {
+      throw new Error(
+        `Expected ${answerOrder.length} ordering selectors, found ${await selects.count()}.`
+      );
+    }
+    for (const [index, value] of answerOrder.entries()) {
+      await selects.nth(index).selectOption(String(value));
+    }
+  }
+
+  /**
+   * Adds values to the Set Input response rule.
+   */
+  async updateSetInputLearnerAnswerInResponseModal(
+    rule: string,
+    values: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const responseBody = this.page.locator(responseModalBodySelector);
+    const inputs = responseBody.locator(textInputField);
+    for (const value of values) {
+      const inputCount = await inputs.count();
+      await responseBody.locator(addResponseOptionButton).click();
+      await expect(inputs).toHaveCount(inputCount + 1);
+      await inputs.nth(inputCount).fill(value);
+      await expect(inputs.nth(inputCount)).toHaveValue(value);
+    }
+  }
+
+  /**
+   * Updates the multiple-choice response rule and selected answer.
+   */
+  async updateMultipleChoiceLearnersAnswerInResponseModal(
+    rule: string,
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const responseBody = this.page.locator(responseModalBodySelector);
+    await responseBody.locator(multipleChoiceResponseDropdown).click();
+    await this.clickOnElementWithSelectorAndText(
+      multipleChoiceResponseOption,
+      answer
+    );
+    await this.expectTextContentToBe(
+      `${responseModalBodySelector} ${multipleChoiceResponseDropdown}`,
+      answer
+    );
+  }
+
+  /**
+   * Updates a numeric-expression response rule and expression.
+   */
+  async updateNumericExpressionLearnerAnswerInResponseModal(
+    rule: string,
+    expression: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const editorSelector = `${responseModalBodySelector} ${ruleEditorSelector} ${algebraicExpressionEditorSelector}`;
+    await this.page.locator(editorSelector).click();
+    await this.typeInInputField(editorSelector, expression);
+    await this.dismissMathKeyboardIfVisible();
+  }
+
+  /**
+   * Updates an algebraic-expression response rule and expression.
+   */
+  async updateAlgebraicExpressionLearnerAnswerInResponseModal(
+    rule: string,
+    expression: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const editorSelector = `${responseModalBodySelector} ${ruleEditorSelector} ${algebraicExpressionEditorSelector}`;
+    await this.page.locator(editorSelector).click();
+    await this.typeInInputField(editorSelector, expression);
+    await this.dismissMathKeyboardIfVisible();
+  }
+
+  /**
+   * Updates a math-equation response rule and equation.
+   */
+  async updateMathEquationLearnerAnswerInResponseModal(
+    rule: string,
+    equation: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const editorSelector = `${responseModalBodySelector} ${ruleEditorSelector} ${algebraicExpressionEditorSelector}`;
+    await this.page.locator(editorSelector).click();
+    await this.typeInInputField(editorSelector, equation);
+    await this.dismissMathKeyboardIfVisible();
+  }
+
+  /**
+   * Updates the answer in a Number With Units response rule.
+   */
+  async updateNumberWithUnitsLearnerAnswerInResponseModal(
+    rule: string,
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    await this.typeInInputField(
+      `${responseModalBodySelector} ${ruleEditorSelector} ${numberWithUnitsEditorSelector}`,
+      answer
+    );
+  }
+
+  /**
+   * Updates the answer in a Ratio Expression response rule.
+   */
+  async updateRatioExpressionInputLearnerAnswerInResponseModal(
+    rule: string,
+    answers: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const inputs = (await this.getResponseRuleEditor()).locator('input');
+    if ((await inputs.count()) !== answers.length) {
+      throw new Error(
+        `Expected ${answers.length} ratio inputs, found ${await inputs.count()}.`
+      );
+    }
+    for (const [index, answer] of answers.entries()) {
+      await inputs.nth(index).fill(answer);
+    }
+  }
+
+  /**
+   * Adds an expression solution and its explanation.
+   */
+  private async addMathExpressionSolution(
+    expression: string,
+    explanation: string
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addSolutionButton);
+    const editorSelector = `oppia-add-or-update-solution-modal ${algebraicExpressionEditorSelector}`;
+    await this.page.locator(editorSelector).click();
+    await this.typeInInputField(editorSelector, expression);
+    await this.dismissMathKeyboardIfVisible();
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.addSolutionExplanationAndSave(explanation);
+  }
+
+  /**
+   * Adds the solution for a numeric-expression interaction.
+   */
+  async addNumericInteractionSolutionToState(
+    solution: string,
+    explanation: string
+  ): Promise<void> {
+    await this.addMathExpressionSolution(solution, explanation);
+  }
+
+  /**
+   * Adds the solution for an algebraic-expression interaction.
+   */
+  async addAlgebraicExpressionSolutionToState(
+    solution: string,
+    explanation: string
+  ): Promise<void> {
+    await this.addMathExpressionSolution(solution, explanation);
+  }
+
+  /**
+   * Adds the solution for a math-equation interaction.
+   */
+  async addMathEquationSolutionToState(
+    solution: string,
+    explanation: string
+  ): Promise<void> {
+    await this.addMathExpressionSolution(solution, explanation);
+  }
+
+  /**
+   * Adds values to a Set Input solution.
+   */
+  async addSetInputSolutionToState(
+    setValues: string[],
+    explanation: string
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addSolutionButton);
+    const solutionModal = this.page.locator(
+      'oppia-add-or-update-solution-modal'
+    );
+    const inputs = solutionModal.locator(textInputField);
+    await expect(inputs).toHaveCount(1);
+    for (const [index, value] of setValues.entries()) {
+      await inputs.nth(index).fill(value);
+      await expect(inputs.nth(index)).toHaveValue(value);
+      if (index < setValues.length - 1) {
+        await solutionModal.locator(addResponseOptionButton).click();
+        await expect(inputs).toHaveCount(index + 2);
+      }
+    }
+    await solutionModal.locator(submitAnswerButton).click();
+    await this.addSolutionExplanationAndSave(explanation);
+  }
+
+  /**
+   * Adds an ordered solution to a Drag And Drop Sort interaction.
+   */
+  async addDragAndDropSortSolution(
+    sortedOptions: string[],
+    explanation: string
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(addSolutionButton);
+    const solutionModal = this.page.locator(
+      'oppia-add-or-update-solution-modal'
+    );
+    await solutionModal.waitFor({state: 'visible'});
+    const solutionItems = solutionModal.locator(dragAndDropItemSelector);
+    await solutionItems.first().waitFor({state: 'visible'});
+
+    for (
+      let destinationIndex = 0;
+      destinationIndex < sortedOptions.length;
+      destinationIndex++
+    ) {
+      const currentItems = solutionModal.locator(dragAndDropItemSelector);
+      const currentOrder = (await currentItems.allTextContents()).map(text =>
+        text.trim()
+      );
+      const sourceIndex = currentOrder.indexOf(sortedOptions[destinationIndex]);
+      if (sourceIndex < 0) {
+        throw new Error(
+          `Option "${sortedOptions[destinationIndex]}" not found.`
+        );
+      }
+      if (sourceIndex === destinationIndex) {
+        continue;
+      }
+
+      const sourceItem = currentItems.nth(sourceIndex);
+      const destinationItem = currentItems.nth(destinationIndex);
+      await sourceItem.scrollIntoViewIfNeeded();
+      await this.waitForLocatorToStabilize(sourceItem);
+      await this.waitForLocatorToStabilize(destinationItem);
+      const sourceBox = await sourceItem.boundingBox();
+      const destinationBox = await destinationItem.boundingBox();
+      if (!sourceBox || !destinationBox) {
+        throw new Error(
+          'Could not get bounds for the sortable solution items.'
+        );
+      }
+      await this.page.mouse.move(
+        sourceBox.x + sourceBox.width / 2,
+        sourceBox.y + sourceBox.height / 2
+      );
+      await this.page.mouse.down();
+      await this.page.mouse.move(
+        destinationBox.x + destinationBox.width / 2,
+        destinationBox.y + destinationBox.height / 2,
+        {steps: 10}
+      );
+      await this.page.mouse.up();
+      await expect(solutionItems).toHaveText(sortedOptions);
+    }
+
+    await expect(solutionItems).toHaveText(sortedOptions);
+    await solutionModal.locator(submitAnswerButton).click();
+    await this.addSolutionExplanationAndSave(explanation);
   }
 
   /**

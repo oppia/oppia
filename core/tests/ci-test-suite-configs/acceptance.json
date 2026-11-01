@@ -347,8 +347,8 @@
     },
     {
       "name": "exploration-creator/create-an-exploration-with-all-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/exploration-history",
