@@ -164,6 +164,18 @@ export class Contributor extends ExplorationEditor {
   ): Promise<ElementHandle<Element> | null> {
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
+      const isVisible = await opportunityItemElement.evaluate((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        return (
+          !htmlEl.closest('[hidden]') &&
+          getComputedStyle(htmlEl).display !== 'none' &&
+          getComputedStyle(htmlEl).visibility !== 'hidden'
+        );
+      });
+      if (!isVisible) {
+        continue;
+      }
+
       const opportunityItemHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
           el.querySelector(sel)?.textContent?.trim(),
@@ -497,6 +509,7 @@ export class Contributor extends ExplorationEditor {
    * @param {string} topicName - The name of the topic to filter by.
    */
   async filterContentByTopic(topicName: string): Promise<void> {
+    await this.waitForOpportunityListToStabilize();
     await this.clickOnElementWithSelector(topicSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
@@ -520,7 +533,7 @@ export class Contributor extends ExplorationEditor {
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, topicName);
-    await this.waitForNetworkIdle();
+    await this.waitForOpportunityListToStabilize();
   }
 
   /**
