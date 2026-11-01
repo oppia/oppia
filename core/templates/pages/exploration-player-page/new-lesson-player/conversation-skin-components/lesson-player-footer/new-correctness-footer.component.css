@@ -1,4 +1,5 @@
 .inner-container {
+  align-items: center;
   -webkit-animation-delay: 0.5s;
   -ms-animation-delay: 0.5s;
   -webkit-animation-direction: normal;
@@ -15,160 +16,62 @@
   -ms-animation-play-state: running;
   -webkit-animation-timing-function: linear;
   -ms-animation-timing-function: linear;
-  background-color: rgb(224, 245, 236);
-  border: 2px;
-  border-color: #00b269;
-  border-radius: 3px;
-  border-style: solid;
-  color: #00b269;
+  background-color: #f0ffd1;
+  border-radius: 40px 40px 0 0;
+  box-sizing: border-box;
+  color: #00645c;
+  display: flex;
   font-family: Roboto, arial, sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-style: normal;
   font-weight: 700;
-  height: 60px;
+  height: 48px;
+  justify-content: center;
   line-height: normal;
   margin: 0 auto;
   max-width: 560px;
   min-width: 360px;
   opacity: 0;
-  padding-top: 5px;
+  padding: 0 24px;
   position: relative;
   text-align: center;
+  /* Above the confetti, so that it bursts from behind the pill. */
+  z-index: 1;
 }
 
 .inner-container-alignment {
   bottom: 60px;
   left: 50%;
-  position: fixed;
+  /* Positioned inside the (fixed) footer container, which is as wide as the
+     lesson content area, so that the pill is centred on the card. */
+  position: absolute;
   transform: translateX(-50%);
+  z-index: 1003;
 }
+
+.tick-symbol-badge {
+  align-items: center;
+  background-color: #00645c;
+  border-radius: 50%;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 26px;
+  justify-content: center;
+  margin-right: 10px;
+  width: 26px;
+}
+
 .tick-symbol {
-  font-size: 42px;
-  vertical-align: middle;
+  color: #f0ffd1;
+  font-size: 13px;
 }
 
 .inner-content {
-  padding-left: 8px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .inner-container-fade-out {
   animation: fadeout 5s 1;
-}
-
-.sprinkle-dot {
-  border-radius: 50%;
-  height: 10px;
-  position: absolute;
-  width: 10px;
-}
-
-.dot1 {
-  -webkit-animation: flasha 2s 1;
-  animation: flasha 2s 1;
-  opacity: 0;
-}
-
-.dot2 {
-  -webkit-animation: flashb 2s 1;
-  animation: flashb 2s 1;
-  opacity: 0;
-}
-
-.dot3 {
-  -webkit-animation: flashc 2s 1;
-  animation: flashc 2s 1;
-  opacity: 0;
-}
-
-.dot4 {
-  -webkit-animation: flashd 2s 1;
-  animation: flashd 2s 1;
-  opacity: 0;
-}
-
-.dot5 {
-  -webkit-animation: flashe 2s 1;
-  animation: flashe 2s 1;
-  opacity: 0;
-}
-
-.dot6 {
-  -webkit-animation: flashf 2s 1;
-  animation: flashf 2s 1;
-  opacity: 0;
-}
-
-.dot7 {
-  -webkit-animation: flashg 2s 1;
-  animation: flashg 2s 1;
-  opacity: 0;
-}
-
-.dot8 {
-  -webkit-animation: flashh 2s 1;
-  animation: flashh 2s 1;
-  opacity: 0;
-}
-
-.dot9 {
-  -webkit-animation: flashi 2s 1;
-  animation: flashi 2s 1;
-  opacity: 0;
-}
-
-.dot10 {
-  -webkit-animation: flashra 2s 1;
-  animation: flashra 2s 1;
-  opacity: 0;
-}
-
-.dot11 {
-  -webkit-animation: flashrb 2s 1;
-  animation: flashrb 2s 1;
-  opacity: 0;
-}
-
-.dot12 {
-  -webkit-animation: flashrc 2s 1;
-  animation: flashrc 2s 1;
-  opacity: 0;
-}
-
-.dot13 {
-  -webkit-animation: flashrd 2s 1;
-  animation: flashrd 2s 1;
-  opacity: 0;
-}
-
-.dot14 {
-  -webkit-animation: flashre 2s 1;
-  animation: flashre 2s 1;
-  opacity: 0;
-}
-
-.dot15 {
-  -webkit-animation: flashrf 2s 1;
-  animation: flashrf 2s 1;
-  opacity: 0;
-}
-
-.dot16 {
-  -webkit-animation: flashrg 2s 1;
-  animation: flashrg 2s 1;
-  opacity: 0;
-}
-
-.dot17 {
-  -webkit-animation: flashrh 2s 1;
-  animation: flashrh 2s 1;
-  opacity: 0;
-}
-
-.dot18 {
-  -webkit-animation: flashri 2s 1;
-  animation: flashri 2s 1;
-  opacity: 0;
 }
 
 @keyframes fadeout {
@@ -179,230 +82,619 @@
   50% { opacity: 1; }
   100% { opacity: 0; }
 }
-@keyframes flasha {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #800000; left: 90px; opacity: 1; top: 20px; }
-  100% { background-color: #800000; left: 20px; opacity: 1; top: -50px; }
+
+.confetti-stage {
+  /* How high the burst can go, relative to the viewport. */
+  --height: 760px;
+  /* How far a piece can be thrown sideways. */
+  --reach: min(34vw, 360px);
+  /* The stage spans the width of the pill and its origin is the vertical
+     centre of the pill (height: 48px), so that the cannons are the two sides
+     of the pill. */
+  height: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 24px;
+  z-index: 0;
 }
-@-webkit-keyframes flasha {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #800000; left: 90px; opacity: 1; top: 20px; }
-  100% { background-color: #800000; left: 20px; opacity: 1; top: -50px; }
+
+@media (max-height: 975px) {
+  .confetti-stage {
+    --height: 78vh;
+  }
 }
-@keyframes flashb {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: red; left: 55px; opacity: 1; top: 35px; }
-  100% { background-color: red; left: -5px; opacity: 1; top: -30px; }
+
+.confetti-piece {
+  --ax: 1;
+  --ay: 0;
+  --color: #103862;
+  --delay: 0ms;
+  --dome: 1;
+  --dur: 4800ms;
+  --dx: calc(var(--reach) * var(--throw) * var(--side) * -1);
+  --fall: calc(var(--height) * 0.1);
+  --flip: 1250ms;
+  --h: 11px;
+  --peak: calc(var(--height) * var(--power) * var(--dome));
+  --power: 0.7;
+  /* -1: left cannon, 1: right cannon. */
+  --side: 1;
+  --side-delay: 0ms;
+  --spin: 540deg;
+  --start: calc(var(--delay) + var(--side-delay));
+  --sway: 10px;
+  --throw: 0.5;
+  --w: 11px;
+  /* Thrown sideways (fast at first, then slowed by the air), up and down, and
+     faded out at the very end. */
+  animation: confetti-drift-x var(--dur) cubic-bezier(0.05, 0.8, 0.2, 1) var(--start) forwards,
+    confetti-rise-and-fall var(--dur) linear var(--start) forwards,
+    confetti-fade var(--dur) linear var(--start) forwards;
+  left: calc(50% + var(--side) * 50%);
+  opacity: 0;
+  position: absolute;
+  top: 0;
 }
-@-webkit-keyframes flashb {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: red; left: 55px; opacity: 1; top: 35px; }
-  100% { background-color: red; left: -5px; opacity: 1; top: -30px; }
+
+.confetti-piece::before {
+  animation: confetti-sway calc(var(--dur) / 4) ease-in-out var(--start) infinite,
+    confetti-spin var(--dur) linear var(--start) forwards,
+    confetti-flip var(--flip) linear var(--start) infinite;
+  background-color: var(--color);
+  content: '';
+  display: block;
+  height: var(--h);
+  /* Centre the piece on its position. */
+  margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+  scale: 1.45;
+  width: var(--w);
 }
-@keyframes flashc {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b30000; left: 65px; opacity: 1; top: 0; }
-  100% { background-color: #b30000; left: 0; opacity: 1; top: -65px; }
+
+/* Cannons: half of the pieces come from the left one, which fires a little
+   later than the right one. */
+.confetti-piece:nth-child(10n + 1),
+.confetti-piece:nth-child(10n + 2),
+.confetti-piece:nth-child(10n + 5),
+.confetti-piece:nth-child(10n + 6),
+.confetti-piece:nth-child(10n + 9) {
+  --side: -1;
+  --side-delay: 300ms;
 }
-@-webkit-keyframes flashc {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b30000; left: 65px; opacity: 1; top: 0; }
-  100% { background-color: #b30000; left: 0; opacity: 1; top: -65px; }
+
+/* Colours: mostly navy, some red. */
+.confetti-piece:nth-child(5n + 2),
+.confetti-piece:nth-child(5n + 4) {
+  --color: #d7263d;
 }
-@keyframes flashd {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: yellow; left: 25px; opacity: 1; top: 30px; }
-  100% { background-color: yellow; left: -35px; opacity: 1; top: -35px; }
+
+/* Shapes: squares, bars, dots, ovals and stars. */
+.confetti-piece:nth-child(6n + 2)::before {
+  --w: 16px;
+  --h: 7px;
 }
-@-webkit-keyframes flashd {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: yellow; left: 25px; opacity: 1; top: 30px; }
-  100% { background-color: yellow; left: -35px; opacity: 1; top: -35px; }
+.confetti-piece:nth-child(6n + 3)::before {
+  border-radius: 50%;
 }
-@keyframes flashe {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
-  100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
+.confetti-piece:nth-child(6n + 4)::before {
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+    50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+  );
+  --w: 17px;
+  --h: 17px;
 }
-@-webkit-keyframes flashe {
-  0% { opacity: 0; }
-  50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
-  100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
+.confetti-piece:nth-child(6n + 5)::before {
+  border-radius: 50%;
+  --w: 8px;
+  --h: 12px;
 }
-@keyframes flashf {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; left: -15px; opacity: 1; top: 30px; }
-  100% { background-color: #0ff; left: -60px; opacity: 1; top: -35px; }
+.confetti-piece:nth-child(6n + 6)::before {
+  --w: 7px;
+  --h: 7px;
 }
-@-webkit-keyframes flashf {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; left: -15px; opacity: 1; top: 30px; }
-  100% { background-color: #0ff; left: -60px; opacity: 1; top: -35px; }
+
+/* Throw: how far sideways each piece is thrown, as a fraction of --reach
+   (positive: towards the middle, negative: away from it). Pieces thrown far
+   rise a little less (--dome). The values are overridden per screen size in
+   the media queries below. */
+.confetti-piece:nth-child(11n + 1) {
+  --throw: -0.35;
+  --dome: 1;
 }
-@keyframes flashg {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #300; left: 10px; opacity: 1; top: 5px; }
-  100% { background-color: #300;left: -50px; opacity: 1; top: -50px; }
+.confetti-piece:nth-child(11n + 2) {
+  --throw: -0.15;
+  --dome: 1;
 }
-@-webkit-keyframes flashg {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #300; left: 10px; opacity: 1; top: 5px; }
-  100% { background-color: #300;left: -50px; opacity: 1; top: -50px; }
+.confetti-piece:nth-child(11n + 3) {
+  --throw: 0;
+  --dome: 1;
 }
-@keyframes flashh {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; left: 40px; opacity: 1; top: -10px; }
-  100% { background-color: #0ff;left: -20px; opacity: 1; top: -70px; }
+.confetti-piece:nth-child(11n + 4) {
+  --throw: 0.1;
+  --dome: 1;
 }
-@-webkit-keyframes flashh {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; left: 40px; opacity: 1; top: -10px; }
-  100% { background-color: #0ff;left: -20px; opacity: 1; top: -70px; }
+.confetti-piece:nth-child(11n + 5) {
+  --throw: 0.2;
+  --dome: 0.99;
 }
-@keyframes flashi {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b34700; left: -20px; opacity: 1; top: -20px; }
-  100% { background-color: #b34700;left: -80px; opacity: 1; top: -80px; }
+.confetti-piece:nth-child(11n + 6) {
+  --throw: 0.3;
+  --dome: 0.98;
 }
-@-webkit-keyframes flashi {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b34700; left: -20px; opacity: 1; top: -20px; }
-  100% { background-color: #b34700;left: -80px; opacity: 1; top: -80px; }
+.confetti-piece:nth-child(11n + 7) {
+  --throw: 0.45;
+  --dome: 0.95;
 }
-@keyframes flashra {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #800000; opacity: 1; right: 90px; top: 20px; }
-  100% { background-color: #800000; opacity: 1; right: 20px; top: -50px; }
+.confetti-piece:nth-child(11n + 8) {
+  --throw: 0.6;
+  --dome: 0.91;
 }
-@-webkit-keyframes flashra {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #800000; opacity: 1; right: 90px; top: 20px; }
-  100% { background-color: #800000; opacity: 1; right: 20px; top: -50px; }
+.confetti-piece:nth-child(11n + 9) {
+  --throw: 0.75;
+  --dome: 0.86;
 }
-@keyframes flashrb {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: red; opacity: 1; right: 55px; top: 35px; }
-  100% { background-color: red; opacity: 1; right: -5px; top: -30px; }
+.confetti-piece:nth-child(11n + 10) {
+  --throw: 1;
+  --dome: 0.75;
 }
-@-webkit-keyframes flashrb {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: red; opacity: 1; right: 55px; top: 35px; }
-  100% { background-color: red; opacity: 1; right: -5px; top: -30px; }
+.confetti-piece:nth-child(11n + 11) {
+  --throw: 0.35;
+  --dome: 0.97;
 }
-@keyframes flashrc {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b30000; opacity: 1; right: 65px; top: 0; }
-  100% { background-color: #b30000; opacity: 1; right: 0; top: -65px; }
+
+/* Power: how high each piece goes. */
+.confetti-piece:nth-child(13n + 1) {
+  --power: 0.8;
 }
-@-webkit-keyframes flashrc {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b30000; opacity: 1; right: 65px; top: 0; }
-  100% { background-color: #b30000; opacity: 1; right: 0; top: -65px; }
+.confetti-piece:nth-child(13n + 2) {
+  --power: 0.55;
 }
-@keyframes flashrd {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: yellow; opacity: 1; right: 25px; top: 30px; }
-  100% { background-color: yellow; opacity: 1; right: -35px; top: -35px; }
+.confetti-piece:nth-child(13n + 3) {
+  --power: 1;
 }
-@-webkit-keyframes flashrd {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: yellow; opacity: 1; right: 25px; top: 30px; }
-  100% { background-color: yellow; opacity: 1; right: -35px; top: -35px; }
+.confetti-piece:nth-child(13n + 4) {
+  --power: 0.7;
 }
-@keyframes flashre {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: 40px; top: 15px; }
-  100% { background-color: #0ff; opacity: 1; right: -20px; top: -50px; }
+.confetti-piece:nth-child(13n + 5) {
+  --power: 0.92;
 }
-@-webkit-keyframes flashre {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: 40px; top: 15px; }
-  100% { background-color: #0ff; opacity: 1; right: -20px; top: -50px; }
+.confetti-piece:nth-child(13n + 6) {
+  --power: 0.5;
 }
-@keyframes flashrf {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: -15px; top: 30px; }
-  100% { background-color: #0ff; opacity: 1; right: -60px; top: -35px; }
+.confetti-piece:nth-child(13n + 7) {
+  --power: 0.98;
 }
-@-webkit-keyframes flashrf {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: -15px; top: 30px; }
-  100% { background-color: #0ff; opacity: 1; right: -60px; top: -35px; }
+.confetti-piece:nth-child(13n + 8) {
+  --power: 0.62;
 }
-@keyframes flashrg {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #300; opacity: 1; right: 10px; top: 5px; }
-  100% { background-color: #300; opacity: 1;right: -50px; top: -50px; }
+.confetti-piece:nth-child(13n + 9) {
+  --power: 0.78;
 }
-@-webkit-keyframes flashrg {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #300; opacity: 1; right: 10px; top: 5px; }
-  100% { background-color: #300; opacity: 1;right: -50px; top: -50px; }
+.confetti-piece:nth-child(13n + 10) {
+  --power: 1.05;
 }
-@keyframes flashrh {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: 40px; top: -10px; }
-  100% { background-color: #0ff; opacity: 1;right: -20px; top: -70px; }
+.confetti-piece:nth-child(13n + 11) {
+  --power: 0.56;
 }
-@-webkit-keyframes flashrh {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #0ff; opacity: 1; right: 40px; top: -10px; }
-  100% { background-color: #0ff; opacity: 1;right: -20px; top: -70px; }
+.confetti-piece:nth-child(13n + 12) {
+  --power: 0.88;
 }
-@keyframes flashri {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b34700; opacity: 1; right: -20px; top: -20px; }
-  100% { background-color: #b34700; opacity: 1;right: -80px; top: -80px; }
+.confetti-piece:nth-child(13n + 13) {
+  --power: 0.66;
 }
-@-webkit-keyframes flashri {
-  0% { opacity: 0; }
-  49% { opacity: 0; }
-  50% { background-color: #b34700; opacity: 1; right: -20px; top: -20px; }
-  100% { background-color: #b34700; opacity: 1;right: -80px; top: -80px; }
+
+/* Weight: how far each piece has fallen back when it fades out, and how much
+   it sways on the way down. */
+.confetti-piece:nth-child(7n + 1) {
+  --fall: calc(var(--height) * 0.14);
+  --sway: 10px;
 }
+.confetti-piece:nth-child(7n + 2) {
+  --fall: calc(var(--height) * 0.2);
+  --sway: -14px;
+}
+.confetti-piece:nth-child(7n + 3) {
+  --fall: calc(var(--height) * 0.17);
+  --sway: 18px;
+}
+.confetti-piece:nth-child(7n + 4) {
+  --fall: calc(var(--height) * 0.24);
+  --sway: -8px;
+}
+.confetti-piece:nth-child(7n + 5) {
+  --fall: calc(var(--height) * 0.15);
+  --sway: 14px;
+}
+.confetti-piece:nth-child(7n + 6) {
+  --fall: calc(var(--height) * 0.19);
+  --sway: -18px;
+}
+.confetti-piece:nth-child(7n + 7) {
+  --fall: calc(var(--height) * 0.26);
+  --sway: 8px;
+}
+
+/* Timing: a tight stagger, so that each cannon reads as one pop. */
+.confetti-piece:nth-child(8n + 1) {
+  --delay: 0ms;
+}
+.confetti-piece:nth-child(8n + 2) {
+  --delay: 40ms;
+}
+.confetti-piece:nth-child(8n + 3) {
+  --delay: 90ms;
+}
+.confetti-piece:nth-child(8n + 4) {
+  --delay: 140ms;
+}
+.confetti-piece:nth-child(8n + 5) {
+  --delay: 190ms;
+}
+.confetti-piece:nth-child(8n + 6) {
+  --delay: 230ms;
+}
+.confetti-piece:nth-child(8n + 7) {
+  --delay: 280ms;
+}
+.confetti-piece:nth-child(8n + 8) {
+  --delay: 330ms;
+}
+.confetti-piece:nth-child(9n + 1) {
+  --dur: 3800ms;
+}
+.confetti-piece:nth-child(9n + 2) {
+  --dur: 4200ms;
+}
+.confetti-piece:nth-child(9n + 3) {
+  --dur: 4600ms;
+}
+.confetti-piece:nth-child(9n + 4) {
+  --dur: 4000ms;
+}
+.confetti-piece:nth-child(9n + 5) {
+  --dur: 4400ms;
+}
+.confetti-piece:nth-child(9n + 6) {
+  --dur: 4800ms;
+}
+.confetti-piece:nth-child(9n + 7) {
+  --dur: 4100ms;
+}
+.confetti-piece:nth-child(9n + 8) {
+  --dur: 4500ms;
+}
+.confetti-piece:nth-child(9n + 9) {
+  --dur: 4900ms;
+}
+
+/* Tumbling: how much each piece spins, and how fast and around which axis it
+   flips. */
+.confetti-piece:nth-child(10n + 1) {
+  --spin: 540deg;
+}
+.confetti-piece:nth-child(10n + 2) {
+  --spin: -720deg;
+}
+.confetti-piece:nth-child(10n + 3) {
+  --spin: 360deg;
+}
+.confetti-piece:nth-child(10n + 4) {
+  --spin: -480deg;
+}
+.confetti-piece:nth-child(10n + 5) {
+  --spin: 900deg;
+}
+.confetti-piece:nth-child(10n + 6) {
+  --spin: -360deg;
+}
+.confetti-piece:nth-child(10n + 7) {
+  --spin: 630deg;
+}
+.confetti-piece:nth-child(10n + 8) {
+  --spin: -540deg;
+}
+.confetti-piece:nth-child(10n + 9) {
+  --spin: 270deg;
+}
+.confetti-piece:nth-child(10n + 10) {
+  --spin: -810deg;
+}
+.confetti-piece:nth-child(3n + 1) {
+  --flip: 900ms;
+}
+.confetti-piece:nth-child(3n + 2) {
+  --flip: 1250ms;
+}
+.confetti-piece:nth-child(3n + 3) {
+  --flip: 1600ms;
+}
+.confetti-piece:nth-child(4n + 1) {
+  --ax: 1;
+  --ay: 0;
+}
+.confetti-piece:nth-child(4n + 2) {
+  --ax: 0;
+  --ay: 1;
+}
+.confetti-piece:nth-child(4n + 3) {
+  --ax: 1;
+  --ay: 0.6;
+}
+.confetti-piece:nth-child(4n + 4) {
+  --ax: 0.6;
+  --ay: 1;
+}
+
+/* Streamers: thin and wavy, lighter than the other pieces, so they are thrown
+   less high and float down later. */
+.confetti-piece:nth-child(18n + 4),
+.confetti-piece:nth-child(18n + 13) {
+  --dur: 4900ms;
+  --fall: calc(var(--height) * 0.22);
+  --power: 0.6;
+}
+.confetti-piece:nth-child(18n + 4)::before,
+.confetti-piece:nth-child(18n + 13)::before {
+  background-color: transparent;
+  background-size: 100% 100%;
+  --spin: 50deg;
+  --w: 14px;
+  --h: 48px;
+}
+.confetti-piece:nth-child(18n + 4)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 48'%3E%3Cpath fill='none' stroke='%23103862' stroke-width='2.6' stroke-linecap='round' d='M7 1.5C12.5 7 12.5 13 7 19S1.5 31 7 37s5.5 6 0 9.5'/%3E%3C/svg%3E");
+}
+.confetti-piece:nth-child(18n + 13)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 48'%3E%3Cpath fill='none' stroke='%23d7263d' stroke-width='2.6' stroke-linecap='round' d='M7 1.5C12.5 7 12.5 13 7 19S1.5 31 7 37s5.5 6 0 9.5'/%3E%3C/svg%3E");
+}
+
+/* Smaller screens: fewer and smaller pieces that stay lower, so that the
+   confetti does not cover the lesson text. */
+@media (max-width: 959px) {
+  /* Match the horizontal padding of the pill's wrapper. */
+  .confetti-stage {
+    left: 30px;
+    right: 30px;
+  }
+
+  .confetti-piece:nth-child(n + 61) {
+    visibility: hidden;
+  }
+
+  .confetti-piece::before {
+    scale: 1.15;
+  }
+}
+
+@media (max-width: 500px) {
+  .confetti-stage {
+    --height: 60vh;
+  }
+
+  .confetti-piece:nth-child(n + 41) {
+    visibility: hidden;
+  }
+
+  .confetti-piece::before {
+    scale: 1;
+  }
+}
+
+/* Large screens: the burst reaches (and goes past) the top of the lesson area,
+   and pieces are thrown both outwards and inwards in roughly equal amounts, so
+   the confetti covers the whole width instead of piling up in the middle. */
+@media (min-width: 960px) {
+  .confetti-stage {
+    --height: min(92vh, 1000px);
+    --reach: min(22vw, 300px);
+  }
+
+  .confetti-piece:nth-child(11n + 1) {
+    --throw: -0.7;
+    --dome: 0.86;
+  }
+
+  .confetti-piece:nth-child(11n + 2) {
+    --throw: -0.3;
+    --dome: 0.94;
+  }
+
+  .confetti-piece:nth-child(11n + 3) {
+    --throw: 0.15;
+    --dome: 0.97;
+  }
+
+  .confetti-piece:nth-child(11n + 4) {
+    --throw: 0.5;
+    --dome: 0.9;
+  }
+
+  .confetti-piece:nth-child(11n + 5) {
+    --throw: -0.5;
+    --dome: 0.9;
+  }
+
+  .confetti-piece:nth-child(11n + 6) {
+    --throw: 0.9;
+    --dome: 0.82;
+  }
+
+  .confetti-piece:nth-child(11n + 7) {
+    --throw: 0;
+    --dome: 1;
+  }
+
+  .confetti-piece:nth-child(11n + 8) {
+    --throw: 0.7;
+    --dome: 0.86;
+  }
+
+  .confetti-piece:nth-child(11n + 9) {
+    --throw: -0.15;
+    --dome: 0.97;
+  }
+
+  .confetti-piece:nth-child(11n + 10) {
+    --throw: 0.35;
+    --dome: 0.93;
+  }
+
+  .confetti-piece:nth-child(11n + 11) {
+    --throw: 1;
+    --dome: 0.8;
+  }
+}
+
+/* Smaller screens: the two cannons are close together, so nearly every piece
+   is thrown inwards, towards the middle of the page, and the two sprays cross
+   over each other instead of both going straight up the sides. */
+@media (max-width: 959px) {
+  .confetti-stage {
+    --reach: min(42vw, 300px);
+  }
+
+  .confetti-piece:nth-child(11n + 1) {
+    --throw: 0.2;
+    --dome: 0.96;
+  }
+
+  .confetti-piece:nth-child(11n + 2) {
+    --throw: 0.45;
+    --dome: 0.92;
+  }
+
+  .confetti-piece:nth-child(11n + 3) {
+    --throw: 0.7;
+    --dome: 0.87;
+  }
+
+  .confetti-piece:nth-child(11n + 4) {
+    --throw: 0.95;
+    --dome: 0.83;
+  }
+
+  .confetti-piece:nth-child(11n + 5) {
+    --throw: 0.3;
+    --dome: 0.95;
+  }
+
+  .confetti-piece:nth-child(11n + 6) {
+    --throw: 0.6;
+    --dome: 0.89;
+  }
+
+  .confetti-piece:nth-child(11n + 7) {
+    --throw: 1.1;
+    --dome: 0.8;
+  }
+
+  .confetti-piece:nth-child(11n + 8) {
+    --throw: 0.1;
+    --dome: 0.98;
+  }
+
+  .confetti-piece:nth-child(11n + 9) {
+    --throw: 0.8;
+    --dome: 0.85;
+  }
+
+  .confetti-piece:nth-child(11n + 10) {
+    --throw: 0.5;
+    --dome: 0.91;
+  }
+
+  .confetti-piece:nth-child(11n + 11) {
+    --throw: -0.15;
+    --dome: 0.97;
+  }
+}
+
+/* Thrown sideways: fast at first, then slowed by the air. */
+@keyframes confetti-drift-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--dx));
+  }
+}
+
+/* Up very quickly, brief hang at the peak, then down at a nearly constant
+   speed. */
+@keyframes confetti-rise-and-fall {
+  0% {
+    animation-timing-function: cubic-bezier(0.1, 0.9, 0.3, 1);
+    translate: 0 0;
+  }
+  16% {
+    animation-timing-function: cubic-bezier(0.2, 0.25, 0.75, 0.75);
+    translate: 0 calc(var(--peak) * -1);
+  }
+  100% {
+    translate: 0 var(--fall);
+  }
+}
+
+/* The pieces leave through the bottom of the screen, so they only fade at the
+   very end. */
+@keyframes confetti-fade {
+  0%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-sway {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: var(--sway) 0;
+  }
+  75% {
+    translate: calc(var(--sway) * -1) 0;
+  }
+}
+
+@keyframes confetti-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: var(--spin);
+  }
+}
+
+@keyframes confetti-flip {
+  from {
+    transform: perspective(400px) rotate3d(var(--ax), var(--ay), 0, 0deg);
+  }
+  to {
+    transform: perspective(400px) rotate3d(var(--ax), var(--ay), 0, 360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-stage {
+    display: none;
+  }
+}
+
 /* Some mobile devices have CSS width below 520px, use a responsive min-width
   when under 520px to prevent pushing things offscreen. */
-@media(max-width: 500px) {
+@media (max-width: 500px) {
   .inner-container {
     min-width: 250px;
   }
 }
 
-@media(max-width: 959px) {
+@media (max-width: 959px) {
   .inner-container-alignment {
     padding-left: 30px;
     padding-right: 30px;
