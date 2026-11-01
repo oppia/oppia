@@ -77,9 +77,7 @@ class FeatureFlagConfigModelValidationJobTests(job_test_utils.JobTestBase):
         )
 
     def test_valid_active_feature_flag_config_produces_no_errors(self) -> None:
-        model = self.create_feature_flag_config_model(
-            ACTIVE_FEATURE_NAME
-        )
+        model = self.create_feature_flag_config_model(ACTIVE_FEATURE_NAME)
         self.put_multi([model])
 
         self.assert_job_output_is([])
@@ -161,9 +159,7 @@ class FeatureFlagConfigModelValidationJobTests(job_test_utils.JobTestBase):
 
     def test_inconsistent_timestamps_produces_error(self) -> None:
         now = datetime.datetime.now()
-        model = self.create_feature_flag_config_model(
-            ACTIVE_FEATURE_NAME
-        )
+        model = self.create_feature_flag_config_model(ACTIVE_FEATURE_NAME)
         model.created_on = now + datetime.timedelta(days=1)
         model.last_updated = now
         self.put_multi([model])
