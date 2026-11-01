@@ -109,11 +109,82 @@ export class Contributor extends ExplorationEditor {
     subheading: string,
     visible: boolean = true
   ): Promise<ElementHandle | null> {
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
-    const translationOpportunitiesPreset = await this.isElementVisible(
-      opportunityItemSelector
-    );
+    try {
+      await this.page.waitForFunction(
+        (
+          itemSelector: string,
+          hSelector: string,
+          sSelector: string,
+          expectedHeading: string,
+          expectedSubheading: string,
+          expectedVisible: boolean
+        ) => {
+          const items = Array.from(document.querySelectorAll(itemSelector));
+          const found = items.some(el => {
+            if (el.closest('[hidden]')) {
+              return false;
+            }
+            const h = el.querySelector(hSelector)?.textContent?.trim();
+            const s = el.querySelector(sSelector)?.textContent?.trim();
+            return (
+              h === expectedHeading &&
+              (s?.includes(expectedSubheading) || false)
+            );
+          });
+          return expectedVisible ? found : !found;
+        },
+        {timeout: 10000},
+        opportunityItemSelector,
+        opportunityItemHeadingSelector,
+        opportunitySubHeadingSelector,
+        heading,
+        subheading,
+        visible
+      );
+    } catch {
+      if (visible) {
+        throw new Error(
+          `Translation opportunity for ${heading} in ${subheading} not found.`
+        );
+      } else {
+        const foundSubheading = await this.page.evaluate(
+          (
+            itemSelector: string,
+            hSelector: string,
+            sSelector: string,
+            expHeading: string
+          ) => {
+            const items = Array.from(document.querySelectorAll(itemSelector));
+            for (const el of items) {
+              if (el.closest('[hidden]')) {
+                continue;
+              }
+              const h = el.querySelector(hSelector)?.textContent?.trim();
+              if (h === expHeading) {
+                return el.querySelector(sSelector)?.textContent?.trim();
+              }
+            }
+            return null;
+          },
+          opportunityItemSelector,
+          opportunityItemHeadingSelector,
+          opportunitySubHeadingSelector,
+          heading
+        );
+        throw new Error(
+          `Failure: Translation opportunity for ${heading} in ${foundSubheading || subheading} was found.`
+        );
+      }
+    }
+
+    if (!visible) {
+      showMessage(
+        `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+      return null;
+    }
 
     // Sometimes, the opportunities refreshes after they have been loaded.
     // This causes problem that older node gets detached from the DOM.
@@ -145,23 +216,15 @@ export class Contributor extends ExplorationEditor {
       previousElementIds = currentElementIds;
     } while (opportunityItemListChanged);
 
-    // Handle the case where no translation opportunity is present.
-    if (!translationOpportunitiesPreset) {
-      if (visible) {
-        throw new Error(
-          `Translation opportunity for ${heading} in ${subheading} not found.`
-        );
-      } else {
-        showMessage(
-          `Success: Translation opportunity for ${heading} in ${subheading} not found.`
-        );
-        return null;
-      }
-    }
-
     // Get the opportunity item element.
     const opportunityItems = await this.page.$$(opportunityItemSelector);
     for (const opportunityItemElement of opportunityItems) {
+      const isHidden = await opportunityItemElement.evaluate(
+        el => !!el.closest('[hidden]')
+      );
+      if (isHidden) {
+        continue;
+      }
       const opportunityItemHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
           el.querySelector(sel)?.textContent?.trim(),
@@ -177,24 +240,13 @@ export class Contributor extends ExplorationEditor {
         opportunityItemHeading === heading &&
         opportunityItemSubHeading?.includes(subheading)
       ) {
-        if (!visible) {
-          throw new Error(
-            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
-          );
-        }
         return opportunityItemElement;
       }
     }
 
-    if (visible) {
-      throw new Error(
-        `Translation opportunity for ${heading} in ${subheading} not found.`
-      );
-    }
-    showMessage(
-      `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+    throw new Error(
+      `Translation opportunity for ${heading} in ${subheading} not found.`
     );
-    return null;
   }
 
   /**
@@ -448,6 +500,7 @@ export class Contributor extends ExplorationEditor {
 
     // Verify option is selected.
     await this.expectTextContentToBe(selectedTopicSelector, topicName);
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -634,6 +687,7 @@ export class Contributor extends ExplorationEditor {
 
     // Verify language is selected.
     await this.expectTextContentToContain(selectedLanguageSelector, language);
+    await this.waitForNetworkIdle();
   }
 
   /**
