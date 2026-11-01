@@ -16,7 +16,14 @@
  * @fileoverview Component for the Contributor Admin Dashboard table.
  */
 
-import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
@@ -62,6 +69,7 @@ import isEqual from 'lodash/isEqual';
   ],
 })
 export class ContributorAdminStatsTable implements OnInit {
+  @Output() rightsUpdated = new EventEmitter<void>();
   @Input() inputs: {
     activeTab: string;
     filter: ContributorAdminDashboardFilter;
@@ -134,6 +142,24 @@ export class ContributorAdminStatsTable implements OnInit {
     return lastContributedType;
   }
 
+  getLastContributedText(element: ContributorStats): string {
+    if (
+      'reviewedQuestionsCount' in element &&
+      element.reviewedQuestionsCount === 0
+    ) {
+      return 'N/A';
+    }
+    if (element.lastContributedInDays === 0) {
+      return 'Today';
+    }
+    return (
+      element.lastContributedInDays +
+      ' ' +
+      (element.lastContributedInDays === 1 ? 'day' : 'days') +
+      ' ago'
+    );
+  }
+
   getContributionCountLabel(activeTab: string): string {
     let contributionCountLabel: string = '';
 
@@ -199,14 +225,16 @@ export class ContributorAdminStatsTable implements OnInit {
           isQuestionReviewer: response.can_review_questions,
         };
         modelRef.result.then(
-          results => {
-            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
+          async results => {
+            await this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
               username,
               results.isQuestionSubmitter,
               results.isQuestionReviewer,
               response.can_submit_questions,
               response.can_review_questions
             );
+            this.refreshPagination();
+            this.rightsUpdated.emit();
           },
           () => {
             // Note to developers:
