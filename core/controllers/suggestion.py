@@ -251,8 +251,6 @@ class SuggestionHandler(
             assert isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             )
-            self._copy_images_from_target_content_to_translation(suggestion)
-
             files = self.normalized_payload.get('files')
             new_image_filenames = (
                 suggestion.get_new_image_filenames_added_in_suggestion()
@@ -298,46 +296,6 @@ class SuggestionHandler(
                 'image',
                 image_is_compressible,
             )
-
-    def _copy_images_from_target_content_to_translation(
-        self, suggestion: suggestion_registry.SuggestionTranslateContent
-    ) -> None:
-        """Creates copies of images from the suggestion's target content
-        for the translation suggestion to use.
-
-        Args:
-            suggestion: SuggestionTranslateContent. The translation suggestion
-                to copy its target content's images to.
-
-        Raises:
-            Exception. An image in the target entity's content is not a
-                saved asset belonging to the target entity.
-        """
-        target_image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
-                suggestion.get_target_entity_html_strings()
-            )
-        )
-        try:
-            fs_services.copy_images(
-                suggestion.target_type,
-                suggestion.target_id,
-                suggestion.image_context,
-                suggestion.target_id,
-                target_image_filenames,
-            )
-        except ValueError as error:
-            _, source_asset_path, *_ = error.args
-            filename_start_index = source_asset_path.rfind('/') + 1
-            source_asset_filename = source_asset_path[filename_start_index:]
-            source_asset_directory = source_asset_path[:filename_start_index]
-            raise Exception(
-                'An image in the submitted translation\'s original content '
-                'named "%s" cannot be found. Please save it to the '
-                % (source_asset_filename)
-                + 'backend file system at /%s ' % (source_asset_directory)
-                + 'before submitting this translation again.'
-            ) from error
 
 
 class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
