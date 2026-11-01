@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import feature_flag_domain
+from core.domain import feature_flag_domain, feature_flag_domain_errors
 from core.tests import test_utils
 
 
@@ -169,7 +169,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False, -1, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
-            utils.ValidationError,
+            feature_flag_domain_errors.InvalidRolloutPercentageError,
             'Feature flag rollout-percentage should be between '
             '0 and 100 inclusive.',
         ):
@@ -182,7 +182,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False, 101, [], utils.get_current_utc_datetime()
         )
         with self.assertRaisesRegex(
-            utils.ValidationError,
+            feature_flag_domain_errors.InvalidRolloutPercentageError,
             'Feature flag rollout-percentage should be between '
             '0 and 100 inclusive.',
         ):
@@ -195,7 +195,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
-                    utils.ValidationError,
+                    feature_flag_domain_errors.IncompatibleFeatureStageError,
                     'Feature flag in dev stage cannot be updated in test '
                     'environment.',
                 ):
@@ -210,7 +210,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
-                    utils.ValidationError,
+                    feature_flag_domain_errors.IncompatibleFeatureStageError,
                     'Feature flag in dev stage cannot be updated in prod '
                     'environment.',
                 ):
@@ -225,7 +225,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
-                    utils.ValidationError,
+                    feature_flag_domain_errors.IncompatibleFeatureStageError,
                     'Feature flag in test stage cannot be updated in prod '
                     'environment.',
                 ):
