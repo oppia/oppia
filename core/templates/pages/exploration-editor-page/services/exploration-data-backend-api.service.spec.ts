@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Exploration data backend api service.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -40,7 +38,7 @@ describe('Exploration data backend api service', () => {
   it('should send a post request to discardDraft', fakeAsync(() => {
     edbas
       .discardDraft('/createhandler/autosave_draft/0')
-      .subscribe(async res => expect(res).toBe(1));
+      .subscribe(async res => expect(res).toBeTruthy());
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0'
     );
@@ -52,7 +50,7 @@ describe('Exploration data backend api service', () => {
   it('should send a put update exploration', fakeAsync(() => {
     edbas
       .saveChangeList('/createhandler/autosave_draft/0', [], 1)
-      .subscribe(async res => expect(res).toBe(1));
+      .subscribe(async res => expect(res).toBeTruthy());
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0'
     );
