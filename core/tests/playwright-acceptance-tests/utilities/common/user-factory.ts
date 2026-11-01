@@ -17,10 +17,8 @@
  * Uses prototype-based composition to mix role capabilities onto user instances.
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
-import {BlogAdmin} from '../user/blog-admin';
-import {BlogPostEditor} from '../user/blog-post-editor';
-import {Browser, Page} from '@playwright/test';
-import testConstants from './test-constants';
+import {Browser} from '@playwright/test';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
@@ -36,6 +34,8 @@ import {
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
+import {BlogPostEditorFactory} from '../user/blog-post-editor';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -49,6 +49,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
  * Mapping of user roles to their respective factory functions.
  */
 const USER_ROLE_MAPPING = {
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
@@ -89,7 +90,10 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin & BlogAdmin) | null = null;
+// The blog admin role is only given to the super admin when a spec needs a
+// blog post editor, so that other specs don't pay for the extra setup.
+let superAdminIsBlogAdmin = false;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -169,6 +173,29 @@ export class UserFactory {
       }
 
       switch (role) {
+        case ROLES.BLOG_POST_EDITOR:
+          // The blog post editor role cannot be assigned from the admin
+          // page, so it is assigned from the blog admin page instead.
+          if (!superAdminIsBlogAdmin) {
+            if (!superAdminInstance.username) {
+              throw new Error('Super admin username is null.');
+            }
+            await superAdminInstance.assignRoleToUser(
+              superAdminInstance.username,
+              ROLES.BLOG_ADMIN
+            );
+            await superAdminInstance.expectUserToHaveRole(
+              superAdminInstance.username,
+              ROLES.BLOG_ADMIN
+            );
+            superAdminIsBlogAdmin = true;
+          }
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
         case ROLES.TOPIC_MANAGER:
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');
@@ -280,7 +307,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -294,6 +321,7 @@ export class UserFactory {
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
+      BlogAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');

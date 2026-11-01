@@ -24,6 +24,7 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -69,15 +70,19 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
     return this.SECTION_FORM_HEADING_SCHEMA;
   }
 
-  updateLocalHeading($event: string): void {
-    if (this.tempSectionHeadingPlaintext !== $event) {
-      this.tempSectionHeadingPlaintext = $event;
+  updateLocalHeading($event: SchemaDefaultValue): void {
+    // The schema editor may emit non-string values (e.g. null) in some edge
+    // cases, so non-string values are reset to the empty string.
+    const heading = typeof $event === 'string' ? $event : '';
+    if (this.tempSectionHeadingPlaintext !== heading) {
+      this.tempSectionHeadingPlaintext = heading;
     }
   }
 
-  updateLocalContent($event: string): void {
-    if (this.tempSectionContentHtml !== $event) {
-      this.tempSectionContentHtml = $event;
+  updateLocalContent($event: SchemaDefaultValue): void {
+    const content = typeof $event === 'string' ? $event : '';
+    if (this.tempSectionContentHtml !== content) {
+      this.tempSectionContentHtml = content;
     }
   }
 

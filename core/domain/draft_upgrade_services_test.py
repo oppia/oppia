@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import copy
+
 from core import feconf, utils
 from core.domain import (
     draft_upgrade_services,
@@ -29,7 +31,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Dict, Final
+from typing import Dict, Final, List, cast
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -131,6 +133,461 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID
             )
         )
+
+
+class DraftUpgradeBranchUnitTests(test_utils.TestBase):
+    """Test preservation and conversion branches in legacy drafts."""
+
+    def convert_html(
+        self, changes: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Convert HTML while keeping non-HTML values unchanged."""
+        convert_html = getattr(
+            draft_upgrade_services.DraftUpgradeUtil,
+            '_convert_html_in_draft_change_list',
+        )
+        # Here we use cast because getattr does not preserve the
+        # private conversion method's return type.
+        return cast(
+            List[exp_domain.ExplorationChange],
+            convert_html(changes, lambda html: html.replace('old', 'new')),
+        )
+
+    def test_convert_html_preserves_unrelated_changes_and_absent_values(
+        self,
+    ) -> None:
+        changes = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'old title',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'widget_customization_args',
+                    'new_value': {'rows': {'value': 1}},
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'default_outcome',
+                    'new_value': None,
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'solution',
+                    'new_value': None,
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'content',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>old content</p>',
+                    },
+                    'old_value': {
+                        'content_id': 'content',
+                        'html': '<p>previous content</p>',
+                    },
+                }
+            ),
+        ]
+        expected = copy.deepcopy([change.to_dict() for change in changes])
+        expected[-1]['old_value'] = None
+        expected[-1]['new_value'] = {
+            'content_id': 'content',
+            'html': '<p>new content</p>',
+        }
+
+        converted = self.convert_html(changes)
+
+        self.assertEqual([change.to_dict() for change in converted], expected)
+
+    def test_convert_html_preserves_non_html_choices_and_translations(
+        self,
+    ) -> None:
+        legacy_translations = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'data_format': 'unicode',
+                        'translation': 'old text',
+                        'needs_update': False,
+                    },
+                    'es': {
+                        'html': '<p>old translation</p>',
+                        'needs_update': False,
+                    },
+                }
+            }
+        }
+        changes = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'widget_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [
+                                {
+                                    'content_id': 'choice_0',
+                                    'unicode_str': 'old text',
+                                },
+                                {
+                                    'content_id': 'choice_1',
+                                    'html': '<p>old choice</p>',
+                                },
+                                '<p>old legacy choice</p>',
+                            ]
+                        }
+                    },
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'written_translations',
+                    'new_value': legacy_translations,
+                }
+            ),
+        ]
+
+        converted = self.convert_html(changes)
+
+        self.assertEqual(
+            converted[0].new_value,
+            {
+                'choices': {
+                    'value': [
+                        {'content_id': 'choice_0', 'unicode_str': 'old text'},
+                        {'content_id': 'choice_1', 'html': '<p>new choice</p>'},
+                        '<p>new legacy choice</p>',
+                    ]
+                }
+            },
+        )
+        self.assertEqual(
+            converted[1].new_value,
+            {
+                'translations_mapping': {
+                    'content': {
+                        'en': {
+                            'data_format': 'unicode',
+                            'translation': 'old text',
+                            'needs_update': False,
+                        },
+                        'es': {
+                            'html': '<p>new translation</p>',
+                            'needs_update': False,
+                        },
+                    }
+                },
+            },
+        )
+
+    def test_convert_html_preserves_non_html_solution_answers(self) -> None:
+        correct_answers: List[state_domain.AcceptableCorrectAnswerTypes] = [
+            0,
+            ['old answer'],
+        ]
+        for correct_answer in correct_answers:
+            with self.subTest(correct_answer=correct_answer):
+                change = exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': 'solution',
+                        'new_value': {
+                            'answer_is_exclusive': True,
+                            'correct_answer': correct_answer,
+                            'explanation': {
+                                'content_id': 'solution',
+                                'html': '<p>old explanation</p>',
+                            },
+                        },
+                    }
+                )
+
+                converted = self.convert_html([change])
+
+                self.assertEqual(
+                    converted[0].new_value,
+                    {
+                        'answer_is_exclusive': True,
+                        'correct_answer': correct_answer,
+                        'explanation': {
+                            'content_id': 'solution',
+                            'html': '<p>new explanation</p>',
+                        },
+                    },
+                )
+
+    def test_migrations_preserve_unrelated_changes(self) -> None:
+        for version in (27, 29, 30, 32, 50, 51, 52):
+            with self.subTest(version=version):
+                changes = [
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                            'property_name': 'title',
+                            'new_value': 'Title',
+                        }
+                    ),
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'state_name': 'Introduction',
+                            'property_name': 'widget_id',
+                            'new_value': 'TextInput',
+                        }
+                    ),
+                ]
+                expected = copy.deepcopy(
+                    [change.to_dict() for change in changes]
+                )
+                convert = getattr(
+                    draft_upgrade_services.DraftUpgradeUtil,
+                    '_convert_states_v%s_dict_to_v%s_dict'
+                    % (version, version + 1),
+                )
+
+                converted = convert(changes)
+
+                self.assertEqual(
+                    [change.to_dict() for change in converted], expected
+                )
+
+    def test_v52_conversion_preserves_unicode_and_converts_later_html(
+        self,
+    ) -> None:
+        changes = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'NewState',
+                    'content_id_for_state_content': 'content',
+                    'content_id_for_default_outcome': 'default_outcome',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'written_translations',
+                    'new_value': translation_domain.WrittenTranslations(
+                        {
+                            'content': {
+                                'en': translation_domain.WrittenTranslation(
+                                    'unicode', 'old text', False
+                                ),
+                                'es': translation_domain.WrittenTranslation(
+                                    'html', '<p>old translation</p>', False
+                                ),
+                            },
+                        }
+                    ).to_dict(),
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'content',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>old content</p>',
+                    },
+                }
+            ),
+        ]
+        convert = getattr(
+            draft_upgrade_services.DraftUpgradeUtil,
+            '_convert_states_v52_dict_to_v53_dict',
+        )
+        with self.swap(
+            exp_domain.Exploration,
+            'fix_content',
+            lambda html: html.replace('old', 'new'),
+        ):
+            converted = convert(changes)
+
+        self.assertEqual(
+            converted[0].to_dict(),
+            {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'NewState',
+                'content_id_for_state_content': 'content',
+                'content_id_for_default_outcome': 'default_outcome',
+            },
+        )
+        self.assertEqual(
+            converted[1].new_value,
+            {
+                'translations_mapping': {
+                    'content': {
+                        'en': {
+                            'data_format': 'unicode',
+                            'translation': 'old text',
+                            'needs_update': False,
+                        },
+                        'es': {
+                            'data_format': 'html',
+                            'translation': '<p>new translation</p>',
+                            'needs_update': False,
+                        },
+                    }
+                },
+            },
+        )
+        self.assertEqual(
+            converted[2].new_value,
+            {
+                'content_id': 'content',
+                'html': '<p>new content</p>',
+            },
+        )
+
+    def test_v34_conversion_rejects_math_rules_without_widget_change(
+        self,
+    ) -> None:
+        convert = getattr(
+            draft_upgrade_services.DraftUpgradeUtil,
+            '_convert_states_v34_dict_to_v35_dict',
+        )
+        for rule_type in ('Equals', 'IsMathematicallyEquivalentTo'):
+            with self.subTest(rule_type=rule_type):
+                answer_group = state_domain.AnswerGroup(
+                    state_domain.Outcome(
+                        'Introduction',
+                        None,
+                        state_domain.SubtitledHtml('feedback', ''),
+                        False,
+                        [],
+                        None,
+                        None,
+                    ),
+                    [state_domain.RuleSpec(rule_type, {'x': 'x'})],
+                    [],
+                    None,
+                ).to_dict()
+                change = exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': 'answer_groups',
+                        'new_value': [answer_group],
+                    }
+                )
+                if rule_type == 'IsMathematicallyEquivalentTo':
+                    with self.assertRaisesRegex(
+                        draft_upgrade_services.InvalidDraftConversionException,
+                        'Conversion cannot be completed.',
+                    ):
+                        convert([change])
+                else:
+                    self.assertEqual(convert([change]), [change])
+
+    def test_v30_conversion_adds_voiceover_duration(self) -> None:
+        legacy_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'en.mp3',
+                        'file_size_bytes': 128,
+                        'needs_update': False,
+                    }
+                }
+            }
+        }
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'recorded_voiceovers',
+                'new_value': legacy_voiceovers,
+            }
+        )
+        convert = getattr(
+            draft_upgrade_services.DraftUpgradeUtil,
+            '_convert_states_v30_dict_to_v31_dict',
+        )
+
+        converted = convert([change])
+
+        self.assertEqual(
+            converted[0].new_value,
+            {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'en.mp3',
+                            'file_size_bytes': 128,
+                            'needs_update': False,
+                            'duration_secs': 0.0,
+                        }
+                    }
+                }
+            },
+        )
+
+    def test_v36_conversion_preserves_other_rules_before_equals(self) -> None:
+        answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction',
+                None,
+                state_domain.SubtitledHtml('feedback', '<p>Feedback</p>'),
+                False,
+                [],
+                None,
+                None,
+            ),
+            [
+                state_domain.RuleSpec('Contains', {'x': 'other'}),
+                state_domain.RuleSpec('CaseSensitiveEquals', {'x': 'answer'}),
+            ],
+            [],
+            None,
+        ).to_dict()
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'answer_groups',
+                'new_value': [answer_group],
+            }
+        )
+        expected = copy.deepcopy(answer_group)
+        expected['rule_specs'][1]['rule_type'] = 'Equals'
+        convert = getattr(
+            draft_upgrade_services.DraftUpgradeUtil,
+            '_convert_states_v36_dict_to_v37_dict',
+        )
+
+        converted = convert([change])
+
+        self.assertEqual(converted[0].new_value, [expected])
 
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
@@ -1821,6 +2278,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNone(migrated_draft_change_list_1_v35)
+
+        empty_answer_groups: list[state_domain.AnswerGroupDict] = []
+        draft_change_list_3_v34 = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': 'answer_groups',
+                    'new_value': empty_answer_groups,
+                }
+            )
+        ]
+        migrated_draft_change_list_3_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_3_v34, 1, 2, self.EXP_ID
+            )
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_3_v35 is not None
+        self.assertEqual(
+            draft_change_list_3_v34,
+            migrated_draft_change_list_3_v35,
+        )
 
         migrated_draft_change_list_2_v35 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(

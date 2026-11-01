@@ -121,6 +121,11 @@ const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+
+const previewTabButton = '.e2e-test-preview-tab';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -147,6 +152,13 @@ const voiceoverLanguageAccentOptionSelector =
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const skillNameInput = '.e2e-test-skill-name-input';
 
+const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
+
+const skillReviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewConceptCardLink = `${skillReviewComponent} .e2e-test-concept-card-link`;
+const skillReviewComponentModal =
+  'oppia-noninteractive-skillreview-concept-card-modal';
+
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
 const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
@@ -169,6 +181,7 @@ const totalPlaysCardSelector = '.total-plays';
 const openFeedbackCardSelector = '.total-open-feedback';
 const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationDashboardCardSelector = '.e2e-test-exploration-dashboard-card';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
@@ -216,6 +229,8 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
+
+const addTitleBar = 'input#explorationTitle';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -410,10 +425,30 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(feedbackEditorSelector);
     await this.typeInInputField(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
     if (destination) {
-      await this.select(destinationCardSelector, '/');
-      await this.typeInInputField(addStateInput, destination);
+      // Check if the destination card already exists in the dropdown options.
+      const hasExistingCard = await this.page.evaluate(
+        ({selector, cardName}: {selector: string; cardName: string}) => {
+          const selectElement = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          if (!selectElement) {
+            return false;
+          }
+          return Array.from(selectElement.options).some(
+            option => option.value === cardName
+          );
+        },
+        {selector: destinationCardSelector, cardName: destination}
+      );
+
+      if (hasExistingCard) {
+        await this.select(destinationCardSelector, destination);
+      } else {
+        // The '/' value is used to select the 'a new card called' option in the dropdown.
+        await this.select(destinationCardSelector, '/');
+        await this.typeInInputField(addStateInput, destination);
+      }
     }
     if (responseIsCorrect) {
       await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
@@ -1118,6 +1153,44 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to the exploration preview tab.
+   */
+  async navigateToExplorationEditorPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobilePreviewTabButton);
+    } else {
+      await this.expectElementToBeVisible(previewTabButton);
+      await this.clickOnElementWithSelector(previewTabButton);
+    }
+
+    await this.expectElementToBeVisible(previewTabContainer);
+  }
+
+  /**
+   * Function to open the skill review component.
+   */
+  async clickOnSkillReviewComponent(): Promise<void> {
+    await this.clickOnElementWithSelector(skillReviewConceptCardLink);
+    await this.expectElementToBeVisible(skillReviewComponentModal);
+  }
+
+  /**
+   * Function to verify that the concept card with worked example is displayed.
+   * @param {string} question - Expected worked example question.
+   * @param {string} answer - Expected worked example answer.
+   */
+  async checkConceptCardWithWorkedExampleIsInserted(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    await this.expectTextContentToContain('body', question);
+    await this.expectTextContentToContain('body', answer);
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
@@ -1219,6 +1292,28 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateContentInputField, false);
     await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Function to update a card with content and insert a concept card.
+   * @param {string} content - The content to be added to the card.
+   */
+  async updateCardContentWithConceptCard(content: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+
+    await this.typeInInputField(stateContentInputField, `${content}`);
+
+    // Add the concept card.
+    await this.clickOnElementWithSelector(addSkillReviewComponentButton);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(stateContentInputField, false);
+
+    showMessage('Card content is updated successfully with concept card.');
   }
 
   /**
@@ -1735,6 +1830,57 @@ export class ExplorationEditor extends BaseUser {
           `but found ${totalUsers} instead.`
       );
     }
+  }
+
+  /**
+   * Opens the exploration editor for the exploration with the given name from the creator dashboard.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationSummaryTileTitleSelector);
+    const title = await this.getTextContent(
+      explorationSummaryTileTitleSelector
+    );
+
+    if (title === explorationName) {
+      await this.clickOnElementWithSelector(explorationDashboardCardSelector);
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible(
+      explorationSummaryTileTitleSelector,
+      false
+    );
+  }
+
+  /**
+   * Updates the exploration title in the settings tab.
+   * @param {string} title - The new title of the exploration.
+   */
+  async updateTitleTo(title: string): Promise<void> {
+    await this.expectElementToBeVisible(addTitleBar);
+    await this.clearAllTextFrom(addTitleBar);
+    await this.typeInInputField(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+
+    const newTitle = await this.page.$eval(addTitleBar, el =>
+      (el as HTMLInputElement).value?.trim()
+    );
+
+    // Compare first 36 characters of title.
+    if (newTitle !== title.slice(0, 36)) {
+      throw new Error(
+        `Failed to update title. Expected: ${title}, but got: ${newTitle}`
+      );
+    }
+
+    showMessage(`Title has been updated to ${newTitle}`);
   }
 }
 
