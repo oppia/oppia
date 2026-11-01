@@ -2095,6 +2095,70 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         }
         self.assertEqual(output, expected_output)
 
+    def test_handler_skips_machine_translation_for_list_content(self) -> None:
+        """Test that list content is skipped while string content is translated."""
+        translatable_contents = {
+            'Introduction': {
+                'normalized_strings': translation_domain.TranslatableContent(
+                    'normalized_strings',
+                    translation_domain.ContentType.RULE,
+                    translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING,
+                    ['one', 'two'],
+                ),
+                'unicode_strings': translation_domain.TranslatableContent(
+                    'unicode_strings',
+                    translation_domain.ContentType.RULE,
+                    translation_domain.TranslatableContentFormat.SET_OF_UNICODE_STRING,
+                    ['three', 'four'],
+                ),
+                'text': translation_domain.TranslatableContent(
+                    'text',
+                    translation_domain.ContentType.CONTENT,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    '<p>Please continue.</p>',
+                ),
+            }
+        }
+
+        with (
+            unittest.mock.patch.object(
+                translation_services,
+                'get_translatable_text',
+                return_value=translatable_contents,
+            ),
+            unittest.mock.patch.object(
+                translation_services,
+                'get_and_cache_machine_translation',
+                return_value='<p>Por favor continua.</p>',
+            ) as mock_machine_translation,
+        ):
+            output = self.get_json(
+                '/machine_translated_state_texts_handler',
+                params={
+                    'exp_id': self.exp_id,
+                    'state_name': 'Introduction',
+                    'content_ids': (
+                        '["normalized_strings", "unicode_strings", "text"]'
+                    ),
+                    'target_language_code': 'es',
+                },
+                expected_status_int=200,
+            )
+
+        self.assertEqual(
+            output,
+            {
+                'translated_texts': {
+                    'normalized_strings': None,
+                    'unicode_strings': None,
+                    'text': '<p>Por favor continua.</p>',
+                }
+            },
+        )
+        mock_machine_translation.assert_called_once_with(
+            'en', 'es', '<p>Please continue.</p>'
+        )
+
 
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
@@ -3040,7 +3104,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             {
                 'from_date': from_date.strftime('%d %b %Y'),
                 'to_date': to_date.strftime('%d %b %Y'),
-                'contribution_hours': '0.01',
+                'contribution_hours': 0.01,
                 'contribution_word_count': 3,
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi',

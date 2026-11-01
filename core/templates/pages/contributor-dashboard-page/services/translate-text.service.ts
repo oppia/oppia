@@ -30,6 +30,9 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
 import {AppConstants} from 'app.constants';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {States} from 'domain/exploration/states.model';
+import {ComputeGraphService} from 'services/compute-graph.service';
 
 export interface TranslatableItem {
   translation: string | string[];
@@ -81,8 +84,53 @@ export class TranslateTextService {
   activeContentStatus: Status = 'pending';
 
   constructor(
-    private translateTextBackendApiService: TranslateTextBackendApiService
+    private translateTextBackendApiService: TranslateTextBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private computeGraphService: ComputeGraphService
   ) {}
+
+  private async getStateNamesInLessonOrder(
+    expId: string,
+    entityType: string,
+    translatableTexts: TranslatableTexts
+  ): Promise<string[]> {
+    const stateNames = Object.keys(translatableTexts.stateWiseContents);
+    if (entityType !== AppConstants.ENTITY_TYPE.EXPLORATION) {
+      return stateNames;
+    }
+
+    try {
+      const response =
+        await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
+          expId,
+          Number(translatableTexts.explorationVersion)
+        );
+      const initStateName = response.exploration.init_state_name;
+      const states = States.createFromBackendDict(response.exploration.states);
+      const traversal = this.computeGraphService.computeBfsTraversalOfStates(
+        initStateName,
+        states,
+        initStateName
+      );
+      const genericStateName = AppConstants.DEFAULT_SUGGESTION_STATE_NAME;
+      const orderedStateNames = [
+        ...stateNames.filter(stateName => stateName === genericStateName),
+        ...traversal.filter(
+          stateName =>
+            stateName !== genericStateName &&
+            translatableTexts.stateWiseContents.hasOwnProperty(stateName)
+        ),
+      ];
+      const includedStateNames = new Set(orderedStateNames);
+      return [
+        ...orderedStateNames,
+        ...stateNames.filter(stateName => !includedStateNames.has(stateName)),
+      ];
+    } catch {
+      // A failed exploration fetch should not prevent translators from working.
+      return stateNames;
+    }
+  }
 
   private _getNextText(): string | string[] | null {
     if (this.stateAndContent.length === 0) {
@@ -174,10 +222,15 @@ export class TranslateTextService {
     this.activeEntityType = entityType;
     this.translateTextBackendApiService
       .getTranslatableTextsAsync(expId, languageCode, entityType)
-      .then((translatableTexts: TranslatableTexts) => {
+      .then(async (translatableTexts: TranslatableTexts) => {
         this.stateWiseContents = translatableTexts.stateWiseContents;
         this.activeExpVersion = translatableTexts.explorationVersion;
-        for (const stateName in this.stateWiseContents) {
+        const stateNames = await this.getStateNamesInLessonOrder(
+          expId,
+          entityType,
+          translatableTexts
+        );
+        for (const stateName of stateNames) {
           let stateHasText: boolean = false;
           const contentIds: string[] = [];
           const contentIdToContentMapping = this.stateWiseContents[stateName];

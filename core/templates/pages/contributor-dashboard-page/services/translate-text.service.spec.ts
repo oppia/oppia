@@ -31,12 +31,17 @@ import {
 import {TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING} from 'domain/exploration/written-translation.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {AppConstants} from 'app.constants';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
 
 class MockPlatformFeatureService {
+  isTranslationOppsEnabled = false;
+
   get status() {
     return {
       EnableTranslationOppsWithNewOppModels: {
-        isEnabled: false,
+        isEnabled: this.isTranslationOppsEnabled,
       },
     };
   }
@@ -47,6 +52,8 @@ describe('TranslateTextService', () => {
   let stateContent: StateAndContent;
   let httpTestingController: HttpTestingController;
   let mockPlatformFeatureService: MockPlatformFeatureService;
+  let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
+  let computeGraphService: jasmine.SpyObj<ComputeGraphService>;
   const getTranslatableItem = (text: string) => {
     return {
       content_format: 'html',
@@ -60,6 +67,19 @@ describe('TranslateTextService', () => {
 
   beforeEach(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
+    readOnlyExplorationBackendApiService = jasmine.createSpyObj(
+      'ReadOnlyExplorationBackendApiService',
+      ['fetchExplorationAsync']
+    );
+    readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
+      Promise.resolve({
+        exploration: {init_state_name: 'stateName1', states: {}},
+      })
+    );
+    computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
+      'computeBfsTraversalOfStates',
+    ]);
+    computeGraphService.computeBfsTraversalOfStates.and.returnValue([]);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -67,6 +87,11 @@ describe('TranslateTextService', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useValue: readOnlyExplorationBackendApiService,
+        },
+        {provide: ComputeGraphService, useValue: computeGraphService},
       ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -87,6 +112,133 @@ describe('TranslateTextService', () => {
   });
 
   describe('getTextToTranslate', () => {
+    it('should order cards by lesson traversal and append unreachable states', fakeAsync(() => {
+      const sampleStateWiseContentMapping = {
+        tail: {tailContent: getTranslatableItem('tail text')},
+        unreachable: {
+          unreachableContent: getTranslatableItem('unreachable text'),
+        },
+        start: {
+          firstContent: getTranslatableItem('first text'),
+          secondContent: getTranslatableItem('second text'),
+        },
+        middle: {middleContent: getTranslatableItem('middle text')},
+      };
+      computeGraphService.computeBfsTraversalOfStates.and.returnValue([
+        'start',
+        'middle',
+        'tail',
+      ]);
+
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
+
+      expect(
+        readOnlyExplorationBackendApiService.fetchExplorationAsync
+      ).toHaveBeenCalledWith('1', 1);
+      expect(translateTextService.stateNamesList).toEqual([
+        'start',
+        'middle',
+        'tail',
+        'unreachable',
+      ]);
+      expect(
+        translateTextService.stateAndContent.map(item => item.contentID)
+      ).toEqual([
+        'firstContent',
+        'secondContent',
+        'middleContent',
+        'tailContent',
+        'unreachableContent',
+      ]);
+    }));
+
+    it('should keep generic content before lesson states', fakeAsync(() => {
+      computeGraphService.computeBfsTraversalOfStates.and.returnValue([
+        'start',
+      ]);
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      req.flush({
+        state_names_to_content_id_mapping: {
+          start: {stateContent: getTranslatableItem('state text')},
+          [AppConstants.DEFAULT_SUGGESTION_STATE_NAME]: {
+            genericContent: getTranslatableItem('generic text'),
+          },
+        },
+        version: 1,
+      });
+      flushMicrotasks();
+
+      expect(
+        translateTextService.stateAndContent.map(item => item.contentID)
+      ).toEqual(['genericContent', 'stateContent']);
+    }));
+
+    it('should retain backend order when exploration fetch fails', fakeAsync(() => {
+      readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
+        Promise.reject('Exploration unavailable')
+      );
+      const successCallback = jasmine.createSpy('successCallback');
+      translateTextService.init('1', 'en', successCallback);
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      req.flush({
+        state_names_to_content_id_mapping: {
+          tail: {tailContent: getTranslatableItem('tail text')},
+          start: {startContent: getTranslatableItem('start text')},
+        },
+        version: 1,
+      });
+      flushMicrotasks();
+
+      expect(successCallback).toHaveBeenCalled();
+      expect(translateTextService.stateNamesList).toEqual(['tail', 'start']);
+    }));
+
+    it('should keep backend order for non-exploration content', fakeAsync(() => {
+      mockPlatformFeatureService.isTranslationOppsEnabled = true;
+      translateTextService.init('skill1', 'en', () => {}, 'skill');
+      const req = httpTestingController.expectOne(
+        '/gettranslatablecontentshandlerv2?entity_id=skill1&entity_type=skill&language_code=en'
+      );
+      req.flush({
+        translatable_contents: [
+          {
+            content_id: 'firstContent',
+            content_type: 'content',
+            content_format: 'html',
+            content_value: 'first text',
+            grouping_key: 'first',
+          },
+          {
+            content_id: 'secondContent',
+            content_type: 'content',
+            content_format: 'html',
+            content_value: 'second text',
+            grouping_key: 'second',
+          },
+        ],
+        version: '1',
+      });
+      flushMicrotasks();
+
+      expect(
+        readOnlyExplorationBackendApiService.fetchExplorationAsync
+      ).not.toHaveBeenCalled();
+      expect(translateTextService.stateNamesList).toEqual(['first', 'second']);
+    }));
+
     it('should return all texts per state', fakeAsync(() => {
       let textAndAvailability;
       const sampleStateWiseContentMapping = {
