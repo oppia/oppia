@@ -25,7 +25,12 @@ import re
 from typing import Dict, Final, List, Pattern, Set, Tuple, TypedDict
 
 from .. import build, common, concurrent_task_utils
-from . import js_ts_linter, linter_utils, warranted_angular_security_bypasses
+from . import (
+    filename_linter,
+    js_ts_linter,
+    linter_utils,
+    warranted_angular_security_bypasses,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -927,6 +932,14 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    def check_filename_patterns(self) -> concurrent_task_utils.TaskResult:
+        """Check filenames against the configurable frontend naming rules.
+
+        Returns:
+            TaskResult. The result of checking the supplied filenames.
+        """
+        return filename_linter.check_filenames(self.all_filepaths)
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -952,6 +965,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             self.check_disallowed_flags(),
             self.check_rte_component_config_ids(),
             self.check_modal_component_patterns(),
+            self.check_filename_patterns(),
         ]
         return task_results
 
