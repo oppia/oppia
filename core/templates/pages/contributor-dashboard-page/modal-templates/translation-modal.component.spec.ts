@@ -292,40 +292,90 @@ describe('Translation Modal Component', () => {
     );
   });
 
-  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
-    // eslint-disable-next-line dot-notation
-    spyOn(component['rteHelperService'], 'openCustomizationModal');
-    component.ngOnInit();
+  it(
+    'should remove component type from rteComponentsNeedingConfirmation ' +
+      'when its customization modal is submitted',
+    fakeAsync(() => {
+      // eslint-disable-next-line dot-notation
+      spyOn(component['rteHelperService'], 'openCustomizationModal');
+      component.ngOnInit();
 
-    const req = httpTestingController.expectOne(
-      '/gettranslatabletexthandler?exp_id=1&language_code=es'
-    );
-    req.flush({
-      state_names_to_content_id_mapping: {
-        stateName1: {contentId1: {content_value: 'text1', data_format: 'html'}},
-      },
-      version: 1,
-    });
-    tick();
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=es'
+      );
+      req.flush({
+        state_names_to_content_id_mapping: {
+          stateName1: {
+            contentId1: {content_value: 'text1', data_format: 'html'},
+          },
+        },
+        version: 1,
+      });
+      tick();
 
-    // Check initial state.
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+      // Seed the pending-confirmation set with 'image' and 'link'.
+      component.rteComponentsNeedingConfirmation = new Set(['image', 'link']);
 
-    // Call the intercepted function with a non-image component.
-    // eslint-disable-next-line dot-notation
-    component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
-    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+      // Calling with a component NOT in the set changes nothing.
+      let capturedSubmit: ((arg: unknown) => void) | undefined;
+      // eslint-disable-next-line dot-notation
+      (
+        component['rteHelperService'].openCustomizationModal as jasmine.Spy
+      ).and.callFake(
+        (
+          _new: boolean,
+          _id: string,
+          _specs: unknown,
+          _attrs: unknown,
+          onSubmit?: (arg: unknown) => void
+        ) => {
+          capturedSubmit = onSubmit;
+        }
+      );
 
-    // Call the intercepted function with the 'image' component.
-    // eslint-disable-next-line dot-notation
-    component['rteHelperService'].openCustomizationModal(
-      false,
-      'image',
-      [],
-      {}
-    );
-    expect(component.hasAltTextModalBeenOpened).toBeTrue();
-  }));
+      // eslint-disable-next-line dot-notation
+      component['rteHelperService'].openCustomizationModal(
+        false,
+        'math',
+        [],
+        {},
+        () => {}
+      );
+      capturedSubmit!(null);
+      expect(
+        component.rteComponentsNeedingConfirmation.has('math')
+      ).toBeFalse();
+      // 'image' and 'link' are still pending.
+      expect(component.rteComponentsNeedingConfirmation.size).toBe(2);
+
+      // Submitting the 'image' modal removes it from the set.
+      // eslint-disable-next-line dot-notation
+      component['rteHelperService'].openCustomizationModal(
+        false,
+        'image',
+        [],
+        {},
+        () => {}
+      );
+      capturedSubmit!(null);
+      expect(
+        component.rteComponentsNeedingConfirmation.has('image')
+      ).toBeFalse();
+      expect(component.rteComponentsNeedingConfirmation.size).toBe(1);
+
+      // Submitting the 'link' modal empties the set.
+      // eslint-disable-next-line dot-notation
+      component['rteHelperService'].openCustomizationModal(
+        false,
+        'link',
+        [],
+        {},
+        () => {}
+      );
+      capturedSubmit!(null);
+      expect(component.rteComponentsNeedingConfirmation.size).toBe(0);
+    })
+  );
 
   it('should wrap text with ellipsis when text is too long', () => {
     expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
@@ -1745,11 +1795,18 @@ describe('Translation Modal Component', () => {
     });
   });
 
-  describe('when checking for validation errors with auto-translated images', () => {
-    it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
-      component.hasImageInAutoTranslation = true;
-      component.hasAltTextModalBeenOpened = false;
+  describe('when checking for validation errors with auto-translated RTE components', () => {
+    it('should return true if rteComponentsNeedingConfirmation is non-empty', () => {
+      component.rteComponentsNeedingConfirmation = new Set(['image']);
       expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
+    it('should return false once rteComponentsNeedingConfirmation is cleared', () => {
+      component.rteComponentsNeedingConfirmation = new Set();
+      component.hasImgTextError = false;
+      component.hasIncompleteTranslationError = false;
+      component.hasLengthValidationError = false;
+      expect(component.hasSubmitValidationErrors()).toBe(false);
     });
   });
 
@@ -1810,6 +1867,9 @@ describe('Translation Modal Component', () => {
       component.generateTranslation();
 
       expect(component.isGeneratingTranslation).toBeTrue();
+      // Flush the main translation call and the subsequent
+      // translateRteComponentFields call (no RTE elements, so it returns
+      // immediately without extra API calls).
       flushMicrotasks();
 
       expect(
@@ -1818,7 +1878,183 @@ describe('Translation Modal Component', () => {
       expect(component.isGeneratingTranslation).toBeFalse();
       expect(component.activeWrittenTranslation).toBe('<p>hola</p>');
     }));
+  });
 
+  describe('translateRteComponentFields', () => {
+    it(
+      'should translate alt and caption of an image RTE component and add ' +
+        'image to rteComponentsNeedingConfirmation',
+      fakeAsync(() => {
+        const encodedAlt = '&amp;quot;A cat on a mat&amp;quot;';
+        const encodedCaption = '&amp;quot;Cat photo&amp;quot;';
+        const html =
+          `<p>Text</p>` +
+          `<oppia-noninteractive-image alt-with-value="${encodedAlt}"` +
+          ` caption-with-value="${encodedCaption}"` +
+          ` filepath-with-value="&amp;quot;img.svg&amp;quot;">` +
+          `</oppia-noninteractive-image>`;
+
+        spyOn(
+          translateTextBackendApiService,
+          'getMachineTranslationAsync'
+        ).and.returnValues(
+          Promise.resolve({
+            translated_text: 'Un gato sobre una esterilla',
+            translation_provider: 'Google',
+          }),
+          Promise.resolve({
+            translated_text: 'Foto de gato',
+            translation_provider: 'Google',
+          })
+        );
+
+        let result: string = '';
+        // eslint-disable-next-line dot-notation
+        component['translateRteComponentFields'](html, 'en', 'es').then(r => {
+          result = r;
+        });
+        flushMicrotasks();
+
+        expect(
+          translateTextBackendApiService.getMachineTranslationAsync
+        ).toHaveBeenCalledWith('A cat on a mat', 'en', 'es');
+        expect(
+          translateTextBackendApiService.getMachineTranslationAsync
+        ).toHaveBeenCalledWith('Cat photo', 'en', 'es');
+        expect(result).toContain('Un gato sobre una esterilla');
+        expect(result).toContain('Foto de gato');
+        expect(
+          component.rteComponentsNeedingConfirmation.has('image')
+        ).toBeTrue();
+      })
+    );
+
+    it(
+      'should translate text-with-value for link and skillreview components ' +
+        'and update rteComponentsNeedingConfirmation',
+      fakeAsync(() => {
+        const encodedLinkText = '&amp;quot;Click here&amp;quot;';
+        const encodedSkillText = '&amp;quot;Learn more&amp;quot;';
+        const html =
+          `<oppia-noninteractive-link text-with-value="${encodedLinkText}"` +
+          ` url-with-value="&amp;quot;https://example.com&amp;quot;">` +
+          `</oppia-noninteractive-link>` +
+          `<oppia-noninteractive-skillreview text-with-value="${encodedSkillText}"` +
+          ` skill_id-with-value="&amp;quot;skill1&amp;quot;">` +
+          `</oppia-noninteractive-skillreview>`;
+
+        spyOn(
+          translateTextBackendApiService,
+          'getMachineTranslationAsync'
+        ).and.returnValues(
+          Promise.resolve({
+            translated_text: 'Haz clic aquí',
+            translation_provider: 'Google',
+          }),
+          Promise.resolve({
+            translated_text: 'Aprende más',
+            translation_provider: 'Google',
+          })
+        );
+
+        let result: string = '';
+        // eslint-disable-next-line dot-notation
+        component['translateRteComponentFields'](html, 'en', 'es').then(r => {
+          result = r;
+        });
+        flushMicrotasks();
+
+        expect(result).toContain('Haz clic aquí');
+        expect(result).toContain('Aprende más');
+        expect(
+          component.rteComponentsNeedingConfirmation.has('link')
+        ).toBeTrue();
+        expect(
+          component.rteComponentsNeedingConfirmation.has('skillreview')
+        ).toBeTrue();
+      })
+    );
+
+    it(
+      'should return HTML unchanged and clear rteComponentsNeedingConfirmation ' +
+        'when there are no translatable RTE fields',
+      fakeAsync(() => {
+        const html = '<p>Simple paragraph with no RTE components.</p>';
+        component.rteComponentsNeedingConfirmation = new Set(['image']);
+
+        spyOn(translateTextBackendApiService, 'getMachineTranslationAsync');
+
+        let result: string = '';
+        // eslint-disable-next-line dot-notation
+        component['translateRteComponentFields'](html, 'en', 'es').then(r => {
+          result = r;
+        });
+        flushMicrotasks();
+
+        expect(
+          translateTextBackendApiService.getMachineTranslationAsync
+        ).not.toHaveBeenCalled();
+        // Previously pending components are cleared.
+        expect(component.rteComponentsNeedingConfirmation.size).toBe(0);
+      })
+    );
+
+    it('should fall back to original text when translation API call fails for a field', fakeAsync(() => {
+      const encodedAlt = '&amp;quot;A cat&amp;quot;';
+      const html =
+        `<oppia-noninteractive-image alt-with-value="${encodedAlt}"` +
+        ` filepath-with-value="&amp;quot;img.svg&amp;quot;">` +
+        `</oppia-noninteractive-image>`;
+
+      spyOn(
+        translateTextBackendApiService,
+        'getMachineTranslationAsync'
+      ).and.returnValue(Promise.reject('network error'));
+
+      let result: string = '';
+      // eslint-disable-next-line dot-notation
+      component['translateRteComponentFields'](html, 'en', 'es').then(r => {
+        result = r;
+      });
+      flushMicrotasks();
+
+      // Falls back to original — image is NOT added to confirmation set
+      // because the translated text equals the original.
+      expect(
+        component.rteComponentsNeedingConfirmation.has('image')
+      ).toBeFalse();
+    }));
+  });
+
+  describe('getUnconfirmedRteComponentLabels', () => {
+    it('should return human-readable labels for component IDs in the set', () => {
+      component.rteComponentsNeedingConfirmation = new Set([
+        'image',
+        'link',
+        'skillreview',
+        'workedexample',
+        'collapsible',
+      ]);
+      const labels = component.getUnconfirmedRteComponentLabels();
+      expect(labels).toContain('image');
+      expect(labels).toContain('link');
+      expect(labels).toContain('concept card');
+      expect(labels).toContain('worked example');
+      expect(labels).toContain('collapsible block');
+    });
+
+    it('should return empty array when no components need confirmation', () => {
+      component.rteComponentsNeedingConfirmation = new Set();
+      expect(component.getUnconfirmedRteComponentLabels()).toEqual([]);
+    });
+
+    it('should fall back to the raw ID for unknown component types', () => {
+      component.rteComponentsNeedingConfirmation = new Set(['video']);
+      expect(component.getUnconfirmedRteComponentLabels()).toEqual(['video']);
+    });
+  });
+
+  describe('generateTranslation', () => {
     it('should handle error when generating translation', fakeAsync(() => {
       component.activeDataFormat = 'html';
       component.textToTranslate = 'hello';
@@ -1862,7 +2098,9 @@ describe('Translation Modal Component', () => {
       expect(component.isGeneratingTranslation).toBeFalse();
       expect(component.hasIncompleteTranslationError).toBeFalse();
     });
+  });
 
+  describe('when suggesting translated text with unedited auto-translation', () => {
     it('should open unedited confirmation modal if translation is auto-generated and unedited', fakeAsync(() => {
       spyOn(translateTextService, 'suggestTranslatedText').and.callFake(
         (
