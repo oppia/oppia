@@ -21,7 +21,6 @@ import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const PROFILE_PICTURE = testConstants.data.profilePicture;
 const TEST_EXPLORATION = {
@@ -33,7 +32,7 @@ const TEST_EXPLORATION = {
 test.describe.configure({mode: 'serial'});
 
 test.describe('Logged-in User', function () {
-  let loggedInUser: LoggedInUser & ExplorationEditor;
+  let loggedInUser: LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
     loggedInUser = await UserFactory.createNewUser(
