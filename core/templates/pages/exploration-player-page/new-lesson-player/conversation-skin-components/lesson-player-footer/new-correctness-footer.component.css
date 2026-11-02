@@ -439,6 +439,7 @@
 .confetti-piece:nth-child(18n + 13)::before {
   background-color: transparent;
   background-size: 100% 100%;
+  clip-path: none;
   --spin: 50deg;
   --w: 14px;
   --h: 48px;
@@ -460,7 +461,7 @@
   }
 
   .confetti-piece:nth-child(n + 61) {
-    visibility: hidden;
+    display: none;
   }
 
   .confetti-piece::before {
@@ -474,7 +475,7 @@
   }
 
   .confetti-piece:nth-child(n + 41) {
-    visibility: hidden;
+    display: none;
   }
 
   .confetti-piece::before {

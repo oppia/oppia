@@ -51,7 +51,7 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
     this.topicName = '';
     this.classroomName = '';
 
-    this.isLinkedToTopic = this.computeIsLinkedToTopic();
+    this.isLinkedToTopic = this._computeIsLinkedToTopic();
 
     if (!this.isLinkedToTopic) {
       return;
@@ -95,7 +95,7 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
   // fragments, which together indicate the exploration is being played as
   // part of a curated topic (rather than e.g. standalone via the community
   // library). The URL service throws when a fragment is missing.
-  private computeIsLinkedToTopic(): boolean {
+  private _computeIsLinkedToTopic(): boolean {
     try {
       this.topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
