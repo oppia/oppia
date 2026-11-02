@@ -1366,7 +1366,9 @@ export class CurriculumAdmin extends TopicManager {
           document.querySelectorAll('div.e2e-test-skill-item')
         );
         const element = skillItemDivs.find(
-          element => element.textContent?.trim() === skillName
+          element =>
+            element.querySelector('.clickable-item')?.textContent?.trim() ===
+              skillName || element.textContent?.trim() === skillName
         ) as HTMLElement;
         if (element) {
           const assignSkillButton = element.querySelector(
@@ -1387,7 +1389,14 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOnElementWithText('Assign to Subtopic');
+    await this.page.evaluate(selector => {
+      const assignButton = document.querySelector(selector) as HTMLElement;
+      if (assignButton) {
+        assignButton.click();
+      } else {
+        throw new Error('Assign to Subtopic button not found.');
+      }
+    }, assignSubtopicButton);
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
