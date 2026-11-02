@@ -81,13 +81,13 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
         )
 
         repair_results = (
-            (user_auth_details_models, user_settings_models)
-            | 'Zip user models'
-            >> firebase_transforms.ZipUserSettingsAndUserAuthDetailsModels()
-            | 'Compute repairs'
-            >> firebase_transforms.RepairUserAuthDetailsModels(
-                user_id_by_firebase_auth_id_models
+            (
+                user_auth_details_models,
+                user_settings_models,
+                user_id_by_firebase_auth_id_models,
             )
+            | 'Compute repairs'
+            >> firebase_transforms.RepairUserAuthDetailsModels()
         )
 
         put_models = repair_results[

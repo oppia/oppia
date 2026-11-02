@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-import hashlib
-import string
 from collections import abc
 
+from core import utils
 from core.jobs import job_utils
 from core.jobs.types import firebase_domain
 from core.platform import models
@@ -38,9 +37,6 @@ auth_models, user_models = models.Registry.import_models(
 )
 
 datastore_services = models.Registry.import_datastore_services()
-
-# The characters used to encode generated Firebase auth IDs (i.e. base62).
-_FIREBASE_AUTH_ID_ALPHABET = f'{string.digits}{string.ascii_letters}'
 
 # The length of generated Firebase auth IDs. This matches the length of the IDs
 # that Firebase generates for its own accounts.
@@ -250,85 +246,29 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class ZipUserSettingsAndUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
-    """Groups UserAuthDetailsModels and UserSettingsModels by their user ID.
-
-    This transform expects a tuple of PCollections with exactly 2 elements: the
-    first is a PCollection[UserAuthDetailsModel] and the second is a
-    PCollection[UserSettingsModel]. Both models are keyed by the user's ID, so
-    each output element pairs a user ID with all of the models belonging to it.
-    """
-
-    def expand(
-        self,
-        model_pairs: tuple[
-            beam.PCollection[auth_models.UserAuthDetailsModel],
-            beam.PCollection[user_models.UserSettingsModel],
-        ],
-    ) -> beam.PCollection[
-        tuple[
-            str,
-            tuple[
-                abc.Iterable[auth_models.UserAuthDetailsModel],
-                abc.Iterable[user_models.UserSettingsModel],
-            ],
-        ]
-    ]:
-        """Groups the input pair of model collections by user ID.
-
-        Args:
-            model_pairs: tuple. The pair of model collections to be grouped. The
-                first PCollection holds UserAuthDetailsModels and the second
-                holds UserSettingsModels.
-
-        Returns:
-            PCollection. The (user_id, (user_auth_details_models,
-            user_settings_models)) pairs. Either iterable may be empty when a
-            user is missing the corresponding model.
-        """
-
-        user_auth_details_models, user_settings_models = model_pairs
-
-        keyed_user_auth_details_models = (
-            user_auth_details_models
-            | 'Get UserAuthDetailsModels keyed with id'
-            >> beam.Map(lambda m: (m.id, m))
-        )
-
-        keyed_user_settings_models = (
-            user_settings_models
-            | 'Get UserSettingsModels keyed with id'
-            >> beam.Map(lambda m: (m.id, m))
-        )
-
-        return (
-            keyed_user_auth_details_models,
-            keyed_user_settings_models,
-        ) | 'Group models by user id' >> beam.CoGroupByKey()
-
-
-# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
     """Repairs users whose auth models are missing or broken.
 
-    This transform expects the output of ZipUserSettingsAndUserAuthDetailsModels
-    (i.e. a PCollection of (user_id, (user_auth_details_models,
-    user_settings_models)) pairs), and emits the model writes needed for every
-    user to have a UserAuthDetailsModel that FirebaseRecord.from_oppia_models
-    can rebuild a Firebase record from. Users are repaired as follows:
+    This transform expects a tuple of PCollections with exactly 3 elements:
+    every UserAuthDetailsModel, UserSettingsModel and
+    UserIdByFirebaseAuthIdModel, including deleted ones. It emits the model
+    writes needed for every live, full user to have a firebase_auth_id that
+    FirebaseRecord.from_oppia_models can rebuild a Firebase record from, and a
+    UserIdByFirebaseAuthIdModel that maps the ID back to the user.
 
-    - A user with a UserSettingsModel but no UserAuthDetailsModel gets a new
-      UserAuthDetailsModel and UserIdByFirebaseAuthIdModel.
-    - A user whose UserAuthDetailsModel has no parent_user_id and no
-      firebase_auth_id gets its firebase_auth_id filled in, and a new
-      UserIdByFirebaseAuthIdModel.
+    Repaired users get the firebase_auth_id utils.convert_to_hash(user_id).
+    Because the ID is deterministic, a rerun finishes the repairs that an
+    interrupted run left half-written.
 
-    Users whose UserAuthDetailsModel or UserSettingsModel is marked deleted are
-    never repaired, and neither are users that would get a new firebase_auth_id
-    while a UserIdByFirebaseAuthIdModel already maps to them (because the right
-    firebase_auth_id would then be ambiguous). These users are reported as
-    problems instead, as are the auth models of users without a
-    UserSettingsModel, which this transform never deletes.
+    Users are reported as problems instead of being repaired when:
+
+    - Their UserAuthDetailsModel or UserSettingsModel is marked deleted.
+    - A UserIdByFirebaseAuthIdModel with a different (or deleted) ID already
+      maps to them, because the right firebase_auth_id is then ambiguous.
+    - Another live, full user shares their email, because FirebaseServerSyncJob
+      refuses to sync while Oppia users share an email.
+    - They are missing their UserSettingsModel, because this transform never
+      deletes models.
 
     NOTE: Profile users (i.e. users with a parent_user_id) that are missing
     their UserAuthDetailsModel can't be told apart from full users, so they are
@@ -362,62 +302,70 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
         TAG_PROBLEMS,
     ) = OutputDict.__annotations__.keys()
 
-    def __init__(
-        self,
-        user_id_by_firebase_auth_id_models: beam.PCollection[
-            auth_models.UserIdByFirebaseAuthIdModel
-        ],
-        label: str | None = None,
-    ) -> None:
-        """Initializes the RepairUserAuthDetailsModels PTransform.
-
-        Args:
-            user_id_by_firebase_auth_id_models: PCollection. Every
-                UserIdByFirebaseAuthIdModel, including deleted ones. Used to
-                find the reverse mappings belonging to each user.
-            label: str|None. The label of the PTransform.
-        """
-        super().__init__(label=label)
-        self._user_id_by_firebase_auth_id_models = (
-            user_id_by_firebase_auth_id_models
-        )
-
     def expand(
         self,
-        grouped_models: beam.PCollection[
-            tuple[
-                str,
-                tuple[
-                    abc.Iterable[auth_models.UserAuthDetailsModel],
-                    abc.Iterable[user_models.UserSettingsModel],
-                ],
-            ]
+        input_models: tuple[
+            beam.PCollection[auth_models.UserAuthDetailsModel],
+            beam.PCollection[user_models.UserSettingsModel],
+            beam.PCollection[auth_models.UserIdByFirebaseAuthIdModel],
         ],
     ) -> RepairUserAuthDetailsModels.OutputDict:
-        """Computes the repairs needed by each of the given users.
+        """Computes the repairs needed by each user.
 
         Args:
-            grouped_models: PCollection. The (user_id, (user_auth_details_models,
-                user_settings_models)) pairs emitted by
-                ZipUserSettingsAndUserAuthDetailsModels.
+            input_models: tuple. The UserAuthDetailsModels, UserSettingsModels
+                and UserIdByFirebaseAuthIdModels to repair, including deleted
+                ones.
 
         Returns:
             OutputDict. A mapping from each tag to its PCollection.
         """
+        (
+            user_auth_details_models,
+            user_settings_models,
+            user_id_by_firebase_auth_id_models,
+        ) = input_models
 
-        keyed_user_id_by_firebase_auth_id_models = (
-            self._user_id_by_firebase_auth_id_models
-            | 'Get UserIdByFirebaseAuthIdModels keyed with user_id'
-            >> beam.Map(lambda m: (m.user_id, m))
+        grouped_models = (
+            user_auth_details_models
+            | 'Key UserAuthDetailsModels by user id'
+            >> beam.Map(lambda m: (m.id, m)),
+            user_settings_models
+            | 'Key UserSettingsModels by user id'
+            >> beam.Map(lambda m: (m.id, m)),
+            user_id_by_firebase_auth_id_models
+            | 'Key UserIdByFirebaseAuthIdModels by user id'
+            >> beam.Map(lambda m: (m.user_id, m)),
+        ) | 'Group models by user id' >> beam.CoGroupByKey()
+
+        # NOTE: FirebaseServerSyncJob reports an Oppia user collision (and then
+        # refuses to sync anything) when users that get a Firebase account
+        # share an email. Only live, full users get a Firebase account, so
+        # those are the only users that can collide with a repaired user.
+        shared_email_user_ids = (
+            grouped_models
+            | 'Get emails of live full users'
+            >> beam.FlatMapTuple(self._yield_live_full_user_email)
+            | 'Group user ids by email' >> beam.GroupByKey()
+            | 'Sort user ids' >> beam.MapTuple(lambda e, ids: (e, sorted(ids)))
+            | 'Keep emails shared by multiple users'
+            >> beam.Filter(lambda email_and_ids: len(email_and_ids[1]) > 1)
         )
 
-        repair_outputs = (
-            (grouped_models, keyed_user_id_by_firebase_auth_id_models)
-            | 'Group reverse models by user id' >> beam.CoGroupByKey()
-            | 'Compute repairs'
-            >> beam.FlatMapTuple(self._yield_repairs).with_outputs(
-                self.TAG_OK, self.TAG_PUT, self.TAG_PROBLEMS
-            )
+        # NOTE: The method is bound to a local variable so that the lambda below
+        # doesn't need to pickle this PTransform.
+        yield_repairs = self._yield_repairs
+        repair_outputs = grouped_models | 'Compute repairs' >> (
+            # NOTE: FlatMapTuple requires defaults for side inputs, so FlatMap
+            # is used instead and the (user_id, grouped) pair is unpacked here.
+            beam.FlatMap(
+                lambda pair, user_ids_by_shared_email: yield_repairs(
+                    pair[0], pair[1], user_ids_by_shared_email
+                ),
+                user_ids_by_shared_email=beam.pvalue.AsDict(
+                    shared_email_user_ids
+                ),
+            ).with_outputs(self.TAG_OK, self.TAG_PUT, self.TAG_PROBLEMS)
         )
 
         return RepairUserAuthDetailsModels.OutputDict(
@@ -431,30 +379,21 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
         cls,
         user_id: str,
         grouped: tuple[
-            abc.Iterable[
-                tuple[
-                    abc.Iterable[auth_models.UserAuthDetailsModel],
-                    abc.Iterable[user_models.UserSettingsModel],
-                ]
-            ],
+            abc.Iterable[auth_models.UserAuthDetailsModel],
+            abc.Iterable[user_models.UserSettingsModel],
             abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel],
         ],
+        user_ids_by_shared_email: abc.Mapping[str, list[str]],
     ) -> abc.Iterator[beam.TaggedOutput]:
         """Yields the repairs needed by the given user using tagged outputs."""
-        grouped_models_iter, reverse_model_iter = grouped
-        # NOTE: The iterable is empty when only reverse models refer to the
-        # user, and otherwise has exactly one element because both of its
-        # inputs are grouped by user id.
-        user_auth_details_model_iter, user_settings_model_iter = next(
-            iter(grouped_models_iter), ((), ())
-        )
+        auth_model_iter, settings_model_iter, reverse_model_iter = grouped
         # NOTE: Both models are keyed by user id, so there is at most one each.
-        user_auth_details_model = next(iter(user_auth_details_model_iter), None)
-        user_settings_model = next(iter(user_settings_model_iter), None)
+        auth_model = next(iter(auth_model_iter), None)
+        settings_model = next(iter(settings_model_iter), None)
         reverse_models = list(reverse_model_iter)
 
-        if user_auth_details_model is None:
-            if user_settings_model is None:
+        if settings_model is None:
+            if auth_model is None:
                 for reverse_model in reverse_models:
                     yield cls._report(
                         user_id,
@@ -463,92 +402,119 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
                         'it still has a UserIdByFirebaseAuthIdModel '
                         f'(firebase_auth_id={reverse_model.id!r})',
                     )
-                return
-
-            problem = 'is missing its UserAuthDetailsModel'
-            if user_settings_model.deleted:
-                yield cls._report(
-                    user_id, problem, 'its UserSettingsModel is marked deleted'
-                )
-            elif reverse_models:
-                yield cls._report_ambiguous(user_id, problem, reverse_models)
             else:
-                with datastore_services.get_ndb_context():
-                    new_model = auth_models.UserAuthDetailsModel(id=user_id)
-                yield from cls._yield_firebase_auth_id_assignment(new_model)
+                firebase_auth_ids = sorted(m.id for m in reverse_models)
+                yield cls._report(
+                    user_id,
+                    'is missing its UserSettingsModel',
+                    'it still has a UserAuthDetailsModel and '
+                    f'UserIdByFirebaseAuthIdModels ({firebase_auth_ids=!r})',
+                )
+            return
 
-        elif user_settings_model is None:
+        # NOTE: The ID is a hash of the user ID, so reruns of a repair job
+        # always assign the same ID to the same user.
+        firebase_auth_id = utils.convert_to_hash(
+            user_id, _FIREBASE_AUTH_ID_LENGTH
+        )
+        has_reverse_model = any(
+            m.id == firebase_auth_id and not m.deleted for m in reverse_models
+        )
+
+        if auth_model is None:
+            problem = 'is missing its UserAuthDetailsModel'
+        elif auth_model.parent_user_id is not None:
+            yield beam.TaggedOutput(cls.TAG_OK, 1)
+            return
+        elif not auth_model.firebase_auth_id:
+            problem = 'is missing its firebase_auth_id'
+        elif (
+            auth_model.firebase_auth_id == firebase_auth_id
+            and not has_reverse_model
+        ):
+            problem = 'is missing its UserIdByFirebaseAuthIdModel'
+        else:
+            yield beam.TaggedOutput(cls.TAG_OK, 1)
+            return
+
+        if auth_model is not None and auth_model.deleted:
+            yield cls._report(
+                user_id, problem, 'its UserAuthDetailsModel is marked deleted'
+            )
+        elif settings_model.deleted:
+            yield cls._report(
+                user_id, problem, 'its UserSettingsModel is marked deleted'
+            )
+        elif any(m.id != firebase_auth_id or m.deleted for m in reverse_models):
             firebase_auth_ids = sorted(m.id for m in reverse_models)
             yield cls._report(
                 user_id,
-                'is missing its UserSettingsModel',
-                'it still has a UserAuthDetailsModel and '
-                f'UserIdByFirebaseAuthIdModels ({firebase_auth_ids=!r})',
+                problem,
+                'UserIdByFirebaseAuthIdModels already map to it '
+                f'({firebase_auth_ids=!r})',
             )
-
-        elif (
-            user_auth_details_model.parent_user_id is None
-            and not user_auth_details_model.firebase_auth_id
-        ):
-            problem = 'is missing its firebase_auth_id'
-            if user_auth_details_model.deleted:
-                yield cls._report(
-                    user_id,
-                    problem,
-                    'its UserAuthDetailsModel is marked deleted',
-                )
-            elif user_settings_model.deleted:
-                yield cls._report(
-                    user_id, problem, 'its UserSettingsModel is marked deleted'
-                )
-            elif reverse_models:
-                yield cls._report_ambiguous(user_id, problem, reverse_models)
-            else:
-                # NOTE: Apache Beam requires inputs to be treated as immutable,
-                # so the input model is cloned before being changed.
-                yield from cls._yield_firebase_auth_id_assignment(
-                    job_utils.clone_model(user_auth_details_model)
-                )
-
+        elif settings_model.email in user_ids_by_shared_email:
+            user_ids = [
+                i
+                for i in user_ids_by_shared_email[settings_model.email]
+                if i != user_id
+            ]
+            yield cls._report(
+                user_id,
+                problem,
+                f'other Oppia users share its email ({user_ids=!r})',
+            )
         else:
-            yield beam.TaggedOutput(cls.TAG_OK, 1)
+            models_to_put: list[
+                auth_models.UserAuthDetailsModel
+                | auth_models.UserIdByFirebaseAuthIdModel
+            ] = []
+            with datastore_services.get_ndb_context():
+                if auth_model is None or not auth_model.firebase_auth_id:
+                    # NOTE: Apache Beam requires inputs to be treated as
+                    # immutable, so the input model is cloned before being
+                    # changed.
+                    new_auth_model = (
+                        auth_models.UserAuthDetailsModel(id=user_id)
+                        if auth_model is None
+                        else job_utils.clone_model(auth_model)
+                    )
+                    new_auth_model.firebase_auth_id = firebase_auth_id
+                    models_to_put.append(new_auth_model)
+                if not has_reverse_model:
+                    models_to_put.append(
+                        auth_models.UserIdByFirebaseAuthIdModel(
+                            id=firebase_auth_id, user_id=user_id
+                        )
+                    )
+                for model in models_to_put:
+                    model.update_timestamps()
+            for model in models_to_put:
+                yield beam.TaggedOutput(cls.TAG_PUT, model)
 
-    @classmethod
-    def _yield_firebase_auth_id_assignment(
-        cls, user_auth_details_model: auth_models.UserAuthDetailsModel
-    ) -> abc.Iterator[beam.TaggedOutput]:
-        """Assigns a generated firebase_auth_id to the given (unshared) model.
-
-        Yields the given model, updated with the generated firebase_auth_id,
-        and a new UserIdByFirebaseAuthIdModel mapping that ID back to the user.
-        """
-        user_id = user_auth_details_model.id
-        firebase_auth_id = _generate_firebase_auth_id(user_id)
-        with datastore_services.get_ndb_context():
-            user_auth_details_model.firebase_auth_id = firebase_auth_id
-            user_auth_details_model.update_timestamps()
-            reverse_model = auth_models.UserIdByFirebaseAuthIdModel(
-                id=firebase_auth_id, user_id=user_id
-            )
-            reverse_model.update_timestamps()
-        yield beam.TaggedOutput(cls.TAG_PUT, user_auth_details_model)
-        yield beam.TaggedOutput(cls.TAG_PUT, reverse_model)
-
-    @classmethod
-    def _report_ambiguous(
-        cls,
+    @staticmethod
+    def _yield_live_full_user_email(
         user_id: str,
-        problem: str,
-        reverse_models: abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel],
-    ) -> beam.TaggedOutput:
-        """Returns the problem for a user with existing reverse models."""
-        firebase_auth_ids = sorted(m.id for m in reverse_models)
-        return cls._report(
-            user_id,
-            problem,
-            'UserIdByFirebaseAuthIdModels already map to it '
-            f'({firebase_auth_ids=!r})',
-        )
+        grouped: tuple[
+            abc.Iterable[auth_models.UserAuthDetailsModel],
+            abc.Iterable[user_models.UserSettingsModel],
+            abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel],
+        ],
+    ) -> abc.Iterator[tuple[str, str]]:
+        """Yields the (email, user_id) pair of a live, full user.
+
+        Users missing their UserAuthDetailsModel are treated as full users,
+        because that is how they are repaired.
+        """
+        auth_model_iter, settings_model_iter, _ = grouped
+        auth_model = next(iter(auth_model_iter), None)
+        settings_model = next(iter(settings_model_iter), None)
+        if (
+            settings_model is not None
+            and not settings_model.deleted
+            and (auth_model is None or auth_model.parent_user_id is None)
+        ):
+            yield (settings_model.email, user_id)
 
     @classmethod
     def _report(
@@ -558,27 +524,3 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
         return beam.TaggedOutput(
             cls.TAG_PROBLEMS, f'{user_id=!r} {problem}, but {reason}'
         )
-
-
-def _generate_firebase_auth_id(user_id: str) -> str:
-    """Returns a Firebase auth ID generated deterministically from a user ID.
-
-    The ID is the base62-encoding of the user ID's SHA-256 digest (read as a
-    big-endian integer), truncated to the length of Firebase's own IDs. Being
-    deterministic makes repairs idempotent: Apache Beam retries and reruns of a
-    repair job always assign the same ID to the same user.
-
-    Args:
-        user_id: str. The ID of the user to generate a Firebase auth ID for.
-
-    Returns:
-        str. The generated Firebase auth ID.
-    """
-    value = int.from_bytes(hashlib.sha256(user_id.encode()).digest(), 'big')
-    digits = []
-    while value:
-        value, remainder = divmod(value, len(_FIREBASE_AUTH_ID_ALPHABET))
-        digits.append(_FIREBASE_AUTH_ID_ALPHABET[remainder])
-    # NOTE: Digits are produced least-significant first, so they are reversed
-    # to read most-significant first before truncating.
-    return ''.join(reversed(digits))[:_FIREBASE_AUTH_ID_LENGTH]

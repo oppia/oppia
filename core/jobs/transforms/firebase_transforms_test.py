@@ -22,16 +22,15 @@ from core.jobs import job_test_utils
 from core.jobs.transforms import firebase_transforms
 from core.jobs.types import firebase_domain
 from core.platform import models
-from core.tests import test_utils
 
 import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models, user_models
+    from mypy_imports import auth_models, base_models, user_models
 
-auth_models, user_models = models.Registry.import_models(
-    [models.Names.AUTH, models.Names.USER]
+auth_models, base_models, user_models = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER]
 )
 
 TAG_OK = firebase_transforms.DiffFirebaseRecords.TAG_OK
@@ -46,17 +45,12 @@ TAG_REPAIR_OK = firebase_transforms.RepairUserAuthDetailsModels.TAG_OK
 TAG_PUT = firebase_transforms.RepairUserAuthDetailsModels.TAG_PUT
 TAG_PROBLEMS = firebase_transforms.RepairUserAuthDetailsModels.TAG_PROBLEMS
 
-# The deterministic Firebase auth IDs generated for user IDs 'uid_a', 'uid_b'
-# and 'uid_c', respectively.
-FB_A = 'YlVAOpV9YVJstppf7XQTihtFzKUR'
-FB_B = 'VWrAZshtYNpMu1Fm29JsT40cNBdh'
-FB_C = 'yQpsxVH7PO7R2ilLmvEjNh50dZye'
-
-# The helper is private to its module, but its determinism is load-bearing for
-# the repair's idempotence, so it is tested directly.
-generate_firebase_auth_id = (
-    firebase_transforms._generate_firebase_auth_id  # pylint: disable=protected-access
-)
+# The Firebase auth IDs generated for user IDs 'uid_a', 'uid_b' and 'uid_c',
+# respectively. They are pinned because changing them would make reruns of the
+# repair job assign different IDs than earlier runs did.
+FB_A = 'sqTIGueuegJe59TSS4G8eWnTiSIc'
+FB_B = 'gCwxWz2BUfDbQ9W7u9wRTTwiSWkc'
+FB_C = 'dTHofouzkG0AaAKYyLGmpbWri48c'
 
 
 class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
@@ -263,172 +257,66 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
         ) | beam.Flatten()
 
 
-class ZipUserSettingsAndUserAuthDetailsModelsTests(
-    job_test_utils.PipelinedTestBase
-):
-    """Pipeline tests for ZipUserSettingsAndUserAuthDetailsModels."""
+# The problems that RepairUserAuthDetailsModels can find with a user.
+MISSING_AUTH = 'is missing its UserAuthDetailsModel'
+MISSING_ID = 'is missing its firebase_auth_id'
+MISSING_REVERSE = 'is missing its UserIdByFirebaseAuthIdModel'
+MISSING_SETTINGS = 'is missing its UserSettingsModel'
 
-    def test_zip_with_no_models_produces_no_output(self) -> None:
-        self.assert_pcoll_empty(self.run_zip([], []))
+# The reasons why RepairUserAuthDetailsModels can refuse to repair a user.
+AUTH_DELETED = 'its UserAuthDetailsModel is marked deleted'
+SETTINGS_DELETED = 'its UserSettingsModel is marked deleted'
 
-    def test_zip_with_both_models_groups_them_by_user_id(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_zip(
-                [
-                    self.create_model(
-                        auth_models.UserAuthDetailsModel,
-                        id='uid_a',
-                        firebase_auth_id='fb_a',
-                    )
-                ],
-                [
-                    self.create_model(
-                        user_models.UserSettingsModel,
-                        id='uid_a',
-                        email='a@a.com',
-                    )
-                ],
-            ),
-            [('uid_a', ['fb_a'], ['a@a.com'])],
-        )
-
-    def test_zip_with_only_auth_details_model_groups_it_alone(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_zip(
-                [
-                    self.create_model(
-                        auth_models.UserAuthDetailsModel,
-                        id='uid_a',
-                        firebase_auth_id='fb_a',
-                    )
-                ],
-                [],
-            ),
-            [('uid_a', ['fb_a'], [])],
-        )
-
-    def test_zip_with_only_settings_model_groups_it_alone(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_zip(
-                [],
-                [
-                    self.create_model(
-                        user_models.UserSettingsModel,
-                        id='uid_a',
-                        email='a@a.com',
-                    )
-                ],
-            ),
-            [('uid_a', [], ['a@a.com'])],
-        )
-
-    def test_zip_with_multiple_users_groups_each_by_user_id(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_zip(
-                [
-                    self.create_model(
-                        auth_models.UserAuthDetailsModel,
-                        id='uid_a',
-                        firebase_auth_id='fb_a',
-                    ),
-                    self.create_model(
-                        auth_models.UserAuthDetailsModel,
-                        id='uid_b',
-                        firebase_auth_id='fb_b',
-                    ),
-                ],
-                [
-                    self.create_model(
-                        user_models.UserSettingsModel,
-                        id='uid_a',
-                        email='a@a.com',
-                    ),
-                    self.create_model(
-                        user_models.UserSettingsModel,
-                        id='uid_c',
-                        email='c@c.com',
-                    ),
-                ],
-            ),
-            [
-                ('uid_a', ['fb_a'], ['a@a.com']),
-                ('uid_b', ['fb_b'], []),
-                ('uid_c', [], ['c@c.com']),
-            ],
-        )
-
-    def run_zip(
-        self,
-        user_auth_details_models: list[auth_models.UserAuthDetailsModel],
-        user_settings_models: list[user_models.UserSettingsModel],
-    ) -> beam.PCollection[tuple[str, list[str], list[str]]]:
-        """Runs the zip and summarizes each group into comparable values.
-
-        Each emitted element is a (user_id, firebase_auth_ids, emails) triple,
-        where firebase_auth_ids comes from the grouped UserAuthDetailsModels
-        and emails comes from the grouped UserSettingsModels.
-
-        Args:
-            user_auth_details_models: list(UserAuthDetailsModel). The auth
-                details models to zip.
-            user_settings_models: list(UserSettingsModel). The settings models
-                to zip.
-
-        Returns:
-            PCollection. The summarized (user_id, firebase_auth_ids, emails)
-            triples.
-        """
-        return (
-            (
-                self.pipeline
-                | 'Create UserAuthDetailsModels'
-                >> beam.Create(user_auth_details_models),
-                self.pipeline
-                | 'Create UserSettingsModels'
-                >> beam.Create(user_settings_models),
-            )
-            | 'Zip models'
-            >> firebase_transforms.ZipUserSettingsAndUserAuthDetailsModels()
-            | 'Summarize grouped models'
-            >> beam.MapTuple(
-                lambda user_id, grouped: (
-                    user_id,
-                    [m.firebase_auth_id for m in grouped[0]],
-                    [m.email for m in grouped[1]],
-                )
-            )
-        )
+RepairOutput = tuple[str | int | bool | None, ...]
 
 
-class GenerateFirebaseAuthIdTests(test_utils.TestBase):
-    """Unit tests for _generate_firebase_auth_id."""
+def ok() -> RepairOutput:
+    """Returns the output of a user that doesn't need to be repaired."""
+    return (TAG_REPAIR_OK, 1)
 
-    def test_generates_same_id_for_same_user_id(self) -> None:
-        self.assertEqual(
-            generate_firebase_auth_id('uid_a'),
-            generate_firebase_auth_id('uid_a'),
-        )
 
-    def test_generates_28_alphanumeric_characters(self) -> None:
-        firebase_auth_id = generate_firebase_auth_id('uid_a')
+def put_auth(user_id: str, firebase_auth_id: str) -> RepairOutput:
+    """Returns the output of a UserAuthDetailsModel that needs to be put."""
+    return (TAG_PUT, 'UserAuthDetailsModel', user_id, firebase_auth_id, True)
 
-        self.assertEqual(len(firebase_auth_id), 28)
-        self.assertTrue(firebase_auth_id.isalnum())
-        self.assertTrue(firebase_auth_id.isascii())
 
-    def test_generates_different_ids_for_different_user_ids(self) -> None:
-        self.assertNotEqual(
-            generate_firebase_auth_id('uid_a'),
-            generate_firebase_auth_id('uid_b'),
-        )
+def put_reverse(firebase_auth_id: str, user_id: str) -> RepairOutput:
+    """Returns the output of a UserIdByFirebaseAuthIdModel that needs to be
+    put.
+    """
+    return (
+        TAG_PUT,
+        'UserIdByFirebaseAuthIdModel',
+        firebase_auth_id,
+        user_id,
+        True,
+    )
 
-    def test_generates_pinned_id(self) -> None:
-        # Changing the generated ID would make reruns of the repair job assign
-        # a different ID than earlier runs did, so the value is pinned here.
-        self.assertEqual(
-            generate_firebase_auth_id('uid_a'),
-            FB_A,
-        )
+
+def problem(user_id: str, issue: str, reason: str) -> RepairOutput:
+    """Returns the output of a user that can't be repaired."""
+    return (TAG_PROBLEMS, f'{user_id=!r} {issue}, but {reason}')
+
+
+def mapped_by(*firebase_auth_ids: str) -> str:
+    """Returns the reason for a user with existing reverse models."""
+    return (
+        'UserIdByFirebaseAuthIdModels already map to it '
+        f'(firebase_auth_ids={list(firebase_auth_ids)!r})'
+    )
+
+
+def shared_with(*user_ids: str) -> str:
+    """Returns the reason for a user whose email other users share."""
+    return f'other Oppia users share its email (user_ids={list(user_ids)!r})'
+
+
+def orphaned_by(*firebase_auth_ids: str) -> str:
+    """Returns the reason for a user that only has auth models left."""
+    return (
+        'it still has a UserAuthDetailsModel and UserIdByFirebaseAuthIdModels '
+        f'(firebase_auth_ids={list(firebase_auth_ids)!r})'
+    )
 
 
 class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
@@ -452,50 +340,54 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
                 )
 
     def test_repair_with_no_models_produces_no_output(self) -> None:
-        self.assert_pcoll_empty(self.run_repair([], [], []))
+        self.assert_pcoll_empty(self.run_repair())
 
     def test_repair_with_healthy_user_reports_ok(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', firebase_auth_id='fb_a')],
-                [self.create_settings_model('uid_a')],
-                [self.create_reverse_model('fb_a', 'uid_a')],
-            ),
-            [(TAG_REPAIR_OK, 1)],
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', 'fb_a'),
+                self.settings_model('uid_a'),
+                self.reverse_model('fb_a', 'uid_a'),
+            ],
+            [ok()],
+        )
+
+    def test_repair_with_repaired_user_reports_ok(self) -> None:
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', FB_A),
+                self.settings_model('uid_a'),
+                self.reverse_model(FB_A, 'uid_a'),
+            ],
+            [ok()],
         )
 
     def test_repair_with_profile_user_reports_ok(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', parent_user_id='uid_p')],
-                [self.create_settings_model('uid_a')],
-                [],
-            ),
-            [(TAG_REPAIR_OK, 1)],
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', parent_user_id='uid_p'),
+                self.settings_model('uid_a'),
+            ],
+            [ok()],
         )
 
     def test_repair_with_only_reverse_models_reports_each(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [],
-                [],
-                [
-                    self.create_reverse_model('fb_a', 'uid_a'),
-                    self.create_reverse_model('fb_b', 'uid_a', deleted=True),
-                ],
-            ),
+        reason = 'it still has a UserIdByFirebaseAuthIdModel'
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserAuthDetailsModel '
-                    'and UserSettingsModel, but it still has a '
-                    'UserIdByFirebaseAuthIdModel (firebase_auth_id=\'fb_a\')',
+                self.reverse_model('fb_a', 'uid_a'),
+                self.reverse_model('fb_b', 'uid_a', deleted=True),
+            ],
+            [
+                problem(
+                    'uid_a',
+                    'is missing its UserAuthDetailsModel and UserSettingsModel',
+                    f'{reason} (firebase_auth_id=\'fb_a\')',
                 ),
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserAuthDetailsModel '
-                    'and UserSettingsModel, but it still has a '
-                    'UserIdByFirebaseAuthIdModel (firebase_auth_id=\'fb_b\')',
+                problem(
+                    'uid_a',
+                    'is missing its UserAuthDetailsModel and UserSettingsModel',
+                    f'{reason} (firebase_auth_id=\'fb_b\')',
                 ),
             ],
         )
@@ -503,82 +395,84 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
     def test_repair_with_missing_auth_model_creates_both_auth_models(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair([], [self.create_settings_model('uid_a')], []),
-            [
-                (TAG_PUT, 'UserAuthDetailsModel', 'uid_a', FB_A, True),
-                (TAG_PUT, 'UserIdByFirebaseAuthIdModel', FB_A, 'uid_a', True),
-            ],
+        self.assert_repairs(
+            [self.settings_model('uid_a')],
+            [put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
         )
 
     def test_repair_with_missing_auth_model_of_deleted_user_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [], [self.create_settings_model('uid_a', deleted=True)], []
-            ),
-            [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserAuthDetailsModel, '
-                    'but its UserSettingsModel is marked deleted',
-                ),
-            ],
+        self.assert_repairs(
+            [self.settings_model('uid_a', deleted=True)],
+            [problem('uid_a', MISSING_AUTH, SETTINGS_DELETED)],
         )
 
     def test_repair_with_missing_auth_model_and_reverse_model_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [],
-                [self.create_settings_model('uid_a')],
-                [self.create_reverse_model('fb_a', 'uid_a')],
-            ),
+        self.assert_repairs(
+            [self.settings_model('uid_a'), self.reverse_model('fb_a', 'uid_a')],
+            [problem('uid_a', MISSING_AUTH, mapped_by('fb_a'))],
+        )
+
+    def test_repair_with_only_generated_reverse_model_creates_auth_model(
+        self,
+    ) -> None:
+        # NOTE: This is what an interrupted repair job leaves behind.
+        self.assert_repairs(
+            [self.settings_model('uid_a'), self.reverse_model(FB_A, 'uid_a')],
+            [put_auth('uid_a', FB_A)],
+        )
+
+    def test_repair_with_generated_id_but_no_reverse_model_creates_it(
+        self,
+    ) -> None:
+        # NOTE: This is what an interrupted repair job leaves behind.
+        self.assert_repairs(
+            [self.auth_model('uid_a', FB_A), self.settings_model('uid_a')],
+            [put_reverse(FB_A, 'uid_a')],
+        )
+
+    def test_repair_with_deleted_generated_reverse_model_skips(self) -> None:
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserAuthDetailsModel, '
-                    'but UserIdByFirebaseAuthIdModels already map to it '
-                    '(firebase_auth_ids=[\'fb_a\'])',
-                ),
+                self.settings_model('uid_a'),
+                self.reverse_model(FB_A, 'uid_a', deleted=True),
             ],
+            [problem('uid_a', MISSING_AUTH, mapped_by(FB_A))],
+        )
+
+    def test_repair_with_generated_id_and_other_reverse_model_skips(
+        self,
+    ) -> None:
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', FB_A),
+                self.settings_model('uid_a'),
+                self.reverse_model('fb_a', 'uid_a'),
+            ],
+            [problem('uid_a', MISSING_REVERSE, mapped_by('fb_a'))],
         )
 
     def test_repair_with_none_firebase_auth_id_fills_it_in(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', firebase_auth_id=None)],
-                [self.create_settings_model('uid_a')],
-                [],
-            ),
-            [
-                (TAG_PUT, 'UserAuthDetailsModel', 'uid_a', FB_A, True),
-                (TAG_PUT, 'UserIdByFirebaseAuthIdModel', FB_A, 'uid_a', True),
-            ],
+        self.assert_repairs(
+            [self.auth_model('uid_a', None), self.settings_model('uid_a')],
+            [put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
         )
 
     def test_repair_with_empty_firebase_auth_id_fills_it_in(self) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', firebase_auth_id='')],
-                [self.create_settings_model('uid_a')],
-                [],
-            ),
-            [
-                (TAG_PUT, 'UserAuthDetailsModel', 'uid_a', FB_A, True),
-                (TAG_PUT, 'UserIdByFirebaseAuthIdModel', FB_A, 'uid_a', True),
-            ],
+        self.assert_repairs(
+            [self.auth_model('uid_a', ''), self.settings_model('uid_a')],
+            [put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
         )
 
     def test_repair_with_empty_firebase_auth_id_keeps_other_fields(
         self,
     ) -> None:
         repairs = self.run_repair_transform(
-            [self.create_auth_model('uid_a', gae_id='gae_a')],
-            [self.create_settings_model('uid_a')],
-            [],
+            self.auth_model('uid_a', gae_id='gae_a'),
+            self.settings_model('uid_a'),
         )
 
         self.assert_pcoll_equal(
@@ -594,164 +488,170 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
     def test_repair_with_empty_firebase_auth_id_of_deleted_user_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', deleted=True)],
-                [self.create_settings_model('uid_a')],
-                [],
-            ),
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its firebase_auth_id, but '
-                    'its UserAuthDetailsModel is marked deleted',
-                ),
+                self.auth_model('uid_a', deleted=True),
+                self.settings_model('uid_a'),
             ],
+            [problem('uid_a', MISSING_ID, AUTH_DELETED)],
         )
 
     def test_repair_with_empty_firebase_auth_id_of_deleted_settings_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a')],
-                [self.create_settings_model('uid_a', deleted=True)],
-                [],
-            ),
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its firebase_auth_id, but '
-                    'its UserSettingsModel is marked deleted',
-                ),
+                self.auth_model('uid_a'),
+                self.settings_model('uid_a', deleted=True),
             ],
+            [problem('uid_a', MISSING_ID, SETTINGS_DELETED)],
         )
 
     def test_repair_with_empty_firebase_auth_id_of_deleted_models_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', deleted=True)],
-                [self.create_settings_model('uid_a', deleted=True)],
-                [],
-            ),
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its firebase_auth_id, but '
-                    'its UserAuthDetailsModel is marked deleted',
-                ),
+                self.auth_model('uid_a', deleted=True),
+                self.settings_model('uid_a', deleted=True),
             ],
+            [problem('uid_a', MISSING_ID, AUTH_DELETED)],
         )
 
     def test_repair_with_empty_firebase_auth_id_and_reverse_model_skips(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a')],
-                [self.create_settings_model('uid_a')],
-                [
-                    self.create_reverse_model('fb_b', 'uid_a'),
-                    self.create_reverse_model('fb_a', 'uid_a'),
-                ],
-            ),
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its firebase_auth_id, but '
-                    'UserIdByFirebaseAuthIdModels already map to it '
-                    '(firebase_auth_ids=[\'fb_a\', \'fb_b\'])',
-                ),
+                self.auth_model('uid_a'),
+                self.settings_model('uid_a'),
+                self.reverse_model('fb_b', 'uid_a'),
+                self.reverse_model('fb_a', 'uid_a'),
             ],
+            [problem('uid_a', MISSING_ID, mapped_by('fb_a', 'fb_b'))],
         )
 
     def test_repair_with_missing_settings_model_reports_auth_models(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', firebase_auth_id='fb_a')],
-                [],
-                [
-                    self.create_reverse_model('fb_b', 'uid_a', deleted=True),
-                    self.create_reverse_model('fb_a', 'uid_a'),
-                ],
-            ),
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserSettingsModel, but '
-                    'it still has a UserAuthDetailsModel and '
-                    'UserIdByFirebaseAuthIdModels '
-                    '(firebase_auth_ids=[\'fb_a\', \'fb_b\'])',
-                ),
+                self.auth_model('uid_a', 'fb_a'),
+                self.reverse_model('fb_b', 'uid_a', deleted=True),
+                self.reverse_model('fb_a', 'uid_a'),
             ],
+            [problem('uid_a', MISSING_SETTINGS, orphaned_by('fb_a', 'fb_b'))],
         )
 
     def test_repair_with_missing_settings_model_of_deleted_user_reports_it(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [self.create_auth_model('uid_a', deleted=True)],
-                [],
-                [],
-            ),
+        self.assert_repairs(
+            [self.auth_model('uid_a', deleted=True)],
+            [problem('uid_a', MISSING_SETTINGS, orphaned_by())],
+        )
+
+    def test_repair_with_missing_auth_model_and_shared_email_skips(
+        self,
+    ) -> None:
+        self.assert_repairs(
             [
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_a\' is missing its UserSettingsModel, but '
-                    'it still has a UserAuthDetailsModel and '
-                    'UserIdByFirebaseAuthIdModels (firebase_auth_ids=[])',
-                ),
+                self.auth_model('uid_a', 'fb_a'),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_b', email='x@x.com'),
+                self.reverse_model('fb_a', 'uid_a'),
             ],
+            [ok(), problem('uid_b', MISSING_AUTH, shared_with('uid_a'))],
+        )
+
+    def test_repair_with_empty_firebase_auth_id_and_shared_email_skips(
+        self,
+    ) -> None:
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a'),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_b', email='x@x.com'),
+                self.settings_model('uid_c', email='x@x.com'),
+            ],
+            [
+                problem('uid_a', MISSING_ID, shared_with('uid_b', 'uid_c')),
+                problem('uid_b', MISSING_AUTH, shared_with('uid_a', 'uid_c')),
+                problem('uid_c', MISSING_AUTH, shared_with('uid_a', 'uid_b')),
+            ],
+        )
+
+    def test_repair_with_email_shared_by_profile_user_repairs_it(
+        self,
+    ) -> None:
+        # Profile users share their parent's email, but they never get a
+        # Firebase account, so they can't collide with the repaired user.
+        self.assert_repairs(
+            [
+                self.auth_model('uid_p', parent_user_id='uid_a'),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_p', email='x@x.com'),
+            ],
+            [ok(), put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
+        )
+
+    def test_repair_with_email_shared_by_deleted_user_repairs_it(
+        self,
+    ) -> None:
+        self.assert_repairs(
+            [
+                self.auth_model('uid_b', 'fb_b', deleted=True),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_b', email='x@x.com', deleted=True),
+                self.reverse_model('fb_b', 'uid_b', deleted=True),
+            ],
+            [ok(), put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
+        )
+
+    def test_repair_with_healthy_users_sharing_email_reports_ok(
+        self,
+    ) -> None:
+        # Existing collisions are reported by FirebaseServerSyncJob, so users
+        # that don't need repairs are left alone.
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', 'fb_a'),
+                self.auth_model('uid_b', 'fb_b'),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_b', email='x@x.com'),
+                self.reverse_model('fb_a', 'uid_a'),
+                self.reverse_model('fb_b', 'uid_b'),
+            ],
+            [ok(), ok()],
         )
 
     def test_repair_with_multiple_users_repairs_each_independently(
         self,
     ) -> None:
-        self.assert_pcoll_equal(
-            self.run_repair(
-                [
-                    self.create_auth_model('uid_a', firebase_auth_id='fb_a'),
-                    self.create_auth_model('uid_b'),
-                    self.create_auth_model('uid_d', firebase_auth_id='fb_d'),
-                ],
-                [
-                    self.create_settings_model('uid_a'),
-                    self.create_settings_model('uid_b'),
-                    self.create_settings_model('uid_c'),
-                    self.create_settings_model('uid_e', deleted=True),
-                ],
-                [
-                    self.create_reverse_model('fb_a', 'uid_a'),
-                    self.create_reverse_model('fb_d', 'uid_d'),
-                ],
-            ),
+        self.assert_repairs(
             [
-                (TAG_REPAIR_OK, 1),
-                (TAG_PUT, 'UserAuthDetailsModel', 'uid_b', FB_B, True),
-                (TAG_PUT, 'UserIdByFirebaseAuthIdModel', FB_B, 'uid_b', True),
-                (TAG_PUT, 'UserAuthDetailsModel', 'uid_c', FB_C, True),
-                (TAG_PUT, 'UserIdByFirebaseAuthIdModel', FB_C, 'uid_c', True),
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_d\' is missing its UserSettingsModel, but '
-                    'it still has a UserAuthDetailsModel and '
-                    'UserIdByFirebaseAuthIdModels '
-                    '(firebase_auth_ids=[\'fb_d\'])',
-                ),
-                (
-                    TAG_PROBLEMS,
-                    'user_id=\'uid_e\' is missing its UserAuthDetailsModel, '
-                    'but its UserSettingsModel is marked deleted',
-                ),
+                self.auth_model('uid_a', 'fb_a'),
+                self.auth_model('uid_b'),
+                self.auth_model('uid_d', 'fb_d'),
+                self.settings_model('uid_a'),
+                self.settings_model('uid_b'),
+                self.settings_model('uid_c'),
+                self.settings_model('uid_e', deleted=True),
+                self.reverse_model('fb_a', 'uid_a'),
+                self.reverse_model('fb_d', 'uid_d'),
+            ],
+            [
+                ok(),
+                put_auth('uid_b', FB_B),
+                put_reverse(FB_B, 'uid_b'),
+                put_auth('uid_c', FB_C),
+                put_reverse(FB_C, 'uid_c'),
+                problem('uid_d', MISSING_SETTINGS, orphaned_by('fb_d')),
+                problem('uid_e', MISSING_AUTH, SETTINGS_DELETED),
             ],
         )
 
-    def create_auth_model(
+    def auth_model(
         self,
         user_id: str,
         firebase_auth_id: str | None = None,
@@ -769,18 +669,18 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
             deleted=deleted,
         )
 
-    def create_settings_model(
-        self, user_id: str, deleted: bool = False
+    def settings_model(
+        self, user_id: str, email: str | None = None, deleted: bool = False
     ) -> user_models.UserSettingsModel:
         """Returns a new UserSettingsModel with the given properties."""
         return self.create_model(
             user_models.UserSettingsModel,
             id=user_id,
-            email=f'{user_id}@example.com',
+            email=f'{user_id}@example.com' if email is None else email,
             deleted=deleted,
         )
 
-    def create_reverse_model(
+    def reverse_model(
         self, firebase_auth_id: str, user_id: str, deleted: bool = False
     ) -> auth_models.UserIdByFirebaseAuthIdModel:
         """Returns a new UserIdByFirebaseAuthIdModel with the given IDs."""
@@ -791,14 +691,25 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
             deleted=deleted,
         )
 
-    def run_repair(
+    def assert_repairs(
         self,
-        user_auth_details_models: list[auth_models.UserAuthDetailsModel],
-        user_settings_models: list[user_models.UserSettingsModel],
-        user_id_by_firebase_auth_id_models: list[
-            auth_models.UserIdByFirebaseAuthIdModel
-        ],
-    ) -> beam.PCollection[tuple[str | int | bool | None, ...]]:
+        input_models: list[base_models.BaseModel],
+        expected_outputs: list[RepairOutput],
+    ) -> None:
+        """Asserts that repairing the given models has the expected outputs.
+
+        Args:
+            input_models: list(BaseModel). The models to repair.
+            expected_outputs: list(tuple). The outputs built with ok(),
+                put_auth(), put_reverse() and problem().
+        """
+        self.assert_pcoll_equal(
+            self.run_repair(*input_models), expected_outputs
+        )
+
+    def run_repair(
+        self, *input_models: base_models.BaseModel
+    ) -> beam.PCollection[RepairOutput]:
         """Runs the repair and flattens the tagged outputs into one PCollection.
 
         Each emitted element is a tuple starting with its tag. TAG_OK is paired
@@ -808,12 +719,7 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
         UserIdByFirebaseAuthIdModel), and whether its timestamps were updated.
 
         Args:
-            user_auth_details_models: list(UserAuthDetailsModel). The auth
-                details models to repair.
-            user_settings_models: list(UserSettingsModel). The settings models
-                to repair against.
-            user_id_by_firebase_auth_id_models: list(UserIdByFirebaseAuthIdModel).
-                The reverse mapping models to repair against.
+            *input_models: BaseModel. The models to repair.
 
         Returns:
             PCollection. The flattened, summarized tagged outputs.
@@ -823,12 +729,11 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
         year_ago = self.YEAR_AGO
 
         def summarize(
-            tag: str,
             model: (
                 auth_models.UserAuthDetailsModel
                 | auth_models.UserIdByFirebaseAuthIdModel
             ),
-        ) -> tuple[str, str, str, str | None, bool]:
+        ) -> RepairOutput:
             """Summarizes the given model into comparable values."""
             mapped_id = (
                 model.firebase_auth_id
@@ -836,68 +741,50 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
                 else model.user_id
             )
             return (
-                tag,
+                TAG_PUT,
                 type(model).__name__,
                 model.id,
                 mapped_id,
                 model.last_updated != year_ago,
             )
 
-        repairs = self.run_repair_transform(
-            user_auth_details_models,
-            user_settings_models,
-            user_id_by_firebase_auth_id_models,
-        )
+        repairs = self.run_repair_transform(*input_models)
 
         return (
             repairs[TAG_REPAIR_OK]
             | 'Summarize OK' >> beam.Map(lambda num: (TAG_REPAIR_OK, num)),
-            repairs[TAG_PUT]
-            | 'Summarize PUT' >> beam.Map(lambda m: summarize(TAG_PUT, m)),
+            repairs[TAG_PUT] | 'Summarize PUT' >> beam.Map(summarize),
             repairs[TAG_PROBLEMS]
             | 'Summarize PROBLEMS' >> beam.Map(lambda msg: (TAG_PROBLEMS, msg)),
         ) | 'Flatten summaries' >> beam.Flatten()
 
     def run_repair_transform(
-        self,
-        user_auth_details_models: list[auth_models.UserAuthDetailsModel],
-        user_settings_models: list[user_models.UserSettingsModel],
-        user_id_by_firebase_auth_id_models: list[
-            auth_models.UserIdByFirebaseAuthIdModel
-        ],
+        self, *input_models: base_models.BaseModel
     ) -> dict[str, beam.PCollection]:
         """Runs the repair on the given models and returns its raw outputs.
 
         Args:
-            user_auth_details_models: list(UserAuthDetailsModel). The auth
-                details models to repair.
-            user_settings_models: list(UserSettingsModel). The settings models
-                to repair against.
-            user_id_by_firebase_auth_id_models: list(UserIdByFirebaseAuthIdModel).
-                The reverse mapping models to repair against.
+            *input_models: BaseModel. The models to repair. They are split by
+                type into the transform's three inputs.
 
         Returns:
             dict(str, PCollection). A mapping from each tag to its PCollection.
         """
-        reverse_models = (
-            self.pipeline
-            | 'Create UserIdByFirebaseAuthIdModels'
-            >> beam.Create(user_id_by_firebase_auth_id_models)
+        model_types = (
+            auth_models.UserAuthDetailsModel,
+            user_models.UserSettingsModel,
+            auth_models.UserIdByFirebaseAuthIdModel,
         )
         repairs: dict[str, beam.PCollection] = (
-            (
+            tuple(
                 self.pipeline
-                | 'Create UserAuthDetailsModels'
-                >> beam.Create(user_auth_details_models),
-                self.pipeline
-                | 'Create UserSettingsModels'
-                >> beam.Create(user_settings_models),
+                | f'Create {model_type.__name__}s'
+                >> beam.Create(
+                    [m for m in input_models if isinstance(m, model_type)]
+                )
+                for model_type in model_types
             )
-            | 'Zip models'
-            >> firebase_transforms.ZipUserSettingsAndUserAuthDetailsModels()
             | 'Repair models'
-            >> firebase_transforms.RepairUserAuthDetailsModels(
-                user_id_by_firebase_auth_id_models=reverse_models
-            )
+            >> firebase_transforms.RepairUserAuthDetailsModels()
         )
         return repairs

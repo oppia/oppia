@@ -24,7 +24,7 @@ from collections import abc
 
 from core.constants import constants
 from core.jobs.io import ndb_io
-from core.jobs.transforms import firebase_transforms, job_result_transforms
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import firebase_domain, job_run_result
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -89,9 +89,21 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
+        keyed_user_auth_details_models = (
+            user_auth_details_models
+            | 'Get UserAuthDetailsModels keyed with id'
+            >> beam.Map(lambda m: (m.id, m))
+        )
+
+        keyed_user_settings_models = (
+            user_settings_models
+            | 'Get UserSettingsModels keyed with id'
+            >> beam.Map(lambda m: (m.id, m))
+        )
+
         [oks, errs] = (
-            (user_auth_details_models, user_settings_models)
-            | firebase_transforms.ZipUserSettingsAndUserAuthDetailsModels()
+            (keyed_user_auth_details_models, keyed_user_settings_models)
+            | beam.CoGroupByKey()
             | beam.FlatMapTuple(self._yield_recreated_records_from_oppia_models)
             | beam.Partition(lambda res, _: int(res.is_err()), 2)
         )

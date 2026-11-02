@@ -111,6 +111,14 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
             model = base_models.BaseModel.get_by_id(model_id)
             self.assertIsNotNone(model)
 
+    def test_put_model(self) -> None:
+        model = self.put_model(base_models.BaseModel, deleted=True)
+
+        stored_model = base_models.BaseModel.get_by_id(model.id)
+        self.assertIsNotNone(stored_model)
+        self.assertTrue(stored_model.deleted)
+        self.assertEqual(stored_model.last_updated, self.YEAR_AGO)
+
     def test_job_output_is(self) -> None:
         # TODO(#16049): Here we use MyPy ignore because the attribute
         # 'return_value' is accessed on 'run' function and currently
