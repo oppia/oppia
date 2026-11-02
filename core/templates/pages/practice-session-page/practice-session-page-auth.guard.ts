@@ -48,14 +48,14 @@ export class PracticeSessionAccessGuard implements CanActivate {
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
     const nodeId = route.paramMap.get('node_id') || '';
-    const arcId = route.paramMap.get('arc_id') || '';
+    const moduleId = route.paramMap.get('module_id') || '';
 
-    const isStoryEditorArcsEnabled =
-      this.platformFeatureService.status.StoryEditorArcs.isEnabled;
+    const isStoryEditorModulesEnabled =
+      this.platformFeatureService.status.StoryEditorModules.isEnabled;
 
     if (
-      (nodeId || arcId || (!selectedSubtopicIds && !nodeId && !arcId)) &&
-      !isStoryEditorArcsEnabled
+      (nodeId || moduleId || (!selectedSubtopicIds && !nodeId && !moduleId)) &&
+      !isStoryEditorModulesEnabled
     ) {
       return new Promise<boolean>(resolve => {
         this.router
@@ -72,12 +72,12 @@ export class PracticeSessionAccessGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       let validationPromise: Promise<void>;
 
-      if (arcId) {
+      if (moduleId) {
         validationPromise =
-          this.accessValidationBackendApiService.validateAccessToEndOfArcPage(
+          this.accessValidationBackendApiService.validateAccessToEndOfModulePage(
             classroomUrlFragment,
             topicUrlFragment,
-            arcId
+            moduleId
           );
       } else if (selectedSubtopicIds) {
         validationPromise =

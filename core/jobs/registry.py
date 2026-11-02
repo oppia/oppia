@@ -70,6 +70,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
+    story_module_migration_jobs,
     subtopic_migration_jobs,
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,

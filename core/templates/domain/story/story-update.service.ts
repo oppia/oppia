@@ -34,7 +34,7 @@ import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
 import {Story} from 'domain/story/story.model';
 import {
-  ArcModel,
+  ModuleModel,
   StoryContents,
 } from 'domain/story/story-contents-object.model';
 import {StoryNode} from './story-node.model';
@@ -59,13 +59,13 @@ interface Params {
   new_value?: string | string[] | boolean | number | null;
   property_name?: string;
   cmd?: string;
-  // Arc-related parameters.
-  arc_id?: string;
+  // Module-related parameters.
+  module_id?: string;
   description?: string;
   node_ids?: string[];
   new_title?: string;
-  arc_ids_order?: string[];
-  to_arc_id?: string;
+  module_ids_order?: string[];
+  to_module_id?: string;
   old_position_index?: number;
 }
 
@@ -471,12 +471,22 @@ export class StoryUpdateService {
       }
     );
 
-    if (this._platformFeatureService.status.StoryEditorArcs?.isEnabled) {
-      const arcs = story.getStoryContents().getArcs();
-      if (arcs.length === 0) {
-        this.createArc(story, 'arc_default', 'All Chapters', '', [nextNodeId]);
+    if (this._platformFeatureService.status.StoryEditorModules?.isEnabled) {
+      const modules = story.getStoryContents().getModules();
+      if (modules.length === 0) {
+        // Note: module IDs are opaque, so this does not need to match the
+        // 'default_module' minted by admin.py, nor the 'arc_default' that
+        // stories migrated from schema v6 still carry. Each is only ever
+        // minted into a story that has no modules yet, so they cannot collide.
+        this.createModule(story, 'module_default', 'All Chapters', '', [
+          nextNodeId,
+        ]);
       } else {
-        this.moveNodeToArc(story, nextNodeId, arcs[arcs.length - 1].getId());
+        this.moveNodeToModule(
+          story,
+          nextNodeId,
+          modules[modules.length - 1].getId()
+        );
       }
     }
   }
@@ -1167,182 +1177,190 @@ export class StoryUpdateService {
     );
   }
 
-  createArc(
+  createModule(
     story: Story,
-    arcId: string,
+    moduleId: string,
     title: string,
     description: string,
     nodeIds: string[]
   ): void {
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_CREATE_ARC,
+      StoryDomainConstants.CMD_CREATE_MODULE,
       {
-        arc_id: arcId,
+        module_id: moduleId,
         title: title,
         description: description,
         node_ids: nodeIds,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        const arc = ArcModel.createNew(arcId, title, description, nodeIds);
-        story.getStoryContents().addArc(arc);
+        const module = ModuleModel.createNew(
+          moduleId,
+          title,
+          description,
+          nodeIds
+        );
+        story.getStoryContents().addModule(module);
       },
       (changeDict, story) => {
         // ---- Undo ----
-        story.getStoryContents().deleteArc(arcId);
+        story.getStoryContents().deleteModule(moduleId);
       }
     );
   }
 
-  deleteArc(story: Story, arcId: string): void {
-    const arcIndex = story.getStoryContents().getArcIndex(arcId);
-    const arc = story.getStoryContents().getArcs()[arcIndex];
-    const oldId = arc.getId();
-    const oldTitle = arc.getTitle();
-    const oldDescription = arc.getDescription();
-    const oldNodeIds = arc.getNodeIds().slice();
+  deleteModule(story: Story, moduleId: string): void {
+    const moduleIndex = story.getStoryContents().getModuleIndex(moduleId);
+    const module = story.getStoryContents().getModules()[moduleIndex];
+    const oldId = module.getId();
+    const oldTitle = module.getTitle();
+    const oldDescription = module.getDescription();
+    const oldNodeIds = module.getNodeIds().slice();
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_DELETE_ARC,
+      StoryDomainConstants.CMD_DELETE_MODULE,
       {
-        arc_id: arcId,
+        module_id: moduleId,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        story.getStoryContents().deleteArc(arcId);
+        story.getStoryContents().deleteModule(moduleId);
       },
       (changeDict, story) => {
         // ---- Undo ----
-        const restoredArc = ArcModel.createNew(
+        const restoredModule = ModuleModel.createNew(
           oldId,
           oldTitle,
           oldDescription,
           oldNodeIds
         );
-        story.getStoryContents().insertArcAt(arcIndex, restoredArc);
+        story.getStoryContents().insertModuleAt(moduleIndex, restoredModule);
       }
     );
   }
 
-  renameArc(story: Story, arcId: string, newTitle: string): void {
-    const arcIndex = story.getStoryContents().getArcIndex(arcId);
-    const oldTitle = story.getStoryContents().getArcs()[arcIndex].getTitle();
+  renameModule(story: Story, moduleId: string, newTitle: string): void {
+    const moduleIndex = story.getStoryContents().getModuleIndex(moduleId);
+    const oldTitle = story
+      .getStoryContents()
+      .getModules()
+      [moduleIndex].getTitle();
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_RENAME_ARC,
+      StoryDomainConstants.CMD_RENAME_MODULE,
       {
-        arc_id: arcId,
+        module_id: moduleId,
         new_title: newTitle,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        story.getStoryContents().getArcs()[arcIndex].setTitle(newTitle);
+        story.getStoryContents().getModules()[moduleIndex].setTitle(newTitle);
       },
       (changeDict, story) => {
         // ---- Undo ----
-        story.getStoryContents().getArcs()[arcIndex].setTitle(oldTitle);
+        story.getStoryContents().getModules()[moduleIndex].setTitle(oldTitle);
       }
     );
   }
 
-  updateArcProperty(
+  updateModuleProperty(
     story: Story,
-    arcId: string,
+    moduleId: string,
     propertyName: string,
     oldValue: string,
     newValue: string
   ): void {
-    const arcIndex = story.getStoryContents().getArcIndex(arcId);
-    if (arcIndex === -1) {
-      throw new Error("The given arc doesn't exist");
+    const moduleIndex = story.getStoryContents().getModuleIndex(moduleId);
+    if (moduleIndex === -1) {
+      throw new Error("The given module doesn't exist");
     }
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_UPDATE_ARC_PROPERTY,
+      StoryDomainConstants.CMD_UPDATE_MODULE_PROPERTY,
       {
-        arc_id: arcId,
+        module_id: moduleId,
         property_name: propertyName,
         old_value: oldValue,
         new_value: newValue,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        const arc = story.getStoryContents().getArcs()[arcIndex];
-        if (propertyName === StoryDomainConstants.ARC_PROPERTY_TITLE) {
-          arc.setTitle(newValue);
+        const module = story.getStoryContents().getModules()[moduleIndex];
+        if (propertyName === StoryDomainConstants.MODULE_PROPERTY_TITLE) {
+          module.setTitle(newValue);
         } else if (
-          propertyName === StoryDomainConstants.ARC_PROPERTY_DESCRIPTION
+          propertyName === StoryDomainConstants.MODULE_PROPERTY_DESCRIPTION
         ) {
-          arc.setDescription(newValue);
+          module.setDescription(newValue);
         } else {
-          throw new Error('Invalid arc property');
+          throw new Error('Invalid module property');
         }
       },
       (changeDict, story) => {
         // ---- Undo ----
-        const arc = story.getStoryContents().getArcs()[arcIndex];
-        if (propertyName === StoryDomainConstants.ARC_PROPERTY_TITLE) {
-          arc.setTitle(oldValue);
+        const module = story.getStoryContents().getModules()[moduleIndex];
+        if (propertyName === StoryDomainConstants.MODULE_PROPERTY_TITLE) {
+          module.setTitle(oldValue);
         } else if (
-          propertyName === StoryDomainConstants.ARC_PROPERTY_DESCRIPTION
+          propertyName === StoryDomainConstants.MODULE_PROPERTY_DESCRIPTION
         ) {
-          arc.setDescription(oldValue);
+          module.setDescription(oldValue);
         }
       }
     );
   }
 
-  rearrangeArcs(story: Story, arcIdsOrder: string[]): void {
-    const oldArcIds = story
+  rearrangeModules(story: Story, moduleIdsOrder: string[]): void {
+    const oldModuleIds = story
       .getStoryContents()
-      .getArcs()
-      .map(arc => arc.getId());
+      .getModules()
+      .map(module => module.getId());
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_REARRANGE_ARCS,
+      StoryDomainConstants.CMD_REARRANGE_MODULES,
       {
-        arc_ids_order: arcIdsOrder,
+        module_ids_order: moduleIdsOrder,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        story.getStoryContents().rearrangeArcs(arcIdsOrder);
+        story.getStoryContents().rearrangeModules(moduleIdsOrder);
       },
       (changeDict, story) => {
         // ---- Undo ----
-        story.getStoryContents().rearrangeArcs(oldArcIds);
+        story.getStoryContents().rearrangeModules(oldModuleIds);
       }
     );
   }
 
-  moveNodeToArc(story: Story, nodeId: string, toArcId: string): void {
-    let oldArcId = '';
+  moveNodeToModule(story: Story, nodeId: string, toModuleId: string): void {
+    let oldModuleId = '';
     let oldPositionIndex = -1;
-    for (const arc of story.getStoryContents().getArcs()) {
-      const nodeIndex = arc.getNodeIds().indexOf(nodeId);
+    for (const module of story.getStoryContents().getModules()) {
+      const nodeIndex = module.getNodeIds().indexOf(nodeId);
       if (nodeIndex !== -1) {
-        oldArcId = arc.getId();
+        oldModuleId = module.getId();
         oldPositionIndex = nodeIndex;
         break;
       }
     }
     this._applyChange(
       story,
-      StoryDomainConstants.CMD_MOVE_NODE_TO_ARC,
+      StoryDomainConstants.CMD_MOVE_NODE_TO_MODULE,
       {
         node_id: nodeId,
-        to_arc_id: toArcId,
+        to_module_id: toModuleId,
       },
       (changeDict, story) => {
         // ---- Apply ----
-        story.getStoryContents().moveNodeToArc(nodeId, toArcId);
+        story.getStoryContents().moveNodeToModule(nodeId, toModuleId);
       },
       (changeDict, story) => {
         // ---- Undo ----
-        if (oldArcId) {
+        if (oldModuleId) {
           story
             .getStoryContents()
-            .moveNodeToArc(nodeId, oldArcId, oldPositionIndex);
+            .moveNodeToModule(nodeId, oldModuleId, oldPositionIndex);
         }
       }
     );
