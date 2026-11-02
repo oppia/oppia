@@ -1840,6 +1840,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'topic_id_1')
         self.assertEqual(cards[0].entity_description, 'Topic 1')
+        self.assertEqual(cards[0].content_count, 2)
         self.assertTrue(cards[0].currently_available_to_learners)
 
         # Delete.

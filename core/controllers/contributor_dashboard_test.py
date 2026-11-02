@@ -3694,15 +3694,23 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_handler_returns_400_for_topic(self) -> None:
+    def test_handler_returns_topic_name_and_description(self) -> None:
         response = self.get_json(
             '%s?language_code=hi&entity_type=topic&entity_id=%s'
             % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.topic_id),
-            expected_status_int=400,
         )
         self.assertEqual(
-            response['error'],
-            'Translation for entity_type topic is not supported yet.',
+            [
+                content['content_id']
+                for content in response['translatable_contents']
+            ],
+            [feconf.TOPIC_NAME_CONTENT_ID, feconf.TOPIC_DESCRIPTION_CONTENT_ID],
+        )
+        self.assertEqual(
+            response['translatable_contents'][0]['content_value'], 'Topic Name'
+        )
+        self.assertEqual(
+            response['translatable_contents'][0]['content_type'], 'metadata'
         )
 
     @test_utils.enable_feature_flags(

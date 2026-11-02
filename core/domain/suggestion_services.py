@@ -43,6 +43,7 @@ from core.domain import (
     state_domain,
     suggestion_registry,
     taskqueue_services,
+    topic_fetchers,
     translation_domain,
     translation_fetchers,
     user_domain,
@@ -328,6 +329,20 @@ def create_suggestion(
                             'The Skill content has changed since this translation '
                             'was submitted.'
                         )
+        elif target_type == feconf.ENTITY_TYPE_TOPIC:
+            topic = topic_fetchers.get_topic_by_id(target_id)
+            contents = (
+                topic.get_translatable_contents_collection().content_id_to_translatable_content
+            )
+            if (
+                content_id not in contents
+                or contents[content_id].content_value
+                != change_cmd['content_html']
+            ):
+                raise Exception(
+                    'The Topic content has changed since this translation '
+                    'was submitted.'
+                )
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
         existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(

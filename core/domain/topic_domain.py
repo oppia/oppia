@@ -32,9 +32,14 @@ from core.constants import constants
 # once the schema migration functions are moved outside the
 # domain file.
 from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import change_domain, study_guide_domain, subtopic_page_domain
+from core.domain import (
+    change_domain,
+    study_guide_domain,
+    subtopic_page_domain,
+    translation_domain,
+)
 
-from typing import Dict, Final, List, Literal, Optional, TypedDict
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -1063,7 +1068,7 @@ class VersionedStoryReferencesDict(TypedDict):
     story_references: List[StoryReferenceDict]
 
 
-class Topic:
+class Topic(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia Topic."""
 
     def __init__(
@@ -1159,6 +1164,30 @@ class Topic:
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
+
+    def get_translatable_contents_collection(
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Returns the topic name and description as translatable metadata."""
+        collection = translation_domain.TranslatableContentsCollection()
+        if self.name:
+            collection.add_translatable_field(
+                feconf.TOPIC_NAME_CONTENT_ID,
+                translation_domain.ContentType.METADATA,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                self.name,
+            )
+        if self.description:
+            collection.add_translatable_field(
+                feconf.TOPIC_DESCRIPTION_CONTENT_ID,
+                translation_domain.ContentType.METADATA,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                self.description,
+            )
+        return collection
 
     def to_dict(self) -> TopicDict:
         """Returns a dict representing this Topic domain object.
