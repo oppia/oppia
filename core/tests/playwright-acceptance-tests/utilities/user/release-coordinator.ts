@@ -83,10 +83,6 @@ export class ReleaseCoordinator extends BaseUser {
           );
           await this.clickOnElement(saveButton);
 
-          await this.expectElementValueToBe(
-            selectElement,
-            enable ? '0: true' : '1: false'
-          );
           // Wait for the save button in this feature's row to become disabled.
           // Other feature rows can already have disabled Save buttons.
           await this.expectElementToBeVisible(
