@@ -536,6 +536,7 @@ class TopicsToClassroomsRelationHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         topic_dicts = [
             topic.to_dict() for topic in topic_fetchers.get_all_topics()
         ]
@@ -586,6 +587,7 @@ class AllClassroomsSummaryHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         classrooms = classroom_config_services.get_all_classrooms()
         all_classrooms_summary_dicts: List[Dict[str, str | bool | int]] = []
 

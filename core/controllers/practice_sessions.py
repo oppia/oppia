@@ -68,12 +68,12 @@ class PracticeSessionsPageDataHandler(
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name: str, **kwargs: str) -> None:
+    def get(self, topic_name: str, **_kwargs: str) -> None:
         """Retrieves information about a topic.
 
         Args:
             topic_name: str. The topic name.
-            **kwargs: str. The keyword arguments.
+            **_kwargs: str. The keyword arguments.
 
         Raises:
             NotFoundException. The page cannot be found.

@@ -370,6 +370,7 @@ class EntityTranslationsBulkHandler(
         entity_id: str,
         entity_version: int,
     ) -> None:
+        """Handles GET requests."""
         exploration_editor_can_modify_translations = feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
             self.user_id,
