@@ -177,20 +177,6 @@ describe('Logged-in Learner', function () {
       '11'
     );
 
-    await curriculumAdmin.addHindiTranslationToExploration(explorationIds[0]);
-
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard('Introduction');
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
-      '\u0939\u093F\u0928\u094D\u0926\u0940 (Hindi)',
-      'Hindi (India)',
-      'Content',
-      testConstants.data.IntroContentVoiceoverInHindi
-    );
-    await curriculumAdmin.saveExplorationDraft();
-
     loggedInLearner = await UserFactory.createNewUser(
       'learner1',
       'learner_topic_page1@example.com'
