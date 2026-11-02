@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from collections import abc
 
-from core import utils
+from core import feconf, utils
 from core.jobs import job_utils
 from core.jobs.types import firebase_domain
 from core.platform import models
@@ -270,9 +270,10 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
     - They are missing their UserSettingsModel, because this transform never
       deletes models.
 
-    NOTE: Profile users (i.e. users with a parent_user_id) that are missing
-    their UserAuthDetailsModel can't be told apart from full users, so they are
-    repaired as full users.
+    Profile users are never repaired, because they have no Firebase account.
+    They are recognized by the parent_user_id of their UserAuthDetailsModel or,
+    when that model is missing, by the mobile learner role that every profile
+    user has.
 
     Attributes:
         TAG_OK: PCollection[int] that can be summed to find the number of users
@@ -421,11 +422,12 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
             m.id == firebase_auth_id and not m.deleted for m in reverse_models
         )
 
-        if auth_model is None:
-            problem = 'is missing its UserAuthDetailsModel'
-        elif auth_model.parent_user_id is not None:
+        if cls._is_profile_user(auth_model, settings_model):
             yield beam.TaggedOutput(cls.TAG_OK, 1)
             return
+
+        if auth_model is None:
+            problem = 'is missing its UserAuthDetailsModel'
         elif not auth_model.firebase_auth_id:
             problem = 'is missing its firebase_auth_id'
         elif (
@@ -501,20 +503,34 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
             abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel],
         ],
     ) -> abc.Iterator[tuple[str, str]]:
-        """Yields the (email, user_id) pair of a live, full user.
-
-        Users missing their UserAuthDetailsModel are treated as full users,
-        because that is how they are repaired.
-        """
+        """Yields the (email, user_id) pair of a live, full user."""
         auth_model_iter, settings_model_iter, _ = grouped
         auth_model = next(iter(auth_model_iter), None)
         settings_model = next(iter(settings_model_iter), None)
         if (
             settings_model is not None
             and not settings_model.deleted
-            and (auth_model is None or auth_model.parent_user_id is None)
+            and not RepairUserAuthDetailsModels._is_profile_user(
+                auth_model, settings_model
+            )
         ):
             yield (settings_model.email, user_id)
+
+    @staticmethod
+    def _is_profile_user(
+        auth_model: auth_models.UserAuthDetailsModel | None,
+        settings_model: user_models.UserSettingsModel,
+    ) -> bool:
+        """Returns whether the given models belong to a profile user.
+
+        NOTE: Only UserAuthDetailsModel stores the parent_user_id, so profile
+        users missing that model are recognized by their mobile learner role
+        instead. Every profile user is created with that role, and
+        user_services forbids changing it.
+        """
+        if auth_model is not None and auth_model.parent_user_id is not None:
+            return True
+        return feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
 
     @classmethod
     def _report(

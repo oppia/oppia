@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.transforms import firebase_transforms
 from core.jobs.types import firebase_domain
@@ -267,6 +268,9 @@ MISSING_SETTINGS = 'is missing its UserSettingsModel'
 AUTH_DELETED = 'its UserAuthDetailsModel is marked deleted'
 SETTINGS_DELETED = 'its UserSettingsModel is marked deleted'
 
+# The roles that every profile user has, and that no full user can have.
+PROFILE_ROLES = (feconf.ROLE_ID_MOBILE_LEARNER,)
+
 RepairOutput = tuple[str | int | bool | None, ...]
 
 
@@ -368,6 +372,16 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
                 self.auth_model('uid_a', parent_user_id='uid_p'),
                 self.settings_model('uid_a'),
             ],
+            [ok()],
+        )
+
+    def test_repair_with_profile_user_missing_auth_model_reports_ok(
+        self,
+    ) -> None:
+        # NOTE: Profile users have no Firebase account, so they don't need a
+        # UserAuthDetailsModel for FirebaseServerSyncJob to sync them.
+        self.assert_repairs(
+            [self.settings_model('uid_p', roles=PROFILE_ROLES)],
             [ok()],
         )
 
@@ -595,6 +609,19 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
             [ok(), put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
         )
 
+    def test_repair_with_email_shared_by_profile_missing_auth_repairs_it(
+        self,
+    ) -> None:
+        self.assert_repairs(
+            [
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model(
+                    'uid_p', email='x@x.com', roles=PROFILE_ROLES
+                ),
+            ],
+            [ok(), put_auth('uid_a', FB_A), put_reverse(FB_A, 'uid_a')],
+        )
+
     def test_repair_with_email_shared_by_deleted_user_repairs_it(
         self,
     ) -> None:
@@ -670,7 +697,11 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
         )
 
     def settings_model(
-        self, user_id: str, email: str | None = None, deleted: bool = False
+        self,
+        user_id: str,
+        email: str | None = None,
+        deleted: bool = False,
+        roles: tuple[str, ...] = (),
     ) -> user_models.UserSettingsModel:
         """Returns a new UserSettingsModel with the given properties."""
         return self.create_model(
@@ -678,6 +709,7 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
             id=user_id,
             email=f'{user_id}@example.com' if email is None else email,
             deleted=deleted,
+            roles=list(roles),
         )
 
     def reverse_model(
