@@ -265,8 +265,8 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
     - Their UserAuthDetailsModel or UserSettingsModel is marked deleted.
     - A UserIdByFirebaseAuthIdModel with a different (or deleted) ID already
       maps to them, because the right firebase_auth_id is then ambiguous.
-    - Another live, full user shares their email, because FirebaseServerSyncJob
-      refuses to sync while Oppia users share an email.
+    - Another live, full user shares their email (ignoring case), because
+      FirebaseServerSyncJob refuses to sync while Oppia users share an email.
     - They are missing their UserSettingsModel, because this transform never
       deletes models.
 
@@ -455,10 +455,10 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
                 'UserIdByFirebaseAuthIdModels already map to it '
                 f'({firebase_auth_ids=!r})',
             )
-        elif settings_model.email in user_ids_by_shared_email:
+        elif settings_model.email.lower() in user_ids_by_shared_email:
             user_ids = [
                 i
-                for i in user_ids_by_shared_email[settings_model.email]
+                for i in user_ids_by_shared_email[settings_model.email.lower()]
                 if i != user_id
             ]
             yield cls._report(
@@ -503,7 +503,11 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
             abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel],
         ],
     ) -> abc.Iterator[tuple[str, str]]:
-        """Yields the (email, user_id) pair of a live, full user."""
+        """Yields the (email, user_id) pair of a live, full user.
+
+        NOTE: The email is lowercased because Firebase stores emails in
+        lowercase, so emails that differ only by case still collide.
+        """
         auth_model_iter, settings_model_iter, _ = grouped
         auth_model = next(iter(auth_model_iter), None)
         settings_model = next(iter(settings_model_iter), None)
@@ -514,7 +518,7 @@ class RepairUserAuthDetailsModels(beam.PTransform):  # type: ignore[misc]
                 auth_model, settings_model
             )
         ):
-            yield (settings_model.email, user_id)
+            yield (settings_model.email.lower(), user_id)
 
     @staticmethod
     def _is_profile_user(

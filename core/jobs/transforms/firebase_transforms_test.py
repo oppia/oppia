@@ -578,6 +578,19 @@ class RepairUserAuthDetailsModelsTests(job_test_utils.PipelinedTestBase):
             [ok(), problem('uid_b', MISSING_AUTH, shared_with('uid_a'))],
         )
 
+    def test_repair_with_email_shared_up_to_case_skips(self) -> None:
+        # NOTE: Firebase stores emails in lowercase, so emails that differ
+        # only by case still collide in FirebaseServerSyncJob.
+        self.assert_repairs(
+            [
+                self.auth_model('uid_a', 'fb_a'),
+                self.settings_model('uid_a', email='x@x.com'),
+                self.settings_model('uid_b', email='X@x.com'),
+                self.reverse_model('fb_a', 'uid_a'),
+            ],
+            [ok(), problem('uid_b', MISSING_AUTH, shared_with('uid_a'))],
+        )
+
     def test_repair_with_empty_firebase_auth_id_and_shared_email_skips(
         self,
     ) -> None:
