@@ -391,6 +391,69 @@ describe('FractionInputValidationService', () => {
   });
 
   it(
+    'should not catch equivalent and in simplest form followed by ' +
+      'equivalent as redundant',
+    () => {
+      answerGroups[0].rules = [
+        equivalentToOneAndSimplestFormRule,
+        equivalentToOneRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([]);
+    }
+  );
+
+  it(
+    'should catch equivalent and in simplest form followed by equivalent ' +
+      'as redundant if require simplest form',
+    () => {
+      customizationArgs.requireSimplestForm.value = true;
+      let equivalentToHalfAndSimplestFormRule = Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentToAndInSimplestForm',
+          inputs: {
+            f: createFractionDict(false, 0, 1, 2),
+          },
+        },
+        'FractionInput'
+      );
+      let equivalentToHalfRule = Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentTo',
+          inputs: {
+            f: createFractionDict(false, 0, 1, 2),
+          },
+        },
+        'FractionInput'
+      );
+      answerGroups[0].rules = [
+        equivalentToHalfAndSimplestFormRule,
+        equivalentToHalfRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message:
+            'Learner answer 2 from Oppia response 1 will never be ' +
+            'matched because it is made redundant by answer 1 from ' +
+            'Oppia response 1',
+        },
+      ]);
+    }
+  );
+
+  it(
     'should catch equivalent followed by equals same value' + 'as redundant',
     function () {
       answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
