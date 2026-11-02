@@ -220,16 +220,18 @@ export class SkillSelectorComponent implements OnInit {
       }
     }
 
-    this.visibleTopicFilterList = this.topicFilterList.filter(topic =>
-      matchingSubtopics.has(topic.topicName)
+    this.visibleTopicFilterList = this.topicFilterList.filter(
+      topic => topic.checked || matchingSubtopics.has(topic.topicName)
     );
     this.visibleSubTopicFilterDict = {};
     for (let topicName in this.subTopicFilterDict) {
-      const matchingNames = matchingSubtopics.get(topicName);
-      if (matchingNames) {
-        this.visibleSubTopicFilterDict[topicName] = this.subTopicFilterDict[
-          topicName
-        ].filter(subtopic => matchingNames.has(subtopic.subTopicName));
+      const matchingNames =
+        matchingSubtopics.get(topicName) || new Set<string>();
+      const visibleSubtopics = this.subTopicFilterDict[topicName].filter(
+        subtopic => subtopic.checked || matchingNames.has(subtopic.subTopicName)
+      );
+      if (visibleSubtopics.length) {
+        this.visibleSubTopicFilterDict[topicName] = visibleSubtopics;
       }
     }
   }
