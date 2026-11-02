@@ -71,6 +71,57 @@ describe('State Editor Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should leave state content scrolling normally by default', () => {
+    fixture.detectChanges();
+
+    const card = fixture.nativeElement.querySelector('mat-card');
+    expect(component.stateContentShouldStayVisibleOnScroll).toBeFalse();
+    expect(getComputedStyle(card).position).not.toBe('sticky');
+  });
+
+  it('should keep opted-in state content visible while scrolling answers', () => {
+    component.stateContentShouldStayVisibleOnScroll = true;
+    fixture.detectChanges();
+
+    const editor: HTMLElement = fixture.nativeElement;
+    const card: HTMLElement = editor.querySelector('mat-card');
+    const responses: HTMLElement = editor.querySelector(
+      '#editorTabTourStateResponsesTab'
+    );
+    const scroller = document.createElement('div');
+    scroller.style.height = '400px';
+    scroller.style.overflowY = 'auto';
+    editor.style.display = 'block';
+    card.style.display = 'block';
+    responses.style.height = '1500px';
+    editor.parentNode.insertBefore(scroller, editor);
+    scroller.appendChild(editor);
+
+    try {
+      const initialTop = card.getBoundingClientRect().top;
+      scroller.scrollTop = 200;
+
+      expect(scroller.scrollTop).toBe(200);
+      expect(card.getBoundingClientRect().top).toBeLessThanOrEqual(initialTop);
+      expect(card.getBoundingClientRect().top).toBeCloseTo(
+        scroller.getBoundingClientRect().top,
+        0
+      );
+
+      const longQuestion = document.createElement('div');
+      longQuestion.style.height = '1000px';
+      card.appendChild(longQuestion);
+
+      expect(card.clientHeight).toBeLessThanOrEqual(window.innerHeight * 0.4);
+      expect(card.scrollHeight).toBeGreaterThan(card.clientHeight);
+      card.scrollTop = 100;
+      expect(card.scrollTop).toBe(100);
+    } finally {
+      scroller.parentNode.insertBefore(editor, scroller);
+      scroller.remove();
+    }
+  });
+
   it('should emit values properly', () => {
     spyOn(component.recomputeGraph, 'emit').and.stub();
     spyOn(component.onSaveLinkedSkillId, 'emit').and.stub();

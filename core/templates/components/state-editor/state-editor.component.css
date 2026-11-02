@@ -1,3 +1,13 @@
+.oppia-sticky-state-content {
+  /* Leave room for reviewing answers even when the question contains images. */
+  background-color: #fff;
+  max-height: 40vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 .state-content-header-container {
   display: none;
   padding: 0 30px;
