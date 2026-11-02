@@ -54,7 +54,9 @@ export class SkillSelectorComponent implements OnInit {
   selectedSkill!: string;
   skillFilterText: string = '';
   topicFilterList: {topicName: string; checked: boolean}[] = [];
+  visibleTopicFilterList: {topicName: string; checked: boolean}[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
+  visibleSubTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
   userCanEditSkills: boolean = false;
 
@@ -82,6 +84,7 @@ export class SkillSelectorComponent implements OnInit {
       }
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+    this.updateVisibleFilterLists();
 
     this.userService
       .canUserAccessTopicsAndSkillsDashboard()
@@ -160,6 +163,7 @@ export class SkillSelectorComponent implements OnInit {
     } else {
       this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
     }
+    this.updateVisibleFilterLists();
   }
 
   // The following function is called when the topic filter changes.
@@ -195,6 +199,43 @@ export class SkillSelectorComponent implements OnInit {
     this.updateSkillsListOnSubtopicFilterChange();
   }
 
+  updateVisibleFilterLists(): void {
+    if (this.skillFilterText.trim() === '') {
+      this.visibleTopicFilterList = this.topicFilterList;
+      this.visibleSubTopicFilterDict = this.subTopicFilterDict;
+      return;
+    }
+
+    let matchingSubtopics = new Map<string, Set<string>>();
+    for (let topicName in this.categorizedSkills) {
+      let matchingNames = new Set<string>();
+      for (let subtopicName in this.categorizedSkills[topicName]) {
+        let skills = this.categorizedSkills[topicName][subtopicName];
+        if (this.searchInSubtopicSkills(skills, this.skillFilterText).length) {
+          matchingNames.add(subtopicName);
+        }
+      }
+      if (matchingNames.size) {
+        matchingSubtopics.set(topicName, matchingNames);
+      }
+    }
+
+    this.visibleTopicFilterList = this.topicFilterList.filter(
+      topic => topic.checked || matchingSubtopics.has(topic.topicName)
+    );
+    this.visibleSubTopicFilterDict = {};
+    for (let topicName in this.subTopicFilterDict) {
+      const matchingNames =
+        matchingSubtopics.get(topicName) || new Set<string>();
+      const visibleSubtopics = this.subTopicFilterDict[topicName].filter(
+        subtopic => subtopic.checked || matchingNames.has(subtopic.subTopicName)
+      );
+      if (visibleSubtopics.length) {
+        this.visibleSubTopicFilterDict[topicName] = visibleSubtopics;
+      }
+    }
+  }
+
   searchInSubtopicSkills(
     input: ShortSkillSummary[],
     searchText: string
@@ -204,7 +245,7 @@ export class SkillSelectorComponent implements OnInit {
     });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(
       skills,
-      searchText
+      searchText.trim()
     );
     return input.filter(val => {
       return filteredSkills.includes(val.description);
@@ -219,7 +260,7 @@ export class SkillSelectorComponent implements OnInit {
       });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(
       skills,
-      searchText
+      searchText.trim()
     );
     return this.untriagedSkillSummaries.filter(val => {
       return filteredSkills.includes(val.description);
