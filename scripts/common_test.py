@@ -1452,9 +1452,8 @@ class UrlRetrieveTests(CommonTests):
         )
 
     def test_url_open(self) -> None:
-        # Keep a real HTTPS request to exercise default SSL verification.
-        # Use a raw repository file because GitHub's unauthenticated REST API
-        # rate limit has caused intermittent failures in this test.
+        # Send a real HTTPS request to a static file in the Oppia repository
+        # to exercise default SSL verification.
         github_url = (
             'https://raw.githubusercontent.com/oppia/oppia/develop/LICENSE'
         )
