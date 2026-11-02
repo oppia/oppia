@@ -31,6 +31,8 @@ const baseUrl = testConstants.URLs.BaseURL;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
+const explorationDashboardLinkSelector = (explorationId: string): string =>
+  `a[href="/create/${explorationId}"]`;
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
@@ -120,6 +122,9 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const improvementsTabButton = '.e2e-test-improvements-tab';
+const mobileImprovementsTabItem =
+  '.oppia-exploration-editor-tabs-dropdown-item:has-text("Improvements")';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
 
 const previewTabButton = '.e2e-test-preview-tab';
@@ -1202,6 +1207,97 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Returns the ID of the exploration currently open in the editor.
+   */
+  async getExplorationId(): Promise<string> {
+    await this.expectPageURLToContain(`${baseUrl}/create/`);
+    return new URL(this.page.url()).pathname.split('/')[2];
+  }
+
+  /**
+   * Opens an existing exploration from the Creator Dashboard.
+   * @param {string} explorationId - The ID of the exploration to reopen.
+   */
+  async openExplorationFromCreatorDashboard(
+    explorationId: string
+  ): Promise<void> {
+    // List view contains several links to the same exploration, so the first
+    // matching link is sufficient in both list and card views.
+    await this.clickOnElementWithSelector(
+      `${explorationDashboardLinkSelector(explorationId)}:visible`
+    );
+    await this.expectPageURLToContain(`/create/${explorationId}`);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
+   * Verifies that the exploration is a draft with no unsaved changes.
+   */
+  async expectExplorationToBeDraft(): Promise<void> {
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSaveChangesButtonSelector))
+    ) {
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+    }
+    const saveButtonSelector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.expectElementToBeVisible(`${saveButtonSelector}[disabled]`);
+    await this.expectTextContentToBe(saveButtonSelector, 'Save Draft');
+  }
+
+  /**
+   * Verifies that opening Improvements directly redirects to the editor tab.
+   */
+  async expectImprovementsTabToBeInaccessible(): Promise<void> {
+    const explorationId = await this.getExplorationId();
+    // Verify the redirect instead of waiting for the requested Improvements
+    // URL, since draft explorations cannot access this tab.
+    await this.goto(`${baseUrl}/create/${explorationId}#/improvements`, false);
+    // The editor router reads the hash on initialization. Changing only the
+    // hash of an already loaded editor does not trigger that routing logic.
+    await this.reloadPage();
+    await this.expectPageURLToContain(`/create/${explorationId}#/gui/`);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+  }
+
+  /**
+   * Verifies Improvements tab visibility after the main editor has loaded.
+   * The mobile Options dropdown must initially be closed and is left closed.
+   * @param {boolean} present - Whether the Improvements tab should be visible.
+   */
+  async expectImprovementsTabToBePresent(present: boolean): Promise<void> {
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      // A closed or empty menu would make the absence assertion pass without
+      // checking whether Improvements is actually available.
+      await this.expectElementToBeVisible(mobileMainTabButton);
+      await this.expectElementToBeVisible(mobileImprovementsTabItem, present);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(
+        navigationDropdownInMobileVisibleSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeVisible(mainTabButton);
+      await this.expectElementToBeVisible(improvementsTabButton, present);
+    }
+  }
+
+  /**
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
@@ -1292,6 +1388,14 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateContentInputField, false);
     await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Verifies the content of the current card in the exploration editor.
+   * @param {string} content - The expected card content.
+   */
+  async expectEditorCardContentToContain(content: string): Promise<void> {
+    await this.expectTextContentToContain(stateContentSelector, content);
   }
 
   /**
