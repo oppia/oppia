@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf, utils
+from core.domain import job_services
 from core.platform import models
 
 from typing import List, Sequence
@@ -29,14 +30,12 @@ if MYPY:  # pragma: no cover
         base_models,
         beam_job_models,
         datastore_services,
-        job_models,
     )
 
-base_models, beam_job_models, job_models = models.Registry.import_models(
+base_models, beam_job_models = models.Registry.import_models(
     [
         models.Names.BASE_MODEL,
         models.Names.BEAM_JOB,
-        models.Names.JOB,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -46,7 +45,6 @@ datastore_services = models.Registry.import_datastore_services()
 MODEL_CLASSES_TO_MARK_AS_DELETED = {
     beam_job_models.BeamJobRunModel: datetime.timedelta(days=180),
     beam_job_models.BeamJobRunResultModel: datetime.timedelta(days=180),
-    job_models.JobModel: datetime.timedelta(days=180),
 }
 
 
@@ -79,8 +77,7 @@ def delete_models_marked_as_deleted() -> None:
 
 
 def mark_outdated_models_as_deleted() -> None:
-    """Mark models in MODEL_CLASSES_TO_MARK_AS_DELETED, as deleted if they were
-    last updated more than their deletion period ago.
+    """Mark outdated models and jobs as deleted.
     """
     models_to_mark_as_deleted: List[base_models.BaseModel] = []
     for model_class, period_to_keep in MODEL_CLASSES_TO_MARK_AS_DELETED.items():
@@ -92,6 +89,9 @@ def mark_outdated_models_as_deleted() -> None:
                 model_class.last_updated < date_before_which_to_mark_as_deleted
             ).fetch()
         )
+    job_services.mark_outdated_jobs_as_deleted(
+        utils.get_current_utc_datetime() - datetime.timedelta(days=180)
+    )
     for model_to_mark_as_deleted in models_to_mark_as_deleted:
         model_to_mark_as_deleted.deleted = True
     datastore_services.update_timestamps_multi(models_to_mark_as_deleted)

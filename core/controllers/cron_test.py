@@ -27,6 +27,8 @@ from core.domain import (
     email_manager,
     exp_domain,
     exp_services,
+    job_domain,
+    job_services,
     platform_parameter_domain,
     platform_parameter_list,
     platform_parameter_registry,
@@ -56,7 +58,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         app_feedback_report_models,
         exp_models,
-        job_models,
         suggestion_models,
         user_models,
     )
@@ -65,14 +66,12 @@ if MYPY:  # pragma: no cover
     app_feedback_report_models,
     exp_models,
     suggestion_models,
-    job_models,
     user_models,
 ) = models.Registry.import_models(
     [
         models.Names.APP_FEEDBACK_REPORT,
         models.Names.EXPLORATION,
         models.Names.SUGGESTION,
-        models.Names.JOB,
         models.Names.USER,
     ]
 )
@@ -170,18 +169,37 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def test_run_cron_to_mark_old_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        job_model = job_models.JobModel(
-            id='job_id',
-            last_updated=utils.get_current_utc_datetime()
-            - datetime.timedelta(days=181),
+        current_time = utils.get_current_utc_datetime()
+        job = job_domain.Job(
+            job_id='job_id',
+            job_type='job_type',
+            time_queued_msec=1.0,
+            time_started_msec=None,
+            time_finished_msec=None,
+            status_code='queued',
+            metadata=None,
+            output=None,
+            error=None,
+            has_been_cleaned_up=False,
+            additional_job_params=None,
         )
-        job_model.update_timestamps(update_last_updated_time=False)
-        job_model.put()
+        outdated_time = current_time - datetime.timedelta(days=181)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: outdated_time
+        ):
+            job_services.save_job(job)
 
         with self.testapp_swap:
             self.get_json('/cron/models/cleanup')
+            self.assertIsNotNone(job_services.get_job_by_id('job_id'))
 
-        self.assertTrue(job_model.get_by_id('job_id').deleted)
+            future_time = current_time + datetime.timedelta(days=181)
+            with self.swap(
+                utils, 'get_current_utc_datetime', lambda: future_time
+            ):
+                self.get_json('/cron/models/cleanup')
+
+        self.assertIsNone(job_services.get_job_by_id('job_id'))
 
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(
         self,

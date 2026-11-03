@@ -19,17 +19,15 @@ from __future__ import annotations
 import datetime
 
 from core import utils
-from core.domain import cron_services
+from core.domain import cron_services, job_domain, job_services
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import job_models, user_models
+    from mypy_imports import user_models
 
-job_models, user_models = models.Registry.import_models(
-    [models.Names.JOB, models.Names.USER]
-)
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class CronServicesTests(test_utils.GenericTestBase):
@@ -73,16 +71,34 @@ class CronServicesTests(test_utils.GenericTestBase):
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        job_model = job_models.JobModel(
-            id='job_id',
-            last_updated=utils.get_current_utc_datetime()
-            - datetime.timedelta(days=181),
+        current_time = utils.get_current_utc_datetime()
+        job = job_domain.Job(
+            job_id='job_id',
+            job_type='job_type',
+            time_queued_msec=1.0,
+            time_started_msec=None,
+            time_finished_msec=None,
+            status_code='queued',
+            metadata=None,
+            output=None,
+            error=None,
+            has_been_cleaned_up=False,
+            additional_job_params=None,
         )
-        job_model.update_timestamps(update_last_updated_time=False)
-        job_model.put()
+        outdated_time = current_time - datetime.timedelta(days=181)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: outdated_time
+        ):
+            job_services.save_job(job)
 
-        self.assertFalse(job_model.get_by_id('job_id').deleted)
+        self.assertIsNotNone(job_services.get_job_by_id('job_id'))
 
         cron_services.mark_outdated_models_as_deleted()
 
-        self.assertTrue(job_model.get_by_id('job_id').deleted)
+        future_time = current_time + datetime.timedelta(days=181)
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: future_time
+        ):
+            cron_services.delete_models_marked_as_deleted()
+
+        self.assertIsNone(job_services.get_job_by_id('job_id'))
