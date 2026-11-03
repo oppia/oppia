@@ -63,7 +63,7 @@ export class CodeStringEditorComponent implements OnInit {
     this.warningText = '';
   }
 
-  onEdit(e: {target: {value: string}}): void {
-    this.debounceInputSubject.next(e.target.value);
+  onEdit(e: Event): void {
+    this.debounceInputSubject.next((e.target as HTMLTextAreaElement).value);
   }
 }
