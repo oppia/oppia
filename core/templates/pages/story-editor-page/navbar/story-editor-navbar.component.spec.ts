@@ -592,6 +592,7 @@ describe('Story editor navbar component', () => {
       'onChangeActiveTab'
     ).and.returnValue(mockStoryInitializedEventEmitter);
     let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+    spyOn(storyEditorStateService, 'hasLoadedStory').and.returnValue(true);
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -606,6 +607,26 @@ describe('Story editor navbar component', () => {
 
     expect(component.currentTab).toBe('story_editor');
   });
+
+  it(
+    'should not get story node data when switching to the chapter editor ' +
+      'before the story has loaded',
+    () => {
+      let mockActiveTabChangedEventEmitter = new EventEmitter<string>();
+      spyOnProperty(
+        storyEditorNavigationService,
+        'onChangeActiveTab'
+      ).and.returnValue(mockActiveTabChangedEventEmitter);
+      let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+      spyOn(storyEditorStateService, 'hasLoadedStory').and.returnValue(false);
+
+      component.ngOnInit();
+      mockActiveTabChangedEventEmitter.emit('chapter_editor');
+
+      expect(component.currentTab).toBe('chapter_editor');
+      expect(getStoryNodeSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it('should get story node data', () => {
     story = Story.createFromBackendDict(storyBackendDict);

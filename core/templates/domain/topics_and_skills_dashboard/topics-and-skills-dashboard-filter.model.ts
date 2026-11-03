@@ -22,6 +22,7 @@ import {
   ETopicStatusOptions,
   ETopicSortOptions,
   ETopicNewSortingOptions,
+  SkillStatusOptions,
   TopicsAndSkillsDashboardPageConstants,
   // eslint-disable-next-line max-len
 } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
@@ -30,20 +31,23 @@ export class TopicsAndSkillsDashboardFilter {
   classroom: string;
   keywords: string[];
   sort: ETopicSortOptions | ETopicNewSortingOptions;
-  status: ETopicPublishedOptions | ETopicStatusOptions;
+  // Topic statuses are used on the topics tab, and skill statuses are used
+  // on the skills tab; both tabs share this single status field.
+  status: ETopicPublishedOptions | ETopicStatusOptions | SkillStatusOptions;
 
   /**
    * @param {String} classroom - classroom to filter for.
    * @param {String[]} keywords - keywords to filter for.
    * @param {ETopicSortOptions} sort - One of the values in ETopicSortOptions.
-   * @param {ETopicPublishedOptions | ETopicStatusOptions} status - One of the
-   *   calues in ETopicPublishedOptions or ETopicStatusOptions.
+   * @param {ETopicPublishedOptions | ETopicStatusOptions | SkillStatusOptions} status -
+   *   One of the values in ETopicPublishedOptions, ETopicStatusOptions or
+   *   SkillStatusOptions.
    */
   constructor(
     classroom: string,
     keywords: string[],
     sort: ETopicSortOptions | ETopicNewSortingOptions,
-    status: ETopicPublishedOptions | ETopicStatusOptions
+    status: ETopicPublishedOptions | ETopicStatusOptions | SkillStatusOptions
   ) {
     this.classroom = classroom;
     this.keywords = keywords;

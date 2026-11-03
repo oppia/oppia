@@ -37,18 +37,14 @@ import {
   SubtopicMasterySummaryBackendDict,
 } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import {SuggestionModalForLearnerDashboardService} from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {AlertsService} from 'services/alerts.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -138,7 +134,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS;
 
   username: string = '';
-  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -158,20 +153,13 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
-  numberOfUnreadThreads!: number;
   activeSection!: string;
   activeSubsection!: string;
 
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
-  explorationTitle!: string;
-  explorationId!: string;
-  communityLibraryUrl =
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
-
   communityLessonsDataLoaded: boolean = false;
-  loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
@@ -185,13 +173,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
-    private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private loaderService: LoaderService,
-    private suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService,
-    private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private translateService: TranslateService,
@@ -386,16 +370,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getauthorPicturePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
-    return pngImageUrl;
-  }
-
-  getauthorPictureWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
-    return webpImageUrl;
-  }
-
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE'
@@ -547,50 +521,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           // This is placed here in order to satisfy Unit tests.
         });
     }
-  }
-
-  showUsernamePopover(subscriberUsername: string): string {
-    // The popover on the subscription card is only shown if the length
-    // of the subscriber username is greater than 10 and the user hovers
-    // over the truncated username.
-    if (subscriberUsername.length > 10) {
-      return 'mouseenter';
-    } else {
-      return 'none';
-    }
-  }
-
-  showSuggestionModal(
-    newContent: string,
-    oldContent: string,
-    description: string
-  ): void {
-    this.suggestionModalForLearnerDashboardService.showSuggestionModal(
-      'edit_exploration_state_content',
-      {
-        newContent: newContent,
-        oldContent: oldContent,
-        description: description,
-      }
-    );
-  }
-
-  getLabelClass(status: string): string {
-    return this.threadStatusDisplayService.getLabelClass(status);
-  }
-
-  getHumanReadableStatus(status: string): string {
-    return this.threadStatusDisplayService.getHumanReadableStatus(status);
-  }
-
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch
-    );
-  }
-
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
   }
 
   isShowRedesignedLearnerDashboardActive(): boolean {
