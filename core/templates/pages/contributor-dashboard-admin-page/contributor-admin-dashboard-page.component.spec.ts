@@ -363,7 +363,7 @@ describe('Contributor dashboard Admin page', () => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync');
     });
 
-    it('should label the tab as Translation Coordinators / Featured Languages', fakeAsync(() => {
+    it('should label the tab as Translation Coordinators', fakeAsync(() => {
       getUserInfoSpy.and.returnValue(
         Promise.resolve(translationCoordinatorInfo)
       );
@@ -378,7 +378,7 @@ describe('Contributor dashboard Admin page', () => {
         .map(node => (node.textContent ?? '').trim())
         .filter(text => text.length > 0)
         .join(' ');
-      expect(label).toBe('Translation Coordinators / Featured Languages');
+      expect(label).toBe('Translation Coordinators');
     }));
 
     it('should map only the translation coordinator key to a custom label', () => {
@@ -386,7 +386,7 @@ describe('Contributor dashboard Admin page', () => {
         component.getContributionTypeLabel(
           component.TAB_NAME_TRANSLATION_COORDINATOR
         )
-      ).toBe('Translation Coordinators / Featured Languages');
+      ).toBe('Translation Coordinators');
       expect(
         component.getContributionTypeLabel(
           component.TAB_NAME_QUESTION_COORDINATOR

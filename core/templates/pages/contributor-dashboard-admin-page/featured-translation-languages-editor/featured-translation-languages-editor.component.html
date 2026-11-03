@@ -31,9 +31,12 @@
             <td colspan="3">No featured languages configured.</td>
           </tr>
           <tr *ngFor="let language of featuredLanguages; index as i">
-            <td>{{ language.languageCode }}</td>
-            <td>{{ language.explanation }}</td>
-            <td>
+            <td class="text-nowrap">{{ language.languageCode }}</td>
+            <!-- The text-break class lets long explanations (including ones
+                 without spaces) wrap inside the cell, so the table never grows
+                 wider than the card and pushes the Remove buttons off-screen. -->
+            <td class="w-100 text-break">{{ language.explanation }}</td>
+            <td class="text-nowrap">
               <button type="button"
                       class="btn btn-secondary e2e-test-remove-featured-language"
                       (click)="removeFeaturedLanguage(i)">
@@ -44,21 +47,30 @@
         </tbody>
       </table>
 
-      <div class="e2e-test-add-featured-language-row">
-        <label for="featured-language-select">Language</label>
-        <select id="featured-language-select" [(ngModel)]="newLanguageCode">
-          <option value="">Select language</option>
-          <option *ngFor="let option of availableLanguageOptions"
-                  [value]="option.id">
-            {{ option.description }}
-          </option>
-        </select>
+      <div class="border rounded p-3 mt-4 mb-4 e2e-test-add-featured-language-row">
+        <p class="fw-bold mb-3">Add a featured language</p>
+        <div class="mb-3">
+          <label for="featured-language-select" class="form-label">Language</label>
+          <select id="featured-language-select"
+                  class="form-select"
+                  [(ngModel)]="newLanguageCode">
+            <option value="">Select language</option>
+            <option *ngFor="let option of availableLanguageOptions"
+                    [value]="option.id">
+              {{ option.description }}
+            </option>
+          </select>
+        </div>
 
-        <label for="featured-language-explanation">Explanation</label>
-        <input id="featured-language-explanation"
-               type="text"
-               [(ngModel)]="newExplanation"
-               placeholder="Explanation">
+        <div class="mb-3">
+          <label for="featured-language-explanation" class="form-label">Explanation</label>
+          <textarea id="featured-language-explanation"
+                    class="form-control"
+                    rows="4"
+                    [(ngModel)]="newExplanation"
+                    placeholder="Why should contributors prioritize this language? Contributors see this as a tooltip in the language selector.">
+          </textarea>
+        </div>
 
         <button type="button"
                 class="btn btn-secondary e2e-test-add-featured-language"

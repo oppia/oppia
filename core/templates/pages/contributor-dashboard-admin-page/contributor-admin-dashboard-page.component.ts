@@ -105,8 +105,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   // the stats table component, so tabs whose user-facing label differs from
   // their key are mapped to that label here instead of renaming the key.
   CONTRIBUTION_TYPE_LABELS: Record<string, string> = {
-    [this.TAB_NAME_TRANSLATION_COORDINATOR]:
-      'Translation Coordinators / Featured Languages',
+    [this.TAB_NAME_TRANSLATION_COORDINATOR]: 'Translation Coordinators',
   };
   ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
