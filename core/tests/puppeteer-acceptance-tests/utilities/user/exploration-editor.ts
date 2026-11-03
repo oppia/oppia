@@ -978,10 +978,31 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(feedbackEditorSelector);
     await this.typeInInputField(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
     if (destination) {
-      await this.select(destinationCardSelector, '/');
-      await this.typeInInputField(addStateInput, destination);
+      // Check if the destination card already exists in the dropdown options.
+      const hasExistingCard = await this.page.evaluate(
+        (selector, cardName) => {
+          const selectElement = document.querySelector(
+            selector
+          ) as HTMLSelectElement;
+          if (!selectElement) {
+            return false;
+          }
+          return Array.from(selectElement.options).some(
+            option => option.value === cardName
+          );
+        },
+        destinationCardSelector,
+        destination
+      );
+
+      if (hasExistingCard) {
+        await this.select(destinationCardSelector, destination);
+      } else {
+        // The '/' value is used to select the 'a new card called' option in the dropdown.
+        await this.select(destinationCardSelector, '/');
+        await this.typeInInputField(addStateInput, destination);
+      }
     }
     if (responseIsCorrect) {
       await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
@@ -1778,6 +1799,7 @@ export class ExplorationEditor extends BaseUser {
 
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(expression);
+    await this.waitForElementToStabilize(algebricExpressionEditor);
   }
 
   /**
@@ -1804,6 +1826,7 @@ export class ExplorationEditor extends BaseUser {
 
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
+    await this.waitForElementToStabilize(algebricExpressionEditor);
 
     if (await this.isOnScreenKeyboardVisible()) {
       await this.hideOSK();
@@ -2134,6 +2157,7 @@ export class ExplorationEditor extends BaseUser {
 
     await equationBox.click();
     await equationBox.type(equation);
+    await this.waitForElementToStabilize(equationBox);
 
     if (this.isViewportAtMobileWidth()) {
       const onScreenKeyboardSelector = '.e2e-test-osk-hide-button';
@@ -2161,6 +2185,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+    await this.waitForElementToStabilize(equationBox);
 
     if (await this.isOnScreenKeyboardVisible()) {
       await this.hideOSK();
@@ -5006,6 +5031,30 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(mainTabContainerSelector);
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Adds a Hindi translation to the "Content" of the "Introduction" card of the
+   * given published exploration, then saves the draft. This is used in
+   * acceptance tests to give a lesson a non-English text language so that the
+   * language selector and fallback info tooltip render on the redesigned topic
+   * viewer page. The exploration must already be linked to a story so that the
+   * translation-mode switcher is available in the translation tab.
+   * @param {string} explorationId - The ID of the published exploration to
+   *     which the Hindi translation is added.
+   */
+  async addHindiTranslationToExploration(explorationId: string): Promise<void> {
+    await this.navigateToExplorationEditor(explorationId);
+    await this.waitForPageToFullyLoad();
+    await this.navigateToCard('Introduction');
+    await this.navigateToTranslationsTab();
+    await this.dismissTranslationTabWelcomeModal();
+    await this.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Content',
+      'यह अंशों का परिचय है।'
+    );
+    await this.saveExplorationDraft();
   }
 
   /**

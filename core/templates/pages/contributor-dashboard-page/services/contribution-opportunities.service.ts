@@ -120,6 +120,14 @@ export class ContributionOpportunitiesService {
     return this._getSkillOpportunitiesAsync('', query);
   }
 
+  async getSkillOpportunitiesCountAsync(searchQuery?: string): Promise<number> {
+    const query = searchQuery || '';
+    return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
+      'skill',
+      query
+    );
+  }
+
   async getTranslationOpportunitiesAsync(
     languageCode: string,
     topicId: string,
@@ -129,6 +137,19 @@ export class ContributionOpportunitiesService {
       languageCode,
       topicId,
       '',
+      entityType
+    );
+  }
+
+  async getTranslationOpportunitiesCountAsync(
+    languageCode: string,
+    topicId: string,
+    entityType?: string
+  ): Promise<number> {
+    return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
+      'translation',
+      topicId,
+      languageCode,
       entityType
     );
   }

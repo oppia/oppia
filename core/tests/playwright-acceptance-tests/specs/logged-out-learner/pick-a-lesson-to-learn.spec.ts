@@ -103,7 +103,8 @@ test.describe('Logged-Out Learner', function () {
     await curriculumAdmin.createAndPublishTopic(
       'Length Measurement',
       'Basics of Length Measurement',
-      'length-measurement'
+      'length-measurement',
+      true
     );
     await curriculumAdmin.createAndPublishClassroom(
       'Math',

@@ -40,6 +40,10 @@ export class SideNavigationBarComponent {
 
   impactReports = [
     {
+      link: AppConstants.IMPACT_REPORT_LINK_2025,
+      year: '2025',
+    },
+    {
       link: AppConstants.IMPACT_REPORT_LINK_2024,
       year: '2024',
     },

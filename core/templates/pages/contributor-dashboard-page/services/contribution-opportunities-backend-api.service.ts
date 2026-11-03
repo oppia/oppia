@@ -58,6 +58,10 @@ interface TranslationContributionOpportunitiesBackendDictV2 {
   more: boolean;
 }
 
+interface OpportunitiesCountBackendDict {
+  total_count: number;
+}
+
 interface ReviewableTranslationOpportunitiesBackendDict {
   opportunities: ExplorationOpportunitySummaryBackendDict[];
 }
@@ -454,5 +458,40 @@ export class ContributionOpportunitiesBackendApiService {
         return null;
       }
     });
+  }
+
+  async fetchOpportunitiesCountAsync(
+    opportunityType: string,
+    topicId: string,
+    languageCode: string = '',
+    entityType?: string
+  ): Promise<number> {
+    const queryParams: Record<string, string> = {};
+    if (this.shouldFilterByTopic(topicId)) {
+      queryParams.topic_id = topicId;
+    }
+    if (languageCode) {
+      queryParams.language_code = languageCode;
+    }
+    if (this.shouldFilterByEntityType(entityType)) {
+      queryParams.entity_type = entityType as string;
+    }
+
+    const countUrl = this.urlInterpolationService.interpolateUrl(
+      '/opportunitiescounthandler/<opportunity_type>',
+      {opportunity_type: opportunityType}
+    );
+
+    return this.http
+      .get<OpportunitiesCountBackendDict>(countUrl, {
+        params: queryParams,
+      })
+      .toPromise()
+      .then(
+        response => response.total_count,
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }

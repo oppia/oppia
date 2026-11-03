@@ -21,6 +21,7 @@ import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TestInteractionPanel} from './test-interaction-panel.component';
 
 class MockNgbModal {
@@ -57,6 +58,7 @@ describe('Test Interaction Panel Component', () => {
           useClass: MockExplorationStatesService,
         },
         CurrentInteractionService,
+        UrlInterpolationService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -81,6 +83,9 @@ describe('Test Interaction Panel Component', () => {
     let isSubmitButtonDisabled = component.isSubmitButtonDisabled();
 
     expect(component.interactionIsInline).toEqual(true);
+    expect(component.userBlueImgUrl).toEqual(
+      '/assets/images/avatar/user_blue_150px.png'
+    );
     expect(isSubmitButtonDisabled).toEqual(false);
   });
 

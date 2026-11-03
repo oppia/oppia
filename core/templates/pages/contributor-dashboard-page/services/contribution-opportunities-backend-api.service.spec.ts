@@ -68,6 +68,7 @@ describe('Contribution Opportunities backend API service', function () {
         skill_description: 'A new skill for question',
         topic_name: 'A new topic',
         question_count: 30,
+        questions_in_review_count: 0,
       },
     ],
     next_cursor: '6',
@@ -259,6 +260,141 @@ describe('Contribution Opportunities backend API service', function () {
       more: skillOpportunityResponse.more,
     });
     expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch the opportunities count data', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic_id_1', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_id=topic_id_1&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 42});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(42);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch the opportunities count data with empty topic and language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', '', '')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 10});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(10);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should not send a topic ID for the opportunities count of all topics', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync(
+        'translation',
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
+        'hi'
+      )
+      .then(successHandler, failHandler);
+
+    // The "all topics" sentinel is never sent, so topic_id is left off.
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?language_code=hi'
+    );
+    expect(req.request.params.has('topic_id')).toBeFalse();
+    req.flush({total_count: 3});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(3);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch opportunities count data with specific entityType', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic_id_1', 'hi', 'skill')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_id=topic_id_1&language_code=hi&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should omit entity_type from opportunities count request when entityType is all', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic_id_1', 'hi', 'all')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_id=topic_id_1&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({total_count: 5});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(5);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch the opportunities count data on error', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchOpportunitiesCountAsync('translation', 'topic_id_1', 'hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitiescounthandler/translation?topic_id=topic_id_1&language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Failed to fetch opportunities count data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch opportunities count data.')
+    );
   }));
 
   it('should fetch skill opportunities with a search query', fakeAsync(() => {

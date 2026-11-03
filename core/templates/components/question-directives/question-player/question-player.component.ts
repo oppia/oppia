@@ -84,10 +84,6 @@ export interface QuestionPlayerConfig {
   skillList: string[];
   skillDescriptions: string[];
   questionCount: number;
-  questionPlayerMode?: {
-    modeType: string;
-    passCutoff: number;
-  };
   questionsSortedByDifficulty: boolean;
 }
 
@@ -109,9 +105,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   allQuestions!: number;
   finalCorrect!: number;
   scorePerSkillMapping!: ScorePerSkillMapping;
-  testIsPassed!: boolean;
   masteryPerSkillMapping!: MasteryPerSkillMapping;
-  failedSkillIds!: string[];
   userIsLoggedIn!: boolean;
   canCreateCollections!: boolean;
   componentSubscription = new Subscription();
@@ -269,71 +263,12 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     );
   }
 
-  hasUserPassedTest(): boolean {
-    let testIsPassed: boolean = true;
-    let failedSkillIds: string[] = [];
-    if (this.isInPassOrFailMode()) {
-      Object.keys(this.scorePerSkillMapping).forEach(skillId => {
-        let correctionRate =
-          this.scorePerSkillMapping[skillId].score /
-          this.scorePerSkillMapping[skillId].total;
-        if (
-          correctionRate <
-          (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
-        ) {
-          testIsPassed = false;
-          failedSkillIds.push(skillId);
-        }
-      });
-    }
-
-    if (!testIsPassed) {
-      this.questionPlayerConfig.resultActionButtons = [];
-      this.failedSkillIds = failedSkillIds;
-    }
-    return testIsPassed;
-  }
-
   getScorePercentage(scorePerSkill: ScorePerSkill): number {
     return (scorePerSkill.score / scorePerSkill.total) * 100;
   }
 
-  getColorForScore(scorePerSkill: ScorePerSkill): string {
-    if (!this.isInPassOrFailMode()) {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
-    }
-    let correctionRate = scorePerSkill.score / scorePerSkill.total;
-    if (
-      correctionRate >=
-      (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
-    ) {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
-    } else {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
-    }
-  }
-
-  getColorForScoreBar(scorePerSkill: ScorePerSkill): string {
-    if (!this.isInPassOrFailMode()) {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
-    }
-    let correctionRate = scorePerSkill.score / scorePerSkill.total;
-    if (
-      correctionRate >=
-      (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
-    ) {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
-    } else {
-      return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
-    }
-  }
-
-  reviewConceptCardAndRetryTest(): void {
-    if (!this.failedSkillIds || this.failedSkillIds.length === 0) {
-      throw new Error('No failed skills');
-    }
-
-    this.openConceptCardModal(this.failedSkillIds);
+  getColorForScoreBar(): string {
+    return QuestionPlayerConstants.SCORE_COLORS.PASSED_COLOR_BAR;
   }
 
   openSkillMasteryModal(skillId: string): void {
@@ -411,13 +346,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   isSortByDifficulty(): boolean {
     return this.questionPlayerConfig.questionsSortedByDifficulty ?? false;
-  }
-
-  isInPassOrFailMode(): boolean {
-    return (
-      this.questionPlayerConfig.questionPlayerMode?.modeType ===
-      QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE
-    );
   }
 
   createScorePerSkillMapping(): void {
@@ -553,7 +481,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.allQuestions = 0;
     this.finalCorrect = 0.0;
     this.scorePerSkillMapping = {};
-    this.testIsPassed = true;
     this.questionsLoading = true;
   }
 
@@ -612,7 +539,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             this.calculateMasteryDegrees(questionStateData);
           }
 
-          this.testIsPassed = this.hasUserPassedTest();
           this.siteAnalyticsService.registerPracticeSessionEndEvent(
             this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
             this.urlService.getTopicUrlFragmentFromLearnerUrl(),
