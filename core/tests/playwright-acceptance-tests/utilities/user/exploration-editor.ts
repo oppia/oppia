@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -139,6 +139,20 @@ const translationTabContainer = '.e2e-test-translation-tab-container';
 const translationModeButton = 'button.e2e-test-translation-mode';
 const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
+
+const helpTabSelector = '.e2e-test-help-button';
+const helpModalContainerSelector = '.e2e-test-help-modal-container';
+const helpModalHeaderSelector = '.e2e-test-help-modal-header';
+const helpPageLinkSelector = '.e2e-test-help-page-link';
+const takeATourButtonSelector = '.e2e-test-tour-button';
+const translationTourButtonSelector = '.e2e-test-translation-tour-button';
+const shepherdTitleSelector = '.shepherd-element:not([hidden]) .shepherd-title';
+const shepherdStepSelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdFooterSelector =
+  '.shepherd-element:not([hidden]) .shepherd-footer';
+const shepherdPreviousButtonSelector = `${shepherdFooterSelector} button.shepherd-button-secondary`;
+const shepherdNextButtonSelector = `${shepherdFooterSelector} button.shepherd-button-primary:has-text("Next")`;
+const shepherdDoneButtonSelector = `${shepherdFooterSelector} button.shepherd-button-primary:has-text("Done")`;
 
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
@@ -807,6 +821,163 @@ export class ExplorationEditor extends BaseUser {
       false
     );
     showMessage('Translation tutorial pop-up closed successfully.');
+  }
+
+  /**
+   * Function to open the help modal in the exploration editor.
+   */
+  async clickOnHelpButton(): Promise<void> {
+    await this.expectElementToBeVisible(helpTabSelector);
+    await this.clickOnElementWithSelector(helpTabSelector);
+    await this.expectElementToBeVisible(helpModalContainerSelector);
+  }
+
+  /**
+   * Function to check the title of the help modal.
+   * @param {string} expectedTitle - The expected title of the help modal.
+   */
+  async expectHelpModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(helpModalHeaderSelector, expectedTitle);
+  }
+
+  /**
+   * Function to check that the "Visit the Help Center" link in the help
+   * modal opens the user documentation in a new tab.
+   */
+  async expectHelpCenterButtonToWorkProperly(): Promise<void> {
+    await this.expectElementToBeVisible(helpPageLinkSelector);
+
+    const newTabPromise = this.page.context().waitForEvent('page');
+    await this.clickOnElementWithSelector(helpPageLinkSelector);
+    const newTab = await newTabPromise;
+    await newTab.waitForLoadState();
+    expect(newTab.url().startsWith(testConstants.URLs.UserDocumentation)).toBe(
+      true
+    );
+    await newTab.close();
+
+    // Clicking the link also dismisses the help modal.
+    await this.expectElementToBeVisible(helpModalContainerSelector, false);
+  }
+
+  /**
+   * Function to start the exploration editor tour from the help modal.
+   */
+  async clickOnTakeATourButton(): Promise<void> {
+    await this.expectElementToBeVisible(takeATourButtonSelector);
+    await this.clickOnElementWithSelector(takeATourButtonSelector);
+    await this.expectElementToBeVisible(shepherdStepSelector);
+  }
+
+  /**
+   * Function to start the translations tab tour from the help modal.
+   */
+  async clickOnTakeATranslationsTourButton(): Promise<void> {
+    await this.expectElementToBeVisible(translationTourButtonSelector);
+    await this.clickOnElementWithSelector(translationTourButtonSelector);
+    await this.expectElementToBeVisible(shepherdStepSelector);
+  }
+
+  /**
+   * Function to check the title of the current tour step.
+   * @param {string} expectedTitle - The expected title of the tour step.
+   */
+  async expectShepherdTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(shepherdTitleSelector, expectedTitle);
+  }
+
+  /**
+   * Function to check that the current tour step contains the given text.
+   * @param {string} expectedContent - The text expected in the tour step.
+   */
+  async expectShepherdContentToContain(expectedContent: string): Promise<void> {
+    await this.expectTextContentToContain(
+      shepherdStepSelector,
+      expectedContent
+    );
+  }
+
+  /**
+   * Function to check the visibility of the "Previous" button in the tour.
+   * @param {boolean} visible - Whether the button should be visible.
+   */
+  async expectShepherdPreviousButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      shepherdPreviousButtonSelector,
+      visible
+    );
+  }
+
+  /**
+   * Function to check the visibility of the "Next" button in the tour.
+   * @param {boolean} visible - Whether the button should be visible.
+   */
+  async expectShepherdNextButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(shepherdNextButtonSelector, visible);
+  }
+
+  /**
+   * Function to check the visibility of the "Done" button in the tour.
+   * @param {boolean} visible - Whether the button should be visible.
+   */
+  async expectShepherdDoneButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(shepherdDoneButtonSelector, visible);
+  }
+
+  /**
+   * Function to click a tour button and wait for the tour to move to a
+   * different step.
+   * @param {string} buttonSelector - The selector of the button to click.
+   */
+  private async clickShepherdButtonAndWaitForStepChange(
+    buttonSelector: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(buttonSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
+
+    await this.page.click(buttonSelector);
+    await this.page.waitForFunction(
+      ({selector, content}: {selector: string; content: string}) => {
+        const element = document.querySelector(selector);
+        return (
+          element !== null && element.textContent?.trim() !== content.trim()
+        );
+      },
+      {selector: shepherdStepSelector, content: currentContent}
+    );
+  }
+
+  /**
+   * Function to move to the next step of the tour.
+   */
+  async continueToNextShepherdStep(): Promise<void> {
+    await this.clickShepherdButtonAndWaitForStepChange(
+      shepherdNextButtonSelector
+    );
+  }
+
+  /**
+   * Function to move to the previous step of the tour.
+   */
+  async continueToPreviousShepherdStep(): Promise<void> {
+    await this.clickShepherdButtonAndWaitForStepChange(
+      shepherdPreviousButtonSelector
+    );
+  }
+
+  /**
+   * Function to finish the tour by clicking the "Done" button.
+   */
+  async finishShepherd(): Promise<void> {
+    await this.expectShepherdDoneButtonToBeVisible();
+    await this.page.click(shepherdDoneButtonSelector);
+    await this.expectElementToBeVisible(shepherdStepSelector, false);
   }
 
   /**

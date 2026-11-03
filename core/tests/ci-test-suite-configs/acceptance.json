@@ -367,8 +367,8 @@
     },
     {
       "name": "exploration-creator/exploration-help",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/exploration-navbar-header",

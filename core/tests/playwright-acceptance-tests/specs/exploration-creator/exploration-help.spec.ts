@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,24 +19,27 @@
  * EC. Help.
  */
 
-import {showMessage} from '../../utilities/common/show-message';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
+  // TODO(#22991): Currently, the help button is not available in mobile viewport.
+  // So, we skip the test in mobile viewport.
+  test.skip(
+    () => process.env.MOBILE === 'true',
+    'Test skipped in mobile viewport'
+  );
+
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
-    // TODO(#22991): Currently, the help button is not available in mobile viewport.
-    // So, we skip the test in mobile viewport.
-    if (process.env.MOBILE === 'true') {
-      showMessage('Test skipped in mobile viewport');
-
-      process.exit(0);
-    }
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -44,16 +47,16 @@ describe('Exploration Editor', function () {
     await explorationEditor.dismissWelcomeModal();
   });
 
-  it('should be able to visit exploration help tab', async function () {
+  test('should be able to visit exploration help tab', async function () {
     await explorationEditor.clickOnHelpButton();
     await explorationEditor.expectHelpModalTitleToBe('Need Help?');
   });
 
-  it('should be able to visit help center', async function () {
+  test('should be able to visit help center', async function () {
     await explorationEditor.expectHelpCenterButtonToWorkProperly();
   });
 
-  it('should be able to take a tour of the exploration editor', async function () {
+  test('should be able to take a tour of the exploration editor', async function () {
     await explorationEditor.clickOnHelpButton();
     await explorationEditor.clickOnTakeATourButton();
 
@@ -112,13 +115,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.finishShepherd();
   });
 
-  it('should be able to take a tour of translations tab', async function () {
-    if (explorationEditor.isViewportAtMobileWidth()) {
-      showMessage(
-        'Skipping translations tab tour in mobile view, as help button is not visible.'
-      );
-      return;
-    }
+  test('should be able to take a tour of translations tab', async function () {
     await explorationEditor.clickOnHelpButton();
     await explorationEditor.clickOnTakeATranslationsTourButton();
     await explorationEditor.dismissTranslationTabWelcomeModal();
@@ -167,7 +164,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.finishShepherd();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
