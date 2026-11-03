@@ -951,6 +951,53 @@ export class ExplorationEditor extends BaseUser {
       },
       {selector: shepherdStepSelector, content: currentContent}
     );
+    await this.scrollShepherdStepTargetIntoView();
+  }
+
+  /**
+   * Function to wait until the current tour step is visible. Shepherd hides
+   * a step when the element it is attached to is outside the viewport (e.g.
+   * the last step of the translations tour on a 720px tall screen), so the
+   * target is scrolled into view, the same way a user would scroll to it.
+   */
+  private async scrollShepherdStepTargetIntoView(): Promise<void> {
+    // Some steps smooth-scroll the page when shown, so wait for the scroll
+    // position to settle before checking whether the step is visible.
+    await this.page.evaluate(
+      () =>
+        new Promise<void>(resolve => {
+          let lastScrollY = window.scrollY;
+          let stableFrames = 0;
+          const check = () => {
+            if (window.scrollY === lastScrollY) {
+              stableFrames++;
+            } else {
+              stableFrames = 0;
+              lastScrollY = window.scrollY;
+            }
+            if (stableFrames >= 15) {
+              resolve();
+              return;
+            }
+            requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        })
+    );
+
+    await this.page.waitForFunction(() => {
+      const step = document.querySelector('.shepherd-element:not([hidden])');
+      if (!step) {
+        return false;
+      }
+      if (step.hasAttribute('data-popper-reference-hidden')) {
+        document
+          .querySelector('.shepherd-target:not(body)')
+          ?.scrollIntoView({block: 'center'});
+        return false;
+      }
+      return getComputedStyle(step).visibility === 'visible';
+    });
   }
 
   /**
