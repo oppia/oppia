@@ -284,18 +284,17 @@ class DraftUpgradeUtil:
                                 for answer_html_index, answer_html in enumerate(
                                     html_list
                                 ):
-                                    if isinstance(answer_html, str):
-                                        # Here we use cast because all
-                                        # of the above 'if' conditions
-                                        # forces 'correct_answer' to be
-                                        # of type List[List[str]].
-                                        correct_answer = cast(
-                                            List[List[str]],
-                                            new_value['correct_answer'],
-                                        )
-                                        correct_answer[list_index][
-                                            answer_html_index
-                                        ] = conversion_fn(answer_html)
+                                    # Nested correct answers are List[List[str]].
+                                    assert isinstance(answer_html, str)
+                                    # Here we use cast because the list checks
+                                    # and assertion narrow the answer type.
+                                    correct_answer = cast(
+                                        List[List[str]],
+                                        new_value['correct_answer'],
+                                    )
+                                    correct_answer[list_index][
+                                        answer_html_index
+                                    ] = conversion_fn(answer_html)
             elif (
                 change.property_name
                 == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
