@@ -5406,6 +5406,11 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(closeLessonInfoButton, {visible: true});
     await this.clickOnElementWithSelector(closeLessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {hidden: true});
+    await this.page.waitForFunction(
+      () =>
+        document.querySelectorAll('.modal-backdrop, ngb-modal-window, .modal')
+          .length === 0
+    );
   }
 
   /**
