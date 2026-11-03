@@ -87,8 +87,8 @@
     },
     {
       "name": "interested-parent/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/sign-up-for-oppias-newsletter",
@@ -187,13 +187,13 @@
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/view-subtopic-study-guides",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/create-and-delete-account",
