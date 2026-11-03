@@ -533,5 +533,113 @@ describe('LocalStorageService', () => {
 
       expect(localStorageService.getMasteredModules('story_1')).toEqual([]);
     });
+
+    it('should return false for lesson exit modal when nothing is saved', () => {
+      expect(localStorageService.isLessonExitModalHidden('user_1')).toBe(false);
+    });
+
+    it('should hide the lesson exit modal for a given user', () => {
+      localStorageService.setLessonExitModalHidden('user_1', true);
+
+      expect(localStorageService.isLessonExitModalHidden('user_1')).toBe(true);
+      expect(
+        localStorage.getItem(
+          localStorageService.HIDE_LESSON_EXIT_MODAL_KEY_PREFIX + ':user_1'
+        )
+      ).toBe('true');
+    });
+
+    it('should keep the lesson exit modal preference separate per user', () => {
+      localStorageService.setLessonExitModalHidden('user_1', true);
+
+      expect(localStorageService.isLessonExitModalHidden('user_1')).toBe(true);
+      expect(localStorageService.isLessonExitModalHidden('user_2')).toBe(false);
+    });
+
+    it('should show the lesson exit modal again when hidden is set to false', () => {
+      localStorageService.setLessonExitModalHidden('user_1', true);
+      localStorageService.setLessonExitModalHidden('user_1', false);
+
+      expect(localStorageService.isLessonExitModalHidden('user_1')).toBe(false);
+      expect(
+        localStorage.getItem(
+          localStorageService.HIDE_LESSON_EXIT_MODAL_KEY_PREFIX + ':user_1'
+        )
+      ).toBeNull();
+    });
+
+    it('should not save lesson exit modal preference when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.setLessonExitModalHidden('user_1', true);
+
+      expect(
+        localStorage.getItem(
+          localStorageService.HIDE_LESSON_EXIT_MODAL_KEY_PREFIX + ':user_1'
+        )
+      ).toBeNull();
+    });
+
+    it('should return false for lesson exit modal when storage is not available', () => {
+      localStorageService.setLessonExitModalHidden('user_1', true);
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      expect(localStorageService.isLessonExitModalHidden('user_1')).toBe(false);
+    });
+
+    it('should return null for post sign in exit intent when nothing is saved', () => {
+      expect(localStorageService.getPostSignInExitIntent()).toBeNull();
+    });
+
+    it('should correctly save and retrieve post sign in exit intent', () => {
+      localStorageService.setPostSignInExitIntent('{"type":"exit"}');
+
+      expect(localStorageService.getPostSignInExitIntent()).toBe(
+        '{"type":"exit"}'
+      );
+    });
+
+    it('should overwrite an existing post sign in exit intent', () => {
+      localStorageService.setPostSignInExitIntent('first');
+      localStorageService.setPostSignInExitIntent('second');
+
+      expect(localStorageService.getPostSignInExitIntent()).toBe('second');
+    });
+
+    it('should correctly remove post sign in exit intent', () => {
+      localStorageService.setPostSignInExitIntent('{"type":"exit"}');
+
+      localStorageService.removePostSignInExitIntent();
+
+      expect(localStorageService.getPostSignInExitIntent()).toBeNull();
+    });
+
+    it('should not save post sign in exit intent when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.setPostSignInExitIntent('{"type":"exit"}');
+
+      expect(
+        localStorage.getItem(localStorageService.POST_SIGN_IN_EXIT_INTENT_KEY)
+      ).toBeNull();
+    });
+
+    it('should return null for post sign in exit intent when storage is not available', () => {
+      localStorageService.setPostSignInExitIntent('{"type":"exit"}');
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      expect(localStorageService.getPostSignInExitIntent()).toBeNull();
+    });
+
+    it('should not remove post sign in exit intent when storage is not available', () => {
+      localStorageService.setPostSignInExitIntent('{"type":"exit"}');
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.removePostSignInExitIntent();
+
+      expect(
+        localStorage.getItem(localStorageService.POST_SIGN_IN_EXIT_INTENT_KEY)
+      ).toBe('{"type":"exit"}');
+    });
   });
 });
