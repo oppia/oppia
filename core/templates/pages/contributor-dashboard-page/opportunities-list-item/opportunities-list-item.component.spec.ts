@@ -214,6 +214,7 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.opportunityType = 'skill';
