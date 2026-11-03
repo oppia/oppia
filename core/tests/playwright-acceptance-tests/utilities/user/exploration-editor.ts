@@ -238,6 +238,8 @@ const newMemberRoleSelect = 'mat-select.e2e-test-role-select';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const collaboratorRoleNames = '.e2e-test-editor-role-names';
+const playtesterRoleNames = '.e2e-test-viewer-role-names';
 const deleteExplorationButton = '.e2e-test-delete-exploration-button';
 const confirmDeleteExplorationButton =
   '.e2e-test-really-delete-exploration-button';
@@ -1081,25 +1083,43 @@ export class ExplorationEditor extends BaseUser {
    * @param {string[]} expectedTags - The expected tags.
    */
   async expectTagsToMatch(expectedTags: string[]): Promise<void> {
-    const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
+    const sortedExpectedTags = expectedTags
+      .map(tag => tag.toLowerCase())
+      .sort();
+    const tagChipsSelector = `mat-chip-list:has(${settingsTagsInput}) mat-chip`;
+    const getTags = (chips: Element[]): string[] =>
+      chips.map(chip =>
+        (
+          chip.querySelector('.mat-chip-remove')?.previousSibling
+            ?.textContent ?? ''
+        ).trim()
+      );
+
     try {
-      await this.page.waitForFunction((expected: string[]) => {
-        const observedTags = Array.from(
-          document.querySelectorAll('mat-chip')
-        ).map(chip =>
-          (
-            chip.querySelector('.mat-chip-remove')?.previousSibling
-              ?.textContent ?? ''
-          ).trim()
-        );
-        return expected.every(tag => observedTags.includes(tag));
-      }, lowercaseExpectedTags);
+      await this.page.waitForFunction(
+        ({selector, expected}: {selector: string; expected: string[]}) => {
+          const observedTags = Array.from(
+            document.querySelectorAll(selector)
+          ).map(chip =>
+            (
+              chip.querySelector('.mat-chip-remove')?.previousSibling
+                ?.textContent ?? ''
+            ).trim()
+          );
+          return (
+            JSON.stringify(observedTags.sort()) === JSON.stringify(expected)
+          );
+        },
+        {selector: tagChipsSelector, expected: sortedExpectedTags}
+      );
     } catch (error) {
+      const observedTags = await this.page.$$eval(tagChipsSelector, getTags);
       throw new Error(
-        `Not all tags were added. Expected: ${lowercaseExpectedTags.join(', ')}.`
+        `Tags do not match. Expected: [${sortedExpectedTags.join(', ')}], ` +
+          `observed: [${observedTags.sort().join(', ')}].`
       );
     }
-    showMessage('All expected tags were added successfully.');
+    showMessage('Tags match the expected tags.');
   }
 
   /**
@@ -1141,10 +1161,13 @@ export class ExplorationEditor extends BaseUser {
    * section of the settings tab.
    * @param {string} username - The username of the user.
    * @param {string} roleOption - The text of the role option to select.
+   * @param {string} roleNamesSelector - The selector of the names listed
+   *     under the role.
    */
   private async assignUserToRole(
     username: string,
-    roleOption: string
+    roleOption: string,
+    roleNamesSelector: string
   ): Promise<void> {
     await this.expandSettingsTabSection('Roles');
     await this.expectElementToBeVisible(editRolesButton);
@@ -1158,6 +1181,16 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
+
+    // The form closes before the save request finishes, so also wait for the
+    // user to show up under the role.
+    await this.page.waitForFunction(
+      ({selector, name}: {selector: string; name: string}) =>
+        Array.from(document.querySelectorAll(selector)).some(
+          element => element.textContent?.trim() === name
+        ),
+      {selector: roleNamesSelector, name: username}
+    );
   }
 
   /**
@@ -1165,7 +1198,11 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} username - The username of the user.
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
-    await this.assignUserToRole(username, collaboratorRoleOption);
+    await this.assignUserToRole(
+      username,
+      collaboratorRoleOption,
+      collaboratorRoleNames
+    );
     showMessage(`${username} has been added as a collaborator.`);
   }
 
@@ -1174,7 +1211,11 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} username - The username of the user.
    */
   async assignUserToPlaytesterRole(username: string): Promise<void> {
-    await this.assignUserToRole(username, playtesterRoleOption);
+    await this.assignUserToRole(
+      username,
+      playtesterRoleOption,
+      playtesterRoleNames
+    );
     showMessage(`${username} has been added as a playtester.`);
   }
 
