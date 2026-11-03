@@ -876,14 +876,20 @@ export class BaseUser {
    * @param {string} selector - The selector of button to click.
    * @param {boolean} useSelector - Whether to use the selector or the text.
    * @param {number} timeout - The maximum time to wait for navigation in milliseconds. Defaults to 60000.
+   * @param {'load' | 'domcontentloaded' | 'networkidle' | 'commit'} waitUntil - When to consider the navigation finished. Defaults to 'networkidle'.
    */
   async clickAndWaitForNavigation(
     selector: string,
     useSelector: boolean = false,
-    timeout: number = 60000
+    timeout: number = 60000,
+    waitUntil:
+      | 'load'
+      | 'domcontentloaded'
+      | 'networkidle'
+      | 'commit' = 'networkidle'
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation({
-      waitUntil: 'networkidle',
+      waitUntil,
       timeout,
     });
 
@@ -1059,6 +1065,16 @@ export class BaseUser {
       }
       throw error;
     }
+  }
+
+  /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
   }
 
   /**
