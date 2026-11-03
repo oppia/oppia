@@ -143,6 +143,7 @@ export class BaseContentComponent {
 
   closeSidebarOnSwipe(): void {
     this.sidebarStatusService.closeSidebar();
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
   }
 
   toggleMobileNavOptions(): void {
