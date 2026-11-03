@@ -317,18 +317,28 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 FeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
-                )
+                ),
+                FeatureNames.TEST_FEATURE_2.value: (
+                    'a feature in test stage',
+                    FeatureStages.TEST,
+                    'test developer notes',
+                ),
             },
         )
         feature_list_ctx = self.swap(
             feature_flag_services,
             'ALL_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_1],
+            [FeatureNames.TEST_FEATURE_1, FeatureNames.TEST_FEATURE_2],
         )
         feature_set_ctx = self.swap(
             feature_flag_services,
             'ALL_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_1.value]),
+            set(
+                [
+                    FeatureNames.TEST_FEATURE_1.value,
+                    FeatureNames.TEST_FEATURE_2.value,
+                ]
+            ),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -345,7 +355,18 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                             'rollout_percentage': 0,
                             'user_group_ids': [],
                             'last_updated': None,
-                        }
+                            'developer_notes': None,
+                        },
+                        {
+                            'name': FeatureNames.TEST_FEATURE_2.value,
+                            'description': 'a feature in test stage',
+                            'feature_stage': FeatureStages.TEST.value,
+                            'force_enable_for_all_users': False,
+                            'rollout_percentage': 0,
+                            'user_group_ids': [],
+                            'last_updated': None,
+                            'developer_notes': 'test developer notes',
+                        },
                     ],
                 )
                 self.assertEqual(len(response_dict['user_group_dicts']), 2)

@@ -10,6 +10,10 @@
       <div class="col-2 oppia-feature-column-mobile"><b>Feature Stage:</b></div>
       <div class="col-10">{{ getFeatureStageString(featureFlagViewModel) }}</div>
     </div>
+    <div *ngIf="featureFlagViewModel.developerNotes" class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Developer Notes:</b></div>
+      <div class="col-10 oppia-developer-notes-content">{{featureFlagViewModel.developerNotes}}</div>
+    </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-2 oppia-feature-column-mobile"><b>Rollout percentage for logged-in users (0-100):</b></div>
       <div class="col-10">
@@ -112,6 +116,10 @@
     <div class="row oppia-feature-top-margin">
       <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
       <div class="col-10 oppia-description-content">{{featureFlagViewModel.description}}</div>
+    </div>
+    <div *ngIf="featureFlagViewModel.developerNotes" class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Developer Notes:</b></div>
+      <div class="col-10 oppia-developer-notes-content">{{featureFlagViewModel.developerNotes}}</div>
     </div>
   </div>
 </div>
