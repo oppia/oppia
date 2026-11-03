@@ -931,7 +931,7 @@ describe('Opportunities List Component', () => {
 
       component.unpinOpportunity({
         explorationId: component.opportunities[0].id as string,
-        topicName: component.opportunities[0].topicName,
+        topicId: component.opportunities[0].topicId as string,
       });
       tick();
 
