@@ -377,8 +377,8 @@
     },
     {
       "name": "exploration-creator/preview-commonly-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-creator/preview-math-interactions",

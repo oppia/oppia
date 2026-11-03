@@ -19,6 +19,7 @@
  * EC.EE. Preview commonly used interactions.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -38,21 +39,24 @@ const CARD_NAMES = {
   EIGHTH: '8th Card',
 };
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
-    explorationEditor = await UserFactory.createNewUser(
+  test.beforeAll(async function ({browser}) {
+    explorationEditor = (await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
-    );
+      'exploration_editor@example.com',
+      browser
+    )) as ExplorationEditor & LoggedInUser & LoggedOutUser;
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
   });
 
-  it('should be able to preview "Continue Button" interaction', async function () {
+  test('should be able to preview "Continue Button" interaction', async function () {
     await explorationEditor.updateCardContent('Click on the button.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await explorationEditor.saveExplorationDraft();
@@ -97,7 +101,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.closeLessonInfoModal();
   });
 
-  it('should be able to preview "Multiple Choice" interaction', async function () {
+  test('should be able to preview "Multiple Choice" interaction', async function () {
     // Add a multiple choice interaction.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
@@ -149,7 +153,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
   });
 
-  it('should be able to preview "Number Input" interaction', async function () {
+  test('should be able to preview "Number Input" interaction', async function () {
     // Add a number input interaction.
     await explorationEditor.updateCardContent('Enter number less than 0.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
@@ -204,7 +208,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
   });
 
-  it('should be able to preview "Text Input" interaction', async function () {
+  test('should be able to preview "Text Input" interaction', async function () {
     // Add a text input interaction.
     await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
     await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
@@ -246,7 +250,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
   });
 
-  it('should be able to preview "Image Region" interaction', async function () {
+  test('should be able to preview "Image Region" interaction', async function () {
     // Add an image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
     await explorationEditor.addImageInteraction('Perfect!', CARD_NAMES.SIXTH);
@@ -268,7 +272,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
   });
 
-  it('should be able to preview "Item Selection" interaction', async function () {
+  test('should be able to preview "Item Selection" interaction', async function () {
     // Add an item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
     await explorationEditor.addInteraction(
@@ -318,7 +322,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
   });
 
-  it('should be able to preview "Drag and Drop Sort" interaction', async function () {
+  test('should be able to preview "Drag and Drop Sort" interaction', async function () {
     // Add Drag and Drop Sort Interaction.
     await explorationEditor.updateCardContent('Arrange in Ascending Order');
     await explorationEditor.addInteraction(
@@ -382,7 +386,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
