@@ -31,10 +31,12 @@ const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const usernameInputSelector = '.e2e-test-blog-author-name-field';
 const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
+const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
 // Selectors for the blog post editor.
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
+const mobileBlogBodyInputWithText = 'div.e2e-test-rte p';
 const editBlogSelector = '.e2e-test-content-button';
 const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
@@ -43,6 +45,12 @@ const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const confirmButtonSelector = 'button.e2e-test-confirm-button';
+
+// Selectors for the paste error box in the blog post editor.
+const pasteErrorBox = '.e2e-test-oppia-rte-paste-error-box';
+const dismissPasteErrorButton = '.e2e-test-oppia-dismiss-paste-error-button';
+const pasteValidComponentsButton = '.e2e-test-oppia-paste-valid-content-button';
+const cancelPasteButton = '.e2e-test-oppia-cancel-rte-paste-button';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -67,6 +75,19 @@ export class BlogPostEditor extends BaseUser {
       await this.clickOnElementWithSelector(authorBioSaveButton);
       await this.expectElementToBeVisible(authorBioSaveButton, false);
     }
+  }
+
+  /**
+   * Function for verifying that the expected number of blog posts are visible
+   * on the blog dashboard.
+   * @param {number} number - The expected number of blog posts.
+   */
+  async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
+    const allBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
+    if (allBlogPosts.length !== number) {
+      throw new Error(`Number of blog posts is not equal to ${number}`);
+    }
+    showMessage(`Number of blog posts is equal to ${number}`);
   }
 
   /**
@@ -145,6 +166,20 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * Function for creating a draft blog post with the given title and opening
+   * its body editor.
+   * @param {string} draftBlogPostTitle - The title for the draft blog post.
+   */
+  async createDraftBlogPostWithTitleAndOpenBodyRte(
+    draftBlogPostTitle: string
+  ): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
+    await this.updateBlogPostTitle(draftBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+  }
+
+  /**
    * Function for selecting or deselecting a tag of the blog post.
    * @param {string} tag - The name of the tag.
    * @param {boolean} shouldBePresent - Whether the tag should be selected
@@ -207,6 +242,87 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveDraftButtonSelector);
 
     await expect(this.page.locator(saveDraftButtonSelector)).toBeDisabled();
+  }
+
+  /**
+   * Function for writing the given HTML to the page clipboard.
+   * @param {string} html - The HTML content to write to the clipboard.
+   */
+  async setClipboardContent(html: string): Promise<void> {
+    await this.page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write']);
+    await this.page.evaluate(async (htmlContent: string) => {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([htmlContent], {type: 'text/html'}),
+          'text/plain': new Blob([''], {type: 'text/plain'}),
+        }),
+      ]);
+    }, html);
+  }
+
+  /**
+   * Function for pasting clipboard content into the blog post content editor.
+   */
+  async pasteContentInBlogPostContentRte(): Promise<void> {
+    await this.page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write']);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileBlogBodyInputWithText);
+      await this.page.click(mobileBlogBodyInputWithText);
+    } else {
+      await this.expectElementToBeVisible(blogBodyInput);
+      await this.page.click(blogBodyInput);
+    }
+    await this.page.keyboard.press('ControlOrMeta+KeyV');
+  }
+
+  /**
+   * Function for dismissing the paste error box without keeping the pasted
+   * content.
+   */
+  async clickOnDismissPasteErrorButton(): Promise<void> {
+    await this.expectElementToBeVisible(pasteErrorBox);
+    await this.clickOnElementWithSelector(dismissPasteErrorButton);
+    await this.expectElementToBeVisible(pasteErrorBox, false);
+  }
+
+  /**
+   * Function for accepting the valid portion of pasted content and verifying
+   * that it appears.
+   * @param {string} textPasted - The text expected to be present after pasting.
+   */
+  async clickOnPasteValidComponentsButton(textPasted: string): Promise<void> {
+    await this.expectElementToBeVisible(pasteErrorBox);
+    await this.clickOnElementWithSelector(pasteValidComponentsButton);
+    await this.expectElementToBeVisible(pasteErrorBox, false);
+    const isTextPresent = await this.isTextPresentOnPage(textPasted);
+    if (!isTextPresent) {
+      throw new Error(
+        'Expected pasted text to be present, but it was not found.'
+      );
+    }
+  }
+
+  /**
+   * Function for cancelling the paste flow from the paste error box.
+   */
+  async clickOnCancelPasteButton(): Promise<void> {
+    await this.expectElementToBeVisible(pasteErrorBox);
+    await this.clickOnElementWithSelector(cancelPasteButton);
+    await this.expectElementToBeVisible(pasteErrorBox, false);
+  }
+
+  /**
+   * Function for typing in the editor to dismiss the paste error box.
+   */
+  async typeInRteToDismissError(): Promise<void> {
+    await this.expectElementToBeVisible(pasteErrorBox);
+    await this.expectElementToBeVisible(blogBodyInput);
+    await this.typeInInputField(blogBodyInput, 'qwerty');
+    await this.expectElementToBeVisible(pasteErrorBox, false);
   }
 }
 

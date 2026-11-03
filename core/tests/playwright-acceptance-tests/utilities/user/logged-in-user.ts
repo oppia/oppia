@@ -2553,6 +2553,21 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Expect topic link returns404.
+   * @param {string} topicUrlFragment - The topic url fragment.
+   */
+  async expectTopicLinkReturns404(topicUrlFragment: string): Promise<void> {
+    await this.page.reload();
+    await this.goto(`${baseUrl}/learn/staging/${topicUrlFragment}`);
+    const is404Present = await this.isTextPresentOnPage('Error 404');
+    if (!is404Present) {
+      throw new Error(
+        `Expected 404 for topic "${topicUrlFragment}" but page loaded successfully.`
+      );
+    }
+    showMessage(`Topic link for "${topicUrlFragment}" correctly returns 404.`);
+  }
+  /**
    * Navigates to the profile page using the profile dropdown.
    */
   async navigateToProfilePageUsingProfileDropdown(): Promise<void> {

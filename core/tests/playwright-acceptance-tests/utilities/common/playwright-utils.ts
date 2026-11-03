@@ -442,13 +442,12 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Using Control+A to select all text, then Backspace to delete it.
+    // Using ControlOrMeta+A to select all text, then Backspace to delete it.
+    // ControlOrMeta maps to Meta on macOS and Control elsewhere.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
     await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('ControlOrMeta+A');
     await this.page.keyboard.press('Backspace');
   }
 
@@ -1087,6 +1086,16 @@ export class BaseUser {
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
     await this.waitTillHTMLRendered(this.page);
+  }
+
+  /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.waitForPageToFullyLoad();
   }
 
   /**
