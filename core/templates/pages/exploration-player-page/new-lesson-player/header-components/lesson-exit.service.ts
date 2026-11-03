@@ -45,10 +45,6 @@ export class LessonExitService {
     private localStorageService: LocalStorageService
   ) {}
 
-  /**
-   * A lesson is curated when it is being played as a chapter of a story, which
-   * is the case when the URL carries classroom, topic and story fragments.
-   */
   isCuratedLesson(): boolean {
     try {
       return Boolean(
@@ -61,12 +57,6 @@ export class LessonExitService {
     }
   }
 
-  /**
-   * Where the "Exit" button takes the learner:
-   *  - curated lesson: the topic page;
-   *  - community lesson that belongs to a collection: the collection page;
-   *  - any other community lesson: the community library.
-   */
   getExitUrl(): string {
     if (this.isCuratedLesson()) {
       return this.urlService.getLearnerTopicStoryUrl();
@@ -86,10 +76,6 @@ export class LessonExitService {
     this.localStorageService.setLessonExitModalHidden(username, true);
   }
 
-  /**
-   * Remembers that the learner is about to sign in from the exit modal. Call
-   * this right before redirecting to the sign-in page.
-   */
   saveSignInIntent(explorationId: string): void {
     const intent: PostSignInExitIntent = {
       explorationId: explorationId,
@@ -101,10 +87,6 @@ export class LessonExitService {
     this.localStorageService.setPostSignInExitIntent(JSON.stringify(intent));
   }
 
-  /**
-   * Returns the stored intent if it belongs to this exploration and has not
-   * expired, and always removes it from storage.
-   */
   consumeSignInIntent(explorationId: string): PostSignInExitIntent | null {
     const rawIntent = this.localStorageService.getPostSignInExitIntent();
     this.clearSignInIntent();

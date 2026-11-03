@@ -398,8 +398,6 @@ input.form-control:focus {
   }
 }
 
-/* On screens up to 768px the card spans the full width, like the current
-   lesson player, so there is no room for the avatar and the bubble tail. */
 @media (max-width: 768px) {
   .oppia-learner-view-card .conversation-skin-oppia-avatar,
   .oppia-learner-view-card .left-side-curve {

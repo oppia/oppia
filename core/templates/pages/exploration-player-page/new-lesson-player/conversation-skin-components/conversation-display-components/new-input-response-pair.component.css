@@ -266,7 +266,6 @@
 }
 
 @media (max-width: 768px) {
-  /* Same 20px inset the blue question content has inside the card. */
   .answer-wrapper {
     padding-right: 20px;
   }

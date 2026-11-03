@@ -19,6 +19,8 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {Router} from '@angular/router';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 import {
   ComponentFixture,
   fakeAsync,
@@ -45,6 +47,7 @@ import {StatsReportingService} from '../../services/stats-reporting.service';
 import {PlayerHeaderComponent} from './player-header.component';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {AccessValidationBackendApiService} from '../../../oppia-root/routing/access-validation-backend-api.service';
 import {CapitalizePipe} from '../../../../filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from '../../../../domain/classroom/classroom-backend-api.service';
@@ -159,6 +162,10 @@ class MockStoryViewerBackendApiService {
     );
 }
 
+class MockMatBottomSheet {
+  open = jasmine.createSpy('open');
+}
+
 describe('Lesson player header component', () => {
   let fixture: ComponentFixture<PlayerHeaderComponent>;
   let componentInstance: PlayerHeaderComponent;
@@ -218,6 +225,7 @@ describe('Lesson player header component', () => {
           provide: StoryViewerBackendApiService,
           useClass: MockStoryViewerBackendApiService,
         },
+        {provide: MatBottomSheet, useClass: MockMatBottomSheet},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -422,9 +430,6 @@ describe('Lesson player header component', () => {
       spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
         null
       );
-
-      componentInstance.isLinkedToTopic = true;
-      componentInstance.storyUrlFragment = null;
 
       expect(() => componentInstance.ngOnInit()).toThrowError(
         'Story URL fragment is null'
@@ -819,22 +824,7 @@ describe('Lesson player header component', () => {
         });
       });
 
-      it('should record the reached checkpoint and keep the progress id', fakeAsync(() => {
-        componentInstance.closePlayer();
-        tick();
-
-        expect(
-          editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
-        ).toHaveBeenCalledWith('expId', 7, 'Mid');
-        expect(
-          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
-        ).toBe('pid123');
-        expect(mockWindowRef.nativeWindow.location.href).toBe(
-          '/login?return_url=/lesson/expId'
-        );
-      }));
-
-      it('should replace a stale progress id with a fresh one', fakeAsync(() => {
+      it('should record the reached checkpoint and replace any stale progress id', fakeAsync(() => {
         localStorageService.updateUniqueProgressIdOfLoggedOutLearner('old');
 
         componentInstance.closePlayer();
@@ -848,20 +838,8 @@ describe('Lesson player header component', () => {
         ).toBe('pid123');
       }));
 
-      it('should drop a stale progress id when there is nothing to save', fakeAsync(() => {
+      it('should skip saving and drop a stale progress id when no checkpoint has been reached', fakeAsync(() => {
         localStorageService.updateUniqueProgressIdOfLoggedOutLearner('old');
-        checkpointProgressService.checkpoint = null;
-
-        componentInstance.closePlayer();
-        tick();
-
-        expect(
-          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
-        ).toBe(null);
-        expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-      }));
-
-      it('should skip saving when no checkpoint has been reached', fakeAsync(() => {
         checkpointProgressService.checkpoint = null;
 
         componentInstance.closePlayer();
@@ -870,6 +848,9 @@ describe('Lesson player header component', () => {
         expect(
           editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
         ).not.toHaveBeenCalled();
+        expect(
+          localStorageService.getUniqueProgressIdOfLoggedOutLearner()
+        ).toBe(null);
         expect(userService.getLoginUrlAsync).toHaveBeenCalled();
       }));
 
@@ -887,7 +868,7 @@ describe('Lesson player header component', () => {
         expect(userService.getLoginUrlAsync).toHaveBeenCalled();
       }));
 
-      it('should still send the learner to sign in if saving fails', fakeAsync(() => {
+      it('should still sign in, without an exit intent, if saving fails', fakeAsync(() => {
         editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.callFake(
           () => Promise.reject('server error')
         );
@@ -901,16 +882,6 @@ describe('Lesson player header component', () => {
         expect(mockWindowRef.nativeWindow.location.href).toBe(
           '/login?return_url=/lesson/expId'
         );
-      }));
-
-      it('should not leave an exit intent behind if saving fails', fakeAsync(() => {
-        editableApi.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner.and.callFake(
-          () => Promise.reject('server error')
-        );
-
-        componentInstance.closePlayer();
-        tick();
-
         expect(lessonExitService.saveSignInIntent).not.toHaveBeenCalled();
         expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
       }));
@@ -943,6 +914,57 @@ describe('Lesson player header component', () => {
 
       expect(lessonExitService.clearSignInIntent).toHaveBeenCalled();
     }));
+
+    describe('on a mobile screen', () => {
+      let bottomSheet: MockMatBottomSheet;
+      let sheetDismissed: Subject<unknown>;
+
+      beforeEach(() => {
+        spyOn(
+          TestBed.inject(WindowDimensionsService),
+          'getWidth'
+        ).and.returnValue(400);
+        bottomSheet = TestBed.inject(
+          MatBottomSheet
+        ) as unknown as MockMatBottomSheet;
+        sheetDismissed = new Subject<unknown>();
+        bottomSheet.open.and.returnValue({
+          afterDismissed: () => sheetDismissed,
+        });
+      });
+
+      it('should open the exit bottom sheet instead of the modal', fakeAsync(() => {
+        userService.isLoggedIn = true;
+
+        componentInstance.closePlayer();
+        tick();
+
+        expect(bottomSheet.open).toHaveBeenCalledWith(
+          LessonExitModalComponent,
+          {data: {isLoggedIn: true}}
+        );
+        expect(ngbModal.open).not.toHaveBeenCalled();
+      }));
+
+      it('should exit when the bottom sheet returns a result', fakeAsync(() => {
+        componentInstance.closePlayer();
+        tick();
+
+        sheetDismissed.next({action: 'exit', dontShowAgain: false});
+
+        expect(router.navigateByUrl).toHaveBeenCalledWith('/exit-url');
+      }));
+
+      it('should stay in the lesson when the bottom sheet is dismissed without a result', fakeAsync(() => {
+        componentInstance.closePlayer();
+        tick();
+
+        sheetDismissed.next(undefined);
+        sheetDismissed.next('cancel');
+
+        expect(router.navigateByUrl).not.toHaveBeenCalled();
+      }));
+    });
 
     it('should navigate to practice page parent for practice session when confirmed', () => {
       mockWindowRef.setPathname('/learn/classroom1/topic1/practice');

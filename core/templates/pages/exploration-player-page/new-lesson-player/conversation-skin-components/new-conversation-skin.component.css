@@ -40,8 +40,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
 }
 
 .new-conversation-skin-cards-container {
-  /* Top aligned so the card keeps a fixed top margin and only grows
-     downwards when its content (or the supplemental card) gets taller. */
   align-items: flex-start;
   display: -webkit-flex;
   display: flex;
@@ -49,8 +47,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   margin: 0 auto;
   margin-bottom: 50px;
   margin-top: 50px;
-  /* The fixed header (40px) and voiceover bar (65px) cover the top 105px,
-     so 50px margin + 80px padding leaves a 25px gap below them. */
   padding: 80px 14px 0;
   padding-bottom: 50px;
   width: 100%;
@@ -143,9 +139,6 @@ oppia-card-navigation-control {
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {
     display: block;
-    /* Padding (not margin) so the card's own 30px top margin does not
-       collapse into it: 100px + 30px = 130px, which clears the fixed header
-       (40px) and the voiceover bar (65px) with a 25px gap. */
     margin-top: 0;
     padding: 100px 0 50px;
     position: relative;

@@ -266,8 +266,6 @@ export class PlayerHeaderComponent {
     const isLoggedIn = userInfo.isLoggedIn();
     const username = userInfo.getUsername() || '';
 
-    // Logged-in learners can opt out of the modal. Logged-out learners can't,
-    // since the modal is where they are offered to save their progress.
     if (isLoggedIn && this.lessonExitService.isExitModalHidden(username)) {
       this.exitLesson();
       return;
@@ -286,13 +284,9 @@ export class PlayerHeaderComponent {
     };
 
     if ('result' in modalOrSheetRef) {
-      modalOrSheetRef.result.then(onResult, () => {
-        // The learner dismissed the modal, which means they stay in the lesson.
-      });
+      modalOrSheetRef.result.then(onResult, () => {});
     } else {
       modalOrSheetRef.afterDismissed().subscribe(result => {
-        // A dismissed bottom sheet gives back 'cancel' or nothing, not a
-        // result object, which also means the learner stays in the lesson.
         if (result && typeof result === 'object') {
           onResult(result);
         }
@@ -329,8 +323,6 @@ export class PlayerHeaderComponent {
       await this.saveLoggedOutProgress();
       this.lessonExitService.saveSignInIntent(this.explorationId);
     } catch (e) {
-      // We still let the learner sign in, but without an exit intent: nothing
-      // was saved, so the player must not send them away as if it had been.
       this.lessonExitService.clearSignInIntent();
     }
     try {
@@ -354,7 +346,6 @@ export class PlayerHeaderComponent {
       checkpointStateName =
         this.checkpointProgressService.getMostRecentlyReachedCheckpoint();
     } catch (e) {
-      // No checkpoint has been reached yet, so there is no progress to save.
       return;
     }
     const response =
