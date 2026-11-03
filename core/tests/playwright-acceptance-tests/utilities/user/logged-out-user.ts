@@ -3800,7 +3800,9 @@ export class LoggedOutUser extends BaseUser {
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.openMobileSidebar();
-      await this.page.locator(mobileSidebarExpandGetInvolvedMenuButton).click();
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
       await this.expectElementToBeVisible(
         mobileSidebarGetInvolvedMenuContactUsButton
       );
@@ -3824,10 +3826,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyContactUsSubHeading(subheading: string): Promise<void> {
     await this.expectElementToBeVisible(contactUsSubheadingSelector);
-    await this.expectTextContentToContain(
-      contactUsSubheadingSelector,
-      subheading
-    );
+    const actualSubheading = await this.page
+      .locator(contactUsSubheadingSelector)
+      .textContent();
+    const trimmedSubheading = actualSubheading ? actualSubheading.trim() : '';
+
+    if (trimmedSubheading !== subheading) {
+      throw new Error(
+        `Expected subheading to be "${subheading}", but found "${trimmedSubheading}"`
+      );
+    }
   }
 
   /**
