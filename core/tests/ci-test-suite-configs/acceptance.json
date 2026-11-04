@@ -162,8 +162,8 @@
     },
     {
       "name": "lesson-creator/create-a-basic-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "lesson-creator/modify-an-existing-exploration",
