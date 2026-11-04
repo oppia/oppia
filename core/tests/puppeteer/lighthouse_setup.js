@@ -230,9 +230,7 @@ const retryStep = async function (
         timeoutMs
       );
     });
-    // Keep a reference to the attempt so a late rejection after the deadline
-    // wins the race is still handled; otherwise closing the page would surface
-    // it as an unhandled rejection.
+
     const attemptPromise = action(attemptPage);
     attemptPromise.catch(() => undefined);
     try {
@@ -249,9 +247,10 @@ const retryStep = async function (
       console.log(error);
     } finally {
       clearTimeout(timeoutId);
-      // Closing the page aborts any Puppeteer call from this attempt that is
-      // still in flight, so it cannot race the next attempt. The page may
-      // already be gone if the browser crashed, so ignore close failures.
+      // Closing the page stops any Puppeteer call from this attempt that is
+      // still running, so it cannot interfere with the next attempt. The page
+      // might already be gone if the browser crashed, so ignore errors from
+      // closing it.
       await attemptPage.close().catch(() => undefined);
     }
   }
@@ -1053,8 +1052,6 @@ const enableFeatureFlagForAllUsers = async function (
   // double-accept one, which Puppeteer rejects with "Cannot accept dialog
   // which is already handled!".
   const acceptDialog = async dialog => {
-    // The page may be closed while the dialog is open (for example, when a
-    // timed-out attempt is aborted), in which case accept() rejects.
     await dialog.accept().catch(() => undefined);
   };
   page.on('dialog', acceptDialog);

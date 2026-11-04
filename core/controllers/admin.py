@@ -1173,9 +1173,6 @@ class AdminHandler(
                 '#F8BF74',
             )
 
-            # Each node acquires the skill whose questions are linked above, so
-            # the node-practice and end-of-arc practice pages receive a
-            # non-empty skill list and render the question player.
             story_node_dicts = [
                 {
                     'exp_id': '6',

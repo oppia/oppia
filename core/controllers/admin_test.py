@@ -758,9 +758,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(questions), 3 * feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
         )
-        # Each story node must acquire the skill whose questions are linked to
-        # it, otherwise the node-practice and end-of-arc practice pages render
-        # an empty question player.
         skill_ids_by_description = {
             summary.description: summary.id for summary in skill_summaries
         }
