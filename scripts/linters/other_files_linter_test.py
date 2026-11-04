@@ -24,8 +24,9 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
+from scripts import concurrent_task_utils
 
-from typing import Final, List, Tuple
+from typing import Dict, Final, List, Tuple
 
 from . import other_files_linter, run_lint_checks
 
@@ -36,6 +37,7 @@ FILE_CACHE: Final = NAME_SPACE.files
 LINTER_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'scripts', 'linters', 'test_files'
 )
+CORE_TEMPLATES_DIR: Final = os.path.join(os.getcwd(), 'core', 'templates')
 
 
 class CustomLintChecksManagerTests(test_utils.LinterTestBase):
@@ -1408,6 +1410,476 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             any(
                 '\n  MASTERY_CHALLENGE\n' in msg
                 for msg in result.trimmed_messages
+            )
+        )
+
+    def _run_route_feature_flag_check(
+        self, files: Dict[str, str]
+    ) -> concurrent_task_utils.TaskResult:
+        """Runs the route feature flag check against mocked file contents.
+
+        Args:
+            files: dict(str, str). Maps file paths to their mocked contents.
+
+        Returns:
+            TaskResult. The result of the lint check.
+        """
+
+        def mock_read(path: str) -> str:
+            if path in files:
+                return files[path]
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            return other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_route_feature_flags_match_guards()
+
+    def _get_practice_route_routing_content(self) -> str:
+        """Returns routing content with a flag-declaring practice route.
+
+        Returns:
+            str. The mocked app.routing.module.ts content.
+        """
+        return '\n'.join(
+            [
+                'import {RequiredFeatureFlagsGuard,} from '
+                '\'./guards/required-feature-flags.guard\';',
+                'import {PracticeSessionAccessGuard} from '
+                '\'pages/practice-session-page/'
+                'practice-session-page-auth.guard\';',
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.NODE_PRACTICE_SESSION.ROUTE,',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.StoryEditorArcs]},',
+                '    loadChildren: () =>',
+                '      import(\'pages/practice-session-page/'
+                'practice-session-page.module\').then(',
+                '        m => m.PracticeSessionPageModule',
+                '      ),',
+                '    canActivate: [RequiredFeatureFlagsGuard, '
+                'PracticeSessionAccessGuard],',
+                '  },',
+                '];',
+            ]
+        )
+
+    def _get_certificate_route_routing_content(self) -> str:
+        """Returns routing content with a flag-declaring certificate route.
+
+        Returns:
+            str. The mocked app.routing.module.ts content.
+        """
+        return '\n'.join(
+            [
+                'import {RequiredFeatureFlagsGuard} from '
+                '\'./guards/required-feature-flags.guard\';',
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.CERTIFICATE_OFFERING_AVAILABLE.ROUTE,',
+                '    pathMatch: \'full\',',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.EnableCertificateAssessment]},',
+                '    canActivate: [RequiredFeatureFlagsGuard],',
+                '    loadChildren: () =>',
+                '      import(',
+                '        \'pages/certificate-offering-available-page/'
+                'certificate-offering-available-page.module\'',
+                '      ).then(m => m.CertificateOfferingAvailablePageModule),',
+                '  },',
+                '];',
+            ]
+        )
+
+    def test_check_route_feature_flags_match_guards_top_level_match(
+        self,
+    ) -> None:
+        """A top-level guard that checks the declared flag passes."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: (
+                'platformFeatureService.status.StoryEditorArcs.isEnabled'
+            ),
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_top_level_mismatch(
+        self,
+    ) -> None:
+        """A top-level guard that checks a different flag fails."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: (
+                'platformFeatureService.status.NewLessonPlayer.isEnabled'
+            ),
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'NODE_PRACTICE_SESSION' in message
+                and 'StoryEditorArcs' in message
+                and 'NewLessonPlayer' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_module_routing_match(
+        self,
+    ) -> None:
+        """A guard in a lazy module's routing module is checked."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page.module.ts',
+        )
+        routing_module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-routing.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_certificate_route_routing_content()
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageRoutingModule} '
+                    'from \'./certificate-offering-available-page-routing'
+                    '.module\';',
+                ]
+            ),
+            routing_module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageAuthGuard} '
+                    'from \'./certificate-offering-available-page-auth'
+                    '.guard\';',
+                    'const routes = [',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateOfferingAvailablePageAuthGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.'
+                'EnableCertificateAssessment\n'
+                '        .isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_module_routing_mismatch(
+        self,
+    ) -> None:
+        """A lazy module guard that checks a different flag fails."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page.module.ts',
+        )
+        routing_module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-routing.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_certificate_route_routing_content()
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageRoutingModule} '
+                    'from \'./certificate-offering-available-page-routing'
+                    '.module\';',
+                ]
+            ),
+            routing_module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageAuthGuard} '
+                    'from \'./certificate-offering-available-page-auth'
+                    '.guard\';',
+                    'const routes = [',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateOfferingAvailablePageAuthGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.NewLessonPlayer.isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'CERTIFICATE_OFFERING_AVAILABLE' in message
+                and 'EnableCertificateAssessment' in message
+                and 'NewLessonPlayer' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_inline_module_route(
+        self,
+    ) -> None:
+        """A guard in an inline lazy-module route is checked."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-assessment-player-page',
+            'certificate-assessment-player-page.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-assessment-player-page',
+            'certificate-assessment-player-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'import {RequiredFeatureFlagsGuard} from '
+                    '\'./guards/required-feature-flags.guard\';',
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,',
+                    '    data: {requiredFeatureFlags: '
+                    '[FeatureNames.EnableCertificateAssessment]},',
+                    '    canActivate: [RequiredFeatureFlagsGuard],',
+                    '    loadChildren: () =>',
+                    '      import(\'pages/certificate-assessment-player-page/'
+                    'certificate-assessment-player-page.module\').then(',
+                    '        m => m.CertificateAssessmentPlayerPageModule',
+                    '      ),',
+                    '  },',
+                    '];',
+                ]
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateAssessmentPlayerPageAuthGuard} from '
+                    '\'./certificate-assessment-player-page-auth.guard\';',
+                    'RouterModule.forChild([',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateAssessmentPlayerPageAuthGuard],',
+                    '  },',
+                    ']);',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.'
+                'EnableCertificateAssessment\n'
+                '        .isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_ignores_undeclared(
+        self,
+    ) -> None:
+        """A route without requiredFeatureFlags is ignored."""
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'import {PracticeSessionAccessGuard} from '
+                    '\'pages/practice-session-page/'
+                    'practice-session-page-auth.guard\';',
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.PRACTICE_SESSION.ROUTE,',
+                    '    canActivate: [PracticeSessionAccessGuard],',
+                    '    loadChildren: () =>',
+                    '      import(\'pages/practice-session-page/'
+                    'practice-session-page.module\').then(',
+                    '        m => m.PracticeSessionPageModule',
+                    '      ),',
+                    '  },',
+                    '];',
+                ]
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_unresolved_guard(
+        self,
+    ) -> None:
+        """A guard that cannot be resolved fails the check."""
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.NODE_PRACTICE_SESSION.ROUTE,',
+                    '    data: {requiredFeatureFlags: '
+                    '[FeatureNames.StoryEditorArcs]},',
+                    '    canActivate: [UnknownGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'UnknownGuard' in message and 'could not be resolved' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_guard_has_no_flags(
+        self,
+    ) -> None:
+        """A guard that checks no flags does not fail the check."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: 'return true;',
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_unreadable_guard(
+        self,
+    ) -> None:
+        """A guard whose source cannot be read fails the check."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        routing_content = '\n'.join(
+            [
+                'import {PracticeSessionAccessGuard} from '
+                '\'pages/practice-session-page/'
+                'practice-session-page-auth.guard\';',
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.NODE_PRACTICE_SESSION.ROUTE,',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.StoryEditorArcs]},',
+                '    canActivate: [PracticeSessionAccessGuard],',
+                '  },',
+                '];',
+            ]
+        )
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return routing_content
+            if path == guard_path:
+                raise OSError('guard source missing')
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_route_feature_flags_match_guards()
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'PracticeSessionAccessGuard' in message
+                and 'could not be read' in message
+                for message in result.trimmed_messages
             )
         )
 

@@ -23,7 +23,7 @@ import os
 import re
 
 import yaml
-from typing import Any, Dict, Final, List, Set, Tuple, TypedDict
+from typing import Any, Dict, Final, List, Optional, Set, Tuple, TypedDict
 
 from .. import concurrent_task_utils
 from . import linter_utils
@@ -92,6 +92,135 @@ ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
     r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
 )
 QUOTED_STRING_REGEX: Final = r'"([^"]+)"'
+
+CORE_TEMPLATES_DIR: Final = os.path.join(os.getcwd(), 'core', 'templates')
+
+REQUIRED_FEATURE_FLAGS_REGEX: Final = r'requiredFeatureFlags\s*:\s*\[([^\]]*)\]'
+FEATURE_NAME_MEMBER_REGEX: Final = r'FeatureNames\.([A-Za-z0-9_]+)'
+CAN_ACTIVATE_REGEX: Final = r'canActivate\s*:\s*\[([^\]]*)\]'
+GUARD_CLASS_REGEX: Final = r'([A-Z][A-Za-z0-9_]*)'
+TS_IMPORT_REGEX: Final = r'import\s*\{([^}]*)\}\s*from\s*\'([^\']+)\''
+LAZY_MODULE_IMPORT_REGEX: Final = r'import\s*\(\s*\'([^\']+)\'\s*\)'
+PLATFORM_FEATURE_FLAG_REGEX: Final = (
+    r'platformFeatureService\.status\.([A-Za-z0-9_]+)\s*\.\s*isEnabled'
+)
+REQUIRED_FEATURE_FLAGS_GUARD_NAME: Final = 'RequiredFeatureFlagsGuard'
+
+
+def _normalize_ts_source(content: str) -> str:
+    """Removes comments and joins concatenated import paths in TypeScript.
+
+    Args:
+        content: str. The TypeScript source to normalize.
+
+    Returns:
+        str. The normalized source, with single-line comments removed and
+        adjacent string literals joined.
+    """
+    normalized = re.sub(r'//[^\n]*', '', content)
+    # The regex and replacement contain literal single quotes from the
+    # TypeScript source, so double-quote delimiters are required.
+    normalized = re.sub(
+        r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=invalid-string-quote
+        r"'\1\2'",  # pylint: disable=invalid-string-quote
+        normalized,
+    )
+    return normalized
+
+
+def _resolve_ts_module_path(import_path: str, importer_path: str) -> str:
+    """Resolves a TypeScript import path to the module file it refers to.
+
+    Args:
+        import_path: str. The path exactly as written in the import statement.
+        importer_path: str. The path of the file containing the import.
+
+    Returns:
+        str. The absolute path of the imported module with a `.ts` extension.
+    """
+    if import_path.startswith('.'):
+        base_path = os.path.dirname(importer_path)
+    else:
+        base_path = CORE_TEMPLATES_DIR
+    resolved_path = os.path.normpath(os.path.join(base_path, import_path))
+    if not resolved_path.endswith('.ts'):
+        resolved_path += '.ts'
+    return resolved_path
+
+
+def _get_imports(content: str, importer_path: str) -> Dict[str, str]:
+    """Maps each named import in a TypeScript file to its module path.
+
+    Args:
+        content: str. The normalized TypeScript source.
+        importer_path: str. The path of the file containing the imports.
+
+    Returns:
+        dict(str, str). Maps each imported name to the absolute path of the
+        module that defines it.
+    """
+    imports: Dict[str, str] = {}
+    for names_block, import_path in re.findall(
+        TS_IMPORT_REGEX, content, re.DOTALL
+    ):
+        resolved_path = _resolve_ts_module_path(import_path, importer_path)
+        for name in names_block.split(','):
+            # `Foo as Bar` imports Foo under the local alias Bar.
+            local_name = name.strip().split(' as ')[-1].strip()
+            if local_name:
+                imports[local_name] = resolved_path
+    return imports
+
+
+def _get_lazy_module_path(route_object: str) -> Optional[str]:
+    """Returns the module file a route lazy-loads, if any.
+
+    Args:
+        route_object: str. The normalized source of a top-level route object.
+
+    Returns:
+        str|None. The absolute path of the lazy-loaded module, or None if the
+        route does not lazy-load one.
+    """
+    import_match = re.search(LAZY_MODULE_IMPORT_REGEX, route_object)
+    if not import_match:
+        return None
+    return _resolve_ts_module_path(
+        import_match.group(1), APP_ROUTING_MODULE_FILEPATH
+    )
+
+
+def _get_can_activate_guard_names(content: str) -> List[str]:
+    """Returns the guard classes named in a file's canActivate blocks.
+
+    Args:
+        content: str. The normalized TypeScript source.
+
+    Returns:
+        list(str). The guard class names, excluding RequiredFeatureFlagsGuard
+        because it consumes the route declaration rather than hardcoding a
+        flag of its own.
+    """
+    guard_names: List[str] = []
+    for can_activate_block in re.findall(CAN_ACTIVATE_REGEX, content):
+        for guard_name in re.findall(GUARD_CLASS_REGEX, can_activate_block):
+            if guard_name != REQUIRED_FEATURE_FLAGS_GUARD_NAME:
+                guard_names.append(guard_name)
+    return guard_names
+
+
+def _get_guard_feature_flags(guard_content: str) -> Set[str]:
+    """Returns the feature flags a guard checks directly.
+
+    Args:
+        guard_content: str. The source of a guard class.
+
+    Returns:
+        set(str). The PascalCase FeatureNames members the guard reads through
+        platformFeatureService.status.<Flag>.isEnabled.
+    """
+    normalized = _normalize_ts_source(guard_content)
+    return set(re.findall(PLATFORM_FEATURE_FLAG_REGEX, normalized))
 
 
 def _extract_top_level_route_objects(content: str) -> List[str]:
@@ -591,17 +720,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         lh_pages_content = self.file_cache.read(LIGHTHOUSE_PAGES_JSON_FILEPATH)
         constants_content = self.file_cache.read(ASSETS_CONSTANTS_FILEPATH)
 
-        # Normalize routing content: remove single-line comments and
-        # join string-concatenated import paths so that the regex can
-        # match them reliably.
-        normalized = re.sub(r'//[^\n]*', '', routing_content)
-        # The regex and replacement contain literal single quotes from
-        # the TypeScript source, so double-quote delimiters are required.
-        normalized = re.sub(
-            r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=invalid-string-quote
-            r"'\1\2'",  # pylint: disable=invalid-string-quote
-            normalized,
-        )
+        normalized = _normalize_ts_source(routing_content)
 
         # The path segments that each Lighthouse page's URL audits.
         lh_pages = json.loads(lh_pages_content)
@@ -689,6 +808,117 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             name, bool(error_messages), error_messages, error_messages
         )
 
+    def check_route_feature_flags_match_guards(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that a route's required flags match its page guards' flags.
+
+        data.requiredFeatureFlags in app.routing.module.ts is the declaration
+        the CI script reads to decide which pages Lighthouse can audit. The
+        page guards attached to a route check feature flags themselves, so a
+        guard could silently check a different flag from the one the route
+        declares. This check compares the two and reports any drift.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the
+            lint check.
+        """
+        name = 'Route feature flags match page guards'
+
+        routing_content = self.file_cache.read(APP_ROUTING_MODULE_FILEPATH)
+        normalized_routing = _normalize_ts_source(routing_content)
+        routing_imports = _get_imports(
+            normalized_routing, APP_ROUTING_MODULE_FILEPATH
+        )
+
+        error_messages: List[str] = []
+        for route_object in _extract_top_level_route_objects(
+            normalized_routing
+        ):
+            key_match = re.search(ROUTE_KEY_REGEX, route_object)
+            if not key_match:
+                continue
+            route_key = key_match.group(1)
+
+            declared_flags: Set[str] = set()
+            for flags_block in re.findall(
+                REQUIRED_FEATURE_FLAGS_REGEX, route_object
+            ):
+                declared_flags.update(
+                    re.findall(FEATURE_NAME_MEMBER_REGEX, flags_block)
+                )
+            if not declared_flags:
+                continue
+
+            guard_name_to_path: Dict[str, Optional[str]] = {}
+            for guard_name in _get_can_activate_guard_names(route_object):
+                guard_name_to_path[guard_name] = routing_imports.get(guard_name)
+
+            lazy_module_path = _get_lazy_module_path(route_object)
+            if lazy_module_path is not None:
+                module_content = self.file_cache.read(lazy_module_path)
+                normalized_module = _normalize_ts_source(module_content)
+                module_sources = [(lazy_module_path, normalized_module)]
+                module_imports = _get_imports(
+                    normalized_module, lazy_module_path
+                )
+                for imported_path in module_imports.values():
+                    if imported_path.endswith('routing.module.ts'):
+                        routing_module_content = self.file_cache.read(
+                            imported_path
+                        )
+                        module_sources.append(
+                            (
+                                imported_path,
+                                _normalize_ts_source(routing_module_content),
+                            )
+                        )
+                for source_path, source_content in module_sources:
+                    source_imports = _get_imports(source_content, source_path)
+                    for guard_name in _get_can_activate_guard_names(
+                        source_content
+                    ):
+                        guard_name_to_path.setdefault(
+                            guard_name, source_imports.get(guard_name)
+                        )
+
+            guard_flags: Set[str] = set()
+            for guard_name, guard_path in sorted(guard_name_to_path.items()):
+                if guard_path is None:
+                    error_messages.append(
+                        'Route %s references guard %s in canActivate, but it '
+                        'could not be resolved to a source file, so its '
+                        'feature flag usage cannot be checked.'
+                        % (route_key, guard_name)
+                    )
+                    continue
+                try:
+                    guard_content = self.file_cache.read(guard_path)
+                except OSError:
+                    error_messages.append(
+                        'Route %s references guard %s in canActivate, but its '
+                        'source file could not be read, so its feature flag '
+                        'usage cannot be checked.' % (route_key, guard_name)
+                    )
+                    continue
+                guard_flags.update(_get_guard_feature_flags(guard_content))
+
+            if guard_flags and guard_flags != declared_flags:
+                error_messages.append(
+                    'Route %s declares required feature flags [%s] but its '
+                    'page guards check [%s]. Update app.routing.module.ts '
+                    'or the guards so they agree.'
+                    % (
+                        route_key,
+                        ', '.join(sorted(declared_flags)),
+                        ', '.join(sorted(guard_flags)),
+                    )
+                )
+
+        return concurrent_task_utils.TaskResult(
+            name, bool(error_messages), error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -706,6 +936,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             self.check_duplicate_method_names_in_user_utilities()
         )
         linter_stdout.append(self.check_lighthouse_page_coverage())
+        linter_stdout.append(self.check_route_feature_flags_match_guards())
 
         return linter_stdout
 
