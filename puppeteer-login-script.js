@@ -67,6 +67,10 @@ const ERROR_ROUTE_PREFIX = '/error';
 // checked separately. The intentional /error/iframed audit is an error route and
 // is therefore skipped by the call site below.
 const IFRAMED_ERROR_PAGE_SELECTOR = 'oppia-error-iframed-page-root';
+// The selector for a route component rendered by the Angular router. Every
+// audited page mounts its route component as a sibling of <router-outlet>, so
+// finding one means the router has activated a route.
+const RENDERED_ROUTE_SELECTOR = 'oppia-root > :not(router-outlet)';
 // The signup route, and the only path whose landing URL is verified after the
 // navigation below. The signup page is only served to an account that has not
 // completed registration, so a registered account would be redirected away
@@ -289,6 +293,39 @@ const isErrorRoute = function (url) {
   );
 };
 
+// Puppeteer reports both navigation and wait timeouts as a TimeoutError.
+// Other navigation failures (DNS, connection refused, an aborted navigation)
+// mean the page was never reached, so they must fail the audit instead of
+// being treated as a slow page.
+const isTimeoutError = function (error) {
+  return error instanceof Error && error.name === 'TimeoutError';
+};
+
+/**
+ * Waits until the audited page has either rendered the error page or finished
+ * loading an Angular route.
+ *
+ * A navigation can resolve (or time out) before the router has activated the
+ * route, especially when a guard has to make a backend request first.
+ * Inspecting the DOM at that point would miss an error page that is about to
+ * render. Waiting for one of these states means the checks that follow run
+ * against the page the audit will actually score.
+ *
+ * @param {puppeteer.Page} page - The page to wait on.
+ */
+const waitForReadyOrErrorState = async function (page) {
+  await page.waitForFunction(
+    (errorSelector, iframedErrorSelector, routeSelector) =>
+      document.querySelector(errorSelector) !== null ||
+      document.querySelector(iframedErrorSelector) !== null ||
+      document.querySelector(routeSelector) !== null,
+    {timeout: LOGIN_WAIT_TIMEOUT_MS, polling: 100},
+    ERROR_PAGE_SELECTOR,
+    IFRAMED_ERROR_PAGE_SELECTOR,
+    RENDERED_ROUTE_SELECTOR
+  );
+};
+
 /**
  * Asserts that the page at the given URL did not render the Oppia error page.
  *
@@ -308,12 +345,30 @@ const assertErrorPageIsAbsent = async function (page, url) {
     // the page has rendered. networkidle2 tolerates those requests.
     await page.goto(url, {waitUntil: 'networkidle2'});
   } catch (error) {
-    // The page was reached but never went network-idle, usually because of a
-    // slow or long-lived request. Inspect whatever it rendered instead of
-    // failing here; a page that actually rendered the error page is still
-    // caught by the check below.
+    // Only a navigation timeout means the page was reached but never went
+    // network-idle (usually because of a slow or long-lived request). Any
+    // other failure means the page was not reached at all, so it must fail
+    // the audit instead of being inspected.
+    if (!isTimeoutError(error)) {
+      throw error;
+    }
     // eslint-disable-next-line no-console
     console.log(error);
+  }
+  try {
+    // The navigation can finish before the Angular router has activated the
+    // route, especially when a guard waits on a backend request. Wait for the
+    // route (or the error page) to render so the checks below inspect the
+    // page the audit will actually score.
+    await waitForReadyOrErrorState(page);
+  } catch (error) {
+    if (!isTimeoutError(error)) {
+      throw error;
+    }
+    throw new Error(
+      `Lighthouse cannot audit ${url}: the page neither rendered a route nor ` +
+        'the Oppia error page before the check timed out.'
+    );
   }
   const errorPageIsPresent = await page.evaluate(
     selector => document.querySelector(selector) !== null,
