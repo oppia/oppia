@@ -23,6 +23,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {State} from 'domain/state/state.model';
 import {StateDiffModalComponent} from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 import {StateLink} from 'pages/exploration-editor-page/services/exploration-diff.service';
+import {GraphLink} from 'services/compute-graph.service';
 
 interface NodesData {
   [key: string]: {
@@ -34,11 +35,7 @@ interface NodesData {
 
 interface LegendGraph {
   nodes: Record<string, string>;
-  links: {
-    source: string;
-    target: string;
-    linkProperty: string;
-  }[];
+  links: GraphLink[];
   finalStateIds: string[];
   initStateId: string;
 }
@@ -53,29 +50,6 @@ export interface DiffNodeData {
   v1InitStateId: number;
 }
 
-interface DIFF_GRAPH_LINK_PROPERTY_MAPPING {
-  added: string;
-  deleted: string;
-}
-
-interface LEGEND_GRAPH_COLORS {
-  Added: string;
-  Deleted: string;
-  Changed: string;
-  'Changed/renamed': string;
-  Renamed: string;
-  Unchanged: string;
-}
-
-interface LEGEND_GRAPH_LINK_PROPERTY_MAPPING {
-  hidden: string;
-}
-
-interface LEGEND_GRAPH_SECONDARY_LABELS {
-  'Changed/renamed': string;
-  Renamed: string;
-}
-
 interface DiffGraphSecondaryLabels {
   [nodeId: string]: string;
 }
@@ -85,9 +59,9 @@ interface DiffGraphNodeColors {
 }
 
 interface DiffGraphData {
-  nodes: object;
-  links: StateLink[];
-  initStateId: number;
+  nodes: Record<string, string>;
+  links: GraphLink[];
+  initStateId: string;
   finalStateIds: string[];
 }
 
@@ -165,16 +139,14 @@ export class VersionDiffVisualizationComponent implements OnInit {
   nodesData!: NodesData;
   diffGraphData!: DiffGraphData;
   diffGraphNodeColors!: DiffGraphNodeColors;
-  v1InitStateId!: number;
+  v1InitStateId!: string;
   diffGraphSecondaryLabels!: DiffGraphSecondaryLabels;
-  DIFF_GRAPH_LINK_PROPERTY_MAPPING!: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
+  DIFF_GRAPH_LINK_PROPERTY_MAPPING!: Record<string, string>;
   legendGraph!: LegendGraph;
-  LEGEND_GRAPH_COLORS!: LEGEND_GRAPH_COLORS | Record<string, string>;
-  LEGEND_GRAPH_SECONDARY_LABELS!:
-    | LEGEND_GRAPH_SECONDARY_LABELS
-    | Record<string, string>;
+  LEGEND_GRAPH_COLORS!: Record<string, string>;
+  LEGEND_GRAPH_SECONDARY_LABELS!: Record<string, string>;
 
-  LEGEND_GRAPH_LINK_PROPERTY_MAPPING!: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
+  LEGEND_GRAPH_LINK_PROPERTY_MAPPING!: Record<string, string>;
 
   constructor(private ngbModal: NgbModal) {}
 
@@ -330,12 +302,17 @@ export class VersionDiffVisualizationComponent implements OnInit {
       }
     }
 
-    this.v1InitStateId = this.diffData.v1InitStateId;
+    this.v1InitStateId = String(this.diffData.v1InitStateId);
 
     this.diffGraphData = {
       nodes: this.diffGraphNodes,
-      links: this.diffData.links,
-      initStateId: this.diffData.v2InitStateId,
+      links: this.diffData.links.map(link => ({
+        source: String(link.source),
+        target: String(link.target),
+        linkProperty: link.linkProperty,
+        connectsDestIfStuck: false,
+      })),
+      initStateId: String(this.diffData.v2InitStateId),
       finalStateIds: this.diffData.finalStateIds,
     };
 
@@ -357,6 +334,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
             source: _lastUsedStateType,
             target: stateProperty,
             linkProperty: 'hidden',
+            connectsDestIfStuck: false,
           });
         }
         _lastUsedStateType = stateProperty;

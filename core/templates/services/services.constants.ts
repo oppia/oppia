@@ -71,8 +71,6 @@ export const ServicesConstants = {
   // Oppia page visited.
   ENABLE_PROMO_BAR: true,
 
-  SEARCH_DATA_URL: '/searchhandler/data',
-
   STATE_ANSWER_STATS_URL: '/createhandler/state_answer_stats/<exploration_id>',
 
   RTE_COMPONENT_SPECS: RTE_COMPONENT_SPECS,

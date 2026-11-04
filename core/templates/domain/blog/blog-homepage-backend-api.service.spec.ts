@@ -27,8 +27,6 @@ import {
   BlogPostPageData,
   BlogPostPageBackendResponse,
   BlogHomePageBackendResponse,
-  SearchResponseData,
-  SearchResponseBackendDict,
   BlogAuthorProfilePageBackendResponse,
   BlogAuthorProfilePageData,
 } from 'domain/blog/blog-homepage-backend-api.service';
@@ -71,14 +69,11 @@ describe('Blog home page backend api service', () => {
   };
   let blogHomePageDataObject: BlogHomePageData;
   let blogPostSummaryObject: BlogPostSummary;
-  let searchResponseData: SearchResponseData;
-  let searchResponseBackendDict: SearchResponseBackendDict;
   let blogPostPageDataObject: BlogPostPageData;
   let blogPostObject: BlogPostData;
   let blogPostPageBackendResponse: BlogPostPageBackendResponse;
   let blogAuthorProfileBackendResponse: BlogAuthorProfilePageBackendResponse;
   let blogAuthorProfileDataObject: BlogAuthorProfilePageData;
-  let urlSearchQuery: string;
   let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
     displayed_author_name: 'new_displayed_author_name',
     author_bio: 'general bio',
@@ -106,18 +101,6 @@ describe('Blog home page backend api service', () => {
     };
     blogPostSummaryObject =
       BlogPostSummary.createFromBackendDict(blogPostSummary);
-    searchResponseBackendDict = {
-      search_offset: null,
-      blog_post_summaries_list: [],
-      list_of_default_tags: ['learners', 'news'],
-      total_matching_blog_posts: 0,
-    };
-    searchResponseData = {
-      searchOffset: null,
-      blogPostSummariesList: [],
-      listOfDefaultTags: ['learners', 'news'],
-      totalMatchingBlogPosts: 0,
-    };
     blogPostObject = BlogPostData.createFromBackendDict(blogPost);
     blogPostPageBackendResponse = {
       author_username: 'test_username',
@@ -204,78 +187,6 @@ describe('Blog home page backend api service', () => {
       expect(failHandler).toHaveBeenCalled();
     })
   );
-
-  it('should successfully fetch search data', fakeAsync(() => {
-    urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-    searchResponseBackendDict.total_matching_blog_posts = 0;
-    searchResponseData.totalMatchingBlogPosts = 0;
-    bhpbas
-      .fetchBlogPostSearchResultAsync(urlSearchQuery)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
-    );
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(searchResponseBackendDict);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(searchResponseData);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it(
-    'should use the rejection handler if the backend request fails to fetch' +
-      'search data',
-    fakeAsync(() => {
-      urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-      bhpbas
-        .fetchBlogPostSearchResultAsync(urlSearchQuery)
-        .then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
-      );
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(
-        {
-          error: 'Some error in the backend.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
-
-  it('should fetch search data with blog post summary data', fakeAsync(() => {
-    urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-    searchResponseBackendDict.total_matching_blog_posts = 0;
-    searchResponseData.totalMatchingBlogPosts = 0;
-    searchResponseBackendDict.blog_post_summaries_list = [blogPostSummary];
-    searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
-    bhpbas
-      .fetchBlogPostSearchResultAsync(urlSearchQuery)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
-    );
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(searchResponseBackendDict);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(searchResponseData);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
 
   it('should fetch the blog post data to populate blog post page', fakeAsync(() => {
     bhpbas

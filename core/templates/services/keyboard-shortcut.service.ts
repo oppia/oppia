@@ -96,25 +96,6 @@ export class KeyboardShortcutService {
   }
 
   bindLibraryPageShortcuts(): void {
-    Mousetrap.bind('/', () => {
-      var searchBar = document.querySelector(
-        '.oppia-search-bar-text-input'
-      ) as HTMLElement;
-      if (searchBar !== null) {
-        searchBar.focus();
-      }
-      return false;
-    });
-
-    Mousetrap.bind('c', () => {
-      var categoryBar = document.querySelector(
-        '.oppia-search-bar-dropdown-toggle'
-      ) as HTMLElement;
-      if (categoryBar !== null) {
-        categoryBar.focus();
-      }
-    });
-
     Mousetrap.bind('s', () => {
       var skipButton = document.querySelector(
         '.oppia-skip-to-content'

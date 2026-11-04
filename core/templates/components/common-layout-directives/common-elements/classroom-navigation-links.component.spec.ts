@@ -137,6 +137,30 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(component.isLoading).toBe(false);
   }));
 
+  it('should stop loading when fetching classroom summaries fails', fakeAsync(() => {
+    classroomBackendApiService.getAllClassroomsSummaryAsync.and.rejectWith(
+      new Error('Failed to fetch classroom summaries.')
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomSummaries).toEqual([]);
+    expect(component.isLoading).toBe(false);
+  }));
+
+  it('should emit the number of classrooms after they finish loading', fakeAsync(() => {
+    classroomBackendApiService.getAllClassroomsSummaryAsync.and.returnValue(
+      Promise.resolve(dummyClassroomSummaries)
+    );
+    spyOn(component.classroomCountChange, 'emit');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomCountChange.emit).toHaveBeenCalledWith(3);
+  }));
+
   it('should get classroom thumbnail', () => {
     const classroomId = 'math';
     const thumbnailFilename = 'thumbnail.svg';

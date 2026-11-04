@@ -3,7 +3,7 @@
                  [schema]="$any(schema)"
                  [ngModel]="localValue"
                  (ngModelChange)="updateValue($event)"
-                 alwaysEditable="true"
+                 [alwaysEditable]="true"
                  name="objectEditor"
                  [form]="form">
   </object-editor>
