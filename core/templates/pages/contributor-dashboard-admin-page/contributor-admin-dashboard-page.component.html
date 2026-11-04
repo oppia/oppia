@@ -30,7 +30,12 @@
     </div>
   </div>
   <div class="dashboard-content">
-    <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
+    <div class="dashboard-content-primary e2e-test-translation-configuration-content"
+         *ngIf="activeTab === TAB_NAME_TRANSLATION_CONFIGURATION">
+      <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
+    </div>
+    <div class="dashboard-content-primary"
+         *ngIf="!checkMobileView() && activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION">
       <div>
         <ul class="dashboard-tabs">
           <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
@@ -61,6 +66,13 @@
           <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}" *ngIf="isQuestionCoordinator">
             <a class="dashboard-tabs-text e2e-test-question-coordinators-tab" (click)="setActiveTab(TAB_NAME_QUESTION_COORDINATOR)">
               Question<br>Coordinators
+            </a>
+          </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_CONFIGURATION}"
+              *ngIf="showTranslationConfigurationTab">
+            <a class="dashboard-tabs-text e2e-test-translation-configuration-tab"
+               (click)="setActiveTab(TAB_NAME_TRANSLATION_CONFIGURATION)">
+              Translation<br>Configuration
             </a>
           </li>
         </ul>
@@ -117,7 +129,8 @@
       </div>
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
-    <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
+    <div class="dashboard-content-mobile"
+         *ngIf="checkMobileView() && activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION">
       <div class="dropdown">
         <mat-form-field class="choices-field">
           <mat-select placeholder="Contribution Type"

@@ -300,17 +300,17 @@
 
 .oppia-auto-translate-warning-box {
   align-items: center;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
+  background-color: #e3b007;
+  border: 1px solid #ffe082;
   border-radius: 4px;
-  color: #333;
+  color: #5d4037;
   display: flex;
   font-size: 14px;
   padding: 10px;
 }
 
 .oppia-auto-translate-warning-icon {
-  color: #666;
+  color: #f72c08;
   font-size: 20px;
   margin-right: 10px;
 }
