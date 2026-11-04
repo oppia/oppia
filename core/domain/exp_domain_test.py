@@ -3017,7 +3017,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_domain.State,
         state_domain.AnswerGroup,
     ]:
-        """Create a valid exploration with a TextInput answer group."""
+        """Creates a valid exploration with a TextInput answer group.
+
+        Returns:
+            Tuple(Exploration, ContentIdGenerator, State, AnswerGroup). A tuple
+            containing the valid exploration, content ID generator,
+            initial state, and answer group.
+        """
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
