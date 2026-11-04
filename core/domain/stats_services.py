@@ -1606,3 +1606,102 @@ def delete_learner_answer_details_for_question_state(question_id: str) -> None:
     )
     if learner_answer_details_model is not None:
         learner_answer_details_model.delete()
+
+
+def get_state_counter_from_model(
+    state_counter_model: stats_models.StateCounterModel,
+) -> stats_domain.StateCounter:
+    """Gets a StateCounter domain object from a StateCounterModel instance.
+
+    The exploration_id and state_name are recovered by splitting the model's
+    entity ID on the FIRST '.' only (split('.', 1)), because '.' is not in
+    INVALID_NAME_CHARS and state names may themselves contain '.'.
+
+    Args:
+        state_counter_model: StateCounterModel. A StateCounterModel
+            instance from datastore.
+
+    Returns:
+        StateCounter. The domain object for the state counter.
+    """
+    exploration_id, state_name = state_counter_model.id.split('.', 1)
+    return stats_domain.StateCounter(
+        exploration_id,
+        state_name,
+        state_counter_model.first_entry_count,
+        state_counter_model.subsequent_entries_count,
+        state_counter_model.resolved_answer_count,
+        state_counter_model.active_answer_count,
+    )
+
+
+def get_state_counter_model_from_domain_object(
+    state_counter: stats_domain.StateCounter,
+) -> stats_models.StateCounterModel:
+    """Gets a StateCounterModel from a StateCounter domain object.
+
+    The returned model is NOT persisted; the caller must persist it
+    explicitly (see save_state_counter).
+
+    Args:
+        state_counter: StateCounter. The StateCounter domain object.
+
+    Returns:
+        StateCounterModel. The model instance with counts copied from
+        the domain object. Not yet saved to datastore.
+    """
+    instance_id = '.'.join(
+        [state_counter.exploration_id, state_counter.state_name]
+    )
+    model = stats_models.StateCounterModel(id=instance_id)
+    model.first_entry_count = state_counter.first_entry_count
+    model.subsequent_entries_count = state_counter.subsequent_entries_count
+    model.resolved_answer_count = state_counter.resolved_answer_count
+    model.active_answer_count = state_counter.active_answer_count
+    return model
+
+
+def get_state_counter(
+    exploration_id: str, state_name: str
+) -> stats_domain.StateCounter:
+    """Gets the StateCounter for an exploration state, or a default
+    (all-zero) counter if none is stored.
+
+    A default counter returned here is IN-MEMORY ONLY — it is NOT
+    persisted to datastore, because StateCounterModel.get_or_create()
+    does not call put(). Only save_state_counter() writes to datastore.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+        state_name: str. Name of the state.
+
+    Returns:
+        StateCounter. The domain object for the state counter. All
+        counts are zero if no model exists yet in datastore.
+    """
+    model = stats_models.StateCounterModel.get_or_create(
+        exploration_id, state_name
+    )
+    return get_state_counter_from_model(model)
+
+
+def save_state_counter(
+    state_counter: stats_domain.StateCounter,
+) -> None:
+    """Persists a StateCounter to datastore.
+
+    This is the ONE place persistence happens for StateCounter objects.
+    Reads via get_state_counter never create stored data; only this
+    function writes.
+
+    Args:
+        state_counter: StateCounter. The domain object to persist.
+    """
+    model = stats_models.StateCounterModel.get_or_create(
+        state_counter.exploration_id, state_counter.state_name
+    )
+    model.first_entry_count = state_counter.first_entry_count
+    model.subsequent_entries_count = state_counter.subsequent_entries_count
+    model.resolved_answer_count = state_counter.resolved_answer_count
+    model.active_answer_count = state_counter.active_answer_count
+    model.put()
