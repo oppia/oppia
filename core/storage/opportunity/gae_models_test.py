@@ -207,7 +207,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_translation_opportunities_by_topic(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
-                5, None, 'hi', 'a_topic name'
+                5, None, 'hi', 'topic_id1'
             )
         )
         self.assertEqual(len(results), 2)
@@ -215,6 +215,36 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[1].id, 'opportunity_id3')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
+
+    def test_get_translation_opportunities_by_topic_name_returns_nothing(
+        self,
+    ) -> None:
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
+                5, None, 'hi', 'a_topic name'
+            )
+        )
+        self.assertEqual(len(results), 0)
+        self.assertFalse(more)
+
+    def test_get_translation_opportunities_by_topic_pagination(self) -> None:
+        results, cursor, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
+                1, None, 'hi', 'topic_id3'
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id4')
+        self.assertTrue(more)
+
+        results, _, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
+                1, cursor, 'hi', 'topic_id3'
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id6')
+        self.assertFalse(more)
 
     def test_count_translation_opportunities(self) -> None:
         self.assertEqual(
@@ -225,9 +255,16 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
-                'hi', 'a_topic name'
+                'hi', 'topic_id1'
             ),
             2,
+        )
+        # A topic name is not a valid topic ID filter.
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(
+                'hi', 'a_topic name'
+            ),
+            0,
         )
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel.count_translation_opportunities(

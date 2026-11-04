@@ -24,6 +24,7 @@ export interface TranslationCountsDict {
 
 export interface ExplorationOpportunitySummaryBackendDict {
   id: string;
+  topic_id: string;
   topic_name: string;
   story_title: string;
   chapter_title: string;
@@ -54,6 +55,7 @@ export interface TranslationOpportunityCardInfoBackendDict {
 
 export class ExplorationOpportunitySummary {
   id: string;
+  topicId: string;
   topicName: string;
   storyTitle: string;
   chapterTitle: string;
@@ -67,6 +69,7 @@ export class ExplorationOpportunitySummary {
 
   constructor(
     expId: string,
+    topicId: string,
     topicName: string,
     storyTitle: string,
     chapterTitle: string,
@@ -79,6 +82,7 @@ export class ExplorationOpportunitySummary {
     entityType?: string
   ) {
     this.id = expId;
+    this.topicId = topicId;
     this.topicName = topicName;
     this.storyTitle = storyTitle;
     this.chapterTitle = chapterTitle;
@@ -96,6 +100,7 @@ export class ExplorationOpportunitySummary {
   ): ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
       backendDict.id,
+      backendDict.topic_id,
       backendDict.topic_name,
       backendDict.story_title,
       backendDict.chapter_title,
@@ -113,6 +118,10 @@ export class ExplorationOpportunitySummary {
   ): ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
       backendDict.entity_id,
+      // An opportunity can be linked to several topics. The first one is used
+      // as its topic, since the backend also derives topic_name from the
+      // first of these topics that it can find.
+      backendDict.topic_ids.length > 0 ? backendDict.topic_ids[0] : '',
       backendDict.topic_name,
       backendDict.story_title || '',
       backendDict.entity_description,

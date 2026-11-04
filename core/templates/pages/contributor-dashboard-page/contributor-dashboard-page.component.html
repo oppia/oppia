@@ -103,8 +103,8 @@
                 <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
                   <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                   <translation-topic-selector class="oppia-topic-selector"
-                                              [activeTopicName]="topicName"
-                                              (setActiveTopicName)="onChangeTopic($event)">
+                                              [activeTopicId]="topicId"
+                                              (setActiveTopicId)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
                 <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
@@ -150,8 +150,8 @@
                 <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
                   <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                   <translation-topic-selector class="oppia-topic-selector"
-                                              [activeTopicName]="topicName"
-                                              (setActiveTopicName)="onChangeTopic($event)">
+                                              [activeTopicId]="topicId"
+                                              (setActiveTopicId)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
                 <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
@@ -169,7 +169,7 @@
     </div>
   </div>
   <div *ngIf="activeTabName === 'myContributionTab' || !activeTabName">
-    <oppia-contributions-and-review [activeTopicName]="topicName" [activeEntityType]="activeEntityType">
+    <oppia-contributions-and-review [activeTopicId]="topicId" [activeEntityType]="activeEntityType">
     </oppia-contributions-and-review>
   </div>
   <div *ngIf="activeTabName === 'submitQuestionTab'"

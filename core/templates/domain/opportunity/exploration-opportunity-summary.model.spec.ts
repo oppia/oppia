@@ -30,6 +30,7 @@ describe('Exploration opportunity summary model', () => {
     beforeEach(() => {
       backendDict = {
         id: 'exp_id',
+        topic_id: 'topic_id',
         topic_name: 'Topic',
         story_title: 'A new story',
         chapter_title: 'Introduction',
@@ -52,6 +53,11 @@ describe('Exploration opportunity summary model', () => {
       expect(explorationOpportunitySummary.getExplorationId()).toEqual(
         'exp_id'
       );
+    });
+
+    it('should return the correct topic ID and name', () => {
+      expect(explorationOpportunitySummary.topicId).toEqual('topic_id');
+      expect(explorationOpportunitySummary.topicName).toEqual('Topic');
     });
 
     it('should return a correct opportunity heading', () => {
@@ -108,6 +114,7 @@ describe('Exploration opportunity summary model', () => {
       () => {
         const backendDictWithNoContents = {
           id: 'exp_id',
+          topic_id: 'topic_id',
           topic_name: 'Topic',
           story_title: 'A new story',
           chapter_title: 'Introduction',
@@ -161,6 +168,7 @@ describe('Exploration opportunity summary model', () => {
       const summary =
         ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
       expect(summary.getExplorationId()).toEqual('exp_id');
+      expect(summary.topicId).toEqual('topic_id');
       expect(summary.getOpportunityHeading()).toEqual('Introduction');
       expect(summary.getOpportunitySubheading()).toEqual('Exploration - Topic');
       expect(summary.storyTitle).toEqual('');
@@ -200,6 +208,46 @@ describe('Exploration opportunity summary model', () => {
       expect(summary.storyTitle).toEqual('Story');
       expect(summary.languageCode).toEqual('hi');
       expect(summary.getReviewerOnlyContentCount()).toEqual(5);
+    });
+
+    it('should use the first linked topic as the V2 topic ID', () => {
+      const backendDictV2: TranslationOpportunityCardInfoBackendDict = {
+        topic_ids: ['topic_id_1', 'topic_id_2'],
+        entity_id: 'skill_id',
+        content_count: 10,
+        incomplete_translation_language_codes: ['hi'],
+        translation_counts: {},
+        entity_type: 'skill',
+        topic_name: 'Topic 1',
+        entity_description: 'Skill',
+        is_pinned: false,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {},
+      };
+
+      const summary =
+        ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
+      expect(summary.topicId).toEqual('topic_id_1');
+    });
+
+    it('should use an empty V2 topic ID when no topic is linked', () => {
+      const backendDictV2: TranslationOpportunityCardInfoBackendDict = {
+        topic_ids: [],
+        entity_id: 'skill_id',
+        content_count: 10,
+        incomplete_translation_language_codes: ['hi'],
+        translation_counts: {},
+        entity_type: 'skill',
+        topic_name: '',
+        entity_description: 'Skill',
+        is_pinned: false,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {},
+      };
+
+      const summary =
+        ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
+      expect(summary.topicId).toEqual('');
     });
   });
 });

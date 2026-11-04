@@ -215,7 +215,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName(),
+        this.translationTopicService.getActiveTopicId(),
         this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
@@ -224,7 +224,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   async loadOpportunitiesCountAsync(): Promise<number> {
     return this.contributionOpportunitiesService.getTranslationOpportunitiesCountAsync(
       this.translationLanguageService.getActiveLanguageCode(),
-      this.translationTopicService.getActiveTopicName(),
+      this.translationTopicService.getActiveTopicId(),
       this.activeEntityType
     );
   }
@@ -236,7 +236,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName(),
+        this.translationTopicService.getActiveTopicId(),
         this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));

@@ -23,24 +23,36 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/translation-topic-selector/translation-topic-selector.component';
 import {
+  ALL_TOPICS_OPTION,
   ContributionOpportunitiesBackendApiService,
+  TranslatableTopicsPerClassroom,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
-describe('Translation language selector', () => {
+describe('Translation topic selector', () => {
   let component: TranslationTopicSelectorComponent;
   let fixture: ComponentFixture<TranslationTopicSelectorComponent>;
 
-  const topicsPerClassroomBackendDict = [
-    {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-    {classroom: 'Class 2', topics: ['Topic 3']},
-    {classroom: '', topics: ['All', 'Topic 4']},
+  const topicsPerClassroom: TranslatableTopicsPerClassroom[] = [
+    {
+      classroom: 'Class 1',
+      topics: [
+        {id: 'topic_id_1', name: 'Topic 1'},
+        {id: 'topic_id_2', name: 'Topic 2'},
+      ],
+    },
+    {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
+    {
+      classroom: '',
+      topics: [ALL_TOPICS_OPTION, {id: 'topic_id_4', name: 'Topic 4'}],
+    },
   ];
 
   let contributionOpportunitiesBackendApiServiceStub: Partial<ContributionOpportunitiesBackendApiService> =
     {
-      fetchTranslatableTopicNamesPerClassroomAsync: async () =>
-        Promise.resolve(topicsPerClassroomBackendDict),
+      fetchTranslatableTopicsPerClassroomAsync: async () =>
+        Promise.resolve(topicsPerClassroom),
     };
 
   let clickDropdown: () => void;
@@ -61,7 +73,6 @@ describe('Translation language selector', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TranslationTopicSelectorComponent);
     component = fixture.componentInstance;
-    component.activeTopicName = 'All';
     fixture.detectChanges();
   });
 
@@ -80,12 +91,57 @@ describe('Translation language selector', () => {
     };
   });
 
-  it('should correctly initialize dropdown activeTopicName', () => {
+  it('should initialize the active topic to "All" and emit it', () => {
+    const newFixture = TestBed.createComponent(
+      TranslationTopicSelectorComponent
+    );
+    const newComponent = newFixture.componentInstance;
+    spyOn(newComponent.setActiveTopicId, 'emit');
+
+    newFixture.detectChanges();
+
+    expect(newComponent.activeTopicId).toBe(
+      ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+    );
+    expect(newComponent.setActiveTopicId.emit).toHaveBeenCalledWith(
+      ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+    );
+    const dropdown = newFixture.nativeElement.querySelector(
+      '.oppia-translation-topic-selector-inner-container'
+    );
+    expect(dropdown.firstChild.textContent.trim()).toBe('All');
+  });
+
+  it('should display the name of the active topic', async () => {
+    await fixture.whenStable();
+
+    component.activeTopicId = 'topic_id_3';
+    fixture.detectChanges();
+
     const dropdown = fixture.nativeElement.querySelector(
       '.oppia-translation-topic-selector-inner-container'
     );
+    expect(dropdown.firstChild.textContent.trim()).toBe('Topic 3');
+  });
 
-    expect(dropdown.firstChild.textContent.trim()).toBe('All');
+  it('should display nothing for an unknown active topic ID', async () => {
+    await fixture.whenStable();
+
+    component.activeTopicId = 'unknown_topic_id';
+
+    expect(component.getActiveTopicName()).toBe('');
+  });
+
+  it('should highlight the option for the active topic', async () => {
+    await fixture.whenStable();
+    component.activeTopicId = 'topic_id_2';
+    clickDropdown();
+
+    const selectedOptions = fixture.debugElement.nativeElement.querySelectorAll(
+      '.oppia-translation-topic-selector-dropdown-option-selected'
+    );
+    expect(selectedOptions.length).toBe(1);
+    expect(selectedOptions[0].textContent.trim()).toBe('Topic 2');
   });
 
   it('should correctly display topics organized by classroom', async () => {
@@ -138,12 +194,31 @@ describe('Translation language selector', () => {
     expect(getDropdownOptionsContainer()).toBeFalsy();
   });
 
-  it('should correctly select and indicate selection of an option', () => {
-    spyOn(component.setActiveTopicName, 'emit');
+  it('should emit the topic ID when an option is selected', () => {
+    spyOn(component.setActiveTopicId, 'emit');
 
-    component.selectOption('Topic 1');
+    component.selectOption('topic_id_1');
     fixture.detectChanges();
 
-    expect(component.setActiveTopicName.emit).toHaveBeenCalledWith('Topic 1');
+    expect(component.setActiveTopicId.emit).toHaveBeenCalledWith('topic_id_1');
+  });
+
+  it('should emit the topic ID when an option is clicked', async () => {
+    await fixture.whenStable();
+    spyOn(component.setActiveTopicId, 'emit');
+    clickDropdown();
+
+    const options: HTMLElement[] = Array.from(
+      fixture.debugElement.nativeElement.querySelectorAll(
+        '.oppia-translation-topic-selector-dropdown-option'
+      )
+    );
+    const topic4Option = options.find(
+      option => option.textContent?.trim() === 'Topic 4'
+    );
+    topic4Option?.click();
+
+    expect(component.setActiveTopicId.emit).toHaveBeenCalledWith('topic_id_4');
+    expect(component.dropdownShown).toBe(false);
   });
 });

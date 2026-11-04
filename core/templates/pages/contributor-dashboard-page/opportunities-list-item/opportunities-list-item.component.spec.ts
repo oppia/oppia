@@ -78,6 +78,7 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 0,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.clickActionButton.emit = () =>
@@ -159,6 +160,7 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.opportunityType = 'translation';
@@ -212,6 +214,7 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.opportunityType = 'skill';
@@ -248,6 +251,7 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 30,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.opportunityType = 'translation';
@@ -311,6 +315,7 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.opportunityType = 'translation';
@@ -357,7 +362,7 @@ describe('Opportunities List Item Component', () => {
     it('should emit a pin event with the correct properties', () => {
       const spy = spyOn(component.clickPinButton, 'emit');
       const expectedPayload = {
-        topic_name: 'Topic 1',
+        topic_id: 'topic_id_1',
         exploration_id: '1',
       };
 
@@ -370,6 +375,7 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.pinOpportunity();
@@ -379,7 +385,7 @@ describe('Opportunities List Item Component', () => {
 
     it('should emit an unpin event with the correct properties', () => {
       const spy = spyOn(component.clickUnpinButton, 'emit');
-      const expectedTopicName = 'Topic 1';
+      const expectedTopicId = 'topic_id_1';
 
       component.opportunity = {
         id: '1',
@@ -390,12 +396,13 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
+        topicId: 'topic_id_1',
         topicName: 'Topic 1',
       };
       component.unpinOpportunity();
 
       expect(spy).toHaveBeenCalledWith({
-        topic_name: expectedTopicName,
+        topic_id: expectedTopicId,
         exploration_id: '1',
       });
     });

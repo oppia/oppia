@@ -64,7 +64,8 @@ describe('Contributor dashboard page', () => {
     can_suggest_questions: true,
   };
   let focusManagerService: FocusManagerService;
-  let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
+  let getTranslatableTopicsAsyncSpy: jasmine.Spy;
+  let getLastSelectedTranslationTopicIdSpy: jasmine.Spy;
   let getUserInfoAsyncSpy: jasmine.Spy;
   let urlInterpolationService: UrlInterpolationService;
   let contributionAndReviewService: ContributionAndReviewService;
@@ -108,26 +109,29 @@ describe('Contributor dashboard page', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
-    getTranslatableTopicNamesAsyncSpy = spyOn(
+    getTranslatableTopicsAsyncSpy = spyOn(
       contributionOpportunitiesService,
-      'getTranslatableTopicNamesAsync'
+      'getTranslatableTopicsAsync'
     );
-    getTranslatableTopicNamesAsyncSpy.and.returnValue(
-      Promise.resolve(['Topic 1', 'Topic 2'])
+    getTranslatableTopicsAsyncSpy.and.returnValue(
+      Promise.resolve([
+        {id: 'topic_id_1', name: 'Topic 1'},
+        {id: 'topic_id_2', name: 'Topic 2'},
+      ])
     );
     spyOn(
       localStorageService,
       'getLastSelectedTranslationLanguageCode'
     ).and.returnValue('');
-    spyOn(
+    getLastSelectedTranslationTopicIdSpy = spyOn(
       localStorageService,
-      'getLastSelectedTranslationTopicName'
-    ).and.returnValue('Topic 1');
+      'getLastSelectedTranslationTopicId'
+    ).and.returnValue('topic_id_2');
     spyOn(
       translationLanguageService,
       'setActiveLanguageCode'
     ).and.callThrough();
-    spyOn(translationTopicService, 'setActiveTopicName').and.callThrough();
+    spyOn(translationTopicService, 'setActiveTopicId').and.callThrough();
 
     let userInfo = {
       isLoggedIn: () => true,
@@ -228,8 +232,11 @@ describe('Contributor dashboard page', () => {
       component.ngOnInit();
       flush();
 
-      expect(component.topicName).toBe('Topic 1');
-      expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
+      // The previously selected topic is restored by its ID.
+      expect(component.topicId).toBe('topic_id_2');
+      expect(translationTopicService.setActiveTopicId).toHaveBeenCalledWith(
+        'topic_id_2'
+      );
       expect(component.activeTabName).toBe('myContributionTab');
       expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
         '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
@@ -242,17 +249,35 @@ describe('Contributor dashboard page', () => {
       );
     }));
 
-    it('should set active topic name as default when no topics are returned', fakeAsync(() => {
+    it('should fall back to the first topic when the stored topic is unknown', fakeAsync(() => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
-      getTranslatableTopicNamesAsyncSpy.and.returnValue(Promise.resolve([]));
+      // For example, a topic name stored before topics were tracked by ID.
+      getLastSelectedTranslationTopicIdSpy.and.returnValue('Topic 2');
 
       component.ngOnInit();
       flush();
 
-      expect(component.topicName).toBeUndefined();
-      expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
+      expect(component.topicId).toBe('topic_id_1');
+      expect(translationTopicService.setActiveTopicId).toHaveBeenCalledWith(
+        'topic_id_1'
+      );
+    }));
+
+    it('should set the "all topics" sentinel when no topics are returned', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      getTranslatableTopicsAsyncSpy.and.returnValue(Promise.resolve([]));
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.topicId).toBeUndefined();
+      expect(translationTopicService.setActiveTopicId).toHaveBeenCalledWith(
+        ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+      );
     }));
 
     it('should return language description in kebab case format', () => {
@@ -330,17 +355,18 @@ describe('Contributor dashboard page', () => {
       );
       spyOn(
         localStorageService,
-        'updateLastSelectedTranslationTopicName'
+        'updateLastSelectedTranslationTopicId'
       ).and.callThrough();
 
-      component.onChangeTopic('Topic 2');
+      component.onChangeTopic('topic_id_2');
 
-      expect(translationTopicService.setActiveTopicName).toHaveBeenCalledWith(
-        'Topic 2'
+      expect(component.topicId).toBe('topic_id_2');
+      expect(translationTopicService.setActiveTopicId).toHaveBeenCalledWith(
+        'topic_id_2'
       );
       expect(
-        localStorageService.updateLastSelectedTranslationTopicName
-      ).toHaveBeenCalledWith('Topic 2');
+        localStorageService.updateLastSelectedTranslationTopicId
+      ).toHaveBeenCalledWith('topic_id_2');
     });
 
     it('should show topic selector based on active tab', () => {

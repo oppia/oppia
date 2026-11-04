@@ -5002,6 +5002,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'id': 'exp1',
                     'is_pinned': False,
                     'story_title': 'A story',
+                    'topic_id': self.TOPIC_ID,
                     'topic_name': 'topic',
                     'translation_counts': {},
                     'translation_in_review_counts': {},
@@ -5102,12 +5103,12 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-                'topic_name': self.TOPIC_ID,
+                'topic_id': self.TOPIC_ID,
             },
         )
         self.assertEqual(len(response['suggestions']), 1)
 
-    def test_skill_handler_with_all_topics_filter_returns_one_question(
+    def test_skill_handler_with_empty_topic_id_returns_all_questions(
         self,
     ) -> None:
         response = self.get_json(
@@ -5116,10 +5117,40 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-                'topic_name': 'All',
+                'topic_id': '',
             },
         )
         self.assertEqual(len(response['suggestions']), 2)
+
+    def test_skill_handler_with_non_existent_topic_id_raises_error(
+        self,
+    ) -> None:
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_id': 'non_existent_topic_id',
+            },
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'The topic ID \'non_existent_topic_id\' is not valid',
+        )
+
+    def test_skill_handler_rejects_topic_name_param(self) -> None:
+        self.get_json(
+            '/getreviewablesuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic',
+            },
+            expected_status_int=400,
+        )
 
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
@@ -5139,7 +5170,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-                'topic_name': 'non_existent_topic',
+                'topic_id': 'non_existent_topic',
             },
             expected_status_int=400,
         )
