@@ -199,7 +199,6 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
         stack.enter_context(servers.managed_firebase_auth_emulator())
         stack.enter_context(
             servers.managed_cloud_datastore_emulator(clear_datastore=True)

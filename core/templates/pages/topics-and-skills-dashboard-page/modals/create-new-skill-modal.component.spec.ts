@@ -82,6 +82,16 @@ describe('Create new skill modal', () => {
     ).toEqual('text2');
   });
 
+  it('should reset explanation to empty string for a non-string value', () => {
+    componentInstance.bindableDict.displayedConceptCardExplanation = 'text1';
+
+    componentInstance.updateExplanation(null);
+
+    expect(
+      componentInstance.bindableDict.displayedConceptCardExplanation
+    ).toEqual('');
+  });
+
   it('should open concept card explanation editor', () => {
     componentInstance.openConceptCardExplanationEditor();
     expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();

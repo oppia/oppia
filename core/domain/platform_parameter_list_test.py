@@ -35,8 +35,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         'email_footer',
         'email_sender_name',
         'enable_admin_notifications_for_reviewer_shortage',
-        'es_cloud_id',
-        'es_username',
         'high_bounce_rate_task_minimum_exploration_starts',
         'high_bounce_rate_task_state_bounce_rate_creation_threshold',  # pylint: disable=line-too-long
         'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',  # pylint: disable=line-too-long
@@ -51,7 +49,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         'promo_bar_enabled',
         'promo_bar_message',
         'record_playthrough_probability',
-        'server_can_send_emails',
         'signup_email_body_content',
         'signup_email_subject_content',
         'system_email_address',

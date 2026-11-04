@@ -117,7 +117,6 @@ describe('Logged-out User', function () {
     'should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
       await loggedOutUser.continueToNextCard();
 

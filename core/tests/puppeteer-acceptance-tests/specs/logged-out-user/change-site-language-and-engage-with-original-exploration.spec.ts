@@ -103,7 +103,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectPageLanguageToMatch('hi');
 
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
       await loggedOutUser.continueToNextCard();
 

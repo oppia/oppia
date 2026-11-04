@@ -316,6 +316,21 @@ indexes:
   - name: target_id
   - name: author_id
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: language_code
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: final_reviewer_id
+  - name: suggestion_type
+  - name: last_updated
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -454,11 +469,6 @@ indexes:
     direction: desc
 
 - kind: RecentUpdatesRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
-- kind: SearchRankerRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on
@@ -723,6 +733,24 @@ indexes:
   - name: exploration_id
   - name: status
   - name: created_on
+    direction: desc
+
+- kind: CollectionSummaryModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: collection_model_last_updated
+    direction: desc
+
+- kind: ExpSummaryModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: scaled_average_rating
     direction: desc
 
 - kind: LessonFeedbackModel

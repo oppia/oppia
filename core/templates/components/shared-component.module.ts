@@ -94,7 +94,6 @@ import {DisplaySolutionModalComponent} from 'pages/exploration-player-page/curre
 import {DisplaySolutionInterstititalModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-solution-interstitial-modal.component';
 import {DisplayHintModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-hint-modal.component';
 import {HintAndSolutionButtonsComponent} from './button-directives/hint-and-solution-buttons.component';
-import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
 import {FilteredChoicesFieldComponent} from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-field/multi-selection-field.component';
@@ -155,10 +154,10 @@ import {StateGraphVisualization} from 'pages/exploration-editor-page/editor-tab/
 import {VersionDiffVisualizationComponent} from './version-diff-visualization/version-diff-visualization.component';
 import {QuestionSuggestionEditorModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import {QuestionSuggestionReviewModalComponent} from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
-import {ReviewTestPageComponent} from 'pages/review-test-page/review-test-page.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {AnswerContentModalComponent} from './common-layout-directives/common-elements/answer-content-modal.component';
+import {ErrorModalComponent} from './common-layout-directives/common-elements/error-modal.component';
 import {VisualizationSortedTilesComponent} from '../../../extensions/visualizations/oppia-visualization-sorted-tiles.component';
 import {OppiaVisualizationClickHexbinsComponent} from '../../../extensions/visualizations/oppia-visualization-click-hexbins.directive';
 import {OppiaVisualizationFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-frequency-table.directive';
@@ -179,6 +178,7 @@ import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
+import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -212,6 +212,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {CardInteractionControlsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-interaction-controls.component';
 import {RouterModule} from '@angular/router';
 import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
@@ -249,7 +250,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
     RichTextComponentsModule,
-    SearchBarModule,
     SharedFormsModule,
     RecommendationsModule,
     StringUtilityPipesModule,
@@ -286,6 +286,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     ProgressBarComponent,
     NewConversationSkinComponent,
     ProgressTrackerComponent,
@@ -415,7 +416,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
@@ -439,7 +439,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 
   entryComponents: [
@@ -458,6 +460,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     ProgressTrackerComponent,
     CheckpointBarComponent,
     NewConversationSkinComponent,
@@ -587,7 +590,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     CopierComponent,
@@ -613,7 +615,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 
   exports: [
@@ -632,7 +636,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
-    SearchBarModule,
     SharedFormsModule,
     StringUtilityPipesModule,
     // Components, directives, and pipes.
@@ -654,6 +657,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    CardInteractionControlsComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
@@ -772,7 +776,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
     OppiaVisualizationFrequencyTableComponent,
-    ReviewTestPageComponent,
     ComponentOverviewComponent,
     TranslateModule,
     VisualizationSortedTilesComponent,
@@ -784,7 +787,9 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
+    TranslationModalUneditedConfirmationModalComponent,
   ],
 })
 export class SharedComponentsModule {}
