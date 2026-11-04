@@ -582,6 +582,10 @@ def get_featured_translation_languages() -> (
         strict=False,
     )
     if model is None:
+        # TODO(#27937): Remove this fallback to the
+        # FEATURED_TRANSLATION_LANGUAGES constant (and the constant itself) once
+        # every server has run the transition step and the datastore row is the
+        # sole source of truth.
         return [
             {
                 'language_code': language['language_code'],
