@@ -182,7 +182,7 @@
   gap: 8px;
   justify-content: space-between;
   padding: 10px;
-  text-align: left;
+  text-align: start;
   width: 100%;
 }
 
