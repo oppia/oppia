@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -38,6 +40,8 @@ if MYPY:  # pragma: no cover
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
+
+GENERATE_CONTENT_ID_TIME_LIMIT = datetime.timedelta(seconds=2)
 
 
 class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
@@ -186,6 +190,10 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         Returns:
             dict|None. Dict containing fix results if duplicates were found and
             fixed, None otherwise.
+
+        Raises:
+            Exception. If a unique content ID cannot be generated within the
+                time limit.
         """
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
@@ -212,6 +220,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         )
 
         fixed_content_ids = []
+        all_content_ids_set = set(all_content_ids)
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
@@ -224,9 +233,22 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
-                new_content_id = content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT
+                timeout = (
+                    datetime.datetime.now() + GENERATE_CONTENT_ID_TIME_LIMIT
                 )
+                while datetime.datetime.now() < timeout:
+                    new_content_id = _generate_matching_content_id(
+                        duplicate_id, content_id_generator
+                    )
+                    if new_content_id not in all_content_ids_set:
+                        break
+                else:
+                    raise Exception(
+                        'Timeout generating unique content ID for '
+                        f'exploration {exploration.id}.'
+                    )
+
+                all_content_ids_set.add(new_content_id)
 
                 _replace_content_id_in_state(
                     state, duplicate_id, new_content_id
@@ -253,6 +275,51 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 'fixed_content_ids': fixed_content_ids,
                 'fixed_model': updated_model,
             }
+
+
+def _generate_matching_content_id(
+    existing_content_id: str,
+    content_id_generator: translation_domain.ContentIdGenerator,
+) -> str:
+    """Generates a replacement content ID matching the existing ID prefix.
+
+    Args:
+        existing_content_id: str. The existing content ID that is duplicated.
+        content_id_generator: ContentIdGenerator. Generator used to create
+            unique content IDs.
+
+    Returns:
+        str. A newly generated content ID that preserves the same content type
+        prefix as the existing content ID.
+    """
+    content_type = translation_domain.ContentType.CONTENT
+    extra_prefix = None
+
+    for possible_content_type in translation_domain.ContentType:
+        type_prefix = f'{possible_content_type.value}_'
+        if existing_content_id.startswith(type_prefix):
+            content_type = possible_content_type
+            break
+
+    if content_type == translation_domain.ContentType.CUSTOMIZATION_ARG:
+        # Customization arg content IDs can contain an additional prefix
+        # between the content type and numeric index. For example:
+        #
+        #   ca_choices_12
+        #
+        # where:
+        #   - "ca" is the CUSTOMIZATION_ARG content type prefix
+        #   - "choices" is the customization arg name
+        #   - "12" is the generated index
+        #
+        # While regenerating duplicate IDs we preserve the customization arg
+        # portion ("choices") so the new ID retains the same structure and
+        # remains compatible with existing content references.
+        content_id_parts = existing_content_id.split('_')
+        if len(content_id_parts) >= 3:
+            extra_prefix = '_'.join(content_id_parts[1:-1])
+
+    return content_id_generator.generate(content_type, extra_prefix)
 
 
 def _replace_content_id_in_state(
@@ -324,6 +391,21 @@ def _replace_content_id_in_state(
                 state.interaction.solution.explanation.content_id = (
                     new_content_id
                 )
+
+    if (
+        hasattr(state, 'recorded_voiceovers')
+        and old_content_id in state.recorded_voiceovers.voiceovers_mapping
+    ):
+        state.recorded_voiceovers.voiceovers_mapping[new_content_id] = (
+            state.recorded_voiceovers.voiceovers_mapping.pop(old_content_id)
+        )
+    if (
+        hasattr(state, 'written_translations')
+        and old_content_id in state.written_translations.translations_mapping
+    ):
+        state.written_translations.translations_mapping[new_content_id] = (
+            state.written_translations.translations_mapping.pop(old_content_id)
+        )
 
 
 # Here we use type Any because the customization arg value can be of
