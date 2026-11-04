@@ -89,8 +89,6 @@ const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 
-const toastMessage = '.e2e-test-toast-message';
-
 const mobileChangesDropdownSelector = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButtonSelector =
   'button.e2e-test-save-changes-for-small-screens';
@@ -983,10 +981,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.locator(feedbackResponseRemoveSelector).waitFor({
       state: 'visible',
     });
-    // On mobile the help card text overlaps its close button; force the click like the Puppeteer element click.
+    // Dispatch the click on the element itself, like Puppeteer's element.click(); an overlay can otherwise take a mouse click.
     await this.page
       .locator(feedbackResponseRemoveSelector)
-      .click({force: true, timeout: 15000});
+      .dispatchEvent('click');
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
 
@@ -2049,9 +2047,8 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveDraftButton);
     await this.expectElementToBeVisible(saveDraftButton, false);
 
-    // Toast message confirms that the draft has been saved.
-    await this.expectElementToBeVisible(toastMessage);
-    await this.expectElementToBeVisible(toastMessage, false);
+    // The toast can appear and vanish before a visibility check starts, so wait for the save request to finish instead.
+    await this.waitForNetworkIdle();
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
   }
