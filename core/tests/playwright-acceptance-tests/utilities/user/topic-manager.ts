@@ -1025,7 +1025,15 @@ export class TopicManager extends BaseUser {
     if (thumbnail) {
       await this.clickOnElementWithSelector(subtopicPhotoBoxButton);
       await this.expectElementToBeVisible(photoUploadModal);
-      await this.uploadFile(thumbnail);
+      // The subtopic editor page also has other hidden file inputs, so the
+      // file is set on the input that is inside the upload modal.
+      await this.page
+        .locator(
+          'edit-thumbnail-modal input[type=file], ' +
+            'oppia-image-uploader-modal input[type=file]'
+        )
+        .first()
+        .setInputFiles(thumbnail);
       await this.expectElementToBeVisible(
         `${uploadPhotoButton}:not([disabled])`
       );
