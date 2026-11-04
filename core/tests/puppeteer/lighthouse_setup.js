@@ -184,20 +184,44 @@ const logStep = async function (name, step) {
   console.log(`[lighthouse-setup] ${name} done (${elapsedSeconds}s)`);
 };
 
+// Applies the viewport and default timeouts used by every page the setup
+// drives, so a stuck Puppeteer call fails within the shard's per-action budget
+// instead of hanging until the CI step times out.
+const configurePage = async function (page) {
+  await page.setViewport({
+    width: 1920,
+    height: 1080,
+  });
+  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
+  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+};
+
 // Runs a setup step with a time limit, and retries it if it fails.
 //
-// Each attempt gets timeoutMs milliseconds. If the action throws, or takes
-// longer than that, the attempt counts as failed and we try again, up to
-// maxAttempts times.
+// Each attempt gets timeoutMs milliseconds and its own page. If the action
+// throws, or takes longer than that, the attempt counts as failed and we try
+// again, up to maxAttempts times. Running each attempt on a fresh page lets a
+// timed-out attempt be aborted by closing that page, so the abandoned
+// Puppeteer calls cannot keep driving the page that the retry is using. Pages
+// share the browser's cookie jar, so the login performed by earlier steps still
+// applies.
 //
 // Why: Puppeteer functions like page.$$, page.evaluate and page.select have no
 // timeout of their own. If the browser renderer gets stuck, one of them can
 // wait forever and freeze the whole shard for the rest of the CI job. Giving
 // each attempt its own deadline (and retrying) means a brief hiccup either
 // clears on the retry or fails quickly with the step name, instead of hanging.
-const retryStep = async function (name, action, maxAttempts, timeoutMs) {
+const retryStep = async function (
+  browser,
+  name,
+  action,
+  maxAttempts,
+  timeoutMs
+) {
   let lastError = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const attemptPage = await browser.newPage();
+    await configurePage(attemptPage);
     let timeoutId = null;
     const deadlinePromise = new Promise((resolve, reject) => {
       timeoutId = setTimeout(
@@ -206,9 +230,14 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
         timeoutMs
       );
     });
+    // Keep a reference to the attempt so a late rejection after the deadline
+    // wins the race is still handled; otherwise closing the page would surface
+    // it as an unhandled rejection.
+    const attemptPromise = action(attemptPage);
+    attemptPromise.catch(() => undefined);
     try {
       lastError = null;
-      await Promise.race([action(), deadlinePromise]);
+      await Promise.race([attemptPromise, deadlinePromise]);
       return;
     } catch (error) {
       lastError = error;
@@ -220,6 +249,10 @@ const retryStep = async function (name, action, maxAttempts, timeoutMs) {
       console.log(error);
     } finally {
       clearTimeout(timeoutId);
+      // Closing the page aborts any Puppeteer call from this attempt that is
+      // still in flight, so it cannot race the next attempt. The page may
+      // already be gone if the browser crashed, so ignore close failures.
+      await attemptPage.close().catch(() => undefined);
     }
   }
   throw lastError;
@@ -1020,7 +1053,9 @@ const enableFeatureFlagForAllUsers = async function (
   // double-accept one, which Puppeteer rejects with "Cannot accept dialog
   // which is already handled!".
   const acceptDialog = async dialog => {
-    await dialog.accept();
+    // The page may be closed while the dialog is open (for example, when a
+    // timed-out attempt is aborted), in which case accept() rejects.
+    await dialog.accept().catch(() => undefined);
   };
   page.on('dialog', acceptDialog);
   try {
@@ -1494,11 +1529,12 @@ const shard5Setup = async function (browser, page) {
 
   await logStep('enabling learner groups feature flag', () =>
     retryStep(
+      browser,
       'enabling the learner_groups_are_enabled feature flag',
-      () =>
+      attemptPage =>
         enableFeatureFlagForAllUsers(
           browser,
-          page,
+          attemptPage,
           'learner_groups_are_enabled'
         ),
       2,
@@ -1508,11 +1544,12 @@ const shard5Setup = async function (browser, page) {
 
   await logStep('enabling technical feedback feature flag', () =>
     retryStep(
+      browser,
       'enabling the technical_feedback_dashboard_enabled feature flag',
-      () =>
+      attemptPage =>
         enableFeatureFlagForAllUsers(
           browser,
-          page,
+          attemptPage,
           'technical_feedback_dashboard_enabled'
         ),
       2,
@@ -1572,14 +1609,7 @@ const main = async function () {
     args: [],
   });
   const page = await browser.newPage();
-  await page.setViewport({
-    width: 1920,
-    height: 1080,
-  });
-  // Bound every wait and navigation that does not pass its own timeout so a
-  // single stuck step cannot stall the shard indefinitely.
-  await page.setDefaultTimeout(SETUP_ACTION_TIMEOUT_MS);
-  await page.setDefaultNavigationTimeout(SETUP_NAVIGATION_TIMEOUT_MS);
+  await configurePage(page);
   // Last-resort ceiling for the whole setup; see SETUP_WATCHDOG_MS.
   const watchdogId = setTimeout(() => {
     console.error(
