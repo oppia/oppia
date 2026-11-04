@@ -67,10 +67,14 @@ const ERROR_ROUTE_PREFIX = '/error';
 // checked separately. The intentional /error/iframed audit is an error route and
 // is therefore skipped by the call site below.
 const IFRAMED_ERROR_PAGE_SELECTOR = 'oppia-error-iframed-page-root';
-// The single path whose landing URL is verified after the navigation below.
-// The signup page is only served to an account that has not completed
-// registration, so a registered account would be redirected away from it and
-// the audit would silently score the wrong page.
+// The signup route, and the only path whose landing URL is verified after the
+// navigation below. The signup page is only served to an account that has not
+// completed registration, so a registered account would be redirected away
+// from it and the audit would silently score the wrong page. Other audited
+// routes either render the error page when they cannot be served (which
+// assertErrorPageIsAbsent rejects) or redirect intentionally (for example
+// /learn forwards to the only published classroom), so they are not checked
+// here.
 const SIGNUP_PATH = '/signup';
 
 // Feature flags whose value has to differ between pages audited in the same
@@ -265,7 +269,7 @@ module.exports = async (browser, context) => {
     await assertErrorPageIsAbsent(page, context.url);
   }
   if (new URL(context.url).pathname === SIGNUP_PATH) {
-    assertLandedOnRequestedPath(page, context.url);
+    assertSignupPageLoaded(page, context.url);
   }
   await page.close();
 };
@@ -337,18 +341,22 @@ const assertErrorPageIsAbsent = async function (page, url) {
 };
 
 /**
- * Asserts that the loaded page is still at the path of the audited URL.
+ * Asserts that the /signup audit actually landed on /signup.
  *
- * The error-page check above only rejects a URL that rendered the error page,
- * so a URL that silently redirected elsewhere would still be scored, and would
- * be recorded under the page it landed on because LHCI reports lhr.finalUrl.
- * That is exactly how the signup audit disappeared: a registered account makes
- * /signup redirect to the homepage, which then forwards to a dashboard.
+ * This is deliberately signup-specific. The error-page check above only
+ * rejects a URL that rendered the error page, so a URL that silently
+ * redirected elsewhere would still be scored, and would be recorded under the
+ * page it landed on because LHCI reports lhr.finalUrl. That is exactly how the
+ * signup audit disappeared: a registered account makes /signup redirect to the
+ * homepage, which then forwards to a dashboard. The check is not applied to
+ * every audited URL because some routes redirect on purpose (for example
+ * /learn forwards to the only published classroom), while routes that redirect
+ * to an error page are already caught by assertErrorPageIsAbsent.
  *
  * @param {puppeteer.Page} page - The page to inspect.
- * @param {string} url - The audited URL whose path must be the loaded one.
+ * @param {string} url - The audited /signup URL.
  */
-const assertLandedOnRequestedPath = function (page, url) {
+const assertSignupPageLoaded = function (page, url) {
   const requestedPath = new URL(url).pathname;
   const loadedPath = new URL(page.url()).pathname;
   if (loadedPath !== requestedPath) {
