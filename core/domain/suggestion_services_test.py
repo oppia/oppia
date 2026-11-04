@@ -948,6 +948,32 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'Outdated topic translation',
             )
 
+    def test_create_topic_translation_suggestion_with_invalid_topic_id_raises(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.TOPIC_NAME_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Topic name',
+            'translation_html': 'Translated topic name',
+            'data_format': 'unicode',
+        }
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'No topic with the given id exists: invalid_topic_id',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                'invalid_topic_id',
+                1,
+                self.author_id,
+                change_dict,
+                'Topic translation',
+            )
+
     def test_rejects_topic_name_translation_over_character_limit(self) -> None:
         topic = self.save_new_topic(
             'long_topic_translation',

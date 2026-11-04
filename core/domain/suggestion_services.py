@@ -330,7 +330,11 @@ def create_suggestion(
                             'was submitted.'
                         )
         elif target_type == feconf.ENTITY_TYPE_TOPIC:
-            topic = topic_fetchers.get_topic_by_id(target_id)
+            topic = topic_fetchers.get_topic_by_id(target_id, strict=False)
+            if topic is None:
+                raise utils.InvalidInputException(
+                    'No topic with the given id exists: %s' % target_id
+                )
             contents = (
                 topic.get_translatable_contents_collection().content_id_to_translatable_content
             )

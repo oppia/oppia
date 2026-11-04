@@ -1171,7 +1171,12 @@ class Topic(translation_domain.BaseTranslatableObject):
         self,
         **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
-        """Returns the topic name and description as translatable metadata."""
+        """Returns the topic name and description as translatable metadata.
+
+        Returns:
+            TranslatableContentsCollection. A collection of translatable
+            contents in the topic.
+        """
         collection = translation_domain.TranslatableContentsCollection()
         if self.name:
             collection.add_translatable_field(

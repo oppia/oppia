@@ -125,7 +125,13 @@ def add_new_translation(
 def carry_forward_topic_translations(
     old_topic: topic_domain.Topic, updated_topic: topic_domain.Topic
 ) -> None:
-    """Copies topic translations to the next version, marking changed text stale."""
+    """Copies topic translations to the next version, marking changed text
+    stale.
+
+    Args:
+        old_topic: Topic. The original topic domain object.
+        updated_topic: Topic. The updated topic domain object.
+    """
     old_contents = (
         old_topic.get_translatable_contents_collection().content_id_to_translatable_content
     )
