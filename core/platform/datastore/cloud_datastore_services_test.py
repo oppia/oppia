@@ -227,6 +227,10 @@ class AwareDateTimePropertyTests(test_utils.GenericTestBase):
                     indexed=True
                 )
 
+                # _get_kind is NDB's override point for a model's datastore
+                # kind. Overriding it makes this temporary writer resolve to the
+                # same kind as AwareDateTimePropertyTestModel, so the row it
+                # writes looks like pre-migration data of that kind.
                 @classmethod
                 def _get_kind(cls) -> str:
                     return (  # pylint: disable=protected-access
@@ -338,6 +342,10 @@ class AwareDateTimePropertyTests(test_utils.GenericTestBase):
                     indexed=True
                 )
 
+                # _get_kind is NDB's override point for a model's datastore
+                # kind. Overriding it makes this temporary reader resolve to the
+                # same kind as AwareDateTimePropertyTestModel, so it reads the
+                # row back through a plain (legacy) DateTimeProperty.
                 @classmethod
                 def _get_kind(cls) -> str:
                     return (  # pylint: disable=protected-access
