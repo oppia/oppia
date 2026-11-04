@@ -1278,29 +1278,3 @@ class LearnerGroupProgressSharingPermissionHandler(
         self.render_json(
             {'progress_sharing_permission': progress_sharing_permission}
         )
-
-
-class LearnerGroupsFeatureStatusHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """The handler for checking whether the learner groups feature is
-    enabled.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_json(
-            {
-                'feature_is_enabled': (
-                    learner_group_services.is_learner_group_feature_enabled(
-                        self.user_id
-                    )
-                )
-            }
-        )

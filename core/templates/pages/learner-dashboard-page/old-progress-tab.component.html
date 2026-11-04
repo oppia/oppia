@@ -93,7 +93,7 @@
                         [topicUrlFragment]="tile[1].urlFragment"
                         [classroomUrlFragment]="tile[1].classroomUrlFragment"
                         [subtopicMastery]="subtopicMastery[tile[1].id]"
-                        [displayArea]="progressTab">
+                        [displayArea]="'progressTab'">
           </practice-tab>
         </div>
       </div>
@@ -113,7 +113,7 @@
       <div class="completed-stories-content" [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let tile of completedStoriesList" class="story-tile">
           <oppia-learner-story-summary-tile [storySummary]="tile"
-                                            [displayArea]="progressTab">
+                                            [displayArea]="'progressTab'">
           </oppia-learner-story-summary-tile>
         </div>
       </div>

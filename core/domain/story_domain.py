@@ -2013,38 +2013,6 @@ class Story:
                         acquired_skill_ids.append(skill_id)
         return acquired_skill_ids
 
-    def get_prerequisite_skill_ids_for_exp_id(
-        self, exp_id: str
-    ) -> Optional[List[str]]:
-        """Returns the prerequisite skill ids of the node having the given
-        exploration id.
-
-        Args:
-            exp_id: str. The ID of the exploration linked to the story.
-
-        Returns:
-            list(str)|None. The list of prerequisite skill ids for the
-            exploration or None, if no node is linked to it.
-        """
-        for node in self.story_contents.nodes:
-            if node.exploration_id == exp_id:
-                return node.prerequisite_skill_ids
-        return None
-
-    def has_exploration(self, exp_id: str) -> bool:
-        """Checks whether an exploration is present in the story.
-
-        Args:
-            exp_id: str. The ID of the exploration linked to the story.
-
-        Returns:
-            bool. Whether the exploration is linked to the story.
-        """
-        for node in self.story_contents.nodes:
-            if node.exploration_id == exp_id:
-                return True
-        return False
-
     def to_dict(self) -> StoryDict:
         """Returns a dict representing this Story domain object.
 

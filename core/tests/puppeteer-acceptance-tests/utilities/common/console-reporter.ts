@@ -83,10 +83,6 @@ const CONSOLE_ERRORS_TO_IGNORE = [
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [
-  // TODO(#19746): Development console error "Uncaught in Promise" on signup.
-  new RegExp(
-    'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
-  ),
   // TODO(#20748): SyntaxError: Unexpected token < in JSON at position 0.
   new RegExp(
     'Uncaught \\(in promise\\): SyntaxError: Unexpected token < in JSON.*',

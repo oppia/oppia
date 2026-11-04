@@ -661,4 +661,10 @@ describe('Customize Interaction Modal Component', () => {
 
     expect(component.getContentIdToContent()).toEqual({});
   });
+
+  it('should expose the customization args from the injected service', () => {
+    expect(component.customizationArgs).toBe(
+      stateCustomizationArgsService.displayed
+    );
+  });
 });
