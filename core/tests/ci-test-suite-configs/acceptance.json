@@ -177,8 +177,8 @@
     },
     {
       "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "lesson-creator/create-a-collection",

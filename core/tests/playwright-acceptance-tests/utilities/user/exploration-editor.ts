@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, Locator, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -232,7 +232,172 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 
 const addTitleBar = 'input#explorationTitle';
 
+const feedbackTabButton = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button a';
+const feedbackCardSelector = '.e2e-test-exploration-feedback-card';
+const startNewThreadButton = '.e2e-test-start-new-thread-button';
+const createFeedbackThreadModal = 'oppia-create-feedback-thread-modal';
+const createNewFeedbackButton = '.e2e-test-create-new-feedback-btn';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+const feedbackStatusInRowSelector = '.e2e-test-exploration-feedback-status';
+const feedbackAuthorInRowSelector = '.e2e-test-exploration-feedback-author';
+const feedbackActiveCardSelector = '.e2e-test-exploration-feedback-card-active';
+const feedbackMessageSelector = '.e2e-test-exploration-feedback';
+const feedbackResponseTextarea = '.e2e-test-feedback-response-textarea';
+const feedbackResponseSendButton = '.e2e-test-oppia-feedback-response-send-btn';
+const feedbackStatusMenuSelector = '.e2e-test-oppia-feedback-status-menu';
+const feedbackBackButton = '.e2e-test-oppia-feedback-back-button';
+const feedbackLastUpdatedCellSelector = 'td:nth-child(4) span';
+
+const statsTabButton = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button a';
+const statsCardSelector = '.e2e-test-exploration-stats-card';
+const numPassersbySelector = '.e2e-test-num-passersby';
+
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Navigates to either the feedback or stats tab in the exploration editor,
+   * handling both mobile and desktop viewports.
+   */
+  private async navigateToFeedbackOrStatsTab(
+    tab: 'feedback' | 'stats'
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.page.locator(mobileNavbarOptions).isVisible())) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page
+        .locator(
+          tab === 'stats' ? mobileStatsTabButton : mobileFeedbackTabButton
+        )
+        .click();
+    } else {
+      await this.clickOnElementWithSelector(
+        tab === 'stats' ? statsTabButton : feedbackTabButton
+      );
+    }
+    await expect(
+      this.page.locator(
+        tab === 'stats' ? statsCardSelector : feedbackCardSelector
+      )
+    ).toBeVisible();
+  }
+
+  /**
+   * Navigates to the feedback tab of the exploration editor.
+   */
+  async navigateToFeedbackTab(): Promise<void> {
+    await this.navigateToFeedbackOrStatsTab('feedback');
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    await this.navigateToFeedbackOrStatsTab('stats');
+  }
+
+  /**
+   * Returns a locator for the feedback thread row matching the given subject.
+   */
+  private feedbackRow(subject: string): Locator {
+    return this.page.locator(feedbackTabRowSelector).filter({
+      has: this.page.getByText(subject, {exact: true}),
+    });
+  }
+
+  /**
+   * Starts a new feedback thread from the feedback tab.
+   */
+  async startAFeedbackThread(subject: string, feedback: string): Promise<void> {
+    await this.clickOnElementWithSelector(startNewThreadButton);
+    const modal = this.page.locator(createFeedbackThreadModal);
+    await expect(modal).toBeVisible();
+    await modal.locator('input').fill(subject);
+    await modal.locator('textarea').fill(feedback);
+    await modal.locator(createNewFeedbackButton).click();
+    await expect(modal).toBeHidden();
+    await expect(this.feedbackRow(subject)).toBeVisible();
+  }
+
+  /**
+   * Verifies the status badge of a feedback thread in the threads list.
+   */
+  async expectFeedbackStatusInList(
+    subject: string,
+    status: string
+  ): Promise<void> {
+    await expect(
+      this.feedbackRow(subject).locator(feedbackStatusInRowSelector)
+    ).toHaveText(status);
+  }
+
+  /**
+   * Opens the feedback thread matching the given subject.
+   */
+  async viewFeedbackThread(subject: string): Promise<void> {
+    await this.feedbackRow(subject).click();
+    await expect(this.page.locator(feedbackActiveCardSelector)).toContainText(
+      subject
+    );
+  }
+
+  /**
+   * Verifies that a feedback message is visible in the active thread.
+   */
+  async expectFeedbackMessageToBePresent(message: string): Promise<void> {
+    await expect(
+      this.page.locator(feedbackMessageSelector).filter({hasText: message})
+    ).toBeVisible();
+  }
+
+  /**
+   * Replies to the currently open feedback thread and marks it fixed.
+   */
+  async replyToFeedback(reply: string): Promise<void> {
+    const textarea = this.page.locator(feedbackResponseTextarea);
+    const send = this.page.locator(feedbackResponseSendButton);
+    await this.select(feedbackStatusMenuSelector, 'fixed');
+    await textarea.fill(reply);
+    await send.click();
+    await this.expectFeedbackMessageToBePresent(reply);
+    await expect(send).toBeDisabled();
+  }
+
+  /**
+   * Navigates back from a thread detail view to the feedback threads table.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    const back = this.page.locator(feedbackBackButton);
+    await expect(back).toBeVisible();
+    await back.click();
+    await expect(back).toBeHidden();
+  }
+
+  /**
+   * Verifies that the feedback thread list row displays the expected author
+   * and a non-empty last updated timestamp.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(
+    subject: string,
+    author: string
+  ): Promise<void> {
+    const row = this.feedbackRow(subject);
+    await expect(row.locator(feedbackAuthorInRowSelector)).toHaveText(author);
+    await expect(row.locator(feedbackLastUpdatedCellSelector)).not.toBeEmpty();
+    await expect(row.locator(feedbackLastUpdatedCellSelector)).toBeVisible();
+  }
+
+  /**
+   * Verifies the number of passersby shown on the stats tab.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await expect(this.page.locator(numPassersbySelector)).toHaveText(
+      `${expected} learners browsed this exploration. They left before reaching the second card.`
+    );
+  }
+
   /**
    * Navigate to creator dashboard page.
    */
