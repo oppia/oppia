@@ -35,6 +35,35 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                 response.mustcontain('<oppia-root></oppia-root>')
                 response.mustcontain('oppia-feature-flags')
 
+    def test_error_page_with_supported_status_code_returns_oppia_root(
+        self,
+    ) -> None:
+        """Tests that error pages for supported status codes render the oppia
+        root page with a 200 status.
+        """
+        for status_code in ('400', '401', '404', '500'):
+            response = self.get_html_response(
+                '/error/%s' % status_code, expected_status_int=200
+            )
+            response.mustcontain('<oppia-root></oppia-root>')
+            response.mustcontain('oppia-feature-flags')
+
+    def test_error_page_with_unsupported_status_code_returns_404(
+        self,
+    ) -> None:
+        """Tests that an unsupported error status code is not served as 200.
+
+        Only the status codes the frontend error page understands are mapped to
+        the oppia root page. Anything else falls through to the catch-all 404
+        handler, so the response status still reflects the missing resource.
+        """
+        for status_code in ('403', '999', 'not-a-status-code'):
+            response = self.get_html_response(
+                '/error/%s' % status_code, expected_status_int=404
+            )
+            response.mustcontain('<oppia-root></oppia-root>')
+            response.mustcontain('oppia-feature-flags')
+
     def test_lesson_player_embed_url_renders_root_page(self) -> None:
         """Tests that the lesson player embed URL renders the root page.
 

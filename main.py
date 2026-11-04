@@ -1506,10 +1506,17 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend(
     (
-        # Error pages for specific status codes are rendered by the frontend
-        # from the status code in the route, so the backend serves the oppia
-        # root page instead of returning a 404 status for a known error URL.
-        get_redirect_route(r'/error/<status_code>', oppia_root.OppiaRootPage),
+        # Error pages for the status codes the frontend error page supports
+        # (see ErrorPageRootComponent.validStatusCodes) are rendered by the
+        # frontend from the status code in the route, so the backend serves the
+        # oppia root page with a 200 status instead of returning a 404 status
+        # for a known error URL. Any other status code falls through to the
+        # catch-all 404 handler below, so an undefined error URL still returns a
+        # 404 instead of a misleading 200.
+        get_redirect_route(
+            r'/error/<status_code:(400|401|404|500)>',
+            oppia_root.OppiaRootPage,
+        ),
         get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
         get_redirect_route(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
