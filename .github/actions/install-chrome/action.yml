@@ -16,11 +16,34 @@ runs:
         retry_on: error
         shell: bash
         timeout_minutes: 10
+        # Commands that can hang get their own time limits. When the retry
+        # action's timeout fires, it tries to kill the command's process tree,
+        # but it cannot signal processes that sudo runs as root. That fails
+        # with "kill EPERM" and crashes the action instead of retrying
+        # (#26054). Also, with retry_on: error, the action does not retry an
+        # attempt that hit its own timeout. So a hang must end the attempt
+        # with an error before the outer timeout fires. The inner limits add up
+        # to 570 seconds, which is below timeout_minutes.
+        #
+        # Other failures are deliberately not fatal here (e.g. apt-get update
+        # fails if any one apt source is briefly unreachable). If the install
+        # really fails, the version check on the last line fails, and that
+        # attempt is retried.
         command: |
-          sudo apt-get update
-          sudo apt-get install libappindicator3-1
-          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_${{ env.CHROME_VERSION }}_amd64.deb
+          sudo_with_timeout() {
+            sudo timeout --kill-after=10 120 "$@"
+            local status=$?
+            # 124 means the command timed out, and 137 means it also had to
+            # be killed with SIGKILL.
+            if [[ $status -eq 124 || $status -eq 137 ]]; then
+              echo "Error: 'sudo $*' timed out."
+              exit 1
+            fi
+          }
+          sudo_with_timeout apt-get update
+          sudo_with_timeout apt-get install libappindicator3-1
+          curl -L --max-time 180 -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_${{ env.CHROME_VERSION }}_amd64.deb
           sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-          sudo dpkg -i google-chrome.deb
+          sudo_with_timeout dpkg -i google-chrome.deb
           chrome_version=$(google-chrome --version 2>&1 | tr -cd '[:digit:].')
           [[ "${{ env.CHROME_VERSION }}" == "$chrome_version"* ]] || { echo "Error: Desired version does not start with Chrome version."; exit 1;}
