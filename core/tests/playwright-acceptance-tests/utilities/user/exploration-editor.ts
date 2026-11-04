@@ -1341,11 +1341,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Changes the status of the current feedback thread.
+   * Changes the status of the current feedback thread. When changing status
+   * to 'ignored' or 'not_actionable', a reason must be provided in the
+   * response textarea, otherwise Oppia disables the send button.
    * @param {string} statusValue - The new status value to set for the feedback.
    */
   async changeFeedbackStatus(statusValue: string): Promise<void> {
     await this.expectElementToBeVisible(responseTextareaSelector);
+    // Oppia requires specifying a reason in the response textarea when setting
+    // the status to 'ignored' or 'not_actionable', otherwise the send button
+    // remains disabled.
     if (statusValue === 'ignored' || statusValue === 'not_actionable') {
       await this.typeInInputField(responseTextareaSelector, statusValue);
     }
