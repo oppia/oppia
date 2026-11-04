@@ -112,7 +112,9 @@ jobs:
         run: npx prettier --check .
       - name: Explain how to fix the issue
         if: ${{ failure() }}
-        run: echo "Read https://github.com/oppia/oppia/wiki/Formatters to understand how to fix this issue."
+        run: |
+          echo "Run 'npx prettier --write .' to fix formatting issues."
+          echo "See https://github.com/oppia/oppia/wiki/Coding-style-guide#prettier for details."
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -139,7 +141,9 @@ jobs:
         run: black --check .
       - name: Explain how to fix the issue
         if: ${{ failure() }}
-        run: echo "Read https://github.com/oppia/oppia/wiki/Formatters to understand how to fix this issue."
+        run: |
+          echo "Run 'black .' to fix formatting issues."
+          echo "See https://github.com/oppia/oppia/wiki/Coding-style-guide#black for details."
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
