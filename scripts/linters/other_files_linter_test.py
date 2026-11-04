@@ -1444,8 +1444,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         """
         return '\n'.join(
             [
-                'import {RequiredFeatureFlagsGuard,} from '
-                '\'./guards/required-feature-flags.guard\';',
                 'import {PracticeSessionAccessGuard} from '
                 '\'pages/practice-session-page/'
                 'practice-session-page-auth.guard\';',
@@ -1460,8 +1458,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'practice-session-page.module\').then(',
                 '        m => m.PracticeSessionPageModule',
                 '      ),',
-                '    canActivate: [RequiredFeatureFlagsGuard, '
-                'PracticeSessionAccessGuard],',
+                '    canActivate: [PracticeSessionAccessGuard],',
                 '  },',
                 '];',
             ]
@@ -1475,8 +1472,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         """
         return '\n'.join(
             [
-                'import {RequiredFeatureFlagsGuard} from '
-                '\'./guards/required-feature-flags.guard\';',
                 'const routes: Route[] = [',
                 '  {',
                 '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
@@ -1484,7 +1479,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '    pathMatch: \'full\',',
                 '    data: {requiredFeatureFlags: '
                 '[FeatureNames.EnableCertificateAssessment]},',
-                '    canActivate: [RequiredFeatureFlagsGuard],',
                 '    loadChildren: () =>',
                 '      import(',
                 '        \'pages/certificate-offering-available-page/'
@@ -1704,15 +1698,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         files = {
             other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
                 [
-                    'import {RequiredFeatureFlagsGuard} from '
-                    '\'./guards/required-feature-flags.guard\';',
                     'const routes: Route[] = [',
                     '  {',
                     '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
                     '.CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,',
                     '    data: {requiredFeatureFlags: '
                     '[FeatureNames.EnableCertificateAssessment]},',
-                    '    canActivate: [RequiredFeatureFlagsGuard],',
                     '    loadChildren: () =>',
                     '      import(\'pages/certificate-assessment-player-page/'
                     'certificate-assessment-player-page.module\').then(',

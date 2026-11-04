@@ -104,7 +104,6 @@ LAZY_MODULE_IMPORT_REGEX: Final = r'import\s*\(\s*\'([^\']+)\'\s*\)'
 PLATFORM_FEATURE_FLAG_REGEX: Final = (
     r'platformFeatureService\.status\.([A-Za-z0-9_]+)\s*\.\s*isEnabled'
 )
-REQUIRED_FEATURE_FLAGS_GUARD_NAME: Final = 'RequiredFeatureFlagsGuard'
 
 
 def _normalize_ts_source(content: str) -> str:
@@ -197,15 +196,11 @@ def _get_can_activate_guard_names(content: str) -> List[str]:
         content: str. The normalized TypeScript source.
 
     Returns:
-        list(str). The guard class names, excluding RequiredFeatureFlagsGuard
-        because it consumes the route declaration rather than hardcoding a
-        flag of its own.
+        list(str). The guard class names named in canActivate blocks.
     """
     guard_names: List[str] = []
     for can_activate_block in re.findall(CAN_ACTIVATE_REGEX, content):
-        for guard_name in re.findall(GUARD_CLASS_REGEX, can_activate_block):
-            if guard_name != REQUIRED_FEATURE_FLAGS_GUARD_NAME:
-                guard_names.append(guard_name)
+        guard_names.extend(re.findall(GUARD_CLASS_REGEX, can_activate_block))
     return guard_names
 
 
