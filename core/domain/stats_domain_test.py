@@ -3017,3 +3017,292 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info, 'Expected created_on to be a datetime'
         )
+
+
+class StateCounterTests(test_utils.GenericTestBase):
+    """Tests the StateCounter domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.state_counter = stats_domain.StateCounter(
+            'exp123', 'Introduction', 3, 5, 2, 7
+        )
+
+    # Valid test cases.
+
+    def test_create_default(self) -> None:
+        counter = stats_domain.StateCounter.create_default(
+            'exp123', 'Introduction'
+        )
+        self.assertEqual(counter.first_entry_count, 0)
+        self.assertEqual(counter.subsequent_entries_count, 0)
+        self.assertEqual(counter.resolved_answer_count, 0)
+        self.assertEqual(counter.active_answer_count, 0)
+        # A freshly created default counter must be valid.
+        counter.validate()
+
+    def test_validate_with_correct_data(self) -> None:
+        # SetUp object has valid values, so validate() must not raise.
+        self.state_counter.validate()
+
+    def test_to_dict(self) -> None:
+        expected = {
+            'exploration_id': 'exp123',
+            'state_name': 'Introduction',
+            'first_entry_count': 3,
+            'subsequent_entries_count': 5,
+            'resolved_answer_count': 2,
+            'active_answer_count': 7,
+        }
+        self.assertEqual(self.state_counter.to_dict(), expected)
+
+    def test_from_dict(self) -> None:
+        state_counter_dict = self.state_counter.to_dict()
+        reconstructed = stats_domain.StateCounter.from_dict(
+            state_counter_dict
+        )
+        self.assertEqual(reconstructed, self.state_counter)
+
+    def test_clone(self) -> None:
+        cloned = self.state_counter.clone()
+        self.assertEqual(cloned, self.state_counter)
+        # Mutating the clone must not affect the original.
+        cloned.first_entry_count = 999
+        self.assertEqual(self.state_counter.first_entry_count, 3)
+
+    def test_equality(self) -> None:
+        counter_a = stats_domain.StateCounter.create_default(
+            'exp123', 'Introduction'
+        )
+        counter_b = stats_domain.StateCounter.create_default(
+            'exp123', 'Introduction'
+        )
+        self.assertEqual(counter_a, counter_b)
+        # Changing one count must make them unequal.
+        counter_b.first_entry_count = 1
+        self.assertNotEqual(counter_a, counter_b)
+        # Comparing with a different type must return NotImplemented.
+        self.assertEqual(
+            self.state_counter.__eq__('not_a_state_counter'),
+            NotImplemented,
+        )
+
+    def test_hash(self) -> None:
+        # StateCounter is mutable, so hashing must be disallowed.
+        with self.assertRaisesRegex(TypeError, 'is unhashable'):
+            hash(self.state_counter)
+
+    # Invalid exploration_id test cases.
+
+    def test_validate_with_int_exploration_id(self) -> None:
+        setattr(self.state_counter, 'exploration_id', 123)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_id to be a string',
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_empty_exploration_id(self) -> None:
+        self.state_counter.exploration_id = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected exploration_id to match'
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_long_exploration_id(self) -> None:
+        # 13 characters exceeds the 12-character limit in ENTITY_ID_REGEX.
+        self.state_counter.exploration_id = 'abcdefghijklm'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected exploration_id to match'
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_invalid_char_exploration_id(self) -> None:
+        # '!' is not in the allowed set [a-zA-Z0-9-_].
+        self.state_counter.exploration_id = 'exp!id'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected exploration_id to match'
+        ):
+            self.state_counter.validate()
+
+    # Invalid state_name test cases.
+
+    def test_validate_with_empty_state_name(self) -> None:
+        self.state_counter.state_name = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The length of a state name'
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_long_state_name(self) -> None:
+        # 51 characters exceeds the 50-character limit.
+        self.state_counter.state_name = 'a' * 51
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The length of a state name'
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_leading_space_state_name(self) -> None:
+        self.state_counter.state_name = ' Introduction'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Names should not start or end with whitespace',
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_trailing_space_state_name(self) -> None:
+        self.state_counter.state_name = 'Introduction '
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Names should not start or end with whitespace',
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_adjacent_space_state_name(self) -> None:
+        self.state_counter.state_name = 'My  State'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Adjacent whitespace'
+        ):
+            self.state_counter.validate()
+
+    def test_validate_with_invalid_char_state_name(self) -> None:
+        # ':' is one of the characters in constants.INVALID_NAME_CHARS.
+        self.state_counter.state_name = 'My:State'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid character'
+        ):
+            self.state_counter.validate()
+
+    # Invalid count test cases.
+
+    def test_validation_with_string_first_entry_count(self) -> None:
+        setattr(self.state_counter, 'first_entry_count', '5')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_entry_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_float_first_entry_count(self) -> None:
+        setattr(self.state_counter, 'first_entry_count', 2.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_entry_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_bool_first_entry_count(self) -> None:
+        # bool is a subclass of int in Python; validate() must still reject it.
+        self.state_counter.first_entry_count = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_entry_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_negative_first_entry_count(self) -> None:
+        self.state_counter.first_entry_count = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'first_entry_count cannot have negative values',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_string_subsequent_entries_count(self) -> None:
+        setattr(self.state_counter, 'subsequent_entries_count', '5')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected subsequent_entries_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_float_subsequent_entries_count(self) -> None:
+        setattr(self.state_counter, 'subsequent_entries_count', 2.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected subsequent_entries_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_bool_subsequent_entries_count(self) -> None:
+        # bool is a subclass of int in Python; validate() must still reject it.
+        self.state_counter.subsequent_entries_count = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected subsequent_entries_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_negative_subsequent_entries_count(self) -> None:
+        self.state_counter.subsequent_entries_count = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'subsequent_entries_count cannot have negative values',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_string_resolved_answer_count(self) -> None:
+        setattr(self.state_counter, 'resolved_answer_count', '5')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected resolved_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_float_resolved_answer_count(self) -> None:
+        setattr(self.state_counter, 'resolved_answer_count', 2.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected resolved_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_bool_resolved_answer_count(self) -> None:
+        # bool is a subclass of int in Python; validate() must still reject it.
+        self.state_counter.resolved_answer_count = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected resolved_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_negative_resolved_answer_count(self) -> None:
+        self.state_counter.resolved_answer_count = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'resolved_answer_count cannot have negative values',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_string_active_answer_count(self) -> None:
+        setattr(self.state_counter, 'active_answer_count', '5')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected active_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_float_active_answer_count(self) -> None:
+        setattr(self.state_counter, 'active_answer_count', 2.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected active_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_bool_active_answer_count(self) -> None:
+        # bool is a subclass of int in Python; validate() must still reject it.
+        self.state_counter.active_answer_count = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected active_answer_count to be an int',
+        ):
+            self.state_counter.validate()
+
+    def test_validation_with_negative_active_answer_count(self) -> None:
+        self.state_counter.active_answer_count = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'active_answer_count cannot have negative values',
+        ):
+            self.state_counter.validate()
