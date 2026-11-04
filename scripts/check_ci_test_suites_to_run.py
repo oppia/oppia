@@ -121,8 +121,9 @@ LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH: Final = os.path.join(
     'core', 'tests', 'lighthouse-shards.json'
 )
 # The routing module lazy-imports each page module and is the single source of
-# truth for the feature flags a route requires (data.requiredFeatureFlags), so
-# the CI check reads it directly to detect pages gated by DEV-stage flags.
+# truth for the feature flags a route requires (data.requiredFeatureFlags).
+# RequiredFeatureFlagsGuard enforces the same declaration at runtime, so the CI
+# check reads it directly to detect pages gated by DEV-stage flags.
 APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
     'core',
     'templates',

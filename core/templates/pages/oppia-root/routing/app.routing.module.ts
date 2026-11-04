@@ -23,6 +23,7 @@ import {AppConstants} from 'app.constants';
 import {FeatureNames} from 'domain/feature-flag/feature-status-summary.model';
 import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
+import {RequiredFeatureFlagsGuard} from './guards/required-feature-flags.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
 import {PracticeSessionAccessGuard} from 'pages/practice-session-page/practice-session-page-auth.guard';
@@ -30,7 +31,11 @@ import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
-const routes: Route[] = [
+//
+// data.requiredFeatureFlags is the single source of truth for the feature flags
+// a route requires: RequiredFeatureFlagsGuard enforces it at runtime and the CI
+// script reads the same declaration, so the two cannot disagree.
+export const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
     pathMatch: 'full',
@@ -45,6 +50,7 @@ const routes: Route[] = [
       .CERTIFICATE_OFFERING_AVAILABLE.ROUTE,
     pathMatch: 'full',
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/certificate-offering-available-page/certificate-offering-available-page.module'
@@ -156,7 +162,7 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
-    canActivate: [PracticeSessionAccessGuard],
+    canActivate: [RequiredFeatureFlagsGuard, PracticeSessionAccessGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
@@ -165,7 +171,7 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
-    canActivate: [PracticeSessionAccessGuard],
+    canActivate: [RequiredFeatureFlagsGuard, PracticeSessionAccessGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MASTERY_CHALLENGE.ROUTE,
@@ -174,7 +180,7 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
-    canActivate: [PracticeSessionAccessGuard],
+    canActivate: [RequiredFeatureFlagsGuard, PracticeSessionAccessGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
@@ -188,6 +194,7 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/certificate-assessment-player-page/certificate-assessment-player-page.module'
@@ -197,6 +204,7 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CERTIFICATE_ASSESSMENT_RESULT.ROUTE,
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/certificate-assessment-result-page/certificate-assessment-result-page.module'
@@ -308,7 +316,7 @@ const routes: Route[] = [
       import(
         'pages/exploration-player-page/new-lesson-player/lesson-player-page.module'
       ).then(m => m.NewLessonPlayerPageModule),
-    canActivate: [LessonPlayerPageAuthGuard],
+    canActivate: [RequiredFeatureFlagsGuard, LessonPlayerPageAuthGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NEW_LESSON_PLAYER.ROUTE,
@@ -318,7 +326,7 @@ const routes: Route[] = [
         'pages/exploration-player-page/new-lesson-player' +
           '/lesson-player-page.module'
       ).then(m => m.NewLessonPlayerPageModule),
-    canActivate: [LessonPlayerPageAuthGuard],
+    canActivate: [RequiredFeatureFlagsGuard, LessonPlayerPageAuthGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
@@ -549,6 +557,7 @@ const routes: Route[] = [
       .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
@@ -559,6 +568,7 @@ const routes: Route[] = [
       .CREATE_CERTIFICATE_OFFERING.ROUTE,
     pathMatch: 'full',
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/create-certificate-offering-page/create-certificate-offering-page.module'
@@ -569,6 +579,7 @@ const routes: Route[] = [
       .ROUTE,
     pathMatch: 'full',
     data: {requiredFeatureFlags: [FeatureNames.EnableCertificateAssessment]},
+    canActivate: [RequiredFeatureFlagsGuard],
     loadChildren: () =>
       import(
         'pages/edit-certificate-offering-page/edit-certificate-offering-page.module'
@@ -585,7 +596,10 @@ const routes: Route[] = [
       import(
         'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module'
       ).then(m => m.TechnicalFeedbackDashboardPageModule),
-    canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
+    canActivate: [
+      RequiredFeatureFlagsGuard,
+      TechnicalFeedbackDashboardPageComponentAuthGuard,
+    ],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TECHNICAL_FEEDBACK_DETAIL
@@ -598,7 +612,10 @@ const routes: Route[] = [
       import(
         'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module'
       ).then(m => m.TechnicalFeedbackDashboardPageModule),
-    canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
+    canActivate: [
+      RequiredFeatureFlagsGuard,
+      TechnicalFeedbackDashboardPageComponentAuthGuard,
+    ],
   },
 ];
 
