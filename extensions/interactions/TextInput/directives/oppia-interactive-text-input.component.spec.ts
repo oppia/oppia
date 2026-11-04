@@ -42,10 +42,10 @@ describe('InteractiveTextInputComponent', () => {
           },
         },
         rows: {
-          value: Number(attributes.rowsWithValue),
+          value: JSON.parse(attributes.rowsWithValue),
         },
         catchMisspellings: {
-          value: attributes.catchMisspellingsWithValue === 'true',
+          value: JSON.parse(attributes.catchMisspellingsWithValue),
         },
       };
     }

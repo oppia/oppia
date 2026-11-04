@@ -24,7 +24,6 @@ import {InteractiveSetInputComponent} from './oppia-interactive-set-input.compon
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SetInputAnswer} from 'interactions/answer-defs';
-import {Schema} from 'services/schema-default-value.service';
 
 describe('InteractiveSetInputComponent', () => {
   let component: InteractiveSetInputComponent;
@@ -205,7 +204,7 @@ describe('InteractiveSetInputComponent', () => {
         // TODO(mili): Translate this in the HTML.
         add_element_text: 'Add New Item',
       },
-    } as Schema);
+    });
   });
 
   it('should update answer when user edits saved solution', () => {

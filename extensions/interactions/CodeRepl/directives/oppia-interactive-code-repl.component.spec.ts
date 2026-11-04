@@ -272,9 +272,6 @@ describe('InteractiveCodeReplComponent', () => {
 
   it('should display error when code fails', fakeAsync(() => {
     spyOn(Sk, 'importMainWithBody').and.returnValue({});
-    // This throws "Argument of type '() => Promise<never>' is not assignable
-    // to parameter of type 'never'" We need to suppress this error because the
-    // the error case needs to be tested.
     (spyOn(Sk.misceval, 'asyncToPromise') as jasmine.Spy).and.callFake(() => {
       return Promise.reject('Error');
     });
