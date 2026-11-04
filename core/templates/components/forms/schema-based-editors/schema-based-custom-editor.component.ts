@@ -38,7 +38,6 @@ import {
   CustomSchema,
   SchemaDefaultValue,
 } from 'services/schema-default-value.service';
-import './schema-based-custom-editor.component.css';
 
 @Component({
   selector: 'schema-based-custom-editor',

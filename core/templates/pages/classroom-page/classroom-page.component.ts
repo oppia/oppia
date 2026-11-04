@@ -34,7 +34,6 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './classroom-page.component.css';
 import {UserService} from 'services/user.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 

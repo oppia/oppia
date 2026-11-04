@@ -19,7 +19,6 @@
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {MetaTagData} from 'pages/base-root.component';
-import './error-iframed-root.component.css';
 
 @Component({
   selector: 'oppia-error-iframed-page-root',

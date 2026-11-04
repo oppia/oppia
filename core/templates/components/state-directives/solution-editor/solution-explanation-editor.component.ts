@@ -29,14 +29,17 @@ import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
-import './solution-explanation-editor.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
-interface ExplanationFormSchema {
-  type: string;
+export interface ExplanationFormSchema {
+  type: 'html';
   ui_config: object;
 }
 
@@ -64,14 +67,25 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
     private htmlLengthService: HtmlLengthService
   ) {}
 
-  updateExplanationHtml(newHtmlString: string): void {
+  // These getters are used by the component template to access the solution
+  // properties while keeping the injected service private.
+  get displayedSolution(): Solution | null {
+    return this.stateSolutionService.displayed;
+  }
+
+  get solutionSavedMemento(): Solution | null {
+    return this.stateSolutionService.savedMemento;
+  }
+
+  updateExplanationHtml(value: SchemaDefaultValue): void {
     if (this.stateSolutionService.displayed === null) {
       throw new Error('Solution is undefined');
     }
-    this.stateSolutionService.displayed.explanation._html = newHtmlString;
+    this.stateSolutionService.displayed.explanation._html =
+      typeof value === 'string' ? value : '';
   }
 
-  getSchema(): object {
+  getSchema(): Schema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 

@@ -49,6 +49,7 @@ import {ContentTranslationLanguageService} from '../services/content-translation
 import {AudioPreloaderService} from '../services/audio-preloader.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
 
 describe('Content translation manager service', () => {
@@ -69,6 +70,7 @@ describe('Content translation manager service', () => {
   let audioPreloaderService: AudioPreloaderService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let conceptCardBackendApiService: ConceptCardBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -95,6 +97,7 @@ describe('Content translation manager service', () => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
 
     pts.init();
 
@@ -558,5 +561,55 @@ describe('Content translation manager service', () => {
 
     expect(stateName).toBe('EditorState');
     expect(stateEditorService.getActiveStateName).toHaveBeenCalled();
+  });
+
+  it('should preload concept cards when exploration states have linked skill IDs', () => {
+    const mockStateObjects = {
+      State1: {linkedSkillId: 'skill_1'},
+      State2: {linkedSkillId: 'skill_2'},
+      State3: {linkedSkillId: 'skill_1'},
+      State4: {linkedSkillId: null},
+    };
+    (audioPreloaderService as {exploration?: unknown}).exploration = {
+      states: {
+        getStateObjects: () => mockStateObjects,
+      },
+    };
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync');
+
+    ctms.preloadConceptCards('hi');
+
+    expect(
+      conceptCardBackendApiService.loadConceptCardsAsync
+    ).toHaveBeenCalledWith(['skill_1', 'skill_2'], 'hi');
+  });
+
+  it('should not preload concept cards when no states have linked skill IDs', () => {
+    const mockStateObjects = {
+      State1: {linkedSkillId: null},
+    };
+    (audioPreloaderService as {exploration?: unknown}).exploration = {
+      states: {
+        getStateObjects: () => mockStateObjects,
+      },
+    };
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync');
+
+    ctms.preloadConceptCards('hi');
+
+    expect(
+      conceptCardBackendApiService.loadConceptCardsAsync
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should handle preloading concept cards when exploration or states is undefined', () => {
+    (audioPreloaderService as {exploration?: unknown}).exploration = undefined;
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync');
+
+    ctms.preloadConceptCards('hi');
+
+    expect(
+      conceptCardBackendApiService.loadConceptCardsAsync
+    ).not.toHaveBeenCalled();
   });
 });

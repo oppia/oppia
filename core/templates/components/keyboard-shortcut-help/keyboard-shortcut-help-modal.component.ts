@@ -20,7 +20,6 @@ import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
 import {PageContextService} from 'services/page-context.service';
-import './keyboard-shortcut-help-modal.component.css';
 
 @Component({
   selector: 'keyboard-shortcut-help-modal',
@@ -38,9 +37,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
 
   ngOnInit(): void {
     const helpShortcutDescription = 'Show this help dialog';
-    const searchShortcutDescription = 'Search';
     const skipShortcutDescription = 'Select skip to main content button';
-    const categoryShortcutDescription = 'Select exploration category';
     const continueShortcutDescription = 'Select the continue button';
     const backShortcutDescription = 'Select the back button';
 
@@ -54,9 +51,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     } else {
       this.KEYBOARD_SHORTCUTS = {
         '?': helpShortcutDescription,
-        '/': searchShortcutDescription,
         s: skipShortcutDescription,
-        c: categoryShortcutDescription,
       };
     }
   }

@@ -22,6 +22,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'parameter-name-editor',
@@ -66,7 +67,12 @@ export class ParameterNameEditorComponent implements OnInit {
     return this.SCHEMA;
   }
 
-  updateValue(value: string): void {
+  updateValue(value: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof value !== 'string') {
+      return;
+    }
     this.value = value;
     this._validate();
     this.valueChanged.emit(this.value);

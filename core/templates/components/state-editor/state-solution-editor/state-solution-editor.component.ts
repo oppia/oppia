@@ -38,7 +38,6 @@ import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import './state-solution-editor.component.css';
 
 interface DeleteValue {
   index: number;
@@ -52,6 +51,7 @@ interface DeleteValue {
 })
 export class StateSolutionEditorComponent implements OnInit {
   // The state property is null until a solution is specified or removed.
+  @Output() onSaveNextContentIdIndex: EventEmitter<number> = new EventEmitter();
   @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
@@ -187,6 +187,7 @@ export class StateSolutionEditorComponent implements OnInit {
         result => {
           this.stateSolutionService.displayed = result.solution;
           this.stateSolutionService.saveDisplayedValue();
+          this.onSaveNextContentIdIndex.emit();
           this.onSaveSolution(this.stateSolutionService.displayed);
           let activeStateName = this.stateEditorService.getActiveStateName();
           if (activeStateName === null) {

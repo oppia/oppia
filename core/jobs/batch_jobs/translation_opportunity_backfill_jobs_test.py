@@ -250,8 +250,8 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         self.assertEqual(model.entity_type, 'exploration')
         self.assertEqual(model.entity_id, self.exp_id)
         self.assertEqual(model.topic_ids, ['topic_id'])
-        # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
-        self.assertEqual(model.content_count, 4)
+        # Exploration currently has 3 metadata fields (title, objective, 1 tag) when flag is overridden.
+        self.assertEqual(model.content_count, 3)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_translation_count_ignores_content_the_exploration_does_not_have(
@@ -300,7 +300,7 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         model = get_opportunity_model(
             feconf.TranslatableEntityType.EXPLORATION, self.exp_id
         )
-        self.assertEqual(model.content_count, 4)
+        self.assertEqual(model.content_count, 3)
         self.assertEqual(model.translation_counts, {'hi': 1, 'ar': 1})
         self.assertIn('ar', model.incomplete_translation_language_codes)
         opportunity = (
@@ -447,8 +447,8 @@ class BackfillExplorationTranslationOpportunityModelJobTests(
         self.assertEqual(model.entity_type, 'exploration')
         self.assertEqual(model.entity_id, self.exp_id)
         self.assertEqual(model.topic_ids, ['topic_id'])
-        # Exploration has 4 metadata fields (title, objective, category, 1 tag).
-        self.assertEqual(model.content_count, 4)
+        # Exploration has 3 metadata fields (title, objective, 1 tag).
+        self.assertEqual(model.content_count, 3)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_creates_translation_opportunity_model_with_complete_native_language(
@@ -891,7 +891,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
             entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
             entity_id=self.exp_id,
             topic_ids=['topic_id'],
-            content_count=5,
+            content_count=4,
             incomplete_translation_language_codes=[
                 lang['id']
                 for lang in constants.SUPPORTED_AUDIO_LANGUAGES
@@ -911,8 +911,8 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 0\n'
-                        '- Total Content Count (Existing): 5\n'
-                        '- Total Content Count (Computed): 5\n'
+                        '- Total Content Count (Existing): 4\n'
+                        '- Total Content Count (Computed): 4\n'
                         '- Total Translation Counts (Existing): hi: 1\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -934,7 +934,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 0\n'
                         '- Total Content Count (Existing): 0\n'
-                        '- Total Content Count (Computed): 4\n'
+                        '- Total Content Count (Computed): 3\n'
                         '- Total Translation Counts (Existing): None\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -968,7 +968,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                         '- Discrepancies: 1\n'
                         '- Orphaned in Datastore: 0\n'
                         '- Total Content Count (Existing): 10\n'
-                        '- Total Content Count (Computed): 4\n'
+                        '- Total Content Count (Computed): 3\n'
                         '- Total Translation Counts (Existing): None\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -977,7 +977,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                     stderr=(
                         'Discrepancy for model exploration.exp_1: '
                         'Existing (content_count=10, translation_counts={}), '
-                        'Computed (content_count=4, translation_counts={\'hi\': 1})'
+                        'Computed (content_count=3, translation_counts={\'hi\': 1})'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -1076,7 +1076,7 @@ class AuditBackfillExplorationTranslationOpportunityModelJobTests(
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 0\n'
                         '- Total Content Count (Existing): 0\n'
-                        '- Total Content Count (Computed): 4\n'
+                        '- Total Content Count (Computed): 3\n'
                         '- Total Translation Counts (Existing): None\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )

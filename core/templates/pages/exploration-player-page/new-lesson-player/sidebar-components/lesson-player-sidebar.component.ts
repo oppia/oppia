@@ -18,7 +18,6 @@
 
 import {Component, OnInit, Optional} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-import './lesson-player-sidebar.component.css';
 import {PageContextService} from 'services/page-context.service';
 import {
   I18nLanguageCodeService,
@@ -106,6 +105,10 @@ export class LessonPlayerSidebarComponent implements OnInit {
   toggleSidebar(): void {
     this.mobileMenuService.toggleSidebar();
     this.sidebarIsExpanded = this.mobileMenuService.getSidebarIsExpanded();
+  }
+
+  toggleMenuVisibility(): void {
+    this.mobileMenuService.toggleMenuVisibility();
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {

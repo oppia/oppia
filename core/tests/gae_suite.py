@@ -28,6 +28,7 @@ import argparse
 import os
 import sys
 import unittest
+import warnings
 
 from typing import Final, List, Optional
 
@@ -103,6 +104,19 @@ def main(args: Optional[List[str]] = None) -> None:
     Raises:
         Exception. Directory invalid_path does not exist.
     """
+
+    # Treat deprecation warnings from our own code as errors, per
+    # https://docs.python.org/3/whatsnew/3.9.html#you-should-check-for-deprecationwarning-in-your-code
+    # Scoped to our own module namespaces (via a real regex, not the
+    # -W/PYTHONWARNINGS command-line syntax, which silently treats the
+    # module field as a literal string and can't express "any submodule
+    # of X") so warnings raised by third-party/vendored code (e.g.
+    # third_party/python_libs) don't fail the build.
+    warnings.filterwarnings(
+        'error',
+        category=DeprecationWarning,
+        module=r'^(core|scripts|extensions)\.',
+    )
 
     parsed_args = _PARSER.parse_args(args=args)
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:

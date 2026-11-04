@@ -852,7 +852,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 question_id,
                 'owner_id',
                 self._create_valid_question_data(
-                    f'Test Question {i+1}', content_id_generator
+                    f'Test Question {i + 1}', content_id_generator
                 ),
                 [skill_id],
                 content_id_generator.next_content_id_index,

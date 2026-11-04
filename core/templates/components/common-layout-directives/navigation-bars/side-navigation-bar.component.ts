@@ -27,8 +27,6 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-import './side-navigation-bar.component.css';
-
 @Component({
   selector: 'oppia-side-navigation-bar',
   templateUrl: './side-navigation-bar.component.html',
@@ -41,6 +39,10 @@ export class SideNavigationBarComponent {
   @Input() display!: boolean;
 
   impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2025,
+      year: '2025',
+    },
     {
       link: AppConstants.IMPACT_REPORT_LINK_2024,
       year: '2024',

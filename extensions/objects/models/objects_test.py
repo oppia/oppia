@@ -1105,7 +1105,14 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
 
     def test_default_values_for_objects_are_valid(self) -> None:
         for _, member in inspect.getmembers(objects):
-            if inspect.isclass(member) and member.default_value is not None:
+            if not inspect.isclass(member):
+                continue
+            ancestor_names = [
+                base_class.__name__ for base_class in inspect.getmro(member)
+            ]
+            if 'BaseObject' not in ancestor_names:
+                continue
+            if member.default_value is not None:
                 if member.__name__ == 'BaseTranslatableObject':
                     continue
 
@@ -1203,6 +1210,11 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
     def test_translatable_objects_naming(self) -> None:
         for name, member in inspect.getmembers(objects):
             if not inspect.isclass(member):
+                continue
+            ancestor_names = [
+                base_class.__name__ for base_class in inspect.getmro(member)
+            ]
+            if 'BaseObject' not in ancestor_names:
                 continue
 
             # Assert that BaseTranslatableObject subclasses start with

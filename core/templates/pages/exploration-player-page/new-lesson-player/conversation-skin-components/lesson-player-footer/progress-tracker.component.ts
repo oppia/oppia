@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import './progress-tracker.component.css';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {SaveProgressModalComponent} from './save-progress-modal.component';
 import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';

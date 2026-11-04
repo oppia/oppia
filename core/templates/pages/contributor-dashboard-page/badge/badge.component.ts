@@ -18,7 +18,6 @@
 
 import {Component, Input} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import './badge.component.css';
 
 interface ContributionSubTypeTexts {
   submission: string;

@@ -17,7 +17,8 @@
  * the learner and editor views.
  */
 
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
@@ -43,12 +44,13 @@ export class SiteAnalyticsService {
   constructor(
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private userService: UserService
+    private userService: UserService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
       // service is used.
-      initializeGoogleAnalytics();
+      initializeGoogleAnalytics(this.document);
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
@@ -431,18 +433,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerSaveRecordedAudioEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('save_recorded_audio', {
-      exploration_id: explorationId,
-    });
-  }
-
-  registerStartAudioRecordingEvent(explorationId: string): void {
-    this._sendEventToGoogleAnalytics('start_audio_recording', {
-      exploration_id: explorationId,
-    });
-  }
-
   registerUploadAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics('upload_recorded_audio', {
       exploration_id: explorationId,
@@ -489,6 +479,15 @@ export class SiteAnalyticsService {
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'contributor_dashboard_reject_suggestion',
+      {
+        contribution_type: contributionType,
+      }
+    );
+  }
+
+  registerDownloadContributorCertificateEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_download_certificate',
       {
         contribution_type: contributionType,
       }

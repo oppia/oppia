@@ -221,8 +221,7 @@ describe('Translation Submitter V2', function () {
       'Exploration - Fractions'
     );
 
-    // Skip Exploration Title, Objective, and Category cards to reach state content RTE.
-    await translationSubmitter.clickOnSkipTranslationButton();
+    // Skip Exploration Title and Objective cards to reach state content RTE.
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
 

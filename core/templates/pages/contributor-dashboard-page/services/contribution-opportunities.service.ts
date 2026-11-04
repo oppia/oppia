@@ -117,6 +117,14 @@ export class ContributionOpportunitiesService {
     return this._getSkillOpportunitiesAsync('', query);
   }
 
+  async getSkillOpportunitiesCountAsync(searchQuery?: string): Promise<number> {
+    const query = searchQuery || '';
+    return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
+      'skill',
+      query
+    );
+  }
+
   async getTranslationOpportunitiesAsync(
     languageCode: string,
     topicName: string,
@@ -126,6 +134,19 @@ export class ContributionOpportunitiesService {
       languageCode,
       topicName,
       '',
+      entityType
+    );
+  }
+
+  async getTranslationOpportunitiesCountAsync(
+    languageCode: string,
+    topicName: string,
+    entityType?: string
+  ): Promise<number> {
+    return this.contributionOpportunitiesBackendApiService.fetchOpportunitiesCountAsync(
+      'translation',
+      topicName,
+      languageCode,
       entityType
     );
   }

@@ -21,7 +21,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import './topic-manager-role-editor-modal.component.css';
 
 @Component({
   selector: 'oppia-topic-manager-role-editor-modal',

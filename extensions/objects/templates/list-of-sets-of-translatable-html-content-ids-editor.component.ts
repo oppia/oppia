@@ -23,7 +23,7 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 
 interface Choice {
   id: string;
-  selectedRank: string;
+  selectedRank: string | number;
   val: string;
 }
 @Component({
@@ -31,7 +31,9 @@ interface Choice {
   // eslint-disable-next-line max-len
   templateUrl:
     './list-of-sets-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: [],
+  styleUrls: [
+    './list-of-sets-of-translatable-html-content-ids-editor.component.css',
+  ],
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   @Output() valueChanged = new EventEmitter();
@@ -63,8 +65,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 
   selectItem(choiceListIndex: number): void {
     const choiceContentId = this.choices[choiceListIndex].val;
-    const selectedRank =
-      parseInt(this.choices[choiceListIndex].selectedRank) - 1;
+    const selectedRank = +this.choices[choiceListIndex].selectedRank - 1;
     this.errorMessage = '';
     let choiceIdHasBeenAdded = false;
 

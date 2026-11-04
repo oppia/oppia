@@ -105,9 +105,10 @@ type FabricSvgLoadCallback = (
 @Component({
   selector: 'svg-editor',
   templateUrl: './svg-editor.component.html',
+  styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   @Output() discardImage = new EventEmitter();
@@ -183,6 +184,9 @@ export class SvgEditorComponent implements OnInit {
   // The canvasId is used to identify the fabric js
   // canvas element in the editor.
   canvasID = 'canvas' + this.randomId;
+  // The canvasContainerId is used to identify the div wrapping the fabric js
+  // canvas element in the editor.
+  canvasContainerId = 'fabric-canvas-container-' + this.randomId;
   // The following picker variables are used to store the objects returned
   // from the vanilla color picker.
   fillPicker: SvgColorPicker | null = null;
@@ -600,26 +604,34 @@ export class SvgEditorComponent implements OnInit {
     const childNodes = Array.from(element.childNodes);
     let value = '';
     const coloredTextIndex: ColoredTextIndex[] = [];
-    const tspanNodes = childNodes.filter(el => el.nodeName === 'tspan');
-    // Extracts the text from the tspan tags and appends
+    const relevantNodes = childNodes.filter(
+      el =>
+        el.nodeName === 'tspan' ||
+        (el.nodeName === '#text' && (el.nodeValue || '').trim() !== '')
+    );
+    // Extracts the text from the tspan tags and text nodes, appending
     // with a \n tag to ensure that the texts are subsequent lines.
-    tspanNodes.forEach((el, index) => {
-      const tspanElement = el as SVGTSpanElement;
-      const textNodeValue = tspanElement.childNodes[0]?.nodeValue || '';
-      value += textNodeValue;
-      if (tspanElement.style.fill !== '') {
-        // Fetches the position of the coloured text so
-        // it can be given color after the text is rendered.
-        coloredTextIndex.push({
-          startIndex: value.length - textNodeValue.length,
-          endIndex: value.length,
-          fill: tspanElement.style.fill,
-          stroke: tspanElement.style.stroke,
-          strokeWidth: tspanElement.style.strokeWidth,
-        });
+    relevantNodes.forEach((el, index) => {
+      if (el.nodeName === '#text') {
+        value += el.nodeValue || '';
+      } else {
+        const tspanElement = el as SVGTSpanElement;
+        const textNodeValue = tspanElement.childNodes[0]?.nodeValue || '';
+        value += textNodeValue;
+        if (tspanElement.style && tspanElement.style.fill !== '') {
+          // Fetches the position of the coloured text so
+          // it can be given color after the text is rendered.
+          coloredTextIndex.push({
+            startIndex: value.length - textNodeValue.length,
+            endIndex: value.length,
+            fill: tspanElement.style.fill,
+            stroke: tspanElement.style.stroke,
+            strokeWidth: tspanElement.style.strokeWidth,
+          });
+        }
       }
-      // Newline between tspans regardless of fill color.
-      if (index < tspanNodes.length - 1) {
+      // Newline between text nodes regardless of fill color.
+      if (index < relevantNodes.length - 1) {
         value += '\n';
       }
     });
@@ -1336,7 +1348,7 @@ export class SvgEditorComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onFileChanged(file: File, filename: string): void {
+  onFileChanged(file: File, filename?: string): void {
     this.setUploadedFile(file);
   }
 

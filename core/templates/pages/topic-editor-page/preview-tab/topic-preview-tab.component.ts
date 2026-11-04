@@ -26,7 +26,6 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-import './topic-preview-tab.component.css';
 import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-content/topic-viewer-content.component';
 
 @Component({

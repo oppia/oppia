@@ -25,7 +25,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './story-preview-tab.component.css';
 
 interface IconsArray {
   // Thumbnails for the story nodes are null if they are not yet uploaded.

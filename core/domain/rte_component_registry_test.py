@@ -339,7 +339,11 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
                 break
 
         for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and name != 'BaseRteComponent':
+            if (
+                inspect.isclass(obj)
+                and issubclass(obj, module.BaseRteComponent)
+                and name != 'BaseRteComponent'
+            ):
                 actual_component_class_names.append(name)
 
         self.assertEqual(

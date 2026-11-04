@@ -1,8 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
 
 .oppia-footer-container {
   margin-left: auto;
@@ -34,7 +29,8 @@
   text-decoration: none;
 }
 
-.oppia-footer-container a:focus {
+.oppia-footer-container a:focus,
+.oppia-footer-terms-privacy a:focus {
   outline: 2px solid #fff;
   text-decoration: underline;
 }

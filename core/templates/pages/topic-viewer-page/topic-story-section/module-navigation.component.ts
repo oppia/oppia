@@ -30,8 +30,6 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import './module-navigation.component.css';
-
 interface ModuleNavigationGroup {
   lessons: {
     lessonNumber: number;

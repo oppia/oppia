@@ -23,7 +23,6 @@ import {Subscription} from 'rxjs';
 import {PageTitleService} from 'services/page-title.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
-import './partnerships-page.component.css';
 
 @Component({
   selector: 'partnerships-page',

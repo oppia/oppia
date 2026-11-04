@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import './audio-slider.component.css';
 
 @Component({
   selector: 'oppia-audio-slider',

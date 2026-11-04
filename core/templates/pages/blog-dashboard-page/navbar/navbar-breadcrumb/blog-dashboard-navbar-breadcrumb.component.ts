@@ -19,7 +19,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import './blog-dashboard-navbar-breadcrumb.component.css';
 
 @Component({
   selector: 'oppia-blog-dashboard-navbar-breadcrumb',

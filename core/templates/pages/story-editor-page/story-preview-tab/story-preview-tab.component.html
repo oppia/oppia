@@ -2,7 +2,7 @@
   <div class="oppia-story-viewer-title" tabindex="0">
     {{ story.getTitle() }}
   </div>
-  <div dir="auto" class="oppia-story-viewer-description" tabindex="0">
+  <div [attr.dir]="'auto'" class="oppia-story-viewer-description" tabindex="0">
     {{ story.getDescription() }}
   </div>
   <div class="oppia-story-header-text" tabindex="0">
@@ -95,7 +95,7 @@
         <div class="story-text" aria-hidden="true">
           <span dir="ltr" class="oppia-chapter-title">
             <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}:
-            <span dir="auto">{{node.getTitle()}}</span>
+            <span [attr.dir]="'auto'">{{node.getTitle()}}</span>
           </span>
           <div class="oppia-story-viewer-mobile-card-description-box">
             <p>{{node.getDescription()}}</p>

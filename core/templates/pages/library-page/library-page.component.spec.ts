@@ -48,7 +48,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
-import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
@@ -109,7 +108,6 @@ describe('Library Page Component', () => {
   let userService: UserService;
   let keyboardShortcutService: KeyboardShortcutService;
   let loggerService: LoggerService;
-  let searchService: SearchService;
   let translateService: TranslateService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -180,8 +178,17 @@ describe('Library Page Component', () => {
             community_owned: true,
             id: 'id1',
             language_code: '',
+            last_updated_msec: 0,
+            node_count: 0,
             num_views: 5,
             objective: '',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
             status: '',
             tags: [],
             thumbnail_bg_color: '',
@@ -194,8 +201,17 @@ describe('Library Page Component', () => {
             community_owned: true,
             id: 'id2',
             language_code: '',
+            last_updated_msec: 0,
+            node_count: 2,
             num_views: 5,
             objective: '',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
             status: '',
             tags: [],
             thumbnail_bg_color: '',
@@ -208,8 +224,17 @@ describe('Library Page Component', () => {
             community_owned: true,
             id: 'id1',
             language_code: '',
+            last_updated_msec: 0,
+            node_count: 0,
             num_views: 5,
             objective: '',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
             status: '',
             tags: [],
             thumbnail_bg_color: '',
@@ -242,7 +267,6 @@ describe('Library Page Component', () => {
         KeyboardShortcutService,
         LibraryPageBackendApiService,
         LoaderService,
-        SearchService,
         UrlInterpolationService,
         UserService,
         {
@@ -281,7 +305,6 @@ describe('Library Page Component', () => {
     userService = TestBed.inject(UserService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     loggerService = TestBed.inject(LoggerService);
-    searchService = TestBed.inject(SearchService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
@@ -435,7 +458,7 @@ describe('Library Page Component', () => {
   it('should set appropriate new page title when not in browse mode', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
-    componentInstance.pageMode = 'not_search';
+    componentInstance.pageMode = 'index';
     componentInstance.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -446,10 +469,10 @@ describe('Library Page Component', () => {
     );
   });
 
-  it('should set appropriate new page title when in browse mode', () => {
+  it('should set browse mode page title when in group mode', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
-    componentInstance.pageMode = 'search';
+    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP;
     componentInstance.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -534,17 +557,6 @@ describe('Library Page Component', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(fullResultsUrl);
   });
 
-  it('should show full results page when results url is not available', () => {
-    let urlQueryString = 'urlQueryString';
-    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
-      urlQueryString
-    );
-    componentInstance.showFullResultsPage(['id'], '');
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      '/search/find?q=' + urlQueryString
-    );
-  });
-
   it('should increment and decrement carousel', () => {
     componentInstance.libraryGroups = [
       {
@@ -555,8 +567,17 @@ describe('Library Page Component', () => {
             community_owned: true,
             id: '',
             language_code: '',
+            last_updated_msec: 0,
+            node_count: 0,
             num_views: 2,
             objective: '',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
             status: '',
             tags: [],
             thumbnail_bg_color: '',
@@ -640,8 +661,17 @@ describe('Library Page Component', () => {
         community_owned: true,
         id: '',
         language_code: '',
+        last_updated_msec: 0,
+        node_count: 0,
         num_views: 10,
         objective: '',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
         status: '',
         tags: [],
         thumbnail_bg_color: '',
@@ -692,8 +722,17 @@ describe('Library Page Component', () => {
         community_owned: true,
         id: '',
         language_code: '',
+        last_updated_msec: 0,
+        node_count: 0,
         num_views: 10,
         objective: '',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
         status: '',
         tags: [],
         thumbnail_bg_color: '',
@@ -999,19 +1038,5 @@ describe('Library Page Component', () => {
     tick();
 
     expect(componentInstance.loadLibraryData).toHaveBeenCalled();
-  }));
-
-  it('should not reload library data on site language change in search mode', fakeAsync(() => {
-    spyOn(componentInstance, 'loadLibraryData');
-    componentInstance.ngOnInit();
-    tick();
-
-    componentInstance.pageMode = LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
-    (componentInstance.loadLibraryData as jasmine.Spy).calls.reset();
-
-    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
-    tick();
-
-    expect(componentInstance.loadLibraryData).not.toHaveBeenCalled();
   }));
 });

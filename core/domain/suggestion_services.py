@@ -18,6 +18,7 @@ suggestions.
 
 from __future__ import annotations
 
+import collections
 import datetime
 import heapq
 import logging
@@ -1009,12 +1010,6 @@ def accept_suggestion(
             suggestion.change_cmd.language_code,
             suggestion.target_type,
         )
-        if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            # We import exp_services locally here to avoid a circular dependency
-            # with exp_services, which imports suggestion_services at the top level.
-            from core.domain import exp_services
-
-            exp_services.index_explorations_given_ids([suggestion.target_id])
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this
@@ -1683,6 +1678,31 @@ def get_translation_suggestions_in_review_by_entity_ids(
         get_suggestion_from_model(model) if model else None
         for model in suggestion_models_in_review
     ]
+
+
+def get_question_suggestions_in_review_count_by_skill_ids(
+    skill_ids: List[str],
+) -> Dict[str, int]:
+    """Returns the count of in-review question suggestions mapped by skill ID.
+
+    Args:
+        skill_ids: list(str). Skill IDs matching the target ID of the
+            question suggestions.
+
+    Returns:
+        dict(str, int). A dictionary mapping each skill ID to the count of its
+        in-review question suggestions.
+    """
+    if not skill_ids:
+        return {}
+    counts: Dict[str, int] = collections.defaultdict(int)
+    for (
+        model
+    ) in suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
+        skill_ids
+    ):
+        counts[model.target_id] += 1
+    return counts
 
 
 def get_suggestions_with_editable_explorations(
@@ -2649,10 +2669,10 @@ def update_translation_suggestion(
         ]
 
         original_summary_text = (
-            f'Components in original text: {", ".join(original_summary)}.'
+            f'Components in original text: {', '.join(original_summary)}.'
         )
         updated_summary_text = (
-            f'Components in translated text: {", ".join(updated_summary)}.'
+            f'Components in translated text: {', '.join(updated_summary)}.'
         )
 
         # Get truncated versions of both original and translated
@@ -3419,14 +3439,19 @@ def update_translation_contribution_stats_at_submission(
     content_word_count = 0
     topic_id = _get_topic_id_of_translation_target(suggestion)
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
@@ -3586,16 +3611,20 @@ def update_translation_contribution_stats_at_review(
     content_word_count = 0
     topic_id = _get_topic_id_of_translation_target(suggestion)
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
-
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
@@ -3740,14 +3769,19 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    # Here we use cast because translation_html can be either a string or a
+    # list of strings at runtime, although its command type declares str.
+    translation_html = cast(
+        Union[str, List[str]],
+        suggestion.change_cmd.translation_html,
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
@@ -3909,7 +3943,9 @@ def update_question_contribution_stats_at_submission(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+        question_submitter_total_stat_model: Optional[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        ] = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
             suggestion.author_id
         )
 
@@ -4023,10 +4059,11 @@ def update_question_contribution_stats_at_review(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+        question_submitter_total_stat_model: Optional[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        ] = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
             suggestion.author_id
         )
-
         if question_submitter_total_stat_model is None:
             suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(  # pylint: disable=line-too-long
                 contributor_id=suggestion.author_id,
@@ -4132,10 +4169,11 @@ def update_question_review_stats(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_reviewer_total_stat_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
+        question_reviewer_total_stat_model: Optional[
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        ] = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
             suggestion.final_reviewer_id
         )
-
         if question_reviewer_total_stat_model is None:
             accepted_questions_count = 0
             accepted_questions_with_reviewer_edits_count = 0
@@ -4629,6 +4667,54 @@ def generate_contributor_certificate_data(
     return data.to_dict() if data is not None else None
 
 
+def _count_words_in_translation_suggestions(
+    suggestion_source_models: Sequence[
+        suggestion_models.GeneralSuggestionModel
+    ],
+) -> int:
+    """Counts the total number of translated words across the given
+    translation suggestion models.
+
+    Args:
+        suggestion_source_models: list(GeneralSuggestionModel). Translation
+            suggestion models to count words for.
+
+    Returns:
+        int. The total number of words across the given suggestions.
+    """
+    words_count = 0
+    for model in suggestion_source_models:
+        suggestion = get_suggestion_from_model(model)
+        suggestion_change = suggestion.change_cmd
+        data_is_list = (
+            translation_domain.TranslatableContentFormat.is_data_format_list(
+                suggestion_change.data_format
+            )
+        )
+        if suggestion_change.cmd == 'add_written_translation' and data_is_list:
+            words_count += sum(
+                len(item.split()) for item in suggestion_change.translation_html
+            )
+        else:
+            # Retrieve the html content that is emphasized on the
+            # Contributor Dashboard pages. This content is what stands
+            # out for each suggestion when a user views a list of
+            # suggestions.
+            get_html_representing_suggestion = (
+                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                    suggestion.suggestion_type
+                ]
+            )
+            plain_text = _get_plain_text_from_html_content_string(
+                get_html_representing_suggestion(suggestion)
+            )
+
+            words = plain_text.split(' ')
+            words_without_empty_strings = [word for word in words if word != '']
+            words_count += len(words_without_empty_strings)
+    return words_count
+
+
 def _generate_translation_contributor_certificate_data(
     language_code: str,
     from_date: datetime.datetime,
@@ -4676,40 +4762,23 @@ def _generate_translation_contributor_certificate_data(
             language_description.find('(') + 1 : language_description.find(')')
         ]
 
-    suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
+    submitted_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
+        from_date, to_date_to_fetch_contributions, user_id, language_code
+    )
+    # Translations the user reviewed (accepted or rejected) in the same
+    # language and date range are combined into the same certificate so that a
+    # user who both translates and reviews receives one combined certificate.
+    reviewed_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_reviewed_within_given_dates(
         from_date, to_date_to_fetch_contributions, user_id, language_code
     )
 
-    words_count = 0
-    for model in suggestions:
-        suggestion = get_suggestion_from_model(model)
-        suggestion_change = suggestion.change_cmd
-        data_is_list = (
-            translation_domain.TranslatableContentFormat.is_data_format_list(
-                suggestion_change.data_format
-            )
-        )
-        if suggestion_change.cmd == 'add_written_translation' and data_is_list:
-            words_count += sum(
-                len(item.split()) for item in suggestion_change.translation_html
-            )
-        else:
-            # Retrieve the html content that is emphasized on the
-            # Contributor Dashboard pages. This content is what stands
-            # out for each suggestion when a user views a list of
-            # suggestions.
-            get_html_representing_suggestion = (
-                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
-                    suggestion.suggestion_type
-                ]
-            )
-            plain_text = _get_plain_text_from_html_content_string(
-                get_html_representing_suggestion(suggestion)
-            )
-
-            words = plain_text.split(' ')
-            words_without_empty_strings = [word for word in words if word != '']
-            words_count += len(words_without_empty_strings)
+    translated_word_count = _count_words_in_translation_suggestions(
+        submitted_suggestions
+    )
+    reviewed_word_count = _count_words_in_translation_suggestions(
+        reviewed_suggestions
+    )
+    words_count = translated_word_count + reviewed_word_count
     # Go to the below link for more information about how we count hours
     # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
@@ -4722,10 +4791,12 @@ def _generate_translation_contributor_certificate_data(
         from_date.strftime('%d %b %Y'),
         to_date.strftime('%d %b %Y'),
         signature,
-        str(hours_contributed),
+        hours_contributed,
         words_count,
         language_description,
         certificate_profile_name,
+        translated_word_count=translated_word_count,
+        reviewed_word_count=reviewed_word_count,
     )
 
 
@@ -4759,9 +4830,15 @@ def _generate_question_contributor_certificate_data(
     # the to_date are also counted for the certificate.
     to_date_to_fetch_contributions = to_date + datetime.timedelta(days=1)
 
-    suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_submitted_within_given_dates(
+    submitted_suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_submitted_within_given_dates(
         from_date, to_date_to_fetch_contributions, user_id
     )
+    # Questions the user reviewed (accepted or rejected) in the date range are
+    # combined into the same certificate.
+    reviewed_suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_reviewed_within_given_dates(
+        from_date, to_date_to_fetch_contributions, user_id
+    )
+    suggestions = list(submitted_suggestions) + list(reviewed_suggestions)
 
     minutes_contributed = 0
     for model in suggestions:
@@ -4793,8 +4870,12 @@ def _generate_question_contributor_certificate_data(
         from_date.strftime('%d %b %Y'),
         to_date.strftime('%d %b %Y'),
         signature,
-        str(hours_contributed),
+        hours_contributed,
         0,
         None,
         certificate_profile_name,
+        # Word-count breakdown is translation-specific; question certificates
+        # measure effort in minutes, so these are not applicable here.
+        translated_word_count=0,
+        reviewed_word_count=0,
     )

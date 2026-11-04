@@ -31,7 +31,6 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import './skill-editor-navbar.component.css';
 
 @Component({
   selector: 'oppia-skill-editor-navbar',
@@ -131,7 +130,9 @@ export class SkillEditorNavabarComponent implements OnInit {
   getWarningsCount(): number {
     return this.skillEditorStateService.getSkillValidationIssues().length;
   }
-
+  getAllSkillWarnings(): string {
+    return this.skillEditorStateService.getSkillValidationIssues().join('\n');
+  }
   isSkillSaveable(): boolean {
     return this.getChangeListCount() > 0 && this.getWarningsCount() === 0;
   }

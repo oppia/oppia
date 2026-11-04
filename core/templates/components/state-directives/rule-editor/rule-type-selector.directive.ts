@@ -21,7 +21,6 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './rule-type-selector.component.css';
 
 interface Choice {
   id: string;

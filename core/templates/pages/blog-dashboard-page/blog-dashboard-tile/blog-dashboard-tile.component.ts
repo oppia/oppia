@@ -25,7 +25,6 @@ import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-pag
 import {BlogPostEditorBackendApiService} from 'domain/blog/blog-post-editor-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
-import './blog-dashboard-tile.component.css';
 
 @Component({
   selector: 'oppia-blog-dashboard-tile',

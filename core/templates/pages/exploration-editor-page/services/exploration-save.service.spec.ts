@@ -992,7 +992,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
       spyOn(explorationRightsService, 'isPrivate').and.returnValue(false);
       spyOn(explorationWarningsService, 'countWarnings').and.returnValue(1);
       spyOn(explorationWarningsService, 'getWarnings').and.returnValue([
-        'something',
+        {type: 'critical', message: 'something'},
       ]);
 
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);

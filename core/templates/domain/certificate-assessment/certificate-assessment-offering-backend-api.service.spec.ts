@@ -62,7 +62,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       1,
-      1,
       ['Stub demonstration'],
       'Available',
       1
@@ -82,7 +81,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       classroom_id: 'math_classroom_01',
       topics: [{topic_id: 'topic_place_values'}],
       total_questions: 1,
-      time_limit_in_minutes: 1,
       demonstrates: ['Stub demonstration'],
       async_status: 'Available',
     });
@@ -114,7 +112,6 @@ describe('Certificate Assessment Offering backend api service', () => {
           classroom_id: 'sample_classroom',
           topic_ids: ['topic_1', 'topic_2'],
           total_questions: 4,
-          time_limit_in_minutes: 20,
           demonstrates: ['Sample skill'],
           async_status: 'Available',
           version: 1,
@@ -135,7 +132,6 @@ describe('Certificate Assessment Offering backend api service', () => {
           topic_2: 1,
         },
         4,
-        20,
         ['Sample skill'],
         'Available',
         1
@@ -162,6 +158,7 @@ describe('Certificate Assessment Offering backend api service', () => {
           certificate_id: 'mock_certificate_id',
           title: 'Sample Certificate',
           attempt_status: 'Not Attempted',
+          attempt_id: null,
           passed_on_date: null,
           failed_on_date: null,
         },
@@ -252,7 +249,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_2: 1,
       },
       3,
-      15,
       [],
       'Available',
       1
@@ -288,7 +284,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'sample_classroom',
       {topic_1: 1},
       3,
-      15,
       ['Learn math'],
       'Not_Ready',
       1
@@ -399,7 +394,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'math_classroom_01',
       {topic_place_values: 1},
       1,
-      1,
       ['Stub demonstration'],
       'Available',
       1
@@ -425,7 +419,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       classroom_id: 'math_classroom_01',
       topics: [{topic_id: 'topic_place_values'}],
       total_questions: 1,
-      time_limit_in_minutes: 1,
       demonstrates: ['Stub demonstration'],
       async_status: 'Available',
     });
@@ -450,7 +443,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_2: 1,
       },
       3,
-      15,
       [],
       'Available',
       1
@@ -492,7 +484,6 @@ describe('Certificate Assessment Offering backend api service', () => {
       'sample_classroom',
       {topic_1: 1},
       3,
-      15,
       ['Learn math'],
       'Available',
       1
@@ -541,7 +532,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topic_data: {topic_1: 1},
         demonstrates: ['Fetched Demonstration'],
         total_questions: 4,
-        time_limit_in_minutes: 20,
         async_status: 'Available',
         version: 3,
       },
@@ -558,7 +548,6 @@ describe('Certificate Assessment Offering backend api service', () => {
         topicData: {topic_1: 1},
         demonstrates: ['Fetched Demonstration'],
         totalQuestions: 4,
-        timeLimitInMinutes: 20,
         asyncStatus: 'Available',
       })
     );
@@ -1064,11 +1053,27 @@ describe('Certificate Assessment Offering backend api service', () => {
     );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({certificate_id: 'mock_certificate_id'});
+    const stateData1 = {
+      content: {content_id: 'content', html: '<p>What is 5 + 3?</p>'},
+      interaction: {id: 'NumericInput'},
+    };
+    const stateData2 = {
+      content: {content_id: 'content', html: '<p>What is 7 + 2?</p>'},
+      interaction: {id: 'NumericInput'},
+    };
     req.flush({
       attempt_id: 'mock_attempt_id',
       questions: [
-        {question_id: 'q1', question_version: 1},
-        {question_id: 'q2', question_version: 2},
+        {
+          question_id: 'q1',
+          question_version: 1,
+          question_state_data: stateData1,
+        },
+        {
+          question_id: 'q2',
+          question_version: 2,
+          question_state_data: stateData2,
+        },
       ],
     });
 
@@ -1078,8 +1083,8 @@ describe('Certificate Assessment Offering backend api service', () => {
       jasmine.objectContaining({
         _attemptId: 'mock_attempt_id',
         _questions: [
-          {questionId: 'q1', questionVersion: 1},
-          {questionId: 'q2', questionVersion: 2},
+          {questionId: 'q1', questionVersion: 1, questionStateData: stateData1},
+          {questionId: 'q2', questionVersion: 2, questionStateData: stateData2},
         ],
       })
     );
@@ -1204,102 +1209,6 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Error occurred while submitting the assessment.'
-    );
-  }));
-
-  it('should successfully fetch a certificate assessment question', fakeAsync(() => {
-    caos
-      .getCertificateAssessmentQuestionAsync('mock_attempt_id', 'q1')
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
-        '<attempt_id>',
-        'mock_attempt_id'
-      ).replace('<question_id>', 'q1')
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      question_id: 'q1',
-      question_state_data: {
-        content: {
-          content_id: 'content',
-          html: '<p>What is 5 + 3?</p>',
-        },
-      },
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    const result = successHandler.calls.mostRecent().args[0];
-    expect(result.questionId).toBe('q1');
-    expect(result.questionStateData).toEqual({
-      content: {
-        content_id: 'content',
-        html: '<p>What is 5 + 3?</p>',
-      },
-    });
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use rejection handler if fetching a certificate assessment question fails with a nested backend message', fakeAsync(() => {
-    caos
-      .getCertificateAssessmentQuestionAsync('mock_attempt_id', 'q1')
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
-        '<attempt_id>',
-        'mock_attempt_id'
-      ).replace('<question_id>', 'q1')
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(
-      {
-        error: 'Error occurred while fetching the question.',
-      },
-      {
-        status: 500,
-        statusText: 'Internal Server Error',
-      }
-    );
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Error occurred while fetching the question.'
-    );
-  }));
-
-  it('should fall back to the http error message if fetching a certificate assessment question fails with no nested backend message', fakeAsync(() => {
-    caos
-      .getCertificateAssessmentQuestionAsync('mock_attempt_id', 'q1')
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_QUESTION_HANDLER_URL.replace(
-        '<attempt_id>',
-        'mock_attempt_id'
-      ).replace('<question_id>', 'q1')
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(
-      {},
-      {
-        status: 500,
-        statusText: 'Internal Server Error',
-      }
-    );
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      jasmine.stringMatching(
-        /^Http failure response for .*: 500 Internal Server Error$/
-      )
     );
   }));
 

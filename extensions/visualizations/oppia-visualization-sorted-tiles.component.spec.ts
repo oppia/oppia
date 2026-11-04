@@ -103,4 +103,12 @@ describe('Oppia sorted tiles visualization', function () {
 
     expect(ngbModal.open).toHaveBeenCalled();
   }));
+
+  it('should get the answer html when the answer is a string', () => {
+    expect(component.getAnswerHtml('answerHtml')).toBe('answerHtml');
+  });
+
+  it('should return an empty string when the answer is not a string', () => {
+    expect(component.getAnswerHtml(5)).toBe('');
+  });
 });

@@ -1,0 +1,8 @@
+<div class="modal-body">
+  <p [innerHTML]="'I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_1' | translate"></p>
+  <p [innerHTML]="'I18N_MODAL_CONFIRM_FORMULA_AS_TEXT_PARAGRAPH_2' | translate"></p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-continue-editing-button" (click)="cancel()">Continue Editing</button>
+  <button class="btn btn-success e2e-test-save-anyway-button" (click)="confirm()">Save Anyway</button>
+</div>

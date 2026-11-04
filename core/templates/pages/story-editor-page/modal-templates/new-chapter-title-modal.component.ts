@@ -27,7 +27,6 @@ import {Story} from 'domain/story/story.model';
 import {ValidatorsService} from 'services/validators.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import './new-chapter-title-modal.component.css';
 
 @Component({
   selector: 'oppia-new-chapter-title-modal',
@@ -47,8 +46,8 @@ export class NewChapterTitleModalComponent implements OnInit {
   editableThumbnailBgColor!: string;
   editableThumbnailFilename!: string;
   categoryIsDefault!: boolean;
-  statesWithRestrictedInteractions!: string | string[];
-  statesWithTooFewMultipleChoiceOptions!: string | string[];
+  statesWithRestrictedInteractions!: string[];
+  statesWithTooFewMultipleChoiceOptions!: string[];
   allowedBgColors = newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
 
   constructor(

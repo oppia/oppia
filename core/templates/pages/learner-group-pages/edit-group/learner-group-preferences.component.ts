@@ -30,8 +30,6 @@ import {InviteLearnersModalComponent} from '../templates/invite-learners-modal.c
 import {InviteSuccessfulModalComponent} from '../templates/invite-successful-modal.component';
 import {RemoveItemModalComponent} from '../templates/remove-item-modal.component';
 
-import './learner-group-preferences.component.css';
-
 @Component({
   selector: 'oppia-learner-group-preferences',
   templateUrl: './learner-group-preferences.component.html',

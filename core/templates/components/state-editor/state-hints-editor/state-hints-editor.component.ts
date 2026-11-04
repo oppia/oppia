@@ -36,7 +36,6 @@ import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import './state-hints-editor.component.css';
 
 interface DeleteValueResponse {
   index: number;
@@ -73,6 +72,24 @@ export class StateHintsEditorComponent implements OnInit {
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  // These getters are used by the component template to access the hint
+  // properties while keeping the injected services private.
+  get displayedHints(): Hint[] {
+    return this.stateHintsService.displayed;
+  }
+
+  get activeHintIndex(): number | null {
+    return this.stateHintsService.getActiveHintIndex();
+  }
+
+  get isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
+  get isEditableOutsideTutorialMode(): boolean {
+    return this.editabilityService.isEditableOutsideTutorialMode();
+  }
 
   drop(event: CdkDragSortEvent<Hint[]>): void {
     moveItemInArray(

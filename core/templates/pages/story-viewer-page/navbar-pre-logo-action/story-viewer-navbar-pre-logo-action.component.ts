@@ -23,7 +23,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import './story-viewer-navbar-pre-logo-action.component.css';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-pre-logo-action',

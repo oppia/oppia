@@ -36,7 +36,6 @@ import type {
   LessonFeedbackSummary,
   ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
-import './feedback-table.component.css';
 
 @Component({
   selector: 'oppia-feedback-table',

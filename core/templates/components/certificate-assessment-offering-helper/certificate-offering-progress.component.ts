@@ -32,7 +32,6 @@ import {
   CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES,
   CERTIFICATE_OFFERING_SECTION_TITLES,
 } from './certificate-offering-section.model';
-import './certificate-offering-progress.component.css';
 
 @Component({
   selector: 'oppia-certificate-offering-progress',

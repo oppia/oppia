@@ -49,7 +49,6 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import './blog-post-editor.component.css';
 
 type EditorSchema = Schema & {
   ui_config: object;

@@ -28,7 +28,6 @@ import {EndExplorationBackendApiService} from './end-exploration-backend-api.ser
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 
 import {ServicesConstants} from 'services/services.constants';
-import './end-exploration-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-end-exploration',
