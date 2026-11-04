@@ -177,6 +177,37 @@ const addStudyGuideSectionModalSaveButton =
 const studyGuideSectionTileSelector = (sectionIndex: number): string =>
   `.e2e-test-study-guide-section-${sectionIndex}`;
 
+const subtopicCardHeaderSelector = '.subtopic-name-card-header';
+const subtopicTitleSelector = '.e2e-test-subtopic';
+const subtopicOptionsSelector = '.e2e-test-show-subtopic-options';
+const deleteSubtopicButtonSelector = '.e2e-test-delete-subtopic-button';
+const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
+const mobileSubtopicContainerSelector = '.e2e-test-mobile-subtopic-content';
+const subtopicEditorTitleField = '.e2e-test-subtopic-title-field';
+const subtopicEditorUrlFragmentField =
+  '.e2e-test-subtopic-url-fragment-field .e2e-test-url-fragment-field';
+const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
+const saveSubtopicExplanationButtonSelector =
+  '.e2e-test-save-subtopic-content-button';
+const topicPreviewTab = '.e2e-test-topic-preview-button';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
+const subtopicPreviewContainerSelector = '.e2e-test-subtopic-preview-container';
+const previewContentTitle = '.content-title';
+const previewHtmlContent = '.html-content';
+
+/**
+ * Creates a pattern that matches the whole text of an element, so that a name
+ * such as 'Addition' does not also match 'Intro to Addition'.
+ * @param {string} text - The text to match exactly.
+ * @returns {RegExp} - The pattern that matches the text exactly.
+ */
+const exactTextPattern = (text: string): RegExp => {
+  const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^\\s*${escapedText}\\s*$`);
+};
+
 export class TopicManager extends BaseUser {
   /**
    * Create a basic algebra question in the skill editor page.
@@ -890,6 +921,40 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Deletes a subtopic from a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   */
+  async deleteSubtopicFromTopic(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.waitForStaticAssetsToLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(subtopicReassignHeader);
+    }
+
+    await this.expectElementToBeVisible(subtopicCardHeaderSelector);
+    const subtopicCard = this.page
+      .locator(subtopicCardHeaderSelector)
+      .filter({
+        has: this.page
+          .locator(subtopicTitleSelector)
+          .filter({hasText: exactTextPattern(subtopicName)}),
+      })
+      .first();
+
+    await subtopicCard.locator(subtopicOptionsSelector).click();
+    await subtopicCard.locator(deleteSubtopicButtonSelector).click();
+    await this.expectElementToBeVisible(deleteSubtopicButtonSelector, false);
+    showMessage(
+      `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
+    );
+  }
+
+  /**
    * Function for opening the classroom tile in edit mode.
    * @param {string} classroomName - The name of the classroom to be edited.
    */
@@ -927,6 +992,50 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Edits the details of a subtopic in the subtopic editor.
+   * @param {string} title - The new title of the subtopic.
+   * @param {string} urlFragment - The new URL fragment of the subtopic.
+   * @param {string} explanation - The new explanation of the subtopic.
+   * @param {string} thumbnail - Optional. The path to the new thumbnail image.
+   */
+  async editSubTopicDetails(
+    title: string,
+    urlFragment: string,
+    explanation: string,
+    thumbnail?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(subtopicEditorTitleField);
+    await this.clearAllTextFrom(subtopicEditorTitleField);
+    await this.typeInInputField(subtopicEditorTitleField, title);
+    if (urlFragment) {
+      await this.expectElementToBeVisible(subtopicEditorUrlFragmentField);
+      await this.clearAllTextFrom(subtopicEditorUrlFragmentField);
+      await this.typeInInputField(subtopicEditorUrlFragmentField, urlFragment);
+    }
+
+    await this.clickOnElementWithSelector(editSubtopicExplanationSelector);
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, explanation);
+    await this.clickOnElementWithSelector(
+      saveSubtopicExplanationButtonSelector
+    );
+
+    // Update the thumbnail if it is provided.
+    if (thumbnail) {
+      await this.clickOnElementWithSelector(subtopicPhotoBoxButton);
+      await this.expectElementToBeVisible(photoUploadModal);
+      await this.uploadFile(thumbnail);
+      await this.expectElementToBeVisible(
+        `${uploadPhotoButton}:not([disabled])`
+      );
+      await this.clickOnElementWithSelector(uploadPhotoButton);
+    }
+
+    await this.expectElementToBeVisible(photoUploadModal, false);
+  }
+
+  /**
    * Checks if the classroom contains a topic with the given name.
    * @param {string} topicName The name of the topic to check for.
    * @returns {Promise<ElementHandle<Element>>} A promise that resolves to the ElementHandle
@@ -956,6 +1065,22 @@ export class TopicManager extends BaseUser {
     }
 
     return topicBoxElement;
+  }
+
+  /**
+   * Checks that the subtopic preview has the expected title and explanation.
+   * @param {string} subtopicName - The expected title of the subtopic.
+   * @param {string} explanation - The expected explanation of the subtopic.
+   */
+  async expectSubtopicPreviewToHave(
+    subtopicName: string,
+    explanation: string
+  ): Promise<void> {
+    await expect(this.page.locator(previewContentTitle).first()).toHaveText(
+      subtopicName
+    );
+    await this.expectElementToBeVisible(previewHtmlContent);
+    await expect(this.page.getByText(explanation).first()).toBeVisible();
   }
 
   /**
@@ -1032,6 +1157,29 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Navigates to the preview tab of a subtopic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic that has the subtopic.
+   */
+  async navigateToSubtopicPreviewTab(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openSubtopicEditor(subtopicName, topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(topicMobilePreviewTab);
+    } else {
+      await this.expectElementToBeVisible(topicPreviewTab);
+      await this.clickOnElementWithSelector(topicPreviewTab);
+    }
+
+    await this.expectElementToBeVisible(subtopicPreviewContainerSelector);
+    showMessage('Navigated to the subtopic preview tab.');
+  }
+
+  /**
    * Navigate to the topic and skills dashboard page.
    */
   async navigateToTopicsAndSkillsDashboardPageAsTopicManager(): Promise<void> {
@@ -1055,6 +1203,37 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(skillEditorCollapsibleCard);
 
     expect(this.page.url()).toContain('/skill_editor/');
+  }
+
+  /**
+   * Opens the subtopic editor for a subtopic.
+   * @param {string} subtopicName - The name of the subtopic to open.
+   * @param {string} topicName - Optional. The name of the topic that has the
+   * subtopic. If it is not provided, the topic editor must already be open.
+   */
+  async openSubtopicEditor(
+    subtopicName: string,
+    topicName?: string
+  ): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+
+    // Expand the subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
+    }
+
+    await this.expectElementToBeVisible(subtopicCardHeaderSelector);
+    await this.clickOnElementWithSelectorAndText(
+      `${subtopicCardHeaderSelector} ${subtopicTitleSelector}`,
+      subtopicName
+    );
+    await this.expectElementToBeVisible(subtopicEditorContainerSelector);
   }
 
   /**
@@ -1212,6 +1391,47 @@ export class TopicManager extends BaseUser {
       throw error;
     }
   }
+
+  /**
+   * Verifies whether a subtopic is present in a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string | null} topicName - Optional. The name of the topic. If it
+   * is not provided, the topic editor must already be open.
+   * @param {boolean} shouldExist - Whether the subtopic should exist.
+   */
+  async verifySubtopicPresenceInTopic(
+    subtopicName: string,
+    topicName: string | null = null,
+    shouldExist: boolean = true
+  ): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOnElementWithSelector(subtopicReassignHeader);
+      }
+    }
+
+    // Expand the subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
+    }
+
+    const subtopics = this.page
+      .locator(subtopicTitleSelector)
+      .filter({hasText: exactTextPattern(subtopicName)});
+    if (shouldExist) {
+      await expect(subtopics.first()).toBeAttached({timeout: 10000});
+    } else {
+      await expect(subtopics).toHaveCount(0, {timeout: 10000});
+    }
+  }
+
 }
 export let TopicManagerFactory = (page: Page): TopicManager => {
   return new TopicManager(page);
