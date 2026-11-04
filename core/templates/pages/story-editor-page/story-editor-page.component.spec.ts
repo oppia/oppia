@@ -16,10 +16,8 @@
  * @fileoverview Unit tests for story editor page component.
  */
 
-// @ts-nocheck
-
 import {EventEmitter} from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
@@ -134,10 +132,7 @@ describe('Story Editor Page Component', () => {
   let component: StoryEditorPageComponent;
   let fixture: ComponentFixture<StoryEditorPageComponent>;
   let ngbModal: NgbModal;
-  let modalRef: {
-    componentInstance: Record<string, string>;
-    result: Promise<void>;
-  };
+  let modalRef: NgbModalRef;
   let pageTitleService: PageTitleService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let storyEditorStateService: StoryEditorStateService;
@@ -210,7 +205,7 @@ describe('Story Editor Page Component', () => {
     modalRef = {
       componentInstance: {body: 'xyz'},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     story = Story.createFromBackendDict({
       id: '2',
@@ -402,6 +397,12 @@ describe('Story Editor Page Component', () => {
     spyOn(storyEditorStateService, 'getSkillSummaries').and.returnValue([
       {
         id: 'skill_id',
+        description: 'Skill description',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 0,
+        skill_model_created_on: 0,
+        skill_model_last_updated: 0,
       },
     ]);
     storyEditorNavigationService.checkIfPresentInChapterEditor = () => true;
