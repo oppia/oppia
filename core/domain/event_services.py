@@ -338,9 +338,44 @@ class StateHitEventHandler(BaseEventHandler):
         play_type: str,
     ) -> None:
         """Perform in-request processing of recording state hit events."""
+        state_hit_event = stats_domain.StateHitEventLogEntry(
+            feconf.EVENT_TYPE_STATE_HIT,
+            exp_id,
+            exp_version,
+            state_name,
+            session_id,
+            params,
+            play_type,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+        state_hit_event.validate()
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params, play_type
         )
+
+
+def get_state_hit_event_from_model(
+    state_hit_event_model: stats_models.StateHitEventLogEntryModel,
+) -> stats_domain.StateHitEventLogEntry:
+    """Returns a StateHitEventLogEntry domain object from a model.
+
+    Args:
+        state_hit_event_model: StateHitEventLogEntryModel. The storage model
+            instance.
+
+    Returns:
+        StateHitEventLogEntry. The domain object.
+    """
+    return stats_domain.StateHitEventLogEntry(
+        state_hit_event_model.event_type,
+        state_hit_event_model.exploration_id,
+        state_hit_event_model.exploration_version,
+        state_hit_event_model.state_name,
+        state_hit_event_model.session_id,
+        state_hit_event_model.params,
+        state_hit_event_model.play_type,
+        state_hit_event_model.event_schema_version,
+    )
 
 
 class StateCompleteEventHandler(BaseEventHandler):

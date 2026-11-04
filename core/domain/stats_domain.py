@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 import numbers
+import re
 import sys
 
 from core import feconf, utils
@@ -2388,3 +2389,191 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class StateHitEventLogEntryDict(TypedDict):
+    """Dictionary representing a StateHitEventLogEntry object."""
+
+    event_type: str
+    exp_id: str
+    exp_version: int
+    state_name: str
+    session_id: str
+    params: Dict[str, str]
+    play_type: str
+    event_schema_version: int
+
+
+class StateHitEventLogEntry:
+    """Domain object for a state hit event log entry.
+
+    Mirrors core/storage/statistics/gae_models.py::StateHitEventLogEntryModel.
+    """
+
+    def __init__(
+        self,
+        event_type: str,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        params: Dict[str, str],
+        play_type: str,
+        event_schema_version: int,
+    ) -> None:
+        """Constructs a StateHitEventLogEntry domain object.
+
+        Args:
+            event_type: str. The type of event. Must equal
+                feconf.EVENT_TYPE_STATE_HIT.
+            exp_id: str. ID of the exploration currently being played.
+            exp_version: int. Current version of exploration.
+            state_name: str. Name of current state.
+            session_id: str. ID of current student's session.
+            params: dict(str, str). Current parameter values, map of
+                parameter name to value.
+            play_type: str. Which type of playthrough this is. Must be one of
+                feconf.PLAY_TYPE_NORMAL or feconf.PLAY_TYPE_PLAYTEST.
+            event_schema_version: int. The version of the event schema used.
+        """
+        self.event_type = event_type
+        self.exp_id = exp_id
+        self.exp_version = exp_version
+        self.state_name = state_name
+        self.session_id = session_id
+        self.params = (
+            dict(params) if isinstance(params, dict) else params
+        )
+        self.play_type = play_type
+        self.event_schema_version = event_schema_version
+
+    def to_dict(self) -> StateHitEventLogEntryDict:
+        """Returns a dict representing this domain object.
+
+        Returns:
+            dict. A dict version of StateHitEventLogEntry suitable for use.
+        """
+        return {
+            'event_type': self.event_type,
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
+            'state_name': self.state_name,
+            'session_id': self.session_id,
+            'params': (
+                dict(self.params)
+                if isinstance(self.params, dict)
+                else self.params
+            ),
+            'play_type': self.play_type,
+            'event_schema_version': self.event_schema_version,
+        }
+
+    def validate(self) -> None:
+        """Validates various properties of the StateHitEventLogEntry.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if not isinstance(self.event_type, str):
+            raise utils.ValidationError(
+                'Expected event_type to be a string, received %s'
+                % type(self.event_type)
+            )
+        if self.event_type != feconf.EVENT_TYPE_STATE_HIT:
+            raise utils.ValidationError(
+                'Expected event_type to be %s, received %s'
+                % (feconf.EVENT_TYPE_STATE_HIT, self.event_type)
+            )
+
+        if not isinstance(self.exp_id, str):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s'
+                % type(self.exp_id)
+            )
+        if not bool(re.match(constants.ENTITY_ID_REGEX, self.exp_id)):
+            raise utils.ValidationError(
+                'Invalid exp_id %s: does not match %s'
+                % (self.exp_id, constants.ENTITY_ID_REGEX)
+            )
+
+        if not isinstance(self.exp_version, int) or isinstance(
+            self.exp_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s'
+                % type(self.exp_version)
+            )
+        if self.exp_version < 1:
+            raise utils.ValidationError(
+                'Expected exp_version to be a positive integer, received %s'
+                % self.exp_version
+            )
+
+        if not isinstance(self.state_name, str) or not self.state_name:
+            raise utils.ValidationError(
+                'Expected state_name to be a non-empty string, received %s'
+                % self.state_name
+            )
+        if len(self.state_name) > 50:
+            raise utils.ValidationError(
+                'Expected state_name to be at most 50 characters, received %s'
+                % self.state_name
+            )
+
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise utils.ValidationError(
+                'Expected session_id to be a non-empty string, received %s'
+                % self.session_id
+            )
+
+        if not isinstance(self.params, dict):
+            raise utils.ValidationError(
+                'Expected params to be a dict, received %s' % type(self.params)
+            )
+        for param_name, param_val in self.params.items():
+            if not isinstance(param_name, str):
+                raise utils.ValidationError(
+                    'Expected param name to be a string, received %s'
+                    % type(param_name)
+                )
+            if not isinstance(param_val, str):
+                raise utils.ValidationError(
+                    'Expected param value to be a string, received %s'
+                    % type(param_val)
+                )
+
+        if not isinstance(self.play_type, str):
+            raise utils.ValidationError(
+                'Expected play_type to be a string, received %s'
+                % type(self.play_type)
+            )
+        allowed_play_types = [
+            feconf.PLAY_TYPE_PLAYTEST,
+            feconf.PLAY_TYPE_NORMAL,
+        ]
+        if self.play_type not in allowed_play_types:
+            raise utils.ValidationError(
+                'Expected play_type to be one of %s, received %s'
+                % (allowed_play_types, self.play_type)
+            )
+
+        if not isinstance(self.event_schema_version, int) or isinstance(
+            self.event_schema_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be an int, received %s'
+                % type(self.event_schema_version)
+            )
+        if (
+            self.event_schema_version < 1
+            or self.event_schema_version
+            > feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected event_schema_version to be between 1 and %s, '
+                'received %s'
+                % (
+                    feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+                    self.event_schema_version,
+                )
+            )
