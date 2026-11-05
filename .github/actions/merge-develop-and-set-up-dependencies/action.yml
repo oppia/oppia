@@ -93,18 +93,18 @@ runs:
         # numbers for tooling dependencies like Node, Yarn and Redis.
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py', 'scripts/common.py', 'scripts/linters/custom_eslint_checks/**') }}
         path: |
-          /home/runner/work/oppia/oppia_tools
-          /home/runner/work/oppia/yarn_cache
-          /home/runner/work/oppia/oppia/node_modules
-          /home/runner/work/oppia/oppia/third_party/python_libs
-          /home/runner/work/oppia/oppia/third_party/static
+          ${{ github.workspace }}/../oppia_tools
+          ${{ github.workspace }}/../yarn_cache
+          ${{ github.workspace }}/node_modules
+          ${{ github.workspace }}/third_party/python_libs
+          ${{ github.workspace }}/third_party/static
 
     - name: Print requirements files (before)
       run: |
         echo "Contents of requirements_dev.txt (before):"
-        cat /home/runner/work/oppia/oppia/requirements_dev.txt
+        cat "$GITHUB_WORKSPACE/requirements_dev.txt"
         echo "Contents of requirements.txt (before):"
-        cat /home/runner/work/oppia/oppia/requirements.txt
+        cat "$GITHUB_WORKSPACE/requirements.txt"
       shell: bash
 
     - name: Install third-party libs on cache miss (retries on error)
@@ -120,9 +120,9 @@ runs:
     - name: Print requirements files (after)
       run: |
         echo "Contents of requirements_dev.txt (after):"
-        cat /home/runner/work/oppia/oppia/requirements_dev.txt
+        cat "$GITHUB_WORKSPACE/requirements_dev.txt"
         echo "Contents of requirements.txt (after):"
-        cat /home/runner/work/oppia/oppia/requirements.txt
+        cat "$GITHUB_WORKSPACE/requirements.txt"
       shell: bash
 
     - name: Check Yarn Cache
