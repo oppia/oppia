@@ -414,6 +414,7 @@ describe('Contribution and review service', () => {
         'topicName',
         // Question suggestions always target skills, so no entity type
         // filter is forwarded for them.
+        undefined,
         undefined
       );
     });
@@ -434,6 +435,31 @@ describe('Contribution and review service', () => {
         });
 
       expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+    });
+
+    it('should pass topic and language filters for submitted translations', () => {
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(backendFetchResponse)
+      );
+
+      cars.getUserCreatedTranslationSuggestionsAsync(
+        true,
+        'sort_key',
+        'exploration',
+        'Fractions',
+        'hi'
+      );
+
+      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        'SUBMITTED_TRANSLATION_SUGGESTIONS',
+        20,
+        0,
+        'sort_key',
+        null,
+        'Fractions',
+        'exploration',
+        'hi'
+      );
     });
   });
 
