@@ -34,6 +34,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import unittest
+from unittest import mock
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
@@ -1592,3 +1594,108 @@ class UrlRetrieveTests(CommonTests):
                 )
             with open(output_path, 'rb', encoding=None) as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+
+class LogTypeTests(unittest.TestCase):
+    """Tests for the LogType enum."""
+
+    def test_log_type_enum_has_required_values(self) -> None:
+        self.assertIn(common.LogType.INFO, common.LogType)
+        self.assertIn(common.LogType.ERROR, common.LogType)
+        self.assertIn(common.LogType.SUCCESS, common.LogType)
+        self.assertIn(common.LogType.WARNING, common.LogType)
+
+    def test_log_type_values_are_ansi_escape_sequences(self) -> None:
+        # Ensure every LogType value starts with the ANSI CSI prefix.
+        for log_type in common.LogType:
+            self.assertTrue(
+                log_type.value.startswith('\033['),
+                msg='Expected %s.value to be an ANSI escape sequence.'
+                % (log_type,),
+            )
+
+
+class LogToTerminalTests(unittest.TestCase):
+    """Tests for the log_to_terminal() function."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.printed_messages: list[str] = []
+
+    def test_explicit_error_type_prints_red(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Something failed.', common.LogType.ERROR)
+        mock_print.assert_called_once()
+        printed = mock_print.call_args[0][0]
+        self.assertIn(common.LogType.ERROR.value, printed)
+        self.assertIn('Something failed.', printed)
+        self.assertIn(common.ANSI_RESET_CODE, printed)
+
+    def test_explicit_success_type_prints_green(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('All good.', common.LogType.SUCCESS)
+        mock_print.assert_called_once()
+        printed = mock_print.call_args[0][0]
+        self.assertIn(common.LogType.SUCCESS.value, printed)
+        self.assertIn('All good.', printed)
+        self.assertIn(common.ANSI_RESET_CODE, printed)
+
+    def test_explicit_warning_type_prints_yellow(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Watch out.', common.LogType.WARNING)
+        mock_print.assert_called_once()
+        printed = mock_print.call_args[0][0]
+        self.assertIn(common.LogType.WARNING.value, printed)
+        self.assertIn('Watch out.', printed)
+        self.assertIn(common.ANSI_RESET_CODE, printed)
+
+    def test_explicit_info_type_prints_blue(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Just so you know.', common.LogType.INFO)
+        mock_print.assert_called_once()
+        printed = mock_print.call_args[0][0]
+        self.assertIn(common.LogType.INFO.value, printed)
+        self.assertIn('Just so you know.', printed)
+        self.assertIn(common.ANSI_RESET_CODE, printed)
+
+    def test_auto_detects_error_keyword_and_prints_red(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('An error occurred.')
+        mock_print.assert_called_once()
+        self.assertIn(common.LogType.ERROR.value, mock_print.call_args[0][0])
+
+    def test_auto_detects_fail_keyword_and_prints_red(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Test failed with exit code 1.')
+        mock_print.assert_called_once()
+        self.assertIn(common.LogType.ERROR.value, mock_print.call_args[0][0])
+
+    def test_auto_detects_warning_keyword_and_prints_yellow(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('warning: deprecated usage detected.')
+        mock_print.assert_called_once()
+        self.assertIn(common.LogType.WARNING.value, mock_print.call_args[0][0])
+
+    def test_auto_detects_success_keyword_and_prints_green(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('All tests passed.')
+        mock_print.assert_called_once()
+        self.assertIn(common.LogType.SUCCESS.value, mock_print.call_args[0][0])
+
+    def test_auto_detects_done_keyword_and_prints_green(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Done! Build completed.')
+        mock_print.assert_called_once()
+        self.assertIn(common.LogType.SUCCESS.value, mock_print.call_args[0][0])
+
+    def test_no_matching_keyword_prints_plain_message(self) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Starting server on port 8080.')
+        mock_print.assert_called_once_with('Starting server on port 8080.')
+
+    def test_message_type_none_with_no_keyword_match_prints_plain(
+        self,
+    ) -> None:
+        with mock.patch('builtins.print') as mock_print:
+            common.log_to_terminal('Downloading file...', None)
+        mock_print.assert_called_once_with('Downloading file...')

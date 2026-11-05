@@ -28,7 +28,7 @@ import tempfile
 
 from typing import Dict, Iterator, List, Optional, TextIO
 
-from .. import concurrent_task_utils
+from .. import common, concurrent_task_utils
 
 
 @contextlib.contextmanager
@@ -98,18 +98,16 @@ def print_failure_message(failure_message: str) -> None:
     Args:
         failure_message: str. The failure message to print.
     """
-    # \033[91m is the ANSI escape sequences for red color.
-    print('\033[91m' + failure_message + '\033[0m')
+    common.log_to_terminal(failure_message, common.LogType.ERROR)
 
 
 def print_success_message(success_message: str) -> None:
-    """Prints the given success_message in red color.
+    """Prints the given success message in green color.
 
     Args:
         success_message: str. The success message to print.
     """
-    # \033[91m is the ANSI escape sequences for green color.
-    print('\033[92m' + success_message + '\033[0m')
+    common.log_to_terminal(success_message, common.LogType.SUCCESS)
 
 
 class BaseLinter(abc.ABC):
