@@ -18,16 +18,14 @@
 
 const baseConfig = require('./.lighthouserc-base.js');
 
-// Lighthouse's "Regular 3G" preset: 300 ms RTT, 700 Kbps downlink, and a 4x
-// CPU slowdown. Lighthouse's mobile default is the faster Slow 4G preset, so
-// the profile is set explicitly here. The request latency and throughput values
-// match mobileRegular3G in node_modules/lighthouse/core/config/constants.js.
-const MOBILE_3G_THROTTLING = {
-  rttMs: 300,
-  throughputKbps: 700,
-  requestLatencyMs: 1125,
-  downloadThroughputKbps: 630,
-  uploadThroughputKbps: 630,
+// Lighthouse's "Slow 4G" preset, matching mobileSlow4G in
+// node_modules/lighthouse/core/config/constants.js.
+const MOBILE_THROTTLING = {
+  rttMs: 150,
+  throughputKbps: 1638.4,
+  requestLatencyMs: 562.5,
+  downloadThroughputKbps: 1474.56,
+  uploadThroughputKbps: 675,
   cpuSlowdownMultiplier: 4,
 };
 
@@ -39,7 +37,7 @@ module.exports = {
       puppeteerLaunchOptions: baseConfig['puppeteerLaunchOptions'],
       url: baseConfig['urls'],
       settings: {
-        throttling: MOBILE_3G_THROTTLING,
+        throttling: MOBILE_THROTTLING,
         onlyCategories: [
           'performance',
           'accessibility',
