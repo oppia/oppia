@@ -498,6 +498,10 @@ describe('Exploration editor page component', () => {
       eis.initAsync.and.returnValue(improvementsInitialization);
       spyOn(component, 'getActiveTabName').and.returnValue('preview');
       component.explorationEditorPageHasInitialized = true;
+      fixture.detectChanges();
+      const previousPreview =
+        fixture.nativeElement.querySelector('oppia-preview-tab');
+      expect(previousPreview).not.toBeNull();
 
       component.initExplorationPage();
       fixture.detectChanges();
@@ -517,6 +521,32 @@ describe('Exploration editor page component', () => {
       flushMicrotasks();
       fixture.detectChanges();
       expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('oppia-preview-tab')).not.toBe(
+        previousPreview
+      );
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
+    it('should use the initial state when preview opens with an invalid active state', fakeAsync(() => {
+      const stateEditorService = TestBed.inject(StateEditorService);
+      stateEditorService.setActiveStateName('missing-state');
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(stateEditorService.getActiveStateName()).toBe('Introduction');
       expect(
         fixture.nativeElement.querySelector('oppia-preview-tab')
       ).not.toBeNull();
