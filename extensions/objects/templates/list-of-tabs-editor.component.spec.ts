@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for list of tabs editor.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ListOfTabsEditorComponent} from './list-of-tabs-editor.component';
@@ -44,7 +42,7 @@ describe('ListOfTabsEditorComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.value).toEqual([]);
+    expect(component.value as string[]).toEqual([]);
     expect(component.valueChanged.emit).toHaveBeenCalledWith([]);
   });
 
