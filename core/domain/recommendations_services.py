@@ -23,7 +23,7 @@ import io
 import json
 
 from core import feconf, utils
-from core.domain import exp_domain, rights_domain
+from core.domain import exp_domain, recommendations_domain, rights_domain
 from core.platform import models
 
 from typing import Dict, Final, List, Sequence, cast
@@ -369,6 +369,52 @@ def get_item_similarity(
     return similarity_score
 
 
+def _get_exploration_recommendations_from_model(
+    exploration_recommendations_model: (
+        recommendations_models.ExplorationRecommendationsModel
+    ),
+) -> recommendations_domain.ExplorationRecommendations:
+    """Returns an ExplorationRecommendations domain object from the given
+    storage model.
+
+    Args:
+        exploration_recommendations_model: ExplorationRecommendationsModel. The
+            storage model to convert.
+
+    Returns:
+        ExplorationRecommendations. The corresponding domain object.
+    """
+    # TODO(#15621): The explicit declaration of type for ndb properties
+    # should be removed. Currently, these ndb properties are annotated with
+    # Any return type. Once we have proper return type we can remove this.
+    recommended_exploration_ids: List[str] = (
+        exploration_recommendations_model.recommended_exploration_ids
+    )
+    return recommendations_domain.ExplorationRecommendations(
+        exploration_recommendations_model.id, recommended_exploration_ids
+    )
+
+
+def _save_exploration_recommendations(
+    exploration_recommendations: (
+        recommendations_domain.ExplorationRecommendations
+    ),
+) -> None:
+    """Validates and saves the given ExplorationRecommendations domain object.
+
+    Args:
+        exploration_recommendations: ExplorationRecommendations. The domain
+            object to save.
+    """
+    exploration_recommendations.validate()
+    recommendations_models.ExplorationRecommendationsModel(
+        id=exploration_recommendations.exploration_id,
+        recommended_exploration_ids=(
+            exploration_recommendations.recommended_exploration_ids
+        ),
+    ).put()
+
+
 def set_exploration_recommendations(
     exp_id: str, new_recommendations: List[str]
 ) -> None:
@@ -381,10 +427,11 @@ def set_exploration_recommendations(
         new_recommendations: list(str). The new recommended exploration IDs
             to set.
     """
-
-    recommendations_models.ExplorationRecommendationsModel(
-        id=exp_id, recommended_exploration_ids=new_recommendations
-    ).put()
+    _save_exploration_recommendations(
+        recommendations_domain.ExplorationRecommendations(
+            exp_id, new_recommendations
+        )
+    )
 
 
 def get_exploration_recommendations(exp_id: str) -> List[str]:
@@ -406,14 +453,10 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
     )
     if recommendations_model is None:
         return []
-    else:
-        # TODO(#15621): The explicit declaration of type for ndb properties
-        # should be removed. Currently, these ndb properties are annotated with
-        # Any return type. Once we have proper return type we can remove this.
-        recommended_exploration_ids: List[str] = (
-            recommendations_model.recommended_exploration_ids
-        )
-        return recommended_exploration_ids
+
+    return _get_exploration_recommendations_from_model(
+        recommendations_model
+    ).recommended_exploration_ids
 
 
 def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
@@ -447,10 +490,29 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
         for recommending_model in recommending_models:
             all_recommending_models[recommending_model.id] = recommending_model
 
+    exp_ids_to_delete = set(exp_ids)
+    entities = []
     for recommending_model in all_recommending_models.values():
-        for exp_id in exp_ids:
-            recommending_model.recommended_exploration_ids.remove(exp_id)
+        exploration_recommendations = (
+            _get_exploration_recommendations_from_model(recommending_model)
+        )
+        # A model is fetched here if it recommends any one of exp_ids, so it is
+        # not guaranteed to recommend all of them. Filtering rather than
+        # removing each id in turn keeps this correct for that case.
+        exploration_recommendations.recommended_exploration_ids = [
+            recommended_exploration_id
+            for recommended_exploration_id in (
+                exploration_recommendations.recommended_exploration_ids
+            )
+            if recommended_exploration_id not in exp_ids_to_delete
+        ]
+        exploration_recommendations.validate()
+        # The fetched model is updated in place, rather than replaced with a
+        # new one, so that its existing timestamps are preserved.
+        recommending_model.recommended_exploration_ids = (
+            exploration_recommendations.recommended_exploration_ids
+        )
+        entities.append(recommending_model)
 
-    entities = list(all_recommending_models.values())
     recs_model_class.update_timestamps_multi(entities)
     recs_model_class.put_multi(entities)
