@@ -197,9 +197,12 @@ describe('Image Uploader Modal', () => {
   });
 
   it('should handle image upload and confirm image', fakeAsync(() => {
-    // The component's own change detection renders the croppable image once
-    // this upload completes, so stub out initializeCropper to avoid building a
-    // real Cropper (which loads the image over XHR).
+    // ChangeDetectorRef is stubbed in this spec, so the template is not
+    // rendered and @ViewChild('croppableImage') is never populated. Supply a
+    // detached <img> directly so this test can cover the post-upload cropper
+    // initialization and confirm flow; template rendering is not exercised
+    // here. initializeCropper is stubbed to avoid building a real Cropper
+    // (which loads the image over XHR).
     const initializeCropperSpy = spyOn(componentInstance, 'initializeCropper');
     componentInstance.croppableImageRef = new ElementRef(
       document.createElement('img')

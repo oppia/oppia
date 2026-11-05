@@ -121,6 +121,7 @@ describe('Questions List Component', () => {
   let questionUndoRedoService: QuestionUndoRedoService;
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
+  let windowRef: WindowRef;
   let skill: Skill;
   let question: Question | null = null;
   let questionStateData: State | null = null;
@@ -174,6 +175,7 @@ describe('Questions List Component', () => {
     loggerService = TestBed.inject(LoggerService);
     pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
+    windowRef = TestBed.inject(WindowRef);
 
     question = Question.createFromBackendDict({
       id: '1',
@@ -1017,6 +1019,7 @@ describe('Questions List Component', () => {
       ' opened while a question is already being created',
     () => {
       component.newQuestionIsBeingCreated = true;
+      component.questionId = 'questionId';
       spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
 
       component.openQuestionEditor();
@@ -1024,6 +1027,9 @@ describe('Questions List Component', () => {
       expect(
         pageContextService.setImageSaveDestinationToLocalStorage
       ).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.hash).toBe(
+        '/questions#questionId'
+      );
     }
   );
 
