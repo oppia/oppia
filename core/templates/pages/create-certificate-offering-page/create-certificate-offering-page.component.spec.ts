@@ -309,7 +309,7 @@ describe('Create Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'createCertificateAssessmentOfferingAsync'
-    ).and.returnValue(
+    ).and.callFake(() =>
       Promise.reject(new Error('Failed to create certificate.'))
     );
     const alertsSpy = spyOn(alertsService, 'addWarning');
@@ -332,7 +332,7 @@ describe('Create Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'createCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.reject('Failed to create certificate.'));
+    ).and.callFake(() => Promise.reject('Failed to create certificate.'));
     const alertsSpy = spyOn(alertsService, 'addWarning');
     const routerSpy = spyOn(router, 'navigate');
 

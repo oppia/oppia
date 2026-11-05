@@ -104,6 +104,12 @@ describe('NoninteractiveSkillreview', () => {
   });
 
   it('should open concept card when user clicks the link', () => {
+    // Spy on setCustomEntityContext so that the real static
+    // PageContextService.customEntityContext is not mutated. Otherwise the
+    // leaked context (with an undefined entity id, since ngOnInit is not
+    // called here) persists across specs and makes order-dependent specs such
+    // as RteHelperModalComponent fail.
+    spyOn(pageContextService, 'setCustomEntityContext');
     spyOn(pageContextService, 'removeCustomEntityContext');
     let e = {
       currentTarget: {

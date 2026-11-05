@@ -404,6 +404,19 @@ describe('Exploration editor page component', () => {
     spyOn(autosaveInfoModalsService, 'showLostChangesModal').and.stub();
     spyOn(autosaveInfoModalsService, 'isModalOpen').and.returnValue(false);
 
+    // Guard against the real InsertScriptService appending an external
+    // PencilCode script during ngOnInit. A cross-origin script error would
+    // surface as an opaque "Script error." and be reported against whichever
+    // spec happens to be running (see #26940). Only script elements are
+    // dropped; other elements are appended normally.
+    const realAppendChild = document.body.appendChild.bind(document.body);
+    spyOn(document.body, 'appendChild').and.callFake((node: Node) => {
+      if (node instanceof HTMLScriptElement) {
+        return node;
+      }
+      return realAppendChild(node);
+    });
+
     fixture.detectChanges();
   });
 

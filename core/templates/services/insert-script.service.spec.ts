@@ -215,6 +215,36 @@ describe('InsertScriptService', () => {
     expect(result).toBe(true);
   });
 
+  it('should load PENCILCODE script correctly', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    const result = insertScriptService.loadScript(
+      KNOWN_SCRIPTS.PENCILCODE,
+      () => {
+        expect(mockScriptElement.src).toContain(
+          'https://pencilcode.net/lib/pencilcodeembed.js'
+        );
+        done();
+      }
+    );
+
+    expect(result).toBe(true);
+  });
+
   it('should insert script into html', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,

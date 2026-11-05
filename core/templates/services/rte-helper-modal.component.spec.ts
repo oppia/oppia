@@ -64,6 +64,9 @@ describe('RteHelperModalComponent', () => {
   let alertsService: AlertsService;
   let mockExternalRteSaveEventEmitter = new EventEmitter();
   let activeModal: NgbActiveModal;
+  let getEntityTypeSpy: jasmine.Spy;
+  let getEntityIdSpy: jasmine.Spy;
+  let getImageSaveDestinationSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -109,6 +112,21 @@ describe('RteHelperModalComponent', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
     activeModal = TestBed.inject(NgbActiveModal);
+
+    // The save() method reads the entity context and image save destination,
+    // so these are stubbed for every test to keep the math save flow
+    // independent of the static PageContextService state or the current URL.
+    getEntityTypeSpy = spyOn(
+      pageContextService,
+      'getEntityType'
+    ).and.returnValue('exploration');
+    getEntityIdSpy = spyOn(pageContextService, 'getEntityId').and.returnValue(
+      'explorationId'
+    );
+    getImageSaveDestinationSpy = spyOn(
+      pageContextService,
+      'getImageSaveDestination'
+    ).and.returnValue(AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
   });
 
   describe('when customization args has a valid youtube video', function () {
@@ -150,7 +168,6 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.onCustomizationArgsFormChange(
@@ -249,10 +266,6 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-      );
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
 
@@ -298,10 +311,6 @@ describe('RteHelperModalComponent', () => {
     it('should handle being unable to communicate to server and show error while saving', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-      );
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
 
@@ -335,15 +344,8 @@ describe('RteHelperModalComponent', () => {
 
     it('should handle missing entity context when saving math SVG', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-      );
-      spyOn(pageContextService, 'getEntityType').and.returnValue(
-        undefined as unknown as string
-      );
-      spyOn(pageContextService, 'getEntityId').and.returnValue(
-        undefined as unknown as string
-      );
+      getEntityTypeSpy.and.returnValue(undefined as unknown as string);
+      getEntityIdSpy.and.returnValue(undefined as unknown as string);
       spyOn(
         imageUploadHelperService,
         'convertImageDataToImageFile'
@@ -380,10 +382,6 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when math SVG exceeds 100 KB', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-      );
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.customizationArgsForm.value[0] = {
@@ -410,12 +408,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when SVG exceeds 1 MB for blog post', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-      );
-      spyOn(pageContextService, 'getEntityType').and.returnValue(
-        AppConstants.ENTITY_TYPE.BLOG_POST
-      );
+      getEntityTypeSpy.and.returnValue(AppConstants.ENTITY_TYPE.BLOG_POST);
       component.ngOnInit();
       flush();
       component.customizationArgsForm.value[0] = {
@@ -446,9 +439,6 @@ describe('RteHelperModalComponent', () => {
         'empty for a math expression',
       fakeAsync(() => {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-        spyOn(pageContextService, 'getEntityType').and.returnValue(
-          'exploration'
-        );
         component.ngOnInit();
         flush();
         component.customizationArgsForm.value[0] = {
@@ -469,7 +459,6 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args while in local storage', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.customizationArgsForm.value[0] = {
@@ -483,7 +472,7 @@ describe('RteHelperModalComponent', () => {
       );
 
       var imageFile = new Blob();
-      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      getImageSaveDestinationSpy.and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(
@@ -578,7 +567,6 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       expect(component.isErrorMessageNonempty()).toBe(false);
@@ -1124,7 +1112,6 @@ describe('RteHelperModalComponent', () => {
   });
 
   it('should dismiss modal if svg file is missing when saving', fakeAsync(() => {
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.componentId = 'math';
     component.customizationArgSpecs = [
       {
@@ -1154,7 +1141,6 @@ describe('RteHelperModalComponent', () => {
   }));
 
   it('should dismiss modal if resampled svg file is null when saving', fakeAsync(() => {
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.componentId = 'math';
     component.customizationArgSpecs = [
       {
@@ -1198,6 +1184,8 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
   let assetsBackendApiService: AssetsBackendApiService;
   let imageUploadHelperService: ImageUploadHelperService;
   let alertsService: AlertsService;
+  let getEntityTypeSpy: jasmine.Spy;
+  let getImageSaveDestinationSpy: jasmine.Spy;
 
   const modalData = {
     componentId: 'Math',
@@ -1259,6 +1247,19 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
+
+    // The save() method reads the entity context and image save destination,
+    // so these are stubbed for every test to keep the math save flow
+    // independent of the static PageContextService state or the current URL.
+    getEntityTypeSpy = spyOn(
+      pageContextService,
+      'getEntityType'
+    ).and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('explorationId');
+    getImageSaveDestinationSpy = spyOn(
+      pageContextService,
+      'getImageSaveDestination'
+    ).and.returnValue(AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     fixture.detectChanges();
   });
 
@@ -1332,10 +1333,6 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ] as unknown as CustomizationArgsSpecsType;
-    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-    );
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
@@ -1372,10 +1369,6 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ] as unknown as CustomizationArgsSpecsType;
     spyOn(alertsService, 'addWarning');
-    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
-    );
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
@@ -1406,7 +1399,6 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ] as unknown as CustomizationArgsSpecsType;
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
@@ -1440,9 +1432,7 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ] as unknown as CustomizationArgsSpecsType;
-    spyOn(pageContextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.BLOG_POST
-    );
+    getEntityTypeSpy.and.returnValue(AppConstants.ENTITY_TYPE.BLOG_POST);
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
@@ -1476,8 +1466,7 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ] as unknown as CustomizationArgsSpecsType;
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+    getImageSaveDestinationSpy.and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     component.tmpCustomizationArgs = [];
@@ -1515,7 +1504,6 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
         default_value: {raw_latex: '', svg_filename: ''},
       },
     ] as unknown as CustomizationArgsSpecsType;
-    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     component.tmpCustomizationArgs = [];
     (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
