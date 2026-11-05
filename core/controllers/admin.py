@@ -224,6 +224,15 @@ class ClassroomPageDataDict(TypedDict):
     url_fragment: str
 
 
+class DummyStoryNodeDict(TypedDict):
+    """Dict representation of a story node generated as dummy data."""
+
+    exp_id: str
+    title: str
+    description: str
+    acquired_skill_ids: List[str]
+
+
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
@@ -1173,7 +1182,7 @@ class AdminHandler(
                 '#F8BF74',
             )
 
-            story_node_dicts = [
+            story_node_dicts: List[DummyStoryNodeDict] = [
                 {
                     'exp_id': '6',
                     'title': 'What are the place values?',
