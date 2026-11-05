@@ -17,6 +17,7 @@
  */
 
 import {ToastrModule} from 'ngx-toastr';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {RouterModule} from '@angular/router';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
@@ -97,6 +98,7 @@ import {TutorCardModule} from 'components/shared_parts/tutor-card.module';
     DragDropModule,
     InteractionExtensionsModule,
     ToastrModule.forRoot(toastrConfig),
+    MatTooltipModule,
     RouterModule.forChild([
       {
         path: '',
