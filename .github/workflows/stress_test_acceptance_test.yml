@@ -63,28 +63,20 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Use the canonical Oppia directory on forks
+      - name: Checkout fork into the required oppia directory
         if: github.repository != 'oppia/oppia'
-        run: |
-          WORKSPACE_PARENT="$(dirname "$GITHUB_WORKSPACE")"
-          OPPIA_PARENT=/home/runner/work/oppia
-          if [ "$WORKSPACE_PARENT" != "$OPPIA_PARENT" ]; then
-            test ! -e "$OPPIA_PARENT"
-            mv "$WORKSPACE_PARENT" "$OPPIA_PARENT"
-            ln -s "$OPPIA_PARENT" "$WORKSPACE_PARENT"
-          fi
-          if [ "$(basename "$GITHUB_WORKSPACE")" != oppia ]; then
-            test ! -e "$OPPIA_PARENT/oppia"
-            mv "$GITHUB_WORKSPACE" "$OPPIA_PARENT/oppia"
-            ln -s "$OPPIA_PARENT/oppia" "$GITHUB_WORKSPACE"
-          fi
-        # Keep workspace-based actions usable while Python sees a physical oppia/ directory.
+        uses: actions/checkout@v4
+        with:
+          path: oppia
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
+          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+        with:
+          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
 
   run_acceptance_test:
     needs: [build, generate-matrix, setup_merge_sha]
@@ -108,28 +100,20 @@ jobs:
           fi
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Use the canonical Oppia directory on forks
+      - name: Checkout fork into the required oppia directory
         if: github.repository != 'oppia/oppia'
-        run: |
-          WORKSPACE_PARENT="$(dirname "$GITHUB_WORKSPACE")"
-          OPPIA_PARENT=/home/runner/work/oppia
-          if [ "$WORKSPACE_PARENT" != "$OPPIA_PARENT" ]; then
-            test ! -e "$OPPIA_PARENT"
-            mv "$WORKSPACE_PARENT" "$OPPIA_PARENT"
-            ln -s "$OPPIA_PARENT" "$WORKSPACE_PARENT"
-          fi
-          if [ "$(basename "$GITHUB_WORKSPACE")" != oppia ]; then
-            test ! -e "$OPPIA_PARENT/oppia"
-            mv "$GITHUB_WORKSPACE" "$OPPIA_PARENT/oppia"
-            ln -s "$OPPIA_PARENT/oppia" "$GITHUB_WORKSPACE"
-          fi
-        # Keep workspace-based actions usable while Python sees a physical oppia/ directory.
+        uses: actions/checkout@v4
+        with:
+          path: oppia
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
+          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+        with:
+          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
@@ -139,6 +123,7 @@ jobs:
       - name: Run ${{ matrix.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
+          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
           test-suite: ${{ inputs.test_suite }}
           viewport-type: ${{ matrix.viewport-type }}
           enable-screen-recording: true
