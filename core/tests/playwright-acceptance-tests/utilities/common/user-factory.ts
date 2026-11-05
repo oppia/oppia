@@ -18,7 +18,7 @@
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
-import {Browser} from '@playwright/test';
+import {Browser, BrowserContextOptions} from '@playwright/test';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -231,6 +231,7 @@ export class UserFactory {
    * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
    * @param {string | string[]} args - The arguments to pass to the role
    *     assignment function.
+   * @param {BrowserContextOptions} contextOptions - Device settings for the user's context.
    */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
@@ -239,9 +240,11 @@ export class UserFactory {
     email: string,
     browser: Browser,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    args?: string | string[]
+    args?: string | string[],
+    contextOptions: BrowserContextOptions = {}
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
+      ...contextOptions,
       recordVideo: {
         dir: VIDEO_RECORDING_DIR,
       },

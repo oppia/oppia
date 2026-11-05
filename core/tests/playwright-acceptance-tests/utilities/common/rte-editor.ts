@@ -16,7 +16,7 @@
  * @fileoverview Utility class to interact with RTE editor.
  */
 
-import {ElementHandle} from '@playwright/test';
+import {ElementHandle, expect} from '@playwright/test';
 import {BaseUser} from './playwright-utils';
 import {showMessage} from './show-message';
 
@@ -39,6 +39,22 @@ export class RTEEditor {
 
   constructor(user: BaseUser) {
     this.user = user;
+  }
+
+  /** Enters LaTeX and commits the field so Angular can validate the formula. */
+  async typeMathExpression(latex: string): Promise<void> {
+    const modal = this.user.page.locator('oppia-rte-helper-modal');
+    const input = modal.locator(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    await input.fill(latex);
+    await input.press('Tab');
+    await expect(modal.locator('.MathJax_SVG svg')).toBeVisible({
+      timeout: 90000,
+    });
+    await expect(modal.locator(closeButtonForExtraModel)).toBeEnabled({
+      timeout: 90000,
+    });
   }
 
   /**

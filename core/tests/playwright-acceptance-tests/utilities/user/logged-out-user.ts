@@ -635,8 +635,6 @@ export class LoggedOutUser extends BaseUser {
       .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
       .catch(() => null);
 
-    // Wait for 1s to ensure the selected answer is updated in Angular component.
-    await this.page.waitForTimeout(1000);
     // Click on Submit Answer button.
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -666,8 +664,9 @@ export class LoggedOutUser extends BaseUser {
 
         return (
           (submitButton as HTMLButtonElement)?.disabled ||
-          document.querySelector(formErrorContainer)?.textContent?.trim() !==
-            null ||
+          Boolean(
+            document.querySelector(formErrorContainer)?.textContent?.trim()
+          ) ||
           currentValue1 !== value1 ||
           currentValue2 !== value2
         );
@@ -1557,13 +1556,27 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} expectedFeedback - The expected feedback.
    */
   async expectOppiaFeedbackToBe(expectedFeedback: string): Promise<void> {
-    await this.expectElementToBeVisible(feedbackSelector);
-    const feedbackText = await this.getTextContent(`${feedbackSelector} > p`);
-    if (feedbackText !== expectedFeedback) {
-      throw new Error(
-        `Expected feedback to be '${expectedFeedback}', but got '${feedbackText}'.`
-      );
-    }
+    await expect(this.page.locator(feedbackSelector)).toHaveText(
+      expectedFeedback
+    );
+  }
+
+  /** Checks the learner validation message, including errors shown before submit. */
+  async expectAnswerErrorMessageToBe(expectedError: string): Promise<void> {
+    await expect(this.page.locator(formErrorContainer)).toContainText(
+      expectedError
+    );
+  }
+
+  /** Checks both the hint dialog title and its contents. */
+  async expectHintInHintModalToContain(expectedHint: string): Promise<void> {
+    const modal = this.page.locator('ngb-modal-window').filter({
+      has: this.page.locator(gotItButtonSelector),
+    });
+    await expect(modal.locator('.e2e-test-modal-header')).toHaveText('Hint');
+    await expect(modal.locator('.e2e-test-modal-body')).toContainText(
+      expectedHint
+    );
   }
 
   /**
@@ -3029,11 +3042,10 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
-    // Allow input elements to be rendered and ready for interaction.
-    await this.page.waitForTimeout(1000);
-    await this.waitForElementToBeClickable(submitResponseToInteractionInput);
-    await this.clearAllTextFrom(submitResponseToInteractionInput);
-    await this.typeInInputField(submitResponseToInteractionInput, answer);
+    const input = this.page.locator(submitResponseToInteractionInput);
+    await input.fill(answer);
+    await input.blur();
+    await expect(input).toHaveValue(answer);
     await this.clickOnSubmitAnswerButton();
   }
 

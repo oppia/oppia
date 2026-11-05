@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, expect, Locator} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -231,8 +231,239 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
 } as const;
 
 const addTitleBar = 'input#explorationTitle';
+const solutionModalSelector = 'oppia-add-or-update-solution-modal';
+const setInputField = '.e2e-test-text-input';
+const mathExpressionInput = '.e2e-test-guppy-div';
 
 export class ExplorationEditor extends BaseUser {
+  /** Inserts a formula and optionally checks contiguous text in its rendered SVG. */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedText?: string
+  ): Promise<void> {
+    await this.page.locator(stateEditSelector).click();
+    await this.page.locator(stateContentInputField).fill('');
+    const rteEditor = new RTEEditor(this);
+    await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await rteEditor.typeMathExpression(latex);
+    const modal = this.page.locator('oppia-rte-helper-modal');
+    if (expectedText) {
+      // A single SVG text node must contain the whole string; joining separate
+      // nodes would conceal the Arabic shaping regression.
+      await expect(
+        modal.locator('.MathJax_SVG svg text').filter({hasText: expectedText})
+      ).toHaveCount(1, {timeout: 90000});
+    }
+    await modal.locator(closeButtonForExtraModel).click();
+    await expect(modal).toBeHidden();
+    await this.page.locator(saveContentButton).click();
+    await expect(this.page.locator(stateContentInputField)).toBeHidden();
+  }
+
+  /** Enters a Guppy expression through keyboard events rather than input fill. */
+  private async replaceMathExpression(
+    editor: Locator,
+    expression: string
+  ): Promise<void> {
+    await expect(editor).toHaveAttribute('id', /^guppy_/);
+    await editor.click();
+    await this.page.keyboard.press('ControlOrMeta+A');
+    await this.page.keyboard.press('Backspace');
+    await this.page.keyboard.type(expression);
+    if (expression) {
+      await expect(editor.locator('.katex')).toBeVisible();
+    }
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+  }
+
+  /** Configures numeric, algebraic, or equation rules using their Guppy editor. */
+  async updateMathExpressionLearnerAnswerInResponseModal(
+    rule: string,
+    expression: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    await this.replaceMathExpression(
+      this.page.locator(responseModalBodySelector).locator(mathExpressionInput),
+      expression
+    );
+  }
+
+  /** Adds a numeric, algebraic, or equation solution and its explanation. */
+  async addMathExpressionSolutionToState(
+    expression: string,
+    explanation: string
+  ): Promise<void> {
+    await this.page.locator(addSolutionButton).click();
+    const modal = this.page.locator(solutionModalSelector);
+    await this.replaceMathExpression(
+      modal.locator(mathExpressionInput),
+      expression
+    );
+    await modal.locator(submitAnswerButton).click();
+    await this.addSolutionExplanationAndSave(explanation);
+  }
+
+  /** Replaces the learner's Guppy answer, including intentionally empty input. */
+  async submitExpressionAnswer(expression: string): Promise<void> {
+    await this.replaceMathExpression(
+      this.page
+        .locator('oppia-interaction-display')
+        .locator(mathExpressionInput),
+      expression
+    );
+    await this.page.locator(submitAnswerButton).click();
+  }
+
+  /** Selects the allowed algebraic variables and saves customization. */
+  async customizeAlgebraicExpressionInputInteraction(
+    variables: string[],
+    representDivisionUsingFraction: boolean
+  ): Promise<void> {
+    const customization = this.page.locator(customizeInteractionBodySelector);
+    // Variables are selected by buttons, not by typing into the display div.
+    for (const variable of variables) {
+      await customization.locator(`#custom-letter-${variable}`).click();
+    }
+    await expect(
+      customization.locator('.e2e-test-custom-letters > div')
+    ).toHaveText(variables);
+    await customization
+      .locator('input[type="checkbox"]')
+      .setChecked(representDivisionUsingFraction);
+    await this.page.locator(saveInteractionButton).click();
+    await expect(customization).toBeHidden();
+  }
+
+  /** Fills the actual number-with-units input rather than its component host. */
+  async updateNumberWithUnitsLearnerAnswerInResponseModal(
+    rule: string,
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const input = this.page
+      .locator(responseModalBodySelector)
+      .locator('number-with-units-editor input');
+    await input.fill(answer);
+    await input.blur();
+    await expect(input).toHaveValue(answer);
+  }
+
+  /** Replaces each ratio field in the selected response rule. */
+  async updateRatioExpressionInputLearnerAnswerInResponseModal(
+    rule: string,
+    values: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    const inputs = this.page
+      .locator(responseModalBodySelector)
+      .locator('oppia-rule-editor input');
+    await expect(inputs).toHaveCount(values.length);
+    for (let i = 0; i < values.length; i++) {
+      await inputs.nth(i).fill(values[i]);
+      await expect(inputs.nth(i)).toHaveValue(values[i]);
+    }
+  }
+
+  /** Opens and closes the number-with-units format reference. */
+  async expectUnitsTableToShowProperly(): Promise<void> {
+    await this.page.locator('.e2e-test-show-unit-formats').click();
+    const header = this.page.locator(
+      '.e2e-test-number-with-units-help-modal-header'
+    );
+    await expect(header).toBeVisible();
+    const modal = this.page.locator('ngb-modal-window').filter({has: header});
+    await modal.locator('.e2e-test-modal-close-button').click();
+    await expect(modal).toBeHidden();
+  }
+
+  /** Selects a response rule before filling its interaction-specific fields. */
+  async updateRuleInResponseModalTo(rule: string): Promise<void> {
+    const ruleSelect = this.page
+      .locator(responseModalBodySelector)
+      .locator('oppia-rule-type-selector mat-select');
+    await ruleSelect.click();
+    // The modal marks the Material overlay aria-hidden despite visible options.
+    await this.page
+      .getByRole('option', {name: rule, includeHidden: true})
+      .click();
+    await expect(ruleSelect).toContainText(rule);
+  }
+
+  /** Configures the expected set using a separate field for each element. */
+  async updateSetInputLearnerAnswerInResponseModal(
+    rule: string,
+    values: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    await this.fillSetInput(
+      this.page.locator(responseModalBodySelector),
+      values
+    );
+  }
+
+  /** Populates a set editor, including its initially empty or existing rows. */
+  private async fillSetInput(editor: Locator, values: string[]): Promise<void> {
+    await expect(editor).toBeVisible();
+    const fields = editor.locator(setInputField);
+    // A wrong answer can leave the previous learner rows mounted.
+    while ((await fields.count()) > values.length) {
+      const previousCount = await fields.count();
+      await editor.locator('.e2e-test-delete-list-entry').last().click();
+      await expect(fields).toHaveCount(previousCount - 1);
+    }
+    for (let i = 0; i < values.length; i++) {
+      if ((await fields.count()) <= i) {
+        await editor.locator(addResponseOptionButton).click();
+      }
+      await fields.nth(i).fill(values[i]);
+      await fields.nth(i).blur();
+      await expect(fields.nth(i)).toHaveValue(values[i]);
+    }
+    await expect(fields).toHaveCount(values.length);
+  }
+
+  /** Adds every set element to the solution before saving its explanation. */
+  async addSetInputSolutionToState(
+    values: string[],
+    explanation: string
+  ): Promise<void> {
+    await this.page.locator(addSolutionButton).click();
+    const modal = this.page.locator(solutionModalSelector);
+    await expect(modal).toBeVisible();
+    await this.fillSetInput(modal, values);
+    await modal.locator(submitAnswerButton).click();
+    await this.addSolutionExplanationAndSave(explanation);
+  }
+
+  /** Enters a learner set, optionally leaving duplicate validation unsubmitted. */
+  async submitInputSetAnswer(
+    values: string[],
+    submitAnswer: boolean = true
+  ): Promise<void> {
+    await this.fillSetInput(
+      this.page
+        .locator(previewTabContainer)
+        .locator('.e2e-test-conversation-input'),
+      values
+    );
+    if (submitAnswer) {
+      await this.page.locator(submitAnswerButton).click();
+    }
+  }
+
+  /** Checks the current preview content after selecting a card in the editor. */
+  async expectPreviewCardContentToBe(
+    cardName: string,
+    content: string
+  ): Promise<void> {
+    await expect(
+      this.page.locator('.e2e-test-conversation-content'),
+      `Expected preview content for ${cardName}`
+    ).toHaveText(content);
+  }
+
   /**
    * Navigate to creator dashboard page.
    */
@@ -354,8 +585,41 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} hint - The hint to be added for the current card.
    */
   async addHintToState(hint: string): Promise<void> {
+    // The expanded mobile navigation can cover the Add Hint button.
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await this.page.locator(mobileNavbarOptions).isVisible())
+    ) {
+      await this.page.locator(mobileOptionsButtonSelector).click();
+      await expect(this.page.locator(mobileNavbarOptions)).toBeHidden();
+    }
     await this.expectElementToBeVisible(addHintButton);
-    await this.clickOnElementWithSelector(addHintButton);
+    if (this.isViewportAtMobileWidth()) {
+      const button = this.page
+        .locator('oppia-state-hints-editor')
+        .locator(addHintButton);
+      // Native keyboard activation avoids the mobile pointer hit-test mismatch.
+      await expect(button).toBeVisible();
+      await expect(button).toBeEnabled();
+      await button.focus();
+      await expect(button).toBeFocused();
+      await button.press('Enter');
+      await expect(
+        this.page.locator('ngb-modal-window.add-hint-modal')
+      ).toBeVisible();
+      const modal = this.page.locator('ngb-modal-window.add-hint-modal');
+      const editor = modal.locator(
+        `${stateContentInputField}.cke_editable[contenteditable="true"]`
+      );
+      await editor.click();
+      await editor.pressSequentially(hint);
+      await expect(editor).toHaveText(hint);
+      await modal.locator(saveHintButton).click();
+      await expect(modal).toBeHidden();
+      return;
+    } else {
+      await this.clickOnElementWithSelector(addHintButton);
+    }
     await this.typeInInputField(stateContentInputField, hint);
     await this.clickOnElementWithSelector(saveHintButton);
     await this.expectElementToBeVisible(saveHintButton, false);
@@ -1157,15 +1421,19 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.expectElementToBeVisible(mobileNavbarPane);
-      await this.clickOnElementWithSelector(mobilePreviewTabButton);
+      if (!(await this.page.locator(mobileNavbarOptions).isVisible())) {
+        await this.page.locator(mobileOptionsButtonSelector).click();
+      }
+      if (!(await this.page.locator(`${mobileNavbarPane}.show`).isVisible())) {
+        await this.page.locator(mobileNavbarDropdown).click();
+      }
+      await this.page.locator(mobilePreviewTabButton).click();
     } else {
       await this.expectElementToBeVisible(previewTabButton);
       await this.clickOnElementWithSelector(previewTabButton);
     }
 
+    await this.page.waitForURL(url => url.hash.startsWith('#/preview/'));
     await this.expectElementToBeVisible(previewTabContainer);
   }
 
@@ -1526,11 +1794,15 @@ export class ExplorationEditor extends BaseUser {
         await this.expectElementToBeVisible(textInputInteractionOption);
         await this.typeInInputField(textInputInteractionOption, answer);
         break;
-      case INTERACTION_TYPES.FRACTION_INPUT:
-        await this.expectElementToBeVisible(intEditorField);
-        await this.clearAllTextFrom(intEditorField);
-        await this.typeInInputField(intEditorField, answer);
+      case INTERACTION_TYPES.FRACTION_INPUT: {
+        // Replace the default integer without platform-specific keyboard shortcuts.
+        const fractionRuleInput = this.page
+          .locator(responseModalBodySelector)
+          .locator(intEditorField);
+        await fractionRuleInput.fill(answer);
+        await expect(fractionRuleInput).toHaveValue(answer);
         break;
+      }
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
