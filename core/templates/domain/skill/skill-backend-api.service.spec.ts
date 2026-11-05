@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SkillBackendApiService.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -89,15 +87,18 @@ describe('Skill backend API service', () => {
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
     skills.push(Skill.createFromBackendDict(skillBackendDict).toBackendDict());
+    const skillsResponse = {
+      skills: skills,
+    };
     skillBackendApiService
       .fetchAllSkills()
       .toPromise()
       .then(res => {
-        expect(res).toEqual(skills);
+        expect(res).toEqual(skillsResponse);
       });
     let req = httpTestingController.expectOne('/fetch_skills');
     expect(req.request.method).toEqual('GET');
-    req.flush(skills);
+    req.flush(skillsResponse);
 
     flushMicrotasks();
   }));
@@ -117,7 +118,7 @@ describe('Skill backend API service', () => {
       version: 1,
     };
     const groupedSkillSummaries = {
-      topic: skillSummaryBackendDict,
+      topic: [skillSummaryBackendDict],
     };
 
     const backendResponse = {
