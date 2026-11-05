@@ -5,7 +5,7 @@
       (mouseenter)="onEditButtonHover()"
       (mouseleave)="$event.stopPropagation(); onEditButtonHover()"
       class="nav-item">
-    <a href="#" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab">
+    <a href="#" ngbTooltip="Editor" aria-label="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab">
       <i class="fas fa-pen"></i>
     </a>
     <div *ngIf="getWarningsCount()"
@@ -27,7 +27,7 @@
 
   <!-- Settings -->
   <li [ngClass]="{'active': getActiveTabName() === 'settings'}" class="nav-item">
-    <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab">
+    <a href="#" ngbTooltip="Settings" aria-label="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab">
       <i class="fas fa-cog"></i>
     </a>
   </li>
@@ -42,6 +42,7 @@
        target="_blank"
        rel="noopener"
        ngbTooltip="Player (new tab)"
+       aria-label="Player (new tab)"
        placement="bottom" class="nav-link">
       <i class="fas fa-play"></i>
       <div *ngIf="getWarningsCount()"
