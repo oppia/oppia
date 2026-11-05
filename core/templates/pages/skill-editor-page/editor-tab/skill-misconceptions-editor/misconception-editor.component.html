@@ -82,7 +82,8 @@
       <div class="oppia-rule-details-header">
         <strong>Notes for Creator</strong>
         <schema-based-editor [schema]="NOTES_FORM_SCHEMA"
-                             [(localValue)]="container.misconceptionNotes">
+                             [localValue]="container.misconceptionNotes"
+                             (localValueChange)="updateMisconceptionNotes($event)">
         </schema-based-editor>
       </div>
 
@@ -128,7 +129,8 @@
       <div class="oppia-rule-details-header">
         <strong>Feedback for Learner</strong>
         <schema-based-editor [schema]="FEEDBACK_FORM_SCHEMA"
-                             [(localValue)]="container.misconceptionFeedback">
+                             [localValue]="container.misconceptionFeedback"
+                             (localValueChange)="updateMisconceptionFeedback($event)">
         </schema-based-editor>
       </div>
 

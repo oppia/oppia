@@ -42,7 +42,7 @@ class MockTruncatePipe implements PipeTransform {
 }
 
 class MockNavigationService {
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {}
+  openSubmenu(evt: Event, menuName: string): void {}
 }
 
 describe('LearnerGroupLearnersProgressComponent', () => {
@@ -229,7 +229,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
   });
 
   it('should open submenu', () => {
-    const clickEvent = new KeyboardEvent('click');
+    const clickEvent = new MouseEvent('click');
     spyOn(navigationService, 'openSubmenu');
 
     component.openSubmenu(clickEvent, 'learner');

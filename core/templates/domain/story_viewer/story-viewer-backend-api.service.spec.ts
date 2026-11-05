@@ -131,7 +131,6 @@ describe('Story viewer backend API service', () => {
         },
       ],
       next_node_id: 'node_2',
-      ready_for_review_test: true,
     };
 
     let successHandler = jasmine.createSpy('success');
@@ -154,7 +153,6 @@ describe('Story viewer backend API service', () => {
         LearnerExplorationSummary.createFromBackendDict(expSummary)
       ),
       nextNodeId: sampleDataResults.next_node_id,
-      readyForReviewTest: sampleDataResults.ready_for_review_test,
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));

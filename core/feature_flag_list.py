@@ -82,7 +82,6 @@ class FeatureNames(enum.Enum):
     ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
         'enable_background_voiceover_synthesis'
     )
-    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
         'enable_financial_literacy_campaign_banner'
     )
@@ -108,6 +107,7 @@ class FeatureNames(enum.Enum):
         'technical_feedback_dashboard_enabled'
     )
     STORY_EDITOR_ARCS = 'story_editor_arcs'
+    ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -131,8 +131,8 @@ class FeatureNames(enum.Enum):
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -326,12 +326,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.PROD,
         )
     ),
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
-        (
-            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
-            feature_flag_domain.ServerMode.DEV,
-        )
-    ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign.',
@@ -383,6 +377,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables arc-based chapter groupings in the story editor, '
             'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
+        (
+            'This flag enables dropdown-based page navigation on the '
+            'Contributor Dashboard, replacing the simple Previous/Next '
+            'pagination buttons with a page selector dropdown.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }
