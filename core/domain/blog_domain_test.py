@@ -201,7 +201,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_title_for_blog_post(
             'Title field contains invalid characters. Only words '
             r'\(a-zA-Z0-9\(\'!\)\) separated by spaces\, hyphens \(-\)\, comma '
-            r'\(\,\)\, ampersand \(&\) and colon \(:\) are allowed.'
+            r'\(\,\)\, ampersand \(&\) and colon \(:\) are allowed. '
             'Received %s' % r'ABC12@heloo',
             r'ABC12@heloo',
         )
@@ -217,7 +217,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def test_tags_validation_in_strict_mode(self) -> None:
         self._assert_strict_valid_tags_for_blog_post(
-            'Atleast one tag should be selected', []
+            'At least one tag should be selected.', []
         )
 
     def test_url_fragment_validation(self) -> None:
@@ -237,7 +237,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             url_fragment,
         )
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field contains invalid characters.'
+            'Blog Post URL Fragment field contains invalid characters. '
             'Only lowercase words, numbers separated by hyphens are allowed. '
             'Received %s.' % ('oppia-in-covid19-#'),
             'oppia-in-covid19-#',
@@ -314,7 +314,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             ['a    b'],
         )
         self._assert_valid_tags_for_blog_post(
-            'Some tags duplicate each other', ['abc', 'abc']
+            'Some tags duplicate each other.', ['abc', 'abc']
         )
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', '']
@@ -337,7 +337,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
         self.blog_post.tags = ['tag']
         self.blog_post.url_fragment = 'sample-title'
-        self._assert_strict_validation_error('Content can not be empty')
+        self._assert_strict_validation_error('Content cannot be empty.')
 
         self.blog_post.content = '<p>Hello</p>'
         self.blog_post.validate(strict=True)
@@ -599,7 +599,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             url_fragment,
         )
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field contains invalid characters.'
+            'Blog Post URL Fragment field contains invalid characters. '
             'Only lowercase words, numbers separated by hyphens are allowed. '
             'Received %s.' % ('oppia-in-covid19-#'),
             'oppia-in-covid19-#',
@@ -733,7 +733,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.tags = ['tag']
         self.blog_post_summary.summary = ''
         self.blog_post_summary.url_fragment = 'sample-title'
-        self._assert_strict_validation_error('Summary can not be empty')
+        self._assert_strict_validation_error('Summary cannot be empty.')
 
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
@@ -761,7 +761,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             ['a    b'],
         )
         self._assert_valid_tags_for_blog_post(
-            'Some tags duplicate each other', ['abc', 'abc']
+            'Some tags duplicate each other.', ['abc', 'abc']
         )
         self._assert_valid_tags_for_blog_post(
             'Tag should not be empty.', ['abc', '']
@@ -769,7 +769,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_tags_validation_in_strict_mode(self) -> None:
         self._assert_strict_valid_tags_for_blog_post(
-            'Atleast one tag should be selected', []
+            'At least one tag should be selected.', []
         )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type

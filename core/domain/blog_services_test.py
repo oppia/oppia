@@ -362,7 +362,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.blog_post_a_id, self.change_dict_one
         )
         with self.assertRaisesRegex(
-            Exception, ('Atleast one tag should be selected')
+            Exception, ('At least one tag should be selected.')
         ):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
@@ -374,7 +374,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         }
 
         blog_services.update_blog_post(self.blog_post_a_id, change_dict_three)
-        with self.assertRaisesRegex(Exception, ('Content can not be empty')):
+        with self.assertRaisesRegex(Exception, ('Content cannot be empty.')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.delete_blog_post(self.blog_post_a_id)

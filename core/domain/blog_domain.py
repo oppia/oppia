@@ -175,7 +175,7 @@ class BlogPost:
 
             self.require_valid_url_fragment(self.url_fragment)
             if not self.content:
-                raise utils.ValidationError('Content can not be empty')
+                raise utils.ValidationError('Content cannot be empty.')
 
         if not isinstance(self.content, str):
             raise utils.ValidationError(
@@ -192,7 +192,7 @@ class BlogPost:
                 post is published or is going to be published.
 
         Raises:
-            ValidationErrors. One or more tags provided are invalid.
+            ValidationError. One or more tags provided are invalid.
         """
         for tag in tags:
             if not isinstance(tag, str):
@@ -225,11 +225,11 @@ class BlogPost:
         if strict:
             if not tags:
                 raise utils.ValidationError(
-                    'Atleast one tag should be selected'
+                    'At least one tag should be selected.'
                 )
 
         if len(set(tags)) != len(tags):
-            raise utils.ValidationError('Some tags duplicate each other')
+            raise utils.ValidationError('Some tags duplicate each other.')
 
     @classmethod
     def require_valid_title(cls, title: str, strict: bool) -> None:
@@ -241,7 +241,7 @@ class BlogPost:
                 post is published or is going to be published.
 
         Raises:
-            ValidationErrors. Title provided is invalid.
+            ValidationError. Title provided is invalid.
         """
         if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
@@ -254,12 +254,12 @@ class BlogPost:
 
         if strict:
             if not title:
-                raise utils.ValidationError('Title should not be empty')
+                raise utils.ValidationError('Title should not be empty.')
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
                     'Title field contains invalid characters. Only words '
                     '(a-zA-Z0-9(\'!)) separated by spaces, hyphens (-), comma ('
-                    ',), ampersand (&) and colon (:) are allowed.'
+                    ',), ampersand (&) and colon (:) are allowed. '
                     'Received %s' % title
                 )
 
@@ -271,7 +271,7 @@ class BlogPost:
             url_fragment: str. The url fragment to validate.
 
         Raises:
-            ValidationErrors. URL fragment provided is invalid.
+            ValidationError. URL fragment provided is invalid.
         """
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(
@@ -292,7 +292,7 @@ class BlogPost:
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
-                'Blog Post URL Fragment field contains invalid characters.'
+                'Blog Post URL Fragment field contains invalid characters. '
                 'Only lowercase words, numbers separated by hyphens are'
                 ' allowed. Received %s.' % (url_fragment)
             )
@@ -480,7 +480,7 @@ class BlogPostSummary:
                 blog post is published or is going to be published.
 
         Raises:
-            ValidationErrors. Thumbnail filename provided is invalid.
+            ValidationError. Thumbnail filename provided is invalid.
         """
         if strict:
             if not isinstance(thumbnail_filename, str):
@@ -491,7 +491,7 @@ class BlogPostSummary:
 
         if thumbnail_filename == '':
             raise utils.ValidationError(
-                'Thumbnail filename should not be empty'
+                'Thumbnail filename should not be empty.'
             )
 
         utils.require_valid_image_filename(thumbnail_filename)
@@ -504,7 +504,7 @@ class BlogPostSummary:
                 blog post is published or is going to be published.
 
         Raises:
-            ValidationError. One or more attributes of blog post are invalid.
+            ValidationError. One or more attributes of blog post summary are invalid.
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
@@ -527,7 +527,7 @@ class BlogPostSummary:
             self.require_valid_url_fragment(self.url_fragment)
 
             if not self.summary:
-                raise utils.ValidationError('Summary can not be empty')
+                raise utils.ValidationError('Summary cannot be empty.')
 
         if not isinstance(self.summary, str):
             raise utils.ValidationError(
@@ -542,7 +542,7 @@ class BlogPostSummary:
             url_fragment: str. The url fragment to validate.
 
         Raises:
-            ValidationErrors. URL fragment provided is invalid.
+            ValidationError. URL fragment provided is invalid.
         """
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(
@@ -563,7 +563,7 @@ class BlogPostSummary:
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
-                'Blog Post URL Fragment field contains invalid characters.'
+                'Blog Post URL Fragment field contains invalid characters. '
                 'Only lowercase words, numbers separated by hyphens are'
                 ' allowed. Received %s.' % (url_fragment)
             )
@@ -578,7 +578,7 @@ class BlogPostSummary:
                 blog post is published or is going to be published.
 
         Raises:
-            ValidationErrors. Title provided is invalid.
+            ValidationError. Title provided is invalid.
         """
         if not isinstance(title, str):
             raise utils.ValidationError(
@@ -593,7 +593,7 @@ class BlogPostSummary:
 
         if strict:
             if not title:
-                raise utils.ValidationError('Title should not be empty')
+                raise utils.ValidationError('Title should not be empty.')
 
     @classmethod
     def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
@@ -605,7 +605,7 @@ class BlogPostSummary:
                 post is published or is going to be published.
 
         Raises:
-            ValidationErrors.One or more tags provided are invalid.
+            ValidationError. One or more tags provided are invalid.
         """
         for tag in tags:
             if not isinstance(tag, str):
@@ -638,11 +638,11 @@ class BlogPostSummary:
         if strict:
             if not tags:
                 raise utils.ValidationError(
-                    'Atleast one tag should be selected'
+                    'At least one tag should be selected.'
                 )
 
         if len(set(tags)) != len(tags):
-            raise utils.ValidationError('Some tags duplicate each other')
+            raise utils.ValidationError('Some tags duplicate each other.')
 
     def to_dict(self) -> BlogPostSummaryDict:
         """Returns a dict representing this blog post summary domain object.
@@ -734,7 +734,7 @@ class BlogAuthorDetails:
 
         Attributes:
             instance_id: str. The id of the model instance.
-            author_id: str. THe user id of the author.
+            author_id: str. The user id of the author.
             displayed_author_name: str. The publicly viewable name of the user
                 as author of the blog posts.
             author_bio: str. User specified biography to be shown on the author
@@ -815,7 +815,7 @@ class BlogAuthorDetails:
             if reserved_username in author_name.lower().strip():
                 raise utils.ValidationError(
                     'This name contains reserved username. Please use some '
-                    'other name'
+                    'other name.'
                 )
 
     def to_dict(self) -> BlogAuthorDetailsDict:
@@ -839,7 +839,7 @@ class BlogAuthorDetails:
         """Validates various properties of the blog author details object.
 
         Raises:
-            ValidationError. One or more attributes of blog post are invalid.
+            ValidationError. One or more attributes of blog author details are invalid.
         """
         self.require_valid_displayed_author_name(self.displayed_author_name)
 
