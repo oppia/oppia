@@ -47,11 +47,19 @@ export class RTEEditor {
     const input = modal.locator(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
     );
+    // The initial placeholder is typeset after the editor initializes its input
+    // subscription in the MathJax queue. Earlier input events can be lost.
+    await expect(modal.locator('.text-secondary .MathJax_SVG svg')).toBeVisible(
+      {
+        timeout: 90000,
+      }
+    );
     await input.fill(latex);
     await input.press('Tab');
-    await expect(modal.locator('.MathJax_SVG svg')).toBeVisible({
-      timeout: 90000,
-    });
+    // Match the actual expression preview rather than the initial placeholder.
+    await expect(
+      modal.getByLabel(latex, {exact: true}).locator('.MathJax_SVG svg')
+    ).toBeVisible({timeout: 90000});
     await expect(modal.locator(closeButtonForExtraModel)).toBeEnabled({
       timeout: 90000,
     });
