@@ -25,11 +25,12 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
-    platform_parameter_domain,
-    platform_parameter_list,
+    value_generators_domain,
+    web_platform_parameter_domain,
+    web_platform_parameter_list,
 )
-from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services, value_generators_domain
+from core.domain import web_platform_parameter_registry as registry
+from core.domain import web_platform_parameter_services
 
 from typing import Dict, TypedDict
 
@@ -192,12 +193,12 @@ class PromoBarHandler(
         self.render_json(
             {
                 'promo_bar_enabled': (
-                    platform_parameter_services.get_platform_parameter_value(
+                    web_platform_parameter_services.get_web_platform_parameter_value(
                         'promo_bar_enabled'
                     )
                 ),
                 'promo_bar_message': (
-                    platform_parameter_services.get_platform_parameter_value(
+                    web_platform_parameter_services.get_web_platform_parameter_value(
                         'promo_bar_message'
                     )
                 ),
@@ -218,25 +219,29 @@ class PromoBarHandler(
         )
 
         rules_for_promo_bar_enabled_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
+            web_platform_parameter_domain.PlatformParameterRule.from_dict(
                 {'filters': [], 'value_when_matched': promo_bar_enabled_value}
             )
         ]
         rules_for_promo_bar_message_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
+            web_platform_parameter_domain.PlatformParameterRule.from_dict(
                 {'filters': [], 'value_when_matched': promo_bar_message_value}
             )
         ]
 
-        promo_bar_enabled_parameter = registry.Registry.get_platform_parameter(
-            platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
+        promo_bar_enabled_parameter = (
+            registry.Registry.get_web_platform_parameter(
+                web_platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
+            )
         )
 
-        promo_bar_message_parameter = registry.Registry.get_platform_parameter(
-            platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
+        promo_bar_message_parameter = (
+            registry.Registry.get_web_platform_parameter(
+                web_platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
+            )
         )
 
-        registry.Registry.update_platform_parameter(
+        registry.Registry.update_web_platform_parameter(
             'promo_bar_enabled',
             self.user_id,
             'Update promo_bar_enabled property from release '
@@ -245,7 +250,7 @@ class PromoBarHandler(
             promo_bar_enabled_parameter.default_value,
         )
 
-        registry.Registry.update_platform_parameter(
+        registry.Registry.update_web_platform_parameter(
             'promo_bar_message',
             self.user_id,
             'Update promo_bar_message property from release '

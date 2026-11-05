@@ -25,9 +25,9 @@ from typing import Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    # Here, we are importing 'platform_parameter_domain' only for type checking.
+    # Here, we are importing 'web_platform_parameter_domain' only for type checking.
     from core.domain import (  # pylint: disable=invalid-import
-        platform_parameter_domain,
+        web_platform_parameter_domain,
     )
     from mypy_imports import base_models, datastore_services
 
@@ -46,6 +46,25 @@ class PlatformParameterSnapshotContentModel(
     base_models.BaseSnapshotContentModel
 ):
     """Storage model for the content for a platform parameter snapshot."""
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class WebPlatformParameterConfigSnapshotMetadataModel(
+    base_models.BaseSnapshotMetadataModel
+):
+    """Storage model for web platform parameter config snapshot metadata."""
+
+    pass
+
+
+class WebPlatformParameterConfigSnapshotContentModel(
+    base_models.BaseSnapshotContentModel
+):
+    """Storage model for web platform parameter config snapshot content."""
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -97,9 +116,11 @@ class PlatformParameterModel(base_models.VersionedModel):
     def create(
         cls,
         param_name: str,
-        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
+        rule_dicts: List[
+            web_platform_parameter_domain.PlatformParameterRuleDict
+        ],
         rule_schema_version: int,
-        default_value: platform_parameter_domain.PlatformDataTypes,
+        default_value: web_platform_parameter_domain.PlatformDataTypes,
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -126,6 +147,63 @@ class PlatformParameterModel(base_models.VersionedModel):
             PlatformParameterModel. The created PlatformParameterModel
             instance.
         """
+        return cls(
+            id=param_name,
+            rules=rule_dicts,
+            rule_schema_version=rule_schema_version,
+            default_value=default_value,
+        )
+
+
+class WebPlatformParameterConfigModel(
+    base_models.BasePlatformParameterConfigModel
+):
+    """A class that represents a named dynamic web platform parameter."""
+
+    SNAPSHOT_METADATA_CLASS = WebPlatformParameterConfigSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = WebPlatformParameterConfigSnapshotContentModel
+
+    rules = datastore_services.JsonProperty(repeated=True)
+    rule_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
+    default_value = datastore_services.JsonProperty()
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """WebPlatformParameterConfigModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create(
+        cls,
+        param_name: str,
+        rule_dicts: List[
+            web_platform_parameter_domain.PlatformParameterRuleDict
+        ],
+        rule_schema_version: int,
+        default_value: web_platform_parameter_domain.PlatformDataTypes,
+    ) -> WebPlatformParameterConfigModel:
+        """Creates a WebPlatformParameterConfigModel instance."""
         return cls(
             id=param_name,
             rules=rule_dicts,

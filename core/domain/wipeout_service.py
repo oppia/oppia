@@ -1061,6 +1061,7 @@ def _pseudonymize_config_models(
     """
     snapshot_model_classes = (
         config_models.PlatformParameterSnapshotMetadataModel,
+        config_models.WebPlatformParameterConfigSnapshotMetadataModel,
     )
 
     snapshot_metadata_models, _ = (

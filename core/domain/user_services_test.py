@@ -32,13 +32,13 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
-    platform_parameter_list,
     rights_manager,
     role_services,
     state_domain,
     suggestion_services,
     user_domain,
     user_services,
+    web_platform_parameter_list,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -796,7 +796,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -913,7 +913,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -5043,7 +5043,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]

@@ -756,7 +756,7 @@
 
 # Feature Flags and Platform Parameters
 /core/controllers/feature_flag*.py @oppia/core-reviewers
-/core/domain/platform_parameter*.py @oppia/core-reviewers
+/core/domain/web_platform_parameter*.py @oppia/core-reviewers
 /core/domain/feature_flag*.py @oppia/core-reviewers
 /core/feature_flag*.py @oppia/core-reviewers
 /core/templates/domain/platform-parameter/ @oppia/core-reviewers
