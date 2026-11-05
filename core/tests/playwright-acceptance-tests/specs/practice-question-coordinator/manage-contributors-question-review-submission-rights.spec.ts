@@ -86,7 +86,8 @@ test.describe('Practice Question Coordinator', function () {
     await questionSubmitter.createAndPublishTopic(
       'Arithmetic Operations',
       'Basics of Arithmetic',
-      'Addition'
+      'Addition',
+      true
     );
 
     await questionSubmitter.createAndPublishClassroom(
