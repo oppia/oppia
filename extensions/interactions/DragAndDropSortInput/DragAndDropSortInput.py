@@ -29,7 +29,7 @@ class DragAndDropSortInput(base.BaseInteraction):
 
     name: str = 'Drag And Drop Sort'
     description: str = 'Allows learners to drag and drop items for sorting.'
-    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    display_mode: str = base.DISPLAY_MODE_INLINE
     is_trainable: bool = False
     _dependency_ids: List[str] = []
     answer_type: str = 'ListOfSetsOfTranslatableHtmlContentIds'

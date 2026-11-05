@@ -145,7 +145,7 @@
     "name": "Drag And Drop Sort",
     "answer_type": "ListOfSetsOfTranslatableHtmlContentIds",
     "is_linear": false,
-    "display_mode": "supplemental",
+    "display_mode": "inline",
     "id": "DragAndDropSortInput",
     "customization_arg_specs": [
       {
