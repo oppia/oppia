@@ -52,7 +52,14 @@ type ResolvedModuleWithFailedLookupLocations =
 /**
  * List of types that are defined in node.
  */
-const NODE_TYPE_ROOTS = ['fs', 'console', 'path', 'child_process', 'os'];
+const NODE_TYPE_ROOTS = [
+  'fs',
+  'console',
+  'path',
+  'child_process',
+  'os',
+  'process',
+];
 
 /**
  * Checks if a module is a node module.
