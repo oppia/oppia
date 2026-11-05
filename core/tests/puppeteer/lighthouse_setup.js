@@ -53,6 +53,8 @@ const SETUP_WATCHDOG_MS = 20 * 60 * 1000;
 // messages into these elements after a data-generation or save action.
 const statusMessageSelector = '.oppia-status-message-container';
 const toastMessageSelector = '.e2e-test-toast-message';
+// The toast the editor shows after a manual save succeeds.
+const saveSuccessMessage = 'Changes saved.';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
@@ -85,6 +87,12 @@ var endIneractionSelector = '.e2e-test-interaction-tile-EndExploration';
 var saveInteractionButton = '.e2e-test-save-interaction';
 var saveChangesButton = '.e2e-test-save-changes';
 var saveDraftButton = '.e2e-test-save-draft-button';
+var autosaveIndicatorSelector = '.e2e-test-autosave-indicator';
+// The editor reports save failures in modals rather than in a toast, so these
+// selectors let the save wait fail with the modal's text instead of waiting for
+// a toast that will never appear.
+var versionMismatchModalSelector = '.e2e-test-lost-changes-modal';
+var saveErrorModalSelector = '.oppia-error-modal-body';
 var publishExplorationButton = '.e2e-test-publish-exploration';
 var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
 var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
@@ -288,6 +296,74 @@ const waitForStatusMessage = async function (
     `Timed out after ${timeoutMs}ms waiting for status message ` +
       `"${expectedText}". Last observed text in ${selector}: ` +
       `"${observedText}".`
+  );
+};
+
+// Waits until the editor is not autosaving.
+//
+// The editor autosaves the draft shortly after every edit, and a manual save
+// discards that draft. If an autosave lands after the manual save, it recreates
+// the draft against the pre-save version, and the backend reports a version
+// mismatch instead of saving. Waiting for the autosave indicator to disappear
+// keeps the two saves from overlapping.
+const waitForAutosaveToFinish = async function (page) {
+  await page.waitForFunction(
+    selector => document.querySelector(selector) === null,
+    {timeout: SETUP_ACTION_TIMEOUT_MS},
+    autosaveIndicatorSelector
+  );
+};
+
+// Returns a description of the modal that blocked a save, or an empty string
+// when no such modal is on the page.
+const getSaveFailureDescription = async function (page) {
+  return page.evaluate(
+    selectors => {
+      const modals = [
+        ['version mismatch', selectors.versionMismatch],
+        ['error', selectors.error],
+      ];
+      for (const [name, selector] of modals) {
+        const element = document.querySelector(selector);
+        if (element) {
+          const modal = element.closest('ngb-modal-window') || element;
+          const text = modal.textContent.replace(/\s+/g, ' ').trim();
+          return `${name} modal: "${text}"`;
+        }
+      }
+      return '';
+    },
+    {
+      versionMismatch: versionMismatchModalSelector,
+      error: saveErrorModalSelector,
+    }
+  );
+};
+
+// Waits for the toast that confirms a manual save, failing as soon as a save
+// error or version-mismatch modal appears so the shard reports the modal text
+// instead of a bare timeout.
+const waitForExplorationSaveResult = async function (page) {
+  const deadline = Date.now() + SETUP_STATUS_MESSAGE_TIMEOUT_MS;
+  let observedToastText = '';
+  while (Date.now() < deadline) {
+    observedToastText = await page.evaluate(sel => {
+      const element = document.querySelector(sel);
+      return element ? element.textContent.trim() : '';
+    }, toastMessageSelector);
+    if (observedToastText === saveSuccessMessage) {
+      return;
+    }
+    const failureDescription = await getSaveFailureDescription(page);
+    if (failureDescription) {
+      throw new Error(`Exploration save failed with a ${failureDescription}`);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  throw new Error(
+    `Timed out after ${SETUP_STATUS_MESSAGE_TIMEOUT_MS}ms waiting for the ` +
+      `'${saveSuccessMessage}' toast. Last observed toast text: ` +
+      `"${observedToastText}".`
   );
 };
 
@@ -515,17 +591,15 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
+    // Let any pending autosave finish before saving manually, so the autosave
+    // cannot recreate the draft after the manual save discards it.
+    await waitForAutosaveToFinish(page);
     await page.click(saveChangesButton);
 
     await page.waitForSelector(saveDraftButton, {visible: true});
     await page.click(saveDraftButton);
 
-    await waitForStatusMessage(
-      page,
-      toastMessageSelector,
-      'Changes saved.',
-      SETUP_STATUS_MESSAGE_TIMEOUT_MS
-    );
+    await waitForExplorationSaveResult(page);
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(publishExplorationButton);
