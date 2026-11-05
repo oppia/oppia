@@ -19,8 +19,6 @@
  * be attempted due to cross-domain security issues.)
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 import {MessengerService} from './messenger.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -51,7 +49,7 @@ describe('BannerComponent', () => {
         },
       },
       parent: {
-        postMessage: () => {},
+        postMessage: (message: string, targetOrigin: string) => {},
       },
     };
 
