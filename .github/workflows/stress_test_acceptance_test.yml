@@ -63,6 +63,22 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
+      - name: Use the canonical Oppia directory on forks
+        if: github.repository != 'oppia/oppia'
+        run: |
+          WORKSPACE_PARENT="$(dirname "$GITHUB_WORKSPACE")"
+          OPPIA_PARENT=/home/runner/work/oppia
+          if [ "$WORKSPACE_PARENT" != "$OPPIA_PARENT" ]; then
+            test ! -e "$OPPIA_PARENT"
+            mv "$WORKSPACE_PARENT" "$OPPIA_PARENT"
+            ln -s "$OPPIA_PARENT" "$WORKSPACE_PARENT"
+          fi
+          if [ "$(basename "$GITHUB_WORKSPACE")" != oppia ]; then
+            test ! -e "$OPPIA_PARENT/oppia"
+            mv "$GITHUB_WORKSPACE" "$OPPIA_PARENT/oppia"
+            ln -s "$OPPIA_PARENT/oppia" "$GITHUB_WORKSPACE"
+          fi
+        # Keep workspace-based actions usable while Python sees a physical oppia/ directory.
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
@@ -92,6 +108,22 @@ jobs:
           fi
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
+      - name: Use the canonical Oppia directory on forks
+        if: github.repository != 'oppia/oppia'
+        run: |
+          WORKSPACE_PARENT="$(dirname "$GITHUB_WORKSPACE")"
+          OPPIA_PARENT=/home/runner/work/oppia
+          if [ "$WORKSPACE_PARENT" != "$OPPIA_PARENT" ]; then
+            test ! -e "$OPPIA_PARENT"
+            mv "$WORKSPACE_PARENT" "$OPPIA_PARENT"
+            ln -s "$OPPIA_PARENT" "$WORKSPACE_PARENT"
+          fi
+          if [ "$(basename "$GITHUB_WORKSPACE")" != oppia ]; then
+            test ! -e "$OPPIA_PARENT/oppia"
+            mv "$GITHUB_WORKSPACE" "$OPPIA_PARENT/oppia"
+            ln -s "$OPPIA_PARENT/oppia" "$GITHUB_WORKSPACE"
+          fi
+        # Keep workspace-based actions usable while Python sees a physical oppia/ directory.
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
