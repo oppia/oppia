@@ -1851,3 +1851,117 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
                 self.user_id
             )
         )
+
+
+class FirebaseAuthGenericTestBaseTests(test_utils.GenericTestBase):
+    associate_auth_id_with_user_id = staticmethod(
+        firebase_auth_services.associate_auth_id_with_user_id
+    )
+    associate_multi_auth_ids_with_user_ids = staticmethod(
+        firebase_auth_services.associate_multi_auth_ids_with_user_ids
+    )
+
+    def test_associate_existing_auth_details_without_firebase_id(self) -> None:
+        existing_auth_details = mock.Mock(firebase_auth_id=None)
+        get_multi_mock = mock.Mock(return_value=[existing_auth_details])
+        user_auth_details_model = mock.Mock(get_multi=get_multi_mock)
+        mocked_auth_models = mock.Mock(
+            UserAuthDetailsModel=user_auth_details_model,
+            UserIdByFirebaseAuthIdModel=mock.Mock(),
+        )
+
+        with (
+            mock.patch.object(
+                firebase_auth_services,
+                'auth_models',
+                mocked_auth_models,
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_user_id_from_auth_id',
+                return_value=None,
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_auth_id_from_user_id',
+                return_value=None,
+            ),
+        ):
+            self.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid')
+            )
+
+        get_multi_mock.assert_called_once_with(['uid'], include_deleted=True)
+        user_auth_details_model.assert_called_once_with(
+            id='uid', firebase_auth_id='aid'
+        )
+
+    def test_associate_auth_id_preserves_existing_firebase_id(self) -> None:
+        existing_auth_details = mock.Mock(firebase_auth_id='existing_aid')
+        get_multi_mock = mock.Mock(return_value=[existing_auth_details])
+        user_auth_details_model = mock.Mock(get_multi=get_multi_mock)
+        mocked_auth_models = mock.Mock(
+            UserAuthDetailsModel=user_auth_details_model,
+            UserIdByFirebaseAuthIdModel=mock.Mock(),
+        )
+
+        with (
+            mock.patch.object(
+                firebase_auth_services,
+                'auth_models',
+                mocked_auth_models,
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_user_id_from_auth_id',
+                return_value=None,
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_auth_id_from_user_id',
+                return_value=None,
+            ),
+        ):
+            self.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('new_aid', 'uid')
+            )
+
+        get_multi_mock.assert_called_once_with(['uid'], include_deleted=True)
+        user_auth_details_model.assert_not_called()
+        self.assertEqual(existing_auth_details.firebase_auth_id, 'existing_aid')
+
+    def test_associate_multi_auth_ids_skips_existing_auth_details_update(
+        self,
+    ) -> None:
+        existing_auth_details = mock.Mock(firebase_auth_id='existing_aid')
+        get_multi_mock = mock.Mock(return_value=[existing_auth_details])
+        user_auth_details_model = mock.Mock(get_multi=get_multi_mock)
+        mocked_auth_models = mock.Mock(
+            UserAuthDetailsModel=user_auth_details_model,
+            UserIdByFirebaseAuthIdModel=mock.Mock(),
+        )
+
+        with (
+            mock.patch.object(
+                firebase_auth_services,
+                'auth_models',
+                mocked_auth_models,
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_multi_user_ids_from_auth_ids',
+                return_value=[None],
+            ),
+            mock.patch.object(
+                firebase_auth_services,
+                'get_multi_auth_ids_from_user_ids',
+                return_value=[None],
+            ),
+        ):
+            self.associate_multi_auth_ids_with_user_ids(
+                [auth_domain.AuthIdUserIdPair('new_aid', 'uid')]
+            )
+
+        get_multi_mock.assert_called_once_with(('uid',))
+        user_auth_details_model.assert_not_called()
+        self.assertEqual(existing_auth_details.firebase_auth_id, 'existing_aid')

@@ -524,3 +524,198 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp_bulk_email_services.permanently_delete_user_from_list(
                     self.user_email_1
                 )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
+            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+        ]
+    )
+    def test_permanently_delete_user_ignores_missing_member(self) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+
+        with mailchimp_swap:
+            mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                'missing@example.com'
+            )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
+            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+        ]
+    )
+    def test_permanently_delete_user_propagates_request_exception(
+        self,
+    ) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+        request_swap = self.swap_to_always_raise(
+            mailchimp.lists.members,
+            'get',
+            requests.RequestException('request failed'),
+        )
+
+        with mailchimp_swap, request_swap:
+            with self.assertRaisesRegex(
+                requests.RequestException, 'request failed'
+            ):
+                mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                    self.user_email_1
+                )
+
+    def test_add_or_update_user_status_logs_request_exception(self) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+        request_swap = self.swap_to_always_raise(
+            mailchimp.lists.members,
+            'get',
+            requests.RequestException('request failed'),
+        )
+
+        with (
+            mailchimp_swap,
+            request_swap,
+            self.capture_logging(min_level=logging.ERROR) as logs,
+        ):
+            result = mailchimp_bulk_email_services.add_or_update_user_status(
+                self.user_email_1,
+                {},
+                'Web',
+                can_receive_email_updates=True,
+            )
+
+        self.assertFalse(result)
+        self.assertRegex(
+            logs[0], 'Mailchimp error prevented email signup: request failed'
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
+            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+        ]
+    )
+    def test_add_or_update_android_user_without_name(self) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+
+        with mailchimp_swap:
+            self.assertTrue(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    self.user_email_2,
+                    {},
+                    'Android',
+                    can_receive_email_updates=True,
+                )
+            )
+            self.assertEqual(
+                mailchimp.lists.members.users_data[1]['status'], 'subscribed'
+            )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
+            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+        ]
+    )
+    def test_add_or_update_android_user_with_none_name(self) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+        update_data = []
+
+        def capture_update(
+            unused_audience_id: str,
+            unused_subscriber_hash: str,
+            data: Dict[str, str],
+        ) -> None:
+            update_data.append(data)
+
+        update_swap = self.swap(
+            mailchimp.lists.members, 'update', capture_update
+        )
+
+        with mailchimp_swap, update_swap:
+            self.assertTrue(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    self.user_email_2,
+                    {'NAME': None},  # type: ignore[dict-item]
+                    'Android',
+                    can_receive_email_updates=True,
+                )
+            )
+
+        self.assertEqual(
+            update_data,
+            [
+                {
+                    'email_address': self.user_email_2,
+                    'status': 'subscribed',
+                    'merge_fields': {},
+                }
+            ],
+        )
+
+    def test_add_or_update_user_status_rejects_non_dict_merge_fields(
+        self,
+    ) -> None:
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: self.MockMailchimpClass(),
+        )
+
+        with mailchimp_swap:
+            with self.assertRaisesRegex(TypeError, 'not iterable'):
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    self.user_email_1,
+                    None,  # type: ignore[arg-type]
+                    'Android',
+                    can_receive_email_updates=True,
+                )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.MAILCHIMP_USERNAME, 'username'),
+            (platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID, ''),
+        ]
+    )
+    def test_add_or_update_missing_user_without_subscription(self) -> None:
+        mailchimp = self.MockMailchimpClass()
+        mailchimp_swap = self.swap(
+            mailchimp_bulk_email_services,
+            '_get_mailchimp_class',
+            lambda: mailchimp,
+        )
+
+        with mailchimp_swap:
+            self.assertTrue(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'missing@example.com',
+                    {},
+                    'Web',
+                    can_receive_email_updates=False,
+                )
+            )
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
