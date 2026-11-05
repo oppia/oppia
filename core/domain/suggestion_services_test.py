@@ -1984,7 +1984,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because mypy cannot verify that the
         # dict returned matches the stricter QuestionDict type.
         question_dict: question_domain.QuestionDict = (
-            updated_suggestion.change_cmd.question_dict  # type: ignore[assignment]
+            updated_suggestion.change_cmd.question_dict
         )
         new_question_state_data = question_dict['question_state_data']
 

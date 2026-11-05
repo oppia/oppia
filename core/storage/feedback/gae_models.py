@@ -642,8 +642,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
         assert None not in thread_models
         return [
-            thread_model.message_count if thread_model else None
+            thread_model.message_count
             for thread_model in thread_models
+            if thread_model is not None
         ]
 
     # TODO(#13523): Change the return value of the function below from

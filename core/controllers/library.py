@@ -107,7 +107,7 @@ class LibraryIndexHandler(
             # of any new key on typedDict is prohibited by MyPy.
             summary_dicts_by_category.insert(
                 0,
-                {  # type: ignore[typeddict-item]
+                {  # type: ignore[typeddict-unknown-key]
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
                     'header_i18n_id': (

@@ -710,7 +710,7 @@ class MissingHandlerArgsTests(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({})
 
@@ -958,7 +958,7 @@ class EscapingTests(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
 
@@ -2197,7 +2197,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def put(self) -> None:  # type: ignore[override]
+        def put(self) -> None:
             assert self.normalized_payload is not None
             exploration_id = self.normalized_payload['exploration_id']
             if exploration_id != 'random_exp_id':
@@ -2325,7 +2325,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.render_json({})
 
     def setUp(self) -> None:
@@ -2455,7 +2455,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
@@ -2563,7 +2563,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self, entity_type: str, entity_id: str) -> None:  # type: ignore[override]
+        def post(self, entity_type: str, entity_id: str) -> None:
             """Saves an image uploaded by a content creator."""
             assert self.normalized_payload is not None
             assert self.normalized_request is not None
@@ -2685,7 +2685,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 
@@ -2699,7 +2699,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
         # method, and this happens because all handler methods in the main
         # codebase have decorators which modify the function signature
         # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 

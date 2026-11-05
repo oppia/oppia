@@ -6160,7 +6160,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # `schema_version` key, but here we are defining a `schema_version` key
         # which causes MyPy to throw error 'TypedDict has no key schema_version'
         # thus to silence the error, we used ignore here.
-        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[typeddict-item]
+        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[typeddict-unknown-key]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.

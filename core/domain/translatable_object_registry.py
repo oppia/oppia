@@ -20,7 +20,7 @@ import inspect
 
 from extensions.objects.models import objects
 
-from typing import Dict, List, Literal, Type, Union, overload
+from typing import Dict, List, Literal, Type, Union, cast, overload
 
 TranslatableObjectNames = Literal[
     'TranslatableHtml',
@@ -67,6 +67,10 @@ class Registry:
             # string 'Translatable'. So we need to do verification based on the
             # class's ancestors.
             if 'BaseTranslatableObject' in ancestor_names:
+                # Here we use cast because clazz.__name__ is not returning
+                # Literal['<name>'], hence casting it with
+                # TranslatableObjectNames type.
+                clazz.__name__ = cast(TranslatableObjectNames, clazz.__name__)
                 cls._translatable_objects_dict[clazz.__name__] = clazz
 
     @classmethod

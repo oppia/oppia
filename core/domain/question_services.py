@@ -731,7 +731,7 @@ def get_displayable_question_skill_link_details(
             question_domain.MergedQuestionSkillLink(
                 question_ids[ind],
                 skill_ids_list,
-                [skill.description if skill else None for skill in skills],
+                [skill.description for skill in skills if skill is not None],
                 grouped_difficulties[ind],
             )
         )
