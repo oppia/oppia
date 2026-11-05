@@ -869,7 +869,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 last_started_state_translation_tutorial=(
                     user_settings.last_started_state_translation_tutorial
                 ),
-                last_logged_in=utils.get_current_local_datetime(),
+                last_logged_in=utils.get_current_utc_datetime(),
                 last_edited_an_exploration=(
                     user_settings.last_edited_an_exploration
                 ),
