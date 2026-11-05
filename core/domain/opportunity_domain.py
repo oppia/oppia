@@ -36,6 +36,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
+    translation_missing_reasons: Dict[str, List[str]]
     reviewer_only_content_count: int
     is_pinned: bool
 
@@ -89,6 +90,7 @@ class ExplorationOpportunitySummary:
         content_count: int,
         incomplete_translation_language_codes: List[str],
         translation_counts: Dict[str, int],
+        translation_missing_reasons: Dict[str, List[str]],
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
         translation_in_review_counts: Dict[str, int],
@@ -106,12 +108,15 @@ class ExplorationOpportunitySummary:
             chapter_title: str. The title of the story chapter.
             content_count: int. The total number of content available in the
                 exploration.
-            incomplete_translation_language_codes: list(str). A list of language
-                code in which the exploration translation is incomplete.
-            translation_counts: dict. A dict with language code as a key and
-                number of translation available in that language as the value.
-            language_codes_needing_voice_artists: list(str). A list of language
-                code in which the exploration needs voice artist.
+            incomplete_translation_language_codes: list(str). The language codes
+                in which the translations are incomplete.
+            translation_counts: dict(str, int). A dictionary containing the
+                total number of translations available in a language.
+            translation_missing_reasons: dict(str, list(str)). A dict containing the
+                reasons for missing translations for a language.
+            language_codes_needing_voice_artists: list(str). The language codes
+                in which the voiceovers are incomplete and no voice artist is
+                assigned.
             language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
@@ -135,6 +140,7 @@ class ExplorationOpportunitySummary:
             incomplete_translation_language_codes
         )
         self.translation_counts = translation_counts
+        self.translation_missing_reasons = translation_missing_reasons
         self.language_codes_needing_voice_artists = (
             language_codes_needing_voice_artists
         )
@@ -173,6 +179,9 @@ class ExplorationOpportunitySummary:
                 'incomplete_translation_language_codes'
             ],
             exploration_opportunity_summary_dict['translation_counts'],
+            exploration_opportunity_summary_dict.get(
+                'translation_missing_reasons', {}
+            ),
             exploration_opportunity_summary_dict[
                 'language_codes_needing_voice_artists'
             ],
@@ -206,6 +215,7 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
+            'translation_missing_reasons': self.translation_missing_reasons,
             'translation_in_review_counts': self.translation_in_review_counts,
             'reviewer_only_content_count': self.reviewer_only_content_count,
             'is_pinned': self.is_pinned,
@@ -446,6 +456,7 @@ class TranslationOpportunityDict(TypedDict):
     content_count: int
     incomplete_translation_language_codes: List[str]
     translation_counts: Dict[str, int]
+    translation_missing_reasons: Dict[str, List[str]]
     entity_type: str
 
 
@@ -459,6 +470,7 @@ class TranslationOpportunity:
         content_count: int,
         incomplete_translation_language_codes: List[str],
         translation_counts: Dict[str, int],
+        translation_missing_reasons: Dict[str, List[str]],
         entity_type: str,
     ) -> None:
         """Constructs a TranslationOpportunity domain object.
@@ -469,11 +481,13 @@ class TranslationOpportunity:
             entity_id: str. The ID of the related entity.
             content_count: int. The total number of contents available in the
                 entity.
-            incomplete_translation_language_codes: list(str). A list of
-                language codes in which the entity translation is incomplete.
-            translation_counts: dict. A dict mapping language codes to the
-                number of completed translations.
-            entity_type: str. The type of the entity. One of: "exploration",
+            incomplete_translation_language_codes: list(str). The language codes
+                in which the translations are incomplete.
+            translation_counts: dict(str, int). A dictionary containing the
+                total number of translations available in a language.
+            translation_missing_reasons: dict(str, list(str)). A dict containing the
+                reasons for missing translations for a language.
+            entity_type: str. The type of entity (e.g. exploration),
                 "skill", "topic", "story", "classroom".
         """
         self.topic_ids = topic_ids
@@ -483,6 +497,7 @@ class TranslationOpportunity:
             incomplete_translation_language_codes
         )
         self.translation_counts = translation_counts
+        self.translation_missing_reasons = translation_missing_reasons
         self.entity_type = entity_type
         self.validate()
 
@@ -601,6 +616,7 @@ class TranslationOpportunity:
                 'incomplete_translation_language_codes'
             ],
             translation_opportunity_dict['translation_counts'],
+            translation_opportunity_dict.get('translation_missing_reasons', {}),
             translation_opportunity_dict['entity_type'],
         )
 
@@ -619,6 +635,7 @@ class TranslationOpportunity:
                 self.incomplete_translation_language_codes
             ),
             'translation_counts': self.translation_counts,
+            'translation_missing_reasons': self.translation_missing_reasons,
             'entity_type': self.entity_type,
         }
 
@@ -631,6 +648,7 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     content_count: int
     incomplete_translation_language_codes: List[str]
     translation_counts: Dict[str, int]
+    translation_missing_reasons: Dict[str, List[str]]
     entity_type: str
     topic_name: str
     entity_description: str
@@ -657,6 +675,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         content_count: int,
         incomplete_translation_language_codes: List[str],
         translation_counts: Dict[str, int],
+        translation_missing_reasons: Dict[str, List[str]],
         entity_type: str,
         topic_name: str,
         entity_description: str,
@@ -674,6 +693,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             content_count,
             incomplete_translation_language_codes,
             translation_counts,
+            translation_missing_reasons,
             entity_type,
         )
         self.topic_ids = topic_ids
@@ -683,6 +703,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             incomplete_translation_language_codes
         )
         self.translation_counts = translation_counts
+        self.translation_missing_reasons = translation_missing_reasons
         self.entity_type = entity_type
         self.topic_name = topic_name
         self.entity_description = entity_description
@@ -705,6 +726,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
                 self.incomplete_translation_language_codes
             ),
             'translation_counts': self.translation_counts,
+            'translation_missing_reasons': self.translation_missing_reasons,
             'entity_type': self.entity_type,
             'topic_name': self.topic_name,
             'entity_description': self.entity_description,

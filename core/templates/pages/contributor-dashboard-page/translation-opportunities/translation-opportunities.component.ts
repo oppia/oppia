@@ -98,9 +98,21 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
       let translationsCount = opportunity.getTranslationsCount(languageCode);
       const inReviewCount =
         opportunity.getTranslationsInReviewCount(languageCode);
+      let translationMissingReasons =
+        opportunity.translationMissingReasons &&
+        opportunity.translationMissingReasons[languageCode]
+          ? opportunity.translationMissingReasons[languageCode]
+          : [];
 
       if (!this.userIsReviewer) {
         totalCount -= reviewerOnlyContentCount;
+      }
+
+      if (
+        translationMissingReasons.length === 0 &&
+        translationsCount + inReviewCount < totalCount
+      ) {
+        translationMissingReasons = ['new'];
       }
 
       let progressPercentage = 0;
@@ -127,6 +139,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
         // explorations.
         entityType:
           opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
+        translationMissingReasons: translationMissingReasons,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (

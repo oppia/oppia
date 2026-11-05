@@ -78,6 +78,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     translation_audit_jobs,
     translation_migration_jobs,
     translation_opportunity_backfill_jobs,
+    translation_opportunity_migration_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,

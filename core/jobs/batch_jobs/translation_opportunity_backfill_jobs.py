@@ -172,6 +172,7 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
             # would let a stored count exceed content_count, which fails
             # TranslationOpportunity validation when the opportunity is read.
             translation_counts = {}
+            translation_missing_reasons = {}
             for translation_model in translations:
                 entity_translation = (
                     translation_fetchers.get_entity_translation_from_model(
@@ -186,6 +187,24 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
                         ),
                     )
                 )
+
+                reasons = set()
+                entity_translation = (
+                    translation_fetchers.get_entity_translation_from_model(
+                        translation_model
+                    )
+                )
+                pending_contents = (
+                    entity.get_all_contents_which_need_translations(
+                        entity_translation, override_metadata_feature_flag=True
+                    ).values()
+                )
+                for content in pending_contents:
+                    reasons.add(content.status.value)
+                if reasons:
+                    translation_missing_reasons[
+                        translation_model.language_code
+                    ] = sorted(list(reasons))
 
             audio_language_codes = set(
                 language['id']
@@ -213,6 +232,7 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
                     incomplete_translation_language_codes
                 ),
                 translation_counts=translation_counts,
+                translation_missing_reasons=translation_missing_reasons,
             )
             model.update_timestamps()
         return result.Ok(model)
@@ -376,14 +396,22 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
                 exist_model.content_count != comp_model.content_count
                 or exist_model.translation_counts
                 != comp_model.translation_counts
+                or exist_model.translation_missing_reasons
+                != comp_model.translation_missing_reasons
             ):
                 yield ('discrepancy', 1)
                 yield (
-                    f'error_details: Discrepancy for model {opp_id}: '
-                    f'Existing (content_count={exist_model.content_count}, '
-                    f'translation_counts={exist_model.translation_counts}), '
-                    f'Computed (content_count={comp_model.content_count}, '
-                    f'translation_counts={comp_model.translation_counts})',
+                    (
+                        f'error_details: Discrepancy for model {opp_id}: '
+                        f'Existing (content_count={exist_model.content_count}, '
+                        f'translation_counts={exist_model.translation_counts}, '
+                        f'translation_missing_reasons='
+                        f'{exist_model.translation_missing_reasons}), '
+                        f'Computed (content_count={comp_model.content_count}, '
+                        f'translation_counts={comp_model.translation_counts}, '
+                        f'translation_missing_reasons='
+                        f'{comp_model.translation_missing_reasons})'
+                    ),
                     1,
                 )
             else:
