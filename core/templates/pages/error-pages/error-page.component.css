@@ -6,6 +6,13 @@
   font-size: 1.17em;
   font-weight: 700;
 }
+.oppia-wide-panel-content a:focus:not(:focus-visible) {
+  outline: none;
+}
+.oppia-wide-panel-content a:focus-visible {
+  outline: 2px solid #0844aa;
+  outline-offset: 2px;
+}
 @media screen and (min-width: 768px) {
   .oppia-footer {
     position: relative;

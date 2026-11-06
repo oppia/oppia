@@ -16,7 +16,7 @@
  * @fileoverview Component for the error page.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -25,6 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   selector: 'error-page',
   templateUrl: './error-page.component.html',
   styleUrls: ['./error-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ErrorPageComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks.
