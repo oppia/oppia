@@ -203,9 +203,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d and unversioned issue schemas '
             'at present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
         ):
-            stats_services._migrate_to_latest_issue_schema(
+            stats_services._migrate_to_latest_issue_schema(  # pylint: disable=protected-access
                 issue_dict
-            )  # pylint: disable=protected-access
+            )
 
     def test_migrate_issue_schema_converts_older_schema_version(self) -> None:
         issue_dict = self._get_issue_dict()
@@ -219,9 +219,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
 
         with current_schema_version_swap, convert_issue_dict_swap:
-            stats_services._migrate_to_latest_issue_schema(
+            stats_services._migrate_to_latest_issue_schema(  # pylint: disable=protected-access
                 issue_dict
-            )  # pylint: disable=protected-access
+            )
 
         self.assertEqual(issue_dict['schema_version'], 2)
         self.assertEqual(issue_dict['issue_type'], 'ConvertedIssue')
@@ -239,9 +239,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d and unversioned action schemas '
             'at present.' % stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         ):
-            stats_services._migrate_to_latest_action_schema(
+            stats_services._migrate_to_latest_action_schema(  # pylint: disable=protected-access
                 action_dict
-            )  # pylint: disable=protected-access
+            )
 
     def test_migrate_action_schema_converts_older_schema_version(
         self,
@@ -257,9 +257,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
 
         with current_schema_version_swap, convert_action_dict_swap:
-            stats_services._migrate_to_latest_action_schema(
+            stats_services._migrate_to_latest_action_schema(  # pylint: disable=protected-access
                 action_dict
-            )  # pylint: disable=protected-access
+            )
 
         self.assertEqual(action_dict['schema_version'], 2)
         self.assertEqual(action_dict['action_type'], 'ConvertedAction')
@@ -278,9 +278,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
             ),
         ):
-            stats_services._migrate_to_latest_issue_schema(
+            stats_services._migrate_to_latest_issue_schema(  # pylint: disable=protected-access
                 issue_dict
-            )  # pylint: disable=protected-access
+            )
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
     # the backend is fully type-annotated. Here ignore[arg-type] is used to
@@ -296,9 +296,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
             ),
         ):
-            stats_services._migrate_to_latest_action_schema(
+            stats_services._migrate_to_latest_action_schema(  # pylint: disable=protected-access
                 action_dict
-            )  # pylint: disable=protected-access
+            )
 
     def test_update_stats_method(self) -> None:
         """Test the update_stats method."""
