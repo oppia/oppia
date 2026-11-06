@@ -67,6 +67,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     pinned_opportunity_backfill_jobs,
     question_migration_jobs,
     recover_orphaned_translations_jobs,
+    role_migration_jobs,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
