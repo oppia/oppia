@@ -18,6 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -44,6 +45,7 @@ export class TranslationStatusService {
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
+  PLACEHOLDER_STATUS_COLOR: string = '#CCCCCC';
   // These properties are initialized in the constructor and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -57,6 +59,7 @@ export class TranslationStatusService {
   entityTranslation!: EntityTranslation;
 
   constructor(
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private explorationStatesService: ExplorationStatesService,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
@@ -202,12 +205,22 @@ export class TranslationStatusService {
           AppConstants.COMPONENT_NAME_RULE_INPUT,
           allContentIds
         );
-        this.explorationVoiceoverContentRequiredCount +=
-          allContentIds.length - ruleInputContentIds.length;
-        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
-          allContentIds = allContentIds.filter(function (contentId) {
+        let voiceoverableContentIds = allContentIds.filter(
+          function (contentId) {
             return ruleInputContentIds.indexOf(contentId) < 0;
-          });
+          }
+        );
+        // Voiceovers can only be recorded for text that exists in the active
+        // language. Apply this filter only in voiceover mode so translation
+        // progress counts stay unchanged. Graph colors still use the
+        // unfiltered list so untranslated cards stay gray instead of
+        // disappearing from the state graph.
+        const voiceoverRequiredContentIds =
+          this._getVoiceoverContentIdsRequiringAudio(voiceoverableContentIds);
+        this.explorationVoiceoverContentRequiredCount +=
+          voiceoverRequiredContentIds.length;
+        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+          allContentIds = voiceoverRequiredContentIds;
         }
 
         allContentIds.forEach(contentId => {
@@ -272,7 +285,7 @@ export class TranslationStatusService {
         if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
           this.stateWiseStatusColor[stateName] =
             this.getStateGraphColorInVoiceoverMode(
-              allContentIds,
+              voiceoverableContentIds,
               voiceoverContentIds
             );
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
@@ -295,21 +308,42 @@ export class TranslationStatusService {
     stateContentIdsNeedingVoiceover: string[],
     explorationContentIdsWithVoiceover: string[]
   ): string {
-    let color = this.NO_ASSETS_AVAILABLE_COLOR;
-    let allContentsHaveVoiceover: boolean = true;
-    for (let contentId of stateContentIdsNeedingVoiceover) {
-      if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
-        color = this.FEW_ASSETS_AVAILABLE_COLOR;
-      } else {
-        allContentsHaveVoiceover = false;
-      }
+    const uniqueColors = new Set<string>();
+    for (const contentId of stateContentIdsNeedingVoiceover) {
+      uniqueColors.add(
+        this._getVoiceoverGraphContentIdStatusColor(
+          contentId,
+          explorationContentIdsWithVoiceover
+        )
+      );
     }
+    return this._getColorFromUniqueStatusColors(uniqueColors);
+  }
 
-    if (allContentsHaveVoiceover) {
-      color = this.ALL_ASSETS_AVAILABLE_COLOR;
+  _getVoiceoverGraphContentIdStatusColor(
+    contentId: string,
+    explorationContentIdsWithVoiceover: string[]
+  ): string {
+    if (
+      !this.isVoiceoveringOriginalLanguage() &&
+      !this._hasNonemptyWrittenTranslation(contentId)
+    ) {
+      return this.PLACEHOLDER_STATUS_COLOR;
     }
+    if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+    return this.NO_ASSETS_AVAILABLE_COLOR;
+  }
 
-    return color;
+  _getColorFromUniqueStatusColors(uniqueColors: Set<string>): string {
+    if (uniqueColors.size === 0) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+    if (uniqueColors.size === 1) {
+      return Array.from(uniqueColors)[0];
+    }
+    return this.FEW_ASSETS_AVAILABLE_COLOR;
   }
 
   _getContentIdListRelatedToComponent(
@@ -334,30 +368,24 @@ export class TranslationStatusService {
       componentName,
       this._getAvailableContentIds()
     );
-    let availableAudioCount = 0;
-
-    contentIdList.forEach(contentId => {
-      let availabilityStatus =
-        this._getActiveStateContentAvailabilityStatus(contentId);
-      if (availabilityStatus.available) {
-        availableAudioCount++;
-      }
-    });
-    if (contentIdList.length === availableAudioCount) {
-      return this.ALL_ASSETS_AVAILABLE_COLOR;
-    } else if (availableAudioCount === 0) {
-      return this.NO_ASSETS_AVAILABLE_COLOR;
-    } else {
-      return this.FEW_ASSETS_AVAILABLE_COLOR;
-    }
+    const uniqueColors = new Set(
+      contentIdList.map(contentId =>
+        this._getActiveStateContentIdStatusColor(contentId)
+      )
+    );
+    return this._getColorFromUniqueStatusColors(uniqueColors);
   }
 
   _getAvailableContentIds(): string[] {
     let stateName = this.stateEditorService.getActiveStateName();
-    let contentIds = this.explorationStatesService.getAllContentIdsByStateName(
+    // Empty source cards are hidden in both translation and voiceover
+    // modes, so status colors omit those content IDs in both modes.
+    // Untranslated cards stay visible as gray placeholders in voiceover
+    // mode, so they remain in this list and keep tab colors in sync with
+    // the cards.
+    return this.explorationStatesService.getAllNonEmptyContentIdsByStateName(
       stateName as string
     ) as string[];
-    return contentIds;
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {
@@ -380,6 +408,13 @@ export class TranslationStatusService {
   }
 
   _getActiveStateContentIdStatusColor(contentId: string): string {
+    if (
+      this.translationTabActiveModeService.isVoiceoverModeActive() &&
+      !this.isVoiceoveringOriginalLanguage() &&
+      !this._hasNonemptyWrittenTranslation(contentId)
+    ) {
+      return this.PLACEHOLDER_STATUS_COLOR;
+    }
     let availabilityStatus =
       this._getActiveStateContentAvailabilityStatus(contentId);
     if (availabilityStatus.available) {
@@ -387,6 +422,42 @@ export class TranslationStatusService {
     } else {
       return this.NO_ASSETS_AVAILABLE_COLOR;
     }
+  }
+
+  isVoiceoveringOriginalLanguage(): boolean {
+    const originalLanguageCode = this.explorationLanguageCodeService.displayed;
+    if (!originalLanguageCode) {
+      return true;
+    }
+    return (
+      this.translationLanguageService.getActiveLanguageCode() ===
+      originalLanguageCode
+    );
+  }
+
+  _getVoiceoverContentIdsRequiringAudio(contentIds: string[]): string[] {
+    if (
+      !this.translationTabActiveModeService.isVoiceoverModeActive() ||
+      this.isVoiceoveringOriginalLanguage()
+    ) {
+      return contentIds;
+    }
+    return contentIds.filter(contentId =>
+      this._hasNonemptyWrittenTranslation(contentId)
+    );
+  }
+
+  _hasNonemptyWrittenTranslation(contentId: string): boolean {
+    if (
+      !this.entityTranslation ||
+      !this.entityTranslation.hasWrittenTranslation(contentId)
+    ) {
+      return false;
+    }
+    const translatedContent = this.entityTranslation.getWrittenTranslation(
+      contentId
+    ) as TranslatedContent;
+    return translatedContent.translation !== '';
   }
 
   _getActiveStateContentIdNeedsUpdateStatus(contentId: string): boolean {

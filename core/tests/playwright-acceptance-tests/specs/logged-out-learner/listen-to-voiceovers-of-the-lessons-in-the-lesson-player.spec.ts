@@ -32,8 +32,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 
 const ROLES = testConstants.Roles;
-const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
-  testConstants.data.ContinueInteractionVoiceoverInHindi;
 const LONG_VOICEOVER_IN_HI = testConstants.data.LongVoiceoverInHindi;
 
 test.describe.configure({mode: 'serial'});
@@ -158,40 +156,22 @@ test.describe('Logged-Out Learner', function () {
     await curriculumAdmin.navigateToTranslationsTab();
     await curriculumAdmin.editTranslationOfContent(
       'हिन्दी (Hindi)',
-      'Interaction',
-      '3/6 का सबसे सरल रूप में क्या बराबर है?'
-    );
-
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard('Second Card');
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.editTranslationOfContent(
-      'हिन्दी (Hindi)',
       'Feedback',
       'सही!',
       1
     );
 
-    // Add Voiceovers.
+    // Add a content voiceover on Second Card. Fraction Input has an empty
+    // optional placeholder, so the Interaction tab has no visible card.
     await curriculumAdmin.navigateToEditorTab();
     await curriculumAdmin.reloadPage();
+    await curriculumAdmin.navigateToCard('Second Card');
     await curriculumAdmin.navigateToTranslationsTab();
     await curriculumAdmin.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Content',
       LONG_VOICEOVER_IN_HI
-    );
-
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
-      'हिन्दी (Hindi)',
-      'Hindi (India)',
-      'Interaction',
-      CONTINUE_INTERACTION_VOICEOVER_IN_HI
     );
 
     await curriculumAdmin.saveExplorationDraft();
