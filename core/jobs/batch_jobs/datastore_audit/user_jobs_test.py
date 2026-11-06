@@ -204,7 +204,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                         'Expected last_played_exp_version to be an integer '
                         '>= 1, received 0',
                     )
-                )
+                ),
             ]
         )
 
@@ -230,7 +230,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                         'Expected last_played_exp_version to be an integer '
                         '>= 1, received None',
                     )
-                )
+                ),
             ]
         )
 
@@ -254,7 +254,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.InvalidExpUserLastPlaythroughIdError(
                         model
                     )
-                )
+                ),
             ]
         )
 
@@ -283,7 +283,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                         'UserSettingsModel',
                         user_id,
                     )
-                )
+                ),
             ]
         )
 
@@ -312,7 +312,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                         'ExplorationModel',
                         self.EXP_ID,
                     )
-                )
+                ),
             ]
         )
 
@@ -336,7 +336,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.LastPlayedExpVersionTooHighError(
                         model, 2
                     )
-                )
+                ),
             ]
         )
 
@@ -364,7 +364,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.LastPlayedExpVersionNotFoundError(
                         model
                     )
-                )
+                ),
             ]
         )
 
@@ -391,7 +391,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.LastPlayedStateNotInExplorationError(
                         model
                     )
-                )
+                ),
             ]
         )
 
@@ -406,7 +406,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
                     )
-                )
+                ),
             ]
         )
 
@@ -428,7 +428,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
                     )
-                )
+                ),
             ]
         )
 

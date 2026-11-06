@@ -207,7 +207,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
                             model
                         ).stderr
                     )
-                )
+                ),
             ]
         )
 
@@ -230,7 +230,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
                             'Mock validation error message', model
                         ).stderr
                     )
-                )
+                ),
             ]
         )
 
@@ -257,7 +257,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
                             'Mock validation error message', model
                         ).stderr
                     )
-                )
+                ),
             ]
         )
 
@@ -276,7 +276,11 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
         self.put_multi([model])
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult.as_stdout('VALIDATED MODELS SUCCESS: 1')]
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'VALIDATED MODELS SUCCESS: 1'
+                )
+            ]
         )
 
     def test_run_with_empty_storage(self) -> None:
@@ -311,7 +315,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
                                 'Mock validation error message', model2
                             ).stderr,
                         )
-                    )
+                    ),
                 ]
             )
 
