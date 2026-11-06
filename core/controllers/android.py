@@ -520,16 +520,14 @@ class AndroidActivityHandler(
                 requested_version = activity['version']
                 logging.error(
                     'Android requested %s %s at version %s, but it could not '
-                    'be found.'
-                    % (
-                        activity_type,
-                        activity['id'],
-                        (
-                            'latest'
-                            if requested_version is None
-                            else requested_version
-                        ),
-                    )
+                    'be found.',
+                    activity_type,
+                    activity['id'],
+                    (
+                        'latest'
+                        if requested_version is None
+                        else requested_version
+                    ),
                 )
 
         self.render_json(activities)
