@@ -25,6 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   selector: 'error-page',
   templateUrl: './error-page.component.html',
   styleUrls: ['./error-page.component.css'],
+  // We need ViewEncapsulation.None because error page links use innerHTML.
   encapsulation: ViewEncapsulation.None,
 })
 export class ErrorPageComponent implements OnInit {
