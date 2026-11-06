@@ -1,4 +1,4 @@
-<div class="stage">
+<div class="stage" [ngClass]="{'confetti-sidebar-expanded': getSidebarIsExpanded()}">
   <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-1': confettiIsShown}"></div>
   <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-2': confettiIsShown}"></div>
   <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-3': confettiIsShown}"></div>

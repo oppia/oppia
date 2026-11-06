@@ -176,7 +176,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
 
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this),
-      this.isCurrentAnswerValid.bind(this)
+      () => this.value !== '' && this.isCurrentAnswerValid.bind(this)()
     );
   }
 }

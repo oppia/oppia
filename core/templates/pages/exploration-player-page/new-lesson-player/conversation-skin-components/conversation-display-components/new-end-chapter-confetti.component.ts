@@ -18,6 +18,7 @@
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-new-end-chapter-confetti',
@@ -31,8 +32,13 @@ export class NewEndChapterConfettiComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private mobileMenuService: MobileMenuService
   ) {}
+
+  getSidebarIsExpanded(): boolean {
+    return this.mobileMenuService.getSidebarIsExpanded();
+  }
 
   ngOnInit(): void {
     this.endChapterCelebratoryAudio.src =

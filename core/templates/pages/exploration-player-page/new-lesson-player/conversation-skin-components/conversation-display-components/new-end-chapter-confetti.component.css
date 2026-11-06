@@ -164,6 +164,35 @@
   animation: confetti-anim-4 3000ms cubic-bezier(0, 0.7, 0, 1.5);
   left: 70%
 }
+/* On larger screens the confetti is fired from the centre of the lesson content
+   area, i.e. the viewport minus the sidebar, so that it lines up with the
+   card. The stage is a fixed box covering that area and the pieces are
+   positioned inside it. (On small screens the stage is scaled below, which
+   already makes it the reference for its pieces, so nothing is needed.) */
+@media(min-width: 701px) {
+  .stage {
+    height: 0;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    width: calc(100vw - 83px);
+    z-index: 2;
+  }
+  .stage.confetti-sidebar-expanded {
+    width: calc(100vw - 243px);
+  }
+  .confetti,
+  .coiled-confetti {
+    position: absolute;
+  }
+}
+@media(min-width: 701px) and (max-width: 767px) {
+  .stage,
+  .stage.confetti-sidebar-expanded {
+    width: 100vw;
+  }
+}
 @media(max-width: 700px) {
   .stage {
     transform: scale(0.65);
