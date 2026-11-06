@@ -386,4 +386,19 @@ describe('ImageReceiverComponent', () => {
 
     expect(component.fileChanged.emit).toHaveBeenCalled();
   });
+
+  it('should render license terms link and file upload input and label', () => {
+    const licenseLink: HTMLAnchorElement =
+      fixture.nativeElement.querySelector('.license-term-link');
+    const fileInput: HTMLInputElement =
+      fixture.nativeElement.querySelector('#image-file-input');
+    const uploadLabel: HTMLLabelElement =
+      fixture.nativeElement.querySelector('label.image-receiver-upload-label-button');
+
+    expect(licenseLink).toBeTruthy();
+    expect(licenseLink.getAttribute('href')).toBe('/license');
+    expect(fileInput).toBeTruthy();
+    expect(uploadLabel).toBeTruthy();
+    expect(uploadLabel.getAttribute('for')).toBe('image-file-input');
+  });
 });
