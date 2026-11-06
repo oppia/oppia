@@ -182,8 +182,8 @@
     },
     {
       "name": "lesson-creator/create-a-collection",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-collection.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/lesson-creator/create-a-collection.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
