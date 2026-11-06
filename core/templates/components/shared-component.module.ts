@@ -179,6 +179,7 @@ import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exp
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {TranslationModalUneditedConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal-unedited-confirmation-modal.component';
+import {AutoTranslationConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/auto-translation-confirmation-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -442,6 +443,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
+    AutoTranslationConfirmationModalComponent,
   ],
 
   entryComponents: [
@@ -618,6 +620,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
+    AutoTranslationConfirmationModalComponent,
   ],
 
   exports: [
@@ -790,6 +793,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ErrorModalComponent,
     ConfirmFormulaAsTextModalComponent,
     TranslationModalUneditedConfirmationModalComponent,
+    AutoTranslationConfirmationModalComponent,
   ],
 })
 export class SharedComponentsModule {}

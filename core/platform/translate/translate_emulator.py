@@ -62,13 +62,23 @@ class TranslateEmulator(base_translate_services.BaseTranslationService):
         if lookup_key in self._hardcoded_responses:
             return self._hardcoded_responses[lookup_key]
 
-        # Standard baseline execution fallback string formatting.
+        # Standard baseline execution fallback string formatting. Preserve
+        # HTML structure because the HTML translation service exposes nested
+        # RTE text as temporary elements and restores it after translation.
         soup = bs4.BeautifulSoup(source_text, 'html.parser')
+        for text_node in soup.find_all(string=True):
+            if not text_node.strip():
+                continue
 
-        # If it's a paragraph containing text, extract the inner HTML.
-        # Otherwise, just use the raw source text.
-        if soup.p is not None and len(soup.contents) == 1:
-            inner_html = ''.join(str(content) for content in soup.p.contents)
-            return '<p>Mock translation of: %s</p>' % inner_html
+            # Components marked translate="no" contain technical metadata;
+            # translatable RTE fields are represented by sibling temporary
+            # elements and remain eligible for the mock translation.
+            if any(
+                ancestor.get('translate') == 'no'
+                for ancestor in text_node.parents
+            ):
+                continue
 
-        return 'Mock translation of: %s' % source_text
+            text_node.replace_with('Mock translation of: %s' % text_node)
+
+        return str(soup.decode_contents())
