@@ -1262,13 +1262,17 @@ class AdminHandler(
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(i + 1, **story_node_dict)
 
-            # Create a default arc covering all nodes.
+            # Create a default module covering all nodes.
             node_ids = [
                 '%s%d' % (story_domain.NODE_ID_PREFIX, i + 1)
                 for i in range(len(story_node_dicts))
             ]
-            story.story_contents.add_arc(
-                story_domain.Arc('default_arc', 'Module 1', '', node_ids)
+            # Module IDs are opaque and only need to be unique within a
+            # story, so this need not match the 'module_default' minted by the
+            # frontend, nor the 'arc_default' that stories migrated from
+            # schema v6 still carry.
+            story.story_contents.add_module(
+                story_domain.Module('default_module', 'Module 1', '', node_ids)
             )
 
             skill_services.save_new_skill(self.user_id, skill_1)
@@ -1595,18 +1599,18 @@ class AdminHandler(
                 }
                 story_node_dicts.append(story_node_dict)
 
-            # Ensure the story has at least one arc before adding nodes.
+            # Ensure the story has at least one module before adding nodes.
             if not initial_dummy_opportunites_generation:
                 story = story_fetchers.get_story_by_id(story_id)
-                if len(story.story_contents.arcs) == 0:
+                if len(story.story_contents.modules) == 0:
                     existing_node_ids = [
                         node.id for node in story.story_contents.nodes
                     ]
-                    arc_change_list = [
+                    module_change_list = [
                         story_domain.StoryChange(
                             {
-                                'cmd': 'create_arc',
-                                'arc_id': 'default_arc',
+                                'cmd': 'create_module',
+                                'module_id': 'default_module',
                                 'title': 'Module 1',
                                 'description': '',
                                 'node_ids': existing_node_ids,
@@ -1616,13 +1620,13 @@ class AdminHandler(
                     story_services.update_story(
                         self.user_id,
                         story_id,
-                        arc_change_list,
-                        'create default arc',
+                        module_change_list,
+                        'create default module',
                     )
                     story = story_fetchers.get_story_by_id(story_id)
-                target_arc_id = story.story_contents.arcs[0].id
+                target_module_id = story.story_contents.modules[0].id
             else:
-                target_arc_id = 'default_arc'
+                target_module_id = 'default_module'
 
             def generate_dummy_story_nodes(
                 node_id: int,
@@ -1700,10 +1704,10 @@ class AdminHandler(
                         ),
                         story_domain.StoryChange(
                             {
-                                'cmd': 'move_node_to_arc',
+                                'cmd': 'move_node_to_module',
                                 'node_id': '%s%d'
                                 % (story_domain.NODE_ID_PREFIX, node_id),
-                                'to_arc_id': target_arc_id,
+                                'to_module_id': target_module_id,
                             }
                         ),
                     ]
@@ -1740,13 +1744,13 @@ class AdminHandler(
                 )
 
             if initial_dummy_opportunites_generation:
-                # Create a default arc covering all nodes.
+                # Create a default module covering all nodes.
                 story_node_ids = [
                     node.id for node in story.story_contents.nodes
                 ]
-                story.story_contents.add_arc(
-                    story_domain.Arc(
-                        'default_arc', 'Module 1', '', story_node_ids
+                story.story_contents.add_module(
+                    story_domain.Module(
+                        'default_module', 'Module 1', '', story_node_ids
                     )
                 )
                 skill_services.save_new_skill(self.user_id, skill)
@@ -2673,17 +2677,17 @@ class AdminHandler(
                 'thumbnail',
                 False,
             )
-            # Ensure the story has at least one arc before adding nodes.
+            # Ensure the story has at least one module before adding nodes.
             updated_story = story_fetchers.get_story_by_id(story_id)
-            if len(updated_story.story_contents.arcs) == 0:
+            if len(updated_story.story_contents.modules) == 0:
                 existing_node_ids = [
                     node.id for node in updated_story.story_contents.nodes
                 ]
-                arc_change_list = [
+                module_change_list = [
                     story_domain.StoryChange(
                         {
-                            'cmd': 'create_arc',
-                            'arc_id': 'default_arc',
+                            'cmd': 'create_module',
+                            'module_id': 'default_module',
                             'title': 'Module 1',
                             'description': '',
                             'node_ids': existing_node_ids,
@@ -2693,13 +2697,13 @@ class AdminHandler(
                 topic_services.update_story_and_topic_summary(
                     self.user_id,
                     story_id,
-                    arc_change_list,
-                    'create default arc',
+                    module_change_list,
+                    'create default module',
                     story.corresponding_topic_id,
                 )
-                target_arc_id = 'default_arc'
+                target_module_id = 'default_module'
             else:
-                target_arc_id = updated_story.story_contents.arcs[0].id
+                target_module_id = updated_story.story_contents.modules[0].id
 
             new_node_ids = []
             for i, exp_id in enumerate(exp_ids_to_publish):
@@ -2752,9 +2756,9 @@ class AdminHandler(
                     ),
                     story_domain.StoryChange(
                         {
-                            'cmd': 'move_node_to_arc',
+                            'cmd': 'move_node_to_module',
                             'node_id': node_id,
-                            'to_arc_id': target_arc_id,
+                            'to_module_id': target_module_id,
                         }
                     ),
                 ]

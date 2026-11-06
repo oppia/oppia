@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for editing arc title and description.
+ * @fileoverview Component for editing module title and description.
  */
 
 import {Component, Input, Optional} from '@angular/core';
@@ -21,13 +21,13 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'oppia-edit-arc-modal',
-  templateUrl: './edit-arc-modal.component.html',
-  styleUrls: ['./edit-arc-modal.component.css'],
+  selector: 'oppia-edit-module-modal',
+  templateUrl: './edit-module-modal.component.html',
+  styleUrls: ['./edit-module-modal.component.css'],
 })
-export class EditArcModalComponent {
-  @Input() arcTitle = '';
-  @Input() arcDescription = '';
+export class EditModuleModalComponent {
+  @Input() moduleTitle = '';
+  @Input() moduleDescription = '';
   errorMessage: string | null = null;
 
   constructor(
@@ -44,7 +44,7 @@ export class EditArcModalComponent {
   }
 
   save(): void {
-    const trimmedTitle = this.arcTitle.trim();
+    const trimmedTitle = this.moduleTitle.trim();
     if (!trimmedTitle) {
       this.errorMessage = 'Module title cannot be empty.';
       return;
@@ -52,12 +52,12 @@ export class EditArcModalComponent {
     if (this.bottomSheetRef) {
       this.bottomSheetRef.dismiss({
         title: trimmedTitle,
-        description: this.arcDescription.trim(),
+        description: this.moduleDescription.trim(),
       });
     } else if (this.ngbActiveModal) {
       this.ngbActiveModal.close({
         title: trimmedTitle,
-        description: this.arcDescription.trim(),
+        description: this.moduleDescription.trim(),
       });
     }
   }

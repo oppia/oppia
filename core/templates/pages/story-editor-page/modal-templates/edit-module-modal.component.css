@@ -1,13 +1,13 @@
-.arc-input {
+.module-input {
   margin-bottom: 14px;
 }
 
-.arc-input-label {
+.module-input-label {
   font-weight: 600;
   margin-bottom: 4px;
 }
 
-.arc-error-message {
+.module-error-message {
   color: #d93900;
   font-size: 13px;
 }

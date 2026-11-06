@@ -325,7 +325,7 @@ class PracticeSessionAccessValidationPage(
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
-        'arc_id': {
+        'module_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
@@ -349,7 +349,7 @@ class PracticeSessionAccessValidationPage(
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
         node_id = self.request.route_kwargs.get('node_id')
-        arc_id = self.request.route_kwargs.get('arc_id')
+        module_id = self.request.route_kwargs.get('module_id')
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         assert isinstance(topic_url_fragment, str)
@@ -360,8 +360,8 @@ class PracticeSessionAccessValidationPage(
             self._validate_node_id(topic, node_id)
             return
 
-        if arc_id is not None:
-            self._validate_arc_id(topic, arc_id)
+        if module_id is not None:
+            self._validate_module_id(topic, module_id)
             return
 
         if subtopics is None:
@@ -401,23 +401,21 @@ class PracticeSessionAccessValidationPage(
         """
         return story_fetchers.get_all_nodes_for_topic(topic)
 
-    def _get_all_arcs_for_topic(
+    def _get_all_modules_for_topic(
         self, topic: topic_domain.Topic
-    ) -> List[story_domain.Arc]:
-        """Returns arcs from the first published story in the topic.
+    ) -> List[story_domain.Module]:
+        """Returns modules from the first published story in the topic.
 
         Args:
             topic: Topic. The topic object.
 
         Returns:
-            list(Arc). All arcs in order.
+            list(Module). All modules in order.
         """
-        return [
-            arc
-            for _, arc in story_fetchers.get_all_arcs_with_stories_for_topic(
-                topic
-            )
-        ]
+        stories_with_modules = (
+            story_fetchers.get_all_modules_with_stories_for_topic(topic)
+        )
+        return [module for _, module in stories_with_modules]
 
     def _validate_node_id(
         self, topic: topic_domain.Topic, node_id: str
@@ -441,28 +439,30 @@ class PracticeSessionAccessValidationPage(
                 'Node with id %s is not part of this topic.' % node_id
             )
 
-    def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
-        """Validates that the given arc ID exists in the first story.
+    def _validate_module_id(
+        self, topic: topic_domain.Topic, module_id: str
+    ) -> None:
+        """Validates that the given module ID exists in the first story.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc in
-        the first published story of the topic (e.g., '1' maps to the first
-        arc).
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the first published story of the topic (e.g., '1' maps to the first
+        module).
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID (1-based index) to validate.
+            module_id: str. The module ID (1-based index) to validate.
 
         Raises:
-            NotFoundException. The arc ID was not found.
+            NotFoundException. The module ID was not found.
         """
-        all_arcs = self._get_all_arcs_for_topic(topic)
+        all_modules = self._get_all_modules_for_topic(topic)
         if (
-            not arc_id.isascii()
-            or not arc_id.isdigit()
-            or not 1 <= int(arc_id) <= len(all_arcs)
+            not module_id.isascii()
+            or not module_id.isdigit()
+            or not 1 <= int(module_id) <= len(all_modules)
         ):
             raise self.NotFoundException(
-                'Arc with id %s is not part of this topic.' % arc_id
+                'Module with id %s is not part of this topic.' % module_id
             )
 
 

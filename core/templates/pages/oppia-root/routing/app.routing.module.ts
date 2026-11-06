@@ -156,7 +156,7 @@ const routes: Route[] = [
     canActivate: [PracticeSessionAccessGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_MODULE_TEST.ROUTE,
     loadChildren: () =>
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule

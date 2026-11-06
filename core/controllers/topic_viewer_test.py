@@ -1033,17 +1033,17 @@ class TopicPageDataHandlerTests(
         self.logout()
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.STORY_EDITOR_ARCS]
+        [feature_flag_list.FeatureNames.STORY_EDITOR_MODULES]
     )
-    def test_get_with_are_story_arcs_enabled(self) -> None:
+    def test_get_with_are_story_modules_enabled(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
         )
         for canonical_story_dict in json_response['canonical_story_dicts']:
-            self.assertIn('arcs', canonical_story_dict)
+            self.assertIn('modules', canonical_story_dict)
         for additional_story_dict in json_response['additional_story_dicts']:
-            self.assertIn('arcs', additional_story_dict)
+            self.assertIn('modules', additional_story_dict)
         self.logout()
 
 

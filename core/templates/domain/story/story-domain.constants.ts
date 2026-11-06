@@ -44,30 +44,30 @@ export const StoryDomainConstants = {
   STORY_PROPERTY_URL_FRAGMENT: 'url_fragment',
   STORY_PROPERTY_META_TAG_CONTENT: 'meta_tag_content',
 
-  CMD_CREATE_ARC: 'create_arc',
-  CMD_DELETE_ARC: 'delete_arc',
-  CMD_RENAME_ARC: 'rename_arc',
-  CMD_REARRANGE_ARCS: 'rearrange_arcs',
-  CMD_MOVE_NODE_TO_ARC: 'move_node_to_arc',
-  CMD_UPDATE_ARC_PROPERTY: 'update_arc_property',
+  CMD_CREATE_MODULE: 'create_module',
+  CMD_DELETE_MODULE: 'delete_module',
+  CMD_RENAME_MODULE: 'rename_module',
+  CMD_REARRANGE_MODULES: 'rearrange_modules',
+  CMD_MOVE_NODE_TO_MODULE: 'move_node_to_module',
+  CMD_UPDATE_MODULE_PROPERTY: 'update_module_property',
 
-  ARC_PROPERTY_TITLE: 'title',
-  ARC_PROPERTY_DESCRIPTION: 'description',
+  MODULE_PROPERTY_TITLE: 'title',
+  MODULE_PROPERTY_DESCRIPTION: 'description',
 
   INITIAL_NODE_ID: 'initial_node_id',
   NODE: 'node',
 
   /**
-   * Palette used to colour arc header backgrounds and book badges in both the
-   * story-editor and topic-viewer pages.  Each entry has:
-   *   headerBg  – light tint for the arc header card background
+   * Palette used to colour module header backgrounds and book badges in both
+   * the story-editor and topic-viewer pages.  Each entry has:
+   *   headerBg  – light tint for the module header card background
    *   headerBorder – border / rule colour
    *   iconBg    – solid colour for the circular icon badge
-   *   rowAccent – left-border accent shown on chapter rows inside this arc
+   *   rowAccent – left-border accent shown on chapter rows inside this module
    *
-   * At least 15 entries are required so arcs cycle through distinct colours.
+   * At least 15 entries are required so modules cycle through distinct colours.
    */
-  ARC_COLOR_PALETTE: [
+  MODULE_COLOR_PALETTE: [
     {
       headerBg: '#eef7ef',
       headerBorder: '#b8dbbf',

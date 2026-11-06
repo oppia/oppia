@@ -3121,7 +3121,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_arcs_created_when_missing_in_dummy_translation_opportunities(
+    def test_modules_created_when_missing_in_dummy_translation_opportunities(
         self,
     ) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -3175,7 +3175,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         )
 
         updated_story = story_fetchers.get_story_by_id('dummyStoryId')
-        self.assertEqual(len(updated_story.story_contents.arcs), 1)
+        self.assertEqual(len(updated_story.story_contents.modules), 1)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id('dummyStoryId', strict=False)
         )

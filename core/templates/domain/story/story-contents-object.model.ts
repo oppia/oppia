@@ -20,7 +20,7 @@
 import {StoryEditorPageConstants} from 'pages/story-editor-page/story-editor-page.constants';
 import {StoryNodeBackendDict, StoryNode} from 'domain/story/story-node.model';
 
-export interface ArcBackendDict {
+export interface ModuleBackendDict {
   id: string;
   title: string;
   description: string;
@@ -31,14 +31,14 @@ export interface StoryContentsBackendDict {
   initial_node_id: string;
   next_node_id: string;
   nodes: StoryNodeBackendDict[];
-  arcs?: ArcBackendDict[];
+  modules?: ModuleBackendDict[];
 }
 
 interface NodeTitles {
   [title: string]: string;
 }
 
-export class ArcModel {
+export class ModuleModel {
   _id: string;
   _title: string;
   _description: string;
@@ -89,12 +89,12 @@ export class ArcModel {
     title: string,
     description: string,
     nodeIds: string[]
-  ): ArcModel {
-    return new ArcModel(id, title, description, nodeIds);
+  ): ModuleModel {
+    return new ModuleModel(id, title, description, nodeIds);
   }
 
-  static createFromBackendDict(backendDict: ArcBackendDict): ArcModel {
-    return new ArcModel(
+  static createFromBackendDict(backendDict: ModuleBackendDict): ModuleModel {
+    return new ModuleModel(
       backendDict.id,
       backendDict.title,
       backendDict.description,
@@ -102,7 +102,7 @@ export class ArcModel {
     );
   }
 
-  toBackendDict(): ArcBackendDict {
+  toBackendDict(): ModuleBackendDict {
     return {
       id: this._id,
       title: this._title,
@@ -119,17 +119,17 @@ export class StoryContents {
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
-  _arcs: ArcModel[];
+  _modules: ModuleModel[];
   constructor(
     initialNodeId: string,
     nodes: StoryNode[],
     nextNodeId: string,
-    arcs: ArcModel[] = []
+    modules: ModuleModel[] = []
   ) {
     this._initialNodeId = initialNodeId;
     this._nodes = nodes;
     this._nextNodeId = nextNodeId;
-    this._arcs = arcs;
+    this._modules = modules;
   }
 
   getIncrementedNodeId(nodeId: string): string {
@@ -156,79 +156,85 @@ export class StoryContents {
     return this._nodes;
   }
 
-  getArcs(): ArcModel[] {
-    return this._arcs;
+  getModules(): ModuleModel[] {
+    return this._modules;
   }
 
-  getArcIndex(arcId: string): number {
-    for (let i = 0; i < this._arcs.length; i++) {
-      if (this._arcs[i].getId() === arcId) {
+  getModuleIndex(moduleId: string): number {
+    for (let i = 0; i < this._modules.length; i++) {
+      if (this._modules[i].getId() === moduleId) {
         return i;
       }
     }
     return -1;
   }
 
-  addArc(arc: ArcModel): void {
-    this._arcs.push(arc);
+  addModule(module: ModuleModel): void {
+    this._modules.push(module);
   }
 
-  insertArcAt(index: number, arc: ArcModel): void {
-    this._arcs.splice(index, 0, arc);
+  insertModuleAt(index: number, module: ModuleModel): void {
+    this._modules.splice(index, 0, module);
   }
 
-  deleteArc(arcId: string): void {
-    const index = this.getArcIndex(arcId);
+  deleteModule(moduleId: string): void {
+    const index = this.getModuleIndex(moduleId);
     if (index === -1) {
-      throw new Error('The arc with id ' + arcId + ' does not exist');
+      throw new Error('The module with id ' + moduleId + ' does not exist');
     }
-    this._arcs.splice(index, 1);
+    this._modules.splice(index, 1);
   }
 
-  rearrangeArcs(arcIdsOrder: string[]): void {
-    if (arcIdsOrder.length !== this._arcs.length) {
-      throw new Error('Arc order must include each arc exactly once');
+  rearrangeModules(moduleIdsOrder: string[]): void {
+    if (moduleIdsOrder.length !== this._modules.length) {
+      throw new Error('Module order must include each module exactly once');
     }
-    const oldArcs: {[id: string]: ArcModel} = {};
-    for (const arc of this._arcs) {
-      oldArcs[arc.getId()] = arc;
+    const oldModules: {[id: string]: ModuleModel} = {};
+    for (const module of this._modules) {
+      oldModules[module.getId()] = module;
     }
-    const seenArcIds = new Set<string>();
-    const newArcs: ArcModel[] = [];
-    for (const arcId of arcIdsOrder) {
-      if (seenArcIds.has(arcId)) {
-        throw new Error('Duplicate arc id in arc order: ' + arcId);
+    const seenModuleIds = new Set<string>();
+    const newModules: ModuleModel[] = [];
+    for (const moduleId of moduleIdsOrder) {
+      if (seenModuleIds.has(moduleId)) {
+        throw new Error('Duplicate module id in module order: ' + moduleId);
       }
-      if (!Object.prototype.hasOwnProperty.call(oldArcs, arcId)) {
-        throw new Error('Arc with id ' + arcId + ' is not part of this story');
+      if (!Object.prototype.hasOwnProperty.call(oldModules, moduleId)) {
+        throw new Error(
+          'Module with id ' + moduleId + ' is not part of this story'
+        );
       }
-      seenArcIds.add(arcId);
-      newArcs.push(oldArcs[arcId]);
+      seenModuleIds.add(moduleId);
+      newModules.push(oldModules[moduleId]);
     }
-    this._arcs = newArcs;
+    this._modules = newModules;
   }
 
-  moveNodeToArc(nodeId: string, toArcId: string, positionIndex?: number): void {
-    const targetArcIndex = this.getArcIndex(toArcId);
-    if (targetArcIndex === -1) {
-      throw new Error('Arc with id ' + toArcId + ' does not exist');
+  moveNodeToModule(
+    nodeId: string,
+    toModuleId: string,
+    positionIndex?: number
+  ): void {
+    const targetModuleIndex = this.getModuleIndex(toModuleId);
+    if (targetModuleIndex === -1) {
+      throw new Error('Module with id ' + toModuleId + ' does not exist');
     }
-    // Remove the node from any arc that contains it, using setNodeIds to
+    // Remove the node from any module that contains it, using setNodeIds to
     // avoid mutating copies returned by getters and ensure a single source
-    // of truth for arc node lists.
-    for (const arc of this._arcs) {
-      const nodeIds = arc.getNodeIds();
+    // of truth for module node lists.
+    for (const module of this._modules) {
+      const nodeIds = module.getNodeIds();
       if (nodeIds.indexOf(nodeId) !== -1) {
-        arc.setNodeIds(nodeIds.filter(id => id !== nodeId));
+        module.setNodeIds(nodeIds.filter(id => id !== nodeId));
       }
     }
 
-    const currentNodeIds = this._arcs[targetArcIndex].getNodeIds();
+    const currentNodeIds = this._modules[targetModuleIndex].getNodeIds();
     if (positionIndex !== undefined && positionIndex <= currentNodeIds.length) {
       currentNodeIds.splice(positionIndex, 0, nodeId);
-      this._arcs[targetArcIndex].setNodeIds(currentNodeIds);
+      this._modules[targetModuleIndex].setNodeIds(currentNodeIds);
     } else {
-      this._arcs[targetArcIndex].setNodeIds([...currentNodeIds, nodeId]);
+      this._modules[targetModuleIndex].setNodeIds([...currentNodeIds, nodeId]);
     }
   }
 
@@ -549,18 +555,18 @@ export class StoryContents {
         StoryNode.createFromBackendDict(storyContentsBackendObject.nodes[i])
       );
     }
-    var arcs = [];
-    const arcsData = storyContentsBackendObject.arcs;
-    if (arcsData) {
-      for (var i = 0; i < arcsData.length; i++) {
-        arcs.push(ArcModel.createFromBackendDict(arcsData[i]));
+    var modules = [];
+    const modulesData = storyContentsBackendObject.modules;
+    if (modulesData) {
+      for (var i = 0; i < modulesData.length; i++) {
+        modules.push(ModuleModel.createFromBackendDict(modulesData[i]));
       }
     }
     return new StoryContents(
       storyContentsBackendObject.initial_node_id,
       nodes,
       storyContentsBackendObject.next_node_id,
-      arcs
+      modules
     );
   }
 }
