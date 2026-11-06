@@ -154,15 +154,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
   activeSection!: string;
-  activeSubsection!: string;
 
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
   communityLessonsDataLoaded: boolean = false;
-  homeImageUrl: string = '';
-  todolistImageUrl: string = '';
-  progressImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
@@ -240,13 +236,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           );
       }
     });
-    this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
-    this.todolistImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/todolist.svg'
-    );
-    this.progressImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/progress.svg'
-    );
 
     let dashboardTopicAndStoriesDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync();
@@ -262,14 +251,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           responseData.learntToPartiallyLearntTopics;
         this.activeSection =
           LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
-        this.activeSubsection =
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY;
         if (this.urlService.getUrlParams().active_tab === 'learner-groups') {
           this.activeSection =
             LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
         }
         if (
-          this.isShowRedesignedLearnerDashboardActive() &&
           this.isNewExplorationEditorFeedbackTabEnabled() &&
           this.urlService.getUrlParams().active_tab === 'my-suggestions'
         ) {
@@ -458,73 +444,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           // This is placed here in order to satisfy Unit tests.
         });
     }
-  }
-
-  setActiveSubsection(newActiveSubsectionName: string): void {
-    this.activeSubsection = newActiveSubsectionName;
-    if (
-      this.activeSubsection ===
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-        .LESSONS
-    ) {
-      this.loaderService.showLoadingScreen('Loading');
-      let dashboardCollectionsDataPromise =
-        this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
-      dashboardCollectionsDataPromise.then(
-        responseData => {
-          this.completedCollectionsList = responseData.completedCollectionsList;
-          this.incompleteCollectionsList =
-            responseData.incompleteCollectionsList;
-          this.completedToIncompleteCollections =
-            responseData.completedToIncompleteCollections;
-        },
-        errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-          ) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard collections data'
-            );
-          }
-        }
-      );
-
-      let dashboardExplorationsDataPromise =
-        this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-      dashboardExplorationsDataPromise.then(
-        responseData => {
-          this.filterExplorationsData(responseData);
-        },
-        errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-          ) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard explorations data'
-            );
-          }
-        }
-      );
-      Promise.all([
-        dashboardCollectionsDataPromise,
-        dashboardExplorationsDataPromise,
-      ])
-        .then(() => {
-          setTimeout(() => {
-            this.loaderService.hideLoadingScreen();
-            this.communityLessonsDataLoaded = true;
-            // So that focus is applied after the loading screen has dissapeared.
-            this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-          }, 0);
-        })
-        .catch(errorResponse => {
-          // This is placed here in order to satisfy Unit tests.
-        });
-    }
-  }
-
-  isShowRedesignedLearnerDashboardActive(): boolean {
-    return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
   }
 
   isCertificateAssessmentEnabled(): boolean {
