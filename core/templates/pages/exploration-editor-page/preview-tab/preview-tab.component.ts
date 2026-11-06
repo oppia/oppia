@@ -23,7 +23,6 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {
   ExplorationParams,
@@ -35,9 +34,6 @@ import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
-import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
-import {ExplorationStatesService} from '../services/exploration-states.service';
-import {GraphDataService} from '../services/graph-data.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
@@ -69,10 +65,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private explorationEngineService: ExplorationEngineService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
-    private explorationParamChangesService: ExplorationParamChangesService,
-    private explorationStatesService: ExplorationStatesService,
     private platformFeatureService: PlatformFeatureService,
-    private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
     private ngbModal: NgbModal,
     private numberAttemptsService: NumberAttemptsService,
@@ -198,28 +191,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     this.explorationDataService
       .getDataAsync(() => {})
       .then(async explorationData => {
-        // TODO(#13564): Remove this part of code and make sure that this
-        // function is executed only after the Promise in initExplorationPage
-        // is fully finished.
-        if (!this.explorationParamChangesService.savedMemento) {
-          this.explorationParamChangesService.init(
-            ParamChanges.createFromBackendList(explorationData.param_changes)
-          );
-          this.explorationStatesService.init(explorationData.states, false);
-          this.explorationInitStateNameService.init(
-            explorationData.init_state_name
-          );
-          this.graphDataService.recompute();
-          let stateName = this.stateEditorService.getActiveStateName();
-          if (
-            !stateName ||
-            !this.explorationStatesService.getState(stateName)
-          ) {
-            this.stateEditorService.setActiveStateName(
-              this.explorationInitStateNameService.displayed as string
-            );
-          }
-        }
         let initStateNameForPreview =
           this.stateEditorService.getActiveStateName();
 

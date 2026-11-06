@@ -490,6 +490,71 @@ describe('Exploration editor page component', () => {
       component.ngOnDestroy();
     });
 
+    it('should create the preview only after editor initialization completes', fakeAsync(() => {
+      let finishInitialization!: () => void;
+      const improvementsInitialization = new Promise<void>(resolve => {
+        finishInitialization = resolve;
+      });
+      eis.initAsync.and.returnValue(improvementsInitialization);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+      component.explorationEditorPageHasInitialized = true;
+      fixture.detectChanges();
+      const previousPreview =
+        fixture.nativeElement.querySelector('oppia-preview-tab');
+      expect(previousPreview).not.toBeNull();
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+
+      expect(component.explorationEditorPageHasInitialized).toBe(false);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      finishInitialization();
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(component.explorationEditorPageHasInitialized).toBe(true);
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('oppia-preview-tab')).not.toBe(
+        previousPreview
+      );
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
+    it('should use the initial state when preview opens with an invalid active state', fakeAsync(() => {
+      const stateEditorService = TestBed.inject(StateEditorService);
+      stateEditorService.setActiveStateName('missing-state');
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
+      spyOn(component, 'getActiveTabName').and.returnValue('preview');
+
+      component.initExplorationPage();
+      fixture.detectChanges();
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).toBeNull();
+
+      flushMicrotasks();
+      fixture.detectChanges();
+      expect(stateEditorService.getActiveStateName()).toBe('Introduction');
+      expect(
+        fixture.nativeElement.querySelector('oppia-preview-tab')
+      ).not.toBeNull();
+
+      rs.navigateToMainTab(null);
+      discardPeriodicTasks();
+    }));
+
     it('should start editor tutorial when on main page', fakeAsync(() => {
       explorationData.version = 1;
       tds.countOfOpenFeedbackThreads = 2;
