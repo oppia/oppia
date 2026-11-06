@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the ImageClickInput interaction.
  */
 
-// @ts-nocheck
-
 import {
   waitForAsync,
   ComponentFixture,
@@ -667,11 +665,11 @@ describe('InteractiveImageClickInput', () => {
     spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
       left: 100,
       top: 200,
-    });
+    } as DOMRect);
     spyOn(window, 'getComputedStyle').and.returnValue({
       marginLeft: '10px',
       marginTop: '20px',
-    });
+    } as CSSStyleDeclaration);
 
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-select-image-region-cursor');
@@ -680,7 +678,7 @@ describe('InteractiveImageClickInput', () => {
       bottom: 110,
       left: 200,
       right: 210,
-    });
+    } as DOMRect);
 
     const event = new MouseEvent('mousemove', {
       clientX: 100,
