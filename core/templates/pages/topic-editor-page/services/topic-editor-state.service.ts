@@ -58,7 +58,7 @@ import {
 } from 'domain/topic/study-guide.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 
-interface GroupedSkillSummaryDict {
+export interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
   others: SkillSummaryBackendDict[];
 }
@@ -394,7 +394,7 @@ export class TopicEditorStateService {
     return this._newQuestionEditor;
   }
 
-  getGroupedSkillSummaries(): object {
+  getGroupedSkillSummaries(): GroupedSkillSummaryDict {
     return cloneDeep(this._groupedSkillSummaries);
   }
 
@@ -488,7 +488,7 @@ export class TopicEditorStateService {
     return this._topicIsInitialized;
   }
 
-  getSkillIdToRubricsObject(): object {
+  getSkillIdToRubricsObject(): Record<string, Rubric[]> {
     return this._skillIdToRubricsObject;
   }
 

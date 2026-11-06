@@ -63,6 +63,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -131,6 +133,8 @@ class MockPlatformFeatureService {
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
+  let readOnlyExplorationBackendApiService: jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
+  let computeGraphService: jasmine.SpyObj<ComputeGraphService>;
   let translateTextService: TranslateTextService;
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let translationLanguageService: TranslationLanguageService;
@@ -181,6 +185,22 @@ describe('Translation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
+    readOnlyExplorationBackendApiService = jasmine.createSpyObj(
+      'ReadOnlyExplorationBackendApiService',
+      ['fetchExplorationAsync']
+    );
+    readOnlyExplorationBackendApiService.fetchExplorationAsync.and.returnValue(
+      Promise.resolve({
+        exploration: {init_state_name: 'stateName1', states: {}},
+      })
+    );
+    computeGraphService = jasmine.createSpyObj('ComputeGraphService', [
+      'computeBfsTraversalOfStates',
+    ]);
+    computeGraphService.computeBfsTraversalOfStates.and.returnValue([
+      'stateName1',
+      'stateName2',
+    ]);
     mockModalRef = new MockConfirmTranslationExitModal();
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -238,6 +258,14 @@ describe('Translation Modal Component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useValue: readOnlyExplorationBackendApiService,
+        },
+        {
+          provide: ComputeGraphService,
+          useValue: computeGraphService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -291,6 +319,41 @@ describe('Translation Modal Component', () => {
       })
     );
   });
+
+  it('should set hasAltTextModalBeenOpened to true when image customization modal is opened', fakeAsync(() => {
+    // eslint-disable-next-line dot-notation
+    spyOn(component['rteHelperService'], 'openCustomizationModal');
+    component.ngOnInit();
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletexthandler?exp_id=1&language_code=es'
+    );
+    req.flush({
+      state_names_to_content_id_mapping: {
+        stateName1: {contentId1: {content_value: 'text1', data_format: 'html'}},
+      },
+      version: 1,
+    });
+    tick();
+
+    // Check initial state.
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with a non-image component.
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(false, 'link', [], {});
+    expect(component.hasAltTextModalBeenOpened).toBeFalse();
+
+    // Call the intercepted function with the 'image' component.
+    // eslint-disable-next-line dot-notation
+    component['rteHelperService'].openCustomizationModal(
+      false,
+      'image',
+      [],
+      {}
+    );
+    expect(component.hasAltTextModalBeenOpened).toBeTrue();
+  }));
 
   it('should wrap text with ellipsis when text is too long', () => {
     expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
@@ -1707,6 +1770,14 @@ describe('Translation Modal Component', () => {
       expect(component.hasLengthValidationError).toBe(false);
       expect(component.lengthValidationErrorMessage).toBe('');
       expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+  });
+
+  describe('when checking for validation errors with auto-translated images', () => {
+    it('should return true if hasImageInAutoTranslation is true and hasAltTextModalBeenOpened is false', () => {
+      component.hasImageInAutoTranslation = true;
+      component.hasAltTextModalBeenOpened = false;
+      expect(component.hasSubmitValidationErrors()).toBe(true);
     });
   });
 

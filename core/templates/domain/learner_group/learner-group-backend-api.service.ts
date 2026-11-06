@@ -35,10 +35,6 @@ interface DeleteLearnerGroupBackendResponse {
   success: boolean;
 }
 
-interface LearnerGroupFeatureIsEnabledBackendDict {
-  feature_is_enabled: boolean;
-}
-
 interface LearnerGroupProgressSharingPermissionBackendDict {
   progress_sharing_permission: boolean;
 }
@@ -307,21 +303,5 @@ export class LearnerGroupBackendApiService {
           resolve(response.progress_sharing_permission);
         });
     });
-  }
-
-  async _isLearnerGroupFeatureEnabledAsync(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const featureStatusUrl = '/learner_groups_feature_status_handler';
-      this.http
-        .get<LearnerGroupFeatureIsEnabledBackendDict>(featureStatusUrl)
-        .toPromise()
-        .then(response => {
-          resolve(response.feature_is_enabled);
-        });
-    });
-  }
-
-  async isLearnerGroupFeatureEnabledAsync(): Promise<boolean> {
-    return this._isLearnerGroupFeatureEnabledAsync();
   }
 }

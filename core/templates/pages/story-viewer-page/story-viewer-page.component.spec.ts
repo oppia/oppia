@@ -24,7 +24,6 @@ import {
 } from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
 
-import {StoryNode} from 'domain/story/story-node.model';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 import {StoryViewerPageComponent} from './story-viewer-page.component';
 import {UserService} from 'services/user.service';
@@ -60,6 +59,52 @@ class MockPlatformFeatureService {
     },
   };
 }
+
+// Creates a learner-view story node, since 'getExplorationUrl()' accepts the
+// nodes returned by 'StoryPlaythrough.getStoryNodes()'.
+const createReadOnlyStoryNode = (
+  id: string,
+  explorationId: string
+): ReadOnlyStoryNode =>
+  ReadOnlyStoryNode.createFromBackendDict({
+    id: id,
+    title: 'Story node title',
+    description: 'description',
+    destination_node_ids: [],
+    prerequisite_skill_ids: [],
+    acquired_skill_ids: [],
+    outline: 'Outline',
+    outline_is_finalized: false,
+    exploration_id: explorationId,
+    exp_summary_dict: {
+      id: 'exp_id',
+      title: 'Title',
+      status: 'private',
+      activity_type: 'exploration',
+      category: 'Algebra',
+      community_owned: false,
+      language_code: 'en',
+      objective: 'Test Objective',
+      num_views: 0,
+      created_on_msec: 1591296635736.666,
+      last_updated_msec: 1591296737470.528,
+      human_readable_contributors_summary: {},
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      tags: [],
+      thumbnail_bg_color: '#cc4b00',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+    },
+    completed: true,
+    thumbnail_bg_color: '#927117',
+    thumbnail_filename: 'filename',
+    status: 'Published',
+  });
 
 describe('Story Viewer Page component', () => {
   let httpTestingController: HttpTestingController;
@@ -250,9 +295,9 @@ describe('Story Viewer Page component', () => {
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story'
     );
-    let node = StoryNode.createFromIdAndTitle('1', 'Story node title');
+    let node = createReadOnlyStoryNode('1', 'exp_id');
     expect(component.getExplorationUrl(node)).toBe(
-      '/explore/null?topic_url_fragment=topic&' +
+      '/explore/exp_id?topic_url_fragment=topic&' +
         'classroom_url_fragment=math&story_url_fragment=story&' +
         'node_id=1'
     );
@@ -319,7 +364,7 @@ describe('Story Viewer Page component', () => {
         })
       )
     );
-    let node = StoryNode.createFromIdAndTitle('1', 'Story node title');
+    let node = createReadOnlyStoryNode('1', 'exp_id');
 
     expect(() => {
       component.ngOnInit();
@@ -663,6 +708,25 @@ describe('Story Viewer Page component', () => {
     tick();
 
     expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
+  }));
+
+  it('should focus the skip button when the target is null or not an element', fakeAsync(() => {
+    let overlay = new ElementRef(document.createElement('div'));
+    let button = new ElementRef(document.createElement('button'));
+
+    component.skipButton = button;
+    component.overlay = overlay;
+    component.showLoginOverlay = true;
+
+    spyOn(component.skipButton.nativeElement, 'focus');
+
+    component.focusSkipButton(null, false);
+    tick();
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalledTimes(1);
+
+    component.focusSkipButton(document.createTextNode('text'), false);
+    tick();
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalledTimes(2);
   }));
   it('should check if hacky translation is displayed correctly', () => {
     spyOn(

@@ -553,14 +553,6 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/review-test-page/review-test-page.module').then(
-        m => m.ReviewTestPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',

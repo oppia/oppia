@@ -43,7 +43,6 @@ export enum FeatureNames {
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
-  EnableReadyForReviewTest = 'enable_ready_for_review_test',
   EnableCampaignBanner = 'enable_financial_literacy_campaign_banner',
   EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
   EnableAutomaticTranslationSuggestions = 'enable_automatic_translation_suggestions',
