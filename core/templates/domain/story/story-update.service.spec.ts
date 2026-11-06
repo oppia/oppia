@@ -16,8 +16,6 @@
  * @fileoverview Tests for Story update service.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
@@ -584,7 +582,9 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getModules()[0].getNodeIds()
     ).toEqual(['node_1', 'node_2', 'node_3']);
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
+    const committableChangeList: object[] =
+      undoRedoService.getCommittableChangeList();
+    expect(committableChangeList).toEqual([
       {
         cmd: 'add_story_node',
         node_id: 'node_3',
@@ -1536,7 +1536,9 @@ describe('Story update service', () => {
         'Module 1',
         'New Title'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      const committableChangeList: object[] =
+        undoRedoService.getCommittableChangeList();
+      expect(committableChangeList).toEqual([
         {
           cmd: 'create_module',
           module_id: 'module_1',
@@ -1726,7 +1728,9 @@ describe('Story update service', () => {
         []
       );
       storyUpdateService.moveNodeToModule(_sampleStory, 'node_1', 'module_2');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      const committableChangeList: object[] =
+        undoRedoService.getCommittableChangeList();
+      expect(committableChangeList).toEqual([
         {
           cmd: 'create_module',
           module_id: 'module_1',
