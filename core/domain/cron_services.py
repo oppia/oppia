@@ -77,8 +77,7 @@ def delete_models_marked_as_deleted() -> None:
 
 
 def mark_outdated_models_as_deleted() -> None:
-    """Mark outdated models and jobs as deleted.
-    """
+    """Mark outdated models and jobs as deleted."""
     models_to_mark_as_deleted: List[base_models.BaseModel] = []
     for model_class, period_to_keep in MODEL_CLASSES_TO_MARK_AS_DELETED.items():
         date_before_which_to_mark_as_deleted = (

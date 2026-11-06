@@ -122,13 +122,9 @@ class Job:
         if not isinstance(self.job_id, str) or not self.job_id:
             raise utils.ValidationError('Job ID must be a non-empty string.')
         if not isinstance(self.job_type, str) or not self.job_type:
-            raise utils.ValidationError(
-                'Job type must be a non-empty string.'
-            )
+            raise utils.ValidationError('Job type must be a non-empty string.')
         if not isinstance(self.has_been_cleaned_up, bool):
-            raise utils.ValidationError(
-                'has_been_cleaned_up must be a bool.'
-            )
+            raise utils.ValidationError('has_been_cleaned_up must be a bool.')
 
         valid_status_codes = (
             'new',
@@ -163,9 +159,7 @@ class Job:
                     'Job output must contain only strings.'
                 )
         elif self.output is not None:
-            raise utils.ValidationError(
-                'Only completed jobs can have output.'
-            )
+            raise utils.ValidationError('Only completed jobs can have output.')
 
         if self.status_code in ('failed', 'canceled'):
             if not isinstance(self.error, str):

@@ -22,7 +22,7 @@ from core import utils
 from core.domain import job_domain
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class JobTests(test_utils.GenericTestBase):
@@ -52,7 +52,7 @@ class JobTests(test_utils.GenericTestBase):
         self.assertEqual(job.to_dict(), job_dict)
 
     def test_validate_accepts_all_statuses(self) -> None:
-        status_dicts = [
+        status_dicts: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',
                 'time_started_msec': None,
@@ -148,12 +148,14 @@ class JobTests(test_utils.GenericTestBase):
                     job_domain.Job.from_dict(job_dict)
 
         job_dict = self._get_valid_job_dict()
-        job_dict.update({
-            'status_code': 'queued',
-            'time_started_msec': None,
-            'time_finished_msec': None,
-            'output': [],
-        })
+        job_dict.update(
+            {
+                'status_code': 'queued',
+                'time_started_msec': None,
+                'time_finished_msec': None,
+                'output': [],
+            }
+        )
         with self.assertRaises(utils.ValidationError):
             job_domain.Job.from_dict(job_dict)
 
@@ -162,12 +164,14 @@ class JobTests(test_utils.GenericTestBase):
             for error in (None, 1):
                 with self.subTest(status=status_code, error=error):
                     job_dict = self._get_valid_job_dict()
-                    job_dict.update({
-                        'status_code': status_code,
-                        'time_finished_msec': 3.0,
-                        'output': None,
-                        'error': error,
-                    })
+                    job_dict.update(
+                        {
+                            'status_code': status_code,
+                            'time_finished_msec': 3.0,
+                            'output': None,
+                            'error': error,
+                        }
+                    )
                     with self.assertRaises(utils.ValidationError):
                         job_domain.Job.from_dict(job_dict)
 
@@ -199,7 +203,7 @@ class JobTests(test_utils.GenericTestBase):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_timestamps_inconsistent_with_status(self) -> None:
-        invalid_timestamp_updates = [
+        invalid_timestamp_updates: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',
                 'time_started_msec': 2.0,

@@ -134,17 +134,12 @@ class JobServicesTests(test_utils.GenericTestBase):
             ],
             ['queued_job', 'started_job'],
         )
-        self.assertTrue(
-            job_services.do_unfinished_jobs_exist('test_job_type')
-        )
+        self.assertTrue(job_services.do_unfinished_jobs_exist('test_job_type'))
         self.assertFalse(
             job_services.do_unfinished_jobs_exist('completed_job_type')
         )
         self.assertEqual(
-            [
-                job.job_id
-                for job in job_services.get_all_unfinished_jobs(2)
-            ],
+            [job.job_id for job in job_services.get_all_unfinished_jobs(2)],
             ['started_job', 'queued_job'],
         )
 
@@ -172,8 +167,6 @@ class JobServicesTests(test_utils.GenericTestBase):
         job_services.mark_outdated_jobs_as_deleted(current_time)
 
         future_time = current_time + datetime.timedelta(days=181)
-        with self.swap(
-            utils, 'get_current_utc_datetime', lambda: future_time
-        ):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: future_time):
             cron_services.delete_models_marked_as_deleted()
         self.assertIsNone(job_services.get_job_by_id('outdated_job'))

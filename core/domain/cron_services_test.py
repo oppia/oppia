@@ -96,9 +96,7 @@ class CronServicesTests(test_utils.GenericTestBase):
         cron_services.mark_outdated_models_as_deleted()
 
         future_time = current_time + datetime.timedelta(days=181)
-        with self.swap(
-            utils, 'get_current_utc_datetime', lambda: future_time
-        ):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: future_time):
             cron_services.delete_models_marked_as_deleted()
 
         self.assertIsNone(job_services.get_job_by_id('job_id'))
