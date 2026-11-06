@@ -200,10 +200,6 @@ def normalize_against_schema(
             raise Exception(
                 'Could not convert %s to int: %s' % (type(obj).__name__, obj)
             ) from e
-        assert isinstance(obj, numbers.Integral), (
-            'Expected int, received %s' % obj
-        )
-        assert isinstance(obj, int), 'Expected int, received %s' % obj
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         # TODO(#14028): Use just one type.
@@ -327,6 +323,11 @@ def normalize_against_schema(
 
     if global_validators is not None:
         for validator in global_validators:
+            if validator['id'] == 'does_not_contain_email' and not isinstance(
+                normalized_obj, str
+            ):
+                continue
+
             kwargs = dict(validator)
             del kwargs['id']
             assert get_validator(validator['id'])(
@@ -589,9 +590,7 @@ class _Validators:
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        if isinstance(obj, str):
-            return not bool(re.search(EMAIL_REGEX, obj))
-        return True
+        return not bool(re.search(EMAIL_REGEX, obj))
 
     @staticmethod
     def is_valid_user_id(obj: str) -> bool:
