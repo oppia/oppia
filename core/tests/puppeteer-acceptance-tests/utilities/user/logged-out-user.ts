@@ -510,7 +510,7 @@ const partnershipYoutubeVideoIFrameSelector =
   '.e2e-test-partnership-youtube-video-iframe';
 const learnerStoriesHeadingSelector = '.e2e-test-learner-stories-heading';
 const learnerStoriesCarouselContainerSelector =
-  '.e2e-test-learner-stories-coursal-container';
+  '.e2e-test-learner-stories-carousel-container';
 
 // About Us Page Selectors.
 const aboutUsHeadingSelector = '.e2e-test-about-us-title';
@@ -7323,7 +7323,7 @@ export class LoggedOutUser extends BaseUser {
     );
     expect(subHeading).toBe('Learner Stories');
 
-    // Check if coursal works properly.
+    // Check if carousel works properly.
     const carouselItems = await this.page.$$eval(
       `${learnerStoriesCarouselContainerSelector} .carousel-item`,
       elements => elements.map(element => (element as HTMLElement).textContent)

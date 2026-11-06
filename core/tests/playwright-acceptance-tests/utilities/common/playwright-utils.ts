@@ -721,7 +721,7 @@ export class BaseUser {
         failureTrigger += 0.0039;
       }
     } else {
-      failureTrigger += 0.055;
+      failureTrigger += 0.04;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.03;
       } else if (await currentPage.$(libraryBanner)) {

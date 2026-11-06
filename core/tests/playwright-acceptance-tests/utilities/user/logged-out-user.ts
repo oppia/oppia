@@ -43,7 +43,13 @@ const partnershipHeadingSelector = '.e2e-test-partnership-heading';
 const partneringWithOppiaImageSelector =
   '.e2e-test-partnering-with-oppia-image';
 const learnerStoriesCarouselSelector =
-  '.e2e-test-learner-stories-coursal-container';
+  '.e2e-test-learner-stories-carousel-container';
+const learnerStoriesCarouselNextButtonSelector =
+  `${learnerStoriesCarouselSelector} .carousel-control-next`;
+const learnerStoriesCarouselPrevButtonSelector =
+  `${learnerStoriesCarouselSelector} .carousel-control-prev`;
+const learnerStoriesActiveSlideHeadingSelector =
+  `${learnerStoriesCarouselSelector} .carousel-item.active .oppia-partnerships-h4`;
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabPartnershipsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -3880,23 +3886,52 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks the Read More Stories button in the partnerships page.
+   * Clicks the Read More Stories button in the partnerships page
+   * and verifies navigation to the blog page.
    */
   async clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation(): Promise<void> {
     await this.expectElementToBeVisible(
       readMoreStoriesButtonInPartnershipsPage
     );
-    await this.clickOnElementWithSelector(
-      readMoreStoriesButtonInPartnershipsPage
+    await this.clickButtonToNavigateToNewPage(
+      readMoreStoriesButtonInPartnershipsPage,
+      blogUrl
     );
-    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(blogWelcomeHeadingSelector);
   }
 
   /**
-   * Verifies the learner stories carousel is visible and functional.
+   * Verifies that the Learner Stories carousel in the Partnerships page
+   * is visible, displays the initial slide, moves to the next slide when
+   * clicking the next arrow, and returns to the initial slide when clicking
+   * the previous arrow.
    */
   async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
     await this.expectElementToBeVisible(learnerStoriesCarouselSelector);
+
+    // Verify first slide heading is visible initially.
+    await this.expectTextContentToContain(
+      learnerStoriesActiveSlideHeadingSelector,
+      'Ibrahim 14, Jigawa, Nigeria'
+    );
+
+    // Click next arrow and verify carousel moves to second slide.
+    await this.clickOnElementWithSelector(
+      learnerStoriesCarouselNextButtonSelector
+    );
+    await this.expectTextContentToContain(
+      learnerStoriesActiveSlideHeadingSelector,
+      'Joy, 11, Abuja, Nigeria'
+    );
+
+    // Click previous arrow and verify carousel returns to first slide.
+    await this.clickOnElementWithSelector(
+      learnerStoriesCarouselPrevButtonSelector
+    );
+    await this.expectTextContentToContain(
+      learnerStoriesActiveSlideHeadingSelector,
+      'Ibrahim 14, Jigawa, Nigeria'
+    );
   }
 
   /**
