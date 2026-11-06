@@ -151,6 +151,32 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(self.base_suggestion.get_author_name(), 'username')
 
+    def test_set_suggestion_status_updates_status_and_is_handled(
+        self,
+    ) -> None:
+        self.base_suggestion.set_suggestion_status_to_in_review()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+        self.assertFalse(self.base_suggestion.is_handled)
+
+        self.base_suggestion.set_suggestion_status_to_accepted()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_ACCEPTED
+        )
+        self.assertTrue(self.base_suggestion.is_handled)
+
+        self.base_suggestion.set_suggestion_status_to_rejected()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+        self.assertTrue(self.base_suggestion.is_handled)
+
+    def test_set_final_reviewer_id(self) -> None:
+        self.base_suggestion.set_final_reviewer_id('reviewer_id')
+
+        self.assertEqual(self.base_suggestion.final_reviewer_id, 'reviewer_id')
+
 
 class SuggestionEditStateContentDict(TypedDict):
     """Dictionary representing the SuggestionEditStateContent object."""
@@ -230,6 +256,29 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict
         )
+
+    def test_validate_suggestion_edit_state_content_without_final_reviewer(
+        self,
+    ) -> None:
+        # A suggestion that is still in review has no final reviewer yet.
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            suggestion_models.STATUS_IN_REVIEW,
+            self.author_id,
+            None,
+            self.suggestion_dict['change_cmd'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        suggestion.validate()
+
+        self.assertIsNone(suggestion.final_reviewer_id)
 
     def test_validate_suggestion_edit_state_content(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -4092,6 +4141,22 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(language_codes_that_need_reviewers, {'hi', 'fr'})
 
+    def test_get_translation_language_codes_skips_lang_with_enough_reviewers(
+        self,
+    ) -> None:
+        stats = suggestion_services.get_community_contribution_stats()
+        stats.set_translation_suggestion_count_for_language_code('hi', 1)
+        stats.set_translation_reviewer_count_for_language_code('hi', 1)
+        stats.set_translation_suggestion_count_for_language_code('fr', 1)
+
+        language_codes_that_need_reviewers = (
+            stats.get_translation_language_codes_that_need_reviewers()
+        )
+
+        # Hindi has a reviewer for its one suggestion, so only French needs
+        # more reviewers.
+        self.assertEqual(language_codes_that_need_reviewers, {'fr'})
+
     def test_get_translation_language_codes_that_need_reviewers_for_no_lang(
         self,
     ) -> None:
@@ -4537,6 +4602,46 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         )
 
 
+class TranslationContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the TranslationContributionStats class."""
+
+    def test_to_frontend_dict_uses_earliest_and_latest_dates(self) -> None:
+        stats = suggestion_registry.TranslationContributionStats(
+            'es',
+            'uid_01234567890123456789012345678912',
+            'topic_id',
+            2,
+            100,
+            1,
+            0,
+            50,
+            1,
+            50,
+            {
+                datetime.date(2021, 3, 19),
+                datetime.date(2020, 1, 5),
+                datetime.date(2020, 7, 1),
+            },
+        )
+
+        self.assertDictEqual(
+            stats.to_frontend_dict(),
+            {
+                'language_code': 'es',
+                'topic_id': 'topic_id',
+                'submitted_translations_count': 2,
+                'submitted_translation_word_count': 100,
+                'accepted_translations_count': 1,
+                'accepted_translations_without_reviewer_edits_count': 0,
+                'accepted_translation_word_count': 50,
+                'rejected_translations_count': 1,
+                'rejected_translation_word_count': 50,
+                'first_contribution_date': 'Jan 2020',
+                'last_contribution_date': 'Mar 2021',
+            },
+        )
+
+
 class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the TranslationReviewStats class."""
 
@@ -4586,6 +4691,49 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
 
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE,
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(),
+            {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_id': self.TOPIC_ID,
+                'reviewed_translations_count': (
+                    self.REVIEWED_TRANSLATIONS_COUNT
+                ),
+                'reviewed_translation_word_count': (
+                    self.REVIEWED_TRANSLATION_WORD_COUNT
+                ),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT
+                ),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT
+                ),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+            },
+        )
+
 
 class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the QuestionContributionStats class."""
@@ -4623,6 +4771,35 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
 
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.QuestionContributionStats(
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.SUBMITTED_QUESTION_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(),
+            {
+                'topic_id': self.TOPIC_ID,
+                'submitted_questions_count': self.SUBMITTED_QUESTION_COUNT,
+                'accepted_questions_count': self.ACCEPTED_QUESTIONS_COUNT,
+                'accepted_questions_without_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+            },
+        )
+
 
 class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the QuestionReviewStats class."""
@@ -4659,6 +4836,81 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
+
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(),
+            {
+                'topic_id': self.TOPIC_ID,
+                'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
+                'accepted_questions_count': self.ACCEPTED_QUESTIONS_COUNT,
+                'accepted_questions_with_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.strftime('%b %Y')
+                ),
+            },
+        )
+
+
+class ContributorCertificateInfoUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorCertificateInfo class."""
+
+    def test_to_dict(self) -> None:
+        certificate_info = suggestion_registry.ContributorCertificateInfo(
+            '1 Jan 2024',
+            '31 Dec 2024',
+            'Team Lead',
+            10.5,
+            300,
+            'Hindi',
+            'Profile Name',
+            200,
+            100,
+        )
+
+        self.assertDictEqual(
+            certificate_info.to_dict(),
+            {
+                'from_date': '1 Jan 2024',
+                'to_date': '31 Dec 2024',
+                'team_lead': 'Team Lead',
+                'contribution_hours': 10.5,
+                'contribution_word_count': 300,
+                'language': 'Hindi',
+                'certificate_profile_name': 'Profile Name',
+                'translated_word_count': 200,
+                'reviewed_word_count': 100,
+            },
+        )
+
+    def test_word_counts_default_to_zero(self) -> None:
+        certificate_info = suggestion_registry.ContributorCertificateInfo(
+            '1 Jan 2024',
+            '31 Dec 2024',
+            'Team Lead',
+            10.5,
+            300,
+            None,
+            'Profile Name',
+        )
+
+        self.assertEqual(certificate_info.translated_word_count, 0)
+        self.assertEqual(certificate_info.reviewed_word_count, 0)
 
 
 class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
@@ -4968,6 +5220,35 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
             actual_stats.to_frontend_dict(), expected_frontend_dict
         )
 
+    def test_to_frontend_dict_skips_topics_that_do_not_exist(self) -> None:
+        user_settings = user_services.create_new_user(
+            'someUser', 'user@example.com'
+        )
+        user_services.set_username(user_settings.user_id, 'username')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(topic_id, self.user_id, name='topic1')
+
+        stats = suggestion_registry.TranslationSubmitterTotalContributionStats(  # pylint: disable=line-too-long
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id, 'deleted_topic_id'],
+            self.RECENT_REVIEW_OUTCOMES,
+            self.RECENT_PERFORMANCE,
+            self.OVERALL_ACCURACY,
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+            self.SUBMITTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.REJECTED_TRANSLATION_WORD_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        # Only the topic that still exists is listed by name.
+        self.assertEqual(stats.to_frontend_dict()['topic_names'], ['topic1'])
+
 
 class TranslationReviewerTotalContributionStatsUnitTests(
     test_utils.GenericTestBase
@@ -5065,6 +5346,30 @@ class TranslationReviewerTotalContributionStatsUnitTests(
         self.assertDictEqual(
             actual_stats.to_frontend_dict(), expected_stats_dict
         )
+
+    def test_to_frontend_dict_skips_topics_that_do_not_exist(self) -> None:
+        user_settings = user_services.create_new_user(
+            'someUser', 'user@example.com'
+        )
+        user_services.set_username(user_settings.user_id, 'username')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(topic_id, self.user_id, name='topic1')
+
+        stats = suggestion_registry.TranslationReviewerTotalContributionStats(  # pylint: disable=line-too-long
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id, 'deleted_topic_id'],
+            self.REVIEWED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        # Only the topic that still exists is listed by name.
+        self.assertEqual(stats.to_frontend_dict()['topic_names'], ['topic1'])
 
 
 class QuestionSubmitterTotalContributionStatsUnitTests(
@@ -5167,6 +5472,31 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             actual_stats.to_frontend_dict(), expected_stats_dict
         )
 
+    def test_to_frontend_dict_skips_topics_that_do_not_exist(self) -> None:
+        user_settings = user_services.create_new_user(
+            'someUser', 'user@example.com'
+        )
+        user_services.set_username(user_settings.user_id, 'username')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(topic_id, self.user_id, name='topic1')
+
+        stats = suggestion_registry.QuestionSubmitterTotalContributionStats(  # pylint: disable=line-too-long
+            user_settings.user_id,
+            [topic_id, 'deleted_topic_id'],
+            self.RECENT_REVIEW_OUTCOMES,
+            self.RECENT_PERFORMANCE,
+            self.OVERALL_ACCURACY,
+            self.SUBMITTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.REJECTED_QUESTIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        # Only the topic that still exists is listed by name.
+        self.assertEqual(stats.to_frontend_dict()['topic_names'], ['topic1'])
+
 
 class QuestionReviewerTotalContributionStatsUnitTests(
     test_utils.GenericTestBase
@@ -5256,3 +5586,25 @@ class QuestionReviewerTotalContributionStatsUnitTests(
         self.assertDictEqual(
             actual_stats.to_frontend_dict(), expected_stats_dict
         )
+
+    def test_to_frontend_dict_skips_topics_that_do_not_exist(self) -> None:
+        user_settings = user_services.create_new_user(
+            'someUser', 'user@example.com'
+        )
+        user_services.set_username(user_settings.user_id, 'username')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(topic_id, self.user_id, name='topic1')
+
+        stats = suggestion_registry.QuestionReviewerTotalContributionStats(  # pylint: disable=line-too-long
+            user_settings.user_id,
+            [topic_id, 'deleted_topic_id'],
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.REJECTED_QUESTIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+
+        # Only the topic that still exists is listed by name.
+        self.assertEqual(stats.to_frontend_dict()['topic_names'], ['topic1'])
