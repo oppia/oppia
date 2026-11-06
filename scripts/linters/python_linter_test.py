@@ -87,6 +87,13 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Import order', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
+    def test_check_import_order_with_no_files(self) -> None:
+        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
+            []
+        ).check_import_order()
+        self.assertEqual('Import order', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
     def test_valid_job_imports(self) -> None:
         batch_jobs_dir: str = os.path.join(
             os.getcwd(), 'core', 'jobs', 'batch_jobs'
