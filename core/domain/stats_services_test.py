@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+import re
 
 from core import feconf, utils
 from core.domain import (
@@ -85,6 +86,219 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.exp_version, 1)
         self.assertEqual(exploration_stats.exp_id, 'new_exp_id')
         self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_get_playthrough_models_by_ids_returns_none_for_invalid_id(
+        self,
+    ) -> None:
+        playthrough_models = stats_services.get_playthrough_models_by_ids(
+            [self.playthrough_id, 'invalid_id']
+        )
+
+        self.assertEqual(len(playthrough_models), 2)
+        # Ruling out the possibility of None for mypy type checking.
+        assert playthrough_models[0] is not None
+        self.assertEqual(playthrough_models[0].id, self.playthrough_id)
+        self.assertIsNone(playthrough_models[1])
+
+    def test_get_exploration_stats_returns_stored_stats(self) -> None:
+        stats_models.ExplorationStatsModel.create(
+            'exp_id2', 1, 0, 5, 0, 4, 0, 3, {}
+        )
+
+        exploration_stats = stats_services.get_exploration_stats('exp_id2', 1)
+
+        # The stored counts are returned instead of default zero counts.
+        self.assertEqual(exploration_stats.num_starts_v2, 5)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 4)
+        self.assertEqual(exploration_stats.num_completions_v2, 3)
+
+    def test_advance_version_of_exp_stats_on_revert_without_reverted_stats(
+        self,
+    ) -> None:
+        exp_stats = stats_domain.ExplorationStats(
+            'exp_id2',
+            2,
+            0,
+            7,
+            0,
+            6,
+            0,
+            5,
+            {'Home': stats_domain.StateStats.create_default()},
+        )
+
+        new_exp_stats = stats_services.advance_version_of_exp_stats(
+            3, None, exp_stats, None, 1
+        )
+
+        # With no stats for the reverted version, the current stats are
+        # kept and only the version number moves forward.
+        self.assertEqual(new_exp_stats.exp_version, 3)
+        self.assertEqual(new_exp_stats.num_starts_v2, 7)
+        self.assertEqual(new_exp_stats.num_actual_starts_v2, 6)
+        self.assertEqual(new_exp_stats.num_completions_v2, 5)
+        self.assertEqual(
+            list(new_exp_stats.state_stats_mapping.keys()), ['Home']
+        )
+
+    def _dummy_convert_issue_v1_dict_to_v2_dict(
+        self, issue_dict: stats_domain.ExplorationIssueDict
+    ) -> stats_domain.ExplorationIssueDict:
+        """A test implementation of the v1 to v2 issue schema conversion.
+        It changes the issue type so that tests can see it was called.
+        """
+        issue_dict['issue_type'] = 'ConvertedIssue'
+        return issue_dict
+
+    def _dummy_convert_action_v1_dict_to_v2_dict(
+        self, action_dict: stats_domain.LearnerActionDict
+    ) -> stats_domain.LearnerActionDict:
+        """A test implementation of the v1 to v2 action schema conversion.
+        It changes the action type so that tests can see it was called.
+        """
+        action_dict['action_type'] = 'ConvertedAction'
+        return action_dict
+
+    def _get_issue_dict(self) -> stats_domain.ExplorationIssueDict:
+        """Returns a dict for an EarlyQuit issue at the current schema
+        version.
+
+        Returns:
+            ExplorationIssueDict. The issue dict.
+        """
+        return stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'state_name': {'value': 'Home'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            [],
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            True,
+        ).to_dict()
+
+    def _get_action_dict(self) -> stats_domain.LearnerActionDict:
+        """Returns a dict for an ExplorationStart action at the current
+        schema version.
+
+        Returns:
+            LearnerActionDict. The action dict.
+        """
+        return stats_domain.LearnerAction(
+            'ExplorationStart',
+            {'state_name': {'value': 'Home'}},
+            stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        ).to_dict()
+
+    def test_migrate_issue_schema_raises_error_for_newer_schema_version(
+        self,
+    ) -> None:
+        issue_dict = self._get_issue_dict()
+        issue_dict['schema_version'] = (
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION + 1
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned issue schemas '
+            'at present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+        ):
+            stats_services._migrate_to_latest_issue_schema(
+                issue_dict
+            )  # pylint: disable=protected-access
+
+    def test_migrate_issue_schema_converts_older_schema_version(self) -> None:
+        issue_dict = self._get_issue_dict()
+        current_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2
+        )
+        convert_issue_dict_swap = self.swap(
+            stats_domain.ExplorationIssue,
+            '_convert_issue_v1_dict_to_v2_dict',
+            self._dummy_convert_issue_v1_dict_to_v2_dict,
+        )
+
+        with current_schema_version_swap, convert_issue_dict_swap:
+            stats_services._migrate_to_latest_issue_schema(
+                issue_dict
+            )  # pylint: disable=protected-access
+
+        self.assertEqual(issue_dict['schema_version'], 2)
+        self.assertEqual(issue_dict['issue_type'], 'ConvertedIssue')
+
+    def test_migrate_action_schema_raises_error_for_newer_schema_version(
+        self,
+    ) -> None:
+        action_dict = self._get_action_dict()
+        action_dict['schema_version'] = (
+            stats_models.CURRENT_ACTION_SCHEMA_VERSION + 1
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned action schemas '
+            'at present.' % stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        ):
+            stats_services._migrate_to_latest_action_schema(
+                action_dict
+            )  # pylint: disable=protected-access
+
+    def test_migrate_action_schema_converts_older_schema_version(
+        self,
+    ) -> None:
+        action_dict = self._get_action_dict()
+        current_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2
+        )
+        convert_action_dict_swap = self.swap(
+            stats_domain.LearnerAction,
+            '_convert_action_v1_dict_to_v2_dict',
+            self._dummy_convert_action_v1_dict_to_v2_dict,
+        )
+
+        with current_schema_version_swap, convert_action_dict_swap:
+            stats_services._migrate_to_latest_action_schema(
+                action_dict
+            )  # pylint: disable=protected-access
+
+        self.assertEqual(action_dict['schema_version'], 2)
+        self.assertEqual(action_dict['action_type'], 'ConvertedAction')
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[arg-type] is used to
+    # test migrating an exp_issue with no schema_version.
+    def test_migrate_issue_schema_with_no_schema_version(self) -> None:
+        issue_dict = stats_domain.ExplorationIssue(
+            'EarlyQuit', {}, [], None, True  # type: ignore[arg-type]
+        ).to_dict()
+
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
+                'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
+            ),
+        ):
+            stats_services._migrate_to_latest_issue_schema(
+                issue_dict
+            )  # pylint: disable=protected-access
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[arg-type] is used to
+    # test migrating a learner_action with no schema_version.
+    def test_migrate_action_schema_with_no_schema_version(self) -> None:
+        action_dict = stats_domain.LearnerAction(
+            'ExplorationStart', {}, None  # type: ignore[arg-type]
+        ).to_dict()
+
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
+                'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
+            ),
+        ):
+            stats_services._migrate_to_latest_action_schema(
+                action_dict
+            )  # pylint: disable=protected-access
 
     def test_update_stats_method(self) -> None:
         """Test the update_stats method."""
@@ -1739,6 +1953,172 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         )
         self.assertEqual(exp_issues.exp_id, self.exp.id)
         self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_get_playthrough_by_id(self) -> None:
+        playthrough_id = self._create_eq_playthrough('A')
+
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert playthrough is not None
+        self.assertEqual(playthrough.exp_id, self.exp.id)
+        self.assertEqual(playthrough.issue_type, 'EarlyQuit')
+        self.assertEqual(
+            playthrough.issue_customization_args['state_name']['value'], 'A'
+        )
+
+    def test_get_playthrough_by_id_returns_none_for_invalid_id(self) -> None:
+        self.assertIsNone(stats_services.get_playthrough_by_id('invalid_id'))
+
+    def _get_eq_playthrough(self, state_name: str) -> stats_domain.Playthrough:
+        """Creates an Early Quit playthrough and returns its domain object.
+
+        Args:
+            state_name: str. The state the early quit occurred from.
+
+        Returns:
+            Playthrough. The new playthrough.
+        """
+        playthrough = stats_services.get_playthrough_by_id(
+            self._create_eq_playthrough(state_name)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert playthrough is not None
+        return playthrough
+
+    def test_assign_playthrough_creates_issue_when_no_issue_matches(
+        self,
+    ) -> None:
+        cst_issue = self._create_cst_exp_issue([], ['A', 'B', 'A'])
+        eq_issue_in_other_state = self._create_eq_exp_issue([], 'B')
+        exp_issues = stats_domain.ExplorationIssues(
+            self.exp.id,
+            self.exp.version,
+            [cst_issue, eq_issue_in_other_state],
+        )
+
+        playthrough_was_stored = (
+            stats_services.assign_playthrough_to_corresponding_issue(
+                self._get_eq_playthrough('A'),
+                exp_issues,
+                stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            )
+        )
+
+        # The CST issue has a different type and the other EQ issue is in a
+        # different state, so a new EQ issue is created for state A.
+        self.assertTrue(playthrough_was_stored)
+        self.assertEqual(len(exp_issues.unresolved_issues), 3)
+        self.assertEqual(cst_issue.playthrough_ids, [])
+        self.assertEqual(eq_issue_in_other_state.playthrough_ids, [])
+        new_issue = exp_issues.unresolved_issues[2]
+        self.assertEqual(new_issue.issue_type, 'EarlyQuit')
+        self.assertEqual(
+            new_issue.issue_customization_args['state_name']['value'], 'A'
+        )
+        self.assertEqual(len(new_issue.playthrough_ids), 1)
+
+    def test_assign_playthrough_adds_playthrough_to_matching_issue(
+        self,
+    ) -> None:
+        eq_issue = self._create_eq_exp_issue([], 'A')
+        exp_issues = stats_domain.ExplorationIssues(
+            self.exp.id, self.exp.version, [eq_issue]
+        )
+
+        playthrough_was_stored = (
+            stats_services.assign_playthrough_to_corresponding_issue(
+                self._get_eq_playthrough('A'),
+                exp_issues,
+                stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            )
+        )
+
+        self.assertTrue(playthrough_was_stored)
+        self.assertEqual(exp_issues.unresolved_issues, [eq_issue])
+        self.assertEqual(len(eq_issue.playthrough_ids), 1)
+        stored_playthrough = stats_services.get_playthrough_by_id(
+            eq_issue.playthrough_ids[0]
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert stored_playthrough is not None
+        self.assertEqual(stored_playthrough.issue_type, 'EarlyQuit')
+
+    def test_assign_playthrough_does_not_store_it_when_issue_is_full(
+        self,
+    ) -> None:
+        full_playthrough_ids = [
+            'playthrough_id_%d' % i
+            for i in range(feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)
+        ]
+        eq_issue = self._create_eq_exp_issue(list(full_playthrough_ids), 'A')
+        exp_issues = stats_domain.ExplorationIssues(
+            self.exp.id, self.exp.version, [eq_issue]
+        )
+
+        playthrough_was_stored = (
+            stats_services.assign_playthrough_to_corresponding_issue(
+                self._get_eq_playthrough('A'),
+                exp_issues,
+                stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            )
+        )
+
+        self.assertFalse(playthrough_was_stored)
+        self.assertEqual(eq_issue.playthrough_ids, full_playthrough_ids)
+
+    def test_rename_state_keeps_playthrough_actions_without_state_name(
+        self,
+    ) -> None:
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id,
+            self.exp.version,
+            'EarlyQuit',
+            {
+                'state_name': {'value': 'A'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            [
+                {
+                    'action_type': 'ExplorationQuit',
+                    'action_customization_args': {},
+                    'schema_version': (
+                        stats_models.CURRENT_ACTION_SCHEMA_VERSION
+                    ),
+                }
+            ],
+        )
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(
+                self.exp.id,
+                self.exp.version,
+                [self._create_eq_exp_issue([playthrough_id], 'A')],
+            )
+        )
+
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': 'rename_state',
+                        'old_state_name': 'A',
+                        'new_state_name': 'Z',
+                    }
+                )
+            ],
+            'change',
+        )
+
+        playthrough = stats_models.PlaythroughModel.get_by_id(playthrough_id)
+        self.assertEqual(
+            playthrough.issue_customization_args['state_name']['value'], 'Z'
+        )
+        # The action has no state names to rename, so it is left as it was.
+        self.assertEqual(
+            playthrough.actions[0]['action_customization_args'], {}
+        )
 
     def test_delete_playthroughs_multi(self) -> None:
         playthrough_ids = [
@@ -3627,3 +4007,31 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_QUESTION, self.state_reference_question
         )
         self.assertEqual(learner_answer_details, None)
+
+    def test_delete_learner_answer_details_for_exp_state_without_details(
+        self,
+    ) -> None:
+        stats_services.delete_learner_answer_details_for_exploration_state(
+            self.exp_id, 'state_without_details'
+        )
+
+        # Details stored for other states are left untouched.
+        self.assertIsNotNone(
+            stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration
+            )
+        )
+
+    def test_delete_learner_answer_details_for_question_without_details(
+        self,
+    ) -> None:
+        stats_services.delete_learner_answer_details_for_question_state(
+            'question_without_details'
+        )
+
+        # Details stored for other questions are left untouched.
+        self.assertIsNotNone(
+            stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, self.state_reference_question
+            )
+        )
