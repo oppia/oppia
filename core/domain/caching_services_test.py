@@ -49,7 +49,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 57,
+        'states_schema_version': 58,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -145,7 +145,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, '
         '"next_content_id_index": 7, "tags"'
-        ': [], "states_schema_version": 57, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 58, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "inapplicable_skill_misconception_ids": [], '
         '"interaction": {"solution": null, "answer_gr'

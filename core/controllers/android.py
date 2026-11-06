@@ -106,6 +106,7 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
     id: str
     payload: Union[
         exp_domain.ExplorationDictForAndroid,
+        exp_domain.ExplorationDict,
         story_domain.StoryDict,
         story_domain.StoryDictForAndroid,
         skill_domain.SkillDict,
@@ -161,6 +162,7 @@ class AndroidActivityHandler(
                         constants.ACTIVITY_TYPE_EXPLORATION,
                         constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
                         constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
+                        constants.ACTIVITY_TYPE_EXPLORATION_MIGRATION,
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_STORY_MIGRATION,
                         constants.ACTIVITY_TYPE_SKILL,
@@ -437,6 +439,7 @@ class AndroidActivityHandler(
                         skill_domain.Skill,
                         question_domain.Question,
                         topic_domain.Topic,
+                        exp_domain.Exploration,
                     ]
                 ]
             ] = []
@@ -450,6 +453,12 @@ class AndroidActivityHandler(
             elif activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION:
                 fetched_entities = (
                     story_fetchers.get_multiple_stories_by_ids_and_version(
+                        ids_and_versions
+                    )
+                )
+            elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_MIGRATION:
+                fetched_entities = (
+                    exp_fetchers.get_multiple_explorations_by_ids_and_version(
                         ids_and_versions
                     )
                 )
@@ -472,6 +481,16 @@ class AndroidActivityHandler(
                     and isinstance(entity, story_domain.Story)
                 ):
                     response_dict: ActivityDataResponseDict = {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': entity.to_dict_for_android(),
+                    }
+                elif (
+                    activity_type
+                    == constants.ACTIVITY_TYPE_EXPLORATION_MIGRATION
+                    and isinstance(entity, exp_domain.Exploration)
+                ):
+                    response_dict = {
                         'id': activity_data['id'],
                         'version': activity_data.get('version'),
                         'payload': entity.to_dict_for_android(),

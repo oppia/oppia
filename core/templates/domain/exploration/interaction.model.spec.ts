@@ -504,6 +504,9 @@ describe('Interaction', () => {
           requireNonnegativeInput: {
             value: true,
           },
+          allowExponentialNotation: {
+            value: true,
+          },
         },
         default_outcome: defaultOutcomeDict,
         hints: hintsDict,
@@ -512,6 +515,9 @@ describe('Interaction', () => {
       });
       expect(testInteraction.customizationArgs).toEqual({
         requireNonnegativeInput: {
+          value: true,
+        },
+        allowExponentialNotation: {
           value: true,
         },
       });
@@ -528,6 +534,9 @@ describe('Interaction', () => {
           requireNonnegativeInput: {
             value: false,
           },
+          allowExponentialNotation: {
+            value: true,
+          },
         },
         default_outcome: defaultOutcomeDict,
         hints: hintsDict,
@@ -538,6 +547,9 @@ describe('Interaction', () => {
       expect(testInteraction.customizationArgs).toEqual({
         requireNonnegativeInput: {
           value: false,
+        },
+        allowExponentialNotation: {
+          value: true,
         },
       });
     }

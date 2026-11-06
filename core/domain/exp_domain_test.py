@@ -3974,6 +3974,41 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exp_from_dict = exp_domain.Exploration.from_dict(demo_dict)
         self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
+    def test_to_dict_for_android(self) -> None:
+        """Test that to_dict_for_android forces allowExponentialNotation to
+        True for NumericInput interactions, since legacy Android clients
+        always accepted exponential notation.
+        """
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'NumericInput', content_id_generator
+        )
+        self.new_exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index
+        )
+
+        # Explicitly turn the customization arg off to confirm to_dict()
+        # preserves it and to_dict_for_android() overrides it.
+        self.state.interaction.customization_args[
+            'allowExponentialNotation'
+        ].value = False
+
+        exploration_dict = self.new_exploration.to_dict()
+        numeric_input_ca = exploration_dict['states']['Introduction'][
+            'interaction'
+        ]['customization_args']
+        self.assertEqual(
+            numeric_input_ca['allowExponentialNotation']['value'], False
+        )
+
+        android_dict = self.new_exploration.to_dict_for_android()
+        android_numeric_input_ca = android_dict['states']['Introduction'][
+            'interaction'
+        ]['customization_args']
+        self.assertEqual(
+            android_numeric_input_ca['allowExponentialNotation']['value'], True
+        )
+
     def test_interaction_with_none_id_is_not_terminal(self) -> None:
         """Test that an interaction with an id of None leads to is_terminal
         being false.
@@ -7749,7 +7784,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7871,7 +7906,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 """
@@ -8008,7 +8043,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -8092,7 +8127,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8245,7 +8280,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -8339,7 +8374,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8453,7 +8488,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -8506,7 +8541,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8564,6 +8599,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowExponentialNotation:
+            value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -8640,7 +8677,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8669,6 +8706,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowExponentialNotation:
+          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -8707,7 +8746,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -8887,7 +8926,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8983,7 +9022,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9124,7 +9163,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9185,7 +9224,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9302,7 +9341,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9358,7 +9397,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9585,6 +9624,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowExponentialNotation:
+          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -9689,7 +9730,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9770,6 +9811,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowExponentialNotation:
+          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -9816,7 +9859,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10097,7 +10140,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10232,7 +10275,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10384,7 +10427,7 @@ next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10463,7 +10506,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10670,7 +10713,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10761,7 +10804,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10963,7 +11006,7 @@ next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11079,7 +11122,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11305,7 +11348,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11391,7 +11434,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11560,7 +11603,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11641,7 +11684,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11782,7 +11825,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11858,7 +11901,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12115,7 +12158,7 @@ next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12217,7 +12260,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12390,7 +12433,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12489,7 +12532,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12669,7 +12712,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12756,7 +12799,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -13059,7 +13102,7 @@ next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -13218,7 +13261,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -13352,7 +13395,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 63
 states:
   Introduction:
     card_is_checkpoint: true
@@ -13429,7 +13472,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
