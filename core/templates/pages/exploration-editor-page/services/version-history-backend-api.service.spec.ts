@@ -171,4 +171,34 @@ describe('Version history backend api service', () => {
     expect(successHandler).toHaveBeenCalledWith(null);
     expect(failureHandler).not.toHaveBeenCalled();
   }));
+
+  it('should correctly handle state with null version history fields', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+    const sampleStateVersionHistoryDict = {
+      last_edited_version_number: null,
+      state_name_in_previous_version: null,
+      state_dict_in_previous_version: null,
+      last_edited_committer_username: null,
+    };
+    const sampleStateVersionHistory = {
+      lastEditedVersionNumber: null,
+      stateNameInPreviousVersion: null,
+      stateInPreviousVersion: null,
+      lastEditedCommitterUsername: '',
+    };
+    versionHistoryBackendApiService
+      .fetchStateVersionHistoryAsync('1', 'NewState', 2)
+      .then(successHandler, failureHandler);
+
+    const req = http.expectOne(
+      '/version_history_handler/state/1/NewState/2'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleStateVersionHistoryDict);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleStateVersionHistory);
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
 });
