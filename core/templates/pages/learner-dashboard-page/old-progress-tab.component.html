@@ -5,14 +5,16 @@
        [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
        *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
-      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
+      <p class="skill-proficiency-title">
+        {{ 'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate }}
       </p>
       <a aria-label="Progress" class="info-tooltip" href="#/" tabindex="-1">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
           <div class="text-bg-info">
             <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate">
+            <p class="badge-type">
+              {{ 'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate }}
             </p>
             <p class="badge-percent">
               100%
@@ -20,7 +22,8 @@
           </div>
           <div class="text-bg-info">
             <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate">
+            <p class="badge-type">
+              {{ 'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate }}
             </p>
             <p class="badge-percent">
               80-99%
@@ -28,7 +31,8 @@
           </div>
           <div class="text-bg-info">
             <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate">
+            <p class="badge-type">
+              {{ 'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate }}
             </p>
             <p class="badge-percent">
               60-79%
@@ -45,7 +49,8 @@
            class="empty-skill-proficiency">
         </p>
       </a>
-      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate">
+      <p class="empty-skill-proficiency">
+        {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate }}
       </p>
     </div>
     <div *ngIf="!emptySkillProficiency">
@@ -79,14 +84,16 @@
               </div>
             </div>
             <span class="progress-text">
-              <p class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate">
+              <p class="progress-translate">
+                {{ 'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate }}
               </p>
               {{tile[0]}}%
             </span>
           </div>
         </div>
         <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
-          <p class="skills-text" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILLS' | translate">
+          <p class="skills-text">
+            {{ 'I18N_LEARNER_DASHBOARD_SKILLS' | translate }}
           </p>
           <practice-tab [topicName]="tile[1].name"
                         [subtopicsList]="tile[1].subtopics"
@@ -102,7 +109,8 @@
   <div tabindex="0" class="completed-stories e2e-test-compeleted-stories-section" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
        *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
-      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+      <p class="completed-stories-title">
+        {{ 'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate }}
       </p>
       <span class="completed-stories-length">
         {{completedStoriesList.length}}
@@ -122,7 +130,8 @@
   <div tabindex="0" class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
     *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
     <div class="completed-stories-heading">
-      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+      <p class="completed-stories-title">
+        {{ 'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate }}
       </p>
     </div>
     <div class="empty-completed-stories-content">

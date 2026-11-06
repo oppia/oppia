@@ -6,8 +6,8 @@
            [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <div>
           <div class="d-flex align-items-baseline">
-            <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
-                [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
+            <h3 class="my-0 ps-3 blog-home-page-posts-number-display">
+              {{ 'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts} }}
             </h3>
             <ngb-pagination *ngIf="totalBlogPosts > 0"
                             [collectionSize]="totalBlogPosts"

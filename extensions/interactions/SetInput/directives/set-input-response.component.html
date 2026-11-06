@@ -1,6 +1,6 @@
 <div class="oppia-response-set-input">
-  <span *ngIf="escapedAnswer.length === 0"
-        [innerHTML]="'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER' | translate">
+  <span *ngIf="escapedAnswer.length === 0">
+    {{ 'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER' | translate }}
   </span>
   <span *ngIf="escapedAnswer.length > 0">
     <ul class="oppia-item-list">

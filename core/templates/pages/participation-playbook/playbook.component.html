@@ -1,6 +1,6 @@
 <div class="playbook">
   <div class="oppia-static-header">
-    <h1 [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate"></h1>
+    <h1>{{ 'I18N_PLAYBOOK_HEADING' | translate }}</h1>
   </div>
   <background-banner></background-banner>
   <div>
@@ -9,7 +9,7 @@
         <div class="about-tab-container">
           <div class="participation oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': true}">
             <div class="oppia-static-card-content oppia-static-card-content-narrow">
-              <h2 [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_HEADING' | translate"></h2>
+              <h2>{{ 'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_HEADING' | translate }}</h2>
               <ol>
                 <li>
                   <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_GUIDELINE_1' | translate">
@@ -27,9 +27,10 @@
               <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_TEXT' | translate">
               </p>
 
-              <h2 [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_HEADING' | translate"></h2>
+              <h2>{{ 'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_HEADING' | translate }}</h2>
 
-              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1' | translate">
+              <p>
+                {{ 'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1' | translate }}
               </p>
 
               <ul class="oppia-publication-instructions-container">
@@ -50,11 +51,13 @@
               <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2' | translate">
               </p>
 
-              <h2 [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_HEADING' | translate"></h2>
+              <h2>{{ 'I18N_PLAYBOOK_PUBLICATION_POLICY_HEADING' | translate }}</h2>
 
-              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_1' | translate">
+              <p>
+                {{ 'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_1' | translate }}
               </p>
-              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_2' | translate">
+              <p>
+                {{ 'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_2' | translate }}
               </p>
             </div>
           </div>
@@ -66,12 +69,12 @@
           <div class="oppia-about-extra-info">
             <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
               <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
-                <a href="/creator-dashboard?mode=create" class="btn oppia-about-button"
-                  [innerHTML]="'I18N_ACTION_CREATE_EXPLORATION' | translate">
+                <a href="/creator-dashboard?mode=create" class="btn oppia-about-button">
+                  {{ 'I18N_ACTION_CREATE_EXPLORATION' | translate }}
                 </a>
                 <a href="/community-library"
-                   class="btn oppia-about-button"
-                   [innerHTML]="'I18N_ACTION_BROWSE_EXPLORATIONS' | translate">
+                   class="btn oppia-about-button">
+                  {{ 'I18N_ACTION_BROWSE_EXPLORATIONS' | translate }}
                 </a>
               </div>
             </div>
