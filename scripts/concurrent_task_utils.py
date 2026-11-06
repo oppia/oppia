@@ -119,7 +119,10 @@ class TaskThread(threading.Thread):
 
     def run(self) -> None:
         try:
-            while self.num_attempts < MAX_ATTEMPTS:
+            # The loop always exits through the return statement (on success)
+            # or the break statement (on a non-retryable error, or when the
+            # final attempt fails), so it does not need a loop condition.
+            while True:
                 self.num_attempts += 1
                 try:
                     self.task_results = self.func()

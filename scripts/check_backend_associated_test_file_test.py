@@ -83,6 +83,29 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self.error_arr,
         )
 
+    def test_checks_pass_when_an_empty_backend_file_lacks_associated_test_file(
+        self,
+    ) -> None:
+        tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
+        empty_backend_file = os.path.join(tempdir.name, 'empty_file.py')
+        topmost_level_path_swap = self.swap(
+            check_backend_associated_test_file,
+            'TOPMOST_LEVEL_PATH',
+            tempdir.name,
+        )
+        with open(empty_backend_file, 'w', encoding='utf8') as f:
+            f.write('')
+
+        with self.print_swap, self.swap_logging, self.swap_exit:
+            with topmost_level_path_swap:
+                check_backend_associated_test_file.main()
+
+        tempdir.cleanup()
+        self.assertIn(
+            'Backend associated test file checks passed.', self.print_arr
+        )
+        self.assertEqual(self.error_arr, [])
+
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
         self,
     ) -> None:

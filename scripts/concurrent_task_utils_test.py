@@ -396,3 +396,33 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
 
         self.assertEqual(task.num_attempts, 2)
         self.assertEqual(attempt_count, 2)
+
+    def test_keyboard_interrupt_error_is_recorded_but_not_logged(self) -> None:
+        """Tests that an error caused by a KeyboardInterrupt is stored on the
+        task, but is not printed to the terminal as a task error.
+        """
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            raise Exception('KeyboardInterrupt')
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='interrupted_task',
+            report_enabled=False,
+            errors_to_retry_on=[],
+        )
+        task.start_time = time.time()
+        with self.print_swap:
+            task.start()
+            task.join()
+
+        self.assertEqual(task.num_attempts, 1)
+        self.assertTrue(task.finished)
+        self.assertEqual(str(task.exception), 'KeyboardInterrupt')
+        self.assertIsNotNone(task.stacktrace)
+        self.assertEqual(
+            self.task_stdout,
+            ['Attempt 1 of 3 failed for interrupted_task'],
+        )
