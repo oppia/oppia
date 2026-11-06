@@ -188,13 +188,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
                 'interaction': {
                     'id': 'EndExploration',
                     'customization_args': {
-                        'recommendedExplorationIds': {
-                            # Here we use MyPy ignore because the value of 'value'
-                            # is a List[Any] empty list as it is the EndExploration,
-                            # but the type of 'value' is defined as
-                            # Dict[str, UnionOfCustomizationArgsDictValues].
-                            'value': []
-                        }
+                        'recommendedExplorationIds': {'value': []}
                     },
                     'answer_groups': [],
                     'default_outcome': None,

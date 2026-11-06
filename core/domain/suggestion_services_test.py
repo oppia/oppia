@@ -1981,8 +1981,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(updated_suggestion.change_cmd.question_dict, dict)
-        # Here we use MyPy ignore because mypy cannot verify that the
-        # dict returned matches the stricter QuestionDict type.
         question_dict: question_domain.QuestionDict = (
             updated_suggestion.change_cmd.question_dict
         )
