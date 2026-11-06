@@ -82,7 +82,6 @@ class FeatureNames(enum.Enum):
     ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
         'enable_background_voiceover_synthesis'
     )
-    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
         'enable_financial_literacy_campaign_banner'
     )
@@ -132,7 +131,6 @@ class FeatureNames(enum.Enum):
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
@@ -326,12 +324,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
-        (
-            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
-            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (
