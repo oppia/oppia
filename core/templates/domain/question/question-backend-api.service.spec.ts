@@ -154,6 +154,30 @@ describe('Question backend Api service', () => {
     })
   );
 
+  it('should successfully fetch questions for the requested page', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_difficulty=false&page=2';
+
+    questionBackendApiService
+      .fetchQuestionsAsync(['1'], 1, false, 2)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should successfully fetch question count from the backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
@@ -282,6 +306,32 @@ describe('Question backend Api service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Question count has to be a positive integer'
+    );
+  }));
+
+  it('should use the fail handler if page is negative', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    questionBackendApiService
+      .fetchQuestionsAsync(['1'], 1, true, -1)
+      .then(successHandler, failHandler);
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Page has to be a non-negative integer'
+    );
+  }));
+
+  it('should use the fail handler if page is not an integer', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    questionBackendApiService
+      .fetchQuestionsAsync(['1'], 1, true, 1.5)
+      .then(successHandler, failHandler);
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Page has to be a non-negative integer'
     );
   }));
 
