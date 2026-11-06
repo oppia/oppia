@@ -353,6 +353,10 @@ CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 # schema changes.
 CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
 
+# This value should be updated if the schema of AndroidPlatformParameterRule dict
+# schema changes.
+CURRENT_ANDROID_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
 # This value should be updated if the schema of FeedbackSessionLogModel
 # schema changes.
 CURRENT_SESSION_INFO_SCHEMA_VERSION = 1
