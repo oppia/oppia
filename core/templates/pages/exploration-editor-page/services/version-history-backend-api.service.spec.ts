@@ -191,9 +191,7 @@ describe('Version history backend api service', () => {
       .fetchStateVersionHistoryAsync('1', 'NewState', 2)
       .then(successHandler, failureHandler);
 
-    const req = http.expectOne(
-      '/version_history_handler/state/1/NewState/2'
-    );
+    const req = http.expectOne('/version_history_handler/state/1/NewState/2');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleStateVersionHistoryDict);
     flushMicrotasks();
