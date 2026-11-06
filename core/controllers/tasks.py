@@ -342,6 +342,10 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             return
 
         try:
+            if not isinstance(sender_email, str):
+                raise ValueError('Sender email must be a string.')
+            if not isinstance(recipient_id, str):
+                raise ValueError('Recipient email must be a string.')
             email_services.send_mail(
                 sender_email, recipient_id, subject, text_body, html_body
             )

@@ -2045,7 +2045,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
-        certificate_assessment_attempt_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.query(
+        certificate_assessment_attempt_model: Optional[
+            certificate_assessment_offering_models.CertificateAssessmentAttemptModel
+        ] = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.query(
             certificate_assessment_offering_models.CertificateAssessmentAttemptModel.learner_id
             == self.USER_ID_1
         ).get()
