@@ -353,6 +353,12 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_passes_without_profile_name_for_certificate(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = None
+        self.user_settings.validate()
+
     def test_validate_long_profile_name_for_certificate_raises_error(
         self,
     ) -> None:
@@ -716,6 +722,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             updated_contributions.edited_exploration_ids, ['e2', 'e4']
+        )
+
+    def test_add_created_exploration_id_skips_existing_id(self) -> None:
+        self.user_contributions.add_created_exploration_id('e1')
+        self.user_contributions.add_created_exploration_id('e1')
+
+        self.assertEqual(
+            self.user_contributions.created_exploration_ids, ['e1']
         )
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
@@ -1246,6 +1260,19 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         learner_goals.remove_topic_id_from_learn('topic_id0')
 
         self.assertListEqual(learner_goals.topic_ids_to_learn, [])
+
+    def test_to_dict(self) -> None:
+        learner_goals = user_domain.LearnerGoals(
+            'user_id0', ['topic_id0'], ['topic_id1']
+        )
+
+        self.assertDictEqual(
+            learner_goals.to_dict(),
+            {
+                'topic_ids_to_learn': ['topic_id0'],
+                'topic_ids_to_master': ['topic_id1'],
+            },
+        )
 
 
 class UserContributionProficiencyTests(test_utils.GenericTestBase):
@@ -1837,6 +1864,16 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
             'Learner cannot be invited to join learner group group_id_1 since '
             'they are already its learner.',
         )
+
+    def test_validation_passes_for_valid_learner_groups_user(self) -> None:
+        learner_group_user_details = user_domain.LearnerGroupUserDetails(
+            'group_id_1', True
+        )
+
+        user_domain.LearnerGroupsUser(
+            'user1', ['group_id_2'], [learner_group_user_details], 1
+        ).validate()
+        user_domain.LearnerGroupsUser('user1', ['group_id_2'], [], 1).validate()
 
 
 class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
