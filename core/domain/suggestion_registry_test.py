@@ -1046,6 +1046,135 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_outcome_list = ['new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
+    def _create_edit_state_content_suggestion(
+        self, change_cmd: Dict[str, Union[Optional[str], Dict[str, str]]]
+    ) -> suggestion_registry.SuggestionEditStateContent:
+        """Returns an in-review edit state content suggestion for exp1.
+
+        Args:
+            change_cmd: dict. The change_cmd of the suggestion.
+
+        Returns:
+            SuggestionEditStateContent. The suggestion.
+        """
+        return suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            suggestion_models.STATUS_IN_REVIEW,
+            self.author_id,
+            self.reviewer_id,
+            change_cmd,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+    def test_populate_old_value_of_change_with_valid_state(self) -> None:
+        exploration = self.save_new_default_exploration('exp1', self.author_id)
+        suggestion = self._create_edit_state_content_suggestion(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': '<p>new suggestion content</p>',
+                },
+                'old_value': None,
+            }
+        )
+
+        suggestion.populate_old_value_of_change()
+
+        self.assertEqual(
+            suggestion.change_cmd.old_value,
+            exploration.states['Introduction'].content.to_dict(),
+        )
+
+    def test_accept_suggestion_updates_exploration_content(self) -> None:
+        exploration = self.save_new_default_exploration('exp1', self.author_id)
+        old_content = exploration.states['Introduction'].content.to_dict()
+        suggestion = self._create_edit_state_content_suggestion(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'suggested_content_id',
+                    'html': '<p>new suggestion content</p>',
+                },
+                'old_value': None,
+            }
+        )
+
+        suggestion.accept('Accepted suggestion.')
+
+        # The suggested html replaces the state content, and the content
+        # keeps the content id that the state already had.
+        updated_content = (
+            exp_fetchers.get_exploration_by_id('exp1')
+            .states['Introduction']
+            .content
+        )
+        self.assertEqual(updated_content.html, '<p>new suggestion content</p>')
+        self.assertEqual(updated_content.content_id, old_content['content_id'])
+        self.assertEqual(suggestion.change_cmd.old_value, old_content)
+
+    def test_pre_update_validate_passes_when_html_changes(self) -> None:
+        suggestion = self._create_edit_state_content_suggestion(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': '<p>old suggestion html</p>',
+                },
+                'old_value': None,
+            }
+        )
+
+        # No error is raised because only the html is different.
+        suggestion.pre_update_validate(
+            exp_domain.EditExpStatePropertyContentCmd(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'state_1',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>new suggestion html</p>',
+                    },
+                    'old_value': None,
+                }
+            )
+        )
+
+    def test_get_all_html_content_strings_includes_old_value(self) -> None:
+        suggestion = self._create_edit_state_content_suggestion(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'new suggestion content',
+                },
+                'old_value': {
+                    'content_id': 'content',
+                    'html': 'old content',
+                },
+            }
+        )
+
+        self.assertEqual(
+            suggestion.get_all_html_content_strings(),
+            ['new suggestion content', 'old content'],
+        )
+
     def test_convert_html_in_suggestion_change(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
@@ -1341,6 +1470,71 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'The language code must be equal to hi'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_passes_for_new_translation_html(
+        self,
+    ) -> None:
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            self.suggestion_dict['change_cmd'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        # No error is raised because only the translation is different.
+        suggestion.pre_update_validate(
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>This is a content.</p>',
+                    'translation_html': (
+                        '<p>This is the updated translated html.</p>'
+                    ),
+                    'data_format': 'html',
+                }
+            )
+        )
+
+    def test_validate_suggestion_with_list_of_translated_strings(
+        self,
+    ) -> None:
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string',
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        # A list of strings has no rich-text tags to check, so it passes
+        # validation.
+        suggestion.validate()
 
     def test_pre_update_validate_change_content_html(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
