@@ -1992,6 +1992,49 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
         self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
 
+    def test_col_user_removed_from_more_than_max_ops_summaries(
+        self,
+    ) -> None:
+        num_summaries = feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION + 5
+        summary_models = []
+        for i in range(num_summaries):
+            summary_model = collection_models.CollectionSummaryModel(
+                id=f'batch_col_{i}',
+                title=f'Collection {i}',
+                category='Category',
+                objective='Objective',
+                language_code='en',
+                community_owned=False,
+                owner_ids=[self.user_2_id],
+                editor_ids=[],
+                viewer_ids=[],
+                contributor_ids=[self.user_1_id, self.user_2_id],
+                contributors_summary={
+                    self.user_1_id: 2,
+                    self.user_2_id: 1,
+                },
+            )
+            summary_models.append(summary_model)
+        collection_models.CollectionSummaryModel.update_timestamps_multi(
+            summary_models
+        )
+        datastore_services.put_multi(summary_models)
+
+        wipeout_service._remove_user_id_from_contributors_in_summary_models(
+            self.user_1_id, collection_models.CollectionSummaryModel
+        )
+
+        for i in range(num_summaries):
+            model = collection_models.CollectionSummaryModel.get_by_id(
+                f'batch_col_{i}'
+            )
+            self.assertIsNotNone(model)
+            assert model is not None
+            self.assertNotIn(self.user_1_id, model.contributor_ids)
+            self.assertNotIn(self.user_1_id, model.contributors_summary)
+            self.assertIn(self.user_2_id, model.contributor_ids)
+            self.assertEqual(model.contributors_summary[self.user_2_id], 1)
+
     def test_delete_exp_where_user_has_role_when_rights_model_marked_as_deleted(
         self,
     ) -> None:
@@ -2410,6 +2453,45 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
         self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
+    def test_exp_user_removed_from_more_than_max_ops_summaries(
+        self,
+    ) -> None:
+        num_summaries = feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION + 5
+        summary_models = []
+        for i in range(num_summaries):
+            summary_model = exp_models.ExpSummaryModel(
+                id=f'batch_exp_{i}',
+                title=f'Exploration {i}',
+                category='Category',
+                objective='Objective',
+                language_code='en',
+                community_owned=False,
+                owner_ids=[self.user_2_id],
+                editor_ids=[],
+                viewer_ids=[],
+                contributor_ids=[self.user_1_id, self.user_2_id],
+                contributors_summary={
+                    self.user_1_id: 2,
+                    self.user_2_id: 1,
+                },
+            )
+            summary_models.append(summary_model)
+        exp_models.ExpSummaryModel.update_timestamps_multi(summary_models)
+        datastore_services.put_multi(summary_models)
+
+        wipeout_service._remove_user_id_from_contributors_in_summary_models(
+            self.user_1_id, exp_models.ExpSummaryModel
+        )
+
+        for i in range(num_summaries):
+            model = exp_models.ExpSummaryModel.get_by_id(f'batch_exp_{i}')
+            self.assertIsNotNone(model)
+            assert model is not None
+            self.assertNotIn(self.user_1_id, model.contributor_ids)
+            self.assertNotIn(self.user_1_id, model.contributors_summary)
+            self.assertIn(self.user_2_id, model.contributor_ids)
+            self.assertEqual(model.contributors_summary[self.user_2_id], 1)
 
     def test_delete_exp_where_user_has_role_when_rights_model_marked_as_deleted(
         self,
