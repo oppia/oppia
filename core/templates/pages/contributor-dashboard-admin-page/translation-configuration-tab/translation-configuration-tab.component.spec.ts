@@ -213,17 +213,120 @@ describe('TranslationConfigurationTabComponent', () => {
     expect(component.getProviderDisplayName('unknown')).toBe('unknown');
   }));
 
-  it('should reset selected provider on language change', () => {
-    component.selectedProvider = 'azure';
-    component.allAvailableProviders = [
-      {id: 'azure', displayName: 'Azure Translator'},
-    ];
-    component.onLanguageChange();
+  describe('language-specific providers', () => {
+    beforeEach(fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
+      component.allAvailableProviders = [
+        {id: 'azure', displayName: 'Azure Translator'},
+        {id: 'gcp', displayName: 'Google Cloud Translate'},
+      ];
+      // Test fixtures only; production support comes from the shared whitelist.
+      component.languageProviderWhitelist = {
+        hi: ['azure'],
+        es: ['gcp'],
+        fr: ['azure', 'gcp'],
+      };
+    }));
 
-    expect(component.selectedProvider).toBe('');
-    expect(component.availableProvidersForLanguage).toEqual([
-      {id: 'azure', displayName: 'Azure Translator'},
-    ]);
+    const selectLanguage = (code: string): string[] => {
+      component.selectedLanguage = code;
+      component.onLanguageChange();
+      fixture.detectChanges();
+      const select: HTMLSelectElement = fixture.nativeElement.querySelector(
+        '.e2e-test-provider-dropdown'
+      );
+      return Array.from(select.options)
+        .map(option => option.value)
+        .filter(value => value !== '');
+    };
+
+    it('should show only Azure for an Azure-only language', () => {
+      expect(selectLanguage('hi')).toEqual(['azure']);
+    });
+
+    it('should show only GCP for a GCP-only language', () => {
+      expect(selectLanguage('es')).toEqual(['gcp']);
+    });
+
+    it('should show both configured providers for a language supporting both', () => {
+      expect(selectLanguage('fr')).toEqual(['azure', 'gcp']);
+    });
+
+    it('should clear the provider and update options when switching languages', () => {
+      selectLanguage('hi');
+      component.selectedProvider = 'azure';
+
+      expect(selectLanguage('es')).toEqual(['gcp']);
+      expect(component.selectedProvider).toBe('');
+    });
+
+    it('should show no providers and disable Add for an unsupported language', () => {
+      expect(selectLanguage('ak')).toEqual([]);
+      const addButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+        '.e2e-test-add-mapping-btn'
+      );
+      expect(addButton.disabled).toBeTrue();
+    });
+
+    it('should show no providers when no language is selected', () => {
+      expect(selectLanguage('')).toEqual([]);
+    });
+
+    it('should restore providers after switching to an unsupported language and back', fakeAsync(() => {
+      mockLanguageUtilService.getAllVoiceoverLanguageCodes.and.returnValue([
+        'hi',
+        'es',
+        'ak',
+      ]);
+      mockApiService.fetchTranslationConfigurationAsync.and.returnValue(
+        Promise.resolve(
+          new TranslationAdminConfig({}, true, component.allAvailableProviders)
+        )
+      );
+      component.loadConfiguration();
+      tick();
+      fixture.detectChanges();
+
+      const languageDropdown: HTMLSelectElement =
+        fixture.nativeElement.querySelector('.e2e-test-language-dropdown');
+      const providerDropdown: HTMLSelectElement =
+        fixture.nativeElement.querySelector('.e2e-test-provider-dropdown');
+      const addButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+        '.e2e-test-add-mapping-btn'
+      );
+      const changeLanguage = (code: string): void => {
+        languageDropdown.value = code;
+        languageDropdown.dispatchEvent(new Event('change'));
+        tick();
+        fixture.detectChanges();
+      };
+
+      changeLanguage('hi');
+      providerDropdown.value = 'azure';
+      providerDropdown.dispatchEvent(new Event('change'));
+      tick();
+      fixture.detectChanges();
+      expect(addButton.disabled).toBeFalse();
+
+      changeLanguage('ak');
+      expect(component.selectedProvider).toBe('');
+      expect(providerDropdown.options.length).toBe(1);
+      expect(addButton.disabled).toBeTrue();
+
+      changeLanguage('hi');
+      expect(
+        Array.from(providerDropdown.options).map(option => option.value)
+      ).toEqual(['', 'azure']);
+      providerDropdown.value = 'azure';
+      providerDropdown.dispatchEvent(new Event('change'));
+      tick();
+      fixture.detectChanges();
+      expect(addButton.disabled).toBeFalse();
+      expect(
+        mockApiService.updateTranslationConfigurationAsync
+      ).not.toHaveBeenCalled();
+    }));
   });
 
   it('should populate unmappedLanguageOptions on init', fakeAsync(() => {
