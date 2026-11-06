@@ -441,6 +441,21 @@
 .donate-today-content > p:nth-child(3) {
   margin-bottom: 16px;
 }
+/* Keep the learner carousel height stable across slide changes. */
+:host ::ng-deep .donate-learners-section .carousel-inner {
+  display: grid;
+}
+
+:host ::ng-deep .donate-learners-section .carousel-item {
+  display: block;
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+:host ::ng-deep .donate-learners-section .carousel-item.active {
+  visibility: visible;
+}
+
 :host ::ng-deep .donate-learners-section .carousel-indicators {
   bottom: -48px;
   gap: 8px;
