@@ -2413,6 +2413,36 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
             )
 
 
+class HeadRequestWithoutGetTests(test_utils.GenericTestBase):
+    """Tests HEAD requests on a handler that does not support GET."""
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock handler that only supports POST."""
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+        def post(self) -> None:
+            """Handles POST requests."""
+            self.render_json({})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_head_request_without_get_returns_405_with_allow(self) -> None:
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.head('/mock', status=405)
+            self.assertEqual(response.headers['Allow'], 'POST')
+
+
 class MockHandlerNormalizedRequestDict(TypedDict):
     """Type for the MockHandler's normalized_payload
     dictionary.

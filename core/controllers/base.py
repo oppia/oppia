@@ -679,8 +679,6 @@ class BaseHandler(
             bool. Whether the request was handled as an unsupported method.
         """
         http_method = self.request.method.lower()
-        if http_method == 'head':
-            http_method = 'get'
         if http_method in ('get', 'post', 'put', 'delete') and not hasattr(
             self.__class__, http_method
         ):
@@ -708,11 +706,25 @@ class BaseHandler(
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
     def head(self, *args: Any, **kwargs: Any) -> None:
-        """Method to handle HEAD requests. The webapp library automatically
-        makes sure that HEAD only returns the headers of GET request.
+        """Handles HEAD requests as GET, minus the body (RFC 9110 9.3.2).
+        If GET is not supported, responds with 405 and an accurate Allow
+        header.
         """
         if not hasattr(self.__class__, 'get'):
-            self._handle_unsupported_method('get')
+            allowed = [
+                method.upper()
+                for method in ('get', 'post', 'put', 'delete')
+                if hasattr(self.__class__, method)
+            ]
+            self.error(405)
+            self._render_exception(
+                {
+                    'error': 'Invalid method HEAD for %s'
+                    % self.__class__.__name__,
+                    'status_code': 405,
+                }
+            )
+            self.response.headers['Allow'] = ', '.join(allowed)
             return
         getattr(self, 'get')(*args, **kwargs)
 
