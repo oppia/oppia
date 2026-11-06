@@ -2349,3 +2349,49 @@ class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
         )
         self.assertIsNone(collection)
         self.assertIsNone(collection_rights)
+
+
+class CollectionCommitLogUnitTests(CollectionServicesUnitTests):
+    """Tests for the collection commit log service methods."""
+
+    def test_get_collection_commit_log_entry_from_model(self) -> None:
+        self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
+        model = collection_models.CollectionCommitLogEntryModel.get_by_id(
+            'collection-%s-1' % self.COLLECTION_0_ID
+        )
+        self.assertIsNotNone(model)
+        entry = collection_services.get_collection_commit_log_entry_from_model(
+            model
+        )
+        self.assertEqual(entry.collection_id, self.COLLECTION_0_ID)
+        self.assertEqual(entry.user_id, self.owner_id)
+        self.assertEqual(entry.version, 1)
+        self.assertEqual(entry.post_commit_status, 'private')
+        self.assertTrue(entry.post_commit_is_private)
+
+    def test_get_next_page_of_all_non_private_collection_commits(
+        self,
+    ) -> None:
+        self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
+        commits, _cursor, more = (
+            collection_services.get_next_page_of_all_non_private_collection_commits()
+        )
+        self.assertEqual(len(commits), 1)
+        self.assertEqual(commits[0].collection_id, self.COLLECTION_0_ID)
+        self.assertEqual(commits[0].post_commit_status, 'public')
+        self.assertFalse(more)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_get_next_page_of_all_non_private_collection_commits_with_invalid_max_age(  # pylint: disable=line-too-long
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'max_age must be a datetime.timedelta instance or None.',
+        ):
+            collection_services.get_next_page_of_all_non_private_collection_commits(
+                max_age='invalid_max_age'  # type: ignore[arg-type]
+            )
