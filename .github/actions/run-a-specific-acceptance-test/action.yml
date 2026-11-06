@@ -2,10 +2,6 @@ name: Run a specific acceptance test
 description: Runs a specific acceptance test suite that is given as an input.
 
 inputs:
-  working-directory:
-    description: 'Repository directory relative to the GitHub workspace.'
-    required: false
-    default: '.'
   test-suite:
     description: 'The acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
     required: true
@@ -29,15 +25,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Resolve repository and artifact directories
-      id: paths
-      working-directory: ${{ inputs.working-directory }}
-      shell: bash
-      run: |
-        echo "repository=$(pwd -P)" >> "$GITHUB_OUTPUT"
-        echo "parent=$(dirname "$(pwd -P)")" >> "$GITHUB_OUTPUT"
     - name: Check if modified-suite-name-for-uploads contains invalid characters.
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]*$ ]]; then
@@ -45,7 +33,6 @@ runs:
           exit 1
         fi
     - name: Clean up stale Oppia server process before rerun
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         for port in 8181 6379 8089 9099 8000; do
@@ -66,7 +53,6 @@ runs:
         done
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
       # We use xvfb-run to create a virtual screen to run tests without headless mode.
       # Numbers in 1920x1080x24 represent screen width, height and color depth respectively.
@@ -95,11 +81,11 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && (steps.run-acceptance-test.outcome == 'success' || steps.run-acceptance-test.outcome == 'failure') && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-logs_${{ inputs.modified-suite-name-for-uploads }}
-        path: ${{ steps.paths.outputs.repository }}/acceptance_test_${{ inputs.modified-suite-name-for-uploads }}.log
+        path: acceptance_test_${{ inputs.modified-suite-name-for-uploads }}.log
 
     - name: Upload screenshots taken on test failure
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
@@ -110,7 +96,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: failure-point-snapshots_${{ inputs.modified-suite-name-for-uploads }}
-        path: ${{ steps.paths.outputs.parent }}/oppia_full_stack_test_failure_screenshots/acceptance
+        path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
     - name: Upload test diff screenshots
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
@@ -123,7 +109,7 @@ runs:
         name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         # Note: The path must be kept in sync with the one specified in
         # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-        path: ${{ steps.paths.outputs.repository }}/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/diff-snapshots
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/diff-snapshots
     
     - name: Upload test new screenshots
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
@@ -136,14 +122,13 @@ runs:
         name: new-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         # Note: The path must be kept in sync with the one specified in
         # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-        path: ${{ steps.paths.outputs.repository }}/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/new-snapshots
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/new-snapshots
 
     - name: Check for video recordings and test results
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        ls ${{ steps.paths.outputs.parent }}/oppia_full_stack_test_video_recordings/acceptance/** \
-        || ls ${{ steps.paths.outputs.parent }}/oppia_full_stack_test_playwright_results/ \
+        ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/** \
+        || ls /home/runner/work/oppia/oppia_full_stack_test_playwright_results/ \
         || echo "No video recordings and test results found."
 
     - name: Upload test recordings
@@ -151,17 +136,17 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && (steps.run-acceptance-test.outcome == 'success' || steps.run-acceptance-test.outcome == 'failure') && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
-        path: ${{ steps.paths.outputs.parent }}/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
+        path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
         if-no-files-found: warn
 
     - name: Upload Playwright test results
-      if: ${{ !cancelled() && (steps.run-acceptance-test.outcome == 'success' || steps.run-acceptance-test.outcome == 'failure') && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: playwright-results_${{ inputs.modified-suite-name-for-uploads }}
-        path: ${{ steps.paths.outputs.parent }}/oppia_full_stack_test_playwright_results/
+        path: /home/runner/work/oppia/oppia_full_stack_test_playwright_results/
         if-no-files-found: warn

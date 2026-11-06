@@ -63,20 +63,12 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Checkout fork into the required oppia directory
-        if: github.repository != 'oppia/oppia'
-        uses: actions/checkout@v4
-        with:
-          path: oppia
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
-        with:
-          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
 
   run_acceptance_test:
     needs: [build, generate-matrix, setup_merge_sha]
@@ -100,20 +92,12 @@ jobs:
           fi
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Checkout fork into the required oppia directory
-        if: github.repository != 'oppia/oppia'
-        uses: actions/checkout@v4
-        with:
-          path: oppia
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
-        with:
-          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
@@ -123,7 +107,6 @@ jobs:
       - name: Run ${{ matrix.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
-          working-directory: ${{ github.repository == 'oppia/oppia' && '.' || 'oppia' }}
           test-suite: ${{ inputs.test_suite }}
           viewport-type: ${{ matrix.viewport-type }}
           enable-screen-recording: true

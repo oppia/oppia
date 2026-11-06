@@ -1,10 +1,6 @@
 name: Generate build files
 description: 'Generate build files'
 inputs:
-  working-directory:
-    description: 'Repository directory relative to the GitHub workspace.'
-    required: false
-    default: '.'
   prod-env:
     description: "Whether to build in prod mode."
     required: false
@@ -18,18 +14,16 @@ runs:
       with:
         key: ${{ runner.os }}-build-files-${{ inputs.prod-env != 'false' && 'prod' || 'dev' }}-${{ github.sha }}
         path: |
-          ${{ github.workspace }}/${{ inputs.working-directory }}/build
-          ${{ github.workspace }}/${{ inputs.working-directory }}/app.yaml
-          ${{ github.workspace }}/${{ inputs.working-directory }}/assets/hashes.json
-          ${{ github.workspace }}/${{ inputs.working-directory }}/dist
-          ${{ github.workspace }}/${{ inputs.working-directory }}/third_party/generated
+          /home/runner/work/oppia/oppia/build
+          /home/runner/work/oppia/oppia/app.yaml
+          /home/runner/work/oppia/oppia/assets/hashes.json
+          /home/runner/work/oppia/oppia/dist
+          /home/runner/work/oppia/oppia/third_party/generated
     - name: Build (prod)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env != 'false'
       run: python -m scripts.build --prod_env
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
     - name: Build (dev)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env == 'false'
       run: python -c "from scripts import build; build.build_js_files(dev_mode=True)"
-      working-directory: ${{ inputs.working-directory }}
       shell: bash

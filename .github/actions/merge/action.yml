@@ -1,10 +1,6 @@
 name: 'Merge Source Branch into Base Branch'
 description: 'Merge the PR source branch into its base branch, leaving the merge commit checked-out'
 inputs:
-  working-directory:
-    description: 'Repository directory relative to the GitHub workspace.'
-    required: false
-    default: '.'
   merge_sha:
     description: 'Specific commit SHA from develop to merge. If empty, falls back to latest develop.'
     required: false
@@ -37,5 +33,4 @@ runs:
           git checkout base/${{ github.base_ref }}
         fi
         git merge source/$GITHUB_HEAD_REF
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
