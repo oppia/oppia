@@ -55,6 +55,7 @@ import {ExplorationDataService} from './services/exploration-data.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {UserService} from 'services/user.service';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
@@ -81,12 +82,18 @@ import {LostChange} from 'domain/exploration/lost-change.model';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 class MockNgbModalRef {
-  componentInstance = {};
+  componentInstance = {
+    openThreadsCount: 0,
+  };
+  openThreadsCount = 0;
 }
 
 class MockNgbModal {
   open() {
     return {
+      componentInstance: {
+        openThreadsCount: 0,
+      },
       result: Promise.resolve(),
     };
   }
@@ -269,6 +276,7 @@ describe('Exploration editor page component', () => {
         LostChangesModalComponent,
         WelcomeModalComponent,
         HelpModalComponent,
+        FeedbackPromptModalComponent,
       ],
       providers: [
         ThreadDataBackendApiService,
@@ -333,6 +341,7 @@ describe('Exploration editor page component', () => {
           LostChangesModalComponent,
           WelcomeModalComponent,
           HelpModalComponent,
+          FeedbackPromptModalComponent,
         ],
       },
     });
@@ -1164,6 +1173,85 @@ describe('Exploration editor page component', () => {
 
       component.toggleExplorationWarningVisibility();
       expect(component.areExplorationWarningsVisible).toBe(false);
+    });
+
+    it('should open feedback prompt modal and navigate to feedback tab when confirmed', fakeAsync(() => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      spyOn(rs, 'navigateToFeedbackTab');
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve(),
+      } as NgbModalRef);
+
+      expect(rs.navigateToFeedbackTab).not.toHaveBeenCalled();
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      expect(component.isModalOpenable).toBe(true);
+      expect(component.feedbackPromptModalHasBeenShown).toBe(true);
+    }));
+
+    it('should not navigate to feedback tab when feedback prompt modal is dismissed', fakeAsync(() => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      spyOn(rs, 'navigateToFeedbackTab');
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.reject(),
+      } as NgbModalRef);
+
+      expect(rs.navigateToFeedbackTab).not.toHaveBeenCalled();
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(rs.navigateToFeedbackTab).not.toHaveBeenCalled();
+      expect(component.isModalOpenable).toBe(true);
+      expect(component.feedbackPromptModalHasBeenShown).toBe(true);
+    }));
+
+    it('should not open feedback prompt modal if openThreadsCount is 0', () => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
+      spyOn(ngbModal, 'open');
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    });
+
+    it('should not open feedback prompt modal if already shown or modal is not openable', () => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      spyOn(ngbModal, 'open');
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      // Case 1: Modal is not openable.
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = false;
+      component.maybeShowFeedbackPromptModal();
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      // Case 2: Modal was already shown (e.g. after draft save).
+      component.feedbackPromptModalHasBeenShown = true;
+      component.isModalOpenable = true;
+      component.maybeShowFeedbackPromptModal();
+      expect(ngbModal.open).not.toHaveBeenCalled();
     });
 
     it('should get exploration url', () => {

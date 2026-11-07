@@ -86,6 +86,7 @@ import {ExplorationEditorPageRootComponent} from './exploration-editor-page-root
 import {CommonModule} from '@angular/common';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
@@ -205,6 +206,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     VoiceoverRemovalConfirmModalComponent,
     AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
+    FeedbackPromptModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
     DeleteExplorationModalComponent,
@@ -260,6 +262,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     VoiceoverRemovalConfirmModalComponent,
     AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
+    FeedbackPromptModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
     DeleteExplorationModalComponent,
