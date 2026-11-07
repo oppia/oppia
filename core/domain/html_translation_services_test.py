@@ -354,3 +354,80 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             source
         )
         self.assertIn('translate="no"', protected)
+
+        def test_postprocess_handles_link_inside_collapsible(self) -> None:
+             soup = bs4.BeautifulSoup('', 'html.parser')
+        link = soup.new_tag('oppia-noninteractive-link')
+        link['url-with-value'] = json.dumps('https://oppia.org')
+        link['text-with-value'] = json.dumps('Learn more')
+        block = soup.new_tag('oppia-noninteractive-collapsible')
+        block['heading-with-value'] = json.dumps('Hint')
+        block['content-with-value'] = json.dumps(f'<p>{link}</p>')
+
+        protected = html_translation_services.preprocess_html_for_translation(
+            str(block))
+        result = html_translation_services.postprocess_translated_html(
+            protected)
+
+        self.assertIn('oppia-noninteractive-collapsible', result)
+        self.assertIn('Hint', result)
+        self.assertIn('Learn more', result)
+        self.assertIn('https://oppia.org', result)
+        self.assertNotIn('data-temp', result)
+
+    def test_postprocess_handles_image_inside_collapsible(self) -> None:
+        soup = bs4.BeautifulSoup('', 'html.parser')
+        image = soup.new_tag('oppia-noninteractive-image')
+        image['alt-with-value'] = json.dumps('A red car')
+        image['caption-with-value'] = json.dumps('Car caption')
+        image['filepath-with-value'] = json.dumps('car.png')
+        block = soup.new_tag('oppia-noninteractive-collapsible')
+        block['heading-with-value'] = json.dumps('Hint')
+        block['content-with-value'] = json.dumps(f'<p>{image}</p>')
+
+        protected = html_translation_services.preprocess_html_for_translation(
+            str(block))
+        result = html_translation_services.postprocess_translated_html(
+            protected)
+
+        self.assertIn('A red car', result)
+        self.assertIn('Car caption', result)
+        self.assertIn('car.png', result)
+        self.assertNotIn('data-temp', result)
+
+    def test_postprocess_handles_link_inside_worked_example(self) -> None:
+        soup = bs4.BeautifulSoup('', 'html.parser')
+        link = soup.new_tag('oppia-noninteractive-link')
+        link['url-with-value'] = json.dumps('https://oppia.org')
+        link['text-with-value'] = json.dumps('Learn more')
+        block = soup.new_tag('oppia-noninteractive-workedexample')
+        block['question-with-value'] = json.dumps('<p>Question</p>')
+        block['answer-with-value'] = json.dumps(f'<p>{link}</p>')
+
+        protected = html_translation_services.preprocess_html_for_translation(
+            str(block))
+        result = html_translation_services.postprocess_translated_html(
+            protected)
+
+        self.assertIn('Learn more', result)
+        self.assertIn('https://oppia.org', result)
+        self.assertNotIn('data-temp', result)
+
+    def test_postprocess_handles_link_inside_tabs(self) -> None:
+        soup = bs4.BeautifulSoup('', 'html.parser')
+        link = soup.new_tag('oppia-noninteractive-link')
+        link['url-with-value'] = json.dumps('https://oppia.org')
+        link['text-with-value'] = json.dumps('Learn more')
+        tabs = soup.new_tag('oppia-noninteractive-tabs')
+        tabs['tab_contents-with-value'] = json.dumps(
+            [{'title': 'Tab 1', 'content': f'<p>{link}</p>'}])
+
+        protected = html_translation_services.preprocess_html_for_translation(
+            str(tabs))
+        result = html_translation_services.postprocess_translated_html(
+            protected)
+
+        self.assertIn('Tab 1', result)
+        self.assertIn('Learn more', result)
+        self.assertIn('https://oppia.org', result)
+        self.assertNotIn('data-temp', result)
