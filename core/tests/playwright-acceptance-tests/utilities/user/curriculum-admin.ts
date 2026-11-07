@@ -55,6 +55,10 @@ const publishClassroomButton =
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const enableDiagnosticTestButton =
   '.e2e-test-toggle-diagnostic-test-status-btn';
+const skillsTab = 'a.e2e-test-skills-tab';
+const addNewSkillButton = '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
 
 export class CurriculumAdmin extends TopicManager {
   /**
@@ -178,6 +182,25 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(saveNewClassroomButton);
     await this.expectElementToBeVisible(createNewClassroomModal, false);
     showMessage(`Created ${classroomName} classroom.`);
+  }
+
+  /**
+   * Creates a skill from the skills tab of the topics and skills dashboard.
+   * @param {string} skillName - The name of the skill.
+   * @param {string} reviewMaterial - The review material of the skill.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    const skillButtonSelector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : addNewSkillButton;
+    await this.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
+    await this.clickOnElementWithSelector(skillsTab);
+    await this.expectElementToBeVisible(skillButtonSelector);
+    await this.clickOnElementWithSelector(skillButtonSelector);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
   }
 
   /**
