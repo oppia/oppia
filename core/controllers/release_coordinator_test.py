@@ -21,27 +21,27 @@ import enum
 from core import feconf
 from core.constants import constants
 from core.domain import (
-    feature_flag_domain,
-    feature_flag_registry,
-    feature_flag_services,
     platform_parameter_list,
     user_services,
+    web_feature_flag_domain,
+    web_feature_flag_registry,
+    web_feature_flag_services,
 )
 from core.tests import test_utils
 
 
-class FeatureNames(enum.Enum):
+class WebFeatureNames(enum.Enum):
     """Enum for feature names."""
 
     TEST_FEATURE_1 = 'test_feature_1'
     TEST_FEATURE_2 = 'test_feature_2'
 
 
-FeatureStages = feature_flag_domain.FeatureStages
+FeatureStages = web_feature_flag_domain.FeatureStages
 
 
-class MemoryCacheHandlerTest(test_utils.GenericTestBase):
-    """Tests MemoryCacheHandler."""
+class WebMemoryCacheHandlerTest(test_utils.GenericTestBase):
+    """Tests WebMemoryCacheHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -261,8 +261,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
             )
 
 
-class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
-    """Tests FeatureFlagsHandler."""
+class WebFeatureFlagsHandlerTest(test_utils.GenericTestBase):
+    """Tests WebFeatureFlagsHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -285,7 +285,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_RELEASE_COORDINATOR,
         )
 
-    def test_without_feature_flag_name_update_feature_flag_is_not_performed(
+    def test_without_feature_flag_name_update_web_feature_flag_is_not_performed(
         self,
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
@@ -295,12 +295,15 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_flag_name\' must be provided when the action is '
-            'update_feature_flag.',
+            'update_web_feature_flag.',
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.put_json(
                 feconf.FEATURE_FLAGS_URL,
-                {'action': 'update_feature_flag', 'feature_flag_name': None},
+                {
+                    'action': 'update_web_feature_flag',
+                    'feature_flag_name': None,
+                },
                 csrf_token=csrf_token,
             )
 
@@ -311,24 +314,24 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            web_feature_flag_services,
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_1],
+            web_feature_flag_services,
+            'ALL_WEB_FEATURE_FLAGS',
+            [WebFeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_1.value]),
+            web_feature_flag_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set([WebFeatureNames.TEST_FEATURE_1.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -338,7 +341,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     response_dict['feature_flags'],
                     [
                         {
-                            'name': FeatureNames.TEST_FEATURE_1.value,
+                            'name': WebFeatureNames.TEST_FEATURE_1.value,
                             'description': 'a feature in dev stage',
                             'feature_stage': FeatureStages.DEV.value,
                             'force_enable_for_all_users': False,
@@ -355,24 +358,24 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            web_feature_flag_registry,
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_1],
+            web_feature_flag_services,
+            'ALL_WEB_FEATURE_FLAGS',
+            [WebFeatureNames.TEST_FEATURE_1],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_1.value]),
+            web_feature_flag_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set([WebFeatureNames.TEST_FEATURE_1.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -380,8 +383,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 self.put_json(
                     feconf.FEATURE_FLAGS_URL,
                     {
-                        'action': 'update_feature_flag',
-                        'feature_flag_name': FeatureNames.TEST_FEATURE_1.value,
+                        'action': 'update_web_feature_flag',
+                        'feature_flag_name': WebFeatureNames.TEST_FEATURE_1.value,
                         'force_enable_for_all_users': False,
                         'rollout_percentage': 50,
                         'user_group_ids': [],
@@ -390,20 +393,21 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
 
                 updated_feature_flag = (
-                    feature_flag_registry.Registry.get_feature_flag(
-                        FeatureNames.TEST_FEATURE_1.value
+                    web_feature_flag_registry.Registry.get_feature_flag(
+                        WebFeatureNames.TEST_FEATURE_1.value
                     )
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.force_enable_for_all_users,
+                    updated_feature_flag.web_feature_flag_config.force_enable_for_all_users,
                     False,
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.rollout_percentage,
+                    updated_feature_flag.web_feature_flag_config.rollout_percentage,
                     50,
                 )
                 self.assertEqual(
-                    updated_feature_flag.feature_flag_config.user_group_ids, []
+                    updated_feature_flag.web_feature_flag_config.user_group_ids,
+                    [],
                 )
 
         self.logout()
@@ -415,16 +419,16 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature_list_ctx = self.swap(
-            feature_flag_services, 'ALL_FEATURE_FLAGS', []
+            web_feature_flag_services, 'ALL_WEB_FEATURE_FLAGS', []
         )
         feature_set_ctx = self.swap(
-            feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([])
+            web_feature_flag_services, 'ALL_WEB_FEATURES_NAMES_SET', set([])
         )
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            web_feature_flag_registry,
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_1.value: (
+                WebFeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
@@ -436,7 +440,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 response = self.put_json(
                     feconf.FEATURE_FLAGS_URL,
                     {
-                        'action': 'update_feature_flag',
+                        'action': 'update_web_feature_flag',
                         'feature_flag_name': 'test_feature_1',
                         'force_enable_for_all_users': False,
                         'rollout_percentage': 50,
@@ -456,24 +460,24 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         swap_name_to_description_feature_stage_dict = self.swap(
-            feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            web_feature_flag_registry,
+            'WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
-                FeatureNames.TEST_FEATURE_2.value: (
+                WebFeatureNames.TEST_FEATURE_2.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
                 )
             },
         )
         feature_list_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURE_FLAGS',
-            [FeatureNames.TEST_FEATURE_2],
+            web_feature_flag_services,
+            'ALL_WEB_FEATURE_FLAGS',
+            [WebFeatureNames.TEST_FEATURE_2],
         )
         feature_set_ctx = self.swap(
-            feature_flag_services,
-            'ALL_FEATURES_NAMES_SET',
-            set([FeatureNames.TEST_FEATURE_2.value]),
+            web_feature_flag_services,
+            'ALL_WEB_FEATURES_NAMES_SET',
+            set([WebFeatureNames.TEST_FEATURE_2.value]),
         )
 
         with swap_name_to_description_feature_stage_dict:
@@ -481,8 +485,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 response = self.put_json(
                     feconf.FEATURE_FLAGS_URL,
                     {
-                        'action': 'update_feature_flag',
-                        'feature_flag_name': FeatureNames.TEST_FEATURE_2.value,
+                        'action': 'update_web_feature_flag',
+                        'feature_flag_name': WebFeatureNames.TEST_FEATURE_2.value,
                         'force_enable_for_all_users': False,
                         'rollout_percentage': 200,
                         'user_group_ids': [],
