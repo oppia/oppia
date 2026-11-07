@@ -27,7 +27,7 @@ import isort.api
 import pycodestyle
 from pylint import lint
 from pylint.reporters import text
-from typing import List, Tuple
+from typing import List, Set, Tuple
 
 from .. import concurrent_task_utils
 from . import linter_utils
@@ -174,6 +174,41 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    def check_missing_init_files(self) -> concurrent_task_utils.TaskResult:
+        """Checks Python package directories and their ancestors for __init__.py.
+
+        Returns:
+            TaskResult. The result of the package initialization check.
+        """
+        # Use the runner's filtered file list to respect its existing exclusions
+        # for generated files, third-party libraries, and test fixtures.
+        repo_root = os.path.abspath(os.getcwd())
+        directories: Set[str] = set()
+        for filepath in self.all_filepaths:
+            directory = os.path.dirname(os.path.abspath(filepath))
+            # The checkout root is not a package. Only collect its descendants
+            # so intermediate packages are checked without leaving the repo.
+            while (
+                directory != repo_root
+                and os.path.commonpath([directory, repo_root]) == repo_root
+            ):
+                directories.add(directory)
+                directory = os.path.dirname(directory)
+        error_messages = []
+        for directory in sorted(directories):
+            if not os.path.isfile(os.path.join(directory, '__init__.py')):
+                error_messages.append(
+                    'Folder "%s" is missing an __init__.py file required '
+                    'for Python packaging.' % os.path.relpath(directory)
+                )
+
+        return concurrent_task_utils.TaskResult(
+            'Missing __init__.py',
+            bool(error_messages),
+            error_messages,
+            error_messages,
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -202,6 +237,7 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
 
         linter_stdout.append(self.lint_py_files())
         linter_stdout.append(self.check_import_order())
+        linter_stdout.append(self.check_missing_init_files())
         linter_stdout.append(check_jobs_imports(batch_jobs_dir, jobs_registry))
 
         return linter_stdout
