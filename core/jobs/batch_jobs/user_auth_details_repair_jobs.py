@@ -83,20 +83,24 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         # NOTE: Deleted models are included because users that have them must
         # not be repaired.
-        users = {
-            'auth': self.pipeline
+        auth_models_by_user_id = (
+            self.pipeline
             | 'Get UserAuthDetailsModels'
             >> ndb_io.GetModels(
                 auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
             )
-            | 'Key UserAuthDetailsModels' >> beam.WithKeys(lambda m: m.id),
-            'settings': self.pipeline
+            | 'Key UserAuthDetailsModels' >> beam.WithKeys(lambda m: m.id)
+        )
+        settings_models_by_user_id = (
+            self.pipeline
             | 'Get UserSettingsModels'
             >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=True)
             )
-            | 'Key UserSettingsModels' >> beam.WithKeys(lambda m: m.id),
-            'reverse': self.pipeline
+            | 'Key UserSettingsModels' >> beam.WithKeys(lambda m: m.id)
+        )
+        reverse_models_by_user_id = (
+            self.pipeline
             | 'Get UserIdByFirebaseAuthIdModels'
             >> ndb_io.GetModels(
                 auth_models.UserIdByFirebaseAuthIdModel.get_all(
@@ -104,7 +108,12 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
                 )
             )
             | 'Key UserIdByFirebaseAuthIdModels'
-            >> beam.WithKeys(lambda m: m.user_id),
+            >> beam.WithKeys(lambda m: m.user_id)
+        )
+        users = {
+            'auth': auth_models_by_user_id,
+            'settings': settings_models_by_user_id,
+            'reverse': reverse_models_by_user_id,
         } | 'Join models by user id' >> beam.CoGroupByKey()
 
         # NOTE: Users that share an email block FirebaseServerSyncJob, so they
@@ -124,20 +133,16 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             TAG_SET_FIREBASE_AUTH_ID,
             TAG_ADD_REVERSE,
         )
+        diagnoses = users | 'Diagnose users' >> beam.FlatMap(
+            _diagnose_user, shared_emails=beam.pvalue.AsDict(shared_emails)
+        ).with_outputs(*tags)
         (
             ok_users,
             problems,
             user_ids_missing_auth,
             auth_models_missing_firebase_auth_id,
             user_ids_missing_reverse,
-        ) = operator.itemgetter(*tags)(
-            users
-            | 'Diagnose users'
-            >> beam.FlatMap(
-                _diagnose_user,
-                shared_emails=beam.pvalue.AsDict(shared_emails),
-            ).with_outputs(*tags)
-        )
+        ) = operator.itemgetter(*tags)(diagnoses)
 
         repaired_models = (
             user_ids_missing_auth
@@ -148,6 +153,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             | 'Build UserIdByFirebaseAuthIdModels'
             >> beam.Map(_build_reverse_model),
         ) | 'Merge repaired models' >> beam.Flatten()
+
         if not self.DRY_RUN:
             unused_put_result = (
                 repaired_models | 'Put repaired models' >> ndb_io.PutModels()
