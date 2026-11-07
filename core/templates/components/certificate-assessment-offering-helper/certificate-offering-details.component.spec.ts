@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CertificateOfferingDetailsComponent.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,

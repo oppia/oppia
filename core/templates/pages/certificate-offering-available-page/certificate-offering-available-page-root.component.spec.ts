@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for AvailableCertificateOfferingPageRootComponent.
  */
 
-// @ts-nocheck
-
+import {TestBed} from '@angular/core/testing';
 import {ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -28,14 +27,26 @@ import {AvailableCertificateOfferingPageRootComponent} from './certificate-offer
 describe('AvailableCertificateOfferingPageRootComponent', () => {
   let component: AvailableCertificateOfferingPageRootComponent;
 
+  // Registers the stub as the ActivatedRoute provider, so that TestBed returns
+  // the same stub object with the ActivatedRoute type. This avoids casting a
+  // partial object literal to ActivatedRoute, which strict mode rejects.
+  const injectActivatedRoute = function (
+    activatedRouteStub: object
+  ): ActivatedRoute {
+    TestBed.configureTestingModule({
+      providers: [{provide: ActivatedRoute, useValue: activatedRouteStub}],
+    });
+    return TestBed.inject(ActivatedRoute);
+  };
+
   const createComponent = function (classroomUrlFragment: string | null): void {
-    const activatedRoute = {
+    const activatedRoute = injectActivatedRoute({
       snapshot: {
         paramMap: {
           get: jasmine.createSpy().and.returnValue(classroomUrlFragment),
         },
       },
-    } as ActivatedRoute;
+    });
 
     component = new AvailableCertificateOfferingPageRootComponent(
       {} as PageHeadService,
@@ -74,7 +85,7 @@ describe('AvailableCertificateOfferingPageRootComponent', () => {
 
   it('should read the classroom url fragment from the parent route when needed', () => {
     const parentParamMapGetSpy = jasmine.createSpy().and.returnValue('math');
-    const activatedRoute = {
+    const activatedRoute = injectActivatedRoute({
       snapshot: {
         paramMap: {
           get: jasmine.createSpy().and.returnValue(null),
@@ -85,7 +96,7 @@ describe('AvailableCertificateOfferingPageRootComponent', () => {
           },
         },
       },
-    } as ActivatedRoute;
+    });
 
     component = new AvailableCertificateOfferingPageRootComponent(
       {} as PageHeadService,

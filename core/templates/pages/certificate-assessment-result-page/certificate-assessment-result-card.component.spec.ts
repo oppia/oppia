@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CertificateAssessmentResultCardComponent.
  */
 
-// @ts-nocheck
-
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -25,9 +23,20 @@ import {By} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AssessmentResultTopicWiseBreakdown} from 'domain/certificate-assessment/certificate-assessment.model';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
+
+// The component copies the raw question counts into each topic breakdown
+// entry, in addition to the fields declared by
+// AssessmentResultTopicWiseBreakdown. The expected entries in these tests
+// include those counts, so they use this extended type.
+interface ExpectedTopicBreakdownEntry
+  extends AssessmentResultTopicWiseBreakdown {
+  totalCorrectQuestions: number;
+  totalRelatedQuestions: number;
+}
 
 describe('CertificateAssessmentResultCardComponent', () => {
   let component: CertificateAssessmentResultCardComponent;
@@ -129,23 +138,24 @@ describe('CertificateAssessmentResultCardComponent', () => {
       backendApiServiceSpy.getCertificateAssessmentResultAsync
     ).toHaveBeenCalledWith('attempt-1');
     expect(component.certificateId).toBe('cert-1');
+    const expectedTopicBreakdown: ExpectedTopicBreakdownEntry[] = [
+      {
+        topicName: 'Place Values',
+        scorePercentage: 80,
+        totalCorrectQuestions: 4,
+        totalRelatedQuestions: 5,
+      },
+      {
+        topicName: 'Multiplication',
+        scorePercentage: 50,
+        totalCorrectQuestions: 2,
+        totalRelatedQuestions: 4,
+      },
+    ];
     expect(component.result).toEqual({
       certificateName: 'Everyday Arithmetic & Number Confidence',
       scorePercentage: 80,
-      topicBreakdown: [
-        {
-          topicName: 'Place Values',
-          scorePercentage: 80,
-          totalCorrectQuestions: 4,
-          totalRelatedQuestions: 5,
-        },
-        {
-          topicName: 'Multiplication',
-          scorePercentage: 50,
-          totalCorrectQuestions: 2,
-          totalRelatedQuestions: 4,
-        },
-      ],
+      topicBreakdown: expectedTopicBreakdown,
       timeTakenMinutes: 35,
     });
     expect(component.isLoading).toBe(false);
@@ -157,6 +167,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
         certificate_id: 'cert-1',
         title: 'Test Certificate',
         total_score: 99,
+        time_taken_in_minutes: null,
         attempt_data: {
           topic_1: {
             topic_name: 'Place Values',
@@ -173,14 +184,15 @@ describe('CertificateAssessmentResultCardComponent', () => {
 
     await fixture.whenStable();
 
-    expect(component.result?.topicBreakdown).toEqual([
+    const expectedTopicBreakdown: ExpectedTopicBreakdownEntry[] = [
       {
         topicName: 'Place Values',
         scorePercentage: 0,
         totalCorrectQuestions: 0,
         totalRelatedQuestions: 0,
       },
-    ]);
+    ];
+    expect(component.result?.topicBreakdown).toEqual(expectedTopicBreakdown);
   });
 
   it('should render the time taken from the real response', async () => {
@@ -231,6 +243,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
         certificate_id: 'cert-1',
         title: 'Test Certificate',
         total_score: 50,
+        time_taken_in_minutes: null,
         attempt_data: {
           topic_1: {
             topic_name: 'Place Values',

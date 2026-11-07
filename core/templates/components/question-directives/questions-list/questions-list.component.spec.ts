@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Questions List Component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -93,8 +91,8 @@ describe('Questions List Component', () => {
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skill: Skill;
-  let question: Question | null = null;
-  let questionStateData: State | null = null;
+  let question: Question;
+  let questionStateData: State;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -1166,11 +1164,12 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-    // This throws "Type 'null' is not assignable to type 'Question'.". We need to
-    // suppress this error because we are testing the component's behavior when
-    // question is null.
-    // @ts-expect-error
-    component.question = null;
+    // We are testing the component's behavior when question is null, which
+    // its type does not allow. A line-level @ts-expect-error cannot be used
+    // here: the strict check reports the null assignment, but the Karma build
+    // (tsconfig.spec.json, non-strict) allows it and then fails on the unused
+    // directive. Object.assign() sets the value in both cases.
+    Object.assign(component, {question: null});
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1423,7 +1422,7 @@ describe('Questions List Component', () => {
 
   it('should get cached question summaries for one skill', () => {
     spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
-      undefined
+      []
     );
 
     expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();

@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -133,7 +131,11 @@ describe('Story Creation Backend Api Service', () => {
       return 'id';
     };
 
-    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    // The service only reads and writes location.href, so the mock window
+    // provides just that part of the Window interface.
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(
+      mockWindow as Window
+    );
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
       {
         filename: 'Image1',
