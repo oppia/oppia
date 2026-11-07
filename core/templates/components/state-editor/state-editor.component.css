@@ -1,5 +1,4 @@
 .oppia-sticky-state-content {
-  /* Leave room for reviewing answers even when the question contains images. */
   background-color: #fff;
   max-height: 40vh;
   overflow-y: auto;

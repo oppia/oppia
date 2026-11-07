@@ -9,14 +9,12 @@
 }
 
 .modal-body {
-  /* Keep the header and footer visible without assuming a question height. */
   min-height: 0;
   overflow-y: auto;
   padding-top: 0;
 }
 
 .oppia-question-details {
-  /* Keep initial spacing outside the sticky question's scroll offset. */
   padding-top: 15px;
 }
 

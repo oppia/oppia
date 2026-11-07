@@ -424,14 +424,20 @@ describe('Question Suggestion Review Modal component', () => {
         fixture.detectChanges();
 
         const modal: HTMLElement = fixture.nativeElement;
-        const body: HTMLElement = modal.querySelector('.modal-body');
-        const header: HTMLElement = modal.querySelector('.modal-header');
-        const footer: HTMLElement = modal.querySelector('.modal-footer');
+        const body: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-body')
+        ).nativeElement;
+        const header: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-header')
+        ).nativeElement;
+        const footer: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-footer')
+        ).nativeElement;
+        const details: HTMLElement = fixture.debugElement.query(
+          By.css('.oppia-question-details')
+        ).nativeElement;
         expect(getComputedStyle(body).paddingTop).toBe('0px');
-        expect(
-          getComputedStyle(modal.querySelector('.oppia-question-details'))
-            .paddingTop
-        ).toBe('15px');
+        expect(getComputedStyle(details).paddingTop).toBe('15px');
         const questionEditor = fixture.debugElement.query(
           By.css('oppia-question-editor')
         );

@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {By} from '@angular/platform-browser';
 import {
   ComponentFixture,
   fakeAsync,
@@ -84,17 +85,20 @@ describe('State Editor Component', () => {
     fixture.detectChanges();
 
     const editor: HTMLElement = fixture.nativeElement;
-    const card: HTMLElement = editor.querySelector('mat-card');
-    const responses: HTMLElement = editor.querySelector(
-      '#editorTabTourStateResponsesTab'
-    );
+    const card: HTMLElement = fixture.debugElement.query(
+      By.css('mat-card')
+    ).nativeElement;
+    const responses: HTMLElement = fixture.debugElement.query(
+      By.css('#editorTabTourStateResponsesTab')
+    ).nativeElement;
+    const originalParent = editor.parentElement as HTMLElement;
     const scroller = document.createElement('div');
     scroller.style.height = '400px';
     scroller.style.overflowY = 'auto';
     editor.style.display = 'block';
     card.style.display = 'block';
     responses.style.height = '1500px';
-    editor.parentNode.insertBefore(scroller, editor);
+    originalParent.insertBefore(scroller, editor);
     scroller.appendChild(editor);
 
     try {
@@ -117,7 +121,7 @@ describe('State Editor Component', () => {
       card.scrollTop = 100;
       expect(card.scrollTop).toBe(100);
     } finally {
-      scroller.parentNode.insertBefore(editor, scroller);
+      originalParent.insertBefore(editor, scroller);
       scroller.remove();
     }
   });
