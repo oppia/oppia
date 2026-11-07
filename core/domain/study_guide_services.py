@@ -33,7 +33,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -190,6 +190,38 @@ def get_study_guide_by_id(
         return study_guide
     else:
         return None
+
+
+def get_multiple_study_guides_by_ids_and_version(
+    study_guide_ids_and_versions: List[Tuple[str, Optional[int]]],
+) -> List[Optional[study_guide_domain.StudyGuide]]:
+    """Returns a list of study guides matching the IDs and versions provided.
+
+    Both the latest version and specific versions are read from snapshots, so
+    a version reported as the latest one can always be fetched again by its
+    version number.
+
+    Args:
+        study_guide_ids_and_versions: list(tuple(str, int|None)). List of
+            tuples of study guide ID and version number. If the version number
+            is None, the latest version will be returned.
+
+    Returns:
+        list(StudyGuide|None). The list of study guides corresponding to the
+        given IDs and versions. If a study guide (or the requested version of
+        it) does not exist, the corresponding entry will be None.
+    """
+    study_guide_models = subtopic_models.StudyGuideModel.get_version_multi(
+        study_guide_ids_and_versions
+    )
+    return [
+        (
+            get_study_guide_from_model(study_guide_model)
+            if study_guide_model is not None
+            else None
+        )
+        for study_guide_model in study_guide_models
+    ]
 
 
 def get_study_guides_with_ids(

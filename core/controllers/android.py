@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -43,7 +45,7 @@ from core.domain import (
     voiceover_services,
 )
 
-from typing import Dict, List, Optional, Sequence, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -130,6 +132,37 @@ class ActivityDataResponseDict(
 
     version: Optional[int]
     language_code: Optional[str]
+
+
+def _get_study_guides_for_activities(
+    activities_data: List[ActivityDataRequestDict],
+) -> List[Optional[study_guide_domain.StudyGuide]]:
+    """Fetches the study guides for the given subtopic activities.
+
+    Args:
+        activities_data: list(ActivityDataRequestDict). The requested
+            subtopic activities, whose IDs are of the form
+            '<topic_id>-<subtopic_id>'.
+
+    Returns:
+        list(StudyGuide|None). The study guides corresponding to the given
+        activities, in the same order. An entry is None if the study guide
+        (or the requested version of it) does not exist.
+    """
+    study_guide_ids_and_versions: List[Tuple[str, Optional[int]]] = []
+    for activity_data in activities_data:
+        topic_id, subtopic_id = activity_data['id'].split('-')
+        study_guide_ids_and_versions.append(
+            (
+                study_guide_domain.StudyGuide.get_study_guide_id(
+                    topic_id, int(subtopic_id)
+                ),
+                activity_data.get('version'),
+            )
+        )
+    return study_guide_services.get_multiple_study_guides_by_ids_and_version(
+        study_guide_ids_and_versions
+    )
 
 
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
@@ -272,14 +305,10 @@ class AndroidActivityHandler(
             constants.ACTIVITY_TYPE_SUBTOPIC,
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
         ):
-            for activity_data in activities_data:
-                topic_id, study_guide_id = activity_data['id'].split('-')
-                study_guide = study_guide_services.get_study_guide_by_id(
-                    topic_id,
-                    int(study_guide_id),
-                    strict=False,
-                    version=activity_data.get('version'),
-                )
+            study_guides = _get_study_guides_for_activities(activities_data)
+            for activity_data, study_guide in zip(
+                activities_data, study_guides
+            ):
                 activities.append(
                     {
                         'id': activity_data['id'],
@@ -294,14 +323,10 @@ class AndroidActivityHandler(
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
         ):
-            for activity_data in activities_data:
-                topic_id, study_guide_id = activity_data['id'].split('-')
-                study_guide = study_guide_services.get_study_guide_by_id(
-                    topic_id,
-                    int(study_guide_id),
-                    strict=False,
-                    version=activity_data.get('version'),
-                )
+            study_guides = _get_study_guides_for_activities(activities_data)
+            for activity_data, study_guide in zip(
+                activities_data, study_guides
+            ):
                 activities.append(
                     {
                         'id': activity_data['id'],
@@ -485,6 +510,25 @@ class AndroidActivityHandler(
                         ),
                     }
                 activities.append(response_dict)
+
+        for activity in activities:
+            # Only versioned activities include a 'version' key. A missing
+            # payload for one of them means that the requested version (or
+            # the latest one) cannot be served, so the Android lesson
+            # configuration will be out of sync with the server.
+            if 'version' in activity and activity['payload'] is None:
+                requested_version = activity['version']
+                logging.error(
+                    'Android requested %s %s at version %s, but it could not '
+                    'be found.',
+                    activity_type,
+                    activity['id'],
+                    (
+                        'latest'
+                        if requested_version is None
+                        else requested_version
+                    ),
+                )
 
         self.render_json(activities)
 
