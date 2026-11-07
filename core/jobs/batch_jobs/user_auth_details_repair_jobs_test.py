@@ -338,6 +338,22 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
             [stdout('OK SUCCESS: 1'), stdout('PUT SUCCESS: 2')]
         )
 
+    def test_email_shared_with_profile_missing_auth_model_is_repaired(
+        self,
+    ) -> None:
+        self.put_settings_model('uid_a', email='x@x.com')
+        self.put_settings_model(
+            'uid_p', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
+        )
+
+        self.assert_job_output_is(
+            [
+                stderr('uid_p is a profile without a parent_user_id'),
+                stdout('PUT SUCCESS: 2'),
+            ]
+        )
+        self.assert_repaired('uid_a', FB_A)
+
     def test_email_shared_with_deleted_user_is_repaired(self) -> None:
         self.put_settings_model('uid_a', email='x@x.com')
         self.put_settings_model('uid_d', email='x@x.com', deleted=True)

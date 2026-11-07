@@ -319,7 +319,7 @@ def _get_firebase_email(user: User) -> abc.Iterator[str]:
     """
     _, user_models_by_kind = user
     auth_model, settings_model, _ = _unpack(user_models_by_kind)
-    if settings_model is None or _is_profile_user(auth_model):
+    if settings_model is None or _is_profile_user(auth_model, settings_model):
         return
     if not settings_model.deleted or (
         auth_model is not None and auth_model.firebase_auth_id
@@ -347,9 +347,16 @@ def _unpack(
 
 def _is_profile_user(
     auth_model: auth_models.UserAuthDetailsModel | None,
+    settings_model: user_models.UserSettingsModel,
 ) -> bool:
-    """Returns whether the user is a profile, which has no Firebase account."""
-    return auth_model is not None and auth_model.parent_user_id is not None
+    """Returns whether the user is a profile, which has no Firebase account.
+
+    NOTE: The role is checked too because a profile may be missing its auth
+    model.
+    """
+    return (
+        auth_model is not None and auth_model.parent_user_id is not None
+    ) or feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
 
 
 def _is_linked_to_firebase(
