@@ -215,8 +215,7 @@ export class Contributor extends ExplorationEditor {
     const viewBasedBadgeSelector = this.isViewportAtMobileWidth()
       ? `${mobileBadgeContainerSelector} ${badgeSelector}`
       : `${desktopBadgeContainerSelector} ${badgeSelector}`;
-    // We only wait for the first badge to be attached (not visible), because
-    // the first badge might be hidden.
+    // Wait until the badges are visible, so we only check what the user can see.
     await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
     // The badges list may be re-rendered (e.g. after changing the badge
