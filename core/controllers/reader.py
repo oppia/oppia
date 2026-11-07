@@ -375,6 +375,7 @@ class EntityTranslationHandler(
         entity_version: int,
         language_code: str,
     ) -> None:
+        """Handles GET requests."""
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(entity_type),
             entity_id,
@@ -511,6 +512,7 @@ class StatsEventsHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
+        """Handles POST requests."""
         assert self.normalized_payload is not None
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']

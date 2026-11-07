@@ -943,6 +943,7 @@ class UrlHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         if self.user_id:
             self.render_json({'login_url': None})
