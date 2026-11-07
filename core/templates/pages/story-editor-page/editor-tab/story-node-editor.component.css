@@ -116,6 +116,24 @@
 .story-node-planned-publication-date {
   margin-bottom: 25px;
 }
+.exploration-id-display {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 4px;
+}
+.exploration-id-link-icon {
+  font-size: 11px;
+  margin-left: 4px;
+}
+.exploration-id-edit-button {
+  color: #555;
+  padding: 2px 8px;
+}
+.exploration-id-edit-button:hover,
+.exploration-id-edit-button:focus-visible {
+  color: #00645c;
+}
 .save-button-container {
   text-align: right;
 }

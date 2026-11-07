@@ -26,6 +26,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -147,7 +148,9 @@ describe('Story node editor component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      // FormsModule is needed so that submitting the exploration ID form
+      // emits ngSubmit.
+      imports: [HttpClientTestingModule, FormsModule],
       declarations: [StoryNodeEditorComponent],
       providers: [
         WindowDimensionsService,
@@ -317,7 +320,8 @@ describe('Story node editor component', () => {
 
     expect(component.chapterPreviewCardIsShown).toEqual(false);
     expect(component.mainChapterCardIsShown).toEqual(true);
-    expect(component.explorationInputButtonsAreShown).toEqual(false);
+    // No exploration is linked to the chapter, so the input field is shown.
+    expect(component.explorationIdEditorIsShown).toEqual(true);
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
@@ -334,41 +338,123 @@ describe('Story node editor component', () => {
     );
   });
 
-  it('should return the absolute exploration editor URL', () => {
-    expect(component.getExplorationEditorUrl('exp_1')).toEqual(
-      window.location.origin + '/create/exp_1'
-    );
+  it('should return the exploration editor URL', () => {
+    expect(component.getExplorationEditorUrl('exp_1')).toEqual('/create/exp_1');
   });
 
-  it('should show a link to the exploration editor when an exploration is linked', () => {
+  describe('exploration ID field', () => {
+    const query = (selector: string): HTMLElement | null =>
+      fixture.nativeElement.querySelector(selector);
+
     // The first change detection run calls ngOnInit, which copies the
     // explorationId input into currentExplorationId.
-    component.explorationId = 'exp_1';
-    component.mainChapterCardIsShown = true;
-    fixture.detectChanges();
+    const renderChapterWithExploration = (explorationId: string | null) => {
+      component.explorationId = explorationId;
+      component.mainChapterCardIsShown = true;
+      fixture.detectChanges();
+    };
 
-    const link: HTMLAnchorElement | null = fixture.nativeElement.querySelector(
-      'a[href$="/create/exp_1"]'
-    );
-    expect(link).not.toBeNull();
-    expect(link?.getAttribute('target')).toEqual('_blank');
-    expect(link?.textContent?.trim()).toEqual(
-      window.location.origin + '/create/exp_1'
-    );
-  });
+    it('should show the linked exploration as a view-only link', () => {
+      renderChapterWithExploration('exp_1');
 
-  it('should not show the exploration editor link when no exploration is linked', () => {
-    component.explorationId = null;
-    component.mainChapterCardIsShown = true;
-    fixture.detectChanges();
+      const link = query('.e2e-test-exploration-id-link');
+      expect(link?.getAttribute('href')).toEqual('/create/exp_1');
+      expect(link?.getAttribute('target')).toEqual('_blank');
+      expect(link?.getAttribute('rel')).toEqual('noopener');
+      expect(link?.textContent?.trim()).toEqual('exp_1');
+      expect(query('.e2e-test-edit-exploration-id-button')).not.toBeNull();
+      expect(query('.e2e-test-exploration-id-input')).toBeNull();
+    });
 
-    // The exploration ID field is rendered, but there is no link.
-    expect(
-      fixture.nativeElement.querySelector('.e2e-test-exploration-id-input')
-    ).not.toBeNull();
-    expect(
-      fixture.nativeElement.querySelector('a[href*="/create/"]')
-    ).toBeNull();
+    it('should show the input field when no exploration is linked', () => {
+      renderChapterWithExploration(null);
+
+      expect(query('.e2e-test-exploration-id-input')).not.toBeNull();
+      expect(query('.e2e-test-exploration-id-save-button')).not.toBeNull();
+      // There is no saved exploration to go back to, so there is no Cancel
+      // button, and no link.
+      expect(query('.e2e-test-cancel-exploration-id-edit-button')).toBeNull();
+      expect(query('.e2e-test-exploration-id-link')).toBeNull();
+    });
+
+    it('should switch to the input field when the edit button is clicked', fakeAsync(() => {
+      renderChapterWithExploration('exp_1');
+      const setFocusSpy = spyOn(focusManagerService, 'setFocus');
+
+      query('.e2e-test-edit-exploration-id-button')?.click();
+      fixture.detectChanges();
+
+      expect(component.explorationIdEditorIsShown).toBe(true);
+      expect(setFocusSpy).toHaveBeenCalledWith('storyNodeExplorationId');
+      expect(query('.e2e-test-exploration-id-input')).not.toBeNull();
+      expect(
+        query('.e2e-test-cancel-exploration-id-edit-button')
+      ).not.toBeNull();
+      expect(query('.e2e-test-exploration-id-link')).toBeNull();
+      flush();
+    }));
+
+    it('should restore the linked exploration when the edit is cancelled', () => {
+      renderChapterWithExploration('exp_1');
+      component.openExplorationIdEditor();
+      component.explorationId = 'invalid id';
+      component.expIdCanBeSaved = false;
+      component.invalidExpErrorIsShown = true;
+
+      component.cancelExplorationIdEdit();
+      fixture.detectChanges();
+
+      expect(component.explorationId).toEqual('exp_1');
+      expect(component.expIdCanBeSaved).toBe(true);
+      expect(component.invalidExpErrorIsShown).toBe(false);
+      expect(component.explorationIdEditorIsShown).toBe(false);
+      expect(query('.e2e-test-exploration-id-link')).not.toBeNull();
+    });
+
+    it('should save the exploration ID when the form is submitted', () => {
+      renderChapterWithExploration('exp_1');
+      component.openExplorationIdEditor();
+      fixture.detectChanges();
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      component.explorationId = 'exp_2';
+
+      // Clicking Save (or pressing Enter in the input field) submits the form.
+      query('.story-node-exploration form')?.dispatchEvent(new Event('submit'));
+
+      expect(updateExplorationIdSpy).toHaveBeenCalledWith('exp_2');
+    });
+
+    it('should show the delete icon while editing if the story is not published', () => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+      renderChapterWithExploration('exp_1');
+
+      component.openExplorationIdEditor();
+      fixture.detectChanges();
+
+      expect(component.isStoryPublished()).toBe(false);
+      expect(query('.story-node-exploration .fa-trash-alt')).not.toBeNull();
+    });
+
+    it('should not show the delete icon while editing if the story is published', () => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
+      renderChapterWithExploration('exp_1');
+
+      component.openExplorationIdEditor();
+      fixture.detectChanges();
+
+      expect(component.isStoryPublished()).toBe(true);
+      expect(query('.story-node-exploration .fa-trash-alt')).toBeNull();
+    });
+
+    it('should keep the input field when the edit is cancelled and no exploration is linked', () => {
+      renderChapterWithExploration(null);
+      component.explorationId = 'exp_2';
+
+      component.cancelExplorationIdEdit();
+
+      expect(component.explorationId).toBeNull();
+      expect(component.explorationIdEditorIsShown).toBe(true);
+    });
   });
 
   it('should fetch the descriptions for prerequisite skills', fakeAsync(() => {
@@ -826,22 +912,6 @@ describe('Story node editor component', () => {
     expect(component.chapterTodoCardIsShown).toBe(false);
   });
 
-  it('should toggle exploration input buttons', () => {
-    component.explorationInputButtonsAreShown = false;
-
-    component.toggleExplorationInputButtons();
-
-    expect(component.explorationInputButtonsAreShown).toBe(true);
-  });
-
-  it('should untoggle exploration input buttons', () => {
-    component.explorationInputButtonsAreShown = true;
-
-    component.toggleExplorationInputButtons();
-
-    expect(component.explorationInputButtonsAreShown).toBe(false);
-  });
-
   it('should toggle chapter outline buttons', () => {
     component.chapterOutlineButtonsAreShown = false;
     component.toggleChapterOutlineButtons();
@@ -889,12 +959,15 @@ describe('Story node editor component', () => {
         storyUpdateService,
         'setStoryNodeExplorationId'
       );
+      component.explorationIdEditorIsShown = true;
 
       component.updateExplorationId('exp10');
       tick();
 
       expect(expSpy).toHaveBeenCalled();
       expect(storyUpdateSpy).toHaveBeenCalled();
+      expect(component.currentExplorationId).toEqual('exp10');
+      expect(component.explorationIdEditorIsShown).toBe(false);
     })
   );
 
@@ -914,12 +987,16 @@ describe('Story node editor component', () => {
         'setStoryNodeExplorationId'
       );
 
+      component.explorationIdEditorIsShown = true;
+
       component.updateExplorationId('exp10');
       tick();
 
       expect(expSpy).toHaveBeenCalled();
       expect(storyUpdateSpy).not.toHaveBeenCalled();
       expect(component.invalidExpErrorIsShown).toEqual(true);
+      // The input field stays open so that the ID can be fixed.
+      expect(component.explorationIdEditorIsShown).toBe(true);
     })
   );
 
@@ -928,10 +1005,24 @@ describe('Story node editor component', () => {
     let alertsSpy = spyOn(alertsService, 'addInfoMessage');
 
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+    component.explorationIdEditorIsShown = true;
 
     component.updateExplorationId(null as unknown as string);
     expect(storyUpdateSpy).not.toHaveBeenCalled();
     expect(alertsSpy).toHaveBeenCalled();
+    expect(component.explorationIdEditorIsShown).toBe(true);
+  });
+
+  it('should set node exploration id and show it as a link if story is not published', () => {
+    spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+    component.explorationIdEditorIsShown = true;
+
+    component.updateExplorationId('exp10');
+
+    expect(storyUpdateSpy).toHaveBeenCalledWith(story, 'node1', 'exp10');
+    expect(component.currentExplorationId).toEqual('exp10');
+    expect(component.explorationIdEditorIsShown).toBe(false);
   });
 
   it(
@@ -945,9 +1036,14 @@ describe('Story node editor component', () => {
         storyUpdateService,
         'setStoryNodeExplorationId'
       );
+      component.explorationId = 'exp10';
+      component.explorationIdEditorIsShown = false;
 
       component.updateExplorationId(null as unknown as string);
       expect(storyUpdateSpy).toHaveBeenCalled();
+      // The exploration was removed, so the empty input field is shown.
+      expect(component.explorationId).toBeNull();
+      expect(component.explorationIdEditorIsShown).toBe(true);
     }
   );
 
@@ -962,12 +1058,15 @@ describe('Story node editor component', () => {
         null
       );
 
+      component.explorationIdEditorIsShown = true;
+
       component.updateExplorationId('');
       expect(alertsSpy).toHaveBeenCalledWith(
         'Please click the delete icon to remove an exploration ' +
           'from the story.',
         5000
       );
+      expect(component.explorationIdEditorIsShown).toBe(true);
     }
   );
 
