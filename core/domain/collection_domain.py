@@ -1816,11 +1816,9 @@ class CollectionSnapshotMetadata:
                 'received %s' % self.collection_id
             )
 
-        # Here we use type() instead of isinstance() because bool is a subclass
-        # of int in Python, and we want to strictly reject bool values.
-        if (
-            type(self.version) is not int
-        ):  # pylint: disable=unidiomatic-typecheck
+        # Here we check isinstance(..., bool) explicitly because bool is a
+        # subclass of int in Python, and we want to strictly reject bools.
+        if not isinstance(self.version, int) or isinstance(self.version, bool):
             raise utils.ValidationError(
                 'Expected version to be an int, received %s' % self.version
             )
