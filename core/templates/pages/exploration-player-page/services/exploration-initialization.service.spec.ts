@@ -34,6 +34,8 @@ import {StatsReportingService} from './stats-reporting.service';
 import {PlaythroughService} from '../../../services/playthrough.service';
 import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 
 describe('ExplorationInitializationService', () => {
   let service: ExplorationInitializationService;
@@ -49,12 +51,14 @@ describe('ExplorationInitializationService', () => {
   let playthroughService: PlaythroughService;
   let urlService: UrlService;
   let explorationModeService: ExplorationModeService;
+  let entityTranslationsService: EntityTranslationsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         ExplorationInitializationService,
+        EntityTranslationsService,
         UrlService,
         ExplorationModeService,
         StatsReportingService,
@@ -138,18 +142,47 @@ describe('ExplorationInitializationService', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     ) as jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {};
   });
 
   it('should initialize preview player when on exploration editor page', fakeAsync(() => {
     pageContextService.isInExplorationEditorPage.and.returnValue(true);
     pageContextService.getExplorationId.and.returnValue('exp123');
 
+    const mockExplorationData = {
+      param_changes: [],
+      states: {},
+      language_code: 'en',
+      version: 1,
+      auto_tts_enabled: false,
+      preferred_language_codes: ['es'],
+      displayable_language_codes: ['es'],
+    };
+
     editableBackendApi.fetchApplyDraftExplorationAsync.and.returnValue(
-      Promise.resolve({param_changes: [], states: {}})
+      Promise.resolve(mockExplorationData)
     );
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
     );
+
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      hi: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp123',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'hi',
+        translations: {},
+      }),
+      en: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp123',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'en',
+        translations: {},
+      }),
+    };
 
     const callback = jasmine.createSpy('callback');
     service.initializePlayer(callback);
@@ -163,12 +196,12 @@ describe('ExplorationInitializationService', () => {
       {}
     );
     expect(explorationEngineService.init).toHaveBeenCalledWith(
-      {param_changes: [], states: {}},
+      mockExplorationData,
+      1,
       null,
-      null,
-      null,
-      [],
-      [],
+      false,
+      ['es'],
+      ['es', 'hi'],
       callback
     );
     expect(numberAttemptsService.reset).toHaveBeenCalled();

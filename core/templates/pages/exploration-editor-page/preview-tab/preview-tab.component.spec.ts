@@ -54,6 +54,8 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {ChangeListService} from '../services/change-list.service';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -98,6 +100,7 @@ describe('Preview Tab Component', () => {
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
   let numberAttemptsService: NumberAttemptsService;
   let entityVoiceoversService: EntityVoiceoversService;
+  let entityTranslationsService: EntityTranslationsService;
   let changeListService: ChangeListService;
 
   let getUnsetParametersInfo: jasmine.Spy;
@@ -209,6 +212,7 @@ describe('Preview Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     pageContextService = TestBed.inject(PageContextService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
     changeListService = TestBed.inject(ChangeListService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue(
@@ -362,10 +366,39 @@ describe('Preview Tab Component', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
-  it('should reset preview settings', fakeAsync(() => {
+  it('should reset preview settings and retain displayable language codes', fakeAsync(() => {
     spyOn(component, 'loadPreviewState');
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
+
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      hi: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'hi',
+        translations: {},
+      }),
+      en: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'en',
+        translations: {},
+      }),
+    };
+
+    let explorationWithLanguages = {
+      ...exploration,
+      version: 2,
+      displayable_language_codes: ['es'],
+      preferred_language_codes: ['es'],
+    };
+
+    (
+      editableExplorationBackendApiService.fetchApplyDraftExplorationAsync as jasmine.Spy
+    ).and.returnValue(Promise.resolve(explorationWithLanguages));
+
     spyOn(explorationEngineService, 'init').and.callFake(
       (value, value1, value2, value3, value4, value5, callback) => {
         // This throws "Type 'null' is not assignable to type 'State'."
@@ -376,13 +409,21 @@ describe('Preview Tab Component', () => {
       }
     );
 
-    // Get data from exploration data service and resolve promise in open
-    // modal.
     component.resetPreview();
     tick(300);
     flush();
 
-    expect(component.loadPreviewState).toHaveBeenCalled();
+    expect(explorationEngineService.init).toHaveBeenCalledWith(
+      explorationWithLanguages,
+      2,
+      null,
+      false,
+      ['es'],
+      ['es', 'hi'],
+      jasmine.any(Function)
+    );
+    expect(component.loadPreviewState).toHaveBeenCalledWith('state', []);
+    expect(numberAttemptsService.reset).toHaveBeenCalled();
   }));
 
   it('should check new lesson player feature flag is enabled', () => {
