@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the ratio expression component.
  */
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {RatioExpressionEditorComponent} from './ratio-expression-editor.component';
