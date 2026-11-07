@@ -250,7 +250,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         },
       },
     });
-    component.selectAnswer(dummyMouseEvent, '1');
+    component.selectAnswer(dummyMouseEvent, 1);
 
     expect(component.answer).toBe(1);
     expect(updateCurrentAnswerSpy).toHaveBeenCalledWith(1);
@@ -288,7 +288,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       });
       spyOn(component, 'submitAnswer');
 
-      component.selectAnswer(dummyMouseEvent, '1');
+      component.selectAnswer(dummyMouseEvent, 1);
 
       expect(component.submitAnswer).not.toHaveBeenCalled();
       expect(updateCurrentAnswerSpy).toHaveBeenCalledWith(1);

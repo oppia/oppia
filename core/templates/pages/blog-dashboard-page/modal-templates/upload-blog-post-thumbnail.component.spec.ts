@@ -137,6 +137,12 @@ describe('Upload Blog Post Thumbnail Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
+  it('should get invalid SVG issue URL', () => {
+    let svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue_url');
+    expect(componentInstance.getInvalidSvgIssueUrl()).toEqual('issue_url');
+  });
+
   it('should handle invalid image', () => {
     spyOn(componentInstance, 'reset');
 
@@ -144,6 +150,22 @@ describe('Upload Blog Post Thumbnail Component', () => {
 
     expect(componentInstance.reset).toHaveBeenCalled();
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
+  });
+
+  it('should get invalid SVG issue url', () => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    const invalidTagsAndAttrs = {
+      tags: ['circel'],
+      attrs: ['data-name'],
+    };
+    const issueUrl = 'www.example.com';
+    componentInstance.invalidTagsAndAttributes = invalidTagsAndAttrs;
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue(issueUrl);
+
+    expect(componentInstance.getInvalidSvgIssueUrl()).toBe(issueUrl);
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
   });
 
   it('should confirm thumbnail picutre', () => {

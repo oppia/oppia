@@ -25,6 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -137,6 +138,30 @@ describe('State Editor Component', () => {
     expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
     expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
     expect(component.onSaveStateContent.emit).toHaveBeenCalled();
+  });
+
+  it('should emit a single answer group as an array', () => {
+    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
+    const answerGroup = AnswerGroup.createNew(
+      [],
+      new Outcome(
+        'Hola',
+        null,
+        new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+        true,
+        [],
+        null,
+        null
+      ),
+      [],
+      null
+    );
+
+    component.sendOnSaveInteractionAnswerGroups(answerGroup);
+
+    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalledWith([
+      answerGroup,
+    ]);
   });
 
   it('should set component properties initialization', () => {

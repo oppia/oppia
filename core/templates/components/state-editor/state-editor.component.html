@@ -76,12 +76,12 @@
     </div>
     <div *ngIf="currentInteractionCanHaveSolution">
       <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
+                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                    (refreshWarnings)="sendRefreshWarnings()">
       </oppia-state-solution-editor>
     </div>
     <div *ngIf="explorationIsLinkedToStory">
-      <state-skill-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
-                          (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
+      <state-skill-editor (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
       </state-skill-editor>
     </div>
   </div>
