@@ -32,6 +32,7 @@ import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-
 import {QuestionAdmin} from '../../utilities/user/question-admin';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
+const ROLES = testConstants.Roles;
 const NEXT_BUTTON_TEXT = 'Next';
 
 test.describe.configure({mode: 'serial'});
@@ -65,24 +66,20 @@ test.describe('Practice Question Reviewer', function () {
       'questionAdm',
       'question_admin@example.com',
       browser,
-      [testConstants.Roles.QUESTION_ADMIN]
+      [ROLES.QUESTION_ADMIN]
     );
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
       browser,
-      [testConstants.Roles.CURRICULUM_ADMIN]
+      [ROLES.CURRICULUM_ADMIN]
     );
 
     // Add submit question rights to the question submitter.
     await questionAdmin.navigateToContributorDashboardAdminPage();
-    await questionAdmin.addSubmitQuestionRights(
-      questionSubmitter.username ?? ''
-    );
-    await questionAdmin.addReviewQuestionRights(
-      questionReviewer.username ?? ''
-    );
+    await questionAdmin.addSubmitQuestionRights('questionSubmitter');
+    await questionAdmin.addReviewQuestionRights('questionReviewer');
 
     // Create a topic and add story with a chapter.
     const explorationId1 =
@@ -201,7 +198,6 @@ test.describe('Practice Question Reviewer', function () {
   });
 
   test.afterAll(async () => {
-    // Close user contexts explicitly so that video recordings are finalized.
     await UserFactory.closeAllBrowsers();
   });
 });
