@@ -81,6 +81,12 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
     DRY_RUN = True
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns the job's results, and saves the repairs unless DRY_RUN.
+
+        Returns:
+            PCollection. The count of OK users, the count of repaired models,
+            and one error for each user that could not be safely repaired.
+        """
         # NOTE: Deleted models are included because users that have them must
         # not be repaired.
         auth_models_by_user_id = (
