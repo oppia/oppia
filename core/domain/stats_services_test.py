@@ -3627,3 +3627,94 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_QUESTION, self.state_reference_question
         )
         self.assertEqual(learner_answer_details, None)
+
+
+class StateCounterServiceTests(test_utils.GenericTestBase):
+    """Tests the StateCounter service functions."""
+
+    def test_get_state_counter_from_model(self) -> None:
+        model = stats_models.StateCounterModel.get_or_create(
+            'exp123', 'Introduction'
+        )
+        model.first_entry_count = 3
+        model.subsequent_entries_count = 5
+        model.resolved_answer_count = 2
+        model.active_answer_count = 7
+
+        state_counter = stats_services.get_state_counter_from_model(model)
+
+        self.assertEqual(
+            state_counter,
+            stats_domain.StateCounter('exp123', 'Introduction', 3, 5, 2, 7),
+        )
+
+    def test_get_state_counter_model_from_domain_object(self) -> None:
+        state_counter = stats_domain.StateCounter(
+            'exp123', 'Introduction', 3, 5, 2, 7
+        )
+        model = stats_services.get_state_counter_model_from_domain_object(
+            state_counter
+        )
+
+        self.assertEqual(model.id, 'exp123.Introduction')
+        self.assertEqual(model.first_entry_count, 3)
+        self.assertEqual(model.subsequent_entries_count, 5)
+        self.assertEqual(model.resolved_answer_count, 2)
+        self.assertEqual(model.active_answer_count, 7)
+
+    def test_model_domain_model_round_trip(self) -> None:
+        model = stats_models.StateCounterModel.get_or_create(
+            'exp123', 'Introduction'
+        )
+        model.first_entry_count = 3
+        model.subsequent_entries_count = 5
+        model.resolved_answer_count = 2
+        model.active_answer_count = 7
+
+        domain_object = stats_services.get_state_counter_from_model(model)
+        reconstructed_model = (
+            stats_services.get_state_counter_model_from_domain_object(
+                domain_object
+            )
+        )
+
+        self.assertEqual(reconstructed_model.id, 'exp123.Introduction')
+        self.assertEqual(reconstructed_model.first_entry_count, 3)
+        self.assertEqual(reconstructed_model.subsequent_entries_count, 5)
+        self.assertEqual(reconstructed_model.resolved_answer_count, 2)
+        self.assertEqual(reconstructed_model.active_answer_count, 7)
+
+    def test_get_state_counter_returns_default_for_missing(self) -> None:
+        # No model has been saved for this id/name, so all counts must be 0.
+        state_counter = stats_services.get_state_counter(
+            'exp123', 'Introduction'
+        )
+
+        self.assertEqual(state_counter.exploration_id, 'exp123')
+        self.assertEqual(state_counter.state_name, 'Introduction')
+        self.assertEqual(state_counter.first_entry_count, 0)
+        self.assertEqual(state_counter.subsequent_entries_count, 0)
+        self.assertEqual(state_counter.resolved_answer_count, 0)
+        self.assertEqual(state_counter.active_answer_count, 0)
+
+    def test_get_state_counter_does_not_persist(self) -> None:
+        # Reading via get_state_counter must never write to datastore.
+        stats_services.get_state_counter('exp123', 'Introduction')
+
+        model = stats_models.StateCounterModel.get(
+            'exp123.Introduction', strict=False
+        )
+        self.assertIsNone(model)
+
+    def test_save_state_counter_persists(self) -> None:
+        state_counter = stats_domain.StateCounter(
+            'exp123', 'Introduction', 3, 5, 2, 7
+        )
+        stats_services.save_state_counter(state_counter)
+
+        # A fresh read must return the saved counts, not zeros.
+        loaded = stats_services.get_state_counter('exp123', 'Introduction')
+        self.assertEqual(loaded.first_entry_count, 3)
+        self.assertEqual(loaded.subsequent_entries_count, 5)
+        self.assertEqual(loaded.resolved_answer_count, 2)
+        self.assertEqual(loaded.active_answer_count, 7)
