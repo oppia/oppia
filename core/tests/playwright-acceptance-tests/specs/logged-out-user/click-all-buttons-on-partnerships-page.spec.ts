@@ -17,32 +17,28 @@
  * can open links by clicking all buttons in the partnerships page
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-out User in Partnerships page', function () {
+test.describe('Logged-out User in Partnerships page', function () {
   let loggedOutUser: LoggedOutUser;
 
-  beforeAll(async function () {
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  test.beforeAll(async function ({browser}) {
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
+  });
 
-  beforeEach(async function () {
+  test.beforeEach(async function () {
     await loggedOutUser.navigateToPartnershipsPage();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should open the correct Blog Post when the "Read Blog Post" button is clicked.',
-    async function () {
-      await loggedOutUser.clickReadBlogPostLinkInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should open the correct Blog Post when the "Read Blog Post" button is clicked.', async function () {
+    await loggedOutUser.clickReadBlogPostLinkInPartnershipsPage();
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

@@ -30,6 +30,9 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const partnershipsUrl = testConstants.URLs.Partnerships;
+const blogPostUrlInPartnershipsPage =
+  testConstants.URLs.BlogPostUrlInPartnershipsPage;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -241,6 +244,11 @@ const partnershipStoryBoardDesktopSelector =
   '.oppia-about-partnerships-cards-container-desktop .oppia-about-partnerships-card';
 const partnershipStoryBoardMobileSelector =
   '.oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card';
+const carouselSlideSelector = '[data-test="mat-card-content"]';
+const readBlogPostDesktopButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-desktop-button';
+const readBlogPostMobileButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-mobile-button';
 const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
 const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
 const impactReportButtonInAboutPage =
@@ -3958,6 +3966,39 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToBlogPage(): Promise<void> {
     await this.goto(blogUrl);
+  }
+
+  /**
+   * Function to navigate to the Partnerships page.
+   */
+  async navigateToPartnershipsPage(): Promise<void> {
+    await this.goto(partnershipsUrl);
+  }
+
+  /**
+   * Clicks the "Read blog post" button in the Partnerships page and checks
+   * that the blog post opens in a new tab.
+   */
+  async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
+    const readBlogPostButton = this.isViewportAtMobileWidth()
+      ? readBlogPostMobileButtonInPartnershipsPage
+      : readBlogPostDesktopButtonInPartnershipsPage;
+
+    if (this.isViewportAtMobileWidth()) {
+      // Clicking a slide stops the carousel from scrolling, so the button
+      // stays in place for the click below.
+      await this.clickOnElementWithSelector(carouselSlideSelector);
+    }
+    await this.expectElementToBeVisible(readBlogPostButton);
+
+    const newTabPromise = this.page.context().waitForEvent('page');
+    await this.clickOnElementWithSelector(readBlogPostButton);
+    const newTab = await newTabPromise;
+    await newTab.waitForURL(
+      url => url.origin + url.pathname === blogPostUrlInPartnershipsPage,
+      {waitUntil: 'commit'}
+    );
+    await newTab.close();
   }
 
   /**
