@@ -442,7 +442,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
+        question_state_dict['recorded_voiceovers'] = {  # type: ignore[typeddict-unknown-key]
             'voiceovers_mapping': voiceovers_mapping
         }
         return question_state_dict
@@ -834,7 +834,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
-            question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-item]
+            question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-unknown-key]
                 max_existing_content_id_index + 1
             )
             return question_state_dict
@@ -1041,7 +1041,7 @@ class Question(translation_domain.BaseTranslatableObject):
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-item]
+        question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-unknown-key]
             content_id_counter.next_content_id_index
         )
         for new_content_id in content_id_counter.new_content_ids:
@@ -1313,7 +1313,7 @@ class Question(translation_domain.BaseTranslatableObject):
                         }
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains next_content_id_index property.
-            question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-item]
+            question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-unknown-key]
                 content_id_counter.next_content_id_index
             )
             for new_content_id in content_id_counter.new_content_ids:
