@@ -30,11 +30,17 @@ from typing import List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import collection_models, exp_models, user_models
+    from mypy_imports import (
+        collection_models,
+        datastore_services,
+        exp_models,
+        user_models,
+    )
 
 (collection_models, exp_models, user_models) = models.Registry.import_models(
     [models.Names.COLLECTION, models.Names.EXPLORATION, models.Names.USER]
 )
+datastore_services = models.Registry.import_datastore_services()
 
 SummaryModel = Union[
     collection_models.CollectionSummaryModel, exp_models.ExpSummaryModel
@@ -56,9 +62,10 @@ def remove_deleted_contributors(
         set(summary_model.contributor_ids)
         | set(summary_model.contributors_summary)
     )
-    user_settings_models = user_models.UserSettingsModel.get_multi(
-        contributor_ids, include_deleted=True
-    )
+    with datastore_services.get_ndb_context():
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            contributor_ids, include_deleted=True
+        )
     missing_ids = {
         contributor_id
         for contributor_id, user_settings_model in zip(
