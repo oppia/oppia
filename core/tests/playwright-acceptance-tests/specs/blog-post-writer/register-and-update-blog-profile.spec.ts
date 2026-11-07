@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * BW. Register and update blog profile.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
@@ -28,18 +29,21 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const ROLES = testConstants.Roles;
 const URLS = testConstants.URLs;
 
-describe('Blog Post Writer', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Blog Post Writer', function () {
   let blogPostWriter: BlogPostEditor & LoggedInUser & LoggedOutUser;
 
-  beforeAll(async () => {
+  test.beforeAll(async function ({browser}) {
     blogPostWriter = await UserFactory.createNewUser(
       'blogPostWriter',
       'blog_post_writer@example.com',
+      browser,
       [ROLES.BLOG_POST_EDITOR]
     );
   });
 
-  it('should be able to register on the blog platfrom', async function () {
+  test('should be able to register on the blog platform', async function () {
     // Navigate to blog dashboard.
     await blogPostWriter.reloadPage();
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
@@ -69,9 +73,8 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.clickOnSaveProfileButton();
   });
 
-  it('should be able to update blogger details', async function () {
-    // Navigate to blog dashboard.
-    await blogPostWriter.expectScreenshotToMatch('blogDashboard', __dirname);
+  test('should be able to update blogger details', async function () {
+    await blogPostWriter.expectScreenshotToMatch('blogDashboard');
 
     // Edit Username.
     await blogPostWriter.clickOnUpdateUsernameIcon();
@@ -90,7 +93,7 @@ describe('Blog Post Writer', function () {
     );
   });
 
-  afterAll(async () => {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

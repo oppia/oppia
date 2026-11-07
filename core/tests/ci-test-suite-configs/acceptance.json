@@ -592,8 +592,8 @@
     },
     {
       "name": "blog-post-writer/register-and-update-blog-profile",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
