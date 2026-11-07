@@ -17,24 +17,32 @@
  */
 
 import {NgModule} from '@angular/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarouselModule, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {DonatePageComponent} from './donate-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {DonatePageRootComponent} from './donate-page-root.component';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {DonationBoxModule} from 'pages/donate-page/donation-box.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    DonationBoxModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     RouterModule.forChild([
       {
         path: '',
         component: DonatePageRootComponent,
       },
     ]),
-    NgbModule,
+    NgbCarouselModule,
+    NgbModalModule,
   ],
   declarations: [DonatePageComponent, DonatePageRootComponent],
   entryComponents: [DonatePageComponent, DonatePageRootComponent],

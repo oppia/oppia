@@ -17,6 +17,7 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
+import {ContentTranslationLanguageChangeService} from 'services/content-translation-language-change.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
@@ -70,7 +71,8 @@ export class ContentTranslationManagerService {
     private audioPreloaderService: AudioPreloaderService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private conceptCardBackendApiService: ConceptCardBackendApiService
+    private conceptCardBackendApiService: ConceptCardBackendApiService,
+    private contentTranslationLanguageChangeService: ContentTranslationLanguageChangeService
   ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
@@ -85,7 +87,7 @@ export class ContentTranslationManagerService {
   }
 
   get onLanguageChange(): EventEmitter<string> {
-    return this.onLanguageChangeEmitter;
+    return this.contentTranslationLanguageChangeService.onLanguageChange;
   }
 
   /**

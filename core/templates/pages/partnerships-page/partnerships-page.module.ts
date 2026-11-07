@@ -18,17 +18,28 @@
 
 import {NgModule} from '@angular/core';
 import {PartnershipsPageComponent} from './partnerships-page.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {PartnershipsPageRootComponent} from './partnerships-page-root.component';
 import {CommonModule} from '@angular/common';
 import {PartnershipsPageRoutingModule} from './partnerships-page-routing.module';
 import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {MatCardModule} from '@angular/material/card';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    MatCardModule,
+    MatDividerModule,
+    MatExpansionModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     PartnershipsPageRoutingModule,
     NgbCarouselModule,
     CampaignBannerModule,

@@ -20,13 +20,12 @@ import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 
-import {MaterialModule} from 'modules/material.module';
 import {ShortResponseNumericExpressionInput} from './directives/oppia-short-response-numeric-expression-input.component';
 import {ResponseNumericExpressionInput} from './directives/oppia-response-numeric-expression-input.component';
 import {InteractiveNumericExpressionInput} from './directives/oppia-interactive-numeric-expression-input.component';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule],
   declarations: [
     ResponseNumericExpressionInput,
     ShortResponseNumericExpressionInput,

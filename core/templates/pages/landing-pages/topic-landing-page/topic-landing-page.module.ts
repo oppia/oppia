@@ -17,18 +17,14 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicLandingPageComponent} from 'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import {TopicLandingPageRootComponent} from './topic-landing-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TopicLandingPageRoutingModule} from './topic-landing-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    TopicLandingPageRoutingModule,
-  ],
+  imports: [BaseModule, CommonModule, TopicLandingPageRoutingModule],
   declarations: [TopicLandingPageComponent, TopicLandingPageRootComponent],
   entryComponents: [TopicLandingPageComponent, TopicLandingPageRootComponent],
 })

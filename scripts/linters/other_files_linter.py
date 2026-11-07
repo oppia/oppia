@@ -23,7 +23,7 @@ import os
 import re
 
 import yaml
-from typing import Any, Dict, Final, List, Tuple, TypedDict
+from typing import Any, Dict, Final, List, Set, Tuple, TypedDict
 
 from .. import concurrent_task_utils
 from . import linter_utils
@@ -73,11 +73,25 @@ LIGHTHOUSE_PAGES_JSON_FILEPATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'lighthouse-pages.json'
 )
 
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'constants.ts'
+)
+
 ROUTE_KEY_REGEX: Final = (
     r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
 )
 
-MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
+# Matches each PAGES_REGISTERED_WITH_FRONTEND entry and captures its key and
+# ROUTE path. Non-brace characters are allowed between the entry's opening brace
+# and "ROUTE" so that a leading comment (as on the story-viewer entry) does not
+# hide the path; no nested object literal ever precedes "ROUTE" in this block.
+FRONTEND_ROUTE_PATH_REGEX: Final = (
+    r'"([A-Z][A-Z_0-9]+)"\s*:\s*\{[^{}]*"ROUTE"\s*:\s*"([^"]*)"'
+)
+ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
+    r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
+)
+QUOTED_STRING_REGEX: Final = r'"([^"]+)"'
 
 
 def _extract_top_level_route_objects(content: str) -> List[str]:
@@ -110,6 +124,139 @@ def _extract_top_level_route_objects(content: str) -> List[str]:
                 route_objects.append(content[start_index : index + 1])
                 start_index = -1
     return route_objects
+
+
+def _get_routes_without_standalone_pages(constants_content: str) -> Set[str]:
+    """Gets the route keys that have no standalone Lighthouse page.
+
+    The ROUTES_WITH_NO_STANDALONE_PAGE constant lists the keys of routes that
+    are pure redirect handlers (for example login and logout), so that the
+    coverage check can skip them without an inline hardcoded list.
+
+    Args:
+        constants_content: str. The contents of assets/constants.ts, where
+            ROUTES_WITH_NO_STANDALONE_PAGE is defined.
+
+    Returns:
+        set(str). The route keys listed in ROUTES_WITH_NO_STANDALONE_PAGE,
+        or an empty set if the constant is not present.
+    """
+    array_match = re.search(
+        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, constants_content
+    )
+    if not array_match:
+        return set()
+    return set(re.findall(QUOTED_STRING_REGEX, array_match.group(1)))
+
+
+def _get_frontend_route_paths(constants_content: str) -> Dict[str, str]:
+    """Maps each PAGES_REGISTERED_WITH_FRONTEND key to its ROUTE path.
+
+    The path pattern only exists in assets/constants.ts, so it is read here to
+    compare each route against the URLs audited by Lighthouse.
+
+    Args:
+        constants_content: str. The contents of assets/constants.ts, where
+            PAGES_REGISTERED_WITH_FRONTEND is defined.
+
+    Returns:
+        dict(str, str). Maps each route key to its registered path pattern (for
+        example EXPLORATION_PLAYER_EMBED to
+        "embed/exploration/:exploration_id").
+    """
+    return dict(re.findall(FRONTEND_ROUTE_PATH_REGEX, constants_content))
+
+
+def _path_to_segments(path: str) -> List[str]:
+    """Splits a path into its non-empty segments.
+
+    Args:
+        path: str. The path to split, possibly including a query or fragment.
+
+    Returns:
+        list(str). The non-empty segments of the path. The root path yields an
+        empty list.
+    """
+    stripped_path = path.split('?', 1)[0].split('#', 1)[0].strip()
+    segments = stripped_path.strip('/').split('/')
+    return [segment for segment in segments if segment]
+
+
+def _url_to_path_segments(url: str) -> List[str]:
+    """Splits a URL into its path segments, ignoring host, query and fragment.
+
+    Args:
+        url: str. The URL to split.
+
+    Returns:
+        list(str). The path segments, without leading or trailing empty
+        segments. The root path yields an empty list.
+    """
+    without_scheme = url.split('://', 1)[-1]
+    slash_index = without_scheme.find('/')
+    path = without_scheme[slash_index:] if slash_index != -1 else '/'
+    return _path_to_segments(path)
+
+
+def _route_path_covers_page(
+    route_segments: List[str], page_segments: List[str]
+) -> bool:
+    """Checks whether a route's path is audited by a page's URL path.
+
+    A route is covered when its path matches the leading segments of a page's
+    URL path. A route segment is a wildcard when it is a router parameter
+    (``:name``), and a page segment is a wildcard when it is a Lighthouse
+    placeholder (``{{name}}``). This lets a concrete sample value in the page
+    URL (for example ``collection/0``) match a parameterised route
+    (``collection/:collection_id``), and lets a page URL that extends a route
+    with child-route segments (for example ``.../story`` under the topic-viewer
+    route) still count as covering that route.
+
+    Matching on the URL rather than on the lazy-imported module is deliberate:
+    a route that merely shares a module with an audited route (for example the
+    embedded exploration player, which reuses the exploration-player module)
+    must still be reported as uncovered.
+
+    Args:
+        route_segments: list(str). The segments of the route's path.
+        page_segments: list(str). The segments of the page URL's path.
+
+    Returns:
+        bool. Whether the page's URL audits the route.
+    """
+    if len(route_segments) > len(page_segments):
+        return False
+    for route_segment, page_segment in zip(route_segments, page_segments):
+        if route_segment.startswith(':'):
+            continue
+        if page_segment.startswith('{{') and page_segment.endswith('}}'):
+            continue
+        if route_segment != page_segment:
+            return False
+    return True
+
+
+def _route_path_specificity(route_segments: List[str]) -> Tuple[int, ...]:
+    """Ranks how specifically a route path matches a page URL's segments.
+
+    Each router parameter (``:name``) scores 0 and each literal segment scores
+    1, so comparing the tuples of two routes that both match the same page URL
+    orders them by how many of its leading segments they pin down exactly. A
+    tuple that extends a shorter one compares greater, so a route matching more
+    of the page URL is the more specific one. This is what stops a page auditing
+    the literal route ``practice/session`` from also being credited with the
+    sibling parameterised route ``practice/:node_id``, whose only match there is
+    the sample value ``session``.
+
+    Args:
+        route_segments: list(str). The segments of the route's path.
+
+    Returns:
+        tuple(int). A per-segment specificity score, most significant first.
+    """
+    return tuple(
+        0 if segment.startswith(':') else 1 for segment in route_segments
+    )
 
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
@@ -146,46 +293,6 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
         'type_defs_filename_prefix': 'nerdamer-defs-',
     },
 ]
-
-# Routes that are not covered by Lighthouse tests. Each entry is a
-# PAGES_REGISTERED_WITH_FRONTEND key name. Do not add new routes to
-# this list without asking @Hardikgoyal2003.
-LIGHTHOUSE_ROUTE_EXCLUSIONS: Final = {
-    # These routes correspond to features that have not yet been released.
-    'CERTIFICATE_ASSESSMENT_PLAYER',
-    'CERTIFICATE_ASSESSMENT_RESULT',
-    'CERTIFICATE_CREATOR_DASHBOARD',
-    'CERTIFICATE_OFFERING_AVAILABLE',
-    'CREATE_CERTIFICATE_OFFERING',
-    'EDIT_CERTIFICATE_OFFERING',
-    'END_OF_ARC_TEST',
-    'FACILITATOR_DASHBOARD',
-    'LEARNER_GROUP_CREATOR',
-    'LEARNER_GROUP_EDITOR',
-    'LEARNER_GROUP_VIEWER',
-    'MASTERY_CHALLENGE',
-    'NEW_LESSON_PLAYER',
-    'NODE_PRACTICE_SESSION',
-    'TECHNICAL_FEEDBACK_DASHBOARD',
-    'TECHNICAL_FEEDBACK_DETAIL',
-    # Deprecation needs to be discussed with the prodops team first.
-    'BLOG_AUTHOR_PROFILE_PAGE',
-    'COLLECTION_EDITOR',
-    'COLLECTION_PLAYER',
-    # These routes are deprecated or slated for deprecation.
-    'FEEDBACK_UPDATES',
-    'LIBRARY_RECENTLY_PUBLISHED',
-    'LIBRARY_TOP_RATED',
-    # These routes are excluded either because they are for redirection or
-    # because they are rarely used.
-    'ERROR',
-    'EXPLORATION_PLAYER_EMBED',
-    'ERROR_IFRAMED',
-    'LESSON_PLAYER_EMBED',
-    'LOGIN',
-    'LOGOUT',
-    'MAINTENANCE',
-}
 
 
 class CustomLintChecksManager(linter_utils.BaseLinter):
@@ -451,8 +558,20 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         self,
     ) -> concurrent_task_utils.TaskResult:
         """Checks that every route in the routing module has a corresponding
-        Lighthouse page entry in lighthouse-pages.json, or is explicitly
-        listed in the exclusion set.
+        Lighthouse page entry in lighthouse-pages.json, unless its key is
+        listed in the ROUTES_WITH_NO_STANDALONE_PAGE constant.
+
+        A route is covered only when the URL of some Lighthouse page audits it:
+        the page's URL path must lead with the route's path, treating router
+        parameters and Lighthouse placeholders as wildcards. Each page URL is
+        credited only to the most specific route it matches, so that a page
+        auditing a literal route (for example practice/session) is not also
+        counted as covering a sibling parameterised route (for example
+        practice/:node_id) whose only match there is the literal sample value.
+        Matching on the URL rather than on the lazy-imported module is
+        deliberate, so that a route which merely shares a module with an audited
+        route (for example the embedded exploration player, which reuses the
+        exploration-player module) is still reported as uncovered.
 
         The entries in lighthouse-pages.json and lighthouse-shards.json are
         intentionally ordered to group pages that share the same puppeteer
@@ -470,6 +589,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         routing_content = self.file_cache.read(APP_ROUTING_MODULE_FILEPATH)
         lh_pages_content = self.file_cache.read(LIGHTHOUSE_PAGES_JSON_FILEPATH)
+        constants_content = self.file_cache.read(ASSETS_CONSTANTS_FILEPATH)
 
         # Normalize routing content: remove single-line comments and
         # join string-concatenated import paths so that the regex can
@@ -483,52 +603,86 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             normalized,
         )
 
-        # Parse lighthouse-pages.json and extract page_module paths,
-        # normalized to match the routing module import format.
+        # The path segments that each Lighthouse page's URL audits.
         lh_pages = json.loads(lh_pages_content)
-        lh_modules = set()
-        for page_entry in lh_pages.values():
-            page_module = page_entry.get('page_module', '')
-            if page_module.startswith('core/templates/'):
-                page_module = page_module[len('core/templates/') :]
-            if page_module.endswith('.ts'):
-                page_module = page_module[:-3]
-            lh_modules.add(os.path.normpath(page_module))
+        page_paths = [
+            _url_to_path_segments(page_entry.get('url', ''))
+            for page_entry in lh_pages.values()
+        ]
 
-        # Parse each route object to find its key and associated module
-        # import path. Splitting on every '{' would break routes that
-        # contain nested object literals (e.g. a data object) or a
-        # block-bodied loadChildren, because the key and its import could
-        # be placed in separate fragments. Instead, extract each top-level
-        # route object as a whole so the key and its import always stay
-        # together.
-        key_to_modules: Dict[str, List[str]] = {}
+        # The registered path of each route key, used to compare a route
+        # against the URLs audited above.
+        key_to_route_path = _get_frontend_route_paths(constants_content)
+
+        # Find routes that have no corresponding Lighthouse page entry.
+        routes_without_standalone_pages = _get_routes_without_standalone_pages(
+            constants_content
+        )
+        # Splitting on every '{' would break routes that contain nested object
+        # literals (e.g. a data object) or a block-bodied loadChildren, so each
+        # top-level route object is extracted as a whole to keep the key
+        # together with the rest of the route. A dict keeps only the distinct
+        # route keys.
+        routing_keys: Dict[str, bool] = {}
         for route_object in _extract_top_level_route_objects(normalized):
             key_match = re.search(ROUTE_KEY_REGEX, route_object)
             if not key_match:
                 continue
-            key = key_match.group(1)
-            import_matches = re.findall(MODULE_IMPORT_REGEX, route_object)
-            if import_matches:
-                key_to_modules.setdefault(key, []).extend(import_matches)
+            routing_keys[key_match.group(1)] = True
 
-        # Find routes that have no corresponding Lighthouse page entry.
+        # The path segments of each route key that registers a path. Keys
+        # without a registered path are reported as uncovered below.
+        key_to_segments: Dict[str, List[str]] = {}
+        for key in routing_keys:
+            route_path = key_to_route_path.get(key)
+            if route_path is not None:
+                key_to_segments[key] = _path_to_segments(route_path)
+
+        # Credit each page URL only to the most specific route it matches, so
+        # that a page auditing a literal route (for example practice/session) is
+        # not also counted as covering a sibling parameterised route (for
+        # example practice/:node_id) whose only match there is the literal
+        # sample value. Without this, such a parameterised route would look
+        # audited while no page ever reaches it.
+        covered_keys: Set[str] = set()
+        for page_path in page_paths:
+            matching_keys = [
+                key
+                for key, route_segments in key_to_segments.items()
+                if _route_path_covers_page(route_segments, page_path)
+            ]
+            most_specific = max(
+                (
+                    _route_path_specificity(key_to_segments[key])
+                    for key in matching_keys
+                ),
+                default=(),
+            )
+            covered_keys.update(
+                key
+                for key in matching_keys
+                if _route_path_specificity(key_to_segments[key])
+                == most_specific
+            )
+
         uncovered_keys = []
-        for key, modules in sorted(key_to_modules.items()):
-            if key in LIGHTHOUSE_ROUTE_EXCLUSIONS:
+        for key in sorted(routing_keys):
+            # Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE (for example
+            # login and logout) are pure redirect handlers without a dedicated
+            # page to audit, so they cannot have a Lighthouse page entry and
+            # are not part of the coverage check.
+            if key in routes_without_standalone_pages:
                 continue
-            covered = any(os.path.normpath(m) in lh_modules for m in modules)
-            if not covered:
+            if key not in key_to_segments or key not in covered_keys:
                 uncovered_keys.append(key)
 
         if uncovered_keys:
             error_messages.append(
-                'New routes found in app.routing.module.ts that are '
-                'missing from core/tests/lighthouse-pages.json:\n\n'
+                'Routes found in app.routing.module.ts whose URL is not '
+                'audited by any page in core/tests/lighthouse-pages.json:\n\n'
                 '  %s\n\n'
-                'Add a corresponding page_module entry to '
-                'lighthouse-pages.json for each route above.'
-                % '\n  '.join(sorted(uncovered_keys))
+                'Add a lighthouse-pages.json entry whose url reaches each '
+                'route above.' % '\n  '.join(sorted(uncovered_keys))
             )
 
         return concurrent_task_utils.TaskResult(

@@ -21,10 +21,9 @@ import {NgModule} from '@angular/core';
 import {InteractiveEndExplorationComponent} from './directives/oppia-interactive-end-exploration.component';
 import {ResponseEndExplorationComponent} from './directives/oppia-response-end-exploration.component';
 import {ShortResponseEndExplorationComponent} from './directives/oppia-short-response-end-exploration.component';
-import {MaterialModule} from 'modules/material.module';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule],
   declarations: [
     InteractiveEndExplorationComponent,
     ResponseEndExplorationComponent,

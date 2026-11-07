@@ -13,38 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for Ng Bootstrap.
+ * @fileoverview Auto-generated granular module for one shared component.
+ * Each component lives in its own module so pages import only what they use.
  */
 
 import {NgModule} from '@angular/core';
+import {ConfirmFormulaAsTextModalComponent} from '../../pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {CommonModule} from '@angular/common';
-import {
-  NgbDropdownModule,
-  NgbTooltipModule,
-  NgbNavModule,
-  NgbModalModule,
-  NgbPopoverModule,
-  NgbTypeaheadModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    NgbDropdownModule,
-    NgbTooltipModule,
-    NgbNavModule,
-    NgbModalModule,
-    NgbPopoverModule,
-    NgbTypeaheadModule,
-  ],
-  exports: [
-    CommonModule,
-    NgbDropdownModule,
-    NgbTooltipModule,
-    NgbNavModule,
-    NgbModalModule,
-    NgbPopoverModule,
-    NgbTypeaheadModule,
-  ],
+  imports: [CommonModule, TranslateModule],
+  declarations: [ConfirmFormulaAsTextModalComponent],
+  exports: [ConfirmFormulaAsTextModalComponent],
 })
-export class NgBootstrapModule {}
+export class ConfirmFormulaAsTextModalModule {}

@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 
 import {SelectTopicsComponent} from './topic-selector/select-topics.component';
@@ -42,9 +41,39 @@ import {TopicCreationService} from 'components/entity-creation-services/topic-cr
 import {CreateNewSkillModalService} from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 import {RteHelperService} from 'services/rte-helper.service';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {CommonModule} from '@angular/common';
+import {CreateNewSkillModalModule} from 'components/shared_parts/create-new-skill-modal.module';
+import {RteHelperModalModule} from 'components/shared_parts/rte-helper-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {FilteredChoicesFieldModule} from 'components/shared_parts/filtered-choices-field.module';
+import {ImageUploaderModule} from 'components/shared_parts/image-uploader.module';
+import {MatCardModule} from '@angular/material/card';
+import {MultiSelectionFieldModule} from 'components/shared_parts/multi-selection-field.module';
+import {NgbModalModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {SkillSelectorModule} from 'components/shared_parts/skill-selector.module';
+import {TopicsAndSkillsDashboardNavbarBreadcrumbModule} from 'components/shared_parts/topics-and-skills-dashboard-navbar-breadcrumb.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {UrlFragmentEditorModule} from 'components/shared_parts/url-fragment-editor.module';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    UrlFragmentEditorModule,
+    TranslateModule,
+    TopicsAndSkillsDashboardNavbarBreadcrumbModule,
+    SkillSelectorModule,
+    RteHelperModalModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    MultiSelectionFieldModule,
+    MatCardModule,
+    ImageUploaderModule,
+    FilteredChoicesFieldModule,
+    DirectivesModule,
+    CreateNewSkillModalModule,
+    CommonModule,
+    BaseModule,
+    BackgroundBannerModule,
     DynamicContentModule,
     FormsModule,
     MatProgressSpinnerModule,

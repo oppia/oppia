@@ -19,7 +19,6 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateAssessmentResultPageRootComponent} from './certificate-assessment-result-page-root.component';
 import {CertificateAssessmentResultPageComponent} from './certificate-assessment-result-page.component';
 import {CertificateAssessmentResultPageRoutingModule} from './certificate-assessment-result-page-routing.module';
@@ -27,10 +26,13 @@ import {CertificateAssessmentResultCardComponent} from './certificate-assessment
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
 import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     RouterModule,
     CertificateAssessmentResultPageRoutingModule,
     CertificateAssessmentTitledBackgroundBannerModule,

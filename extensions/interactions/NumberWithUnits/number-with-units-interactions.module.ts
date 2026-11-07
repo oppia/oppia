@@ -24,10 +24,9 @@ import {HelpModalNumberWithUnitsComponent} from './directives/oppia-help-modal-n
 import {InteractiveNumberWithUnitsComponent} from './directives/oppia-interactive-number-with-units.component';
 import {ResponseNumberWithUnitsComponent} from './directives/oppia-response-number-with-units.component';
 import {ShortResponseNumberWithUnitsComponent} from './directives/oppia-short-response-number-with-units.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
-
+import {DirectivesModule} from 'directives/directives.module';
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule, TranslateModule],
+  imports: [DirectivesModule, CommonModule, FormsModule, TranslateModule],
   declarations: [
     HelpModalNumberWithUnitsComponent,
     InteractiveNumberWithUnitsComponent,

@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CommonModule} from '@angular/common';
 import {AddSyllabusItemsComponent} from './create-group/add-syllabus-items.component';
 import {InviteLearnersComponent} from './create-group/invite-learners.component';
@@ -25,8 +24,20 @@ import {LearnerGroupDetailsComponent} from './create-group/learner-group-details
 import {LearnerGroupOverviewComponent} from './edit-group/learner-group-overview.component';
 import {LearnerGroupLearnerSpecificProgressComponent} from './edit-group/learner-group-learner-specific-progress.component';
 
+import {FormsModule} from '@angular/forms';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule],
+  imports: [
+    TranslateModule,
+    StringUtilityPipesModule,
+    NgbDropdownModule,
+    MatExpansionModule,
+    FormsModule,
+    CommonModule,
+  ],
   declarations: [
     LearnerGroupDetailsComponent,
     LearnerGroupOverviewComponent,

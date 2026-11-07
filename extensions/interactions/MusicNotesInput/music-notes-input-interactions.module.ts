@@ -18,7 +18,6 @@
 
 import {NgModule} from '@angular/core';
 
-import {MaterialModule} from 'modules/material.module';
 import {MusicNotesInputComponent} from './directives/oppia-interactive-music-notes-input.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -32,7 +31,6 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
   imports: [
     SharedPipesModule,
     CommonModule,
-    MaterialModule,
     TranslateModule,
     ObjectComponentsModule,
     DragDropModule,

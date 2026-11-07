@@ -18,16 +18,18 @@
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
 import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
 import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
 import {CreateCertificateOfferingPageRoutingModule} from './create-certificate-offering-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
+    RouterModule,
+    BaseModule,
     CommonModule,
-    SharedComponentsModule,
     CertificateOfferingSharedModule,
     CreateCertificateOfferingPageRoutingModule,
   ],

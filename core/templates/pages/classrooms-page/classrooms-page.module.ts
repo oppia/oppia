@@ -22,7 +22,6 @@ import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 
@@ -31,11 +30,14 @@ import {ClassroomsPageRootComponent} from './classrooms-page-root.component';
 import {ClassroomsPageComponent} from './classrooms-page.component';
 import {ClassroomSummaryTileComponent} from './classroom-tile/classroom-summary-tile.component';
 
+import {BaseModule} from 'base-components/base.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    BaseModule,
     CommonModule,
     FormsModule,
-    SharedComponentsModule,
     SharedFormsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

@@ -22,6 +22,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {InteractiveTextInputComponent} from './directives/oppia-interactive-text-input.component';
 import {ResponseTextInputComponent} from './directives/oppia-response-text-input.component';
 import {ShortResponseTextInputComponent} from './directives/oppia-short-response-text-input.component';
@@ -31,6 +32,7 @@ import {TranslateModule} from '@ngx-translate/core';
     CommonModule,
     SharedFormsModule,
     SharedPipesModule,
+    StringUtilityPipesModule,
     TranslateModule,
     FormsModule,
   ],

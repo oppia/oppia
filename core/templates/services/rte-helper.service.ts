@@ -20,11 +20,11 @@ import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ServicesConstants} from 'services/services.constants';
-import {
+import type {
   CustomizationArgsForRteType,
   CustomizationArgsSpecsType,
-  RteHelperModalComponent,
   RteComponentId,
+  RteHelperModalComponent,
 } from './rte-helper-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -57,6 +57,15 @@ export class RteHelperService {
     return AppConstants.INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
   }
 
+  // Loads the RTE helper modal (and its form/schema dependencies) on demand
+  // so that they are not pulled into the shared chunk of pages that never
+  // open a customization modal.
+  loadRteHelperModalComponent(): Promise<
+    typeof import('./rte-helper-modal.component')
+  > {
+    return import('./rte-helper-modal.component');
+  }
+
   // The refocusFn arg is a function that restores focus to the text editor
   // after exiting the modal, and moves the cursor back to where it was
   // before the modal was opened.
@@ -69,30 +78,38 @@ export class RteHelperService {
     onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ): void {
     document.execCommand('enableObjectResizing', false);
-    const modalRef = this.modalService.open(RteHelperModalComponent, {
-      backdrop: 'static',
-    });
-    modalRef.componentInstance.componentIsNewlyCreated =
-      componentIsNewlyCreated;
-    modalRef.componentInstance.componentId = componentId;
-    modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
-    modalRef.componentInstance.attrsCustomizationArgsDict =
-      attrsCustomizationArgsDict;
-    modalRef.result.then(
-      result => {
-        if (onSubmitCallback) {
-          onSubmitCallback(result);
-        }
-      },
-      reason => {
-        if (onDismissCallback) {
-          // Treat non-boolean dismiss reasons (e.g. ESC) as cancel behavior.
-          // Existing widgets should stay, while newly-created ones should be
-          // removed.
-          onDismissCallback(
-            reason === true || (componentIsNewlyCreated && reason !== false)
-          );
-        }
+    this.loadRteHelperModalComponent().then(
+      ({RteHelperModalComponent: RteHelperModalComponentClass}) => {
+        const modalRef = this.modalService.open(
+          RteHelperModalComponentClass as unknown as RteHelperModalComponent,
+          {
+            backdrop: 'static',
+          }
+        );
+        modalRef.componentInstance.componentIsNewlyCreated =
+          componentIsNewlyCreated;
+        modalRef.componentInstance.componentId = componentId;
+        modalRef.componentInstance.customizationArgSpecs =
+          customizationArgSpecs;
+        modalRef.componentInstance.attrsCustomizationArgsDict =
+          attrsCustomizationArgsDict;
+        modalRef.result.then(
+          result => {
+            if (onSubmitCallback) {
+              onSubmitCallback(result);
+            }
+          },
+          reason => {
+            if (onDismissCallback) {
+              // Treat non-boolean dismiss reasons (e.g. ESC) as cancel behavior.
+              // Existing widgets should stay, while newly-created ones should be
+              // removed.
+              onDismissCallback(
+                reason === true || (componentIsNewlyCreated && reason !== false)
+              );
+            }
+          }
+        );
       }
     );
   }

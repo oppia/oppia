@@ -20,14 +20,12 @@ import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
 import {ExplorationPlayerViewerCommonModule} from './exploration-player-viewer-common.module';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
 import {LearnerLocalNavComponent} from './layout-directives/learner-local-nav.component';
 import {FlagExplorationModalComponent} from './modals/flag-exploration-modal.component';
 import {ExplorationSuccessfullyFlaggedModalComponent} from './modals/exploration-successfully-flagged-modal.component';
 import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.component';
-import {MaterialModule} from 'modules/material.module';
 import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
@@ -43,16 +41,52 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {RouterModule} from '@angular/router';
 import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
 
+import {AttributionGuideModule} from 'components/shared_parts/attribution-guide.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {ConversationSkinModule} from 'components/shared_parts/conversation-skin.module';
+import {DisplayHintModalModule} from 'components/shared_parts/display-hint-modal.module';
+import {DisplayNewHintModalModule} from 'components/shared_parts/display-new-hint-modal.module';
+import {DisplayNewSolutionInterstitialModalModule} from 'components/shared_parts/display-new-solution-interstitial-modal.module';
+import {DisplayNewSolutionModalModule} from 'components/shared_parts/display-new-solution-modal.module';
+import {DisplaySolutionInterstitialModalModule} from 'components/shared_parts/display-solution-interstitial-modal.module';
+import {DisplaySolutionModalModule} from 'components/shared_parts/display-solution-modal.module';
+import {KeyboardShortcutHelpModalModule} from 'components/shared_parts/keyboard-shortcut-help-modal.module';
+import {TakeBreakModalModule} from 'components/shared_parts/take-break-modal.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
+import {FeedbackPopupModule} from 'components/shared_parts/feedback-popup.module';
+import {FormsModule} from '@angular/forms';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {OnScreenKeyboardModule} from 'components/shared_parts/on-screen-keyboard.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    TakeBreakModalModule,
+    OnScreenKeyboardModule,
+    NgbTooltipModule,
+    KeyboardShortcutHelpModalModule,
+    FormsModule,
+    FeedbackPopupModule,
+    ExplorationFooterModule,
+    DisplaySolutionModalModule,
+    DisplaySolutionInterstitialModalModule,
+    DisplayNewSolutionModalModule,
+    DisplayNewSolutionInterstitialModalModule,
+    DisplayNewHintModalModule,
+    DisplayHintModalModule,
+    DirectivesModule,
+    ConversationSkinModule,
+    BaseModule,
+    BackgroundBannerModule,
+    AttributionGuideModule,
     CommonModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
-    MaterialModule,
     NgbPopoverModule,
     ExplorationPlayerViewerCommonModule,
-    SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

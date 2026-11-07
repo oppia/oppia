@@ -19,15 +19,19 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {AvailableCertificateOfferingPageRootComponent} from './certificate-offering-available-page-root.component';
 import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {CertificateOfferingAvailablePageRoutingModule} from './certificate-offering-available-page-routing.module';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
-    SharedComponentsModule,
     RouterModule,
     CertificateOfferingAvailablePageRoutingModule,
   ],

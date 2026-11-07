@@ -17,17 +17,22 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ContactPageComponent} from './contact-page.component';
 import {ContactPageRootComponent} from './contact-page-root.component';
 import {CommonModule} from '@angular/common';
 import {ContactPageRoutingModule} from './contact-page-routing.module';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     ContactPageRoutingModule,
     CampaignBannerModule,
   ],
