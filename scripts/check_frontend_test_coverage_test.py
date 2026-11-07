@@ -99,6 +99,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[0].file_path, '/opensource/oppia/file.ts')
             self.assertEqual(stanzas[0].total_lines, 10)
             self.assertEqual(stanzas[0].covered_lines, 5)
+            self.assertEqual(stanzas[0].uncovered_lines, [])
             self.assertEqual(stanzas[1].file_name, 'file2.ts')
             self.assertEqual(stanzas[1].file_path, '/opensource/oppia/file2.ts')
             self.assertEqual(stanzas[1].total_lines, 10)
@@ -107,6 +108,20 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[2].file_path, '/opensource/oppia/file3.ts')
             self.assertEqual(stanzas[2].total_lines, 10)
             self.assertEqual(stanzas[2].covered_lines, 5)
+
+    def test_get_uncovered_line_numbers(self) -> None:
+        stanza = check_frontend_test_coverage.LcovStanzaRelevantLines(
+            'SF:/opensource/oppia/file.ts\n'
+            'DA:12,0\nDA:3,2\nDA:7,0,checksum\r\nDA:12,0\n'
+            'LF:3\nLH:1\n'
+        )
+        self.assertEqual(stanza.uncovered_lines, [7, 12])
+
+    def test_fully_covered_file_has_no_uncovered_lines(self) -> None:
+        stanza = check_frontend_test_coverage.LcovStanzaRelevantLines(
+            'SF:/opensource/oppia/file.ts\nDA:3,1\nLF:1\nLH:1\n'
+        )
+        self.assertEqual(stanza.uncovered_lines, [])
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self) -> None:
         self.lcov_items_list = '\n'.join(
@@ -239,6 +254,44 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                     [
                         '\033[1m/opensource/oppia/file.ts\033[0m seems to be '
                         'not completely tested. Make sure it\'s fully covered.'
+                    ],
+                )
+
+    def test_check_coverage_changes_reports_uncovered_lines(self) -> None:
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'DA:2,1',
+                'DA:7,0',
+                'DA:12,0',
+                'LF:3',
+                'LH:1',
+                'end_of_record',
+                'SF:/opensource/oppia/covered.ts',
+                'DA:4,1',
+                'LF:1',
+                'LH:1',
+                'end_of_record',
+                'SF:node_modules/excluded.ts',
+                'DA:5,0',
+                'LF:1',
+                'LH:0',
+                'end_of_record',
+            ]
+        )
+        not_fully_covered_files_swap = self.swap(
+            check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
+        )
+        with self.exists_swap, self.open_swap, self.print_swap:
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegex(SystemExit, '1'):
+                    check_frontend_test_coverage.check_coverage_changes()
+                self.assertEqual(
+                    logs,
+                    [
+                        '\033[1m/opensource/oppia/file.ts\033[0m seems to be '
+                        'not completely tested. Make sure it\'s fully covered.'
+                        '\nUncovered lines: 7, 12'
                     ],
                 )
 
