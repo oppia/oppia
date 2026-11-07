@@ -2020,7 +2020,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         )
         datastore_services.put_multi(summary_models)
 
-        wipeout_service._remove_user_id_from_contributors_in_summary_models(
+        wipeout_service._remove_user_id_from_contributors_in_summary_models(  # pylint: disable=protected-access
             self.user_1_id, collection_models.CollectionSummaryModel
         )
 
@@ -2480,7 +2480,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exp_models.ExpSummaryModel.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
-        wipeout_service._remove_user_id_from_contributors_in_summary_models(
+        wipeout_service._remove_user_id_from_contributors_in_summary_models(  # pylint: disable=protected-access
             self.user_1_id, exp_models.ExpSummaryModel
         )
 
