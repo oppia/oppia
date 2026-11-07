@@ -194,7 +194,8 @@ class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
     DRY_RUN = False
 
 
-def _diagnose_user(
+# NOTE: Each rule returns early so that the rules don't need to be nested.
+def _diagnose_user(  # pylint: disable=too-many-return-statements
     user: User, shared_emails: abc.Mapping[str, int]
 ) -> abc.Iterator[beam.TaggedOutput]:
     """Tags the user as OK, as a problem, or with each repair it needs."""
@@ -204,46 +205,53 @@ def _diagnose_user(
         yield beam.TaggedOutput(
             TAG_PROBLEMS, f'{user_id} is missing its UserSettingsModel'
         )
-    elif deleted_kind := _find_lone_deleted_model(auth_model, settings_model):
-        yield beam.TaggedOutput(
-            TAG_PROBLEMS, f'{user_id} has a deleted {deleted_kind}'
-        )
-    elif feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles and (
-        not _is_profile_user(auth_model)
-    ):
-        yield beam.TaggedOutput(
-            TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
-        )
-    elif _is_profile_user(auth_model) or (
-        _is_linked_to_firebase(user_id, auth_model, reverse_models)
-    ):
+        return
+    match auth_model, settings_model:
+        # NOTE: FirebaseServerSyncJob fails on users with only one of these
+        # models deleted.
+        case auth_models.UserAuthDetailsModel(
+            deleted=True
+        ), user_models.UserSettingsModel(deleted=False):
+            yield beam.TaggedOutput(
+                TAG_PROBLEMS, f'{user_id} has a deleted UserAuthDetailsModel'
+            )
+            return
+        case auth_models.UserAuthDetailsModel(
+            deleted=False
+        ), user_models.UserSettingsModel(deleted=True):
+            yield beam.TaggedOutput(
+                TAG_PROBLEMS, f'{user_id} has a deleted UserSettingsModel'
+            )
+            return
+        case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
+            yield beam.TaggedOutput(TAG_OK, user_id)
+            return
+        case _, user_models.UserSettingsModel(roles=roles) if (
+            feconf.ROLE_ID_MOBILE_LEARNER in roles
+        ):
+            yield beam.TaggedOutput(
+                TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
+            )
+            return
+        case _:
+            pass
+
+    if _is_linked_to_firebase(user_id, auth_model, reverse_models):
         yield beam.TaggedOutput(TAG_OK, user_id)
-    elif problem := _find_problem(
+        return
+    if problem := _find_problem(
         user_id, settings_model, reverse_models, shared_emails
     ):
         yield beam.TaggedOutput(TAG_PROBLEMS, f'{user_id} {problem}')
-    else:
-        if auth_model is None:
-            yield beam.TaggedOutput(TAG_ADD_AUTH, user_id)
-        elif not auth_model.firebase_auth_id:
-            yield beam.TaggedOutput(TAG_SET_FIREBASE_AUTH_ID, auth_model)
-        if not _has_live_reverse_model(
-            _generate_firebase_auth_id(user_id), reverse_models
-        ):
-            yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
-
-
-def _find_lone_deleted_model(
-    auth_model: auth_models.UserAuthDetailsModel | None,
-    settings_model: user_models.UserSettingsModel,
-) -> str | None:
-    """Returns the kind of the user's only deleted model, if exactly one is.
-
-    NOTE: FirebaseServerSyncJob fails on users like these.
-    """
-    if auth_model is None or auth_model.deleted == settings_model.deleted:
-        return None
-    return 'UserAuthDetailsModel' if auth_model.deleted else 'UserSettingsModel'
+        return
+    if auth_model is None:
+        yield beam.TaggedOutput(TAG_ADD_AUTH, user_id)
+    elif not auth_model.firebase_auth_id:
+        yield beam.TaggedOutput(TAG_SET_FIREBASE_AUTH_ID, auth_model)
+    if not _has_live_reverse_model(
+        _generate_firebase_auth_id(user_id), reverse_models
+    ):
+        yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
 
 
 def _find_problem(
