@@ -217,7 +217,7 @@ export class Contributor extends ExplorationEditor {
       : `${desktopBadgeContainerSelector} ${badgeSelector}`;
     // We only wait for the first badge to be attached (not visible), because
     // the first badge might be hidden.
-    await this.expectElementToBeAttachedInDOM(viewBasedBadgeSelector);
+    await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
     // The badges list may be re-rendered (e.g. after changing the badge
     // type), so we wait until the expected badge is found.
