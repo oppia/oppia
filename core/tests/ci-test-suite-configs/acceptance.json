@@ -282,8 +282,8 @@
     },
     {
       "name": "logged-out-user/click-all-links-on-terms-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-terms-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-links-on-terms-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
