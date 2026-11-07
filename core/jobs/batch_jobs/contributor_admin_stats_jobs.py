@@ -639,8 +639,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         ]
 
         if len(translation_reviewer_stats) == 0:
-            # No need to generate total reviewer stats if there is no valid
-            # stats model (e.g. all topics are invalid/deleted).
+            # Every stat for this reviewer referenced a deleted/invalid topic and was
+            # filtered out above, so no valid-topic stats remain to aggregate. Skip
+            # instead of calling min()/max() on an empty list.
             return None
 
         topic_ids = [v.topic_id for v in translation_reviewer_stats]
