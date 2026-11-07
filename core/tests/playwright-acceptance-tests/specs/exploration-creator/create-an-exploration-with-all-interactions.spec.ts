@@ -278,17 +278,17 @@ test.describe('Exploration Editor', function () {
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Drag And Drop Sort)'
     );
-    // Customize Drag and Drop Sort interaction.
+    // Use an order that requires two moves when adding the sorted solution.
     await explorationEditor.customizeDragAndDropSortInteraction([
-      'First',
       'Third',
+      'First',
       'Second',
     ]);
     await explorationEditor.expectModalTitleToBe('Add Response');
     // Add feedback for correct response.
     await explorationEditor.updateDragAndDropSortLearnersAnswerInResponseModal(
       'is equal to ordering ...',
-      [1, 3, 2]
+      [2, 3, 1]
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',

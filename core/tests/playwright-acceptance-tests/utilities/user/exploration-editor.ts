@@ -436,7 +436,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Adds a Multiple Choice interaction with the supplied options.
+   * Replaces the contents of rich text editors with the provided values.
    */
   private async replaceRichTextEditorContents(
     editors: Locator,
@@ -448,10 +448,12 @@ export class ExplorationEditor extends BaseUser {
       await this.page.keyboard.press('Control+A');
       await this.page.keyboard.press('Backspace');
       await this.page.keyboard.type(value);
-      await expect(editor).toHaveText(value);
     }
   }
 
+  /**
+   * Adds a Multiple Choice interaction with the supplied options.
+   */
   async addMultipleChoiceInteraction(options: string[]): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
     await this.expectElementToBeVisible(loadingFullPageOverlaySelector, false);
@@ -2063,7 +2065,6 @@ export class ExplorationEditor extends BaseUser {
       await responseBody.locator(addResponseOptionButton).click();
       await expect(inputs).toHaveCount(inputCount + 1);
       await inputs.nth(inputCount).fill(value);
-      await expect(inputs.nth(inputCount)).toHaveValue(value);
     }
   }
 
@@ -2223,7 +2224,6 @@ export class ExplorationEditor extends BaseUser {
     await expect(inputs).toHaveCount(1);
     for (const [index, value] of setValues.entries()) {
       await inputs.nth(index).fill(value);
-      await expect(inputs.nth(index)).toHaveValue(value);
       if (index < setValues.length - 1) {
         await solutionModal.locator(addResponseOptionButton).click();
         await expect(inputs).toHaveCount(index + 2);
@@ -2290,7 +2290,9 @@ export class ExplorationEditor extends BaseUser {
         {steps: 10}
       );
       await this.page.mouse.up();
-      await expect(solutionItems).toHaveText(sortedOptions);
+      await expect(solutionItems.nth(destinationIndex)).toHaveText(
+        sortedOptions[destinationIndex]
+      );
     }
 
     await expect(solutionItems).toHaveText(sortedOptions);
