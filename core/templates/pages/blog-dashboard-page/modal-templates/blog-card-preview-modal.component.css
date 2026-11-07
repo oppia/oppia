@@ -1,3 +1,42 @@
+.oppia-blog-preview-container {
+  padding: 10px;
+}
+
+.oppia-blog-post-full-preview {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.blog-post-preview-title {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.blog-post-preview-meta {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.blog-post-preview-content {
+  color: #333;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.blog-post-preview-tags .blog-card-tag {
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 2px;
+  color: #555;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .oppia-blog-post-thumbnail /deep/ .blog-card {
   width: unset;
 }
