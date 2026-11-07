@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {By} from '@angular/platform-browser';
 import {
   ComponentFixture,
   fakeAsync,
@@ -70,6 +71,60 @@ describe('State Editor Component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  it('should leave state content scrolling normally by default', () => {
+    fixture.detectChanges();
+
+    const card = fixture.nativeElement.querySelector('mat-card');
+    expect(component.stateContentShouldStayVisibleOnScroll).toBeFalse();
+    expect(getComputedStyle(card).position).not.toBe('sticky');
+  });
+
+  it('should keep opted-in state content visible while scrolling answers', () => {
+    component.stateContentShouldStayVisibleOnScroll = true;
+    fixture.detectChanges();
+
+    const editor: HTMLElement = fixture.nativeElement;
+    const card: HTMLElement = fixture.debugElement.query(
+      By.css('mat-card')
+    ).nativeElement;
+    const responses: HTMLElement = fixture.debugElement.query(
+      By.css('#editorTabTourStateResponsesTab')
+    ).nativeElement;
+    const originalParent = editor.parentElement as HTMLElement;
+    const scroller = document.createElement('div');
+    scroller.style.height = '400px';
+    scroller.style.overflowY = 'auto';
+    editor.style.display = 'block';
+    card.style.display = 'block';
+    responses.style.height = '1500px';
+    originalParent.insertBefore(scroller, editor);
+    scroller.appendChild(editor);
+
+    try {
+      const initialTop = card.getBoundingClientRect().top;
+      scroller.scrollTop = 200;
+
+      expect(scroller.scrollTop).toBe(200);
+      expect(card.getBoundingClientRect().top).toBeLessThanOrEqual(initialTop);
+      expect(card.getBoundingClientRect().top).toBeCloseTo(
+        scroller.getBoundingClientRect().top,
+        0
+      );
+
+      const longQuestion = document.createElement('div');
+      longQuestion.style.height = '1000px';
+      card.appendChild(longQuestion);
+
+      expect(card.clientHeight).toBeLessThanOrEqual(window.innerHeight * 0.4);
+      expect(card.scrollHeight).toBeGreaterThan(card.clientHeight);
+      card.scrollTop = 100;
+      expect(card.scrollTop).toBe(100);
+    } finally {
+      originalParent.insertBefore(editor, scroller);
+      scroller.remove();
+    }
   });
 
   it('should emit values properly', () => {

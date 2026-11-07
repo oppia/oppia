@@ -35,6 +35,7 @@ import {
 } from 'domain/skill/skill-backend-api.service';
 import {Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {By} from '@angular/platform-browser';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
 import {QuestionSuggestionReviewModalComponent} from './question-suggestion-review-modal.component';
@@ -411,6 +412,59 @@ describe('Question Suggestion Review Modal component', () => {
     ];
 
     component.ngOnInit();
+  });
+
+  [true, false].forEach(reviewable => {
+    it(
+      'should contain long questions and keep modal actions visible when ' +
+        `reviewable is ${reviewable}`,
+      fakeAsync(() => {
+        component.reviewable = reviewable;
+        tick();
+        fixture.detectChanges();
+
+        const modal: HTMLElement = fixture.nativeElement;
+        const body: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-body')
+        ).nativeElement;
+        const header: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-header')
+        ).nativeElement;
+        const footer: HTMLElement = fixture.debugElement.query(
+          By.css('.modal-footer')
+        ).nativeElement;
+        const details: HTMLElement = fixture.debugElement.query(
+          By.css('.oppia-question-details')
+        ).nativeElement;
+        expect(getComputedStyle(body).paddingTop).toBe('0px');
+        expect(getComputedStyle(details).paddingTop).toBe('15px');
+        const questionEditor = fixture.debugElement.query(
+          By.css('oppia-question-editor')
+        );
+        expect(
+          questionEditor.properties.stateContentShouldStayVisibleOnScroll
+        ).toBeTrue();
+
+        const longQuestion = document.createElement('div');
+        longQuestion.style.height = '2000px';
+        questionEditor.nativeElement.appendChild(longQuestion);
+
+        expect(modal.getBoundingClientRect().height).toBeLessThanOrEqual(
+          window.innerHeight - 60
+        );
+        expect(body.scrollHeight).toBeGreaterThan(body.clientHeight);
+        const headerTop = header.getBoundingClientRect().top;
+        const footerTop = footer.getBoundingClientRect().top;
+        body.scrollTop = body.scrollHeight;
+
+        expect(body.scrollTop).toBeGreaterThan(0);
+        expect(header.getBoundingClientRect().top).toBe(headerTop);
+        expect(footer.getBoundingClientRect().top).toBe(footerTop);
+        expect(footer.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+          modal.getBoundingClientRect().bottom
+        );
+      })
+    );
   });
 
   describe('when skill rubrics is specified', () => {

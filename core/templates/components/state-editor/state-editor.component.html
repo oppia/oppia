@@ -19,7 +19,8 @@
   </p>
 </div>
 
-<mat-card class="oppia-editor-card-with-avatar">
+<mat-card class="oppia-editor-card-with-avatar"
+          [class.oppia-sticky-state-content]="stateContentShouldStayVisibleOnScroll">
   <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
       <h3 class="oppia-exp-content-card-header">Content</h3>
