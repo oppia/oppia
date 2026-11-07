@@ -120,8 +120,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
         # must not be repaired.
         shared_emails = (
             users
-            | 'Get emails of Firebase users'
-            >> beam.FlatMap(_get_firebase_email)
+            | 'Get Firebase emails' >> beam.FlatMap(_get_firebase_email)
             | 'Count users per email' >> beam.combiners.Count.PerElement()
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
@@ -209,16 +208,18 @@ def _diagnose_user(  # pylint: disable=too-many-return-statements
     match auth_model, settings_model:
         # NOTE: FirebaseServerSyncJob fails on users with only one of these
         # models deleted.
-        case auth_models.UserAuthDetailsModel(
-            deleted=True
-        ), user_models.UserSettingsModel(deleted=False):
+        case (
+            auth_models.UserAuthDetailsModel(deleted=True),
+            user_models.UserSettingsModel(deleted=False),
+        ):
             yield beam.TaggedOutput(
                 TAG_PROBLEMS, f'{user_id} has a deleted UserAuthDetailsModel'
             )
             return
-        case auth_models.UserAuthDetailsModel(
-            deleted=False
-        ), user_models.UserSettingsModel(deleted=True):
+        case (
+            auth_models.UserAuthDetailsModel(deleted=False),
+            user_models.UserSettingsModel(deleted=True),
+        ):
             yield beam.TaggedOutput(
                 TAG_PROBLEMS, f'{user_id} has a deleted UserSettingsModel'
             )
@@ -226,16 +227,14 @@ def _diagnose_user(  # pylint: disable=too-many-return-statements
         case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
             yield beam.TaggedOutput(TAG_OK, user_id)
             return
-        case _, user_models.UserSettingsModel(roles=roles) if (
-            feconf.ROLE_ID_MOBILE_LEARNER in roles
-        ):
-            yield beam.TaggedOutput(
-                TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
-            )
-            return
         case _:
             pass
 
+    if feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles:
+        yield beam.TaggedOutput(
+            TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
+        )
+        return
     if _is_linked_to_firebase(user_id, auth_model, reverse_models):
         yield beam.TaggedOutput(TAG_OK, user_id)
         return
@@ -248,9 +247,8 @@ def _diagnose_user(  # pylint: disable=too-many-return-statements
         yield beam.TaggedOutput(TAG_ADD_AUTH, user_id)
     elif not auth_model.firebase_auth_id:
         yield beam.TaggedOutput(TAG_SET_FIREBASE_AUTH_ID, auth_model)
-    if not _has_live_reverse_model(
-        _generate_firebase_auth_id(user_id), reverse_models
-    ):
+    # NOTE: Users with any other reverse models were reported above.
+    if not reverse_models:
         yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
 
 
@@ -350,9 +348,7 @@ def _unpack(
 def _is_profile_user(
     auth_model: auth_models.UserAuthDetailsModel | None,
 ) -> bool:
-    """Returns whether the user is a profile, which never has a Firebase
-    account.
-    """
+    """Returns whether the user is a profile, which has no Firebase account."""
     return auth_model is not None and auth_model.parent_user_id is not None
 
 
@@ -369,9 +365,9 @@ def _is_linked_to_firebase(
     if auth_model is None or not auth_model.firebase_auth_id:
         return False
     firebase_auth_id: str = auth_model.firebase_auth_id
-    return firebase_auth_id != _generate_firebase_auth_id(
-        user_id
-    ) or _has_live_reverse_model(firebase_auth_id, reverse_models)
+    if firebase_auth_id != _generate_firebase_auth_id(user_id):
+        return True
+    return _has_live_reverse_model(firebase_auth_id, reverse_models)
 
 
 def _has_live_reverse_model(
