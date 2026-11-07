@@ -53,7 +53,7 @@
               Question<br>Reviewers
             </a>
           </li>
-          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_COORDINATOR}" *ngIf="isTranslationCoordinator">
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_COORDINATOR}" *ngIf="isTranslationCoordinator || isTranslationAdmin">
             <a class="dashboard-tabs-text e2e-test-translation-coordinators-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_COORDINATOR)">
               Translation<br>Coordinators
             </a>
@@ -115,6 +115,10 @@
           </div>
         </div>
       </div>
+      <div *ngIf="shouldShowFeaturedLanguagesEditor()" class="featured-translation-languages-container mb-3 e2e-test-featured-translation-languages">
+        <oppia-featured-translation-languages-editor>
+        </oppia-featured-translation-languages-editor>
+      </div>
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
     </div>
     <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
@@ -125,7 +129,7 @@
                       (valueChange)="updateSelectedContributionType($event)"
                       class="e2e-test-tab-selection-dropdown">
             <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
-              {{ choice }}
+              {{ getContributionTypeLabel(choice) }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -178,7 +182,15 @@
           </oppia-topic-filter>
         </div>
       </div>
+<<<<<<< HEAD
+      <div *ngIf="shouldShowFeaturedLanguagesEditor()" class="featured-translation-languages-container mb-3 e2e-test-featured-translation-languages">
+        <oppia-featured-translation-languages-editor>
+        </oppia-featured-translation-languages-editor>
+      </div>
+      <contributor-admin-stats-table *ngIf="shouldShowStatsTable()" [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+=======
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+>>>>>>> upstream/develop
     </div>
   </div>
 </div>
