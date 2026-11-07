@@ -747,7 +747,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.question_state_data.to_dict(), default_question_data
         )
         self.assertEqual(question.language_code, 'en')
-        self.assertEqual(question.version, 0)
+        self.assertEqual(question.version, feconf.INITIAL_ENTITY_VERSION)
         self.assertEqual(question.linked_skill_ids, skill_ids)
 
     def test_update_language_code(self) -> None:

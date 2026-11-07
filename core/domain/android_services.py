@@ -740,7 +740,7 @@ def _create_dummy_question(
         state,
         feconf.CURRENT_STATE_SCHEMA_VERSION,
         constants.DEFAULT_LANGUAGE_CODE,
-        0,
+        feconf.INITIAL_ENTITY_VERSION,
         linked_skill_ids,
         [],
         content_id_generator.next_content_id_index,

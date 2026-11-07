@@ -305,6 +305,11 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # The earliest supported version of the exploration states blob schema.
 EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 
+# The version number of a newly created versioned entity (such as an
+# exploration, collection, skill, story, topic, subtopic page, study guide
+# or question) before it is saved to the datastore for the first time.
+INITIAL_ENTITY_VERSION = 0
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job

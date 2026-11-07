@@ -559,14 +559,14 @@ class Collection:
             [],
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
             [],
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
         )
 
     @classmethod
     def from_dict(
         cls,
         collection_dict: CollectionDict,
-        collection_version: int = 0,
+        collection_version: int = feconf.INITIAL_ENTITY_VERSION,
         collection_created_on: Optional[datetime.datetime] = None,
         collection_last_updated: Optional[datetime.datetime] = None,
     ) -> Collection:
