@@ -67,6 +67,15 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
+  getIssueURL(invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  }): string {
+    // Expose the issue URL builder to the template without making the
+    // sanitizer service public.
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
+  }
+
   initializeCropper(): void {
     if (this.croppableImageRef) {
       let profilePicture = this.croppableImageRef.nativeElement;

@@ -31,6 +31,7 @@ describe('Skill opportunity model', () => {
         skill_description: 'A new skill for question',
         topic_name: 'A new topic',
         question_count: 30,
+        questions_in_review_count: 5,
       };
     });
 
@@ -64,6 +65,13 @@ describe('Skill opportunity model', () => {
         SkillOpportunity.createFromBackendDict(backendDict);
 
       expect(skillOpportunity.getQuestionCount()).toEqual(30);
+    });
+
+    it('should return a correct in-review questions count', () => {
+      let skillOpportunity =
+        SkillOpportunity.createFromBackendDict(backendDict);
+
+      expect(skillOpportunity.getQuestionsInReviewCount()).toEqual(5);
     });
   });
 });

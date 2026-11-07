@@ -28,7 +28,6 @@ const WikiPrivilegesToFirebaseAccount =
 const baseUrl = testConstants.URLs.BaseURL;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
-const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
@@ -105,8 +104,6 @@ const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
-const feedbackThreadSelector = '.e2e-test-feedback-thread';
-const feedbackMessageSelector = '.e2e-test-feedback-message';
 const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
 const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
@@ -308,10 +305,6 @@ const profileContainerSelector = '.e2e-test-profile-container';
 // Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
   '.e2e-test-exploration-flagged-success-message';
-
-// Feedback updates page.
-const feedbackUpdatesMainContentContainer =
-  '.e2e-test-feedback-updates-main-content-container';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =
@@ -900,13 +893,6 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(goalsSectionContainerSelector);
-  }
-
-  /**
-   * Navigates to the feedback updates page.
-   */
-  async navigateToFeedbackUpdatesPage(): Promise<void> {
-    await this.goto(feedbackUpdatesUrl);
   }
 
   /**
@@ -1868,62 +1854,6 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       hidden: true,
     });
-  }
-
-  /**
-   * Views a feedback update thread.
-   * @param {number} threadNumber - The 0-indexed position of the thread.
-   */
-  async viewFeedbackUpdateThread(threadNumber: number): Promise<void> {
-    await this.page.waitForSelector(feedbackThreadSelector);
-    const feedbackThreads = await this.page.$$(feedbackThreadSelector);
-
-    if (threadNumber >= 0 && threadNumber <= feedbackThreads.length) {
-      await feedbackThreads[threadNumber - 1].click();
-    } else {
-      throw new Error(`Thread not found: ${threadNumber}`);
-    }
-
-    await this.page.waitForSelector(feedbackUpdatesMainContentContainer);
-  }
-
-  /**
-   * Checks if the feedback and response match the expected values.
-   * @param {string} expectedFeedback - The expected feedback.
-   * @param {string} expectedResponse - The expected response.
-   */
-
-  async expectFeedbackAndResponseToMatch(
-    expectedFeedback: string,
-    expectedResponse: string
-  ): Promise<void> {
-    await this.page.waitForSelector(feedbackMessageSelector);
-    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
-
-    if (feedbackMessages.length < 2) {
-      throw new Error('Not enough feedback messages found.');
-    }
-
-    const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
-      el.textContent?.trim()
-    );
-
-    // Fetch the text content of the second feedbackMessageSelector.
-    const actualResponse = await this.page.$$eval(
-      feedbackMessageSelector,
-      elements => elements[1]?.textContent?.trim()
-    );
-
-    if (actualFeedback !== expectedFeedback) {
-      throw new Error(
-        `Feedback does not match the expected value. Expected: ${expectedFeedback}, Found: ${actualFeedback}`
-      );
-    }
-    if (actualResponse !== expectedResponse) {
-      throw new Error(
-        `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
-      );
-    }
   }
 
   /**
@@ -3465,24 +3395,12 @@ export class LoggedInUser extends BaseUser {
         };
 
         if (!href) {
-          await Promise.all([
-            this.page.waitForNavigation({
-              waitUntil: 'networkidle2',
-              timeout: 60000,
-            }),
-            button.click(),
-          ]);
+          await button.click();
           await waitForExplorationPlayer();
           return;
         }
 
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: 'networkidle2',
-            timeout: 60000,
-          }),
-          this.page.goto(href),
-        ]);
+        await this.page.goto(href);
         await waitForExplorationPlayer();
         return;
       }
@@ -4730,29 +4648,29 @@ export class LoggedInUser extends BaseUser {
     chapterNames: string[]
   ): Promise<void> {
     await this.page.waitForSelector(availableChapters);
-    const containers = await this.page.$$(availableChapters);
 
     for (const chapterName of chapterNames) {
-      let chapterFound = false;
-
-      for (const container of containers) {
-        const chapterEls = await container.$$(chapterSelector);
-
-        for (const el of chapterEls) {
-          const text = await el.evaluate(node => node.textContent?.trim());
-          if (text && text.includes(chapterName)) {
-            chapterFound = true;
-            showMessage(`Chapter "${chapterName}" found in Available list.`);
-            break;
-          }
-        }
-
-        if (chapterFound) {
-          break;
-        }
-      }
-
-      if (!chapterFound) {
+      try {
+        await this.page.waitForFunction(
+          (availableSel: string, chapterSel: string, name: string) => {
+            const containers = document.querySelectorAll(availableSel);
+            for (const container of containers) {
+              const elements = container.querySelectorAll(chapterSel);
+              for (const el of elements) {
+                if (el.textContent?.trim().includes(name)) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          },
+          {timeout: 15000},
+          availableChapters,
+          chapterSelector,
+          chapterName
+        );
+        showMessage(`Chapter "${chapterName}" found in Available list.`);
+      } catch (error) {
         throw new Error(`Chapter "${chapterName}" not found in Available list`);
       }
     }

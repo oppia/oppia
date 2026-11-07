@@ -51,23 +51,6 @@ class FeedbackMessageDict(TypedDict):
     updated_subject: str
 
 
-class FeedbackThreadSummaryDict(TypedDict):
-    """Dict for FeedbackThreadSummary object."""
-
-    status: str
-    original_author_id: str
-    last_updated_msecs: float
-    last_message_text: str
-    total_message_count: int
-    last_message_is_read: bool
-    second_last_message_is_read: bool
-    author_last_message: str
-    author_second_last_message: Optional[str]
-    exploration_title: str
-    exploration_id: str
-    thread_id: str
-
-
 class FeedbackThread:
     """Domain object for a feedback thread.
 
@@ -354,78 +337,4 @@ class FeedbackMessageReference:
             'entity_id': self.entity_id,
             'thread_id': self.thread_id,
             'message_id': self.message_id,
-        }
-
-
-class FeedbackThreadSummary:
-    """Domain object for the summary of a particular thread.
-
-    Attributes:
-        status: str. The status of the thread.
-        original_author_id: str. The id of the original author of the thread.
-        last_updated: datetime.datetime. When was the thread last updated.
-        last_message_text: str. The text of the last message.
-        total_message_count: int. The total number of messages in the thread.
-        last_message_is_read: bool. Whether the last message is read by the
-            user.
-        second_last_message_is_read: bool. Whether the second last message is
-            read by the user,
-        author_last_message: str. The name of the author of the last message.
-        author_second_last_message: str. The name of the author of the second
-            last message and None if no second-to-last message exists.
-        exploration_title: str. The title of the exploration to which
-            exploration belongs.
-        exploration_id: str. The id of the exploration associated to the thread.
-        thread_id: str. The id of the thread this dict is describing.
-    """
-
-    def __init__(
-        self,
-        status: str,
-        original_author_id: str,
-        last_updated: datetime.datetime,
-        last_message_text: str,
-        total_message_count: int,
-        last_message_is_read: bool,
-        second_last_message_is_read: bool,
-        author_last_message: str,
-        author_second_last_message: Optional[str],
-        exploration_title: str,
-        exploration_id: str,
-        thread_id: str,
-    ) -> None:
-        self.status = status
-        self.original_author_id = original_author_id
-        self.last_updated = last_updated
-        self.last_message_text = last_message_text
-        self.total_message_count = total_message_count
-        self.last_message_is_read = last_message_is_read
-        self.second_last_message_is_read = second_last_message_is_read
-        self.author_last_message = author_last_message
-        self.author_second_last_message = author_second_last_message
-        self.exploration_title = exploration_title
-        self.exploration_id = exploration_id
-        self.thread_id = thread_id
-
-    def to_dict(self) -> FeedbackThreadSummaryDict:
-        """Returns dict representation of the FeedbackThreadSummary object.
-
-        Returns:
-            dict. Dict representation of the FeedbackThreadSummary object.
-        """
-        return {
-            'status': self.status,
-            'original_author_id': self.original_author_id,
-            'last_updated_msecs': (
-                utils.get_time_in_millisecs(self.last_updated)
-            ),
-            'last_message_text': self.last_message_text,
-            'total_message_count': self.total_message_count,
-            'last_message_is_read': self.last_message_is_read,
-            'second_last_message_is_read': self.second_last_message_is_read,
-            'author_last_message': self.author_last_message,
-            'author_second_last_message': self.author_second_last_message,
-            'exploration_title': self.exploration_title,
-            'exploration_id': self.exploration_id,
-            'thread_id': self.thread_id,
         }

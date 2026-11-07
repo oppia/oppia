@@ -30,8 +30,17 @@ import {CollectionPlayerPageRootComponent} from './collection-player-page-root.c
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 
+import {CommonModule} from '@angular/common';
+import {MaterialModule} from 'modules/material.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+
 @NgModule({
   imports: [
+    CommonModule,
+    MaterialModule,
+    TranslateModule,
+    BackgroundBannerModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

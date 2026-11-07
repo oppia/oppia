@@ -57,7 +57,8 @@
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
   <schema-based-editor [schema]="HTML_SCHEMA"
-                       [(localValue)]="stateContentService.displayed._html">
+                     [localValue]="stateContentService.displayed._html"
+                     (localValueChange)="updateContentHtml($event)">
   </schema-based-editor>
   <div *ngIf="isFormulaAsText(stateContentService.displayed._html)"
        class="alert alert-warning e2e-test-formula-as-text-warning mt-2 d-flex justify-content-between"
