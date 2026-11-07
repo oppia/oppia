@@ -17,7 +17,7 @@
  */
 
 import {ViewportSize} from '@playwright/test';
-import test, {expect, Page, ElementHandle} from '@playwright/test';
+import test, {expect, Page, ElementHandle, Locator} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
@@ -1166,19 +1166,18 @@ export class BaseUser {
   }
 
   /**
-   * Gets a human-readable description of an element for logging purposes.
-   * If a string selector is provided, returns it directly.
-   * If an ElementHandle is provided, extracts tag name and key attributes.
-   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element to describe.
+   * Gets a description of an element.
+   * @param {string | ElementHandle<Element> | Locator} selector - The CSS selector, ElementHandle, or Locator of the element.
    */
   private async getElementDescription(
-    selector: string | ElementHandle<Element>
+    selector: string | ElementHandle<Element> | Locator
   ): Promise<string> {
     if (typeof selector === 'string') {
       return selector;
     }
+
     try {
-      const description = await selector.evaluate(el => {
+      const getDescription = (el: Element): string => {
         const tag = el.tagName.toLowerCase();
         const id = el.id ? `#${el.id}` : '';
         const classes = el.className
@@ -1188,8 +1187,20 @@ export class BaseUser {
         const textSuffix = text
           ? ` "${text}${el.textContent && el.textContent.trim().length > 30 ? '...' : ''}"`
           : '';
+
         return `<${tag}${id}${classes}>${textSuffix}`;
-      });
+      };
+
+      let description: string;
+
+      if (selector.constructor.name === 'Locator') {
+        description = await (selector as Locator).evaluate(getDescription);
+      } else {
+        description = await (selector as ElementHandle<Element>).evaluate(
+          getDescription
+        );
+      }
+
       return description;
     } catch {
       return '<detached element>';
@@ -1287,17 +1298,18 @@ export class BaseUser {
 
   /**
    * Waits for an element to stabilize.
-   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
+   * @param {string | ElementHandle<Element> | Locator} selector - The CSS selector, ElementHandle, or Locator of the element.
    * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
-    selector: string | ElementHandle<Element>,
+    selector: string | ElementHandle<Element> | Locator,
     timeout: number = 5000
   ): Promise<void> {
     let element =
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector, {state: 'visible'})
         : selector;
+
     if (!element) {
       throw new Error('Element not found');
     }
@@ -1309,15 +1321,11 @@ export class BaseUser {
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
 
-      // If selector is given, try getting the latest attached element.
-      element =
-        (typeof selector === 'string'
-          ? await this.page.$(selector)
-          : element) ?? element;
-      if (!element) {
-        showMessage(`Element ${elementDesc} seems to have detached.`);
-        continue;
+      // If a selector is given, get the latest attached element.
+      if (typeof selector === 'string') {
+        element = (await this.page.$(selector)) ?? element;
       }
+
       const currentBox = await element.boundingBox();
 
       if (
@@ -1334,6 +1342,7 @@ export class BaseUser {
           `moved from (${previousBox?.x?.toFixed(0)}, ${previousBox?.y?.toFixed(0)}) ` +
           `to (${currentBox?.x?.toFixed(0)}, ${currentBox?.y?.toFixed(0)})`
       );
+
       previousBox = currentBox;
     }
 
