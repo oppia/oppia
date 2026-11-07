@@ -45,16 +45,32 @@
             </span>
           </div>
           <div class="story-node-exploration">
-            <label class="form-heading"> Exploration ID*</label>
-            <form class="form-horizontal">
-              <input class="form-control e2e-test-exploration-id-input" type="text" [(ngModel)]="explorationId" [ngModelOptions]="{standalone: true}" (change)="checkCanSaveExpId()"
-                     (focus)="toggleExplorationInputButtons()">
-              <div class="save-button-container" *ngIf="explorationInputButtonsAreShown">
-                <span *ngIf="!isStoryPublished()" (click)="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
-                <button class="btn btn-secondary" (click)="toggleExplorationInputButtons()">Cancel</button>
+            <label class="form-heading" for="storyNodeExplorationId"> Exploration ID*</label>
+            <div class="form-control exploration-id-display e2e-test-exploration-id-display" *ngIf="!explorationIdEditorIsShown && currentExplorationId">
+              <a class="e2e-test-exploration-id-link"
+                 [href]="getExplorationEditorUrl(currentExplorationId)"
+                 target="_blank"
+                 rel="noopener"
+                 title="Open the exploration editor in a new tab">
+                {{ currentExplorationId }}
+                <i class="fas fa-external-link-alt exploration-id-link-icon" aria-hidden="true"></i>
+              </a>
+              <button type="button"
+                      class="btn exploration-id-edit-button e2e-test-edit-exploration-id-button"
+                      (click)="openExplorationIdEditor()"
+                      title="Edit exploration ID"
+                      aria-label="Edit exploration ID">
+                <i class="fas fa-pen" aria-hidden="true"></i>
+              </button>
+            </div>
+            <form class="form-horizontal" *ngIf="explorationIdEditorIsShown" (ngSubmit)="updateExplorationId(explorationId)">
+              <input id="storyNodeExplorationId" class="form-control e2e-test-exploration-id-input" type="text" [(ngModel)]="explorationId" [ngModelOptions]="{standalone: true}" (change)="checkCanSaveExpId()"
+                     [oppiaFocusOn]="'storyNodeExplorationId'">
+              <div class="save-button-container">
+                <span *ngIf="!isStoryPublished() && currentExplorationId" (click)="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
+                <button type="button" class="btn btn-secondary e2e-test-cancel-exploration-id-edit-button" *ngIf="currentExplorationId" (click)="cancelExplorationIdEdit()">Cancel</button>
                 <button type="submit"
                         class="e2e-test-exploration-id-save-button btn btn-success btn-sm"
-                        (click)="updateExplorationId(explorationId)"
                         [disabled]="!expIdCanBeSaved || (explorationId === currentExplorationId)">
                   Save
                 </button>

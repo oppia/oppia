@@ -35,6 +35,7 @@ import {
   TopicsAndSkillsDashboardBackendApiService,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -72,7 +73,11 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     AppConstants.MAX_CHARS_IN_CHAPTER_DESCRIPTION;
   chapterPreviewCardIsShown = false;
   mainChapterCardIsShown = true;
-  explorationInputButtonsAreShown = false;
+  // The exploration ID is shown as a view-only link to the exploration
+  // editor, and the input field is only shown while it is being edited (or
+  // when no exploration is linked yet), so that the link never shows an ID
+  // that differs from the one in the input field.
+  explorationIdEditorIsShown = false;
   chapterOutlineButtonsAreShown = false;
   acquiredSkillIdToSummaryMap: Record<string, string> = {};
   prerequisiteSkillIdToSummaryMap: Record<string, string> = {};
@@ -88,7 +93,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   nodeIdToTitleMap!: Record<string, string>;
   skillInfoHasLoaded = false;
   allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
-  isStoryPublished!: () => boolean;
   currentTitle!: string;
   editableTitle!: string;
   currentDescription!: string;
@@ -133,12 +137,20 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     private storyUpdateService: StoryUpdateService,
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   isSerialChapterFeatureFlagEnabled(): boolean {
     return this.platformFeatureService.status
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
+  }
+
+  // This is a method (instead of a reference to the service method) so that
+  // the service method is called on the service, since it reads the
+  // publication status from the service instance.
+  isStoryPublished(): boolean {
+    return this.storyEditorStateService.isStoryPublished();
   }
 
   private _init(): void {
@@ -168,7 +180,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.acquiredSkillIdToSummaryMap
     );
 
-    this.isStoryPublished = this.storyEditorStateService.isStoryPublished;
     this.currentTitle = this.nodeIdToTitleMap[this.nodeId];
     this.pageTitleService.setNavbarSubtitleForMobileView(this.currentTitle);
     this.editableTitle = this.currentTitle;
@@ -179,6 +190,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.oldOutline = this.outline;
     this.editableOutline = this.outline;
     this.currentExplorationId = this.explorationId;
+    this.explorationIdEditorIsShown = !this.currentExplorationId;
     this.expIdIsValid = true;
     this.invalidExpErrorIsShown = false;
     this.nodeTitleEditorIsShown = false;
@@ -192,6 +204,13 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   getSkillEditorUrl(skillId: string): string {
     return '/skill_editor/' + skillId;
+  }
+
+  getExplorationEditorUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      '/create/<exploration_id>',
+      {exploration_id: explorationId}
+    );
   }
 
   getSkillsDescription(
@@ -373,9 +392,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.updateCurrentNodeIsPublishable();
   }
 
+  // The input field stays open when the new ID is rejected, so that the user
+  // can fix it. Otherwise, the exploration is shown as a link again (or the
+  // empty input field is kept, if the exploration was removed).
   updateExplorationId(explorationId: string): void {
-    this.toggleExplorationInputButtons();
-
     if (this.storyEditorStateService.isStoryPublished()) {
       if (explorationId === '' || explorationId === null) {
         this.alertsService.addInfoMessage(
@@ -397,6 +417,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
               explorationId
             );
             this.currentExplorationId = explorationId;
+            this.explorationIdEditorIsShown = false;
           } else {
             this.invalidExpErrorIsShown = true;
           }
@@ -417,6 +438,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
         explorationId
       );
       this.currentExplorationId = explorationId;
+      this.explorationIdEditorIsShown = explorationId === null;
       if (explorationId === null) {
         this.explorationId = null;
       }
@@ -595,9 +617,19 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleExplorationInputButtons(): void {
-    this.explorationInputButtonsAreShown =
-      !this.explorationInputButtonsAreShown;
+  openExplorationIdEditor(): void {
+    this.explorationIdEditorIsShown = true;
+    this.focusManagerService.setFocus('storyNodeExplorationId');
+  }
+
+  // Discards the unsaved changes in the input field, and shows the linked
+  // exploration again. If no exploration is linked, the (now empty) input
+  // field is kept, since there is no link to show.
+  cancelExplorationIdEdit(): void {
+    this.explorationId = this.currentExplorationId;
+    this.expIdCanBeSaved = true;
+    this.invalidExpErrorIsShown = false;
+    this.explorationIdEditorIsShown = !this.currentExplorationId;
   }
 
   updateLocalEditableOutline($event: SchemaDefaultValue): void {
