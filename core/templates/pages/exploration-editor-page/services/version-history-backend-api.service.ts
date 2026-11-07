@@ -30,7 +30,7 @@ interface StateVersionHistoryBackendResponse {
   last_edited_version_number: number | null;
   state_name_in_previous_version: string | null;
   state_dict_in_previous_version: StateBackendDict | null;
-  last_edited_committer_username: string;
+  last_edited_committer_username: string | null;
 }
 
 export interface StateVersionHistoryResponse {
@@ -96,7 +96,8 @@ export class VersionHistoryBackendApiService {
           lastEditedVersionNumber: response.last_edited_version_number,
           stateNameInPreviousVersion: response.state_name_in_previous_version,
           stateInPreviousVersion: stateInPreviousVersion,
-          lastEditedCommitterUsername: response.last_edited_committer_username,
+          lastEditedCommitterUsername:
+            response.last_edited_committer_username ?? '',
         };
       })
       .catch(error => {
@@ -127,7 +128,8 @@ export class VersionHistoryBackendApiService {
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
-          lastEditedCommitterUsername: response.last_edited_committer_username,
+          lastEditedCommitterUsername:
+            response.last_edited_committer_username ?? '',
           metadataInPreviousVersion: metadataInPreviousVersion,
         };
       })
