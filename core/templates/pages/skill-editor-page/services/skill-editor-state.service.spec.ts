@@ -27,6 +27,7 @@ import {
   SkillRightsBackendDict,
 } from 'domain/skill/skill-rights.model';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -132,24 +133,12 @@ class FakeSkillBackendApiService {
           skill: this.skillObject,
           groupedSkillSummaries: {
             Name: [
-              {
-                id: 'skill_id_1',
-                description: 'Description 1',
-              },
-              {
-                id: 'skill_id_2',
-                description: 'Description 2',
-              },
+              new SkillSummary('skill_id_1', 'Description 1', 'en', 1, 0, 1, 2),
+              new SkillSummary('skill_id_2', 'Description 2', 'en', 1, 0, 1, 2),
             ],
             Name2: [
-              {
-                id: 'skill_id_3',
-                description: 'Description 1',
-              },
-              {
-                id: 'skill_id_4',
-                description: 'Description 2',
-              },
+              new SkillSummary('skill_id_3', 'Description 1', 'en', 1, 0, 1, 2),
+              new SkillSummary('skill_id_4', 'Description 2', 'en', 1, 0, 1, 2),
             ],
           },
           assignedSkillTopicData: {
@@ -290,6 +279,8 @@ describe('Skill editor state service', () => {
     expect(groupedSkillSummaries.current.length).toEqual(2);
     expect(groupedSkillSummaries.others.length).toEqual(2);
 
+    expect(groupedSkillSummaries.current[0]).toEqual(jasmine.any(SkillSummary));
+    expect(groupedSkillSummaries.others[0]).toEqual(jasmine.any(SkillSummary));
     expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
     expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
 
