@@ -17,9 +17,7 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {SaveProgressModalComponent} from './save-progress-modal.component';
-import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
 import {Subscription} from 'rxjs';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -40,15 +38,12 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 export class ProgressTrackerComponent implements OnInit, OnDestroy {
   @Input() userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
-  loggedOutProgressUniqueUrlId!: string | null;
-  loggedOutProgressUniqueUrl!: string;
   checkpointCount: number = 0;
   completedCheckpointsCount: number = 0;
   explorationTitle: string = '';
 
   constructor(
     private ngbModal: NgbModal,
-    private progressUrlService: ProgressUrlService,
     private urlService: UrlService,
     private playerPositionService: PlayerPositionService,
     private checkpointProgressService: CheckpointProgressService,
@@ -84,16 +79,6 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
           )
         );
       });
-
-    const urlParams = this.urlService.getUrlParams();
-    this.loggedOutProgressUniqueUrlId =
-      urlParams.pid || this.progressUrlService.getUniqueProgressUrlId();
-    if (this.loggedOutProgressUniqueUrlId) {
-      this.loggedOutProgressUniqueUrl =
-        this.urlService.getOrigin() +
-        '/progress/' +
-        this.loggedOutProgressUniqueUrlId;
-    }
   }
 
   ngOnDestroy(): void {
@@ -156,34 +141,5 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
         // the exploration.
       }
     );
-  }
-
-  showSaveProgressModal(): void {
-    const modalInstance: NgbModalRef = this.ngbModal.open(
-      SaveProgressModalComponent,
-      {
-        backdrop: 'static',
-      }
-    );
-    modalInstance.componentInstance.loggedOutProgressUniqueUrlId =
-      this.loggedOutProgressUniqueUrlId;
-    modalInstance.componentInstance.loggedOutProgressUniqueUrl =
-      this.loggedOutProgressUniqueUrl;
-  }
-
-  async saveLoggedOutProgress(): Promise<void> {
-    if (!this.loggedOutProgressUniqueUrlId) {
-      this.progressUrlService.setUniqueProgressUrlId().then(() => {
-        this.loggedOutProgressUniqueUrlId =
-          this.progressUrlService.getUniqueProgressUrlId();
-        this.loggedOutProgressUniqueUrl =
-          this.urlService.getOrigin() +
-          '/progress/' +
-          this.loggedOutProgressUniqueUrlId;
-        this.showSaveProgressModal();
-      });
-    } else {
-      this.showSaveProgressModal();
-    }
   }
 }

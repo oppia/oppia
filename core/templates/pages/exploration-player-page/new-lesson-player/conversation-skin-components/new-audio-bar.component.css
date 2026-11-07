@@ -1,6 +1,13 @@
+/* stylelint-disable selector-pseudo-element-no-unknown */
+.audio-progress-bar ::ng-deep .mat-slider-track-fill,
+.audio-progress-bar ::ng-deep .mat-slider-thumb,
+.audio-progress-bar ::ng-deep .mat-slider-thumb-label {
+  background: #0f766e !important;
+}
 
 .oppia-new-audio-bar {
-  background-color: #fff8e5;
+  background-color: #fff;
+  border-bottom: 1px solid #d9f1ec;
   display: flex;
   height: 44px;
   margin-top: 40px;
@@ -11,12 +18,12 @@
 }
 
 .oppia-new-audio-bar i {
-  color: #c55f45;
+  color: #0f766e;
   font-size: 24px;
 }
 
 .oppia-new-audio-bar p {
-  color: #205d86;
+  color: #0f766e;
   flex-shrink: 0;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
@@ -27,17 +34,17 @@
 }
 
 .oppia-new-audio-bar span {
-  color: #c55f45;
+  color: #0f766e;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
 }
 
 .oppia-new-audio-header-select select {
-  background-color: #fff8e5;
-  border: 2px solid #205d86;
+  background-color: #fff;
+  border: 2px solid #0f766e;
   border-radius: 4px;
-  color: #205d86;
+  color: #0f766e;
   font-weight: 500;
   height: 28px;
   width: 145px;
@@ -49,7 +56,7 @@
 }
 
 .audio-new-header-control-icons i {
-  color: #205d86;
+  color: #0f766e;
   font-size: 15px;
   margin-left: 12px;
   margin-right: 12px;

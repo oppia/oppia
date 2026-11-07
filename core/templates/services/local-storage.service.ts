@@ -61,6 +61,10 @@ export class LocalStorageService {
 
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
+  HIDE_LESSON_EXIT_MODAL_KEY_PREFIX = 'hide_lesson_exit_modal';
+
+  POST_SIGN_IN_EXIT_INTENT_KEY = 'post_sign_in_exit_intent';
+
   SKIPPED_MODULES_KEY = 'skipped_modules';
 
   MASTERED_MODULES_KEY = 'mastered_modules';
@@ -313,6 +317,52 @@ export class LocalStorageService {
       );
     }
     return null;
+  }
+
+  setLessonExitModalHidden(username: string, isHidden: boolean): void {
+    if (this.isStorageAvailable()) {
+      const key = this.HIDE_LESSON_EXIT_MODAL_KEY_PREFIX + ':' + username;
+      if (isHidden) {
+        (this.storage as Storage).setItem(key, 'true');
+      } else {
+        (this.storage as Storage).removeItem(key);
+      }
+    }
+  }
+
+  isLessonExitModalHidden(username: string): boolean {
+    if (this.isStorageAvailable()) {
+      return (
+        (this.storage as Storage).getItem(
+          this.HIDE_LESSON_EXIT_MODAL_KEY_PREFIX + ':' + username
+        ) === 'true'
+      );
+    }
+    return false;
+  }
+
+  setPostSignInExitIntent(serializedIntent: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        this.POST_SIGN_IN_EXIT_INTENT_KEY,
+        serializedIntent
+      );
+    }
+  }
+
+  getPostSignInExitIntent(): string | null {
+    if (this.isStorageAvailable()) {
+      return (this.storage as Storage).getItem(
+        this.POST_SIGN_IN_EXIT_INTENT_KEY
+      );
+    }
+    return null;
+  }
+
+  removePostSignInExitIntent(): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).removeItem(this.POST_SIGN_IN_EXIT_INTENT_KEY);
+    }
   }
 
   /**

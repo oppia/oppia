@@ -27,10 +27,8 @@ import {Subject} from 'rxjs';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {ProgressTrackerComponent} from './progress-tracker.component';
-import {SaveProgressModalComponent} from './save-progress-modal.component';
 import {NewProgressReminderModalComponent} from './new-progress-reminder-modal.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
@@ -47,20 +45,9 @@ class MockNgbModal {
       checkpointCount: 0,
       completedCheckpointsCount: 0,
       explorationTitle: '',
-      loggedOutProgressUniqueUrlId: '',
-      loggedOutProgressUniqueUrl: '',
     },
     result: Promise.resolve(),
   });
-}
-
-class MockProgressUrlService {
-  getUniqueProgressUrlId = jasmine
-    .createSpy('getUniqueProgressUrlId')
-    .and.returnValue('mock-unique-id');
-  setUniqueProgressUrlId = jasmine
-    .createSpy('setUniqueProgressUrlId')
-    .and.returnValue(Promise.resolve());
 }
 
 class MockUrlService {
@@ -68,7 +55,6 @@ class MockUrlService {
     .createSpy('getExplorationVersionFromUrl')
     .and.returnValue(null);
   getPidFromUrl = jasmine.createSpy('getPidFromUrl').and.returnValue(null);
-  getUrlParams = jasmine.createSpy('getUrlParams').and.returnValue({});
   getOrigin = jasmine
     .createSpy('getOrigin')
     .and.returnValue('http://localhost');
@@ -148,7 +134,6 @@ describe('ProgressTrackerComponent', () => {
   let fixture: ComponentFixture<ProgressTrackerComponent>;
 
   let mockNgbModal: MockNgbModal;
-  let mockProgressUrlService: MockProgressUrlService;
   let mockUrlService: MockUrlService;
   let mockPlayerPositionService: MockPlayerPositionService;
   let mockCheckpointProgressService: MockCheckpointProgressService;
@@ -161,7 +146,6 @@ describe('ProgressTrackerComponent', () => {
 
   beforeEach(async () => {
     mockNgbModal = new MockNgbModal();
-    mockProgressUrlService = new MockProgressUrlService();
     mockUrlService = new MockUrlService();
     mockPlayerPositionService = new MockPlayerPositionService();
     mockCheckpointProgressService = new MockCheckpointProgressService();
@@ -179,7 +163,6 @@ describe('ProgressTrackerComponent', () => {
       declarations: [ProgressTrackerComponent],
       providers: [
         {provide: NgbModal, useValue: mockNgbModal},
-        {provide: ProgressUrlService, useValue: mockProgressUrlService},
         {provide: UrlService, useValue: mockUrlService},
         {provide: PlayerPositionService, useValue: mockPlayerPositionService},
         {
@@ -239,17 +222,6 @@ describe('ProgressTrackerComponent', () => {
     expect(component.explorationTitle).toBe('Mock Exploration Title');
   }));
 
-  it('should set loggedOutProgressUniqueUrlId from URL params when pid exists', () => {
-    mockUrlService.getUrlParams.and.returnValue({pid: 'test-pid'});
-
-    component.ngOnInit();
-
-    expect(component.loggedOutProgressUniqueUrlId).toBe('test-pid');
-    expect(component.loggedOutProgressUniqueUrl).toBe(
-      'http://localhost/progress/test-pid'
-    );
-  });
-
   it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', fakeAsync(() => {
     component.checkpointCount = 0;
     mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5);
@@ -266,28 +238,6 @@ describe('ProgressTrackerComponent', () => {
     expect(component.checkpointCount).toBe(5);
     expect(component.showProgressReminderModal).toHaveBeenCalled();
   }));
-
-  it('should set loggedOutProgressUniqueUrlId from progressUrlService when pid does not exist', () => {
-    mockUrlService.getUrlParams.and.returnValue({});
-    mockProgressUrlService.getUniqueProgressUrlId.and.returnValue('service-id');
-
-    component.ngOnInit();
-
-    expect(component.loggedOutProgressUniqueUrlId).toBe('service-id');
-    expect(component.loggedOutProgressUniqueUrl).toBe(
-      'http://localhost/progress/service-id'
-    );
-  });
-
-  it('should not set loggedOutProgressUniqueUrl when loggedOutProgressUniqueUrlId is null', () => {
-    mockUrlService.getUrlParams.and.returnValue({});
-    mockProgressUrlService.getUniqueProgressUrlId.and.returnValue(null);
-
-    component.ngOnInit();
-
-    expect(component.loggedOutProgressUniqueUrlId).toBe(null);
-    expect(component.loggedOutProgressUniqueUrl).toBeUndefined();
-  });
 
   it('should show progress reminder modal when checkpoint count exists and onLoadedMostRecentCheckpoint emits', fakeAsync(() => {
     component.checkpointCount = 5;
@@ -424,59 +374,6 @@ describe('ProgressTrackerComponent', () => {
       tick();
     }).not.toThrowError();
   }));
-
-  it('should open save progress modal with correct properties', () => {
-    component.loggedOutProgressUniqueUrlId = 'test-id';
-    component.loggedOutProgressUniqueUrl = 'test-url';
-
-    const modalInstance = {
-      componentInstance: {
-        loggedOutProgressUniqueUrlId: '',
-        loggedOutProgressUniqueUrl: '',
-      },
-    };
-    mockNgbModal.open.and.returnValue(modalInstance as NgbModalRef);
-
-    component.showSaveProgressModal();
-
-    expect(mockNgbModal.open).toHaveBeenCalledWith(SaveProgressModalComponent, {
-      backdrop: 'static',
-    });
-    expect(modalInstance.componentInstance.loggedOutProgressUniqueUrlId).toBe(
-      'test-id'
-    );
-    expect(modalInstance.componentInstance.loggedOutProgressUniqueUrl).toBe(
-      'test-url'
-    );
-  });
-
-  it('should set unique progress URL ID and show modal when ID is null', fakeAsync(() => {
-    component.loggedOutProgressUniqueUrlId = null;
-    mockProgressUrlService.getUniqueProgressUrlId.and.returnValue('new-id');
-    spyOn(component, 'showSaveProgressModal');
-
-    component.saveLoggedOutProgress();
-    tick();
-
-    expect(mockProgressUrlService.setUniqueProgressUrlId).toHaveBeenCalled();
-    expect(component.loggedOutProgressUniqueUrlId).toBe('new-id');
-    expect(component.loggedOutProgressUniqueUrl).toBe(
-      'http://localhost/progress/new-id'
-    );
-    expect(component.showSaveProgressModal).toHaveBeenCalled();
-  }));
-
-  it('should show save progress modal directly when unique URL ID already exists', () => {
-    component.loggedOutProgressUniqueUrlId = 'existing-id';
-    spyOn(component, 'showSaveProgressModal');
-
-    component.saveLoggedOutProgress();
-
-    expect(
-      mockProgressUrlService.setUniqueProgressUrlId
-    ).not.toHaveBeenCalled();
-    expect(component.showSaveProgressModal).toHaveBeenCalled();
-  });
 
   it('should unsubscribe from directive subscriptions on destroy', () => {
     spyOn(component.directiveSubscriptions, 'unsubscribe');

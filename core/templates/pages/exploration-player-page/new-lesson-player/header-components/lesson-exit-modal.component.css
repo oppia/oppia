@@ -1,0 +1,99 @@
+.oppia-lesson-exit-modal {
+  --exit-green: #00645c;
+  --exit-grey: #d4d4d4;
+  padding: 24px 32px 20px;
+  position: relative;
+  text-align: center;
+}
+
+.oppia-lesson-exit-modal-close {
+  background: none;
+  border: 0;
+  color: #212121;
+  font-size: 24px;
+  inset-block-start: 8px;
+  inset-inline-end: 12px;
+  line-height: 1;
+  position: absolute;
+}
+
+.oppia-lesson-exit-modal-title {
+  color: var(--exit-green);
+  font-size: 20px;
+  line-height: 1.3;
+  margin: 8px auto 16px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.oppia-lesson-exit-modal-subtitle {
+  color: #212121;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 auto 28px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.oppia-lesson-exit-checkpoint-bar {
+  margin: 0 8px 24px;
+}
+
+.oppia-lesson-exit-dont-show {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.oppia-lesson-exit-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.oppia-lesson-exit-actions-end {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.oppia-lesson-exit-primary-button,
+.oppia-lesson-exit-secondary-button {
+  border: 1px solid var(--exit-green);
+  border-radius: 4px;
+  font-weight: 700;
+  min-width: 96px;
+  padding: 8px 16px;
+}
+
+.oppia-lesson-exit-primary-button {
+  background: var(--exit-green);
+  color: #fff;
+}
+
+.oppia-lesson-exit-secondary-button {
+  background: #fff;
+  color: var(--exit-green);
+}
+
+.oppia-lesson-exit-sign-in-button {
+  display: block;
+  margin: 0 auto 12px;
+  min-width: 154px;
+}
+
+.oppia-lesson-exit-link-button {
+  background: none;
+  border: 0;
+  color: var(--exit-green);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.oppia-lesson-exit-primary-button:focus-visible,
+.oppia-lesson-exit-secondary-button:focus-visible,
+.oppia-lesson-exit-link-button:focus-visible,
+.oppia-lesson-exit-modal-close:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
