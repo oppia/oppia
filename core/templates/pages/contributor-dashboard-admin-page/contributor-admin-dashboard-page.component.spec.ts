@@ -28,7 +28,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {ContributorAdminDashboardPageComponent} from './contributor-admin-dashboard-page.component';
 import {UserService} from 'services/user.service';
-import {NO_ERRORS_SCHEMA, QueryList} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {
   CommunityContributionStatsBackendDict,
@@ -63,7 +63,6 @@ describe('Contributor dashboard Admin page', () => {
   let fetchContributorAdminStatsSpy: jasmine.Spy;
   let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
-  let fetchCommunityStatsSpy: jasmine.Spy;
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
     true,
@@ -310,7 +309,7 @@ describe('Contributor dashboard Admin page', () => {
 
   describe('when user is logged in', () => {
     beforeEach(() => {
-      fetchCommunityStatsSpy = spyOn(
+      spyOn(
         contributorDashboardAdminStatsBackendApiService,
         'fetchCommunityStats'
       ).and.returnValue(

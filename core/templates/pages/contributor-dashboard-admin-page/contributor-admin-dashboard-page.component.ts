@@ -21,8 +21,6 @@ import {
   OnInit,
   ChangeDetectorRef,
   ViewChild,
-  ViewChildren,
-  QueryList,
   ElementRef,
   HostListener,
   ViewEncapsulation,
@@ -42,7 +40,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UsernameInputModal} from './username-input-modal/username-input-modal.component';
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
-import {ContributorAdminStatsTable} from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import isEqual from 'lodash/isEqual';
 import {ISODatePickerAdapter} from 'services/iso-datepicker-adapter.service';
 import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
@@ -99,8 +96,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
-  @ViewChildren(ContributorAdminStatsTable)
-  statsTables!: QueryList<ContributorAdminStatsTable>;
 
   languageDropdownShown: boolean = false;
   activeTab!: string;
@@ -388,16 +383,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         // No further action is needed.
       }
     );
-  }
-
-  refreshCommunityStats(): void {
-    this.contributorDashboardAdminStatsBackendApiService
-      .fetchCommunityStats()
-      .then(communityStats => {
-        this.questionReviewersCount = communityStats.question_reviewers_count;
-        this.translationReviewersCountByLanguage =
-          communityStats.translation_reviewers_count;
-      });
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {

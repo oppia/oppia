@@ -77,7 +77,6 @@ export class ContributorAdminStatsTable implements OnInit {
     activeTab: 'Translation Submitter',
     filter: ContributorAdminDashboardFilter.createDefault(),
   };
-  @Output() onRoleChange: EventEmitter<void> = new EventEmitter<void>();
 
   columnsToDisplay: string[] = [];
   allStats: ContributorStats[] = [];
