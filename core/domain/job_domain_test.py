@@ -28,6 +28,7 @@ from typing import Any, Dict, List
 class JobTests(test_utils.GenericTestBase):
     """Tests for the Job domain object."""
 
+    # Here we use type Any because the values in this dictionary can be of any type.
     def _get_valid_job_dict(self) -> Dict[str, Any]:
         """Returns a dictionary representing a valid completed job."""
         return {
@@ -52,6 +53,7 @@ class JobTests(test_utils.GenericTestBase):
         self.assertEqual(job.to_dict(), job_dict)
 
     def test_validate_accepts_all_statuses(self) -> None:
+        # Here we use type Any because the values in this dictionary can be of any type.
         status_dicts: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',
@@ -114,14 +116,14 @@ class JobTests(test_utils.GenericTestBase):
             with self.subTest(field=field_name, value=value):
                 job_dict = self._get_valid_job_dict()
                 job_dict[field_name] = value
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_status_code(self) -> None:
         job_dict = self._get_valid_job_dict()
         job_dict['status_code'] = 'unknown'
 
-        with self.assertRaises(utils.ValidationError):
+        with self.assertRaisesRegex(utils.ValidationError, '.*'):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_json_fields(self) -> None:
@@ -135,7 +137,7 @@ class JobTests(test_utils.GenericTestBase):
             with self.subTest(field=field_name, value=value):
                 job_dict = self._get_valid_job_dict()
                 job_dict[field_name] = value
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_outputs(self) -> None:
@@ -144,7 +146,7 @@ class JobTests(test_utils.GenericTestBase):
             with self.subTest(output=output):
                 job_dict = self._get_valid_job_dict()
                 job_dict['output'] = output
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
 
         job_dict = self._get_valid_job_dict()
@@ -156,7 +158,7 @@ class JobTests(test_utils.GenericTestBase):
                 'output': [],
             }
         )
-        with self.assertRaises(utils.ValidationError):
+        with self.assertRaisesRegex(utils.ValidationError, '.*'):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_errors(self) -> None:
@@ -172,12 +174,12 @@ class JobTests(test_utils.GenericTestBase):
                             'error': error,
                         }
                     )
-                    with self.assertRaises(utils.ValidationError):
+                    with self.assertRaisesRegex(utils.ValidationError, '.*'):
                         job_domain.Job.from_dict(job_dict)
 
         job_dict = self._get_valid_job_dict()
         job_dict['error'] = 'unexpected'
-        with self.assertRaises(utils.ValidationError):
+        with self.assertRaisesRegex(utils.ValidationError, '.*'):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_queue_time(self) -> None:
@@ -185,7 +187,7 @@ class JobTests(test_utils.GenericTestBase):
             with self.subTest(time_queued_msec=time_queued_msec):
                 job_dict = self._get_valid_job_dict()
                 job_dict['time_queued_msec'] = time_queued_msec
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_invalid_optional_timestamp_types(self) -> None:
@@ -193,16 +195,17 @@ class JobTests(test_utils.GenericTestBase):
             job_dict = self._get_valid_job_dict()
             job_dict[field_name] = '2'
             with self.subTest(field=field_name):
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_nan_timestamps(self) -> None:
         job_dict = self._get_valid_job_dict()
         job_dict['time_started_msec'] = float('nan')
-        with self.assertRaises(utils.ValidationError):
+        with self.assertRaisesRegex(utils.ValidationError, '.*'):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_timestamps_inconsistent_with_status(self) -> None:
+        # Here we use type Any because the values in this dictionary can be of any type.
         invalid_timestamp_updates: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',
@@ -281,5 +284,5 @@ class JobTests(test_utils.GenericTestBase):
                     job_dict['error'] = 'failure'
                 if timestamp_update['status_code'] == 'started':
                     job_dict['output'] = None
-                with self.assertRaises(utils.ValidationError):
+                with self.assertRaisesRegex(utils.ValidationError, '.*'):
                     job_domain.Job.from_dict(job_dict)

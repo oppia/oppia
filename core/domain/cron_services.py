@@ -26,11 +26,7 @@ from typing import List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        base_models,
-        beam_job_models,
-        datastore_services,
-    )
+    from mypy_imports import base_models, beam_job_models, datastore_services
 
 base_models, beam_job_models = models.Registry.import_models(
     [

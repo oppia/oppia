@@ -818,3 +818,7 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+/core/domain/job_domain.py @oppia/backend-reviewers
+/core/domain/job_services.py @oppia/backend-reviewers
+/core/domain/job_domain_test.py @oppia/backend-reviewers
+/core/domain/job_services_test.py @oppia/backend-reviewers

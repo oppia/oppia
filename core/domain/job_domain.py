@@ -34,10 +34,12 @@ class Job:
         time_started_msec: Optional[float],
         time_finished_msec: Optional[float],
         status_code: str,
+        # Here we use type Any because the values in this dictionary can be of any type.
         metadata: Optional[Dict[str, Any]],
         output: Optional[List[str]],
         error: Optional[str],
         has_been_cleaned_up: bool,
+        # Here we use type Any because the values in this dictionary can be of any type.
         additional_job_params: Optional[Dict[str, Any]],
     ) -> None:
         """Initializes a Job instance.
@@ -52,13 +54,14 @@ class Job:
             time_finished_msec: float|None. The time the job finished, in
                 milliseconds since the epoch.
             status_code: str. The current status of the job.
-            metadata: dict(str, *)|None. Additional metadata for the job.
+            metadata: dict(str, *)|None. Additional metadata associated with
+                the job.
             output: list(str)|None. The output produced by a completed job.
             error: str|None. The error for a failed or canceled job.
             has_been_cleaned_up: bool. Whether the job's associated models
                 have been cleaned up.
-            additional_job_params: dict(str, *)|None. Additional job
-                parameters.
+            additional_job_params: dict(str, *)|None. Parameters required to
+                run the job.
         """
         self.job_id = job_id
         self.job_type = job_type
@@ -73,6 +76,7 @@ class Job:
         self.additional_job_params = additional_job_params
         self.validate()
 
+    # Here we use type Any because the values in this dictionary can be of any type.
     def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representation of the Job.
 
@@ -94,6 +98,7 @@ class Job:
         }
 
     @classmethod
+    # Here we use type Any because the values in this dictionary can be of any type.
     def from_dict(cls, job_dict: Dict[str, Any]) -> Job:
         """Creates a Job from its dictionary representation.
 
