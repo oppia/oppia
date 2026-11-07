@@ -148,7 +148,7 @@ test.describe('Blog Post Writer', function () {
 
     // Switch to blog card preview tab to verify the link and its visual appearance.
     await blogPostWriter.switchToBlogCardPreviewTab();
-    await blogPostWriter.expectScreenshotToMatch('blogCardPreview', __dirname);
+    await blogPostWriter.expectScreenshotToMatch('blogCardPreview');
 
     // Verify link in blog preview modal.
     await blogPostWriter.clickAndVerifyAnchorWithInnerText(
