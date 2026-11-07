@@ -357,12 +357,19 @@ def _is_profile_user(
 ) -> bool:
     """Returns whether the user is a profile, which has no Firebase account.
 
-    NOTE: The role is checked too because a profile may be missing its auth
-    model.
+    NOTE: FirebaseServerSyncJob syncs any user whose auth model has a
+    firebase_auth_id and no parent_user_id, so only the auth model decides
+    for those users. The role is checked for the others because a profile may
+    be missing its auth model.
     """
+    if auth_model is None:
+        return feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
+    if auth_model.parent_user_id is not None:
+        return True
     return (
-        auth_model is not None and auth_model.parent_user_id is not None
-    ) or feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
+        not auth_model.firebase_auth_id
+        and feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
+    )
 
 
 def _is_linked_to_firebase(

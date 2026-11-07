@@ -354,6 +354,25 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         )
         self.assert_repaired('uid_a', FB_A)
 
+    def test_email_shared_with_linked_mobile_learner_is_reported(
+        self,
+    ) -> None:
+        # NOTE: FirebaseServerSyncJob syncs any user whose auth model has a
+        # firebase_auth_id and no parent_user_id, whatever its roles.
+        self.put_auth_model('uid_m', 'fb_m')
+        self.put_settings_model(
+            'uid_m', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
+        )
+        self.put_settings_model('uid_a', email='x@x.com')
+
+        self.assert_job_output_is(
+            [
+                stderr('uid_m is a profile without a parent_user_id'),
+                stderr('uid_a shares its email with another user'),
+            ]
+        )
+        self.assert_unassigned(FB_A)
+
     def test_email_shared_with_deleted_user_is_repaired(self) -> None:
         self.put_settings_model('uid_a', email='x@x.com')
         self.put_settings_model('uid_d', email='x@x.com', deleted=True)
