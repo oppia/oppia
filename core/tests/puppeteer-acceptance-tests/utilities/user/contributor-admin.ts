@@ -94,6 +94,7 @@ export class ContributorAdmin extends BaseUser {
    * Clicks on the add contributor button.
    */
   async clickOnAddReviewerOrSubmitterButton(): Promise<void> {
+    await this.waitForNoModals();
     await this.expectElementToBeVisible(addContributorButtonSelector);
     await this.clickOnElementWithSelector(addContributorButtonSelector);
 
@@ -120,6 +121,7 @@ export class ContributorAdmin extends BaseUser {
 
     await this.clickOnElementWithSelector(addRightsButtonSelector);
     await this.expectElementToBeVisible(addRightsButtonSelector, false);
+    await this.expectElementToBeVisible(commonModalContainerSelector, false);
   }
 
   /**
