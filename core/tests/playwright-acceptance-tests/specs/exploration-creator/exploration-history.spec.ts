@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,44 +19,44 @@
  * EC. History.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-describe('Exploration Editor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(
-    async function () {
-      explorationEditor = await UserFactory.createNewUser(
-        'explorationEditor',
-        'exploration_editor@example.com'
-      );
+  test.beforeAll(async function ({browser}) {
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com',
+      browser
+    );
 
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+    await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.updateCardContent('Introduction to Fractions');
-      await explorationEditor.addInteraction('Continue Button');
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard('Second Card');
+    await explorationEditor.updateCardContent('Introduction to Fractions');
+    await explorationEditor.addInteraction('Continue Button');
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('Second Card');
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.navigateToCard('Second Card');
+    await explorationEditor.updateCardContent('Thanks for playing!');
+    await explorationEditor.addInteraction('End Exploration');
+    await explorationEditor.saveExplorationDraft();
+
+    for (let i = 0; i < 15; i++) {
+      await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
       await explorationEditor.saveExplorationDraft();
+    }
+  });
 
-      await explorationEditor.navigateToCard('Second Card');
-      await explorationEditor.updateCardContent('Thanks for playing!');
-      await explorationEditor.addInteraction('End Exploration');
-      await explorationEditor.saveExplorationDraft();
-
-      for (let i = 0; i < 15; i++) {
-        await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
-        await explorationEditor.saveExplorationDraft();
-      }
-    },
-    // Test takes more time than default timeout.
-    600000
-  );
-
-  it('should be able to view the history tab', async function () {
+  test('should be able to view the history tab', async function () {
     await explorationEditor.navigateToHistoryTab();
 
     await explorationEditor.searchUserInHistoryTab('guestUser1');
@@ -75,13 +75,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectNumberOfHistoryItemsToBe(15);
   });
 
-  it('should be able to compare versions of an exploration', async function () {
+  test('should be able to compare versions of an exploration', async function () {
     await explorationEditor.compareExplorationVersionsInHistoryTab('1', '5');
     await explorationEditor.expectGraphDifferencesToBeVisible();
     await explorationEditor.resetGraphDifferenceInHistoryTab();
   });
 
-  it('should be able to revert to a previous version of an exploration', async function () {
+  test('should be able to revert to a previous version of an exploration', async function () {
     // Check if exploration version date is properly formatted.
     await explorationEditor.expectExplorationHistoryDateHasProperFormat();
 
@@ -92,7 +92,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectCardContentToBe('Thanks for playing! 6');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

@@ -174,6 +174,22 @@ const historyTabContentContainerSelector = '.e2e-test-exploration-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const historyTableIndex = '.e2e-test-history-table-index';
 const historyListOptions = '.e2e-test-history-table-option';
+const historyUserFilterSelector = 'oppia-history-tab input';
+const historyPaginationDesktopSelector =
+  '.e2e-test-desktop-history-pagination mat-select';
+const historyPaginationMobileSelector =
+  '.e2e-test-mobile-history-pagination mat-select';
+const historyCommitDateSelector = '.e2e-test-history-tab-commit-date';
+const firstVersionComparisonSelect =
+  '.e2e-test-history-version-dropdown-first .e2e-test-version-comparasion-select';
+const secondVersionComparisonSelect =
+  '.e2e-test-history-version-dropdown-second .e2e-test-version-comparasion-select';
+const graphDifferencesSelector = '.e2e-test-graph-diff-container';
+const resetGraphButton = '.e2e-test-reset-graph';
+const revertVersionButtonSelector = '.e2e-test-revert-version';
+const confirmRevertButtonSelector = '.e2e-test-confirm-revert';
+const stateContentDisplaySelector =
+  '.e2e-test-state-editor .e2e-test-state-content-display';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
@@ -1561,6 +1577,195 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(historyTabButton);
     }
     await this.expectElementToBeVisible(historyTabContentContainerSelector);
+  }
+
+  /**
+   * Function to filter the history list by username.
+   * @param {string} username - The username to filter by. An empty string
+   *     clears the filter.
+   */
+  async searchUserInHistoryTab(username: string): Promise<void> {
+    await this.expectElementToBeVisible(historyUserFilterSelector);
+    await this.clearAllTextFrom(historyUserFilterSelector);
+    await this.typeInInputField(historyUserFilterSelector, username);
+    await this.page.keyboard.press('Enter');
+
+    // The filter only re-applies on the input's change event, and clearing
+    // the field with the keyboard does not always fire it, so dispatch it
+    // explicitly to make the filter reflect the current input value.
+    await this.page.$eval(historyUserFilterSelector, el => {
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+    });
+  }
+
+  /**
+   * Function to check the number of items in the history list.
+   * @param {number} numberOfItems - The expected number of history items.
+   */
+  async expectNumberOfHistoryItemsToBe(numberOfItems: number): Promise<void> {
+    if (numberOfItems === 0) {
+      await this.expectElementToBeVisible(historyListContent, false);
+      return;
+    }
+    await this.expectElementToBeVisible(historyListContent);
+    try {
+      await this.page.waitForFunction(
+        ({selector, count}: {selector: string; count: number}) =>
+          document.querySelectorAll(selector).length === count,
+        {selector: historyListContent, count: numberOfItems}
+      );
+    } catch (error) {
+      const actualCount = (await this.page.$$(historyListContent)).length;
+      throw new Error(
+        `Expected ${numberOfItems} history items, but found ${actualCount}.`
+      );
+    }
+    showMessage(`History list has ${numberOfItems} items.`);
+  }
+
+  /**
+   * Function to change the number of history items shown per page.
+   * @param {number} itemsPerPage - The number of items to show per page.
+   */
+  async changePaginationInHistoryTabTo(itemsPerPage: number): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? historyPaginationMobileSelector
+      : historyPaginationDesktopSelector;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+    await this.selectMatOption(itemsPerPage.toString(), true);
+    await this.expectTextContentToContain(selector, itemsPerPage.toString());
+  }
+
+  /**
+   * Function to compare two versions of the exploration in the history tab.
+   * @param {string} version1 - The first version to compare.
+   * @param {string} version2 - The second version to compare.
+   */
+  async compareExplorationVersionsInHistoryTab(
+    version1: string,
+    version2: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(firstVersionComparisonSelect);
+    await this.clickOnElementWithSelector(firstVersionComparisonSelect);
+    await this.selectMatOption(version1, true);
+    await this.expectTextContentToBe(firstVersionComparisonSelect, version1);
+
+    await this.expectElementToBeVisible(secondVersionComparisonSelect);
+    await this.clickOnElementWithSelector(secondVersionComparisonSelect);
+    await this.selectMatOption(version2, true);
+    await this.expectTextContentToBe(secondVersionComparisonSelect, version2);
+  }
+
+  /**
+   * Function to check whether the graph of differences between the selected
+   * versions is visible.
+   * @param {boolean} visible - Whether the graph should be visible.
+   */
+  async expectGraphDifferencesToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(graphDifferencesSelector, visible);
+  }
+
+  /**
+   * Function to reset the version comparison graph in the history tab.
+   */
+  async resetGraphDifferenceInHistoryTab(): Promise<void> {
+    await this.clickOnElementWithSelector(resetGraphButton);
+    await this.expectGraphDifferencesToBeVisible(false);
+  }
+
+  /**
+   * Function to check that the commit date in the history list is formatted
+   * like "Oct 27, 3:45 PM".
+   */
+  async expectExplorationHistoryDateHasProperFormat(): Promise<void> {
+    await this.expectElementToBeVisible(historyCommitDateSelector);
+    const dateString = await this.getTextContent(historyCommitDateSelector);
+    const pattern =
+      /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{1,2}:\d{2} (AM|PM)$/;
+    if (!pattern.test(dateString)) {
+      throw new Error(
+        `The history date "${dateString}" is not formatted properly.`
+      );
+    }
+  }
+
+  /**
+   * Function to revert the exploration to the given version from the history
+   * tab.
+   * @param {string} version - The version to revert to.
+   */
+  async revertExplorationToVersion(version: string): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
+    // The first item in the history list is the latest version.
+    const currentVersion = parseInt(
+      (await this.getTextContent(historyTableIndex)).replace('.', ''),
+      10
+    );
+
+    const historyItems = await this.page.$$(historyListContent);
+    let historyItemToRevert: ElementHandle<Element> | null = null;
+    for (const historyItem of historyItems) {
+      const versionElement = await this.getElementInParent(
+        historyTableIndex,
+        historyItem
+      );
+      const versionText = (await this.getTextContent(versionElement)).replace(
+        '.',
+        ''
+      );
+      if (versionText === version) {
+        historyItemToRevert = historyItem;
+        break;
+      }
+    }
+    if (!historyItemToRevert) {
+      throw new Error(`Version ${version} not found in history tab.`);
+    }
+
+    const optionsButton = await this.getElementInParent(
+      historyListOptions,
+      historyItemToRevert
+    );
+    await this.clickOnElement(optionsButton);
+    const revertButton = await this.getElementInParent(
+      revertVersionButtonSelector,
+      historyItemToRevert
+    );
+    await this.clickOnElement(revertButton);
+
+    // Confirming the revert reloads the page once the revert request
+    // succeeds, so wait for that reload instead of a navigation.
+    await this.waitForElementToStabilize(confirmRevertButtonSelector);
+    const pageReloaded = this.page.waitForEvent('load');
+    await this.clickOnElementWithSelector(confirmRevertButtonSelector);
+    await pageReloaded;
+
+    await this.page.waitForFunction(
+      ({selector, version}: {selector: string; version: number}) =>
+        parseInt(
+          document.querySelector(selector)?.textContent?.replace('.', '') ?? '',
+          10
+        ) === version,
+      {selector: historyTableIndex, version: currentVersion + 1}
+    );
+    showMessage(
+      `Reverted to version ${version}. The latest version is now ` +
+        `${currentVersion + 1}.`
+    );
+  }
+
+  /**
+   * Function to check the content of the current card in the editor.
+   * @param {string} expectedCardContent - The expected card content.
+   */
+  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+    await this.expectTextContentToBe(
+      stateContentDisplaySelector,
+      expectedCardContent
+    );
   }
 
   /**
