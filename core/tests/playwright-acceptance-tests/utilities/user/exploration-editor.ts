@@ -89,6 +89,25 @@ const stateContentInputField = 'div.e2e-test-rte';
 
 const toastMessage = '.e2e-test-toast-message';
 
+const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
+const desktopDiscardDraftButton = 'button.e2e-test-discard-changes';
+const mobileDiscardButtonSelector = 'button.e2e-test-mobile-discard-button';
+const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
+const stateNameInputSelector = 'input.e2e-test-state-name-input';
+const stateNameSubmitButtonSelector = '.e2e-test-state-name-submit';
+const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
+const stateNodeSelector = 'g.node text';
+const closeModalButtonSelector = 'button.e2e-test-close-mobile-graph-modal';
+const explorationGraphSelector = '.e2e-test-exploration-graph';
+const explorationGraphNodeSelector = 'g.node';
+const explorationGraphNodeBackgroundSelector =
+  'rect.e2e-test-node-background, rect';
+const explorationGraphNodeDeleteButtonSelector =
+  '.e2e-test-delete-node, rect.oppia-node-delete, circle.delete-node-circle';
+const confirmDeleteStateButtonSelector = 'button.e2e-test-confirm-delete-state';
+const firstCardSettingsSelector = '.e2e-test-initial-state-select';
+const stateConversationContent = '.e2e-test-conversation-content';
+
 const mobileChangesDropdownSelector = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButtonSelector =
   'button.e2e-test-save-changes-for-small-screens';
@@ -1881,6 +1900,341 @@ export class ExplorationEditor extends BaseUser {
     }
 
     showMessage(`Title has been updated to ${newTitle}`);
+  }
+
+  /**
+   * Discards the current changes in the exploration editor.
+   */
+  async discardCurrentChanges(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.expectElementToBeVisible(
+        `${mobileDiscardButtonSelector}:not(.disabled)`
+      );
+      await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
+    } else {
+      await this.expectElementToBeVisible(discardDraftDropdownSelector);
+      await this.clickOnElementWithSelector(discardDraftDropdownSelector);
+      await this.expectElementToBeVisible(desktopDiscardDraftButton);
+      await this.expectElementToBeVisible(
+        `${desktopDiscardDraftButton}:not(.disabled)`
+      );
+      await this.clickOnElementWithSelector(desktopDiscardDraftButton);
+    }
+    await this.expectElementToBeVisible(confirmDiscardButton);
+    await this.clickOnElementWithSelector(confirmDiscardButton);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(confirmDiscardButton, false);
+  }
+
+  /**
+   * Verifies that the card content matches the expected text.
+   * @param {string} expectedCardContent - The expected card content.
+   */
+  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+    await this.expectElementToBeVisible(stateEditSelector);
+    const cardContent = (
+      await this.page.locator(stateEditSelector).textContent()
+    )?.trim();
+    if (cardContent !== expectedCardContent) {
+      throw new Error(
+        `Expected card content to be "${expectedCardContent}", but got "${cardContent}".`
+      );
+    }
+  }
+
+  /**
+   * Updates the name of the current state/card.
+   * @param {string} newStateName - The new name for the state.
+   */
+  async updateStateName(newStateName: string): Promise<void> {
+    await this.expectElementToBeVisible(currentCardNameContainerSelector);
+    await this.clickOnElementWithSelector(currentCardNameContainerSelector);
+    await this.expectElementToBeVisible(stateNameInputSelector);
+    await this.clearAllTextFrom(stateNameInputSelector);
+    await this.typeInInputField(stateNameInputSelector, newStateName);
+    await this.clickOnElementWithSelector(stateNameSubmitButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      newStateName
+    );
+  }
+
+  /**
+   * Verifies that the state name matches the expected value.
+   * @param {string} expectedStateName - The expected state name.
+   */
+  async expectStateNameToBe(expectedStateName: string): Promise<void> {
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      expectedStateName
+    );
+  }
+
+  /**
+   * Verifies that the current outcome destination matches the expected destination.
+   * @param {string} expectedDestination - The expected destination name.
+   */
+  async expectCurrentOutcomeDestinationToBe(
+    expectedDestination: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(currentOutcomeDestinationSelector);
+    const destination = (
+      await this.page.locator(currentOutcomeDestinationSelector).textContent()
+    )?.trim();
+    if (destination !== expectedDestination) {
+      throw new Error(
+        `Expected outcome destination to be "${expectedDestination}", but got "${destination}".`
+      );
+    }
+  }
+
+  /**
+   * Helper function to truncate card name if longer than 14 characters.
+   * @param {string} cardName - The card name to truncate.
+   */
+  truncateCardName(cardName: string): string {
+    return cardName.length > 14
+      ? cardName.slice(0, 10) + '...' + cardName.slice(-1)
+      : cardName;
+  }
+
+  /**
+   * Opens the exploration state graph modal in mobile view.
+   */
+  async openExplorationStateGraphInMobileView(): Promise<void> {
+    await this.expectElementToBeVisible(mobileStateGraphResizeButton);
+    await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+    await this.expectElementToBeVisible(explorationStateGraphModalSelector);
+  }
+
+  /**
+   * Verifies that the exploration graph contains the specified card.
+   * @param {string} cardName - The name of the card to check.
+   */
+  async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForSelector(explorationGraphNodeSelector);
+
+    const truncatedCardName = this.truncateCardName(cardName);
+    await this.page.waitForFunction(
+      ({
+        selector,
+        fullName,
+        truncatedName,
+      }: {
+        selector: string;
+        fullName: string;
+        truncatedName: string;
+      }) => {
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
+      },
+      {
+        selector: stateNodeSelector,
+        fullName: cardName,
+        truncatedName: truncatedCardName,
+      },
+      {timeout: 60000}
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Verifies that the exploration graph does not contain the specified card.
+   * @param {string} cardName - The name of the card to check.
+   */
+  async expectExplorationGraphToNotContainCard(
+    cardName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForFunction(
+      ({selector, value}: {selector: string; value: string}) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
+        );
+      },
+      {selector: stateNodeSelector, value: cardName},
+      {timeout: 60000}
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Sets the initial/first card of the exploration from the Settings tab.
+   * @param {string} cardName - The name of the card to set as first card.
+   */
+  async selectFirstCard(cardName: string): Promise<void> {
+    await this.expectElementToBeVisible(firstCardSettingsSelector);
+    await this.clickOnElementWithSelector(firstCardSettingsSelector);
+    await this.selectMatOption(cardName);
+    showMessage(`Initial card has been set to ${cardName}.`);
+  }
+
+  /**
+   * Navigates to the Preview tab in exploration editor.
+   */
+  async navigateToPreviewTab(): Promise<void> {
+    await this.navigateToExplorationEditorPreviewTab();
+  }
+
+  /**
+   * Verifies that the preview tab displays the expected card content.
+   * @param {string} _cardName - The name of the card (for parity with Puppeteer signature).
+   * @param {string} expectedCardContent - The expected text content.
+   */
+  async expectPreviewCardContentToBe(
+    _cardName: string,
+    expectedCardContent: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(stateConversationContent);
+    await this.expectTextContentToContain(
+      stateConversationContent,
+      expectedCardContent
+    );
+  }
+
+  /**
+   * Clicks on an element inside a graph node for the given state.
+   * @param {string} stateName - The state name in the graph node.
+   * @param {string} selectorToClick - The selector within the node to click.
+   * @returns {Promise<boolean>} Whether the click was dispatched.
+   */
+  async clickOnGraphNodeElement(
+    stateName: string,
+    selectorToClick: string
+  ): Promise<boolean> {
+    await this.page.waitForFunction(
+      ({nodeSelector}: {nodeSelector: string}) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {nodeSelector: explorationGraphNodeSelector},
+      {timeout: 60000}
+    );
+    return await this.page.evaluate(
+      ({
+        name,
+        selector,
+        nodeSelector,
+      }: {
+        name: string;
+        selector: string;
+        nodeSelector: string;
+      }) => {
+        const nodes = Array.from(document.querySelectorAll(nodeSelector));
+        const targetNode = nodes.find(node => {
+          const title = node.querySelector('title')?.textContent || '';
+          const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+          const normalizedName = name.replace(/\s+/g, ' ').trim();
+          return normalizedTitle.includes(normalizedName);
+        });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const element = targetNode.querySelector(
+          selector
+        ) as HTMLElement | null;
+
+        if (!element) {
+          return false;
+        }
+
+        element.scrollIntoView({block: 'center', inline: 'center'});
+        element.dispatchEvent(new Event('click', {bubbles: true}));
+        return true;
+      },
+      {
+        name: stateName,
+        selector: selectorToClick,
+        nodeSelector: explorationGraphNodeSelector,
+      }
+    );
+  }
+
+  /**
+   * Deletes a state/card from the exploration.
+   * @param {string} stateName - The name of the state to delete.
+   */
+  async deleteState(stateName: string): Promise<void> {
+    await this.expectExplorationGraphToContainCard(stateName);
+    const isMobile = this.isViewportAtMobileWidth();
+
+    if (isMobile) {
+      await this.openExplorationStateGraphInMobileView();
+    } else {
+      await this.navigateToCard(stateName);
+    }
+
+    await this.expectElementToBeVisible(explorationGraphSelector);
+
+    await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeBackgroundSelector
+    );
+
+    const deleteClicked = await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeDeleteButtonSelector
+    );
+
+    if (!deleteClicked) {
+      throw new Error(
+        `Delete button not found in graph for card: ${stateName}`
+      );
+    }
+
+    await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
+    await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
+
+    await this.page.waitForFunction(
+      ({selector, name}: {selector: string; name: string}) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
+      },
+      {selector: stateNodeSelector, name: stateName},
+      {timeout: 60000}
+    );
+
+    if (isMobile) {
+      const closeBtn = await this.page.$(closeModalButtonSelector);
+      if (closeBtn) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      }
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
   }
 }
 
