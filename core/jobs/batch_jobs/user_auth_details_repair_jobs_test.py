@@ -175,12 +175,89 @@ class RepairMissingUserAuthDetailsJobTests(
 
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
 
-    def test_profile_user_missing_auth_model_is_ok(self) -> None:
-        # NOTE: Profiles have no Firebase account, so they need no auth model.
-        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+    def test_firebase_issued_id_without_reverse_model_is_ok(self) -> None:
+        # NOTE: IDs that came from Firebase are left alone.
+        self.put_auth_model('uid_a', 'fb_a')
+        self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
+
+    def test_linked_user_with_stray_reverse_model_is_ok(self) -> None:
+        self.put_healthy_user('uid_a', FB_A)
+        self.put_reverse_model('fb_x', 'uid_a')
+
+        self.assert_job_output_is([stdout('OK SUCCESS: 1')])
+
+    def test_deleted_linked_user_is_ok(self) -> None:
+        # NOTE: FirebaseServerSyncJob disables the accounts of deleted users.
+        self.put_auth_model('uid_a', 'fb_a', deleted=True)
+        self.put_settings_model('uid_a', deleted=True)
+
+        self.assert_job_output_is([stdout('OK SUCCESS: 1')])
+
+    def test_linked_user_with_deleted_auth_model_is_reported(self) -> None:
+        self.put_auth_model('uid_a', 'fb_a', deleted=True)
+        self.put_settings_model('uid_a')
+
+        self.assert_job_output_is(
+            [stderr('uid_a has a deleted UserAuthDetailsModel')]
+        )
+
+    def test_linked_user_with_deleted_settings_model_is_reported(self) -> None:
+        self.put_auth_model('uid_a', 'fb_a')
+        self.put_settings_model('uid_a', deleted=True)
+
+        self.assert_job_output_is(
+            [stderr('uid_a has a deleted UserSettingsModel')]
+        )
+
+    def test_profile_user_missing_auth_model_is_reported(self) -> None:
+        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+
+        self.assert_job_output_is(
+            [stderr('uid_p is a profile without a parent_user_id')]
+        )
         self.assertIsNone(self.get_auth_model('uid_p'))
+
+    def test_profile_user_missing_parent_user_id_is_reported(self) -> None:
+        self.put_auth_model('uid_a')
+        self.put_settings_model('uid_a', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+
+        self.assert_job_output_is(
+            [stderr('uid_a is a profile without a parent_user_id')]
+        )
+        self.assert_firebase_auth_id_is_unassigned(FB_A)
+
+    def test_deleted_profile_user_is_ok(self) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a', deleted=True)
+        self.put_settings_model('uid_p', deleted=True)
+
+        self.assert_job_output_is([stdout('OK SUCCESS: 1')])
+
+    def test_profile_user_with_deleted_auth_model_is_reported(self) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a', deleted=True)
+        self.put_settings_model('uid_p')
+
+        self.assert_job_output_is(
+            [stderr('uid_p has a deleted UserAuthDetailsModel')]
+        )
+
+    def test_profile_user_with_deleted_settings_model_is_reported(
+        self,
+    ) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a')
+        self.put_settings_model('uid_p', deleted=True)
+
+        self.assert_job_output_is(
+            [stderr('uid_p has a deleted UserSettingsModel')]
+        )
+
+    def test_profile_user_missing_settings_model_is_reported(self) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a')
+
+        self.assert_job_output_is(
+            [stderr('uid_p is missing its UserSettingsModel')]
+        )
 
     def test_missing_auth_model_is_created(self) -> None:
         self.put_settings_model('uid_a')
@@ -281,13 +358,25 @@ class RepairMissingUserAuthDetailsJobTests(
         )
         self.assert_firebase_auth_id_is_unassigned(FB_A)
 
+    def test_users_needing_repair_that_share_an_email_are_reported(
+        self,
+    ) -> None:
+        self.put_settings_model('uid_a', email='x@x.com')
+        self.put_settings_model('uid_b', email='x@x.com')
+
+        self.assert_job_output_is(
+            [
+                stderr('uid_a shares its email with another user'),
+                stderr('uid_b shares its email with another user'),
+            ]
+        )
+
     def test_email_shared_with_profile_user_is_repaired(self) -> None:
         # NOTE: Profiles share their parent's email but have no Firebase
         # account, so they can't collide.
         self.put_settings_model('uid_a', email='x@x.com')
-        self.put_settings_model(
-            'uid_p', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
-        )
+        self.put_auth_model('uid_p', parent_user_id='uid_a')
+        self.put_settings_model('uid_p', email='x@x.com')
 
         self.assert_job_output_is(
             [stdout('OK SUCCESS: 1'), stdout('PUT SUCCESS: 2')]
@@ -301,6 +390,20 @@ class RepairMissingUserAuthDetailsJobTests(
             [
                 stdout('PUT SUCCESS: 2'),
                 stderr('uid_d has a deleted UserSettingsModel'),
+            ]
+        )
+
+    def test_email_shared_with_deleted_linked_user_is_reported(self) -> None:
+        # NOTE: FirebaseServerSyncJob keeps a disabled account for this user,
+        # so the email is still taken.
+        self.put_auth_model('uid_d', 'fb_d', deleted=True)
+        self.put_settings_model('uid_d', email='x@x.com', deleted=True)
+        self.put_settings_model('uid_a', email='x@x.com')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK SUCCESS: 1'),
+                stderr('uid_a shares its email with another user'),
             ]
         )
 
@@ -358,3 +461,12 @@ class AuditMissingUserAuthDetailsJobTests(
         self.assertEqual(auth_model.firebase_auth_id, '')
         self.assert_firebase_auth_id_is_unassigned(FB_A)
         self.assert_firebase_auth_id_is_unassigned(FB_B)
+
+    def test_interrupted_repair_is_reported_without_putting_models(
+        self,
+    ) -> None:
+        self.put_auth_model('uid_a', FB_A)
+        self.put_settings_model('uid_a')
+
+        self.assert_job_output_is([stdout('WOULD PUT SUCCESS: 1')])
+        self.assert_firebase_auth_id_is_unassigned(FB_A)

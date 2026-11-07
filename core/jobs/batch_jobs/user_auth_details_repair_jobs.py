@@ -120,29 +120,37 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
         # must not be repaired.
         shared_emails = (
             users
-            | 'Get emails of live full users'
-            >> beam.FlatMap(_get_live_full_user_email)
+            | 'Get emails of Firebase users'
+            >> beam.FlatMap(_get_firebase_email)
             | 'Count users per email' >> beam.combiners.Count.PerElement()
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
 
-        tags = (
-            TAG_OK,
-            TAG_PROBLEMS,
-            TAG_ADD_AUTH,
-            TAG_SET_FIREBASE_AUTH_ID,
-            TAG_ADD_REVERSE,
-        )
-        diagnoses = users | 'Diagnose users' >> beam.FlatMap(
-            _diagnose_user, shared_emails=beam.pvalue.AsDict(shared_emails)
-        ).with_outputs(*tags)
         (
             ok_users,
             problems,
             user_ids_missing_auth,
             auth_models_missing_firebase_auth_id,
             user_ids_missing_reverse,
-        ) = operator.itemgetter(*tags)(diagnoses)
+        ) = operator.itemgetter(
+            TAG_OK,
+            TAG_PROBLEMS,
+            TAG_ADD_AUTH,
+            TAG_SET_FIREBASE_AUTH_ID,
+            TAG_ADD_REVERSE,
+        )(
+            users
+            | 'Diagnose users'
+            >> beam.FlatMap(
+                _diagnose_user, shared_emails=beam.pvalue.AsDict(shared_emails)
+            ).with_outputs(
+                TAG_OK,
+                TAG_PROBLEMS,
+                TAG_ADD_AUTH,
+                TAG_SET_FIREBASE_AUTH_ID,
+                TAG_ADD_REVERSE,
+            )
+        )
 
         repaired_models = (
             user_ids_missing_auth
@@ -192,13 +200,26 @@ def _diagnose_user(
     """Tags the user as OK, as a problem, or with each repair it needs."""
     user_id, user_models_by_kind = user
     auth_model, settings_model, reverse_models = _unpack(user_models_by_kind)
-    if settings_model is not None and (
-        _is_profile_user(auth_model, settings_model)
-        or _is_linked_to_firebase(user_id, auth_model, reverse_models)
+    if settings_model is None:
+        yield beam.TaggedOutput(
+            TAG_PROBLEMS, f'{user_id} is missing its UserSettingsModel'
+        )
+    elif deleted_kind := _find_lone_deleted_model(auth_model, settings_model):
+        yield beam.TaggedOutput(
+            TAG_PROBLEMS, f'{user_id} has a deleted {deleted_kind}'
+        )
+    elif feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles and (
+        not _is_profile_user(auth_model)
+    ):
+        yield beam.TaggedOutput(
+            TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
+        )
+    elif _is_profile_user(auth_model) or (
+        _is_linked_to_firebase(user_id, auth_model, reverse_models)
     ):
         yield beam.TaggedOutput(TAG_OK, user_id)
     elif problem := _find_problem(
-        user_id, auth_model, settings_model, reverse_models, shared_emails
+        user_id, settings_model, reverse_models, shared_emails
     ):
         yield beam.TaggedOutput(TAG_PROBLEMS, f'{user_id} {problem}')
     else:
@@ -212,18 +233,26 @@ def _diagnose_user(
             yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
 
 
+def _find_lone_deleted_model(
+    auth_model: auth_models.UserAuthDetailsModel | None,
+    settings_model: user_models.UserSettingsModel,
+) -> str | None:
+    """Returns the kind of the user's only deleted model, if exactly one is.
+
+    NOTE: FirebaseServerSyncJob fails on users like these.
+    """
+    if auth_model is None or auth_model.deleted == settings_model.deleted:
+        return None
+    return 'UserAuthDetailsModel' if auth_model.deleted else 'UserSettingsModel'
+
+
 def _find_problem(
     user_id: str,
-    auth_model: auth_models.UserAuthDetailsModel | None,
-    settings_model: user_models.UserSettingsModel | None,
+    settings_model: user_models.UserSettingsModel,
     reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
     shared_emails: abc.Mapping[str, int],
 ) -> str | None:
     """Returns why the user can't be safely repaired, or None if it can."""
-    if settings_model is None:
-        return 'is missing its UserSettingsModel'
-    if auth_model is not None and auth_model.deleted:
-        return 'has a deleted UserAuthDetailsModel'
     if settings_model.deleted:
         return 'has a deleted UserSettingsModel'
     if any(
@@ -276,13 +305,19 @@ def _build_reverse_model(
     return model
 
 
-def _get_live_full_user_email(user: User) -> abc.Iterator[str]:
-    """Yields the user's email if the user can have a Firebase account."""
+def _get_firebase_email(user: User) -> abc.Iterator[str]:
+    """Yields the user's email if the user may have a Firebase account.
+
+    NOTE: Deleted users keep a disabled Firebase account, so their email is
+    still taken.
+    """
     _, user_models_by_kind = user
     auth_model, settings_model, _ = _unpack(user_models_by_kind)
-    if settings_model is None or settings_model.deleted:
+    if settings_model is None or _is_profile_user(auth_model):
         return
-    if not _is_profile_user(auth_model, settings_model):
+    if not settings_model.deleted or (
+        auth_model is not None and auth_model.firebase_auth_id
+    ):
         yield _get_email(settings_model)
 
 
@@ -306,17 +341,11 @@ def _unpack(
 
 def _is_profile_user(
     auth_model: auth_models.UserAuthDetailsModel | None,
-    settings_model: user_models.UserSettingsModel,
 ) -> bool:
     """Returns whether the user is a profile, which never has a Firebase
     account.
-
-    NOTE: Every profile has the mobile learner role, so a profile can still be
-    recognized when its UserAuthDetailsModel is missing.
     """
-    if auth_model is not None and auth_model.parent_user_id is not None:
-        return True
-    return feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
+    return auth_model is not None and auth_model.parent_user_id is not None
 
 
 def _is_linked_to_firebase(
