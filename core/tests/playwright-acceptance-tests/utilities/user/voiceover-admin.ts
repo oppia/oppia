@@ -53,7 +53,6 @@ const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
 const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
 const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
-('h3.e2e-test-controls-bar-settings-container');
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
