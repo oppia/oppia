@@ -119,7 +119,7 @@
         <oppia-featured-translation-languages-editor>
         </oppia-featured-translation-languages-editor>
       </div>
-      <contributor-admin-stats-table *ngIf="shouldShowStatsTable()" [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
     </div>
     <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
       <div class="dropdown">
@@ -182,11 +182,15 @@
           </oppia-topic-filter>
         </div>
       </div>
+<<<<<<< HEAD
       <div *ngIf="shouldShowFeaturedLanguagesEditor()" class="featured-translation-languages-container mb-3 e2e-test-featured-translation-languages">
         <oppia-featured-translation-languages-editor>
         </oppia-featured-translation-languages-editor>
       </div>
       <contributor-admin-stats-table *ngIf="shouldShowStatsTable()" [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+=======
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
+>>>>>>> upstream/develop
     </div>
   </div>
 </div>
