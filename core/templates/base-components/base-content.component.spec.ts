@@ -103,6 +103,11 @@ describe('Base Content Component', () => {
         hash: hash,
       },
       document: {
+        body: {
+          style: {
+            overflowY: 'auto',
+          },
+        },
         addEventListener(event: string, callback: () => void) {
           callback();
         },
@@ -228,8 +233,12 @@ describe('Base Content Component', () => {
 
   it('should close sidebar on swipe', () => {
     spyOn(sidebarStatusService, 'closeSidebar');
+    windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+
     componentInstance.closeSidebarOnSwipe();
+
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+    expect(windowRef.nativeWindow.document.body.style.overflowY).toBe('auto');
   });
 
   it('should toggle mobile nav options', () => {

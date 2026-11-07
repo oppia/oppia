@@ -47,6 +47,13 @@ class MockWindowRef {
       href: '',
     },
     gtag: () => {},
+    document: {
+      body: {
+        style: {
+          overflowY: 'auto',
+        },
+      },
+    },
   };
 }
 
@@ -161,8 +168,14 @@ describe('Side Navigation Bar Component', () => {
 
   it('should close sidebar on swipe left', () => {
     spyOn(sidebarStatusService, 'closeSidebar');
+    mockWindowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+
     componentInstance.closeSidebarOnSwipeleft();
+
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'auto'
+    );
   });
 
   it(

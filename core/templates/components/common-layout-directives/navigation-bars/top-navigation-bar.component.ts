@@ -328,11 +328,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         }
 
-        // Close the sidebar, if necessary.
-        this.sidebarStatusService.closeSidebar();
+        // Keep the sidebar open when mobile browser controls resize the viewport.
+        if (!this.windowIsNarrow) {
+          this.sidebarStatusService.closeSidebar();
+          this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+        }
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
-        this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
         // The available space on the right of the dropdowns changes when the
         // window is resized, so recompute the offsets explicitly.
         this.updateGetInvolvedMenuOffset();
