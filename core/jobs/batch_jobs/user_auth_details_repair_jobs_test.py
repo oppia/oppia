@@ -32,9 +32,8 @@ auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
 
-# The firebase_auth_ids generated for 'uid_a' and 'uid_b', respectively. They
-# are pinned because changing them would make reruns of the repair job assign
-# different IDs than earlier runs did.
+# The IDs generated for 'uid_a' and 'uid_b'. They must never change, or reruns
+# of the job would give users different IDs.
 FB_A = 'sqTIGueuegJe59TSS4G8eWnTiSIc'
 FB_B = 'gCwxWz2BUfDbQ9W7u9wRTTwiSWkc'
 
@@ -50,7 +49,7 @@ def stderr(message: str) -> job_run_result.JobRunResult:
 
 
 class RepairMissingUserAuthDetailsJobTestBase(job_test_utils.JobTestBase):
-    """Shared setup helpers for the missing UserAuthDetailsModel repair jobs."""
+    """Shared helpers for the repair job tests."""
 
     def put_auth_model(
         self,
@@ -114,8 +113,7 @@ class RepairMissingUserAuthDetailsJobTestBase(job_test_utils.JobTestBase):
     def assert_user_is_repaired(
         self, user_id: str, firebase_auth_id: str
     ) -> None:
-        """Asserts that the given user was repaired with the given ID, and that
-        FirebaseServerSyncJob can now rebuild its Firebase record.
+        """Asserts that the user was repaired and can now be synced.
 
         Args:
             user_id: str. The Oppia user ID of the user.
@@ -178,8 +176,7 @@ class RepairMissingUserAuthDetailsJobTests(
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
 
     def test_profile_user_missing_auth_model_is_ok(self) -> None:
-        # NOTE: Profile users have no Firebase account, so they don't need a
-        # UserAuthDetailsModel for FirebaseServerSyncJob to sync them.
+        # NOTE: Profiles have no Firebase account, so they need no auth model.
         self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
 
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
@@ -272,8 +269,7 @@ class RepairMissingUserAuthDetailsJobTests(
     def test_email_shared_with_full_user_is_reported_not_repaired(
         self,
     ) -> None:
-        # NOTE: The emails differ by case because Firebase stores emails in
-        # lowercase, so they still collide in FirebaseServerSyncJob.
+        # NOTE: Firebase ignores case, so these emails are the same.
         self.put_healthy_user('uid_h', 'fb_h', email='x@x.com')
         self.put_settings_model('uid_a', email='X@x.com')
 
@@ -286,8 +282,8 @@ class RepairMissingUserAuthDetailsJobTests(
         self.assert_firebase_auth_id_is_unassigned(FB_A)
 
     def test_email_shared_with_profile_user_is_repaired(self) -> None:
-        # NOTE: Profile users share their parent's email, but they never get
-        # a Firebase account, so they can't collide with the repaired user.
+        # NOTE: Profiles share their parent's email but have no Firebase
+        # account, so they can't collide.
         self.put_settings_model('uid_a', email='x@x.com')
         self.put_settings_model(
             'uid_p', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
@@ -309,8 +305,8 @@ class RepairMissingUserAuthDetailsJobTests(
         )
 
     def test_healthy_users_sharing_email_are_ok(self) -> None:
-        # NOTE: Existing collisions are reported by FirebaseServerSyncJob, so
-        # users that don't need repairs are left alone.
+        # NOTE: FirebaseServerSyncJob reports these collisions. This job only
+        # cares about users that need repairs.
         self.put_healthy_user('uid_a', 'fb_a', email='x@x.com')
         self.put_healthy_user('uid_b', 'fb_b', email='x@x.com')
 

@@ -14,19 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that repair users whose UserAuthDetailsModel is missing or broken.
+"""Jobs that repair users who can't be synced to Firebase.
 
-FirebaseServerSyncJob can only rebuild the Firebase record of a full user whose
-UserAuthDetailsModel has a firebase_auth_id, and whose
-UserIdByFirebaseAuthIdModel maps that ID back to the user. These jobs give
-every live, full user that lacks either one the firebase_auth_id
-utils.convert_to_hash(user_id). Because the ID is deterministic, a rerun
-finishes the repairs that an interrupted run left half-written.
+FirebaseServerSyncJob can only sync a user who has a firebase_auth_id and a
+UserIdByFirebaseAuthIdModel for it. These jobs create whichever is missing.
 
-Users are reported instead of repaired when the repair would be unsafe: when
-any of their models is deleted or missing, when another
-UserIdByFirebaseAuthIdModel already maps to them, or when another live, full
-user shares their email (which FirebaseServerSyncJob refuses to sync).
+Each repaired user gets an ID derived from their user ID. The ID is the same
+on every run, so rerunning the job finishes any interrupted repair.
+
+Users are reported instead of repaired when a repair would be unsafe.
 """
 
 from __future__ import annotations
@@ -58,13 +54,12 @@ TAG_OK = 'OK'
 TAG_REPAIR = 'REPAIR'
 TAG_PROBLEMS = 'PROBLEMS'
 
-# The length of generated Firebase auth IDs. This matches the length of the IDs
-# that Firebase generates for its own accounts.
+# Matches the length of the IDs that Firebase generates.
 _FIREBASE_AUTH_ID_LENGTH = 28
 
 
 class UserModels(TypedDict):
-    """The models of one user, as joined by CoGroupByKey."""
+    """The models of one user, grouped by kind."""
 
     auth: list[auth_models.UserAuthDetailsModel]
     settings: list[user_models.UserSettingsModel]
@@ -78,20 +73,17 @@ RepairedModel = (
 
 
 class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
-    """Repairs users whose UserAuthDetailsModel is missing or broken.
+    """Gives users the auth models that FirebaseServerSyncJob needs.
 
     Attributes:
-        DRY_RUN: bool. When True, the job is read-only and merely reports the
-            models that would be put. When False, the job puts them into the
-            datastore.
+        DRY_RUN: bool. Whether to only report the repairs without saving them.
     """
 
     DRY_RUN = True
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        # NOTE: Deleted models are read as well because the repair refuses to
-        # touch users with deleted models, and must see every existing
-        # UserIdByFirebaseAuthIdModel to avoid assigning ambiguous IDs.
+        # NOTE: Deleted models are included because users that have them must
+        # not be repaired.
         users = {
             'auth': self.pipeline
             | 'Get UserAuthDetailsModels'
@@ -116,6 +108,8 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             >> beam.WithKeys(lambda m: m.user_id),
         } | 'Join models by user id' >> beam.CoGroupByKey()
 
+        # NOTE: Users that share an email block FirebaseServerSyncJob, so they
+        # must not be repaired.
         shared_emails = (
             users
             | 'Get emails of live full users'
@@ -159,13 +153,13 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
 
 
 class AuditMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
-    """Read-only: reports the repairs without putting any models."""
+    """Reports the repairs without saving them."""
 
     DRY_RUN = True
 
 
 class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
-    """Read-write: puts the repaired models into the datastore."""
+    """Saves the repairs to the datastore."""
 
     DRY_RUN = False
 
@@ -173,7 +167,7 @@ class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
 def _diagnose_user(
     user: User, shared_emails: abc.Mapping[str, int]
 ) -> beam.TaggedOutput:
-    """Tags the given user as OK, as needing a repair, or as a problem."""
+    """Tags the user as OK, as needing a repair, or as a problem."""
     user_id, user_models_by_kind = user
     auth_model, settings_model, reverse_models = _unpack(user_models_by_kind)
     if settings_model is not None and (
@@ -196,7 +190,7 @@ def _find_problem(
     reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
     shared_emails: abc.Mapping[str, int],
 ) -> str | None:
-    """Returns why the given user can't be repaired, or None if it can be."""
+    """Returns why the user can't be safely repaired, or None if it can."""
     if settings_model is None:
         return 'is missing its UserSettingsModel'
     if auth_model is not None and auth_model.deleted:
@@ -214,7 +208,7 @@ def _find_problem(
 
 
 def _build_repaired_models(user: User) -> list[RepairedModel]:
-    """Returns the new or updated models that repair the given user."""
+    """Returns the models to save to repair the user."""
     user_id, user_models_by_kind = user
     auth_model, _, reverse_models = _unpack(user_models_by_kind)
     firebase_auth_id = _generate_firebase_auth_id(user_id)
@@ -227,8 +221,7 @@ def _build_repaired_models(user: User) -> list[RepairedModel]:
                 )
             )
         elif not auth_model.firebase_auth_id:
-            # NOTE: Apache Beam requires inputs to be treated as immutable, so
-            # the input model is cloned before being changed.
+            # NOTE: Beam inputs must not be changed, so we change a copy.
             repaired_models.append(
                 job_utils.clone_model(
                     auth_model, firebase_auth_id=firebase_auth_id
@@ -246,7 +239,7 @@ def _build_repaired_models(user: User) -> list[RepairedModel]:
 
 
 def _get_live_full_user_email(user: User) -> abc.Iterator[str]:
-    """Yields the email of the given user if it can have a Firebase account."""
+    """Yields the user's email if the user can have a Firebase account."""
     _, user_models_by_kind = user
     auth_model, settings_model, _ = _unpack(user_models_by_kind)
     if settings_model is None or settings_model.deleted:
@@ -262,10 +255,9 @@ def _unpack(
     user_models.UserSettingsModel | None,
     list[auth_models.UserIdByFirebaseAuthIdModel],
 ]:
-    """Returns the auth model, settings model and reverse models of a user.
+    """Returns the user's auth model, settings model and reverse models.
 
-    NOTE: The auth and settings models are keyed by user id, so there is at
-    most one of each.
+    NOTE: A user has at most one auth model and one settings model.
     """
     return (
         next(iter(user_models_by_kind['auth']), None),
@@ -278,12 +270,11 @@ def _is_profile_user(
     auth_model: auth_models.UserAuthDetailsModel | None,
     settings_model: user_models.UserSettingsModel,
 ) -> bool:
-    """Returns whether the given models belong to a profile user.
+    """Returns whether the user is a profile, which never has a Firebase
+    account.
 
-    NOTE: Only UserAuthDetailsModel stores the parent_user_id, so profile users
-    missing that model are recognized by their mobile learner role instead.
-    Every profile user is created with that role, and user_services forbids
-    changing it.
+    NOTE: Every profile has the mobile learner role, so a profile can still be
+    recognized when its UserAuthDetailsModel is missing.
     """
     if auth_model is not None and auth_model.parent_user_id is not None:
         return True
@@ -297,8 +288,8 @@ def _is_linked_to_firebase(
 ) -> bool:
     """Returns whether FirebaseServerSyncJob can already sync the user.
 
-    NOTE: Only the reverse models of generated IDs are checked, because
-    firebase_auth_ids that Firebase assigned predate this job.
+    NOTE: Only IDs created by this job need a check for their reverse model.
+    Other IDs came from Firebase and are left alone.
     """
     if auth_model is None or not auth_model.firebase_auth_id:
         return False
@@ -312,20 +303,18 @@ def _has_live_reverse_model(
     firebase_auth_id: str,
     reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
 ) -> bool:
-    """Returns whether a live reverse model has the given firebase_auth_id."""
+    """Returns whether a non-deleted reverse model uses the given ID."""
     return any(
         m.id == firebase_auth_id and not m.deleted for m in reverse_models
     )
 
 
 def _generate_firebase_auth_id(user_id: str) -> str:
-    """Returns the deterministic firebase_auth_id of a repaired user."""
+    """Returns the ID that this job gives the user, which never changes."""
     return utils.convert_to_hash(user_id, _FIREBASE_AUTH_ID_LENGTH)
 
 
 def _get_email(settings_model: user_models.UserSettingsModel) -> str:
-    """Returns the user's email, lowercased because Firebase stores emails in
-    lowercase, so emails that differ only by case still collide.
-    """
+    """Returns the user's email in lowercase, because Firebase ignores case."""
     email: str = settings_model.email
     return email.lower()
