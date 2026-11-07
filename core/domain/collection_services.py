@@ -56,7 +56,6 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypedDict,
     cast,
     overload,
 )
@@ -73,17 +72,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW: Final = 'create_new'
-
-
-class SnapshotsMetadataDict(TypedDict):
-    """Dictionary representing the snapshot metadata for collection models."""
-
-    committer_id: str
-    commit_message: str
-    commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]]
-    commit_type: str
-    version_number: int
-    created_on_ms: float
 
 
 def _migrate_collection_contents_to_latest_schema(
@@ -1115,28 +1103,79 @@ def delete_collections(
     )
 
 
+def get_collection_snapshot_metadata_from_model(
+    model: collection_models.CollectionSnapshotMetadataModel,
+) -> collection_domain.CollectionSnapshotMetadata:
+    """Returns a CollectionSnapshotMetadata domain object given a
+    CollectionSnapshotMetadataModel loaded from the datastore.
+
+    Args:
+        model: CollectionSnapshotMetadataModel. The snapshot metadata model
+            loaded from the datastore.
+
+    Returns:
+        CollectionSnapshotMetadata. The corresponding domain object.
+    """
+    return collection_domain.CollectionSnapshotMetadata(
+        model.get_unversioned_instance_id(),
+        int(model.get_version_string()),
+        model.committer_id,
+        model.commit_type,
+        model.commit_message,
+        model.commit_cmds,
+        model.commit_cmds_user_ids,
+        model.content_user_ids,
+        model.created_on,
+        model.last_updated,
+        model.deleted,
+    )
+
+
 def get_collection_snapshots_metadata(
     collection_id: str,
-) -> List[SnapshotsMetadataDict]:
-    """Returns the snapshots for this collection, as dicts.
+) -> List[collection_domain.CollectionSnapshotMetadata]:
+    """Returns the snapshots for this collection, as domain objects.
 
     Args:
         collection_id: str. The id of the collection in question.
 
     Returns:
-        list of dicts, each representing a recent snapshot. Each dict has the
-        following keys: committer_id, commit_message, commit_cmds, commit_type,
-        created_on_ms, version_number. The version numbers are consecutive and
-        in ascending order. There are collection.version_number items in the
-        returned list.
+        list(CollectionSnapshotMetadata). A list of domain objects, each
+        representing a snapshot of the collection. The versions are consecutive
+        and in ascending order.
+
+    Raises:
+        Exception. The snapshot metadata model for a version does not exist.
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
     version_nums = list(range(1, current_version + 1))
 
-    return collection_models.CollectionModel.get_snapshots_metadata(
-        collection_id, version_nums
+    snapshot_ids = [
+        collection_models.CollectionModel.get_snapshot_id(
+            collection_id, version_num
+        )
+        for version_num in version_nums
+    ]
+    snapshot_metadata_models = (
+        collection_models.CollectionSnapshotMetadataModel.get_multi(
+            snapshot_ids
+        )
     )
+    snapshots_metadata: List[collection_domain.CollectionSnapshotMetadata] = []
+    for version_num, snapshot_model in zip(
+        version_nums, snapshot_metadata_models
+    ):
+        if snapshot_model is None:
+            raise Exception(
+                'Invalid version number %s for collection with id %s'
+                % (version_num, collection_id)
+            )
+        snapshots_metadata.append(
+            get_collection_snapshot_metadata_from_model(snapshot_model)
+        )
+
+    return snapshots_metadata
 
 
 def publish_collection_and_update_user_profiles(
@@ -1350,7 +1389,7 @@ def compute_collection_contributors_summary(
     contributors_summary: Dict[str, int] = collections.defaultdict(int)
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
-        committer_id = snapshot_metadata['committer_id']
+        committer_id = snapshot_metadata.committer_id
         if committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 

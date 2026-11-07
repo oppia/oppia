@@ -18,10 +18,14 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.constants import constants
-from core.domain import collection_domain, collection_services
+from core.domain import change_domain, collection_domain, collection_services
 from core.tests import test_utils
+
+from typing import Dict, List
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -1462,3 +1466,360 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID, self.collection_summary.contributor_ids
         )
+
+
+class CollectionSnapshotMetadataTests(test_utils.GenericTestBase):
+    """Tests for CollectionSnapshotMetadata domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.created_on = utils.get_current_utc_datetime()
+        self.last_updated = self.created_on + datetime.timedelta(hours=1)
+        self.valid_user_id = 'uid_%s' % ('a' * 32)
+        self.valid_commit_cmds: List[
+            Dict[str, change_domain.AcceptableChangeDictTypes]
+        ] = [
+            {
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'A category',
+            }
+        ]
+        self.snapshot_metadata_dict: (
+            collection_domain.CollectionSnapshotMetadataDict
+        ) = {
+            'collection_id': 'col123',
+            'version': 1,
+            'committer_id': self.valid_user_id,
+            'commit_type': feconf.COMMIT_TYPE_CREATE,
+            'commit_message': 'Commit message',
+            'commit_cmds': self.valid_commit_cmds,
+            'commit_cmds_user_ids': [self.valid_user_id],
+            'content_user_ids': [self.valid_user_id],
+            'created_on': self.created_on,
+            'last_updated': self.last_updated,
+            'deleted': False,
+        }
+        self.snapshot_metadata = collection_domain.CollectionSnapshotMetadata(
+            'col123',
+            1,
+            self.valid_user_id,
+            feconf.COMMIT_TYPE_CREATE,
+            'Commit message',
+            self.valid_commit_cmds,
+            [self.valid_user_id],
+            [self.valid_user_id],
+            self.created_on,
+            self.last_updated,
+            False,
+        )
+
+    def test_to_dict_and_from_dict(self) -> None:
+        self.assertEqual(
+            self.snapshot_metadata.to_dict(), self.snapshot_metadata_dict
+        )
+        reconstituted_metadata = (
+            collection_domain.CollectionSnapshotMetadata.from_dict(
+                self.snapshot_metadata_dict
+            )
+        )
+        self.assertEqual(
+            reconstituted_metadata.to_dict(), self.snapshot_metadata_dict
+        )
+
+    def test_validation_passes_with_valid_properties(self) -> None:
+        self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_collection_id_validation(self) -> None:
+        self.snapshot_metadata.collection_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected collection_id to be a string, received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.collection_id = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected collection_id to be a nonempty alphanumeric string, '
+            'received ',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.collection_id = 'col-id!'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected collection_id to be a nonempty alphanumeric string, '
+            'received col-id!',
+        ):
+            self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_version_validation(self) -> None:
+        self.snapshot_metadata.version = '1'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be an int, received 1',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.version = True
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be an int, received True',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.version = False
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be an int, received False',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.version = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be greater than 0, received 0',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.version = -1
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be greater than 0, received -1',
+        ):
+            self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_committer_id_validation(self) -> None:
+        self.snapshot_metadata.committer_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected committer_id to be a string, received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.committer_id = 'invalid_committer_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected committer_id to be a valid user ID, received '
+            'invalid_committer_id',
+        ):
+            self.snapshot_metadata.validate()
+
+        # System committer ID should be valid.
+        self.snapshot_metadata.committer_id = feconf.SYSTEM_COMMITTER_ID
+        self.snapshot_metadata.validate()
+
+        # Pseudonymous ID should be valid.
+        self.snapshot_metadata.committer_id = 'pid_%s' % ('a' * 32)
+        self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_commit_type_validation(self) -> None:
+        self.snapshot_metadata.commit_type = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_type to be a string, received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_type = 'invalid_type'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid commit_type: invalid_type. Must be one of',
+        ):
+            self.snapshot_metadata.validate()
+
+        for (
+            commit_type
+        ) in (
+            collection_domain.CollectionSnapshotMetadata.SUPPORTED_COMMIT_TYPES
+        ):
+            self.snapshot_metadata.commit_type = commit_type
+            self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_commit_message_validation(self) -> None:
+        self.snapshot_metadata.commit_message = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_message to be a string or None, received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_message = ''
+        self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_message = None
+        self.snapshot_metadata.validate()
+
+    def test_commit_cmds_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.commit_cmds = 'not_a_list'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_cmds to be a list, received not_a_list',
+        ):
+            self.snapshot_metadata.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.commit_cmds = ['not_a_dict']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_cmd to be a dict, received not_a_dict',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_cmds = [{'cmd': 'invalid_cmd'}]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Commit command .* is not valid: .*Command invalid_cmd is not '
+            'allowed',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_cmds = []
+        self.snapshot_metadata.validate()
+
+    def test_commit_cmds_user_ids_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.commit_cmds_user_ids = 'not_a_list'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_cmds_user_ids to be a list, received not_a_list',
+        ):
+            self.snapshot_metadata.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.commit_cmds_user_ids = [123]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_cmds_user_ids to contain valid user IDs, '
+            'received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_cmds_user_ids = ['invalid_user_id']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected commit_cmds_user_ids to contain valid user IDs, '
+            'received invalid_user_id',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.commit_cmds_user_ids = []
+        self.snapshot_metadata.validate()
+
+    def test_content_user_ids_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.content_user_ids = 'not_a_list'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected content_user_ids to be a list, received not_a_list',
+        ):
+            self.snapshot_metadata.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.content_user_ids = [123]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected content_user_ids to contain valid user IDs, received 123',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.content_user_ids = ['invalid_user_id']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected content_user_ids to contain valid user IDs, '
+            'received invalid_user_id',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.content_user_ids = []
+        self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_created_on_validation(self) -> None:
+        self.snapshot_metadata.created_on = 'not_a_datetime'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected created_on to be a datetime.datetime, received '
+            'not_a_datetime',
+        ):
+            self.snapshot_metadata.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_last_updated_validation(self) -> None:
+        self.snapshot_metadata.last_updated = 'not_a_datetime'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected last_updated to be a datetime.datetime, received '
+            'not_a_datetime',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.last_updated = (
+            self.created_on - datetime.timedelta(seconds=1)
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected last_updated .* to be greater than or equal to '
+            'created_on',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.last_updated = self.created_on
+        self.snapshot_metadata.validate()
+
+    def test_deleted_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.deleted = 'not_a_bool'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected deleted to be a bool, received not_a_bool',
+        ):
+            self.snapshot_metadata.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.snapshot_metadata.deleted = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected deleted to be a bool, received 1',
+        ):
+            self.snapshot_metadata.validate()
+
+        self.snapshot_metadata.deleted = True
+        self.snapshot_metadata.validate()
