@@ -46,6 +46,8 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -139,6 +141,111 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin
         )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_topic_edit_carries_forward_and_invalidates_changed_translation(
+        self,
+    ) -> None:
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for content_id, translated_value in (
+            (feconf.TOPIC_NAME_CONTENT_ID, 'Translated name'),
+            (feconf.TOPIC_DESCRIPTION_CONTENT_ID, 'Translated description'),
+        ):
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.TOPIC,
+                topic.id,
+                topic.version,
+                'hi',
+                content_id,
+                translation_domain.TranslatedContent(
+                    translated_value,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    False,
+                ),
+            )
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                        'old_value': topic.description,
+                        'new_value': 'Updated description',
+                    }
+                )
+            ],
+            'Updated topic description.',
+        )
+
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            self.TOPIC_ID,
+            updated_topic.version,
+            'hi',
+        ).translations
+        self.assertFalse(
+            translations[feconf.TOPIC_NAME_CONTENT_ID].needs_update
+        )
+        self.assertTrue(
+            translations[feconf.TOPIC_DESCRIPTION_CONTENT_ID].needs_update
+        )
+        opportunity = opportunity_models.TranslationOpportunityModel.get(
+            'topic.%s' % self.TOPIC_ID
+        )
+        self.assertEqual(opportunity.content_count, 2)
+        self.assertEqual(opportunity.translation_counts['hi'], 1)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,
+            self.TOPIC_ID,
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                        'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                        'old_value': updated_topic.description,
+                        'new_value': '',
+                    }
+                )
+            ],
+            'Clear topic description.',
+        )
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            self.TOPIC_ID,
+            updated_topic.version,
+            'hi',
+        ).translations
+        self.assertIn(feconf.TOPIC_NAME_CONTENT_ID, translations)
+        self.assertNotIn(feconf.TOPIC_DESCRIPTION_CONTENT_ID, translations)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_new_topic_creates_metadata_translation_opportunity(self) -> None:
+        topic = self.save_new_topic(
+            'new_topic_translation',
+            self.user_id_admin,
+            name='New topic for translation',
+            description='New topic description',
+            url_fragment='new-topic-trans',
+        )
+        opportunity = opportunity_models.TranslationOpportunityModel.get(
+            'topic.%s' % topic.id
+        )
+        self.assertEqual(opportunity.topic_ids, [topic.id])
+        self.assertEqual(opportunity.content_count, 2)
 
     def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
         self,
@@ -2963,6 +3070,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model_6_before.content_count, 1)
 
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'topic.%s' % self.TOPIC_ID, strict=False
+            )
+        )
 
         model_5 = opportunity_models.TranslationOpportunityModel.get(
             'skill.skill_id_5', strict=False

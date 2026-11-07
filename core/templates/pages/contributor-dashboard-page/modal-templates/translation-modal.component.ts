@@ -76,6 +76,8 @@ const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
 const EXPLORATION_TITLE_CHAR_LIMIT = 36;
 const CONTENT_TYPE_METADATA = 'metadata';
 const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
+const TOPIC_NAME_CONTENT_ID = 'topic_name';
+const TOPIC_DESCRIPTION_CONTENT_ID = 'topic_description';
 const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill_description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill_explanation';
@@ -710,6 +712,12 @@ export class TranslationModalComponent {
       if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
         return 'objective';
       }
+      if (contentId === TOPIC_NAME_CONTENT_ID) {
+        return 'topic name';
+      }
+      if (contentId === TOPIC_DESCRIPTION_CONTENT_ID) {
+        return 'topic description';
+      }
       if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
         return 'tag';
       }
@@ -893,13 +901,20 @@ export class TranslationModalComponent {
     this.hasLengthValidationError = false;
     this.lengthValidationErrorMessage = '';
     const activeContentId = this.translateTextService.activeContentId;
-    if (activeContentId === EXPLORATION_TITLE_CONTENT_ID) {
-      if (this.activeWrittenTranslation.length > EXPLORATION_TITLE_CHAR_LIMIT) {
-        this.hasLengthValidationError = true;
-        this.lengthValidationErrorMessage =
-          'Translation exceeds the allowed character limit. The translation ' +
-          `for the above content must be ${EXPLORATION_TITLE_CHAR_LIMIT} characters or fewer.`;
-      }
+    const metadataLengthLimits: {[contentId: string]: number} = {
+      [EXPLORATION_TITLE_CONTENT_ID]: EXPLORATION_TITLE_CHAR_LIMIT,
+      [TOPIC_NAME_CONTENT_ID]: AppConstants.MAX_CHARS_IN_TOPIC_NAME,
+      [TOPIC_DESCRIPTION_CONTENT_ID]:
+        AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION,
+    };
+    const limit = activeContentId
+      ? metadataLengthLimits[activeContentId]
+      : null;
+    if (limit && this.activeWrittenTranslation.length > limit) {
+      this.hasLengthValidationError = true;
+      this.lengthValidationErrorMessage =
+        'Translation exceeds the allowed character limit. The translation ' +
+        `for the above content must be ${limit} characters or fewer.`;
     }
   }
 

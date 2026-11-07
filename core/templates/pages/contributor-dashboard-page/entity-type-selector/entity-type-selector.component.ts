@@ -66,6 +66,10 @@ export class EntityTypeSelectorComponent implements OnInit {
       id: AppConstants.ENTITY_TYPE.SKILL,
       label: 'Skills',
     },
+    {
+      id: AppConstants.ENTITY_TYPE.TOPIC,
+      label: 'Topics',
+    },
   ];
 
   ngOnInit(): void {

@@ -1603,3 +1603,80 @@ class BackfillTranslationOpportunityModelJobBaseTests(
             ),
         ):
             job._compute_translation_opportunities()  # pylint: disable=protected-access
+
+
+class BackfillTopicTranslationOpportunityModelJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+    """Tests the topic translation opportunity backfill."""
+
+    JOB_CLASS = (
+        translation_opportunity_backfill_jobs.BackfillTopicTranslationOpportunityModelJob
+    )
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup('topic-author@example.com', 'topicauthor')
+        author_id = self.get_user_id_from_email('topic-author@example.com')
+        self.save_new_topic(
+            'topic_backfill_test',
+            author_id,
+            name='Topic name',
+            description='Topic description',
+        )
+
+    def test_creates_topic_opportunity_with_metadata_fields(self) -> None:
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'TOPIC TRANSLATION OPPORTUNITY MODEL CREATION '
+                        'SUCCESS: 1'
+                    )
+                ),
+            ]
+        )
+        model = get_opportunity_model(
+            feconf.TranslatableEntityType.TOPIC, 'topic_backfill_test'
+        )
+        self.assertEqual(model.topic_ids, ['topic_backfill_test'])
+        self.assertEqual(model.content_count, 2)
+
+
+class AuditBackfillTopicTranslationOpportunityModelJobTests(
+    BackfillTopicTranslationOpportunityModelJobTests
+):
+    """Checks that the topic backfill audit does not write models."""
+
+    JOB_CLASS = (
+        translation_opportunity_backfill_jobs.AuditBackfillTopicTranslationOpportunityModelJob
+    )
+
+    def test_creates_topic_opportunity_with_metadata_fields(self) -> None:
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 2\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'TOPIC TRANSLATION OPPORTUNITY MODEL CREATION '
+                        'SUCCESS: 1'
+                    )
+                ),
+            ]
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'topic.topic_backfill_test', strict=False
+        )
+        self.assertIsNone(model)
