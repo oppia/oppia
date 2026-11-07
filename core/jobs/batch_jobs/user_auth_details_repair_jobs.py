@@ -30,7 +30,7 @@ from __future__ import annotations
 import operator
 from collections import abc
 
-from core import feconf, utils
+from core import utils
 from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -199,8 +199,7 @@ class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
     DRY_RUN = False
 
 
-# NOTE: Each rule returns early so that the rules don't need to be nested.
-def _diagnose_user(  # pylint: disable=too-many-return-statements
+def _diagnose_user(
     user: User, shared_emails: abc.Mapping[str, int]
 ) -> abc.Iterator[beam.TaggedOutput]:
     """Tags the user as OK, as a problem, or with each repair it needs."""
@@ -236,11 +235,6 @@ def _diagnose_user(  # pylint: disable=too-many-return-statements
         case _:
             pass
 
-    if feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles:
-        yield beam.TaggedOutput(
-            TAG_PROBLEMS, f'{user_id} is a profile without a parent_user_id'
-        )
-        return
     if _is_linked_to_firebase(user_id, auth_model, reverse_models):
         yield beam.TaggedOutput(TAG_OK, user_id)
         return
@@ -325,7 +319,7 @@ def _get_firebase_email(user: User) -> abc.Iterator[str]:
     """
     _, user_models_by_kind = user
     auth_model, settings_model, _ = _unpack(user_models_by_kind)
-    if settings_model is None or _is_profile_user(auth_model, settings_model):
+    if settings_model is None or _is_profile_user(auth_model):
         return
     if not settings_model.deleted or (
         auth_model is not None and auth_model.firebase_auth_id
@@ -353,23 +347,13 @@ def _unpack(
 
 def _is_profile_user(
     auth_model: auth_models.UserAuthDetailsModel | None,
-    settings_model: user_models.UserSettingsModel,
 ) -> bool:
     """Returns whether the user is a profile, which has no Firebase account.
 
-    NOTE: FirebaseServerSyncJob syncs any user whose auth model has a
-    firebase_auth_id and no parent_user_id, so only the auth model decides
-    for those users. The role is checked for the others because a profile may
-    be missing its auth model.
+    NOTE: This matches FirebaseServerSyncJob, which skips only users whose
+    auth model has a parent_user_id.
     """
-    if auth_model is None:
-        return feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
-    if auth_model.parent_user_id is not None:
-        return True
-    return (
-        not auth_model.firebase_auth_id
-        and feconf.ROLE_ID_MOBILE_LEARNER in settings_model.roles
-    )
+    return auth_model is not None and auth_model.parent_user_id is not None
 
 
 def _is_linked_to_firebase(

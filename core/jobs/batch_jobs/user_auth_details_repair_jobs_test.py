@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_auth_details_repair_jobs
 from core.jobs.types import job_run_result
@@ -73,7 +72,6 @@ class RepairJobTestBase(job_test_utils.JobTestBase):
         self,
         user_id: str,
         email: str | None = None,
-        roles: tuple[str, ...] = (),
         deleted: bool = False,
     ) -> None:
         """Writes a UserSettingsModel."""
@@ -81,7 +79,6 @@ class RepairJobTestBase(job_test_utils.JobTestBase):
             user_models.UserSettingsModel,
             id=user_id,
             email=f'{user_id}@example.com' if email is None else email,
-            roles=list(roles),
             deleted=deleted,
         )
 
@@ -204,21 +201,6 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
             [stderr('uid_p is missing its UserSettingsModel')]
         )
 
-    def test_profile_missing_auth_model_is_reported(self) -> None:
-        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
-
-        self.assert_job_output_is(
-            [stderr('uid_p is a profile without a parent_user_id')]
-        )
-
-    def test_profile_missing_parent_user_id_is_reported(self) -> None:
-        self.put_auth_model('uid_p')
-        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
-
-        self.assert_job_output_is(
-            [stderr('uid_p is a profile without a parent_user_id')]
-        )
-
     def test_missing_auth_model_is_created(self) -> None:
         self.put_settings_model('uid_a')
 
@@ -337,41 +319,6 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is(
             [stdout('OK SUCCESS: 1'), stdout('PUT SUCCESS: 2')]
         )
-
-    def test_email_shared_with_profile_missing_auth_model_is_repaired(
-        self,
-    ) -> None:
-        self.put_settings_model('uid_a', email='x@x.com')
-        self.put_settings_model(
-            'uid_p', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
-        )
-
-        self.assert_job_output_is(
-            [
-                stderr('uid_p is a profile without a parent_user_id'),
-                stdout('PUT SUCCESS: 2'),
-            ]
-        )
-        self.assert_repaired('uid_a', FB_A)
-
-    def test_email_shared_with_linked_mobile_learner_is_reported(
-        self,
-    ) -> None:
-        # NOTE: FirebaseServerSyncJob syncs any user whose auth model has a
-        # firebase_auth_id and no parent_user_id, whatever its roles.
-        self.put_auth_model('uid_m', 'fb_m')
-        self.put_settings_model(
-            'uid_m', email='x@x.com', roles=(feconf.ROLE_ID_MOBILE_LEARNER,)
-        )
-        self.put_settings_model('uid_a', email='x@x.com')
-
-        self.assert_job_output_is(
-            [
-                stderr('uid_m is a profile without a parent_user_id'),
-                stderr('uid_a shares its email with another user'),
-            ]
-        )
-        self.assert_unassigned(FB_A)
 
     def test_email_shared_with_deleted_user_is_repaired(self) -> None:
         self.put_settings_model('uid_a', email='x@x.com')
