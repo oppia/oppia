@@ -213,6 +213,12 @@ describe('LessonPlayerSidebarComponent', () => {
     expect(component.sidebarIsExpanded).toBe(true);
   });
 
+  it('should toggle menu visibility', () => {
+    component.toggleMenuVisibility();
+
+    expect(mockMobileMenuService.toggleMenuVisibility).toHaveBeenCalled();
+  });
+
   it('should handle mobile menu visibility changes', () => {
     component.ngOnInit();
     expect(component.mobileMenuVisible).toBe(false);

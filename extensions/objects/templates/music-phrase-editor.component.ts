@@ -22,9 +22,9 @@ import {AlertsService} from 'services/alerts.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface MusicPhraseSchema {
-  type: string;
+  type: 'list';
   items: {
-    type: string;
+    type: 'unicode';
     choices: string[];
   };
   ui_config: {add_element_text: string};
@@ -133,13 +133,18 @@ export class MusicPhraseEditorComponent implements OnInit {
     }
   }
 
-  updateValue(newValue: string[]): void {
+  updateValue(newValue: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only string arrays are accepted.
+    if (!Array.isArray(newValue)) {
+      return;
+    }
     if (newValue.length !== this._localValue.length) {
       return;
     }
     for (let i = 0; i < newValue.length; i++) {
       if (newValue[i] !== this._localValue[i]) {
-        this.localValue = newValue;
+        this.localValue = newValue as string[];
         break;
       }
     }

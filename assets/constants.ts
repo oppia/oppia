@@ -18,8 +18,6 @@
  */
 
 export default {
-  "DUPLICATE_ISSUE_LABEL": "potential-duplicate",
-
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL and classroom name for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
@@ -6305,8 +6303,6 @@ export default {
 
   "MAX_QUESTIONS_PER_SKILL": 10,
 
-  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
-
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
@@ -6776,24 +6772,6 @@ export default {
         }
       ]
     },
-    "REVIEW_TEST": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/review-test/:story_url_fragment",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Review what you have learned by taking a practice test on Oppia."
-        }
-      ]
-    },
     "SUBTOPIC_VIEWER": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
@@ -6870,7 +6848,7 @@ export default {
     },
     "COLLECTION_PLAYER": {
       "ROUTE": "collection/:collection_id",
-      "TITLE": "",
+      "TITLE": "I18N_COLLECTION_PLAYER_PAGE_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -7605,22 +7583,6 @@ export default {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Change your Oppia profile settings and preferences."
-        }
-      ]
-    },
-    "FEEDBACK_UPDATES": {
-      "ROUTE": "feedback-updates",
-      "TITLE": "Feedback Updates",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
-        },
-        {
-          "PROPERTY_TYPE": "property",
-          "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
         }
       ]
     },

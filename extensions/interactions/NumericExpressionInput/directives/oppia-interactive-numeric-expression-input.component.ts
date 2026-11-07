@@ -161,6 +161,9 @@ export class InteractiveNumericExpressionInput implements OnInit {
       placeholder.value.unicode,
       this.savedSolution !== undefined ? (this.savedSolution as string) : ''
     );
+
+    this.guppyInitializationService.activate();
+
     Guppy.event('change', this.onAnswerChange.bind(this));
 
     Guppy.event('done', this.submitAnswer.bind(this));

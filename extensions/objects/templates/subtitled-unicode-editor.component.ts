@@ -24,6 +24,7 @@ import {
   Output,
 } from '@angular/core';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'subtitled-unicode-editor',
@@ -35,13 +36,18 @@ export class SubtitledUnicodeEditorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: SubtitledUnicode;
   @Output() valueChanged = new EventEmitter();
-  schema: {type: string} = {
+  schema: {type: 'unicode'} = {
     type: 'unicode',
   };
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
-  updateValue(val: string): void {
+  updateValue(val: SchemaDefaultValue): void {
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof val !== 'string') {
+      return;
+    }
     if (this.value) {
       if (this.value.unicode === val) {
         return;
@@ -53,7 +59,7 @@ export class SubtitledUnicodeEditorComponent {
     }
   }
 
-  getSchema(): {type: string} {
+  getSchema(): {type: 'unicode'} {
     return this.schema;
   }
 }

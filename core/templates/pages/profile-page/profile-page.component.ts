@@ -247,7 +247,7 @@ export class ProfilePageComponent {
     }
   }
 
-  getExplorationsToDisplay(): Object[] {
+  getExplorationsToDisplay(): LearnerExplorationSummary[] {
     this.explorationsOnPage = [];
     if (this.userEditedExplorations.length === 0) {
       return this.explorationsOnPage;

@@ -136,4 +136,12 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
 
     expect(component.answerVisible[0]).toEqual(false);
   }));
+
+  it('should get the answer list when the answer is a string array', () => {
+    expect(component.getAnswerList(['foo'])).toEqual(['foo']);
+  });
+
+  it('should return an empty list when the answer is not an array', () => {
+    expect(component.getAnswerList('foo')).toEqual([]);
+  });
 });
