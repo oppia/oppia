@@ -372,6 +372,45 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
             )
         )
 
+    def test_add_question_reviewer_creates_empty_stats(self) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        self.assertIsNone(model_class.get_by_id(self.question_reviewer_id))
+
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/contributionrightshandler/question',
+            {'username': 'question'},
+            csrf_token=csrf_token,
+        )
+
+        stats_model = model_class.get_by_id(self.question_reviewer_id)
+        assert stats_model is not None
+        self.assertEqual(stats_model.reviewed_questions_count, 0)
+        self.assertEqual(stats_model.topic_ids_with_question_reviews, [])
+
+    def test_remove_question_reviewer_deletes_empty_stats(self) -> None:
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/contributionrightshandler/question',
+            {'username': 'question'},
+            csrf_token=csrf_token,
+        )
+        self.assertIsNotNone(model_class.get_by_id(self.question_reviewer_id))
+
+        self.delete_json(
+            '/contributionrightshandler/question',
+            params={'username': 'question'},
+        )
+
+        self.assertIsNone(model_class.get_by_id(self.question_reviewer_id))
+
     def test_removing_unassigned_question_reviewer_raise_error(self) -> None:
         self.assertFalse(
             user_services.can_review_question_suggestions(

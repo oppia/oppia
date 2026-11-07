@@ -698,69 +698,66 @@ describe('Contributor dashboard Admin page', () => {
       })
     );
 
-    it('should refresh stats tables when question role editor modal is saved', fakeAsync(() => {
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
-
-      const refreshPaginationSpy = spyOn(
-        ContributorAdminStatsTable.prototype,
-        'refreshPagination'
-      );
-      const mockStatsTable = Object.create(
-        ContributorAdminStatsTable.prototype
-      );
-      const queryList = new QueryList<ContributorAdminStatsTable>();
-      queryList.reset([mockStatsTable]);
-      component.statsTables = queryList;
-      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
-      fixture.detectChanges();
-
-      spyOn(
-        contributorDashboardAdminBackendApiService,
-        'updateQuestionRightsAsync'
-      ).and.returnValue(Promise.resolve());
-
+    it('should refresh the table and question reviewers count after question rights are updated', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
         'contributionReviewerRightsAsync'
       ).and.returnValue(
         Promise.resolve({
           can_submit_questions: false,
-          can_review_questions: true,
-          can_review_translation_for_language_codes: ['en'],
+          can_review_questions: false,
+          can_review_translation_for_language_codes: [],
           can_review_voiceover_for_language_codes: [],
         })
       );
+      const updateRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'updateQuestionRightsAsync'
+      ).and.returnValue(Promise.resolve());
+      const refreshCountSpy = spyOn(component, 'refreshQuestionReviewersCount');
+      const statsTable = jasmine.createSpyObj<ContributorAdminStatsTable>(
+        'ContributorAdminStatsTable',
+        ['refreshPagination']
+      );
+      component.statsTable = statsTable;
       spyOn(ngbModal, 'open').and.callFake(() => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve({
             isQuestionSubmitter: false,
-            isQuestionReviewer: false,
+            isQuestionReviewer: true,
           }),
         } as NgbModalRef;
       });
 
-      component.openRoleEditor('user1');
+      component.openCdAdminQuestionRoleEditorModal('user1');
       tick();
 
-      expect(refreshPaginationSpy).toHaveBeenCalled();
+      expect(updateRightsSpy).toHaveBeenCalledWith(
+        'user1',
+        false,
+        true,
+        false,
+        false
+      );
+      expect(statsTable.refreshPagination).toHaveBeenCalled();
+      expect(refreshCountSpy).toHaveBeenCalled();
     }));
 
-    it('should refresh community stats', fakeAsync(() => {
-      fetchCommunityStatsSpy.and.returnValue(
+    it('should update the question reviewers count from community stats', fakeAsync(() => {
+      (
+        contributorDashboardAdminStatsBackendApiService.fetchCommunityStats as jasmine.Spy
+      ).and.returnValue(
         Promise.resolve({
+          translation_reviewers_count: {},
           question_reviewers_count: 5,
-          translation_reviewers_count: {en: 3},
         } as CommunityContributionStatsBackendDict)
       );
 
-      component.refreshCommunityStats();
+      component.refreshQuestionReviewersCount();
       tick();
 
       expect(component.questionReviewersCount).toBe(5);
-      expect(component.translationReviewersCountByLanguage).toEqual({en: 3});
     }));
 
     it(
