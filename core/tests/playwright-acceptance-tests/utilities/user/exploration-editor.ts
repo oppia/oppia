@@ -151,6 +151,8 @@ const voiceoverLanguageAccentOptionSelector =
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const skillNameInput = '.e2e-test-skill-name-input';
+const mathExpressionInput =
+  'textarea[placeholder*="Enter a math expression using LaTeX"]';
 
 const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
 
@@ -318,12 +320,7 @@ export class ExplorationEditor extends BaseUser {
     // Math Formula.
     await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
-    const textareaElement = await this.page.$(
-      'textarea[placeholder*="Enter a math expression using LaTeX"]'
-    );
-    if (textareaElement) {
-      await this.typeInInputField(textareaElement, 'x^2 + y^2 = z^2');
-    }
+    await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
@@ -331,10 +328,7 @@ export class ExplorationEditor extends BaseUser {
     // Concept Card.
     await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
-    const skillSearchElement = await this.page.$(skillNameInput);
-    if (skillSearchElement) {
-      await this.typeInInputField(skillSearchElement, 'Math');
-    }
+    await this.typeInInputField(skillNameInput, 'Math');
     await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
@@ -347,6 +341,97 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(saveContentButton, false);
+  }
+
+  /**
+   * Adds the RTE components that are supported in story explorations.
+   *
+   * Story validation permits image, math, and concept-card components, but
+   * rejects links, videos, collapsible blocks, and tabs. Keeping this helper
+   * limited to the supported components allows the exploration to be added to
+   * a story in both desktop and mobile acceptance runs.
+   */
+  async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+
+    const rteEditor = new RTEEditor(this);
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+
+    await rteEditor.addImageRTE(
+      testConstants.data.profilePicture,
+      'Test Image',
+      'Test Image Caption'
+    );
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.page.keyboard.press('Enter');
+
+    await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    await this.typeInInputField(skillNameInput, 'Math');
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.page.keyboard.press('Enter');
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
+  }
+
+  /**
+   * Adds an image RTE element to the current card and saves its content.
+   */
+  async addImageRTEToCardContent(
+    imageFilePath: string,
+    imageDescription: string,
+    imageCaption: string | null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+    const rteEditor = new RTEEditor(this);
+    await rteEditor.addImageRTE(imageFilePath, imageDescription, imageCaption);
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(stateContentInputField, false);
   }
 
   /**
@@ -695,6 +780,30 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Exploration not published');
     }
+  }
+
+  /**
+   * Creates and publishes a batch of minimal explorations.
+   *
+   * The translation dashboard uses the resulting explorations to exercise
+   * pagination. The IDs are returned in creation order for story setup.
+   *
+   * @param n - The number of explorations to create and publish.
+   */
+  async createAndPublishExplorationsWithCards(n: number): Promise<string[]> {
+    const explorationIds: string[] = [];
+
+    for (let index = 0; index < n; index++) {
+      const explorationId =
+        await this.createAndPublishAMinimalExplorationWithTitle(
+          `Quick Exploration ${index + 1}`,
+          'Algebra',
+          false
+        );
+      explorationIds.push(explorationId);
+    }
+
+    return explorationIds;
   }
 
   /**
@@ -1196,9 +1305,12 @@ export class ExplorationEditor extends BaseUser {
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.expectElementToBeVisible(createExplorationButtonSelector);
     await this.clickOnElementWithSelector(createExplorationButtonSelector);
+    // Images can delay the load event after the editor is ready to use.
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
+      waitUntil: 'domcontentloaded',
     });
+    await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
   /**
