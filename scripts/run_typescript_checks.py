@@ -40,7 +40,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/tests/build_sources/extensions/plugin.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
-    'core/templates/domain/statistics/learner-answer-info.model.ts',
     'core/templates/domain/topic/topic-update.service.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
