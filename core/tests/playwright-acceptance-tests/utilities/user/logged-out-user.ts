@@ -32,8 +32,11 @@ const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
 const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
-const googleAnalyticsPartnerPoliciesUrl =
-  testConstants.URLs.GoogleAnalytics.PartnerPolicies;
+// The Privacy Policy page links to this address, which redirects to
+// testConstants.URLs.GoogleAnalytics.PartnerPolicies.
+const googleAnalyticsPartnersLinkOnPrivacyPolicyPage =
+  'https://www.google.com/policies/privacy/partners/';
+const privacyPolicyPageLinks = '.e2e-test-privacy-page a';
 const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -3982,38 +3985,41 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks the link about managing cookies on the Privacy Policy page and
-   * checks that it opens the expected page.
+   * Checks that the link about managing cookies on the Privacy Policy page
+   * points to the expected page. The link is not opened, since it leads to an
+   * external site.
    */
-  async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'https://allaboutcookies.org/how-to-manage-cookies',
+  async expectCookiesLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
       allAboutCookiesUrl,
-      false
+      allAboutCookiesUrl
     );
   }
 
   /**
-   * Clicks the link about Google Analytics partner policies on the Privacy
-   * Policy page and checks that it opens the expected page.
+   * Checks that the link about Google Analytics partner policies on the
+   * Privacy Policy page points to the expected page. The link is not opened,
+   * since it leads to an external site.
    */
-  async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'https://www.google.com/policies/privacy/partners/',
-      googleAnalyticsPartnerPoliciesUrl,
-      false
+  async expectGoogleAnalyticsLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
+      googleAnalyticsPartnersLinkOnPrivacyPolicyPage,
+      googleAnalyticsPartnersLinkOnPrivacyPolicyPage
     );
   }
 
   /**
-   * Clicks the link to opt out of Google Analytics on the Privacy Policy page
-   * and checks that it opens the expected page.
+   * Checks that the link to opt out of Google Analytics on the Privacy Policy
+   * page points to the expected page. The link is not opened, since it leads
+   * to an external site.
    */
-  async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
+  async expectGoogleAnalyticsOptOutLinkOnPrivacyPolicyPageToBeCorrect(): Promise<void> {
+    await this.openExternalLinkBySelectorAndText(
+      privacyPolicyPageLinks,
       googleAnalyticsOptOutUrl,
-      googleAnalyticsOptOutUrl,
-      false
+      googleAnalyticsOptOutUrl
     );
   }
 

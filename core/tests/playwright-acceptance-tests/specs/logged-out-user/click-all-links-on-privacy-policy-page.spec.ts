@@ -38,16 +38,16 @@ test.describe('Logged-out Users', function () {
     await loggedOutUser.clickLinkToHomePageOnPrivacyPolicyPage();
   });
 
-  test('should be able to follow link to learn about cookies', async function () {
-    await loggedOutUser.clickLinkAboutCookiesOnPrivacyPolicyPage();
+  test('should see a correct link to learn about cookies', async function () {
+    await loggedOutUser.expectCookiesLinkOnPrivacyPolicyPageToBeCorrect();
   });
 
-  test('should be able to follow link to learn about Google Analytics', async function () {
-    await loggedOutUser.clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage();
+  test('should see a correct link to learn about Google Analytics', async function () {
+    await loggedOutUser.expectGoogleAnalyticsLinkOnPrivacyPolicyPageToBeCorrect();
   });
 
-  test('should be able to follow link to learn how to opt out of Google Analytics', async function () {
-    await loggedOutUser.clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage();
+  test('should see a correct link to opt out of Google Analytics', async function () {
+    await loggedOutUser.expectGoogleAnalyticsOptOutLinkOnPrivacyPolicyPageToBeCorrect();
   });
 
   test.afterAll(async function () {
