@@ -223,6 +223,22 @@ def preprocess_html_for_translation(source_html: str) -> str:
     return cast(str, soup.decode_contents())
 
 
+def _is_nested_in_temp_element(tag: bs4.element.Tag) -> bool:
+    """Returns whether the tag lives inside another temporary element.
+
+    Such tags are handled by the recursive postprocess call on the
+    parent's contents, so the outer pass must skip them.
+
+    Args:
+        tag: bs4.element.Tag. The tag to check.
+
+    Returns:
+        bool. True if the tag has an ancestor carrying the temporary
+        attribute-name marker.
+    """
+    return tag.find_parent(attrs={_TEMP_DATA_ATTR_NAME: True}) is not None
+
+
 def postprocess_translated_html(translated_html: str) -> str:
     """Reverses preprocess_html_for_translation after the API call completes.
 
@@ -252,15 +268,26 @@ def postprocess_translated_html(translated_html: str) -> str:
     soup = bs4.BeautifulSoup(translated_html, 'html.parser')
 
     # Build a map from component ID to its tag for fast restoration lookup.
+    # Tags nested inside temporary elements are skipped: they belong to the
+    # recursive call and their IDs can collide with top-level IDs.
     comp_id_to_tag = {}
     for tag in soup.find_all(attrs={_TEMP_DATA_COMP_ID: True}):
+        if _is_nested_in_temp_element(tag):
+            continue
         if tag.name and tag.name.startswith('oppia-noninteractive-'):
             comp_id_to_tag[tag.get(_TEMP_DATA_COMP_ID)] = tag
 
     # Collect tabs data separately since reconstruction requires all tabs.
     tabs_data: Dict[str, Dict[str, str]] = {}
 
-    for temp_tag in list(soup.find_all(attrs={_TEMP_DATA_ATTR_NAME: True})):
+    # Only process top-level temporary elements. Nested ones are decomposed
+    # together with their parent and are restored by the recursive call.
+    top_level_temp_tags = [
+        temp_tag
+        for temp_tag in soup.find_all(attrs={_TEMP_DATA_ATTR_NAME: True})
+        if not _is_nested_in_temp_element(temp_tag)
+    ]
+    for temp_tag in top_level_temp_tags:
         comp_id = temp_tag.get(_TEMP_DATA_COMP_ID)
         attr_name = temp_tag.get(_TEMP_DATA_ATTR_NAME)
         is_encoded = temp_tag.get(_TEMP_DATA_IS_ENCODED) == 'true'
