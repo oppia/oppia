@@ -39,6 +39,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    user_domain_errors,
     user_services,
 )
 from core.platform import models
@@ -939,6 +940,25 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self._get_all_incomplete_exp_ids(self.user_id),
             [self.EXP_ID_0],
         )
+
+    def test_mark_exploration_as_incomplete_with_empty_state_name(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedStateNameError,
+            'Expected last_played_state_name to be a non-empty string',
+        ):
+            learner_progress_services.mark_exploration_as_incomplete(
+                self.user_id, self.EXP_ID_0, '', 1
+            )
+
+        # Neither the last playthrough nor the incomplete list is saved.
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get(
+                self.user_id, self.EXP_ID_0
+            )
+        )
+        self.assertEqual(self._get_all_incomplete_exp_ids(self.user_id), [])
 
     def test_mark_collection_as_incomplete(self) -> None:
         self.assertEqual(

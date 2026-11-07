@@ -23,12 +23,17 @@ import logging
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services, user_domain, user_services
+from core.domain import (
+    auth_services,
+    user_domain,
+    user_domain_errors,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 import pytest
-from typing import List, Optional, TypedDict
+from typing import Final, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -875,6 +880,115 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
         exp_last_playthrough.update_last_played_information(1, 'state1')
         self.assertEqual(exp_last_playthrough.last_played_exp_version, 1)
         self.assertEqual(exp_last_playthrough.last_played_state_name, 'state1')
+
+
+class ExpUserLastPlaythroughValidationTests(test_utils.GenericTestBase):
+    """Tests for the validate method of ExpUserLastPlaythrough."""
+
+    USER_ID: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
+            self.USER_ID,
+            'exp_id0',
+            1,
+            utils.get_current_utc_datetime(),
+            'Introduction',
+        )
+
+    def test_valid_object_passes_validation(self) -> None:
+        self.exp_last_playthrough.validate()
+
+    def test_invalid_user_id_fails_validation(self) -> None:
+        self.exp_last_playthrough.user_id = 'invalid_user_id'
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlaythroughUserIdError,
+            'Expected user_id to be a valid user ID, received '
+            'invalid_user_id',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_non_string_user_id_fails_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.exp_last_playthrough.user_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlaythroughUserIdError,
+            'Expected user_id to be a valid user ID, received 123',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_empty_exploration_id_fails_validation(self) -> None:
+        self.exp_last_playthrough.exploration_id = ''
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlaythroughExplorationIdError,
+            'Expected exploration_id to be a non-empty string, received $',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_non_string_exploration_id_fails_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.exp_last_playthrough.exploration_id = None  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlaythroughExplorationIdError,
+            'Expected exploration_id to be a non-empty string, received None',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_version_less_than_one_fails_validation(self) -> None:
+        self.exp_last_playthrough.last_played_exp_version = 0
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedExpVersionError,
+            'Expected last_played_exp_version to be an integer >= 1, '
+            'received 0',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_non_integer_version_fails_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.exp_last_playthrough.last_played_exp_version = '1'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedExpVersionError,
+            'Expected last_played_exp_version to be an integer >= 1, '
+            'received 1',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_boolean_version_fails_validation(self) -> None:
+        self.exp_last_playthrough.last_played_exp_version = True
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedExpVersionError,
+            'Expected last_played_exp_version to be an integer >= 1, '
+            'received True',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_non_string_state_name_fails_validation(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.exp_last_playthrough.last_played_state_name = None  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedStateNameError,
+            'Expected last_played_state_name to be a non-empty string, '
+            'received None',
+        ):
+            self.exp_last_playthrough.validate()
+
+    def test_empty_state_name_fails_validation(self) -> None:
+        self.exp_last_playthrough.last_played_state_name = ''
+        with self.assertRaisesRegex(
+            user_domain_errors.InvalidLastPlayedStateNameError,
+            'Expected last_played_state_name to be a non-empty string, '
+            'received $',
+        ):
+            self.exp_last_playthrough.validate()
 
 
 class IncompleteActivitiesTests(test_utils.GenericTestBase):
