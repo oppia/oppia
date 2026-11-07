@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 import logging
 import os
 
@@ -1882,7 +1883,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_services.get_collection_snapshots_metadata(
                 self.COLLECTION_0_ID
-            )[1]['commit_message'],
+            )[1].commit_message,
             'A message',
         )
 
@@ -1956,25 +1957,35 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': (
-                    'New collection created with title \'A title\'.'
-                ),
-                'commit_type': 'create',
-                'version_number': 1,
-            },
-            snapshots_metadata[0],
+        self.assertEqual(
+            snapshots_metadata[0].collection_id, self.COLLECTION_0_ID
         )
-        self.assertIn('created_on_ms', snapshots_metadata[0])
+        self.assertEqual(
+            snapshots_metadata[0].commit_cmds,
+            [
+                {
+                    'cmd': 'create_new',
+                    'title': 'A title',
+                    'category': 'A category',
+                }
+            ],
+        )
+        self.assertEqual(snapshots_metadata[0].committer_id, self.owner_id)
+        self.assertEqual(
+            snapshots_metadata[0].commit_message,
+            'New collection created with title \'A title\'.',
+        )
+        self.assertEqual(snapshots_metadata[0].commit_type, 'create')
+        self.assertEqual(snapshots_metadata[0].version, 1)
+        self.assertEqual(snapshots_metadata[0].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[0].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[0].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[0].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[0].last_updated, datetime.datetime
+        )
 
         # Publish the collection and any explorations contained within it. This
         # does not affect the collection version history.
@@ -1987,25 +1998,35 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': (
-                    'New collection created with title \'A title\'.'
-                ),
-                'commit_type': 'create',
-                'version_number': 1,
-            },
-            snapshots_metadata[0],
+        self.assertEqual(
+            snapshots_metadata[0].collection_id, self.COLLECTION_0_ID
         )
-        self.assertIn('created_on_ms', snapshots_metadata[0])
+        self.assertEqual(
+            snapshots_metadata[0].commit_cmds,
+            [
+                {
+                    'cmd': 'create_new',
+                    'title': 'A title',
+                    'category': 'A category',
+                }
+            ],
+        )
+        self.assertEqual(snapshots_metadata[0].committer_id, self.owner_id)
+        self.assertEqual(
+            snapshots_metadata[0].commit_message,
+            'New collection created with title \'A title\'.',
+        )
+        self.assertEqual(snapshots_metadata[0].commit_type, 'create')
+        self.assertEqual(snapshots_metadata[0].version, 1)
+        self.assertEqual(snapshots_metadata[0].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[0].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[0].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[0].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[0].last_updated, datetime.datetime
+        )
 
         # Modify the collection. This affects the collection version history.
         change_list = [
@@ -2025,38 +2046,56 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 2)
-        self.assertIn('created_on_ms', snapshots_metadata[0])
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': (
-                    'New collection created with title \'A title\'.'
-                ),
-                'commit_type': 'create',
-                'version_number': 1,
-            },
-            snapshots_metadata[0],
+        self.assertEqual(
+            snapshots_metadata[0].collection_id, self.COLLECTION_0_ID
         )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            },
-            snapshots_metadata[1],
+        self.assertEqual(
+            snapshots_metadata[0].commit_cmds,
+            [
+                {
+                    'cmd': 'create_new',
+                    'title': 'A title',
+                    'category': 'A category',
+                }
+            ],
+        )
+        self.assertEqual(snapshots_metadata[0].committer_id, self.owner_id)
+        self.assertEqual(
+            snapshots_metadata[0].commit_message,
+            'New collection created with title \'A title\'.',
+        )
+        self.assertEqual(snapshots_metadata[0].commit_type, 'create')
+        self.assertEqual(snapshots_metadata[0].version, 1)
+        self.assertEqual(snapshots_metadata[0].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[0].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[0].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[0].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[0].last_updated, datetime.datetime
+        )
+
+        self.assertEqual(
+            snapshots_metadata[1].collection_id, self.COLLECTION_0_ID
+        )
+        self.assertEqual(snapshots_metadata[1].commit_cmds, change_list)
+        self.assertEqual(snapshots_metadata[1].committer_id, self.owner_id)
+        self.assertEqual(snapshots_metadata[1].commit_message, 'Changed title.')
+        self.assertEqual(snapshots_metadata[1].commit_type, 'edit')
+        self.assertEqual(snapshots_metadata[1].version, 2)
+        self.assertEqual(snapshots_metadata[1].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[1].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[1].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[1].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[1].last_updated, datetime.datetime
         )
         self.assertLess(
-            snapshots_metadata[0]['created_on_ms'],
-            snapshots_metadata[1]['created_on_ms'],
+            snapshots_metadata[0].created_on,
+            snapshots_metadata[1].created_on,
         )
 
         # Using the old version of the collection should raise an error.
@@ -2089,47 +2128,76 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             )
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': (
-                    'New collection created with title \'A title\'.'
-                ),
-                'commit_type': 'create',
-                'version_number': 1,
-            },
-            snapshots_metadata[0],
+        self.assertEqual(
+            snapshots_metadata[0].collection_id, self.COLLECTION_0_ID
         )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            },
-            snapshots_metadata[1],
+        self.assertEqual(
+            snapshots_metadata[0].commit_cmds,
+            [
+                {
+                    'cmd': 'create_new',
+                    'title': 'A title',
+                    'category': 'A category',
+                }
+            ],
         )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': new_change_list,
-                'committer_id': second_committer_id,
-                'commit_message': 'Second commit.',
-                'commit_type': 'edit',
-                'version_number': 3,
-            },
-            snapshots_metadata[2],
+        self.assertEqual(snapshots_metadata[0].committer_id, self.owner_id)
+        self.assertEqual(
+            snapshots_metadata[0].commit_message,
+            'New collection created with title \'A title\'.',
+        )
+        self.assertEqual(snapshots_metadata[0].commit_type, 'create')
+        self.assertEqual(snapshots_metadata[0].version, 1)
+        self.assertEqual(snapshots_metadata[0].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[0].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[0].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[0].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[0].last_updated, datetime.datetime
+        )
+
+        self.assertEqual(
+            snapshots_metadata[1].collection_id, self.COLLECTION_0_ID
+        )
+        self.assertEqual(snapshots_metadata[1].commit_cmds, change_list)
+        self.assertEqual(snapshots_metadata[1].committer_id, self.owner_id)
+        self.assertEqual(snapshots_metadata[1].commit_message, 'Changed title.')
+        self.assertEqual(snapshots_metadata[1].commit_type, 'edit')
+        self.assertEqual(snapshots_metadata[1].version, 2)
+        self.assertEqual(snapshots_metadata[1].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[1].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[1].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[1].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[1].last_updated, datetime.datetime
+        )
+
+        self.assertEqual(
+            snapshots_metadata[2].collection_id, self.COLLECTION_0_ID
+        )
+        self.assertEqual(snapshots_metadata[2].commit_cmds, new_change_list)
+        self.assertEqual(
+            snapshots_metadata[2].committer_id, second_committer_id
+        )
+        self.assertEqual(snapshots_metadata[2].commit_message, 'Second commit.')
+        self.assertEqual(snapshots_metadata[2].commit_type, 'edit')
+        self.assertEqual(snapshots_metadata[2].version, 3)
+        self.assertEqual(snapshots_metadata[2].commit_cmds_user_ids, [])
+        self.assertEqual(snapshots_metadata[2].content_user_ids, [])
+        self.assertFalse(snapshots_metadata[2].deleted)
+        self.assertIsInstance(
+            snapshots_metadata[2].created_on, datetime.datetime
+        )
+        self.assertIsInstance(
+            snapshots_metadata[2].last_updated, datetime.datetime
         )
         self.assertLess(
-            snapshots_metadata[1]['created_on_ms'],
-            snapshots_metadata[2]['created_on_ms'],
+            snapshots_metadata[1].created_on,
+            snapshots_metadata[2].created_on,
         )
 
     def test_versioning_with_add_and_delete_nodes(self) -> None:
@@ -2144,11 +2212,6 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             'Changed title.',
             _get_collection_change_list('title', 'First title'),
         )
-        commit_dict_2 = {
-            'committer_id': self.owner_id,
-            'commit_message': 'Changed title.',
-            'version_number': 2,
-        }
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
                 self.COLLECTION_0_ID
@@ -2171,23 +2234,24 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             _get_added_exploration_change_list('new_exploration_id'),
         )
 
-        commit_dict_3 = {
-            'committer_id': 'committer_id_2',
-            'commit_message': 'Added new exploration',
-            'version_number': 3,
-        }
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
                 self.COLLECTION_0_ID
             )
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        self.assertEqual(snapshots_metadata[1].committer_id, self.owner_id)
+        self.assertEqual(snapshots_metadata[1].commit_message, 'Changed title.')
+        self.assertEqual(snapshots_metadata[1].version, 2)
+        self.assertEqual(snapshots_metadata[2].committer_id, 'committer_id_2')
+        self.assertEqual(
+            snapshots_metadata[2].commit_message, 'Added new exploration'
+        )
+        self.assertEqual(snapshots_metadata[2].version, 3)
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
-                snapshots_metadata[ind]['created_on_ms'],
-                snapshots_metadata[ind + 1]['created_on_ms'],
+                snapshots_metadata[ind].created_on,
+                snapshots_metadata[ind + 1].created_on,
             )
 
         # Perform an invalid action: delete an exploration that does not exist.
@@ -2206,24 +2270,29 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             _get_deleted_exploration_change_list('new_exploration_id'),
         )
 
-        commit_dict_4 = {
-            'committer_id': 'committer_id_3',
-            'commit_message': 'Deleted exploration',
-            'version_number': 4,
-        }
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
                 self.COLLECTION_0_ID
             )
         )
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        self.assertEqual(snapshots_metadata[3].committer_id, 'committer_id_3')
+        self.assertEqual(
+            snapshots_metadata[3].commit_message, 'Deleted exploration'
+        )
+        self.assertEqual(snapshots_metadata[3].version, 4)
+        self.assertEqual(snapshots_metadata[2].committer_id, 'committer_id_2')
+        self.assertEqual(
+            snapshots_metadata[2].commit_message, 'Added new exploration'
+        )
+        self.assertEqual(snapshots_metadata[2].version, 3)
+        self.assertEqual(snapshots_metadata[1].committer_id, self.owner_id)
+        self.assertEqual(snapshots_metadata[1].commit_message, 'Changed title.')
+        self.assertEqual(snapshots_metadata[1].version, 2)
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
-                snapshots_metadata[ind]['created_on_ms'],
-                snapshots_metadata[ind + 1]['created_on_ms'],
+                snapshots_metadata[ind].created_on,
+                snapshots_metadata[ind + 1].created_on,
             )
 
         # The final collection should have exactly one collection node.
@@ -2231,6 +2300,63 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID
         )
         self.assertEqual(len(collection.nodes), 1)
+
+    def test_get_collection_snapshots_metadata_raises_error_for_missing_model(
+        self,
+    ) -> None:
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.owner_id)
+        with self.swap_to_always_return(
+            collection_models.CollectionSnapshotMetadataModel,
+            'get_multi',
+            [None],
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'Invalid version number 1 for collection with id %s'
+                % self.COLLECTION_0_ID,
+            ):
+                collection_services.get_collection_snapshots_metadata(
+                    self.COLLECTION_0_ID
+                )
+
+    def test_get_collection_snapshot_metadata_from_model(self) -> None:
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.owner_id)
+        snapshot_id = collection_models.CollectionModel.get_snapshot_id(
+            self.COLLECTION_0_ID, 1
+        )
+        model = collection_models.CollectionSnapshotMetadataModel.get_by_id(
+            snapshot_id
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        domain_obj = (
+            collection_services.get_collection_snapshot_metadata_from_model(
+                model
+            )
+        )
+        self.assertEqual(domain_obj.collection_id, self.COLLECTION_0_ID)
+        self.assertEqual(domain_obj.version, 1)
+        self.assertEqual(domain_obj.committer_id, self.owner_id)
+        self.assertEqual(domain_obj.commit_type, 'create')
+        self.assertEqual(
+            domain_obj.commit_message,
+            'New collection created with title \'A title\'.',
+        )
+        self.assertEqual(
+            domain_obj.commit_cmds,
+            [
+                {
+                    'cmd': 'create_new',
+                    'title': 'A title',
+                    'category': 'A category',
+                }
+            ],
+        )
+        self.assertEqual(domain_obj.commit_cmds_user_ids, [])
+        self.assertEqual(domain_obj.content_user_ids, [])
+        self.assertEqual(domain_obj.created_on, model.created_on)
+        self.assertEqual(domain_obj.last_updated, model.last_updated)
+        self.assertFalse(domain_obj.deleted)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
