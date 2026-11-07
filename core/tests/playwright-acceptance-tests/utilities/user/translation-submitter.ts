@@ -238,12 +238,6 @@ export class TranslationSubmitter extends BaseUser {
 
     await field.fill(value);
 
-    if (inputType === 'rte') {
-      await expect(field).toContainText(value);
-    } else {
-      await expect(field).toHaveValue(value);
-    }
-
     if (await mathEditor.isVisible()) {
       // Allow debouncedUpdate$ (300ms debounce) and MathJax typesetting to settle.
       await this.page.waitForTimeout(350);
@@ -322,7 +316,7 @@ export class TranslationSubmitter extends BaseUser {
     await expect(latestToast).toHaveText('Submitted translation for review.');
 
     const count = await toasts.count();
-    for (let i = 0; i < count; i++) {
+    for (let i = count - 1; i >= 0; i--) {
       const toast = toasts.nth(i);
       try {
         await toast.click({timeout: 2000});

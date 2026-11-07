@@ -151,6 +151,8 @@ const voiceoverLanguageAccentOptionSelector =
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const skillNameInput = '.e2e-test-skill-name-input';
+const mathExpressionInput =
+  'textarea[placeholder*="Enter a math expression using LaTeX"]';
 
 const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
 
@@ -318,12 +320,7 @@ export class ExplorationEditor extends BaseUser {
     // Math Formula.
     await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
-    const textareaElement = await this.page.$(
-      'textarea[placeholder*="Enter a math expression using LaTeX"]'
-    );
-    if (textareaElement) {
-      await this.typeInInputField(textareaElement, 'x^2 + y^2 = z^2');
-    }
+    await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
@@ -331,10 +328,7 @@ export class ExplorationEditor extends BaseUser {
     // Concept Card.
     await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
-    const skillSearchElement = await this.page.$(skillNameInput);
-    if (skillSearchElement) {
-      await this.typeInInputField(skillSearchElement, 'Math');
-    }
+    await this.typeInInputField(skillNameInput, 'Math');
     await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
@@ -406,22 +400,14 @@ export class ExplorationEditor extends BaseUser {
 
     await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
-    const mathInput = await this.page.$(
-      'textarea[placeholder*="Enter a math expression using LaTeX"]'
-    );
-    if (mathInput) {
-      await this.typeInInputField(mathInput, 'x^2 + y^2 = z^2');
-    }
+    await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
     await this.page.keyboard.press('Enter');
 
     await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
-    const skillSearchInput = await this.page.$(skillNameInput);
-    if (skillSearchInput) {
-      await this.typeInInputField(skillSearchInput, 'Math');
-    }
+    await this.typeInInputField(skillNameInput, 'Math');
     await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
