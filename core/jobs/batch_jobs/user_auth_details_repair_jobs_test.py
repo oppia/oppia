@@ -241,6 +241,16 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is([stdout('PUT SUCCESS: 1')])
         self.assert_repaired('uid_a', FB_A)
 
+    def test_missing_firebase_auth_id_with_reverse_model_is_filled_in(
+        self,
+    ) -> None:
+        self.put_auth_model('uid_a', gae_id='gae_a')
+        self.put_settings_model('uid_a')
+        self.put_reverse_model(FB_A, 'uid_a')
+
+        self.assert_job_output_is([stdout('PUT SUCCESS: 1')])
+        self.assert_repaired('uid_a', FB_A)
+
     def test_missing_reverse_model_is_created(self) -> None:
         self.put_auth_model('uid_a', FB_A)
         self.put_settings_model('uid_a')
