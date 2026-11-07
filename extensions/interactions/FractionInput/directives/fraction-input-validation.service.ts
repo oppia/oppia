@@ -142,6 +142,17 @@ export class FractionInputValidationService {
       ) {
         return false;
       }
+      // An earlier IsEquivalentToAndInSimplestForm rule does not match
+      // equivalent answers that are not in simplest form (e.g. 2/4 for 1/2),
+      // so a later IsEquivalentTo rule can still match them. This only holds
+      // if learners are allowed to submit answers not in simplest form.
+      if (
+        earlierRule.type === 'IsEquivalentToAndInSimplestForm' &&
+        laterRule.type === 'IsEquivalentTo' &&
+        !shouldBeInSimplestForm
+      ) {
+        return false;
+      }
       return true;
     };
 
