@@ -51,8 +51,10 @@ auth_models, user_models = models.Registry.import_models(
 datastore_services = models.Registry.import_datastore_services()
 
 TAG_OK = 'OK'
-TAG_REPAIR = 'REPAIR'
 TAG_PROBLEMS = 'PROBLEMS'
+TAG_ADD_AUTH = 'ADD_AUTH'
+TAG_SET_FIREBASE_AUTH_ID = 'SET_FIREBASE_AUTH_ID'
+TAG_ADD_REVERSE = 'ADD_REVERSE'
 
 # Matches the length of the IDs that Firebase generates.
 _FIREBASE_AUTH_ID_LENGTH = 28
@@ -67,9 +69,6 @@ class UserModels(TypedDict):
 
 
 User = tuple[str, UserModels]
-RepairedModel = (
-    auth_models.UserAuthDetailsModel | auth_models.UserIdByFirebaseAuthIdModel
-)
 
 
 class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
@@ -118,20 +117,37 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
 
-        ok_users, repairable_users, problems = operator.itemgetter(
-            TAG_OK, TAG_REPAIR, TAG_PROBLEMS
-        )(
+        tags = (
+            TAG_OK,
+            TAG_PROBLEMS,
+            TAG_ADD_AUTH,
+            TAG_SET_FIREBASE_AUTH_ID,
+            TAG_ADD_REVERSE,
+        )
+        (
+            ok_users,
+            problems,
+            user_ids_missing_auth,
+            auth_models_missing_firebase_auth_id,
+            user_ids_missing_reverse,
+        ) = operator.itemgetter(*tags)(
             users
             | 'Diagnose users'
-            >> beam.Map(
+            >> beam.FlatMap(
                 _diagnose_user,
                 shared_emails=beam.pvalue.AsDict(shared_emails),
-            ).with_outputs(TAG_OK, TAG_REPAIR, TAG_PROBLEMS)
+            ).with_outputs(*tags)
         )
 
-        repaired_models = repairable_users | 'Build repaired models' >> (
-            beam.FlatMap(_build_repaired_models)
-        )
+        repaired_models = (
+            user_ids_missing_auth
+            | 'Build UserAuthDetailsModels' >> beam.Map(_build_auth_model),
+            auth_models_missing_firebase_auth_id
+            | 'Set firebase_auth_ids' >> beam.Map(_set_firebase_auth_id),
+            user_ids_missing_reverse
+            | 'Build UserIdByFirebaseAuthIdModels'
+            >> beam.Map(_build_reverse_model),
+        ) | 'Merge repaired models' >> beam.Flatten()
         if not self.DRY_RUN:
             unused_put_result = (
                 repaired_models | 'Put repaired models' >> ndb_io.PutModels()
@@ -166,21 +182,28 @@ class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
 
 def _diagnose_user(
     user: User, shared_emails: abc.Mapping[str, int]
-) -> beam.TaggedOutput:
-    """Tags the user as OK, as needing a repair, or as a problem."""
+) -> abc.Iterator[beam.TaggedOutput]:
+    """Tags the user as OK, as a problem, or with each repair it needs."""
     user_id, user_models_by_kind = user
     auth_model, settings_model, reverse_models = _unpack(user_models_by_kind)
     if settings_model is not None and (
         _is_profile_user(auth_model, settings_model)
         or _is_linked_to_firebase(user_id, auth_model, reverse_models)
     ):
-        return beam.TaggedOutput(TAG_OK, user_id)
-    problem = _find_problem(
+        yield beam.TaggedOutput(TAG_OK, user_id)
+    elif problem := _find_problem(
         user_id, auth_model, settings_model, reverse_models, shared_emails
-    )
-    if problem is not None:
-        return beam.TaggedOutput(TAG_PROBLEMS, f'{user_id} {problem}')
-    return beam.TaggedOutput(TAG_REPAIR, user)
+    ):
+        yield beam.TaggedOutput(TAG_PROBLEMS, f'{user_id} {problem}')
+    else:
+        if auth_model is None:
+            yield beam.TaggedOutput(TAG_ADD_AUTH, user_id)
+        elif not auth_model.firebase_auth_id:
+            yield beam.TaggedOutput(TAG_SET_FIREBASE_AUTH_ID, auth_model)
+        if not _has_live_reverse_model(
+            _generate_firebase_auth_id(user_id), reverse_models
+        ):
+            yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
 
 
 def _find_problem(
@@ -207,35 +230,44 @@ def _find_problem(
     return None
 
 
-def _build_repaired_models(user: User) -> list[RepairedModel]:
-    """Returns the models to save to repair the user."""
-    user_id, user_models_by_kind = user
-    auth_model, _, reverse_models = _unpack(user_models_by_kind)
-    firebase_auth_id = _generate_firebase_auth_id(user_id)
-    repaired_models: list[RepairedModel] = []
+# NOTE: The builders below need an NDB context because NDB can't create models
+# without one.
+def _build_auth_model(user_id: str) -> auth_models.UserAuthDetailsModel:
+    """Returns a new UserAuthDetailsModel for the user."""
     with datastore_services.get_ndb_context():
-        if auth_model is None:
-            repaired_models.append(
-                auth_models.UserAuthDetailsModel(
-                    id=user_id, firebase_auth_id=firebase_auth_id
-                )
-            )
-        elif not auth_model.firebase_auth_id:
-            # NOTE: Beam inputs must not be changed, so we change a copy.
-            repaired_models.append(
-                job_utils.clone_model(
-                    auth_model, firebase_auth_id=firebase_auth_id
-                )
-            )
-        if not _has_live_reverse_model(firebase_auth_id, reverse_models):
-            repaired_models.append(
-                auth_models.UserIdByFirebaseAuthIdModel(
-                    id=firebase_auth_id, user_id=user_id
-                )
-            )
-        for model in repaired_models:
-            model.update_timestamps()
-    return repaired_models
+        model = auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=_generate_firebase_auth_id(user_id)
+        )
+        model.update_timestamps()
+    return model
+
+
+def _set_firebase_auth_id(
+    auth_model: auth_models.UserAuthDetailsModel,
+) -> auth_models.UserAuthDetailsModel:
+    """Returns a copy of the model with the user's firebase_auth_id set.
+
+    NOTE: Beam inputs must not be changed, so we change a copy.
+    """
+    with datastore_services.get_ndb_context():
+        model = job_utils.clone_model(
+            auth_model,
+            firebase_auth_id=_generate_firebase_auth_id(auth_model.id),
+        )
+        model.update_timestamps()
+    return model
+
+
+def _build_reverse_model(
+    user_id: str,
+) -> auth_models.UserIdByFirebaseAuthIdModel:
+    """Returns a new UserIdByFirebaseAuthIdModel for the user."""
+    with datastore_services.get_ndb_context():
+        model = auth_models.UserIdByFirebaseAuthIdModel(
+            id=_generate_firebase_auth_id(user_id), user_id=user_id
+        )
+        model.update_timestamps()
+    return model
 
 
 def _get_live_full_user_email(user: User) -> abc.Iterator[str]:
