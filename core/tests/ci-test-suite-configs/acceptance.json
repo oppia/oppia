@@ -737,8 +737,8 @@
     },
     {
       "name": "site-moderator/featured-activities-section",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-partnerships-page",

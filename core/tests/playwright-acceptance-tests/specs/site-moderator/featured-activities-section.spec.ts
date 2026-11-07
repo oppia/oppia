@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,27 +19,32 @@
  * SM.MP.03 Featured Activities Section.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {Moderator} from '../../utilities/user/moderator';
 
-describe('Site Moderator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Site Moderator', function () {
   let siteModerator: Moderator;
   let loggedOutUser: LoggedOutUser;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     siteModerator = await UserFactory.createNewUser(
       'siteModerator',
       'site_moderator@example.com',
+      browser,
       [testConstants.Roles.MODERATOR]
     );
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
 
     const explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -57,12 +62,11 @@ describe('Site Moderator', function () {
     );
   });
 
-  it('should be able to add featured activities', async function () {
+  test('should be able to add featured activities', async function () {
     await siteModerator.navigateToModeratorPage();
     await siteModerator.navigateToFeaturedActivitiesTab();
     await siteModerator.expectScreenshotToMatch(
-      'moderatorPageFeaturedActivitiesTab',
-      __dirname
+      'moderatorPageFeaturedActivitiesTab'
     );
 
     await siteModerator.featureActivity(explorationId);
@@ -83,13 +87,13 @@ describe('Site Moderator', function () {
     await siteModerator.unfeatureActivityAtIndex(2);
   });
 
-  it('should be able to remove featured activity', async function () {
+  test('should be able to remove featured activity', async function () {
     await siteModerator.unfeatureActivityAtIndex(1);
     await loggedOutUser.navigateToCommunityLibraryPage();
     await loggedOutUser.expectToViewFeaturedActivities([]);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
