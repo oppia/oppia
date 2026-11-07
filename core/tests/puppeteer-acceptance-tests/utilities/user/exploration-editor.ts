@@ -4070,7 +4070,36 @@ export class ExplorationEditor extends BaseUser {
    */
   async selectDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
+    // Wait for Angular's updateOptionNames() to asynchronously populate
+    // the dropdown options before attempting selection.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const select = document.querySelector(
+          selector
+        ) as HTMLSelectElement | null;
+        return (
+          select !== null &&
+          Array.from(select.options).some(
+            option =>
+              option.value === '/' ||
+              option.text.trim() === 'A New Card Called...'
+          )
+        );
+      },
+      {},
+      destinationCardSelector
+    );
     await this.select(destinationCardSelector, '/');
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const select = document.querySelector(
+          selector
+        ) as HTMLSelectElement | null;
+        return select !== null && select.value === '/';
+      },
+      {},
+      destinationCardSelector
+    );
     await this.page.waitForSelector(addStateInput, {
       visible: true,
     });
@@ -4087,7 +4116,37 @@ export class ExplorationEditor extends BaseUser {
    */
   async selectExistingDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
+    // Wait for Angular's updateOptionNames() to asynchronously populate
+    // the dropdown options before attempting selection.
+    await this.page.waitForFunction(
+      (selector: string, targetName: string) => {
+        const select = document.querySelector(
+          selector
+        ) as HTMLSelectElement | null;
+        return (
+          select !== null &&
+          Array.from(select.options).some(
+            option =>
+              option.value === targetName || option.text.trim() === targetName
+          )
+        );
+      },
+      {},
+      destinationCardSelector,
+      cardName
+    );
     await this.select(destinationCardSelector, cardName);
+    await this.page.waitForFunction(
+      (selector: string, expectedVal: string) => {
+        const select = document.querySelector(
+          selector
+        ) as HTMLSelectElement | null;
+        return select !== null && select.value === expectedVal;
+      },
+      {},
+      destinationCardSelector,
+      cardName
+    );
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
@@ -4350,15 +4409,99 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
+      // Wait for Angular's updateOptionNames() to asynchronously populate
+      // the dropdown options before attempting selection.
+      await this.page.waitForFunction(
+        (selector: string, targetName: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return (
+            select !== null &&
+            Array.from(select.options).some(
+              option =>
+                option.value === targetName || option.text.trim() === targetName
+            )
+          );
+        },
+        {},
+        destinationSelectorDropdown,
+        destinationValue
+      );
       await this.page.select(destinationSelectorDropdown, destinationValue);
+      await this.page.waitForFunction(
+        (selector: string, expectedVal: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return select !== null && select.value === expectedVal;
+        },
+        {},
+        destinationSelectorDropdown,
+        destinationValue
+      );
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
       await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
-      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
-      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      // Wait for Angular's updateOptionNames() to asynchronously populate
+      // the dropdown options before attempting selection.
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return (
+            select !== null &&
+            Array.from(select.options).some(
+              option => option.text.trim() === 'A New Card Called...'
+            )
+          );
+        },
+        {},
+        destinationWhenStuckSelectorDropdown
+      );
+
+      const newCardOptionValue = await this.page.$eval(
+        destinationWhenStuckSelectorDropdown,
+        (select: HTMLSelectElement) => {
+          const option = Array.from(select.options).find(
+            opt => opt.text.trim() === 'A New Card Called...'
+          );
+          return option ? option.value : null;
+        }
+      );
+
+      if (!newCardOptionValue) {
+        throw new Error(
+          'Option "A New Card Called..." was not found in the stuck destination dropdown.'
+        );
+      }
+
+      await this.select(
+        destinationWhenStuckSelectorDropdown,
+        newCardOptionValue
+      );
+
+      // Verify that the selection succeeded and wait for the new-card input to be visible.
+      await this.page.waitForFunction(
+        (selector: string, expectedVal: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return select !== null && select.value === expectedVal;
+        },
+        {},
+        destinationWhenStuckSelectorDropdown,
+        newCardOptionValue
+      );
+      await this.expectElementToBeVisible(
+        addDestinationStateWhenStuckInput,
+        true
+      );
+
       await this.typeInInputField(
         addDestinationStateWhenStuckInput,
         directToCardWhenStuck
