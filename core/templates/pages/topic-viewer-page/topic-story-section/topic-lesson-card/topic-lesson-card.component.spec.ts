@@ -20,9 +20,6 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
-import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -38,47 +35,14 @@ class MockWindowRef {
 
 describe('TopicLessonCardComponent', () => {
   let component: TopicLessonCardComponent;
-  let componentRef: {
-    isVoiceoverCompatibleWithTextLanguage: (
-      voiceoverCode: string,
-      textLanguageCode: string
-    ) => boolean;
-    getInitialVoiceoverLanguageCode: (
-      sessionFallbackVoiceoverLanguageCode: string | null,
-      selectedTextLanguageCode: string | null
-    ) => string | null;
-    getFallbackTextLanguageCode: () => string;
-    saveSessionFallbackLanguageSelection: () => void;
-    getLanguageDescription: (languageCode: string) => string;
-    getLessonStartUrlWithLanguageSelection: (
-      textLanguageCode: string,
-      voiceoverLanguageCode: string | null
-    ) => string;
-  };
   let fixture: ComponentFixture<TopicLessonCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
-  let languageUtilService: jasmine.SpyObj<LanguageUtilService>;
-  let i18nLanguageCodeService: jasmine.SpyObj<I18nLanguageCodeService>;
-  let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
 
   beforeEach(waitForAsync(() => {
     const urlInterpolationServiceSpy = jasmine.createSpyObj(
       'UrlInterpolationService',
       ['getStaticImageUrl']
-    );
-    const languageUtilServiceSpy = jasmine.createSpyObj('LanguageUtilService', [
-      'getContentLanguageDescription',
-      'getAudioLanguageDescription',
-      'getLanguageCodesRelatedToAudioLanguageCode',
-    ]);
-    const i18nLanguageCodeServiceSpy = jasmine.createSpyObj(
-      'I18nLanguageCodeService',
-      ['getCurrentI18nLanguageCode']
-    );
-    const topicSessionFallbackLanguageServiceSpy = jasmine.createSpyObj(
-      'TopicSessionFallbackLanguageService',
-      ['getFallbackSelection', 'saveFallbackSelection']
     );
 
     TestBed.configureTestingModule({
@@ -90,18 +54,6 @@ describe('TopicLessonCardComponent', () => {
           useValue: urlInterpolationServiceSpy,
         },
         {
-          provide: LanguageUtilService,
-          useValue: languageUtilServiceSpy,
-        },
-        {
-          provide: I18nLanguageCodeService,
-          useValue: i18nLanguageCodeServiceSpy,
-        },
-        {
-          provide: TopicSessionFallbackLanguageService,
-          useValue: topicSessionFallbackLanguageServiceSpy,
-        },
-        {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
@@ -110,19 +62,9 @@ describe('TopicLessonCardComponent', () => {
 
     fixture = TestBed.createComponent(TopicLessonCardComponent);
     component = fixture.componentInstance;
-    componentRef = component as unknown as typeof componentRef;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
     ) as jasmine.SpyObj<UrlInterpolationService>;
-    languageUtilService = TestBed.inject(
-      LanguageUtilService
-    ) as jasmine.SpyObj<LanguageUtilService>;
-    i18nLanguageCodeService = TestBed.inject(
-      I18nLanguageCodeService
-    ) as jasmine.SpyObj<I18nLanguageCodeService>;
-    topicSessionFallbackLanguageService = TestBed.inject(
-      TopicSessionFallbackLanguageService
-    ) as jasmine.SpyObj<TopicSessionFallbackLanguageService>;
     windowRef = TestBed.inject(WindowRef);
   }));
 
@@ -219,7 +161,6 @@ describe('TopicLessonCardComponent', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.lessonNumber = 3;
-    component.selectedTextLanguageCode = null;
 
     component.onStartButtonClick();
 
@@ -240,28 +181,12 @@ describe('TopicLessonCardComponent', () => {
   it('should navigate to startUrl directly when no fallback is needed', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
-    component.selectedTextLanguageCode = null;
 
     component.onStartButtonClick();
 
     expect(component.startLessonClick.emit).toHaveBeenCalledWith({
       lessonNumber: 1,
       startUrl: '/explore/123',
-    });
-  });
-
-  it('should emit startLessonClick with language query params when language is selected', () => {
-    spyOn(component.startLessonClick, 'emit');
-    component.startUrl = '/explore/123';
-    component.selectedTextLanguageCode = 'fr';
-    component.selectedVoiceoverLanguageCode = 'fr';
-
-    component.onStartButtonClick();
-
-    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
-      lessonNumber: 1,
-      startUrl:
-        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr',
     });
   });
 
@@ -282,430 +207,6 @@ describe('TopicLessonCardComponent', () => {
     component.onStartButtonClick();
 
     expect(component.startLessonClick.emit).not.toHaveBeenCalled();
-  });
-
-  it('should update selectedTextLanguageCode', () => {
-    component.onSelectedTextLanguageCodeChange('fr');
-
-    expect(component.selectedTextLanguageCode).toBe('fr');
-  });
-
-  it('should auto-select compatible voiceover language code', () => {
-    component.availableVoiceoverLanguageCodes = ['fr', 'es', 'de'];
-    component.selectedVoiceoverLanguageCode = null;
-
-    component.onSelectedTextLanguageCodeChange('fr');
-
-    expect(component.selectedVoiceoverLanguageCode).toBe('fr');
-  });
-
-  it('should not change existing voiceover selection', () => {
-    component.selectedVoiceoverLanguageCode = 'de';
-    component.availableVoiceoverLanguageCodes = ['fr', 'es', 'de'];
-
-    component.onSelectedTextLanguageCodeChange('fr');
-
-    expect(component.selectedVoiceoverLanguageCode).toBe('de');
-  });
-
-  it('should find compatible voiceover when exact match is not available', () => {
-    component.availableVoiceoverLanguageCodes = ['es', 'de'];
-    component.selectedVoiceoverLanguageCode = null;
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('es')
-      .and.returnValue(['pt']);
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('de')
-      .and.returnValue([]);
-
-    component.onSelectedTextLanguageCodeChange('pt');
-
-    expect(component.selectedVoiceoverLanguageCode).toBe('es');
-  });
-
-  it('should not crash when languageUtilService throws', () => {
-    component.availableVoiceoverLanguageCodes = ['es', 'de'];
-    component.selectedVoiceoverLanguageCode = null;
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('es')
-      .and.throwError('error');
-
-    expect(() => {
-      component.onSelectedTextLanguageCodeChange('fr');
-    }).not.toThrowError();
-  });
-
-  it('should save fallback selection to session service', () => {
-    topicSessionFallbackLanguageService.saveFallbackSelection.and.stub();
-
-    component.onSelectedTextLanguageCodeChange('fr');
-
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).toHaveBeenCalledWith('fr', null);
-  });
-
-  it('should update selectedVoiceoverLanguageCode and save to session', () => {
-    component.selectedVoiceoverLanguageCode = null;
-    component.selectedTextLanguageCode = 'fr';
-
-    component.onSelectedVoiceoverLanguageCodeChange('fr-CA');
-
-    expect(component.selectedVoiceoverLanguageCode).toBe('fr-CA');
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).toHaveBeenCalledWith('fr', 'fr-CA');
-  });
-
-  it('should return true when any available language is not English', () => {
-    component.availableTextLanguageCodes = ['en', 'fr'];
-
-    expect(component.shouldShowInfoIcon).toBeTrue();
-  });
-
-  it('should return false when only English is available', () => {
-    component.availableTextLanguageCodes = ['en'];
-
-    expect(component.shouldShowInfoIcon).toBeFalse();
-  });
-
-  it('should return false when no languages are available', () => {
-    component.availableTextLanguageCodes = [];
-
-    expect(component.shouldShowInfoIcon).toBeFalse();
-  });
-
-  it('should return true when a text language is selected', () => {
-    component.selectedTextLanguageCode = 'fr';
-
-    expect(component.shouldShowFallbackCta()).toBeTrue();
-  });
-
-  it('should return false when no text language is selected', () => {
-    component.selectedTextLanguageCode = null;
-
-    expect(component.shouldShowFallbackCta()).toBeFalse();
-  });
-
-  it('should return false when availableTextLanguageCodes is empty', () => {
-    component.availableTextLanguageCodes = [];
-
-    expect(component.isLessonUnavailableInPreferredLanguage()).toBeFalse();
-  });
-
-  it('should return true when preferred language is not in available', () => {
-    component.availableTextLanguageCodes = ['en', 'fr'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValues(
-      'hi',
-      'hi'
-    );
-
-    expect(component.isLessonUnavailableInPreferredLanguage()).toBeTrue();
-  });
-
-  it('should return false when preferred language is available', () => {
-    component.availableTextLanguageCodes = ['en', 'hi'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValues(
-      'hi',
-      'hi'
-    );
-
-    expect(component.isLessonUnavailableInPreferredLanguage()).toBeFalse();
-  });
-
-  it('should return fallback info when lesson is unavailable in preferred language', () => {
-    component.availableTextLanguageCodes = ['en', 'fr'];
-    component.selectedTextLanguageCode = 'fr';
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('hi');
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue('French');
-
-    expect(component.getFallbackInfoTooltipText()).toBe(
-      'This story is still in French, but you can still play it!'
-    );
-  });
-
-  it('should return info about playback language when preferred language is available', () => {
-    component.availableTextLanguageCodes = ['en', 'fr'];
-    component.selectedTextLanguageCode = 'fr';
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue('French');
-
-    expect(component.getFallbackInfoTooltipText()).toBe(
-      'The story will be played in French.'
-    );
-  });
-
-  it('should use AudioLanguageDescription fallback when content description is missing', () => {
-    component.selectedTextLanguageCode = 'fr';
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue(null);
-    languageUtilService.getAudioLanguageDescription
-      .withArgs('fr')
-      .and.returnValue('French (Audio)');
-
-    expect(component.getFallbackInfoTooltipText()).toBe(
-      'The story will be played in French (Audio).'
-    );
-  });
-
-  it('should set language codes to null when no text languages available', () => {
-    component.availableTextLanguageCodes = [];
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBeNull();
-    expect(component.selectedVoiceoverLanguageCode).toBeNull();
-  });
-
-  it('should use preferred language when available', () => {
-    component.availableTextLanguageCodes = ['en', 'fr', 'es'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('fr');
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('fr');
-  });
-
-  it('should use session fallback when preferred language is unavailable', () => {
-    component.availableTextLanguageCodes = ['en', 'fr', 'es'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('hi');
-    topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue({
-      textLanguageCode: 'fr',
-      voiceoverLanguageCode: null,
-    });
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('fr');
-  });
-
-  it('should use English as fallback when session is not available', () => {
-    component.availableTextLanguageCodes = ['en', 'fr', 'es'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('hi');
-    topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue(
-      null
-    );
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('en');
-  });
-
-  it('should use first available language when English is not available and no session', () => {
-    component.availableTextLanguageCodes = ['fr', 'es', 'de'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('hi');
-    topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue(
-      null
-    );
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('fr');
-  });
-
-  it('should re-initialize on ngOnChanges when language codes change', () => {
-    component.availableTextLanguageCodes = ['en'];
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('en');
-
-    component.availableTextLanguageCodes = ['fr', 'en'];
-
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('fr');
-
-    component.ngOnChanges({
-      availableTextLanguageCodes: new SimpleChange(['en'], ['fr', 'en'], false),
-    });
-
-    expect(component.selectedTextLanguageCode).toBe('fr');
-  });
-
-  it('should re-initialize on ngOnChanges when only voiceover language codes change', () => {
-    component.availableTextLanguageCodes = ['en'];
-    component.availableVoiceoverLanguageCodes = [];
-
-    component.ngOnInit();
-
-    expect(component.selectedTextLanguageCode).toBe('en');
-
-    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
-
-    component.ngOnChanges({
-      availableVoiceoverLanguageCodes: new SimpleChange(
-        [],
-        ['fr', 'es'],
-        false
-      ),
-    });
-
-    expect(component.selectedTextLanguageCode).toBe('en');
-  });
-
-  it('should return true when root codes match', () => {
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('fr', 'fr')
-    ).toBeTrue();
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('fr-CA', 'fr')
-    ).toBeTrue();
-  });
-
-  it('should check for related language codes when root codes do not match', () => {
-    component.availableVoiceoverLanguageCodes = ['es', 'de'];
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('es')
-      .and.returnValue(['pt']);
-
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'pt')
-    ).toBeTrue();
-  });
-
-  it('should return false when voiceover is not compatible', () => {
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('es')
-      .and.returnValue([]);
-
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'de')
-    ).toBeFalse();
-  });
-
-  it('should return null when no voiceover languages are available', () => {
-    component.availableVoiceoverLanguageCodes = [];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'en')).toBeNull();
-  });
-
-  it('should use session fallback voiceover when available', () => {
-    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('fr', null)).toBe('fr');
-  });
-
-  it('should use compatible voiceover matching text language', () => {
-    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'fr')).toBe('fr');
-  });
-
-  it('should fall back to English voiceover', () => {
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'fr')).toBe('en');
-  });
-
-  it('should fall back to first available voiceover', () => {
-    component.availableVoiceoverLanguageCodes = ['fr'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'de')).toBe('fr');
-  });
-
-  it('should return English when available', () => {
-    component.availableTextLanguageCodes = ['fr', 'en'];
-
-    expect(componentRef.getFallbackTextLanguageCode()).toBe('en');
-  });
-
-  it('should return first available language when English not available', () => {
-    component.availableTextLanguageCodes = ['fr', 'es'];
-
-    expect(componentRef.getFallbackTextLanguageCode()).toBe('fr');
-  });
-
-  it('should not save when selected text language is null', () => {
-    component.selectedTextLanguageCode = null;
-
-    componentRef.saveSessionFallbackLanguageSelection();
-
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should save when text language is selected', () => {
-    component.selectedTextLanguageCode = 'fr';
-    component.selectedVoiceoverLanguageCode = 'fr-CA';
-
-    componentRef.saveSessionFallbackLanguageSelection();
-
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).toHaveBeenCalledWith('fr', 'fr-CA');
-  });
-
-  it('should save with null voiceover when voiceover is null', () => {
-    component.selectedTextLanguageCode = 'fr';
-    component.selectedVoiceoverLanguageCode = null;
-
-    componentRef.saveSessionFallbackLanguageSelection();
-
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).toHaveBeenCalledWith('fr', null);
-  });
-
-  it('should return content language description', () => {
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue('French');
-
-    expect(componentRef.getLanguageDescription('fr')).toBe('French');
-  });
-
-  it('should return audio language description as fallback', () => {
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue(null);
-    languageUtilService.getAudioLanguageDescription
-      .withArgs('fr')
-      .and.returnValue('French (Audio)');
-
-    expect(componentRef.getLanguageDescription('fr')).toBe('French (Audio)');
-  });
-
-  it('should return the language code as last resort', () => {
-    languageUtilService.getContentLanguageDescription
-      .withArgs('fr')
-      .and.returnValue(null);
-    languageUtilService.getAudioLanguageDescription
-      .withArgs('fr')
-      .and.returnValue(null);
-
-    expect(componentRef.getLanguageDescription('fr')).toBe('fr');
-  });
-
-  it('should create URL with content language code param', () => {
-    component.startUrl = '/explore/123';
-
-    const result = componentRef.getLessonStartUrlWithLanguageSelection(
-      'fr',
-      null
-    );
-
-    expect(result).toBe(
-      'http://localhost:8181/explore/123?initialContentLanguageCode=fr'
-    );
-  });
-
-  it('should create URL with both language code params', () => {
-    component.startUrl = '/explore/123';
-
-    const result = componentRef.getLessonStartUrlWithLanguageSelection(
-      'fr',
-      'fr-CA'
-    );
-
-    expect(result).toBe(
-      'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA'
-    );
   });
 
   it('should toggle isExpanded in both directions', () => {
@@ -782,7 +283,6 @@ describe('TopicLessonCardComponent', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123';
     component.lessonNumber = 3;
-    component.selectedTextLanguageCode = null;
     component.isExpanded = true;
 
     component.onPlayAgainClick();
@@ -797,29 +297,12 @@ describe('TopicLessonCardComponent', () => {
   it('should append restart param to an existing query string on play again click', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '/explore/123?node_id=x&lang=en';
-    component.selectedTextLanguageCode = null;
 
     component.onPlayAgainClick();
 
     expect(component.startLessonClick.emit).toHaveBeenCalledWith({
       lessonNumber: 1,
       startUrl: '/explore/123?node_id=x&lang=en&restart=1',
-    });
-  });
-
-  it('should append restart param to the language-selected url on play again click', () => {
-    spyOn(component.startLessonClick, 'emit');
-    component.startUrl = '/explore/123';
-    component.selectedTextLanguageCode = 'fr';
-    component.selectedVoiceoverLanguageCode = 'fr';
-    component.lessonNumber = 3;
-
-    component.onPlayAgainClick();
-
-    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
-      lessonNumber: 3,
-      startUrl:
-        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr&restart=1',
     });
   });
 
@@ -935,83 +418,6 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isExpanded).toBeTrue();
   });
 
-  it('should use DEFAULT_LANGUAGE_CODE when selectedTextLanguageCode is null', () => {
-    component.selectedTextLanguageCode = null;
-    component.availableTextLanguageCodes = ['en', 'fr'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('fr');
-    languageUtilService.getContentLanguageDescription
-      .withArgs('en')
-      .and.returnValue('English');
-
-    expect(component.getFallbackInfoTooltipText()).toBe(
-      'The story will be played in English.'
-    );
-  });
-
-  it('should return raw language code when both content and audio descriptions are missing', () => {
-    component.selectedTextLanguageCode = 'zh';
-    component.availableTextLanguageCodes = ['en', 'zh'];
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    languageUtilService.getContentLanguageDescription
-      .withArgs('zh')
-      .and.returnValue(null);
-    languageUtilService.getAudioLanguageDescription
-      .withArgs('zh')
-      .and.returnValue(null);
-
-    expect(component.getFallbackInfoTooltipText()).toBe(
-      'The story will be played in zh.'
-    );
-  });
-
-  it('should use compatible voiceover when session fallback is not in available list', () => {
-    component.availableVoiceoverLanguageCodes = ['fr-CA', 'es'];
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('fr-CA')
-      .and.returnValue(['fr']);
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('de', 'fr')).toBe(
-      'fr-CA'
-    );
-  });
-
-  it('should fall back to English when no compatible voiceover found', () => {
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.returnValue(
-      []
-    );
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('de', 'fr')).toBe('en');
-  });
-
-  it('should use session fallback when it is in the available list', () => {
-    component.availableVoiceoverLanguageCodes = ['fr-CA', 'es'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('fr-CA', 'en')).toBe(
-      'fr-CA'
-    );
-  });
-
-  it('should fall back to first available when session fallback is not available and no compatible found', () => {
-    component.availableVoiceoverLanguageCodes = ['es', 'de'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('fr-CA', 'en')).toBe(
-      'es'
-    );
-  });
-
-  it('should handle regional voiceover codes that match text root codes', () => {
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('en-US', 'en')
-    ).toBeTrue();
-  });
-
-  it('should handle regional text codes that match voiceover root codes', () => {
-    expect(
-      componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'es-MX')
-    ).toBeTrue();
-  });
-
   it('should expand first lesson by default', () => {
     component.lessonNumber = 1;
 
@@ -1081,86 +487,5 @@ describe('TopicLessonCardComponent', () => {
     component.ngOnInit();
 
     expect(component.isExpanded).toBeTrue();
-  });
-
-  it('should return raw code when all description services return empty string', () => {
-    languageUtilService.getContentLanguageDescription
-      .withArgs('xx')
-      .and.returnValue('');
-    languageUtilService.getAudioLanguageDescription
-      .withArgs('xx')
-      .and.returnValue('');
-
-    expect(componentRef.getLanguageDescription('xx')).toBe('xx');
-  });
-
-  it('should emit startLessonClick with voiceover language query param when voiceover is selected', () => {
-    spyOn(component.startLessonClick, 'emit');
-    component.startUrl = '/explore/123';
-    component.selectedTextLanguageCode = 'fr';
-    component.selectedVoiceoverLanguageCode = 'fr-CA';
-
-    component.onStartButtonClick();
-
-    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
-      lessonNumber: 1,
-      startUrl:
-        'http://localhost:8181/explore/123?initialContentLanguageCode=fr&initialVoiceoverLanguageCode=fr-CA',
-    });
-  });
-
-  it('should create URL with only content language code when voiceover is null', () => {
-    component.startUrl = '/explore/123';
-
-    const result = componentRef.getLessonStartUrlWithLanguageSelection(
-      'es',
-      null
-    );
-
-    expect(result).toBe(
-      'http://localhost:8181/explore/123?initialContentLanguageCode=es'
-    );
-  });
-
-  it('should use session fallback voiceover only when it is in available list', () => {
-    component.availableVoiceoverLanguageCodes = ['fr', 'es'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('fr', 'en')).toBe('fr');
-  });
-
-  it('should use compatible voiceover from related codes when session fallback is not available', () => {
-    component.availableVoiceoverLanguageCodes = ['es', 'de'];
-    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
-      .withArgs('es')
-      .and.returnValue(['fr']);
-
-    expect(componentRef.getInitialVoiceoverLanguageCode('pt', 'fr')).toBe('es');
-  });
-
-  it('should return first available voiceover when no compatible found and no English', () => {
-    component.availableVoiceoverLanguageCodes = ['fr', 'de'];
-
-    expect(componentRef.getInitialVoiceoverLanguageCode(null, 'zh')).toBe('fr');
-  });
-
-  it('should return English text language code as fallback when available', () => {
-    component.availableTextLanguageCodes = ['en', 'fr'];
-
-    expect(componentRef.getFallbackTextLanguageCode()).toBe('en');
-  });
-
-  it('should return first text language when English is not available', () => {
-    component.availableTextLanguageCodes = ['fr', 'es'];
-
-    expect(componentRef.getFallbackTextLanguageCode()).toBe('fr');
-  });
-
-  it('should handle onSelectedTextLanguageCodeChange with null value', () => {
-    component.onSelectedTextLanguageCodeChange(null);
-
-    expect(component.selectedTextLanguageCode).toBeNull();
-    expect(
-      topicSessionFallbackLanguageService.saveFallbackSelection
-    ).not.toHaveBeenCalled();
   });
 });
