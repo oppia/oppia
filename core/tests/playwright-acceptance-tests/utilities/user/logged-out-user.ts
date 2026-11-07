@@ -30,6 +30,11 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
+const googleAnalyticsPartnerPoliciesUrl =
+  testConstants.URLs.GoogleAnalytics.PartnerPolicies;
+const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -3958,6 +3963,58 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToBlogPage(): Promise<void> {
     await this.goto(blogUrl);
+  }
+
+  /**
+   * Navigates to the Privacy Policy page.
+   */
+  async navigateToPrivacyPolicyPage(): Promise<void> {
+    await this.goto(privacyPolicyUrl);
+  }
+
+  /**
+   * Clicks the link to the Oppia home page on the Privacy Policy page and
+   * checks that it lands on the home page.
+   */
+  async clickLinkToHomePageOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickAndWaitForNavigation('https://www.oppia.org');
+    await expect(this.page).toHaveURL(homeUrl);
+  }
+
+  /**
+   * Clicks the link about managing cookies on the Privacy Policy page and
+   * checks that it opens the expected page.
+   */
+  async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'https://allaboutcookies.org/how-to-manage-cookies',
+      allAboutCookiesUrl,
+      false
+    );
+  }
+
+  /**
+   * Clicks the link about Google Analytics partner policies on the Privacy
+   * Policy page and checks that it opens the expected page.
+   */
+  async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'https://www.google.com/policies/privacy/partners/',
+      googleAnalyticsPartnerPoliciesUrl,
+      false
+    );
+  }
+
+  /**
+   * Clicks the link to opt out of Google Analytics on the Privacy Policy page
+   * and checks that it opens the expected page.
+   */
+  async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      googleAnalyticsOptOutUrl,
+      googleAnalyticsOptOutUrl,
+      false
+    );
   }
 
   /**
