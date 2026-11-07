@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -54,6 +52,8 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {ChangeListService} from '../services/change-list.service';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -104,7 +104,7 @@ describe('Preview Tab Component', () => {
   let explorationId = 'exp1';
   let stateName = 'State1';
   let changeObjectName = 'change';
-  let exploration = {
+  let exploration: ExplorationBackendDict = {
     auto_tts_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: false,
@@ -131,6 +131,7 @@ describe('Preview Tab Component', () => {
       edits_allowed: true,
     },
     next_content_id_index: 5,
+    version: 1,
   };
   let parameters = [
     {
@@ -398,7 +399,7 @@ describe('Preview Tab Component', () => {
       duration_secs: 12.0,
     };
 
-    let changeDicts = [
+    let changeDicts: ExplorationChange[] = [
       {
         cmd: 'update_voiceovers',
         language_accent_code: 'en-US',

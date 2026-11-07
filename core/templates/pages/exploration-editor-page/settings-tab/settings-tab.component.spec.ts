@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
-// @ts-nocheck
-
 import {
   ChangeDetectorRef,
   EventEmitter,
@@ -73,6 +71,7 @@ import {
   VersionHistoryService,
 } from '../services/version-history.service';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
@@ -644,7 +643,7 @@ describe('Settings Tab Component', () => {
     component.deleteExploration();
     tick();
 
-    expect(windowRef.nativeWindow.location).toBe('/creator-dashboard');
+    expect(String(windowRef.nativeWindow.location)).toBe('/creator-dashboard');
   }));
 
   it('should not delete exploration when dismissing delete exploration modal', fakeAsync(() => {
@@ -664,7 +663,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.location).toBe('');
+    expect(String(windowRef.nativeWindow.location)).toBe('');
   }));
 
   it('should open a modal when removeRole is called', fakeAsync(() => {
@@ -1499,7 +1498,7 @@ describe('Settings Tab Component', () => {
 
     // The service property is typed as a union that can hold non-string
     // values before initialization, so the accessor falls back to ''.
-    explorationCategoryService.displayed = 5;
+    explorationCategoryService.displayed = 5 as string | number;
     expect(component.categoryDisplayed).toBe('');
 
     component.categoryDisplayed = 'Geometry';
@@ -1521,7 +1520,7 @@ describe('Settings Tab Component', () => {
     explorationInitStateNameService.displayed = 'Introduction';
     expect(component.initStateNameDisplayed).toBe('Introduction');
 
-    explorationInitStateNameService.displayed = 3;
+    explorationInitStateNameService.displayed = 3 as string | number;
     expect(component.initStateNameDisplayed).toBe('');
 
     component.initStateNameDisplayed = 'Second state';
@@ -1569,17 +1568,17 @@ describe('Settings Tab Component', () => {
     const explorationParamSpecsService = TestBed.inject(
       ExplorationParamSpecsService
     );
+    expect(component.hasSavedParamSpecs()).toBeFalse();
+    expect(component.hasParamDict()).toBeFalse();
+
+    const paramSpec = ParamSpec.createDefault();
     explorationParamSpecsService.savedMemento = new ParamSpecs({
-      randomProp: {obj_type: 'randomVal'},
+      randomProp: paramSpec,
     });
     expect(component.hasSavedParamSpecs()).toBeTrue();
     expect(component.hasParamDict()).toBeTrue();
     expect(component.getParamDict()).toEqual({
-      randomProp: {obj_type: 'randomVal'},
+      randomProp: paramSpec,
     });
-
-    explorationParamSpecsService.savedMemento = null;
-    expect(component.hasSavedParamSpecs()).toBeFalse();
-    expect(component.hasParamDict()).toBeFalse();
   });
 });
