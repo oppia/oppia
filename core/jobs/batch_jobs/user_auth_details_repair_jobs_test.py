@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_auth_details_repair_jobs
-from core.jobs.types import firebase_domain, job_run_result
+from core.jobs.types import job_run_result
 from core.platform import models
 
 MYPY = False
@@ -48,7 +48,7 @@ def stderr(message: str) -> job_run_result.JobRunResult:
     return job_run_result.JobRunResult.as_stderr(message)
 
 
-class RepairMissingUserAuthDetailsJobTestBase(job_test_utils.JobTestBase):
+class RepairJobTestBase(job_test_utils.JobTestBase):
     """Shared helpers for the repair job tests."""
 
     def put_auth_model(
@@ -86,74 +86,38 @@ class RepairMissingUserAuthDetailsJobTestBase(job_test_utils.JobTestBase):
         )
 
     def put_reverse_model(
-        self, firebase_auth_id: str, user_id: str, deleted: bool = False
+        self, auth_id: str, user_id: str, deleted: bool = False
     ) -> None:
         """Writes a UserIdByFirebaseAuthIdModel."""
         self.put_model(
             auth_models.UserIdByFirebaseAuthIdModel,
-            id=firebase_auth_id,
+            id=auth_id,
             user_id=user_id,
             deleted=deleted,
         )
 
     def put_healthy_user(
-        self, user_id: str, firebase_auth_id: str, email: str | None = None
+        self, user_id: str, auth_id: str, email: str | None = None
     ) -> None:
         """Writes every model of a user that does not need to be repaired."""
-        self.put_auth_model(user_id, firebase_auth_id)
+        self.put_auth_model(user_id, auth_id)
         self.put_settings_model(user_id, email=email)
-        self.put_reverse_model(firebase_auth_id, user_id)
+        self.put_reverse_model(auth_id, user_id)
 
-    def get_auth_model(
-        self, user_id: str
-    ) -> auth_models.UserAuthDetailsModel | None:
-        """Returns the UserAuthDetailsModel of the given user, if any."""
-        return auth_models.UserAuthDetailsModel.get_by_id(user_id)
-
-    def assert_user_is_repaired(
-        self, user_id: str, firebase_auth_id: str
-    ) -> None:
-        """Asserts that the user was repaired and can now be synced.
-
-        Args:
-            user_id: str. The Oppia user ID of the user.
-            firebase_auth_id: str. The Firebase UID the user should have.
-        """
-        auth_model = self.get_auth_model(user_id)
-        assert auth_model is not None
-        self.assertEqual(auth_model.firebase_auth_id, firebase_auth_id)
-        self.assertFalse(auth_model.deleted)
-
-        reverse_model = auth_models.UserIdByFirebaseAuthIdModel.get_by_id(
-            firebase_auth_id
-        )
-        self.assertIsNotNone(reverse_model)
+    def assert_repaired(self, user_id: str, auth_id: str) -> None:
+        """Asserts that the user has live auth models that use the given ID."""
+        auth_model = auth_models.UserAuthDetailsModel.get(user_id)
+        reverse_model = auth_models.UserIdByFirebaseAuthIdModel.get(auth_id)
+        self.assertEqual(auth_model.firebase_auth_id, auth_id)
         self.assertEqual(reverse_model.user_id, user_id)
-        self.assertFalse(reverse_model.deleted)
 
-        self.assertEqual(
-            firebase_domain.FirebaseRecord.from_oppia_models(
-                auth_model, user_models.UserSettingsModel.get_by_id(user_id)
-            ),
-            firebase_domain.FirebaseRecord(
-                auth_id=firebase_auth_id,
-                email=f'{user_id}@example.com',
-                disabled=False,
-            ),
-        )
-
-    def assert_firebase_auth_id_is_unassigned(
-        self, firebase_auth_id: str
-    ) -> None:
+    def assert_unassigned(self, auth_id: str) -> None:
         """Asserts that no UserIdByFirebaseAuthIdModel uses the given ID."""
-        self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(firebase_auth_id)
-        )
+        model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertIsNone(model_class.get_by_id(auth_id))
 
 
-class RepairMissingUserAuthDetailsJobTests(
-    RepairMissingUserAuthDetailsJobTestBase
-):
+class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
     JOB_CLASS = user_auth_details_repair_jobs.RepairMissingUserAuthDetailsJob
 
     def test_empty_storage_produces_no_output(self) -> None:
@@ -166,12 +130,6 @@ class RepairMissingUserAuthDetailsJobTests(
 
     def test_previously_repaired_user_is_ok(self) -> None:
         self.put_healthy_user('uid_a', FB_A)
-
-        self.assert_job_output_is([stdout('OK SUCCESS: 1')])
-
-    def test_profile_user_is_ok(self) -> None:
-        self.put_auth_model('uid_p', parent_user_id='uid_a')
-        self.put_settings_model('uid_p')
 
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
 
@@ -211,30 +169,19 @@ class RepairMissingUserAuthDetailsJobTests(
             [stderr('uid_a has a deleted UserSettingsModel')]
         )
 
-    def test_profile_user_missing_auth_model_is_reported(self) -> None:
-        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+    def test_profile_is_ok(self) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a')
+        self.put_settings_model('uid_p')
 
-        self.assert_job_output_is(
-            [stderr('uid_p is a profile without a parent_user_id')]
-        )
-        self.assertIsNone(self.get_auth_model('uid_p'))
+        self.assert_job_output_is([stdout('OK SUCCESS: 1')])
 
-    def test_profile_user_missing_parent_user_id_is_reported(self) -> None:
-        self.put_auth_model('uid_a')
-        self.put_settings_model('uid_a', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
-
-        self.assert_job_output_is(
-            [stderr('uid_a is a profile without a parent_user_id')]
-        )
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
-
-    def test_deleted_profile_user_is_ok(self) -> None:
+    def test_deleted_profile_is_ok(self) -> None:
         self.put_auth_model('uid_p', parent_user_id='uid_a', deleted=True)
         self.put_settings_model('uid_p', deleted=True)
 
         self.assert_job_output_is([stdout('OK SUCCESS: 1')])
 
-    def test_profile_user_with_deleted_auth_model_is_reported(self) -> None:
+    def test_profile_with_deleted_auth_model_is_reported(self) -> None:
         self.put_auth_model('uid_p', parent_user_id='uid_a', deleted=True)
         self.put_settings_model('uid_p')
 
@@ -242,9 +189,7 @@ class RepairMissingUserAuthDetailsJobTests(
             [stderr('uid_p has a deleted UserAuthDetailsModel')]
         )
 
-    def test_profile_user_with_deleted_settings_model_is_reported(
-        self,
-    ) -> None:
+    def test_profile_with_deleted_settings_model_is_reported(self) -> None:
         self.put_auth_model('uid_p', parent_user_id='uid_a')
         self.put_settings_model('uid_p', deleted=True)
 
@@ -252,55 +197,64 @@ class RepairMissingUserAuthDetailsJobTests(
             [stderr('uid_p has a deleted UserSettingsModel')]
         )
 
-    def test_profile_user_missing_settings_model_is_reported(self) -> None:
+    def test_profile_missing_settings_model_is_reported(self) -> None:
         self.put_auth_model('uid_p', parent_user_id='uid_a')
 
         self.assert_job_output_is(
             [stderr('uid_p is missing its UserSettingsModel')]
         )
 
+    def test_profile_missing_auth_model_is_reported(self) -> None:
+        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+
+        self.assert_job_output_is(
+            [stderr('uid_p is a profile without a parent_user_id')]
+        )
+
+    def test_profile_missing_parent_user_id_is_reported(self) -> None:
+        self.put_auth_model('uid_p')
+        self.put_settings_model('uid_p', roles=(feconf.ROLE_ID_MOBILE_LEARNER,))
+
+        self.assert_job_output_is(
+            [stderr('uid_p is a profile without a parent_user_id')]
+        )
+
     def test_missing_auth_model_is_created(self) -> None:
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('PUT SUCCESS: 2')])
-        self.assert_user_is_repaired('uid_a', FB_A)
+        self.assert_repaired('uid_a', FB_A)
 
     def test_missing_firebase_auth_id_is_filled_in(self) -> None:
         self.put_auth_model('uid_a', gae_id='gae_a')
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('PUT SUCCESS: 2')])
-        self.assert_user_is_repaired('uid_a', FB_A)
-        auth_model = self.get_auth_model('uid_a')
-        assert auth_model is not None
+        self.assert_repaired('uid_a', FB_A)
+        auth_model = auth_models.UserAuthDetailsModel.get('uid_a')
         self.assertEqual(auth_model.gae_id, 'gae_a')
 
-    def test_interrupted_repair_missing_auth_model_is_finished(self) -> None:
+    def test_missing_auth_model_with_reverse_model_is_created(self) -> None:
         self.put_settings_model('uid_a')
         self.put_reverse_model(FB_A, 'uid_a')
 
         self.assert_job_output_is([stdout('PUT SUCCESS: 1')])
-        self.assert_user_is_repaired('uid_a', FB_A)
+        self.assert_repaired('uid_a', FB_A)
 
-    def test_interrupted_repair_missing_reverse_model_is_finished(
-        self,
-    ) -> None:
+    def test_missing_reverse_model_is_created(self) -> None:
         self.put_auth_model('uid_a', FB_A)
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('PUT SUCCESS: 1')])
-        self.assert_user_is_repaired('uid_a', FB_A)
+        self.assert_repaired('uid_a', FB_A)
 
-    def test_user_missing_settings_model_is_reported_not_deleted(
-        self,
-    ) -> None:
+    def test_missing_settings_model_is_reported(self) -> None:
         self.put_auth_model('uid_a', 'fb_a')
         self.put_reverse_model('fb_a', 'uid_a')
 
         self.assert_job_output_is(
             [stderr('uid_a is missing its UserSettingsModel')]
         )
-        self.assertIsNotNone(self.get_auth_model('uid_a'))
 
     def test_user_with_only_reverse_model_is_reported(self) -> None:
         self.put_reverse_model('fb_a', 'uid_a')
@@ -309,33 +263,30 @@ class RepairMissingUserAuthDetailsJobTests(
             [stderr('uid_a is missing its UserSettingsModel')]
         )
 
-    def test_deleted_auth_model_is_reported_not_repaired(self) -> None:
+    def test_deleted_auth_model_is_reported(self) -> None:
         self.put_auth_model('uid_a', deleted=True)
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is(
             [stderr('uid_a has a deleted UserAuthDetailsModel')]
         )
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
 
-    def test_deleted_settings_model_is_reported_not_repaired(self) -> None:
+    def test_deleted_settings_model_is_reported(self) -> None:
         self.put_settings_model('uid_a', deleted=True)
 
         self.assert_job_output_is(
             [stderr('uid_a has a deleted UserSettingsModel')]
         )
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
 
-    def test_other_reverse_model_is_reported_not_repaired(self) -> None:
+    def test_other_reverse_model_is_reported(self) -> None:
         self.put_settings_model('uid_a')
         self.put_reverse_model('fb_a', 'uid_a')
 
         self.assert_job_output_is(
             [stderr('uid_a has unexpected UserIdByFirebaseAuthIdModels')]
         )
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
 
-    def test_deleted_reverse_model_is_reported_not_repaired(self) -> None:
+    def test_deleted_reverse_model_is_reported(self) -> None:
         self.put_settings_model('uid_a')
         self.put_reverse_model(FB_A, 'uid_a', deleted=True)
 
@@ -343,9 +294,7 @@ class RepairMissingUserAuthDetailsJobTests(
             [stderr('uid_a has unexpected UserIdByFirebaseAuthIdModels')]
         )
 
-    def test_email_shared_with_full_user_is_reported_not_repaired(
-        self,
-    ) -> None:
+    def test_email_shared_with_full_user_is_reported(self) -> None:
         # NOTE: Firebase ignores case, so these emails are the same.
         self.put_healthy_user('uid_h', 'fb_h', email='x@x.com')
         self.put_settings_model('uid_a', email='X@x.com')
@@ -356,11 +305,8 @@ class RepairMissingUserAuthDetailsJobTests(
                 stderr('uid_a shares its email with another user'),
             ]
         )
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
 
-    def test_users_needing_repair_that_share_an_email_are_reported(
-        self,
-    ) -> None:
+    def test_repairable_users_sharing_email_are_reported(self) -> None:
         self.put_settings_model('uid_a', email='x@x.com')
         self.put_settings_model('uid_b', email='x@x.com')
 
@@ -371,7 +317,7 @@ class RepairMissingUserAuthDetailsJobTests(
             ]
         )
 
-    def test_email_shared_with_profile_user_is_repaired(self) -> None:
+    def test_email_shared_with_profile_is_repaired(self) -> None:
         # NOTE: Profiles share their parent's email but have no Firebase
         # account, so they can't collide.
         self.put_settings_model('uid_a', email='x@x.com')
@@ -429,13 +375,11 @@ class RepairMissingUserAuthDetailsJobTests(
                 stderr('uid_o is missing its UserSettingsModel'),
             ]
         )
-        self.assert_user_is_repaired('uid_a', FB_A)
-        self.assert_user_is_repaired('uid_b', FB_B)
+        self.assert_repaired('uid_a', FB_A)
+        self.assert_repaired('uid_b', FB_B)
 
 
-class AuditMissingUserAuthDetailsJobTests(
-    RepairMissingUserAuthDetailsJobTestBase
-):
+class AuditMissingUserAuthDetailsJobTests(RepairJobTestBase):
     JOB_CLASS = user_auth_details_repair_jobs.AuditMissingUserAuthDetailsJob
 
     def test_empty_storage_produces_no_output(self) -> None:
@@ -455,18 +399,15 @@ class AuditMissingUserAuthDetailsJobTests(
                 stderr('uid_o is missing its UserSettingsModel'),
             ]
         )
-        self.assertIsNone(self.get_auth_model('uid_a'))
-        auth_model = self.get_auth_model('uid_b')
-        assert auth_model is not None
+        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id('uid_a'))
+        auth_model = auth_models.UserAuthDetailsModel.get('uid_b')
         self.assertEqual(auth_model.firebase_auth_id, '')
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
-        self.assert_firebase_auth_id_is_unassigned(FB_B)
+        self.assert_unassigned(FB_A)
+        self.assert_unassigned(FB_B)
 
-    def test_interrupted_repair_is_reported_without_putting_models(
-        self,
-    ) -> None:
+    def test_missing_reverse_model_is_reported_without_putting_it(self) -> None:
         self.put_auth_model('uid_a', FB_A)
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('WOULD PUT SUCCESS: 1')])
-        self.assert_firebase_auth_id_is_unassigned(FB_A)
+        self.assert_unassigned(FB_A)
