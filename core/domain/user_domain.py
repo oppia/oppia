@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
 import re
 
@@ -1227,15 +1228,9 @@ class LearnerGoals:
         ]
         for field_name, topic_ids in topic_id_lists:
             if not isinstance(topic_ids, list):
-                # A set prints in no fixed order, so it is sorted first.
-                received = (
-                    sorted(topic_ids, key=str)
-                    if isinstance(topic_ids, (set, frozenset))
-                    else topic_ids
-                )
                 raise utils.ValidationError(
                     'Expected %s to be a list, received %s'
-                    % (field_name, received)
+                    % (field_name, topic_ids)
                 )
             for topic_id in topic_ids:
                 if not isinstance(topic_id, str) or not re.match(
@@ -1246,11 +1241,9 @@ class LearnerGoals:
                         'ID, received %s' % (field_name, topic_id)
                     )
             duplicates = sorted(
-                {
-                    topic_id
-                    for topic_id in topic_ids
-                    if topic_ids.count(topic_id) > 1
-                }
+                topic_id
+                for topic_id, count in collections.Counter(topic_ids).items()
+                if count > 1
             )
             if duplicates:
                 raise utils.ValidationError(
