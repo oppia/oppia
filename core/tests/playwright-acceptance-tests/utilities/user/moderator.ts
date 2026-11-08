@@ -468,12 +468,10 @@ export class Moderator extends BaseUser {
     await this.clickOnElementWithText(' Save Featured Activities ');
 
     // Check if either success or warning toast message is visible.
-    if (
-      !(
-        (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
-        (await this.isElementVisible(warningToastMessageSelector, true, 5000))
-      )
-    ) {
+    if (!(
+      (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
+      (await this.isElementVisible(warningToastMessageSelector, true, 5000))
+    )) {
       throw new Error('Activity not unfeatured successfully.');
     }
   }
