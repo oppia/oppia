@@ -93,8 +93,7 @@ const contentBoxSelector =
   '.e2e-test-state-editor .e2e-test-state-content-display';
 const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = '.e2e-test-discard-changes';
-const mobileDiscardButtonSelector =
-  '.e2e-test-mobile-exploration-discard-tab';
+const mobileDiscardButtonSelector = '.e2e-test-mobile-exploration-discard-tab';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const stateNameInputSelector = 'input.e2e-test-state-name-input';
 const stateNameSubmitButtonSelector = '.e2e-test-state-name-submit';
@@ -1154,11 +1153,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileNavbarDropdown, {
         force: true,
       });
-      const opened = await this.isElementVisible(
-        mobileNavbarPane,
-        true,
-        3000
-      );
+      const opened = await this.isElementVisible(mobileNavbarPane, true, 3000);
       if (!opened) {
         await this.clickOnElementWithSelector(mobileNavbarDropdown, {
           force: true,
@@ -1945,9 +1940,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectCardContentToBe(expectedCardContent: string): Promise<void> {
     await this.expectElementToBeVisible(contentBoxSelector);
-    const cardContent = (
-      await this.page.locator(contentBoxSelector).textContent()
-    )?.trim() || '';
+    const cardContent =
+      (await this.page.locator(contentBoxSelector).textContent())?.trim() || '';
     if (!cardContent.includes(expectedCardContent)) {
       throw new Error(
         `Expected card content to include "${expectedCardContent}", but got "${cardContent}".`
