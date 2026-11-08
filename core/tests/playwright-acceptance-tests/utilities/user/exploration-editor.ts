@@ -100,6 +100,35 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+// Feedback tab selectors.
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const explorationFeedbackTabContentSelector =
+  '.e2e-test-exploration-feedback-card';
+const explorationFeedbackCardActiveSelector =
+  '.e2e-test-exploration-feedback-card-active';
+const startNewFeedbackButtonSelector = '.e2e-test-start-new-thread-button';
+const newFeedbackThreadModalSelector = 'oppia-create-feedback-thread-modal';
+const feedbackSubjectSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} input`;
+const feedbackSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} textarea`;
+const createThreadButtonSelector = '.e2e-test-create-new-feedback-btn';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
+const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const feedbackTimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+
+// Stats tab selectors.
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const numberOfPassers = '.e2e-test-num-passersby';
+
 const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
@@ -1857,6 +1886,209 @@ export class ExplorationEditor extends BaseUser {
       explorationSummaryTileTitleSelector,
       false
     );
+  }
+
+  /**
+   * Navigates to the feedback tab of the exploration editor.
+   */
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page
+        .$(mobileNavbarOptions)
+        .catch(() => null);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileFeedbackTabButton);
+    } else {
+      await this.clickOnElementWithSelector(feedBackButtonTab);
+      await this.waitForNetworkIdle();
+    }
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Expects the exploration feedback page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Starts a new feedback thread from the feedback tab.
+   * @param {string} subject - The subject of the feedback thread.
+   * @param {string} feedback - The body of the feedback message.
+   */
+  async startAFeedbackThread(subject: string, feedback: string): Promise<void> {
+    await this.expectElementToBeVisible(startNewFeedbackButtonSelector);
+    await this.clickOnElementWithSelector(startNewFeedbackButtonSelector);
+
+    await this.isTextPresentOnPage('Start New Feedback Thread');
+
+    await this.expectElementToBeVisible(newFeedbackThreadModalSelector);
+    await this.typeInInputField(
+      feedbackSubjectSelectorInNewFeedbackModal,
+      subject
+    );
+    await this.typeInInputField(feedbackSelectorInNewFeedbackModal, feedback);
+
+    await this.clickOnElementWithSelector(createThreadButtonSelector);
+    await this.expectElementToBeVisible(newFeedbackThreadModalSelector, false);
+  }
+
+  /**
+   * Expects the feedback thread with a given subject to be present.
+   * @param {string} feedbackSubject - The subject to verify in the thread list.
+   */
+  async expectFeedbackThreadToBePresent(
+    feedbackSubject: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackSubjectSelector);
+    const subjects = await this.page.$$eval(feedbackSubjectSelector, els =>
+      els.map(el => el.textContent?.trim() ?? '')
+    );
+    if (!subjects.includes(feedbackSubject)) {
+      throw new Error(
+        `Feedback thread with subject "${feedbackSubject}" not found. ` +
+          `Found: ${JSON.stringify(subjects)}`
+      );
+    }
+  }
+
+  /**
+   * Verifies that a feedback thread at the specified index has the expected
+   * status.
+   * @param {number} threadIndex - The 1-indexed position of the feedback
+   *   thread.
+   * @param {string} expectedStatus - The status text expected for the thread.
+   */
+  async expectFeedbackStatusInList(
+    threadIndex: number,
+    expectedStatus: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTabRowSelector);
+    await this.page.waitForFunction(
+      ({selector, elementNumber, expectedText}) => {
+        const elements = document.querySelectorAll(selector);
+        return (
+          elements[elementNumber - 1]?.textContent?.trim() === expectedText
+        );
+      },
+      {
+        selector: feedbackStatusSelector,
+        elementNumber: threadIndex,
+        expectedText: expectedStatus,
+      }
+    );
+  }
+
+  /**
+   * Opens a feedback thread by its 1-indexed position.
+   * @param {number} expectedThread - The 1-indexed position of the thread.
+   */
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
+    // Reload to ensure threads are up-to-date.
+    await this.reloadPage();
+    await this.expectElementToBeVisible(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
+      await feedbackSubjects[expectedThread - 1].click();
+      await this.expectElementToBeVisible(
+        explorationFeedbackCardActiveSelector
+      );
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value (e.g. 'fixed').
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    await this.expectElementToBeVisible(responseTextareaSelector);
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.typeInInputField(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+  }
+
+  /**
+   * Replies to the current feedback thread.
+   * @param {string} reply - The reply message.
+   */
+  async replyToSuggestion(reply: string): Promise<void> {
+    await this.expectElementToBeVisible(responseTextareaSelector);
+    await this.typeInInputField(responseTextareaSelector, reply);
+    await this.clickOnElementWithSelector(sendButtonSelector);
+
+    // Confirm button is disabled after sending.
+    await this.expectElementToBeClickable(sendButtonSelector, false);
+  }
+
+  /**
+   * Navigates back to the feedback thread list from an open thread.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTabBackButtonSelector);
+    await this.clickOnElementWithSelector(feedbackTabBackButtonSelector);
+    await this.expectElementToBeVisible(feedbackTabBackButtonSelector, false);
+  }
+
+  /**
+   * Expects the feedback reply details (author, status, timestamp) to be
+   * visible in the thread list.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(feedbackTimeElement);
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page
+        .$(mobileNavbarOptions)
+        .catch(() => null);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
+  }
+
+  /**
+   * Expects the number of passers (users who completed the exploration) to
+   * equal the given value.
+   * @param {number} expected - The expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await this.expectElementToBeVisible(numberOfPassers);
+    const text = await this.page.$eval(
+      numberOfPassers,
+      el => el.textContent?.trim() || ''
+    );
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
   }
 
   /**
