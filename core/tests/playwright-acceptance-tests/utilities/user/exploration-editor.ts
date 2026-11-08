@@ -1179,10 +1179,24 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarDropdown);
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
       await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+        force: true,
+      });
       await this.expectElementToBeVisible(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobilePreviewTabButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        await this.page.click(dropdownToggleIcon, {force: true});
+      }
     } else {
       await this.expectElementToBeVisible(previewTabButton);
       await this.clickOnElementWithSelector(previewTabButton);
@@ -1576,7 +1590,14 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToHistoryTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      const element = await this.page.$(mobileNavbarDropdown);
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+        force: true,
+      });
       await this.expectElementToBeVisible(mobileHistoryTabButton);
       await this.clickOnElementWithSelector(mobileHistoryTabButton);
     } else {
