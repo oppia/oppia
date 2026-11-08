@@ -1227,9 +1227,15 @@ class LearnerGoals:
         ]
         for field_name, topic_ids in topic_id_lists:
             if not isinstance(topic_ids, list):
+                # A set prints in no fixed order, so it is sorted first.
+                received = (
+                    sorted(topic_ids, key=str)
+                    if isinstance(topic_ids, (set, frozenset))
+                    else topic_ids
+                )
                 raise utils.ValidationError(
                     'Expected %s to be a list, received %s'
-                    % (field_name, topic_ids)
+                    % (field_name, received)
                 )
             for topic_id in topic_ids:
                 if not isinstance(topic_id, str) or not re.match(
@@ -1239,10 +1245,17 @@ class LearnerGoals:
                         'Expected each topic ID in %s to be a valid entity '
                         'ID, received %s' % (field_name, topic_id)
                     )
-            if len(set(topic_ids)) != len(topic_ids):
+            duplicates = sorted(
+                {
+                    topic_id
+                    for topic_id in topic_ids
+                    if topic_ids.count(topic_id) > 1
+                }
+            )
+            if duplicates:
                 raise utils.ValidationError(
                     'Expected %s to have no duplicates, received %s'
-                    % (field_name, topic_ids)
+                    % (field_name, duplicates)
                 )
 
         topic_ids_in_both = set(self.topic_ids_to_learn) & set(

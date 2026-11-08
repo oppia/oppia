@@ -1339,11 +1339,37 @@ class LearnerGoalsValidationTests(test_utils.GenericTestBase):
             self.learner_goals.validate()
 
     def test_validation_fails_with_duplicate_topic_ids(self) -> None:
-        self.learner_goals.topic_ids_to_learn = ['topic_id0', 'topic_id0']
+        self.learner_goals.topic_ids_to_learn = [
+            'topic_id2',
+            'topic_id0',
+            'topic_id2',
+            'topic_id1',
+            'topic_id0',
+        ]
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected topic_ids_to_learn to have no duplicates',
+            r'Expected topic_ids_to_learn to have no duplicates, received '
+            r'\[\'topic_id0\', \'topic_id2\'\]',
+        ):
+            self.learner_goals.validate()
+
+    def test_validation_error_sorts_a_set_given_instead_of_a_list(
+        self,
+    ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.learner_goals.topic_ids_to_learn = {  # type: ignore[assignment]
+            'topic_id2',
+            'topic_id0',
+            'topic_id1',
+        }
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected topic_ids_to_learn to be a list, received '
+            r'\[\'topic_id0\', \'topic_id1\', \'topic_id2\'\]',
         ):
             self.learner_goals.validate()
 
