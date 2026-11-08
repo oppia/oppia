@@ -34,16 +34,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 def get_job_by_id(job_id: str) -> Optional[job_domain.Job]:
-    """Returns the job with the given ID, if it exists.
-
-    Args:
-        job_id: str. The ID of the job.
-
-    Returns:
-        Job|None. The corresponding job, or None if it does not exist.
-    """
-    job_model = job_models.JobModel.get(job_id, strict=False)
-    if job_model is None:
+    """Returns the job for the given ID, or None if not found or deleted."""
+    job_model = job_models.JobModel.get_by_id(job_id)
+    if job_model is None or job_model.deleted:
         return None
     return get_job_from_model(job_model)
 

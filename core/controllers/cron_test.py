@@ -58,6 +58,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         app_feedback_report_models,
         exp_models,
+        job_models,
         suggestion_models,
         user_models,
     )
@@ -65,12 +66,14 @@ if MYPY:  # pragma: no cover
 (
     app_feedback_report_models,
     exp_models,
+    job_models,
     suggestion_models,
     user_models,
 ) = models.Registry.import_models(
     [
         models.Names.APP_FEEDBACK_REPORT,
         models.Names.EXPLORATION,
+        models.Names.JOB,
         models.Names.SUGGESTION,
         models.Names.USER,
     ]
@@ -191,7 +194,10 @@ class CronJobTests(test_utils.GenericTestBase):
 
         with self.testapp_swap:
             self.get_json('/cron/models/cleanup')
-            self.assertIsNotNone(job_services.get_job_by_id('job_id'))
+            job_model = job_models.JobModel.get_by_id('job_id')
+            self.assertIsNotNone(job_model)
+            assert job_model is not None
+            self.assertTrue(job_model.deleted)
 
             future_time = current_time + datetime.timedelta(days=181)
             with self.swap(
@@ -199,7 +205,7 @@ class CronJobTests(test_utils.GenericTestBase):
             ):
                 self.get_json('/cron/models/cleanup')
 
-        self.assertIsNone(job_services.get_job_by_id('job_id'))
+        self.assertIsNone(job_models.JobModel.get_by_id('job_id'))
 
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(
         self,

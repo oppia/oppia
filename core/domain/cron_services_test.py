@@ -25,9 +25,11 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
+    from mypy_imports import job_models, user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+job_models, user_models = models.Registry.import_models(
+    [models.Names.JOB, models.Names.USER]
+)
 
 
 class CronServicesTests(test_utils.GenericTestBase):
@@ -91,12 +93,21 @@ class CronServicesTests(test_utils.GenericTestBase):
         ):
             job_services.save_job(job)
 
-        self.assertIsNotNone(job_services.get_job_by_id('job_id'))
+        job_model = job_models.JobModel.get_by_id('job_id')
+        self.assertIsNotNone(job_model)
+        assert job_model is not None
+        self.assertFalse(job_model.deleted)
 
         cron_services.mark_outdated_models_as_deleted()
+
+        job_model = job_models.JobModel.get_by_id('job_id')
+        self.assertIsNotNone(job_model)
+        assert job_model is not None
+        self.assertTrue(job_model.deleted)
+        self.assertIsNone(job_services.get_job_by_id('job_id'))
 
         future_time = current_time + datetime.timedelta(days=181)
         with self.swap(utils, 'get_current_utc_datetime', lambda: future_time):
             cron_services.delete_models_marked_as_deleted()
 
-        self.assertIsNone(job_services.get_job_by_id('job_id'))
+        self.assertIsNone(job_models.JobModel.get_by_id('job_id'))

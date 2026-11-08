@@ -54,14 +54,12 @@ class Job:
             time_finished_msec: float|None. The time the job finished, in
                 milliseconds since the epoch.
             status_code: str. The current status of the job.
-            metadata: dict(str, *)|None. Additional metadata associated with
-                the job.
+            metadata: Optional[Dict[str, Any]]. The metadata for the job.
             output: list(str)|None. The output produced by a completed job.
             error: str|None. The error for a failed or canceled job.
             has_been_cleaned_up: bool. Whether the job's associated models
                 have been cleaned up.
-            additional_job_params: dict(str, *)|None. Parameters required to
-                run the job.
+            additional_job_params: Optional[Dict[str, Any]]. Additional job parameters.
         """
         self.job_id = job_id
         self.job_type = job_type

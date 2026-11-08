@@ -22,7 +22,14 @@ import datetime
 
 from core import utils
 from core.domain import cron_services, job_domain, job_services
+from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import job_models
+
+(job_models,) = models.Registry.import_models([models.Names.JOB])
 
 
 class JobServicesTests(test_utils.GenericTestBase):
@@ -164,9 +171,20 @@ class JobServicesTests(test_utils.GenericTestBase):
         ):
             job_services.save_job(outdated_job)
 
+        outdated_job_model = job_models.JobModel.get_by_id('outdated_job')
+        self.assertIsNotNone(outdated_job_model)
+        assert outdated_job_model is not None
+        self.assertFalse(outdated_job_model.deleted)
+
         job_services.mark_outdated_jobs_as_deleted(current_time)
+
+        outdated_job_model = job_models.JobModel.get_by_id('outdated_job')
+        self.assertIsNotNone(outdated_job_model)
+        assert outdated_job_model is not None
+        self.assertTrue(outdated_job_model.deleted)
+        self.assertIsNone(job_services.get_job_by_id('outdated_job'))
 
         future_time = current_time + datetime.timedelta(days=181)
         with self.swap(utils, 'get_current_utc_datetime', lambda: future_time):
             cron_services.delete_models_marked_as_deleted()
-        self.assertIsNone(job_services.get_job_by_id('outdated_job'))
+        self.assertIsNone(job_models.JobModel.get_by_id('outdated_job'))
