@@ -410,14 +410,24 @@ def get_collection_and_collection_rights_by_id(
         )
     )
 
+    # Here we use cast because query result has a generic model type.
+    collection_model = cast(
+        Optional[collection_models.CollectionModel],
+        collection_and_rights[0][0],
+    )
     collection = None
-    if collection_and_rights[0][0] is not None:
-        collection = get_collection_from_model(collection_and_rights[0][0])
+    if collection_model is not None:
+        collection = get_collection_from_model(collection_model)
 
+    # Here we use cast because query result has a generic model type.
+    collection_rights_model = cast(
+        Optional[collection_models.CollectionRightsModel],
+        collection_and_rights[1][0],
+    )
     collection_rights = None
-    if collection_and_rights[1][0] is not None:
+    if collection_rights_model is not None:
         collection_rights = rights_manager.get_activity_rights_from_model(
-            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+            collection_rights_model, constants.ACTIVITY_TYPE_COLLECTION
         )
 
     return (collection, collection_rights)
@@ -817,11 +827,12 @@ def apply_change_list(
                     collection.update_language_code(
                         edit_collection_property_language_code_cmd.new_value
                     )
-                elif (
-                    change.property_name
-                    == collection_domain.COLLECTION_PROPERTY_TAGS
-                ):
-                    # Here we use cast because this 'elif' condition forces
+                else:
+                    assert (
+                        change.property_name
+                        == collection_domain.COLLECTION_PROPERTY_TAGS
+                    )
+                    # Here we use cast because the assertion forces
                     # change to have type EditCollectionPropertyTagsCmd.
                     edit_collection_property_tags_cmd = cast(
                         collection_domain.EditCollectionPropertyTagsCmd, change
@@ -1211,11 +1222,11 @@ def update_collection(
         and committer_id != feconf.MIGRATION_BOT_USER_ID
     ):
         user_settings = user_services.get_user_settings(committer_id)
-        if user_settings is not None:
-            user_settings.update_first_contribution_msec(
-                utils.get_current_time_in_millisecs()
-            )
-            user_services.save_user_settings(user_settings)
+
+        user_settings.update_first_contribution_msec(
+            utils.get_current_time_in_millisecs()
+        )
+        user_services.save_user_settings(user_settings)
 
 
 def regenerate_collection_summary_with_new_contributor(
@@ -1391,10 +1402,10 @@ def save_collection_summary(
         ),
     }
 
-    collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id
-        )
+    collection_summary_model: Optional[
+        collection_models.CollectionSummaryModel
+    ] = collection_models.CollectionSummaryModel.get_by_id(
+        collection_summary.id
     )
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)

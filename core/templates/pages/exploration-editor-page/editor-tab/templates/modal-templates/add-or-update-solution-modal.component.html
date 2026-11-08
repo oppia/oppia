@@ -32,7 +32,8 @@
         <strong tabindex="0">Explanation:</strong>
         <schema-based-editor class="e2e-test-explanation-textarea"
                              [schema]="EXPLANATION_FORM_SCHEMA"
-                             [(localValue)]="data.explanationHtml">
+                             [localValue]="data.explanationHtml"
+                             (localValueChange)="updateExplanationHtml($event)">
         </schema-based-editor>
       </div>
     </div>

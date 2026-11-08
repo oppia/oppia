@@ -22,7 +22,7 @@
         </span>
         <span *ngIf="activeWrittenTranslation">
           <oppia-rte-output-display *ngIf="activeWrittenTranslation.isHtml()"
-                                    [rteString]="activeWrittenTranslation.getTranslation()"
+                                    [rteString]="getActiveTranslationAsHtml()"
                                     class="oppia-rte-editor e2e-test-translation-display">
           </oppia-rte-output-display>
           <p *ngIf="activeWrittenTranslation.isUnicode()">
