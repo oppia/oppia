@@ -2033,16 +2033,21 @@ export class ExplorationEditor extends BaseUser {
         fullName: string;
         truncatedName: string;
       }) => {
-        const elements = document.querySelectorAll(selector);
-        const cardValues = Array.from(elements).map(element =>
-          element.textContent?.trim()
-        );
-        return (
-          cardValues.includes(fullName) || cardValues.includes(truncatedName)
-        );
+        const elements = Array.from(document.querySelectorAll(selector));
+        return elements.some(element => {
+          const text = element.textContent?.trim() || '';
+          const title =
+            element.querySelector('title')?.textContent?.trim() || '';
+          return (
+            text.includes(fullName) ||
+            text.includes(truncatedName) ||
+            title === fullName ||
+            title === truncatedName
+          );
+        });
       },
       {
-        selector: stateNodeSelector,
+        selector: explorationGraphNodeSelector,
         fullName: cardName,
         truncatedName: truncatedCardName,
       },
@@ -2071,11 +2076,15 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.waitForFunction(
       ({selector, value}: {selector: string; value: string}) => {
-        return !Array.from(document.querySelectorAll(selector)).some(
-          el => el.textContent?.trim() === value
-        );
+        const elements = Array.from(document.querySelectorAll(selector));
+        return !elements.some(element => {
+          const text = element.textContent?.trim() || '';
+          const title =
+            element.querySelector('title')?.textContent?.trim() || '';
+          return text.includes(value) || title === value;
+        });
       },
-      {selector: stateNodeSelector, value: cardName},
+      {selector: explorationGraphNodeSelector, value: cardName},
       {timeout: 60000}
     );
 
@@ -2217,11 +2226,15 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.waitForFunction(
       ({selector, name}: {selector: string; name: string}) => {
-        return !Array.from(document.querySelectorAll(selector)).some(
-          el => el.textContent?.trim() === name
-        );
+        const elements = Array.from(document.querySelectorAll(selector));
+        return !elements.some(el => {
+          const text = el.textContent?.trim() || '';
+          const title =
+            el.querySelector('title')?.textContent?.trim() || '';
+          return text.includes(name) || title === name;
+        });
       },
-      {selector: stateNodeSelector, name: stateName},
+      {selector: explorationGraphNodeSelector, name: stateName},
       {timeout: 60000}
     );
 
