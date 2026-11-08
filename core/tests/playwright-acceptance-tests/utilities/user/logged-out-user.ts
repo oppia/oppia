@@ -319,6 +319,8 @@ const footerVersionInfoSelector = '.e2e-test-footer-version-info';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const teachUrl = testConstants.URLs.Teach;
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
+const exploreLessonsButtonAtTheBottomInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button-at-the-bottom';
 
 // Parents and Teachers Page.
 const subheadingInParentsAndTeachersPageSelector =
@@ -3264,6 +3266,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to click the Explore Lessons button at the bottom of the Teach
+   * page and check if it opens the Classrooms page.
+   */
+  async clickExploreLessonsButtonAtTheBottomInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      exploreLessonsButtonAtTheBottomInTeachPage,
+      classroomsPageUrl
+    );
+  }
+
+  /**
    * Validates that a given subheading text appears on the Parents and Teachers page.
    *
    * @param subheading - The expected subheading text to be found.
@@ -3958,6 +3971,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToBlogPage(): Promise<void> {
     await this.goto(blogUrl);
+  }
+
+  /**
+   * Function to navigate to the Teach page.
+   */
+  async navigateToTeachPage(): Promise<void> {
+    await this.goto(teachUrl);
   }
 
   /**
