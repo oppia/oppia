@@ -559,15 +559,17 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             '_get_mailchimp_class',
             lambda: mailchimp,
         )
+        # Here we use MyPy ignore because the requests stubs are missing RequestException.
         request_swap = self.swap_to_always_raise(
             mailchimp.lists.members,
             'get',
-            requests.RequestException('request failed'),
+            requests.RequestException('request failed'),  # type: ignore[attr-defined]
         )
 
         with mailchimp_swap, request_swap:
+            # Here we use MyPy ignore because the requests stubs are missing RequestException.
             with self.assertRaisesRegex(
-                requests.RequestException, 'request failed'
+                requests.RequestException, 'request failed'  # type: ignore[attr-defined]
             ):
                 mailchimp_bulk_email_services.permanently_delete_user_from_list(
                     self.user_email_1
@@ -580,10 +582,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             '_get_mailchimp_class',
             lambda: mailchimp,
         )
+        # Here we use MyPy ignore because the requests stubs are missing RequestException.
         request_swap = self.swap_to_always_raise(
             mailchimp.lists.members,
             'get',
-            requests.RequestException('request failed'),
+            requests.RequestException('request failed'),  # type: ignore[attr-defined]
         )
 
         with (
