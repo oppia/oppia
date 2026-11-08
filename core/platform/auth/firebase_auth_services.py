@@ -407,10 +407,9 @@ def associate_auth_id_with_user_id(
     (assoc_by_user_id_model,) = auth_models.UserAuthDetailsModel.get_multi(
         [user_id], include_deleted=True
     )
-    assert (
-        assoc_by_user_id_model is None
-        or assoc_by_user_id_model.firebase_auth_id is None
-    ), 'Impossible state: auth ID collision check missed an existing association.'
+    assert assoc_by_user_id_model is None or (
+        assoc_by_user_id_model.firebase_auth_id is None
+    )
 
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None, even with
@@ -478,7 +477,7 @@ def associate_multi_auth_ids_with_user_ids(
         assoc_by_user_id_model is None
         or assoc_by_user_id_model.firebase_auth_id is None
         for assoc_by_user_id_model in assoc_by_user_id_model_list
-    ), 'Impossible state: auth ID collision check missed an existing association.'
+    )
 
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None.

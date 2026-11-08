@@ -240,7 +240,7 @@ class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
             self.swap(time, 'sleep', stop_sleep),
         ):
             with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
-                emulator._process_queue( # pylint: disable=protected-access
+                emulator._process_queue(  # pylint: disable=protected-access
                     'queue'
                 )
 
@@ -290,7 +290,7 @@ class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
             self.swap(time, 'sleep', stop_sleep),
         ):
             with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
-                emulator._process_queue( # pylint: disable=protected-access
+                emulator._process_queue(  # pylint: disable=protected-access
                     'queue'
                 )
 
