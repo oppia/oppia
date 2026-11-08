@@ -123,7 +123,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
         # must not be repaired.
         shared_emails = (
             users
-            | 'Get Firebase emails' >> beam.FlatMap(_get_firebase_email)
+            | 'Get Firebase emails' >> beam.FlatMap(_get_email)
             | 'Count users per email' >> beam.combiners.Count.PerElement()
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
@@ -325,7 +325,7 @@ def _build_reverse_model(
     return model
 
 
-def _get_firebase_email(user: tuple[str, UserModels]) -> abc.Iterator[str]:
+def _get_email(user: tuple[str, UserModels]) -> abc.Iterator[str]:
     """Yields the user's email if the user may have a Firebase account.
 
     NOTE: Deleted users keep a disabled Firebase account, so their email is
@@ -334,16 +334,15 @@ def _get_firebase_email(user: tuple[str, UserModels]) -> abc.Iterator[str]:
     _, user_models_by_kind = user
     auth_model = next(iter(user_models_by_kind['auth']), None)
     settings_model = next(iter(user_models_by_kind['settings']), None)
-    if settings_model is None:
-        return
-    # NOTE: Like FirebaseServerSyncJob, this skips profiles, which are the
-    # only users with a parent_user_id.
-    if auth_model is not None and auth_model.parent_user_id is not None:
-        return
-    if not settings_model.deleted or (
-        auth_model is not None and auth_model.firebase_auth_id
-    ):
-        yield settings_model.email.lower()
+    match auth_model, settings_model:
+        case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
+            # NOTE: Like FirebaseServerSyncJob, this skips profiles, which are
+            # the only users with a parent_user_id.
+            return
+        case _, user_models.UserSettingsModel(email=str() as email):
+            yield email.lower()
+        case _:
+            pass
 
 
 def _generate_firebase_auth_id(user_id: str) -> str:
