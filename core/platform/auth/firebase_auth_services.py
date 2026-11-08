@@ -404,6 +404,14 @@ def associate_auth_id_with_user_id(
             % (user_id, auth_id_collision)
         )
 
+    (assoc_by_user_id_model,) = auth_models.UserAuthDetailsModel.get_multi(
+        [user_id], include_deleted=True
+    )
+    assert (
+        assoc_by_user_id_model is None
+        or assoc_by_user_id_model.firebase_auth_id is None
+    ), 'Impossible state: auth ID collision check missed an existing association.'
+
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None, even with
     # include_deleted=True.
@@ -423,18 +431,11 @@ def associate_auth_id_with_user_id(
     # NOTE: We use get_multi(include_deleted=True) because get() returns None
     # for models with deleted=True, but we need to make changes to those models
     # when managing deletion.
-    (assoc_by_user_id_model,) = auth_models.UserAuthDetailsModel.get_multi(
-        [user_id], include_deleted=True
+    assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
+        id=user_id, firebase_auth_id=auth_id
     )
-    if (
-        assoc_by_user_id_model is None
-        or assoc_by_user_id_model.firebase_auth_id is None
-    ):
-        assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
-            id=user_id, firebase_auth_id=auth_id
-        )
-        assoc_by_user_id_model.update_timestamps()
-        assoc_by_user_id_model.put()
+    assoc_by_user_id_model.update_timestamps()
+    assoc_by_user_id_model.put()
 
 
 def associate_multi_auth_ids_with_user_ids(
@@ -470,6 +471,15 @@ def associate_multi_auth_ids_with_user_ids(
         )
         raise Exception('already associated: %s' % auth_id_collisions_text)
 
+    assoc_by_user_id_model_list = auth_models.UserAuthDetailsModel.get_multi(
+        user_ids
+    )
+    assert all(
+        assoc_by_user_id_model is None
+        or assoc_by_user_id_model.firebase_auth_id is None
+        for assoc_by_user_id_model in assoc_by_user_id_model_list
+    ), 'Impossible state: auth ID collision check missed an existing association.'
+
     # A new {auth_id: user_id} mapping needs to be created. We know the model
     # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_models = [
@@ -489,21 +499,12 @@ def associate_multi_auth_ids_with_user_ids(
     # create a new model rather than update an existing one.
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
-        for auth_id, user_id, assoc_by_user_id_model in zip(
-            auth_ids,
-            user_ids,
-            auth_models.UserAuthDetailsModel.get_multi(user_ids),
-        )
-        if (
-            assoc_by_user_id_model is None
-            or assoc_by_user_id_model.firebase_auth_id is None
-        )
+        for auth_id, user_id in zip(auth_ids, user_ids)
     ]
-    if assoc_by_user_id_models:
-        auth_models.UserAuthDetailsModel.update_timestamps_multi(
-            assoc_by_user_id_models
-        )
-        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+    auth_models.UserAuthDetailsModel.update_timestamps_multi(
+        assoc_by_user_id_models
+    )
+    auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:

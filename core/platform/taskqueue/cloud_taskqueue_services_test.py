@@ -152,7 +152,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             )
 
 
-class CloudTaskqueueGenericTestBaseTests(test_utils.GenericTestBase):
+class CloudTaskqueueGenericTestBaseTests(test_utils.TestBase):
 
     def test_http_task_without_payload_or_optional_fields(self) -> None:
         class Response:

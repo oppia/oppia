@@ -205,7 +205,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(matched, patterns)
 
 
-class CloudTasksEmulatorGenericTestBaseTests(test_utils.GenericTestBase):
+class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
 
     def test_future_task_remains_queued(self) -> None:
         handled_tasks: List[str] = []
