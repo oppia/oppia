@@ -95,7 +95,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             >> ndb_io.GetModels(
                 auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
             )
-            | 'Key UserAuthDetailsModels' >> beam.WithKeys(lambda m: m.id)
+            | 'Key UserAuthDetailsModels' >> beam.Map(lambda m: (m.id, m))
         )
         settings_models_by_user_id = (
             self.pipeline
@@ -103,7 +103,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=True)
             )
-            | 'Key UserSettingsModels' >> beam.WithKeys(lambda m: m.id)
+            | 'Key UserSettingsModels' >> beam.Map(lambda m: (m.id, m))
         )
         reverse_models_by_user_id = (
             self.pipeline
@@ -114,7 +114,7 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
                 )
             )
             | 'Key UserIdByFirebaseAuthIdModels'
-            >> beam.WithKeys(lambda m: m.user_id)
+            >> beam.Map(lambda m: (m.user_id, m))
         )
         users = {
             'auth': auth_models_by_user_id,
