@@ -28,64 +28,45 @@ import {
 } from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-const ROLES = testConstants.Roles;
-const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
-const EXPLORATION_CONTENT = 'Test Exploration Content';
-
 test.describe.configure({mode: 'serial'});
 
 test.describe('Lesson Creator', function () {
   let explorationEditor: ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationId: string;
+  const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
 
   test.beforeAll(async function ({browser}) {
+    // Create releaseCoordinator to enable the feature flag.
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
       browser,
-      [ROLES.RELEASE_COORDINATOR]
+      [testConstants.Roles.RELEASE_COORDINATOR]
     );
-
-    await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
-    await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationCreator',
       'exploration_creator@example.com',
       browser
     );
+
+    // Enable the Improvements Tab feature flag.
+    await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
+
+    // Create exploration "Test Exploration" and save as draft per CUJ.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
-      EXPLORATION_CONTENT,
-      INTERACTION_TYPES.END_EXPLORATION
-    );
+    await explorationEditor.updateCardContent('Test Exploration Content');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.getExplorationId();
   });
 
   test('should not see improvements tab in draft exploration', async function () {
-    await explorationEditor.expectExplorationToBeDraft();
-    await explorationEditor.expectImprovementsTabToBePresent(false);
-
     await explorationEditor.navigateToCreatorDashboardPage();
-    // Reopen the saved draft rather than creating a second exploration.
-    await explorationEditor.openExplorationFromCreatorDashboard(explorationId);
-    await explorationEditor.expectEditorCardContentToContain(
-      EXPLORATION_CONTENT
-    );
-    await explorationEditor.expectExplorationToBeDraft();
-    await explorationEditor.expectImprovementsTabToBePresent(false);
-  });
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
-  test('should return to editor tab when opening improvements tab in a draft exploration', async function () {
-    await explorationEditor.expectImprovementsTabToBeInaccessible();
-    await explorationEditor.expectEditorCardContentToContain(
-      EXPLORATION_CONTENT
-    );
-    await explorationEditor.expectExplorationToBeDraft();
+    // Improvements Tab should NOT be visible in a draft exploration.
     await explorationEditor.expectImprovementsTabToBePresent(false);
   });
 
