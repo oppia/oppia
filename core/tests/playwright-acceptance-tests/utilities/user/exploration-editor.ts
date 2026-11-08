@@ -337,6 +337,7 @@ export class ExplorationEditor extends BaseUser {
    * Opens the feedback thread matching the given subject.
    */
   async viewFeedbackThread(subject: string): Promise<void> {
+    await this.reloadPage();
     await this.feedbackRow(subject).click();
     await expect(this.page.locator(feedbackActiveCardSelector)).toContainText(
       subject

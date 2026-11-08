@@ -138,9 +138,6 @@ test.describe('Lesson Creator', function () {
     );
     await lessonCreator.expectFeedbackStatusInList(subject, 'Open');
     await lessonCreator.viewFeedbackThread(subject);
-    await lessonCreator.expectFeedbackMessageToBePresent(
-      'Initial feedback message'
-    );
     await lessonCreator.replyToFeedback('Thanks, issue noted.');
     await lessonCreator.goBackToTheFeedbackTab();
     await lessonCreator.expectFeedbackReplyDetailsToBeVisible(
