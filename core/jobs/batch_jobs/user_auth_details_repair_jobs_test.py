@@ -108,11 +108,6 @@ class RepairJobTestBase(job_test_utils.JobTestBase):
         self.assertEqual(auth_model.firebase_auth_id, auth_id)
         self.assertEqual(reverse_model.user_id, user_id)
 
-    def assert_unassigned(self, auth_id: str) -> None:
-        """Asserts that no UserIdByFirebaseAuthIdModel uses the given ID."""
-        model_class = auth_models.UserIdByFirebaseAuthIdModel
-        self.assertIsNone(model_class.get_by_id(auth_id))
-
 
 class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
     JOB_CLASS = user_auth_details_repair_jobs.RepairMissingUserAuthDetailsJob
@@ -394,12 +389,14 @@ class AuditMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id('uid_a'))
         auth_model = auth_models.UserAuthDetailsModel.get('uid_b')
         self.assertEqual(auth_model.firebase_auth_id, '')
-        self.assert_unassigned(FB_A)
-        self.assert_unassigned(FB_B)
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertIsNone(reverse_model_class.get_by_id(FB_A))
+        self.assertIsNone(reverse_model_class.get_by_id(FB_B))
 
     def test_missing_reverse_model_is_reported_without_putting_it(self) -> None:
         self.put_auth_model('uid_a', FB_A)
         self.put_settings_model('uid_a')
 
         self.assert_job_output_is([stdout('WOULD PUT SUCCESS: 1')])
-        self.assert_unassigned(FB_A)
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertIsNone(reverse_model_class.get_by_id(FB_A))
