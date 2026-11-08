@@ -2179,10 +2179,15 @@ export class ExplorationEditor extends BaseUser {
     stateName: string,
     selectorToClick: string
   ): Promise<boolean> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const effectiveNodeSelector = isMobile
+      ? `${explorationStateGraphModalSelector} ${explorationGraphNodeSelector}`
+      : explorationGraphNodeSelector;
+
     await this.page.waitForFunction(
       ({nodeSelector}: {nodeSelector: string}) =>
         document.querySelectorAll(nodeSelector).length > 0,
-      {nodeSelector: explorationGraphNodeSelector},
+      {nodeSelector: effectiveNodeSelector},
       {timeout: 60000}
     );
     return await this.page.evaluate(
@@ -2222,7 +2227,7 @@ export class ExplorationEditor extends BaseUser {
       {
         name: stateName,
         selector: selectorToClick,
-        nodeSelector: explorationGraphNodeSelector,
+        nodeSelector: effectiveNodeSelector,
       }
     );
   }
@@ -2237,11 +2242,11 @@ export class ExplorationEditor extends BaseUser {
 
     if (isMobile) {
       await this.openExplorationStateGraphInMobileView();
+      await this.expectElementToBeVisible(explorationStateGraphModalSelector);
     } else {
       await this.navigateToCard(stateName);
+      await this.expectElementToBeVisible(explorationGraphSelector);
     }
-
-    await this.expectElementToBeVisible(explorationGraphSelector);
 
     await this.clickOnGraphNodeElement(
       stateName,
