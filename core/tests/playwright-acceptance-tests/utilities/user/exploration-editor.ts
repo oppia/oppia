@@ -1137,22 +1137,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to the editor tab.
+   * Helper function to reliably expand the mobile navbar and open its dropdown menu.
    */
-  async navigateToEditorTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarOptions);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
+  async openMobileNavbarDropdown(): Promise<void> {
+    const element = await this.page.$(mobileNavbarDropdown);
+    if (!element) {
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+    }
+    const isPaneOpen = await this.isElementVisible(
+      mobileNavbarPane,
+      true,
+      1500
+    );
+    if (!isPaneOpen) {
       await this.expectElementToBeVisible(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileNavbarDropdown, {
         force: true,
       });
-      await this.expectElementToBeVisible(mobileNavbarPane);
+      const opened = await this.isElementVisible(
+        mobileNavbarPane,
+        true,
+        3000
+      );
+      if (!opened) {
+        await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+          force: true,
+        });
+      }
+    }
+    await this.expectElementToBeVisible(mobileNavbarPane);
+  }
+
+  /**
+   * Function to navigate to the editor tab.
+   */
+  async navigateToEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openMobileNavbarDropdown();
       await this.page.locator(mobileMainTabButton).dispatchEvent('click');
 
       // Close dropdown if it doesn't automatically close.
@@ -1179,15 +1200,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToExplorationEditorPreviewTab(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarDropdown);
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
-        force: true,
-      });
-      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.openMobileNavbarDropdown();
       await this.clickOnElementWithSelector(mobilePreviewTabButton);
 
       // Close dropdown if it doesn't automatically close.
@@ -1253,15 +1266,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarDropdown);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      // Open the navbar dropdown, then navigate to Settings.
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.openMobileNavbarDropdown();
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
@@ -1286,16 +1291,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToTranslationsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarOptions);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.openMobileNavbarDropdown();
       await this.clickAndWaitForNavigation(mobileTranslationTabButton, true);
 
       // Close dropdown if it doesn't automatically close.
@@ -1590,14 +1586,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToHistoryTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarDropdown);
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      await this.expectElementToBeVisible(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
-        force: true,
-      });
+      await this.openMobileNavbarDropdown();
       await this.expectElementToBeVisible(mobileHistoryTabButton);
       await this.clickOnElementWithSelector(mobileHistoryTabButton);
     } else {
