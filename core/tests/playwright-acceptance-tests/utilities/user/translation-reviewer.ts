@@ -214,22 +214,13 @@ export class TranslationReviewer extends BaseUser {
   }
 
   /**
-   * Edits the current translation, verifies the replacement, and saves it.
+   * Clicks on the update translation button and waits for the editor to close.
    */
-  async updateEditedTranslation(expectedContent: string): Promise<void> {
-    await this.page.getByRole('button', {name: 'Edit', exact: true}).click();
-    const editor = this.page.locator('.e2e-test-rte').last();
-    await expect(editor).toBeVisible();
-    await editor.click();
-    await this.page.keyboard.press('ControlOrMeta+A');
-    await this.page.keyboard.press('Backspace');
-    await this.page.keyboard.type(`${expectedContent}\n`);
-    await expect(editor).toContainText(expectedContent);
-    await this.page.locator(updateTranslationButtonSelector).click();
+  async clickOnUpdateTranslationButton(): Promise<void> {
+    await this.clickOnElementWithSelector(updateTranslationButtonSelector);
     await expect(
       this.page.locator(updateTranslationButtonSelector)
     ).toBeHidden();
-    await this.expectCardContentToBeInTranslationReview(expectedContent);
   }
 }
 

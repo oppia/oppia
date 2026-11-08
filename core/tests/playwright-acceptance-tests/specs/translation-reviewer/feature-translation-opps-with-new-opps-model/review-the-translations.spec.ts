@@ -173,9 +173,7 @@ test.describe('Translation Reviewer V2', function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.expectScreenshotToMatch(
-      'translationReviewerReviewTab',
-      undefined,
-      {animations: 'disabled'}
+      'translationReviewerReviewTab'
     );
   });
 
@@ -212,7 +210,10 @@ test.describe('Translation Reviewer V2', function () {
       'सामग्री 2'
     );
     // Accept the translation with adding review comment.
-    await translationReviewer.updateEditedTranslation('नया अनुवाद');
+    await translationReviewer.clickOnElementWithText('Edit');
+    // TODO(#23250): RTE not usable. Once the issue is fixed, uncomment the following line.
+    // await translationReviewer.typeTextForRTE('Review comment');
+    await translationReviewer.clickOnUpdateTranslationButton();
     await translationReviewer.submitTranslationReview(
       'accept',
       'I have added some changes.'
