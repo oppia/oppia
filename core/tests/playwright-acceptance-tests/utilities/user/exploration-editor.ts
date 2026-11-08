@@ -89,6 +89,8 @@ const stateContentInputField = 'div.e2e-test-rte';
 
 const toastMessage = '.e2e-test-toast-message';
 
+const contentBoxSelector =
+  '.e2e-test-state-editor .e2e-test-state-content-display';
 const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = '.e2e-test-discard-changes';
 const mobileDiscardButtonSelector =
@@ -1930,9 +1932,9 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} expectedCardContent - The expected card content.
    */
   async expectCardContentToBe(expectedCardContent: string): Promise<void> {
-    await this.expectElementToBeVisible(stateEditSelector);
+    await this.expectElementToBeVisible(contentBoxSelector);
     const cardContent = (
-      await this.page.locator(stateEditSelector).textContent()
+      await this.page.locator(contentBoxSelector).textContent()
     )?.trim() || '';
     if (!cardContent.includes(expectedCardContent)) {
       throw new Error(
