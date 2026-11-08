@@ -104,7 +104,6 @@ const stateNodeGroupSelector = '.e2e-test-node';
 const closeModalButtonSelector = '.e2e-test-modal-close-button';
 const explorationGraphSelector = 'oppia-exploration-graph';
 const explorationGraphNodeSelector = 'g.e2e-test-node';
-const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
 const explorationGraphNodeDeleteButtonSelector =
   'g.e2e-test-delete-node rect.oppia-node-delete';
 const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
@@ -2221,7 +2220,13 @@ export class ExplorationEditor extends BaseUser {
         }
 
         element.scrollIntoView({block: 'center', inline: 'center'});
-        element.dispatchEvent(new Event('click', {bubbles: true}));
+        element.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
         return true;
       },
       {
@@ -2247,11 +2252,6 @@ export class ExplorationEditor extends BaseUser {
       await this.navigateToCard(stateName);
       await this.expectElementToBeVisible(explorationGraphSelector);
     }
-
-    await this.clickOnGraphNodeElement(
-      stateName,
-      explorationGraphNodeBackgroundSelector
-    );
 
     const deleteClicked = await this.clickOnGraphNodeElement(
       stateName,
