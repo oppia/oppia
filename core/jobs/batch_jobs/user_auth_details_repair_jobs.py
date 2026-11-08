@@ -337,11 +337,11 @@ def _get_firebase_email(user: User) -> abc.Iterator[str]:
     _, user_models_by_kind = user
     auth_model = next(iter(user_models_by_kind['auth']), None)
     settings_model = next(iter(user_models_by_kind['settings']), None)
+    if settings_model is None:
+        return
     # NOTE: Like FirebaseServerSyncJob, this skips profiles, which are the
     # only users with a parent_user_id.
-    if settings_model is None or (
-        auth_model is not None and auth_model.parent_user_id is not None
-    ):
+    if auth_model is not None and auth_model.parent_user_id is not None:
         return
     if not settings_model.deleted or (
         auth_model is not None and auth_model.firebase_auth_id
