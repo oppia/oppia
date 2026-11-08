@@ -1178,6 +1178,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the exploration preview tab.
    */
   async navigateToExplorationEditorPreviewTab(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       if (!element) {
@@ -2129,7 +2130,19 @@ export class ExplorationEditor extends BaseUser {
   async selectFirstCard(cardName: string): Promise<void> {
     await this.expectElementToBeVisible(firstCardSettingsSelector);
     await this.clickOnElementWithSelector(firstCardSettingsSelector);
+
+    const autosavePromise = this.page
+      .waitForResponse(
+        response =>
+          response.url().includes('/createhandler/autosave_draft/') &&
+          response.status() === 200,
+        {timeout: 30000}
+      )
+      .catch(() => null);
+
     await this.selectMatOption(cardName);
+    await autosavePromise;
+    await this.waitForNetworkIdle();
     showMessage(`Initial card has been set to ${cardName}.`);
   }
 
