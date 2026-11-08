@@ -660,6 +660,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertTrue(
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_2,
+                    # Here we use MyPy ignore because this test deliberately passes a wrong type.
                     {'NAME': None},  # type: ignore[dict-item]
                     'Android',
                     can_receive_email_updates=True,
@@ -683,13 +684,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         mailchimp_swap = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
-            lambda: self.MockMailchimpClass(),
+            self.MockMailchimpClass,
         )
 
         with mailchimp_swap:
             with self.assertRaisesRegex(TypeError, 'not iterable'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1,
+                    # Here we use MyPy ignore because this test deliberately passes a wrong type.
                     None,  # type: ignore[arg-type]
                     'Android',
                     can_receive_email_updates=True,

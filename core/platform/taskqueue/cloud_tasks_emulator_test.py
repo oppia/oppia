@@ -236,11 +236,13 @@ class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
             raise StopQueueProcessing('stop')
 
         with (
-            self.swap(cloud_tasks_emulator.time, 'time', lambda: 0.0),
-            self.swap(cloud_tasks_emulator.time, 'sleep', stop_sleep),
+            self.swap(time, 'time', lambda: 0.0),
+            self.swap(time, 'sleep', stop_sleep),
         ):
             with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
-                emulator._process_queue('queue')  # pylint: disable=protected-access
+                emulator._process_queue( # pylint: disable=protected-access
+                    'queue'
+                )
 
         self.assertEqual(emulator.get_number_of_tasks('queue'), 1)
         self.assertEqual(handled_tasks, [])
@@ -284,11 +286,13 @@ class CloudTasksEmulatorGenericTestBaseTests(test_utils.TestBase):
             raise StopQueueProcessing('stop')
 
         with (
-            self.swap(cloud_tasks_emulator.time, 'time', lambda: 1.0),
-            self.swap(cloud_tasks_emulator.time, 'sleep', stop_sleep),
+            self.swap(time, 'time', lambda: 1.0),
+            self.swap(time, 'sleep', stop_sleep),
         ):
             with self.assertRaisesRegex(StopQueueProcessing, '^stop$'):
-                emulator._process_queue('queue')  # pylint: disable=protected-access
+                emulator._process_queue( # pylint: disable=protected-access
+                    'queue'
+                )
 
         self.assertEqual(handled_payloads, [[1, 2, 3]])
         self.assertEqual(emulator.get_number_of_tasks('queue'), 0)
