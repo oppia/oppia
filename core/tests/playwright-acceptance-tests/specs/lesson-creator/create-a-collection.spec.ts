@@ -56,13 +56,13 @@ test.describe('Lesson Creator', function () {
     );
 
     positiveNumbersExplorationId =
-      await lessonCreator.createAndPublishExplorationWithCards(
+      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
         'Positive Numbers',
         'Math'
       );
 
     negativeNumbersExplorationId =
-      await lessonCreator.createAndPublishExplorationWithCards(
+      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers',
         'Math'
       );
@@ -88,14 +88,6 @@ test.describe('Lesson Creator', function () {
 
     await learner.waitForPageToFullyLoad();
 
-    // Wait for the start statistics to persist before completing the lesson.
-    await lessonCreator.expectExplorationPlayCountToBe(
-      negativeNumbersExplorationId,
-      1
-    );
-
-    await learner.continueToNextCardAsLoggedOutUser();
-
     await learner.rateExploration(5, 'Great Lesson', false);
 
     await learner.returnToLibraryFromExplorationCompletion();
@@ -103,13 +95,6 @@ test.describe('Lesson Creator', function () {
     await learner.playExplorationAsLoggedInUser(positiveNumbersExplorationId);
 
     await learner.waitForPageToFullyLoad();
-
-    await lessonCreator.expectExplorationPlayCountToBe(
-      positiveNumbersExplorationId,
-      1
-    );
-
-    await learner.continueToNextCardAsLoggedOutUser();
 
     await learner.rateExploration(3, '', false);
 

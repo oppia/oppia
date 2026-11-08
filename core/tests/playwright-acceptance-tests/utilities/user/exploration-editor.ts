@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {expect, Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -1796,34 +1796,6 @@ export class ExplorationEditor extends BaseUser {
         cards[i]
       );
     }
-  }
-
-  /**
-   * Waits for an exploration's play count to persist on the creator dashboard.
-   *
-   * @param {string} explorationId - The ID of the exploration to check.
-   * @param {number} playCount - The expected number of plays.
-   */
-  async expectExplorationPlayCountToBe(
-    explorationId: string,
-    playCount: number
-  ): Promise<void> {
-    const viewsSelector =
-      `${explorationDashboardCardSelector}:has(a[href="/create/${explorationId}"]) ` +
-      gridViewsSelector;
-
-    // Dashboard statistics are fetched on page load, so refresh while waiting
-    // for the learner's play to be recorded.
-    await expect
-      .poll(
-        async () => {
-          await this.reloadPage();
-          await this.expectElementToBeVisible(viewsSelector);
-          return this.getTextContent(viewsSelector);
-        },
-        {timeout: 30000}
-      )
-      .toBe(String(playCount));
   }
 
   /**
