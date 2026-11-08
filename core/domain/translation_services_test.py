@@ -24,6 +24,7 @@ from core import feconf, utils
 from core.domain import (
     exp_domain,
     exp_fetchers,
+    topic_domain,
     translation_domain,
     translation_fetchers,
     translation_services,
@@ -841,6 +842,76 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             list(observed_translatable_text['Introduction'].keys()),
             ['default_outcome_1'],
         )
+
+    def test_carry_forward_topic_translations(self) -> None:
+        old_topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1',
+            'Old Topic Name',
+            'topic-frag',
+            'Topic Description',
+            'frag',
+        )
+        old_topic.version = 1
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            'topic_id_1',
+            1,
+            'es',
+            feconf.TOPIC_NAME_CONTENT_ID,
+            translation_domain.TranslatedContent(
+                'Nombre antiguo del tema',
+                translation_domain.TranslatableContentFormat.UNICODE,
+                False,
+            ),
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            'topic_id_1',
+            1,
+            'es',
+            feconf.TOPIC_DESCRIPTION_CONTENT_ID,
+            translation_domain.TranslatedContent(
+                'Descripción del tema',
+                translation_domain.TranslatableContentFormat.UNICODE,
+                False,
+            ),
+        )
+
+        updated_topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1',
+            'New Topic Name',
+            'topic-frag',
+            'Topic Description',
+            'frag',
+        )
+        updated_topic.version = 2
+
+        translation_services.carry_forward_topic_translations(
+            old_topic, updated_topic
+        )
+
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.TOPIC,
+            'topic_id_1',
+            2,
+            'es',
+        )
+        name_translation = entity_translations.translations[
+            feconf.TOPIC_NAME_CONTENT_ID
+        ]
+        self.assertEqual(
+            name_translation.content_value, 'Nombre antiguo del tema'
+        )
+        self.assertTrue(name_translation.needs_update)
+
+        description_translation = entity_translations.translations[
+            feconf.TOPIC_DESCRIPTION_CONTENT_ID
+        ]
+        self.assertEqual(
+            description_translation.content_value, 'Descripción del tema'
+        )
+        self.assertFalse(description_translation.needs_update)
 
 
 class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):

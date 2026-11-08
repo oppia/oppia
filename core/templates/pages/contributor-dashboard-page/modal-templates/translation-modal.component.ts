@@ -910,7 +910,7 @@ export class TranslationModalComponent {
     const limit = activeContentId
       ? metadataLengthLimits[activeContentId]
       : null;
-    if (limit && this.activeWrittenTranslation.length > limit) {
+    if (limit && this.activeWrittenTranslationAsString.length > limit) {
       this.hasLengthValidationError = true;
       this.lengthValidationErrorMessage =
         'Translation exceeds the allowed character limit. The translation ' +
