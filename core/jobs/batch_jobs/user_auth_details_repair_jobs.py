@@ -204,7 +204,10 @@ def _diagnose_user(
 ) -> abc.Iterator[beam.TaggedOutput]:
     """Tags the user as OK, as a problem, or with each repair it needs."""
     user_id, user_models_by_kind = user
-    auth_model, settings_model, reverse_models = _unpack(user_models_by_kind)
+    # NOTE: A user has at most one auth model and one settings model.
+    auth_model = next(iter(user_models_by_kind['auth']), None)
+    settings_model = next(iter(user_models_by_kind['settings']), None)
+    reverse_models = user_models_by_kind['reverse']
     if settings_model is None:
         yield beam.TaggedOutput(
             TAG_PROBLEMS, f'{user_id} is missing its UserSettingsModel'
@@ -229,13 +232,27 @@ def _diagnose_user(
                 TAG_PROBLEMS, f'{user_id} has a deleted UserSettingsModel'
             )
             return
+        # NOTE: Profiles have no Firebase account to sync.
         case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
             yield beam.TaggedOutput(TAG_OK, user_id)
             return
         case _:
             pass
 
-    if _is_linked_to_firebase(user_id, auth_model, reverse_models):
+    # NOTE: IDs that came from Firebase are left alone. IDs that this job
+    # created also need their reverse model.
+    generated_id = _generate_firebase_auth_id(user_id)
+    has_live_reverse_model = any(
+        m.id == generated_id and not m.deleted for m in reverse_models
+    )
+    if (
+        auth_model is not None
+        and auth_model.firebase_auth_id
+        and (
+            auth_model.firebase_auth_id != generated_id
+            or has_live_reverse_model
+        )
+    ):
         yield beam.TaggedOutput(TAG_OK, user_id)
         return
     if problem := _find_problem(
@@ -266,7 +283,7 @@ def _find_problem(
         for m in reverse_models
     ):
         return 'has unexpected UserIdByFirebaseAuthIdModels'
-    if _get_email(settings_model) in shared_emails:
+    if settings_model.email.lower() in shared_emails:
         return 'shares its email with another user'
     return None
 
@@ -315,81 +332,23 @@ def _get_firebase_email(user: User) -> abc.Iterator[str]:
     """Yields the user's email if the user may have a Firebase account.
 
     NOTE: Deleted users keep a disabled Firebase account, so their email is
-    still taken.
+    still taken. Emails are lowercased because Firebase ignores case.
     """
     _, user_models_by_kind = user
-    auth_model, settings_model, _ = _unpack(user_models_by_kind)
-    if settings_model is None or _is_profile_user(auth_model):
+    auth_model = next(iter(user_models_by_kind['auth']), None)
+    settings_model = next(iter(user_models_by_kind['settings']), None)
+    # NOTE: Like FirebaseServerSyncJob, this skips profiles, which are the
+    # only users with a parent_user_id.
+    if settings_model is None or (
+        auth_model is not None and auth_model.parent_user_id is not None
+    ):
         return
     if not settings_model.deleted or (
         auth_model is not None and auth_model.firebase_auth_id
     ):
-        yield _get_email(settings_model)
-
-
-def _unpack(
-    user_models_by_kind: UserModels,
-) -> tuple[
-    auth_models.UserAuthDetailsModel | None,
-    user_models.UserSettingsModel | None,
-    list[auth_models.UserIdByFirebaseAuthIdModel],
-]:
-    """Returns the user's auth model, settings model and reverse models.
-
-    NOTE: A user has at most one auth model and one settings model.
-    """
-    return (
-        next(iter(user_models_by_kind['auth']), None),
-        next(iter(user_models_by_kind['settings']), None),
-        list(user_models_by_kind['reverse']),
-    )
-
-
-def _is_profile_user(
-    auth_model: auth_models.UserAuthDetailsModel | None,
-) -> bool:
-    """Returns whether the user is a profile, which has no Firebase account.
-
-    NOTE: This matches FirebaseServerSyncJob, which skips only users whose
-    auth model has a parent_user_id.
-    """
-    return auth_model is not None and auth_model.parent_user_id is not None
-
-
-def _is_linked_to_firebase(
-    user_id: str,
-    auth_model: auth_models.UserAuthDetailsModel | None,
-    reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
-) -> bool:
-    """Returns whether FirebaseServerSyncJob can already sync the user.
-
-    NOTE: Only IDs created by this job need a check for their reverse model.
-    Other IDs came from Firebase and are left alone.
-    """
-    if auth_model is None or not auth_model.firebase_auth_id:
-        return False
-    firebase_auth_id: str = auth_model.firebase_auth_id
-    if firebase_auth_id != _generate_firebase_auth_id(user_id):
-        return True
-    return _has_live_reverse_model(firebase_auth_id, reverse_models)
-
-
-def _has_live_reverse_model(
-    firebase_auth_id: str,
-    reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
-) -> bool:
-    """Returns whether a non-deleted reverse model uses the given ID."""
-    return any(
-        m.id == firebase_auth_id and not m.deleted for m in reverse_models
-    )
+        yield settings_model.email.lower()
 
 
 def _generate_firebase_auth_id(user_id: str) -> str:
     """Returns the ID that this job gives the user, which never changes."""
     return utils.convert_to_hash(user_id, _FIREBASE_AUTH_ID_LENGTH)
-
-
-def _get_email(settings_model: user_models.UserSettingsModel) -> str:
-    """Returns the user's email in lowercase, because Firebase ignores case."""
-    email: str = settings_model.email
-    return email.lower()
