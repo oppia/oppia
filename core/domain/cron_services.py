@@ -84,9 +84,10 @@ def mark_outdated_models_as_deleted() -> None:
                 model_class.last_updated < date_before_which_to_mark_as_deleted
             ).fetch()
         )
-    job_services.mark_outdated_jobs_as_deleted(
-        utils.get_current_utc_datetime() - datetime.timedelta(days=180)
-    )  # pragma: no cover
+    cutoff_time = utils.get_current_utc_datetime() - datetime.timedelta(
+        days=180
+    )
+    job_services.mark_outdated_jobs_as_deleted(cutoff_time)
     for model_to_mark_as_deleted in models_to_mark_as_deleted:
         model_to_mark_as_deleted.deleted = True
     datastore_services.update_timestamps_multi(models_to_mark_as_deleted)
