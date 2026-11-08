@@ -66,6 +66,8 @@ const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const donatePageThanksModalWatchAVideoUrl =
+  testConstants.URLs.DonatePageThanksModalWatchAVideoUrl;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerIdealistPageUrl = testConstants.URLs.VolunteerIdealistPage;
 const volunteerUrl = testConstants.URLs.Volunteer;
@@ -1557,10 +1559,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Watch A Video button
-   * in the Donation thanks modal on donate page and check if it opens the right page.
+   * Function to verify the Watch A Video button
+   * in the Donation thanks modal on donate page has the correct link.
    */
-  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+  async verifyWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -1569,17 +1571,18 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await this.clickAndWaitForNavigation(watchAVideoButton, true);
-    await this.waitForPageToFullyLoad();
+    await this.openExternalLink(
+      watchAVideoButton,
+      donatePageThanksModalWatchAVideoUrl
+    );
+    showMessage('The Watch A Video button has the right link.');
+  }
 
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+  /**
+   * @deprecated Use verifyWatchAVideoButtonInDonationThanksModalOnDonatePage instead.
+   */
+  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.verifyWatchAVideoButtonInDonationThanksModalOnDonatePage();
   }
 
   /**
