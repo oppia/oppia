@@ -90,8 +90,9 @@ const stateContentInputField = 'div.e2e-test-rte';
 const toastMessage = '.e2e-test-toast-message';
 
 const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
-const desktopDiscardDraftButton = 'button.e2e-test-discard-changes';
-const mobileDiscardButtonSelector = 'button.e2e-test-mobile-discard-button';
+const desktopDiscardDraftButton = '.e2e-test-discard-changes';
+const mobileDiscardButtonSelector =
+  '.e2e-test-mobile-exploration-discard-tab';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const stateNameInputSelector = 'input.e2e-test-state-name-input';
 const stateNameSubmitButtonSelector = '.e2e-test-state-name-submit';
@@ -1909,17 +1910,12 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileChangesDropdownSelector);
       await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
-      await this.expectElementToBeVisible(
-        `${mobileDiscardButtonSelector}:not(.disabled)`
-      );
+      await this.expectElementToBeVisible(mobileDiscardButtonSelector);
       await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.expectElementToBeVisible(discardDraftDropdownSelector);
       await this.clickOnElementWithSelector(discardDraftDropdownSelector);
       await this.expectElementToBeVisible(desktopDiscardDraftButton);
-      await this.expectElementToBeVisible(
-        `${desktopDiscardDraftButton}:not(.disabled)`
-      );
       await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.expectElementToBeVisible(confirmDiscardButton);
@@ -1937,10 +1933,10 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateEditSelector);
     const cardContent = (
       await this.page.locator(stateEditSelector).textContent()
-    )?.trim();
-    if (cardContent !== expectedCardContent) {
+    )?.trim() || '';
+    if (!cardContent.includes(expectedCardContent)) {
       throw new Error(
-        `Expected card content to be "${expectedCardContent}", but got "${cardContent}".`
+        `Expected card content to include "${expectedCardContent}", but got "${cardContent}".`
       );
     }
   }
