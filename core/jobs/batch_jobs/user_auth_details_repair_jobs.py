@@ -61,11 +61,14 @@ _FIREBASE_AUTH_ID_LENGTH = 28
 
 
 class UserModels(TypedDict):
-    """The models of one user, grouped by kind."""
+    """The models of one user, grouped by kind.
 
-    auth: list[auth_models.UserAuthDetailsModel]
-    settings: list[user_models.UserSettingsModel]
-    reverse: list[auth_models.UserIdByFirebaseAuthIdModel]
+    NOTE: CoGroupByKey only promises iterables, which may be read only once.
+    """
+
+    auth: abc.Iterable[auth_models.UserAuthDetailsModel]
+    settings: abc.Iterable[user_models.UserSettingsModel]
+    reverse: abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel]
 
 
 class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
@@ -204,7 +207,8 @@ def _diagnose_user(
     # NOTE: A user has at most one auth model and one settings model.
     auth_model = next(iter(user_models_by_kind['auth']), None)
     settings_model = next(iter(user_models_by_kind['settings']), None)
-    reverse_models = user_models_by_kind['reverse']
+    # NOTE: The reverse models are read several times, so they're copied.
+    reverse_models = list(user_models_by_kind['reverse'])
     if settings_model is None:
         yield beam.TaggedOutput(
             TAG_PROBLEMS, f'{user_id} is missing its UserSettingsModel'

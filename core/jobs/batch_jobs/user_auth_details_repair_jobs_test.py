@@ -400,3 +400,68 @@ class AuditMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is([stdout('WOULD PUT SUCCESS: 1')])
         reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
         self.assertIsNone(reverse_model_class.get_by_id(FB_A))
+
+
+class DiagnoseUserTests(job_test_utils.PipelinedTestBase):
+    """Checks that users are diagnosed from single-pass iterables.
+
+    NOTE: CoGroupByKey only promises iterables, and some runners give values
+    that can be read only once.
+    """
+
+    def diagnose(
+        self,
+        auth: list[auth_models.UserAuthDetailsModel],
+        settings: list[user_models.UserSettingsModel],
+        reverse: list[auth_models.UserIdByFirebaseAuthIdModel],
+    ) -> list[tuple[str, str | auth_models.UserAuthDetailsModel]]:
+        """Returns the (tag, value) of each output for the user 'uid_a'."""
+        user_models_by_kind: user_auth_details_repair_jobs.UserModels = {
+            'auth': iter(auth),
+            'settings': iter(settings),
+            'reverse': iter(reverse),
+        }
+        return [
+            (output.tag, output.value)
+            for output in user_auth_details_repair_jobs._diagnose_user(  # pylint: disable=protected-access
+                ('uid_a', user_models_by_kind), {}
+            )
+        ]
+
+    def test_missing_reverse_model_is_created(self) -> None:
+        auth_model = self.create_model(
+            auth_models.UserAuthDetailsModel, id='uid_a', firebase_auth_id=FB_A
+        )
+        settings_model = self.create_model(
+            user_models.UserSettingsModel,
+            id='uid_a',
+            email='uid_a@example.com',
+        )
+
+        self.assertEqual(
+            self.diagnose([auth_model], [settings_model], []),
+            [(user_auth_details_repair_jobs.TAG_ADD_REVERSE, 'uid_a')],
+        )
+
+    def test_other_reverse_model_is_reported(self) -> None:
+        auth_model = self.create_model(
+            auth_models.UserAuthDetailsModel, id='uid_a', firebase_auth_id=FB_A
+        )
+        settings_model = self.create_model(
+            user_models.UserSettingsModel,
+            id='uid_a',
+            email='uid_a@example.com',
+        )
+        reverse_model = self.create_model(
+            auth_models.UserIdByFirebaseAuthIdModel, id='fb_o', user_id='uid_a'
+        )
+
+        self.assertEqual(
+            self.diagnose([auth_model], [settings_model], [reverse_model]),
+            [
+                (
+                    user_auth_details_repair_jobs.TAG_PROBLEMS,
+                    'uid_a has unexpected UserIdByFirebaseAuthIdModels',
+                )
+            ],
+        )
