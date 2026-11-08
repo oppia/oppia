@@ -99,15 +99,15 @@ const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const stateNameInputSelector = 'input.e2e-test-state-name-input';
 const stateNameSubmitButtonSelector = '.e2e-test-state-name-submit';
 const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
-const stateNodeSelector = 'g.node text';
+const stateNodeSelector = '.e2e-test-node-label';
+const stateNodeGroupSelector = '.e2e-test-node';
 const closeModalButtonSelector = '.e2e-test-modal-close-button';
-const explorationGraphSelector = '.e2e-test-exploration-graph';
-const explorationGraphNodeSelector = 'g.node';
-const explorationGraphNodeBackgroundSelector =
-  'rect.e2e-test-node-background, rect';
+const explorationGraphSelector = 'oppia-exploration-graph';
+const explorationGraphNodeSelector = 'g.e2e-test-node';
+const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
 const explorationGraphNodeDeleteButtonSelector =
-  '.e2e-test-delete-node, rect.oppia-node-delete, circle.delete-node-circle';
-const confirmDeleteStateButtonSelector = 'button.e2e-test-confirm-delete-state';
+  'g.e2e-test-delete-node rect.oppia-node-delete';
+const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
 const firstCardSettingsSelector = '.e2e-test-initial-state-select';
 const stateConversationContent = '.e2e-test-conversation-content';
 
@@ -2016,11 +2016,19 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to check.
    */
   async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    const isMobile = this.isViewportAtMobileWidth();
+    if (isMobile) {
       await this.openExplorationStateGraphInMobileView();
     }
 
-    await this.page.waitForSelector(explorationGraphNodeSelector);
+    const nodeSelector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    await this.page.waitForSelector(nodeSelector);
+
+    const labelSelector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeSelector}`
+      : stateNodeSelector;
 
     const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
@@ -2033,28 +2041,23 @@ export class ExplorationEditor extends BaseUser {
         fullName: string;
         truncatedName: string;
       }) => {
-        const elements = Array.from(document.querySelectorAll(selector));
-        return elements.some(element => {
-          const text = element.textContent?.trim() || '';
-          const title =
-            element.querySelector('title')?.textContent?.trim() || '';
-          return (
-            text.includes(fullName) ||
-            text.includes(truncatedName) ||
-            title === fullName ||
-            title === truncatedName
-          );
-        });
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
       },
       {
-        selector: explorationGraphNodeSelector,
+        selector: labelSelector,
         fullName: cardName,
         truncatedName: truncatedCardName,
       },
       {timeout: 60000}
     );
 
-    if (this.isViewportAtMobileWidth()) {
+    if (isMobile) {
       await this.clickOnElementWithSelector(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
@@ -2070,25 +2073,26 @@ export class ExplorationEditor extends BaseUser {
   async expectExplorationGraphToNotContainCard(
     cardName: string
   ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    const isMobile = this.isViewportAtMobileWidth();
+    if (isMobile) {
       await this.openExplorationStateGraphInMobileView();
     }
 
+    const labelSelector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeSelector}`
+      : stateNodeSelector;
+
     await this.page.waitForFunction(
       ({selector, value}: {selector: string; value: string}) => {
-        const elements = Array.from(document.querySelectorAll(selector));
-        return !elements.some(element => {
-          const text = element.textContent?.trim() || '';
-          const title =
-            element.querySelector('title')?.textContent?.trim() || '';
-          return text.includes(value) || title === value;
-        });
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
+        );
       },
-      {selector: explorationGraphNodeSelector, value: cardName},
+      {selector: labelSelector, value: cardName},
       {timeout: 60000}
     );
 
-    if (this.isViewportAtMobileWidth()) {
+    if (isMobile) {
       await this.clickOnElementWithSelector(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
@@ -2224,17 +2228,17 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
     await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
 
+    const labelSelector = isMobile
+      ? `${explorationStateGraphModalSelector} ${stateNodeSelector}`
+      : stateNodeSelector;
+
     await this.page.waitForFunction(
       ({selector, name}: {selector: string; name: string}) => {
-        const elements = Array.from(document.querySelectorAll(selector));
-        return !elements.some(el => {
-          const text = el.textContent?.trim() || '';
-          const title =
-            el.querySelector('title')?.textContent?.trim() || '';
-          return text.includes(name) || title === name;
-        });
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
       },
-      {selector: explorationGraphNodeSelector, name: stateName},
+      {selector: labelSelector, name: stateName},
       {timeout: 60000}
     );
 
