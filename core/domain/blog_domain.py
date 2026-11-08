@@ -750,17 +750,23 @@ class BlogAuthorDetails:
 
     @classmethod
     def create_default_author_details_for_user(
-        cls, user_id: str
+        cls,
+        user_id: str,
+        displayed_author_name: str = 'Deleted User',
+        author_bio: str = '',
     ) -> BlogAuthorDetails:
         """Creates a BlogAuthorDetails with default values.
 
         This is used as a fallback when the underlying
         BlogAuthorDetailsModel is missing (e.g., the author's account
-        was deleted). The returned object is fully usable but contains
-        placeholder values.
+        was deleted or author details have not been created yet). The returned
+        object is fully usable but contains placeholder values.
 
         Args:
-            user_id: str. The user id of the missing author.
+            user_id: str. The user id of the author.
+            displayed_author_name: str. The displayed author name. Defaults to
+                'Deleted User'.
+            author_bio: str. The author biography. Defaults to empty string.
 
         Returns:
             BlogAuthorDetails. A domain object with default placeholder
@@ -769,8 +775,8 @@ class BlogAuthorDetails:
         return cls(
             instance_id='',
             author_id=user_id,
-            displayed_author_name='Deleted User',
-            author_bio='',
+            displayed_author_name=displayed_author_name,
+            author_bio=author_bio,
             last_updated=utils.get_current_utc_datetime(),
         )
 

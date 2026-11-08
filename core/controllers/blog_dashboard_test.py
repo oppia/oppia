@@ -119,8 +119,8 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
 
     def test_get_dashboard_with_missing_author_model(self) -> None:
-        """Tests that dashboard returns default author details when
-        the author model is missing.
+        """Tests that dashboard returns author details with username when
+        the author model is missing for an active user.
         """
         self.signup('neweditor@example.com', 'NewEditor')
         new_editor_id = self.get_user_id_from_email('neweditor@example.com')
@@ -143,15 +143,37 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
                 % new_editor_id
             )
         author_model.delete()
-        # Verify dashboard returns default author details.
+        # Verify dashboard returns default author details with active username.
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
         )
         self.assertEqual(
             json_response['author_details']['displayed_author_name'],
-            'Deleted User',
+            'NewEditor',
         )
         self.assertEqual(json_response['author_details']['author_bio'], '')
+
+        # Now simulate a deleted user (no user settings).
+        def _mock_get_user_settings(
+            unused_user_id: str, **_kwargs: Any
+        ) -> None:
+            return None
+
+        get_user_settings_swap = self.swap(
+            user_services, 'get_user_settings', _mock_get_user_settings
+        )
+        with get_user_settings_swap:
+            deleted_json_response = self.get_json(
+                '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            )
+            self.assertEqual(
+                deleted_json_response['author_details']['displayed_author_name'],
+                'Deleted User',
+            )
+            self.assertEqual(
+                deleted_json_response['author_details']['author_bio'], ''
+            )
+
         self.logout()
 
     def test_create_new_blog_post(self) -> None:

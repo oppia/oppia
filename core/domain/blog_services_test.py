@@ -868,15 +868,37 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         )
 
         with get_author_details_swap:
-            # With strict=False, should return a default object.
+            # For an active user, returns their username and bio.
             author_details = blog_services.get_blog_author_details(
                 self.user_id, strict=False
             )
             self.assertEqual(
-                author_details.displayed_author_name, 'Deleted User'
+                author_details.displayed_author_name, self.user_name
             )
-            self.assertEqual(author_details.author_bio, '')
+            self.assertEqual(author_details.author_bio, self.user_bio)
             self.assertEqual(author_details.author_id, self.user_id)
+
+            # For a deleted/missing user, returns 'Deleted User'.
+            def _mock_get_user_settings(
+                unused_user_id: str, **_kwargs: Any
+            ) -> None:
+                return None
+
+            get_user_settings_swap = self.swap(
+                user_services, 'get_user_settings', _mock_get_user_settings
+            )
+            with get_user_settings_swap:
+                deleted_author_details = blog_services.get_blog_author_details(
+                    self.user_id, strict=False
+                )
+                self.assertEqual(
+                    deleted_author_details.displayed_author_name,
+                    'Deleted User',
+                )
+                self.assertEqual(deleted_author_details.author_bio, '')
+                self.assertEqual(
+                    deleted_author_details.author_id, self.user_id
+                )
 
     def test_get_blog_author_details_create_fails(self) -> None:
         """Tests that create_blog_author_details_model raises an error when user details cannot be fetched."""

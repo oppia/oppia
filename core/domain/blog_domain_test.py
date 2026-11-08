@@ -848,6 +848,32 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         }
         self.assertEqual(self.author_details.to_dict(), expected_dict)
 
+    def test_create_default_author_details_for_user(self) -> None:
+        """Checks create_default_author_details_for_user returns default values."""
+        default_author_details = (
+            blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
+                self.user_id_a
+            )
+        )
+        self.assertEqual(
+            default_author_details.displayed_author_name, 'Deleted User'
+        )
+        self.assertEqual(default_author_details.author_bio, '')
+        self.assertEqual(default_author_details.author_id, self.user_id_a)
+
+        custom_author_details = (
+            blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
+                self.user_id_a,
+                displayed_author_name='Custom Author',
+                author_bio='Custom Bio',
+            )
+        )
+        self.assertEqual(
+            custom_author_details.displayed_author_name, 'Custom Author'
+        )
+        self.assertEqual(custom_author_details.author_bio, 'Custom Bio')
+        self.assertEqual(custom_author_details.author_id, self.user_id_a)
+
     def test_author_details_model_passes_validation(self) -> None:
         """Tests validation for author details model."""
         assert self.author_details is not None

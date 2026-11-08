@@ -992,8 +992,18 @@ def get_blog_author_details(
                 'This may indicate the author\'s account was deleted '
                 'or the model was never created.' % user_id
             )
+        user_settings = user_services.get_user_settings(user_id, strict=False)
+        if user_settings is not None and user_settings.username is not None:
+            displayed_author_name = user_settings.username
+            author_bio = user_settings.user_bio
+        else:
+            displayed_author_name = 'Deleted User'
+            author_bio = ''
+
         return blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
-            user_id
+            user_id,
+            displayed_author_name=displayed_author_name,
+            author_bio=author_bio,
         )
 
     return blog_domain.BlogAuthorDetails(
