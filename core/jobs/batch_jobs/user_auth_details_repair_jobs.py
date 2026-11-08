@@ -68,9 +68,6 @@ class UserModels(TypedDict):
     reverse: list[auth_models.UserIdByFirebaseAuthIdModel]
 
 
-User = tuple[str, UserModels]
-
-
 class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
     """Gives users the auth models that FirebaseServerSyncJob needs.
 
@@ -200,7 +197,7 @@ class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
 
 
 def _diagnose_user(
-    user: User, shared_emails: abc.Mapping[str, int]
+    user: tuple[str, UserModels], shared_emails: abc.Mapping[str, int]
 ) -> abc.Iterator[beam.TaggedOutput]:
     """Tags the user as OK, as a problem, or with each repair it needs."""
     user_id, user_models_by_kind = user
@@ -328,7 +325,7 @@ def _build_reverse_model(
     return model
 
 
-def _get_firebase_email(user: User) -> abc.Iterator[str]:
+def _get_firebase_email(user: tuple[str, UserModels]) -> abc.Iterator[str]:
     """Yields the user's email if the user may have a Firebase account.
 
     NOTE: Deleted users keep a disabled Firebase account, so their email is
