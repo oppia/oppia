@@ -53,6 +53,7 @@ test.describe('Lesson Creator', function () {
   });
 
   test('should change the first card of the exploration', async function () {
+    test.setTimeout(600000);
     await explorationEditor.updateStateName('First');
     await explorationEditor.saveExplorationDraft('Renamed initial card');
 

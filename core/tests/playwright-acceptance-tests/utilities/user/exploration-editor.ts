@@ -100,7 +100,7 @@ const stateNameInputSelector = 'input.e2e-test-state-name-input';
 const stateNameSubmitButtonSelector = '.e2e-test-state-name-submit';
 const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
 const stateNodeSelector = 'g.node text';
-const closeModalButtonSelector = 'button.e2e-test-close-mobile-graph-modal';
+const closeModalButtonSelector = '.e2e-test-modal-close-button';
 const explorationGraphSelector = '.e2e-test-exploration-graph';
 const explorationGraphNodeSelector = 'g.node';
 const explorationGraphNodeBackgroundSelector =
@@ -1921,8 +1921,10 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.expectElementToBeVisible(confirmDiscardButton);
-    await this.clickOnElementWithSelector(confirmDiscardButton);
-    await this.waitForNetworkIdle();
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'networkidle'}),
+      this.clickOnElementWithSelector(confirmDiscardButton),
+    ]);
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(confirmDiscardButton, false);
   }
