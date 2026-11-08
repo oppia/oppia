@@ -331,6 +331,7 @@ const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const mobileLessonCardSelector = '.mobile-activity-summary-card';
 const nextLessonButton = '.e2e-test-next-lesson-button';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
@@ -4084,33 +4085,43 @@ export class LoggedOutUser extends BaseUser {
     expectedRating: number,
     expectedExplorationName: string
   ): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? mobileLessonCardSelector
+      : lessonCardSelector;
+    const cardTitleSelector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
     try {
-      await this.page.waitForSelector(lessonCardSelector);
-      const cards = await this.page.$$(lessonCardSelector);
+      await this.page.waitForSelector(cardSelector);
+      const cards = await this.page.$$(cardSelector);
       for (const card of cards) {
-        await card.waitForSelector(lessonCardTitleSelector);
-        const titleElement = await card.$(lessonCardTitleSelector);
+        await card.waitForSelector(cardTitleSelector);
+        const titleElement = await card.$(cardTitleSelector);
         const titleText = await this.page.evaluate(
           el => el.textContent.trim(),
           titleElement
         );
         if (titleText === expectedExplorationName) {
-          await card.waitForSelector(explorationRatingSelector);
-          const ratingElement = await card.$(explorationRatingSelector);
-          if (ratingElement) {
-            const ratingSpan = await ratingElement.$('span:nth-child(2)');
-            const ratingText = await this.page.evaluate(
-              el => el.textContent.trim(),
-              ratingSpan
-            );
-            const rating = parseFloat(ratingText);
-            if (rating !== expectedRating) {
-              throw new Error(
-                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+          // The mobile activity summary card does not render a rating, so the
+          // rating can only be checked on the desktop card.
+          if (!this.isViewportAtMobileWidth()) {
+            await card.waitForSelector(explorationRatingSelector);
+            const ratingElement = await card.$(explorationRatingSelector);
+            if (ratingElement) {
+              const ratingSpan = await ratingElement.$('span:nth-child(2)');
+              const ratingText = await this.page.evaluate(
+                el => el.textContent.trim(),
+                ratingSpan
               );
+              const rating = parseFloat(ratingText);
+              if (rating !== expectedRating) {
+                throw new Error(
+                  `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+                );
+              }
             }
-            return;
           }
+          return;
         }
       }
       throw new Error(
