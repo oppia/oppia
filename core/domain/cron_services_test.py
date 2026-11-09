@@ -25,10 +25,10 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import job_models, user_models
+    from mypy_imports import beam_job_models, job_models, user_models
 
-job_models, user_models = models.Registry.import_models(
-    [models.Names.JOB, models.Names.USER]
+beam_job_models, job_models, user_models = models.Registry.import_models(
+    [models.Names.BEAM_JOB, models.Names.JOB, models.Names.USER]
 )
 
 
@@ -93,12 +93,28 @@ class CronServicesTests(test_utils.GenericTestBase):
         ):
             job_services.save_job(job)
 
+        beam_job_run_model = beam_job_models.BeamJobRunModel(
+            id=beam_job_models.BeamJobRunModel.get_new_id(),
+            job_name='FooJob',
+            latest_job_state=beam_job_models.BeamJobState.RUNNING.value,
+            last_updated=outdated_time,
+        )
+        beam_job_run_model.update_timestamps(update_last_updated_time=False)
+        beam_job_run_model.put()
+
         job_model = job_models.JobModel.get_by_id('job_id')
         self.assertIsNotNone(job_model)
         assert job_model is not None
         self.assertFalse(job_model.deleted)
 
         cron_services.mark_outdated_models_as_deleted()
+
+        beam_job_model = beam_job_models.BeamJobRunModel.get_by_id(
+            beam_job_run_model.id
+        )
+        self.assertIsNotNone(beam_job_model)
+        assert beam_job_model is not None
+        self.assertTrue(beam_job_model.deleted)
 
         job_model = job_models.JobModel.get_by_id('job_id')
         self.assertIsNotNone(job_model)
