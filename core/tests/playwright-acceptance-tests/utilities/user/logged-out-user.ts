@@ -193,6 +193,23 @@ const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
 const communityLibraryHeading = '.e2e-test-library-main-header';
 const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 
+// Creator Guidelines page.
+const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
+const creatorDashboardCreateModeUrl =
+  testConstants.URLs.CreatorDashboardCreateMode;
+const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
+// The "forum" link points to /forum, which the server redirects to the Oppia
+// Google Group (feconf.GOOGLE_GROUP_URL).
+const forumUrl = `${baseUrl}/forum`;
+const forumRedirectUrlPrefix = 'https://groups.google.com/forum/';
+const forumLinkInCreatorGuidelinesPage = 'a.inline-links:text-is("forum")';
+const designTipsLinkInCreatorGuidelinesPage =
+  'a.inline-links:text-is("Design Tips")';
+const createAnExplorationButtonInCreatorGuidelinesPage =
+  'a.oppia-about-button:text-is("Create an Exploration")';
+const browseOurExplorationsButtonInCreatorGuidelinesPage =
+  'a.oppia-about-button:text-is("Browse our Explorations")';
+
 // Home Page Selectors.
 const homePageHeadingSelector =
   '.e2e-test-splash-page .e2e-test-home-page-title';
@@ -2269,6 +2286,66 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the Creator Guidelines page.
+   */
+  async navigateToCreatorGuidelinesPage(): Promise<void> {
+    await this.goto(creatorGuidelinesUrl);
+  }
+
+  /**
+   * Checks that the "forum" link on the Creator Guidelines page points to
+   * /forum, and that /forum redirects to the Oppia Google Group. The Google
+   * Group is not opened, since it is an external site.
+   */
+  async expectForumLinkOnCreatorGuidelinesPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(forumLinkInCreatorGuidelinesPage, '/forum');
+
+    const response = await this.page.request.get(forumUrl, {maxRedirects: 0});
+    expect(response.status()).toBe(302);
+    expect(response.headers().location).toContain(forumRedirectUrlPrefix);
+  }
+
+  /**
+   * Checks that the "Design Tips" link on the Creator Guidelines page points to
+   * the Design Tips page. The link is not opened, since it leads to an
+   * external site.
+   */
+  async expectDesignTipsLinkOnCreatorGuidelinesPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      designTipsLinkInCreatorGuidelinesPage,
+      explorationDesignTipsUrl
+    );
+  }
+
+  /**
+   * Clicks the "Create an Exploration" button on the Creator Guidelines page
+   * and checks that it opens the creator dashboard in create mode.
+   */
+  async clickCreateAnExplorationLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.expectElementToBeVisible(
+      createAnExplorationButtonInCreatorGuidelinesPage
+    );
+    await this.clickButtonToNavigateToNewPage(
+      createAnExplorationButtonInCreatorGuidelinesPage,
+      creatorDashboardCreateModeUrl
+    );
+  }
+
+  /**
+   * Clicks the "Browse our Explorations" button on the Creator Guidelines page
+   * and checks that it opens the community library.
+   */
+  async clickBrowseOurExplorationsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.expectElementToBeVisible(
+      browseOurExplorationsButtonInCreatorGuidelinesPage
+    );
+    await this.clickButtonToNavigateToNewPage(
+      browseOurExplorationsButtonInCreatorGuidelinesPage,
+      communityLibraryUrl
+    );
   }
 
   /**
