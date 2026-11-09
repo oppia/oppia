@@ -3,11 +3,15 @@
     *ngIf="!isLoadingSkill()">
   <li class="oppia-publish-button-container d-inline-flex align-items-center"
       *ngIf="getActiveTabName() !== 'questions'">
-    <div class="d-inline-block position-relative">
+    <div class="d-inline-block position-relative"
+         [matTooltip]="getAllSkillWarnings()"
+         matTooltipClass="oppia-mat-tooltip-list"
+         [matTooltipDisabled]="getWarningsCount() === 0">
       <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button e2e-test-save-or-publish-skill"
               [ngClass]="{'btn-success': isSkillSaveable()}"
               (click)="saveChanges()"
-              [disabled]="!isSkillSaveable()">
+              [disabled]="!isSkillSaveable()"
+              [style.pointer-events]="!isSkillSaveable() ? 'none' : 'auto'">
         <span *ngIf="!isSaveInProgress()">
           <span title="Publish Changes">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon">
