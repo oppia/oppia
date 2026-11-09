@@ -263,34 +263,36 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/community-library/any', payload={}, expected_status_int=401
         )
 
-    def test_requests_for_invalid_paths(self) -> None:
-        """Test that requests for invalid paths result in a 404 error."""
+    def test_requests_for_unsupported_methods(self) -> None:
+        """Test that requests for methods that a handler does not define
+        result in a 405 error.
+        """
         user_id = user_services.get_user_id_from_username('learneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
-            '/community-library/extra', expected_status_int=404
+            '/community-library/extra', expected_status_int=405
         )
 
         self.get_html_response(
-            '/community-library/data/extra', expected_status_int=404
+            '/community-library/data/extra', expected_status_int=405
         )
 
         self.post_json(
             '/community-library/extra',
             data={},
             csrf_token=csrf_token,
-            expected_status_int=404,
+            expected_status_int=405,
         )
 
         self.put_json(
             '/community-library/extra',
             payload={},
             csrf_token=csrf_token,
-            expected_status_int=404,
+            expected_status_int=405,
         )
 
-        self.delete_json('/community-library/data', expected_status_int=404)
+        self.delete_json('/community-library/data', expected_status_int=405)
 
     def test_html_requests_have_no_store_cache_policy(self) -> None:
         response = self.get_html_response('/community-library')
@@ -437,7 +439,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Invalid URL.
         self.get_html_response(
             'https://oppiaserver.appspot.com/cron/unknown',
-            expected_status_int=404,
+            expected_status_int=405,
         )
 
     def test_no_redirection_for_tasks(self) -> None:
@@ -2402,14 +2404,14 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
-            self.get_json('/mock', expected_status_int=404)
+            self.get_json('/mock', expected_status_int=405)
 
-    def test_post_request_on_handler_without_post_returns_404(self) -> None:
+    def test_post_request_on_handler_without_post_returns_405(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock',
                 {},
-                expected_status_int=404,
+                expected_status_int=405,
             )
 
 

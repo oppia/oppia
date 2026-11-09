@@ -687,21 +687,31 @@ class BaseHandler(
         return False
 
     def _handle_unsupported_method(self, method_name: str) -> None:
-        """Responds with Oppia's 404 for an HTTP method this handler lacks.
+        """Responds with 405band an Allow header for an HTTP method that this
+        handler does not define.
 
         Args:
             method_name: str. Lowercase HTTP method name.
         """
-        if method_name == 'get':
-            logging.warning('Invalid URL requested: %s', self.request.uri)
-            self.error(404)
-            values: ResponseValueDict = {
-                'error': 'Could not find the resource %s.' % self.request.uri,
-                'status_code': 404,
+        allowed = [
+            method.upper()
+            for method in ('get', 'post', 'put', 'delete')
+            if hasattr(self.__class__, method)
+        ]
+        if 'GET' in allowed:
+            allowed.append('HEAD')
+            logging.warning(
+                'Method %s not allowed for %s', method_name, self.request.uri
+            )
+        self.error(405)
+        self._render_exception(
+            {
+                'error': 'Method %s not allowed for %s.'
+                % (method_name.upper(), self.request.uri),
+                'status_code': 405,
             }
-            self._render_exception(values)
-        else:
-            self.handle_exception(self.NotFoundException(), self.app.debug)
+        )
+        self.response.headers['Allow'] = ', '.join(allowed)
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
@@ -711,20 +721,7 @@ class BaseHandler(
         header.
         """
         if not hasattr(self.__class__, 'get'):
-            allowed = [
-                method.upper()
-                for method in ('get', 'post', 'put', 'delete')
-                if hasattr(self.__class__, method)
-            ]
-            self.error(405)
-            self._render_exception(
-                {
-                    'error': 'Invalid method HEAD for %s'
-                    % self.__class__.__name__,
-                    'status_code': 405,
-                }
-            )
-            self.response.headers['Allow'] = ', '.join(allowed)
+            self._handle_unsupported_method('head')
             return
         getattr(self, 'get')(*args, **kwargs)
 
