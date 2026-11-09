@@ -560,9 +560,7 @@ def _build_opportunity_for_non_exploration_entity(
     Returns:
         TranslationOpportunity. The constructed opportunity domain object.
     """
-    # Story and Topic do not extend BaseTranslatableObject, so
-    # get_content_count() is not available for them. Content count defaults
-    # to 0 for non-translatable entities.
+    # Entities without translatable content have a zero content count.
     content_count = (
         entity.get_content_count()
         if isinstance(entity, translation_domain.BaseTranslatableObject)
@@ -1549,11 +1547,13 @@ def _get_translation_opportunity_cards_from_models(
             if exp_summary is not None:
                 exp_summary_map[exp_summary.id] = exp_summary
 
-    exp_and_skill_entity_ids = exp_entity_ids + skill_entity_ids
-    if exp_and_skill_entity_ids:
+    translatable_entity_ids = (
+        exp_entity_ids + skill_entity_ids + topic_entity_ids
+    )
+    if translatable_entity_ids:
         in_review_counts = (
             _build_entity_id_to_translation_suggestion_in_review_count(
-                exp_and_skill_entity_ids, language_code
+                translatable_entity_ids, language_code
             )
         )
 
@@ -1873,41 +1873,6 @@ def get_exploration_opportunity_summary_by_id(
     return get_exploration_opportunity_summary_from_model(
         exp_opportunity_summary_model
     )
-
-
-def get_topic_id_to_translation_completeness(
-    language_code: str,
-) -> Dict[str, float]:
-    """Returns a map from topic id to translation completeness percentage
-    (0-100) for the given language, aggregated over all exploration
-    opportunity summaries in that topic.
-
-    Args:
-        language_code: str. The language to compute completeness for.
-
-    Returns:
-        dict(str, float). Map of topic id to completeness percentage.
-    """
-    all_summaries: Sequence[
-        opportunity_models.ExplorationOpportunitySummaryModel
-    ] = opportunity_models.ExplorationOpportunitySummaryModel.get_all().fetch()
-
-    topic_id_to_content_count: Dict[str, int] = collections.defaultdict(int)
-    topic_id_to_translation_count: Dict[str, int] = collections.defaultdict(int)
-    for summary in all_summaries:
-        topic_id_to_content_count[summary.topic_id] += summary.content_count
-        topic_id_to_translation_count[summary.topic_id] += (
-            summary.translation_counts or {}
-        ).get(language_code, 0)
-
-    topic_id_to_completeness: Dict[str, float] = {}
-    for topic_id, content_count in topic_id_to_content_count.items():
-        topic_id_to_completeness[topic_id] = (
-            topic_id_to_translation_count[topic_id] / content_count * 100
-            if content_count > 0
-            else 0
-        )
-    return topic_id_to_completeness
 
 
 def get_exploration_opportunity_summaries_by_topic_id(

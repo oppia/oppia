@@ -52,6 +52,7 @@ export enum FeatureNames {
   TechnicalFeedbackDashboardEnabled = 'technical_feedback_dashboard_enabled',
   StoryEditorArcs = 'story_editor_arcs',
   EnableDropdownPagination = 'enable_dropdown_pagination',
+  EnableTopicMetadataTranslationOpportunities = 'enable_topic_metadata_translation_opportunities',
 }
 
 export interface FeatureStatusSummaryBackendDict {
