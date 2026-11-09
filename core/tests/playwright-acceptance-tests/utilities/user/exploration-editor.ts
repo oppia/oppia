@@ -410,6 +410,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add a math interaction to the card.
+   * @param {string} interactionToAdd - The math interaction to add to the card.
+   */
+  async addMathInteraction(interactionToAdd: string): Promise<void> {
+    await this.addInteraction(interactionToAdd);
+  }
+
+  /**
    * Adds the response details in the response modal.
    * @param {string} feedback The feedback to be added in the response modal.
    * @param {string} destination The destination to be added in the response modal.
@@ -790,6 +798,24 @@ export class ExplorationEditor extends BaseUser {
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.typeInInputField(addStateInput, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
+  }
+
+  /**
+   * Function to direct learners to an already existing card for default response.
+   * @param {string} cardName - The name of the card to which learners will be directed.
+   */
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    const isDestinationSelectorVisible = await this.page
+      .locator(destinationCardSelector)
+      .isVisible();
+    if (!isDestinationSelectorVisible) {
+      await this.expectElementToBeVisible(openOutcomeDestButton);
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+    }
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.expectElementToBeVisible(saveOutcomeDestButton, false);
   }
