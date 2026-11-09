@@ -195,8 +195,9 @@ const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 
 // Creator Guidelines page.
 const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
-const creatorDashboardCreateModeUrl =
-  testConstants.URLs.CreatorDashboardCreateMode;
+// "Create an Exploration" opens /creator-dashboard?mode=create, which creates
+// a new exploration and redirects to its editor at /create/<exploration_id>.
+const newExplorationEditorUrlRegex = new RegExp(`^${baseUrl}/create/[\\w-]+`);
 const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
 // The "forum" link points to /forum, which the server redirects to the Oppia
 // Google Group (feconf.GOOGLE_GROUP_URL).
@@ -2322,16 +2323,21 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Clicks the "Create an Exploration" button on the Creator Guidelines page
-   * and checks that it opens the creator dashboard in create mode.
+   * and checks that a new exploration is created and opened in the editor.
+   * The button opens /creator-dashboard?mode=create, which redirects to the
+   * editor of the new exploration. The editor keeps polling the server, so
+   * this waits for its URL instead of for the network to be idle.
    */
   async clickCreateAnExplorationLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.expectElementToBeVisible(
       createAnExplorationButtonInCreatorGuidelinesPage
     );
-    await this.clickButtonToNavigateToNewPage(
-      createAnExplorationButtonInCreatorGuidelinesPage,
-      creatorDashboardCreateModeUrl
-    );
+    await Promise.all([
+      this.page.waitForURL(newExplorationEditorUrlRegex),
+      this.clickOnElementWithSelector(
+        createAnExplorationButtonInCreatorGuidelinesPage
+      ),
+    ]);
   }
 
   /**
