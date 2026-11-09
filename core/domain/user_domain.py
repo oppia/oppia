@@ -1230,7 +1230,7 @@ class LearnerGoals:
             if not isinstance(topic_ids, list):
                 raise utils.ValidationError(
                     'Expected %s to be a list, received %s'
-                    % (field_name, topic_ids)
+                    % (field_name, type(topic_ids).__name__)
                 )
             for topic_id in topic_ids:
                 if not isinstance(topic_id, str) or not re.match(

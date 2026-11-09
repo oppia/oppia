@@ -1297,7 +1297,7 @@ class LearnerGoalsValidationTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected topic_ids_to_learn to be a list, received topic_id0',
+            'Expected topic_ids_to_learn to be a list, received str',
         ):
             self.learner_goals.validate()
 
@@ -1311,7 +1311,7 @@ class LearnerGoalsValidationTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected topic_ids_to_master to be a list, received None',
+            'Expected topic_ids_to_master to be a list, received NoneType',
         ):
             self.learner_goals.validate()
 
