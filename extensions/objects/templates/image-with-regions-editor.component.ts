@@ -35,7 +35,10 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {CustomSchema} from 'services/schema-default-value.service';
+import {
+  CustomSchema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {UtilsService} from 'services/utils.service';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
@@ -727,9 +730,14 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     this.valueChanged.emit({...this.value});
   }
 
-  imageValueChanged(newVal: string): void {
+  imageValueChanged(newVal: SchemaDefaultValue): void {
     // Called when the image is changed to calculate the required
     // width and height, especially for large images.
+    // The schema-based-editor emits a SchemaDefaultValue. Guard the value to
+    // ensure only unicode strings are accepted.
+    if (typeof newVal !== 'string') {
+      return;
+    }
     const that = this;
     this.value.imagePath = newVal;
     if (newVal !== '') {

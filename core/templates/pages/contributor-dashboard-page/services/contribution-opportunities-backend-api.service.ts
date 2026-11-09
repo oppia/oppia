@@ -17,7 +17,7 @@
  * contributors to contribute.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {
@@ -58,6 +58,10 @@ interface TranslationContributionOpportunitiesBackendDictV2 {
   more: boolean;
 }
 
+interface OpportunitiesCountBackendDict {
+  total_count: number;
+}
+
 interface ReviewableTranslationOpportunitiesBackendDict {
   opportunities: ExplorationOpportunitySummaryBackendDict[];
 }
@@ -90,9 +94,15 @@ interface TopicNamesBackendDict {
   topic_names: string[];
 }
 
+export interface TranslatableTopic {
+  name: string;
+  id: string;
+  completeness: number | null;
+}
+
 interface TopicNamesPerClassroomDict {
   classroom: string;
-  topics: string[];
+  topics: TranslatableTopic[];
 }
 
 interface TopicNamesPerClassroomBackendDict {
@@ -375,13 +385,18 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchTranslatableTopicNamesPerClassroomAsync(): Promise<
-    TopicNamesPerClassroomDict[]
-  > {
+  async fetchTranslatableTopicNamesPerClassroomAsync(
+    languageCode?: string
+  ): Promise<TopicNamesPerClassroomDict[]> {
     try {
+      let params = new HttpParams();
+      if (languageCode) {
+        params = params.set('language_code', languageCode);
+      }
       const response = await this.http
         .get<TopicNamesPerClassroomBackendDict>(
-          '/gettranslatabletopicnamesperclassroom'
+          '/gettranslatabletopicnamesperclassroom',
+          {params}
         )
         .toPromise();
 
@@ -390,7 +405,14 @@ export class ContributionOpportunitiesBackendApiService {
           classroom,
           topics:
             classroom === ''
-              ? [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...topics]
+              ? [
+                  {
+                    name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
+                    id: '',
+                    completeness: null,
+                  },
+                  ...topics,
+                ]
               : topics,
         })
       );
@@ -435,5 +457,40 @@ export class ContributionOpportunitiesBackendApiService {
         return null;
       }
     });
+  }
+
+  async fetchOpportunitiesCountAsync(
+    opportunityType: string,
+    topicName: string,
+    languageCode: string = '',
+    entityType?: string
+  ): Promise<number> {
+    const queryParams: Record<string, string> = {};
+    if (topicName) {
+      queryParams.topic_name = topicName;
+    }
+    if (languageCode) {
+      queryParams.language_code = languageCode;
+    }
+    if (this.shouldFilterByEntityType(entityType)) {
+      queryParams.entity_type = entityType as string;
+    }
+
+    const countUrl = this.urlInterpolationService.interpolateUrl(
+      '/opportunitiescounthandler/<opportunity_type>',
+      {opportunity_type: opportunityType}
+    );
+
+    return this.http
+      .get<OpportunitiesCountBackendDict>(countUrl, {
+        params: queryParams,
+      })
+      .toPromise()
+      .then(
+        response => response.total_count,
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }

@@ -46,6 +46,14 @@ export enum ETopicStatusOptions {
   NotPublished = 'Not Published',
 }
 
+// The skill statuses that can be selected on the skills dashboard tab. This
+// type is derived from AppConstants.SKILL_STATUS_OPTIONS so that the choices
+// rendered in the skill status dropdown and the filter's status type can
+// never diverge.
+type SkillStatusOptionsMap = typeof AppConstants.SKILL_STATUS_OPTIONS;
+export type SkillStatusOptions =
+  SkillStatusOptionsMap[keyof SkillStatusOptionsMap];
+
 export const TopicsAndSkillsDashboardPageConstants = {
   SKILL_DESCRIPTION_STATUS_VALUES: {
     STATUS_UNCHANGED: 'unchanged',

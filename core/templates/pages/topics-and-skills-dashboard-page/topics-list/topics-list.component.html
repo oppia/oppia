@@ -56,7 +56,7 @@
       <td>
         <p class="list-summary text-center">
           <span> {{topic.totalSkillCount}} </span>
-          <span [hidden]="!topic.uncategorized_skill_count"
+          <span [hidden]="!topic.uncategorizedSkillCount"
                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
                 ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{topic.uncategorizedSkillCount > 1 ? 's' : ''}}."
                 placement="bottom">
@@ -167,7 +167,7 @@
       <td>
         <p class="list-summary text-center">
           <span> {{ topic.totalSkillCount }} </span>
-          <span [hidden]="!topic.uncategorized_skill_count"
+          <span [hidden]="!topic.uncategorizedSkillCount"
                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
                 ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{ topic.uncategorizedSkillCount > 1 ? 's' : '' }}."
                 placement="bottom">
@@ -178,10 +178,10 @@
         </p>
       </td>
       <td class="text-center topic-list-status topic-status">
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic, idx)">
           Fully Published
         </span>
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic, idx)">
           Partially Published
         </span>
         <span class="topic-list-status-text" *ngIf="!topic.isPublished">
@@ -311,10 +311,10 @@
         </div>
         <div class="topic-item-topic-status">
           <span class="topic-item-topic-status-header">Status</span>
-          <span *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
+          <span *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic, idx)">
             Fully Published
           </span>
-          <span *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
+          <span *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic, idx)">
             Partially Published
           </span>
           <span *ngIf="!topic.isPublished">

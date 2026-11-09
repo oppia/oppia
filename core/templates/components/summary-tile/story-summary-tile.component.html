@@ -31,7 +31,7 @@
       </text>
     </svg>
   </div>
-  <div class="oppia-story-title" dir="auto" *ngIf="!checkTabletView()">
+  <div class="oppia-story-title" [attr.dir]="'auto'" *ngIf="!checkTabletView()">
     <strong class="title-text">
       <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
         <span *ngIf="!isHackyStoryTitleTranslationDisplayed()" class="e2e-test-story-title-in-topic-page">
@@ -42,7 +42,7 @@
         </span>
       </a>
     </strong>
-    <span dir="auto" class="oppia-chapters-count" tabindex="0" [attr.aria-label]="'Number of chapters: ' + (nodeCount || 0)">
+    <span [attr.dir]="'auto'" class="oppia-chapters-count" tabindex="0" [attr.aria-label]="'Number of chapters: ' + (nodeCount || 0)">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
     </span>
   </div>
@@ -90,7 +90,7 @@
         <strong class="title-text">
           <a [href]="storyLink" class="e2e-test-mobile-story-title" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }}</a>
         </strong>
-        <span dir="auto" class="oppia-chapters-count">
+        <span [attr.dir]="'auto'" class="oppia-chapters-count">
           <p class="oppia-chapters-count-text" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></p>
         </span>
       </div>
@@ -113,10 +113,10 @@
           </div>
           <div class="chapter-text">
             <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
-              <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+              <span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                 {{ title }}
               </span>
-              <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              <span [attr.dir]="'auto'" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
                 {{ nodeTitlesTranslationKeys[idx] | translate }}
               </span>
             </a>
@@ -138,10 +138,10 @@
             </div>
             <div class="chapter-text">
               <a [href]="getChapterUrl(node.getTitle())" rel="noopener" class="e2e-test-chapter-title">
-                <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                <span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ node.getTitle() }}
                 </span>
-                <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                <span [attr.dir]="'auto'" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ nodeTitlesTranslationKeys[idx] | translate }}
                 </span>
               </a>
@@ -165,10 +165,10 @@
             </div>
             <div class="chapter-text">
               <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank" class="disabled-link e2e-test-chapter-title">
-                <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                <span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ node.getTitle() }}
                 </span>
-                <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                <span [attr.dir]="'auto'" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ nodeTitlesTranslationKeys[idx] | translate }}
                 </span>
               </a>
@@ -186,8 +186,8 @@
              *ngIf="idx < chaptersDisplayed">
           <a [href]="getChapterUrl(title)" rel="noopener">
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
-            <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
+            <span [attr.dir]="'auto'" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
               {{ nodeTitlesTranslationKeys[idx] | translate }}
             </span>
           </a>
@@ -221,8 +221,8 @@
               *ngIf="node.getStatus() === 'Published'">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener" class="e2e-test-chapter-title">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-              </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
-              <span dir="auto" class="e2e-chapter-name" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
+              <span [attr.dir]="'auto'" class="e2e-chapter-name" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
                 {{ nodeTitlesTranslationKeys[idx] | translate }}
               </span>
             </a>
@@ -244,8 +244,8 @@
               *ngIf="node.getStatus() === 'Ready To Publish'" [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener" class="disabled-link e2e-test-chapter-title">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-              </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
-              <span dir="auto" class="e2e-chapter-name" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span [attr.dir]="'auto'" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
+              <span [attr.dir]="'auto'" class="e2e-chapter-name" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
                 {{ nodeTitlesTranslationKeys[idx] | translate }}
               </span>
             </a>

@@ -61,10 +61,6 @@ export interface QuestionPlayerConfig {
   skillList: string[];
   skillDescriptions: string[];
   questionCount: number;
-  questionPlayerMode?: {
-    modeType: string;
-    passCutoff: number;
-  };
   questionsSortedByDifficulty: boolean;
 }
 
@@ -82,7 +78,7 @@ export class NewRatingsAndRecommendationsComponent
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
-  @Input() collectionSummary!: CollectionSummary;
+  @Input() collectionSummary!: CollectionSummary | string | null;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
 
   // TODO(#22780): Remove these variable and related code.

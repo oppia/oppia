@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core.platform.translate import base_translate_services
 
+import bs4
 from typing import Dict, Tuple
 
 
@@ -62,4 +63,12 @@ class TranslateEmulator(base_translate_services.BaseTranslationService):
             return self._hardcoded_responses[lookup_key]
 
         # Standard baseline execution fallback string formatting.
+        soup = bs4.BeautifulSoup(source_text, 'html.parser')
+
+        # If it's a paragraph containing text, extract the inner HTML.
+        # Otherwise, just use the raw source text.
+        if soup.p is not None and len(soup.contents) == 1:
+            inner_html = ''.join(str(content) for content in soup.p.contents)
+            return '<p>Mock translation of: %s</p>' % inner_html
+
         return 'Mock translation of: %s' % source_text

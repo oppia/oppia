@@ -345,15 +345,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
-    pathMatch: 'full',
-    canActivate: [IsLoggedInGuard],
-    loadChildren: () =>
-      import('pages/feedback-updates-page/feedback-updates-page.module').then(
-        m => m.FeedbackUpdatesPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
     loadChildren: () =>
       import('pages/profile-page/profile-page.module').then(
@@ -560,14 +551,6 @@ const routes: Route[] = [
         m => m.SkillEditorPageModule
       ),
     canActivate: [IsLoggedInGuard],
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/review-test-page/review-test-page.module').then(
-        m => m.ReviewTestPageModule
-      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND

@@ -10,7 +10,7 @@
       <a class="answer-rank" (click)="toggleAnswerVisibility(index)">Answer Set #{{ index + 1 }}</a>
       <table class="item table item-table"
              [hidden]="!answerVisible[index]">
-        <tr *ngFor="let item of row.answer">
+        <tr *ngFor="let item of getAnswerList(row.answer)">
           <td class="answers">
             <oppia-rte-output-display [rteString]="item">
             </oppia-rte-output-display>
