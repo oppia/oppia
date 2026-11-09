@@ -2441,9 +2441,7 @@ class StateHitEventLogEntry:
         self.exp_version = exp_version
         self.state_name = state_name
         self.session_id = session_id
-        self.params = (
-            dict(params) if isinstance(params, dict) else params
-        )
+        self.params = dict(params) if isinstance(params, dict) else params
         self.play_type = play_type
         self.event_schema_version = event_schema_version
 

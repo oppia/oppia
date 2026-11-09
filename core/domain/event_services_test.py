@@ -313,9 +313,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid exp_id'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid exp_id'):
             event_services.StateHitEventHandler.record(
                 'invalid@id!',
                 1,
