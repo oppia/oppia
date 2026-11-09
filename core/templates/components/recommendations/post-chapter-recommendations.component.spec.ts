@@ -48,17 +48,14 @@ interface MockLocation {
 }
 
 class MockWindowRef {
-  location: MockLocation = {
-    pathname: '/learn/math',
-    href: '',
-    reload: jasmine.createSpy('reload'),
-    assign: jasmine.createSpy('assign'),
+  nativeWindow: {location: MockLocation} = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+      reload: jasmine.createSpy('reload'),
+      assign: jasmine.createSpy('assign'),
+    },
   };
-
-  // When the user signs in, the component replaces window.location with the
-  // login URL string, so nativeWindow.location is either the mock location
-  // object or a string.
-  nativeWindow: {location: MockLocation | string} = {location: this.location};
 }
 
 describe('End chapter check mark component', function () {
@@ -122,7 +119,12 @@ describe('End chapter check mark component', function () {
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location).toBe('login_url');
+    // To go to the login page, signIn() replaces window.location with the
+    // login URL string, so the location is read through a type that also
+    // allows a string.
+    const nativeWindowAfterSignIn: {location: MockLocation | string} =
+      mockWindowRef.nativeWindow;
+    expect(nativeWindowAfterSignIn.location).toBe('login_url');
   }));
 
   it(
@@ -137,7 +139,7 @@ describe('End chapter check mark component', function () {
       tick();
 
       expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-      expect(mockWindowRef.location.reload).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     })
   );
 

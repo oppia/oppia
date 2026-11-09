@@ -32,6 +32,7 @@ import {
   FetchQuestionResponse,
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
+import {QuestionSummaryForOneSkill} from 'domain/question/question-summary-for-one-skill-object.model';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
 import {Question} from 'domain/question/question.model';
 import {Misconception} from 'domain/skill/misconception.model';
@@ -1156,6 +1157,9 @@ describe('Questions List Component', () => {
   });
 
   it('should show solution if interaction can have solution', () => {
+    // The question is not set until one is created or opened for editing.
+    expect(component.showSolutionCheckpoint()).toBe(false);
+
     component.question = question as Question;
     spyOn(component.question, 'getStateData').and.returnValue({
       interaction: {
@@ -1164,13 +1168,6 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-    // We are testing the component's behavior when question is null, which
-    // its type does not allow. A line-level @ts-expect-error cannot be used
-    // here: the strict check reports the null assignment, but the Karma build
-    // (tsconfig.spec.json, non-strict) allows it and then fails on the unused
-    // directive. Object.assign() sets the value in both cases.
-    Object.assign(component, {question: null});
-    expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
   it('should show info message if skills is already linked to question', fakeAsync(() => {
@@ -1421,11 +1418,18 @@ describe('Questions List Component', () => {
   }));
 
   it('should get cached question summaries for one skill', () => {
+    const cachedQuestionSummaries: QuestionSummaryForOneSkill[] = [];
     spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
-      []
+      cachedQuestionSummaries
     );
 
-    expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();
+    component.getQuestionSummariesForOneSkill();
+
+    // The component's list also starts out empty, so toBe() is used to check
+    // that it now holds the exact array returned by the service.
+    expect(component.questionSummariesForOneSkill).toBe(
+      cachedQuestionSummaries
+    );
   });
 
   it('should not toggle difficulty card if window is not narrow', () => {

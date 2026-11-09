@@ -24,34 +24,37 @@ import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
 import {AvailableCertificateOfferingPageRootComponent} from './certificate-offering-available-page-root.component';
 
+// A stand-in for ActivatedRoute that has only the snapshot members the
+// component reads.
+class MockActivatedRoute {
+  snapshot: {
+    paramMap: {get: jasmine.Spy};
+    parent: {paramMap: {get: jasmine.Spy}} | null;
+  } = {
+    paramMap: {get: jasmine.createSpy('get')},
+    parent: null,
+  };
+}
+
 describe('AvailableCertificateOfferingPageRootComponent', () => {
   let component: AvailableCertificateOfferingPageRootComponent;
+  let mockActivatedRoute: MockActivatedRoute;
 
-  // Registers the stub as the ActivatedRoute provider, so that TestBed returns
-  // the same stub object with the ActivatedRoute type. This avoids casting a
-  // partial object literal to ActivatedRoute, which strict mode rejects.
-  const injectActivatedRoute = function (
-    activatedRouteStub: object
-  ): ActivatedRoute {
+  beforeEach(() => {
+    mockActivatedRoute = new MockActivatedRoute();
     TestBed.configureTestingModule({
-      providers: [{provide: ActivatedRoute, useValue: activatedRouteStub}],
+      providers: [{provide: ActivatedRoute, useValue: mockActivatedRoute}],
     });
-    return TestBed.inject(ActivatedRoute);
-  };
+  });
 
   const createComponent = function (classroomUrlFragment: string | null): void {
-    const activatedRoute = injectActivatedRoute({
-      snapshot: {
-        paramMap: {
-          get: jasmine.createSpy().and.returnValue(classroomUrlFragment),
-        },
-      },
-    });
-
+    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(
+      classroomUrlFragment
+    );
     component = new AvailableCertificateOfferingPageRootComponent(
       {} as PageHeadService,
       {} as TranslateService,
-      activatedRoute
+      TestBed.inject(ActivatedRoute)
     );
   };
 
@@ -85,24 +88,12 @@ describe('AvailableCertificateOfferingPageRootComponent', () => {
 
   it('should read the classroom url fragment from the parent route when needed', () => {
     const parentParamMapGetSpy = jasmine.createSpy().and.returnValue('math');
-    const activatedRoute = injectActivatedRoute({
-      snapshot: {
-        paramMap: {
-          get: jasmine.createSpy().and.returnValue(null),
-        },
-        parent: {
-          paramMap: {
-            get: parentParamMapGetSpy,
-          },
-        },
+    mockActivatedRoute.snapshot.parent = {
+      paramMap: {
+        get: parentParamMapGetSpy,
       },
-    });
-
-    component = new AvailableCertificateOfferingPageRootComponent(
-      {} as PageHeadService,
-      {} as TranslateService,
-      activatedRoute
-    );
+    };
+    createComponent(null);
 
     expect(component.classroomUrlFragment).toBe('math');
     expect(parentParamMapGetSpy).toHaveBeenCalledWith('classroomUrlFragment');
