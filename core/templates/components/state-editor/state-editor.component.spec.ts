@@ -116,7 +116,9 @@ describe('State Editor Component', () => {
       longQuestion.style.height = '1000px';
       card.appendChild(longQuestion);
 
-      expect(card.clientHeight).toBeLessThanOrEqual(window.innerHeight * 0.4);
+      expect(card.clientHeight).toBeLessThanOrEqual(
+        document.documentElement.clientHeight * 0.4
+      );
       expect(card.scrollHeight).toBeGreaterThan(card.clientHeight);
       card.scrollTop = 100;
       expect(card.scrollTop).toBe(100);

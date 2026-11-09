@@ -450,7 +450,7 @@ describe('Question Suggestion Review Modal component', () => {
         questionEditor.nativeElement.appendChild(longQuestion);
 
         expect(modal.getBoundingClientRect().height).toBeLessThanOrEqual(
-          window.innerHeight - 60
+          document.documentElement.clientHeight - 60
         );
         expect(body.scrollHeight).toBeGreaterThan(body.clientHeight);
         const headerTop = header.getBoundingClientRect().top;
