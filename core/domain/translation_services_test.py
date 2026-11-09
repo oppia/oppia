@@ -861,7 +861,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             feconf.TOPIC_NAME_CONTENT_ID,
             translation_domain.TranslatedContent(
                 'Nombre antiguo del tema',
-                translation_domain.TranslatableContentFormat.UNICODE,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 False,
             ),
         )
@@ -873,7 +873,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             feconf.TOPIC_DESCRIPTION_CONTENT_ID,
             translation_domain.TranslatedContent(
                 'Descripción del tema',
-                translation_domain.TranslatableContentFormat.UNICODE,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 False,
             ),
         )
