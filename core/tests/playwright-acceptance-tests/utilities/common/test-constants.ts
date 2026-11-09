@@ -97,6 +97,8 @@ export default {
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
+    VolunteerIdealistPage:
+      'https://www.idealist.org/en/nonprofit/e436a3f9282f42439350aa6f0c335072-oppia-foundation-inc-sacramento',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     WikiPrivilegesToFirebaseAccount:
       'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
