@@ -3052,7 +3052,7 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         self.assertEqual(self.entry.to_dict(), expected_dict)
 
     def test_event_type_must_be_string(self) -> None:
-        self.entry.event_type = 123  # type: ignore[assignment]
+        setattr(self.entry, 'event_type', 123)
         self._assert_validation_error(
             self.entry, 'Expected event_type to be a string'
         )
@@ -3065,7 +3065,7 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         )
 
     def test_exp_id_must_be_string(self) -> None:
-        self.entry.exp_id = 123  # type: ignore[assignment]
+        setattr(self.entry, 'exp_id', 123)
         self._assert_validation_error(
             self.entry, 'Expected exp_id to be a string'
         )
@@ -3078,13 +3078,13 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         self._assert_validation_error(self.entry, 'Invalid exp_id')
 
     def test_exp_version_must_be_int(self) -> None:
-        self.entry.exp_version = '1'  # type: ignore[assignment]
+        setattr(self.entry, 'exp_version', '1')
         self._assert_validation_error(
             self.entry, 'Expected exp_version to be an int'
         )
 
     def test_exp_version_must_not_be_bool(self) -> None:
-        self.entry.exp_version = True  # type: ignore[assignment]
+        setattr(self.entry, 'exp_version', True)
         self._assert_validation_error(
             self.entry, 'Expected exp_version to be an int'
         )
@@ -3101,7 +3101,7 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         )
 
     def test_state_name_must_be_string(self) -> None:
-        self.entry.state_name = 123  # type: ignore[assignment]
+        setattr(self.entry, 'state_name', 123)
         self._assert_validation_error(
             self.entry, 'Expected state_name to be a non-empty string'
         )
@@ -3119,7 +3119,7 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         )
 
     def test_session_id_must_be_non_empty_string(self) -> None:
-        self.entry.session_id = 123  # type: ignore[assignment]
+        setattr(self.entry, 'session_id', 123)
         self._assert_validation_error(
             self.entry, 'Expected session_id to be a non-empty string'
         )
@@ -3130,25 +3130,25 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         )
 
     def test_params_must_be_dict(self) -> None:
-        self.entry.params = 'not_a_dict'  # type: ignore[assignment]
+        setattr(self.entry, 'params', 'not_a_dict')
         self._assert_validation_error(
             self.entry, 'Expected params to be a dict'
         )
 
     def test_params_keys_must_be_string(self) -> None:
-        self.entry.params = {123: 'val'}  # type: ignore[dict-item]
+        setattr(self.entry, 'params', {123: 'val'})
         self._assert_validation_error(
             self.entry, 'Expected param name to be a string'
         )
 
     def test_params_values_must_be_string(self) -> None:
-        self.entry.params = {'key': 123}  # type: ignore[dict-item]
+        setattr(self.entry, 'params', {'key': 123})
         self._assert_validation_error(
             self.entry, 'Expected param value to be a string'
         )
 
     def test_play_type_must_be_string(self) -> None:
-        self.entry.play_type = 123  # type: ignore[assignment]
+        setattr(self.entry, 'play_type', 123)
         self._assert_validation_error(
             self.entry, 'Expected play_type to be a string'
         )
@@ -3164,13 +3164,13 @@ class StateHitEventLogEntryTests(test_utils.GenericTestBase):
         self.entry.validate()
 
     def test_event_schema_version_must_be_int(self) -> None:
-        self.entry.event_schema_version = '1'  # type: ignore[assignment]
+        setattr(self.entry, 'event_schema_version', '1')
         self._assert_validation_error(
             self.entry, 'Expected event_schema_version to be an int'
         )
 
     def test_event_schema_version_must_not_be_bool(self) -> None:
-        self.entry.event_schema_version = True  # type: ignore[assignment]
+        setattr(self.entry, 'event_schema_version', True)
         self._assert_validation_error(
             self.entry, 'Expected event_schema_version to be an int'
         )
