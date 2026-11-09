@@ -65,7 +65,6 @@ from core.controllers import (
     recent_commits,
     release_coordinator,
     resources,
-    review_tests,
     skill_editor,
     skill_mastery,
     story_editor,
@@ -577,17 +576,6 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
-        review_tests.ReviewTestsPageDataHandler,
-    ),
-    get_redirect_route(
-        r'%s/can_access_review_tests_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/<story_url_fragment>'
-        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.ReviewTestsPageAccessValidationHandler,
-    ),
-    get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler,
     ),
@@ -859,10 +847,6 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
-        reader.PretestHandler,
     ),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,

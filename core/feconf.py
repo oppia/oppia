@@ -650,9 +650,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
 
-# No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 0
-
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
@@ -962,7 +959,6 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
     '/learneranswerinfohandler/learner_answer_details'
 )
-EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
@@ -1042,8 +1038,6 @@ DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
 EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
-REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
-REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
 OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'

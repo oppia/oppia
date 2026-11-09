@@ -31,6 +31,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssignSkillToTopicModalComponent} from '../modals/assign-skill-to-topic-modal.component';
+import {SelectableTopicSummary} from '../topic-selector/select-topics.component';
 import {DeleteSkillModalComponent} from '../modals/delete-skill-modal.component';
 import {
   TopicAssignmentsSummary,
@@ -199,10 +200,17 @@ export class SkillsListComponent {
 
   assignSkillToTopic(skill: AugmentedSkillSummary): void {
     let skillId: string = skill.id;
-    let topicSummaries: CreatorTopicSummary[] =
-      this.editableTopicSummaries.filter(
-        topicSummary => !skill.topicNames.includes(topicSummary.name)
-      );
+    // Topics are passed as SelectableTopicSummary so that the select-topics
+    // component can track the user's selection via its isSelected flag.
+    let topicSummaries: SelectableTopicSummary[] = this.editableTopicSummaries
+      .filter(topicSummary => !skill.topicNames.includes(topicSummary.name))
+      .map(topicSummary => ({
+        id: topicSummary.id,
+        name: topicSummary.name,
+        isPublished: topicSummary.isPublished,
+        uncategorizedSkillCount: topicSummary.uncategorizedSkillCount,
+        isSelected: false,
+      }));
     let modalRef: NgbModalRef = this.ngbModal.open(
       AssignSkillToTopicModalComponent,
       {
