@@ -234,6 +234,9 @@ class JobTestBase(PipelinedTestBase):
     ) -> base_models.SELF_BASE_MODEL:
         """Creates a model with create_model and puts it into the datastore.
 
+        This is shorthand for put_multi([create_model(...)]), for tests that
+        set up many models one at a time.
+
         Args:
             model_class: *. A subclass of BaseModel.
             **properties: dict(str: *). Properties to assign to the model.

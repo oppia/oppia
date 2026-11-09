@@ -14,24 +14,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that repair users who can't be synced to Firebase.
+"""Jobs that fix users who can't be synced to Firebase.
 
-FirebaseServerSyncJob can only sync a user who has a firebase_auth_id and a
-UserIdByFirebaseAuthIdModel for it. These jobs create whichever is missing.
+FirebaseServerSyncJob creates each user's Firebase account with
+uid=UserAuthDetailsModel.firebase_auth_id, and Oppia finds the user who signed
+in through UserIdByFirebaseAuthIdModel(id=firebase_auth_id). A user who is
+missing either model can't be synced, and can't sign in after a sync. These
+jobs create whichever model is missing.
 
-Each repaired user gets an ID derived from their user ID. The ID is the same
-on every run, so rerunning the job finishes any interrupted repair.
+These jobs only read and write the datastore. They never call Firebase; the
+next FirebaseServerSyncJob run creates the Firebase accounts.
 
-Users are reported instead of repaired when a repair would be unsafe.
+A user who has no firebase_auth_id gets one derived from their user ID (see
+_get_deterministic_auth_id). The ID is the same on every run, so rerunning the
+job finishes any fix that an earlier run left half-written.
+
+A user is reported instead of fixed when their email is missing or is shared
+with another user, because FirebaseServerSyncJob can't sync them either way.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import operator
 from collections import abc
+import types
 
 from core import utils
-from core.jobs import base_jobs, job_utils
+from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
@@ -42,313 +52,374 @@ from typing import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models, datastore_services, user_models
+    from mypy_imports import (
+        auth_models,
+        base_models,
+        datastore_services,
+        user_models,
+    )
 
-auth_models, user_models = models.Registry.import_models(
-    [models.Names.AUTH, models.Names.USER]
+auth_models, base_models, user_models = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER]
 )
 
 datastore_services = models.Registry.import_datastore_services()
 
 TAG_OK = 'OK'
-TAG_PROBLEMS = 'PROBLEMS'
-TAG_ADD_AUTH = 'ADD_AUTH'
-TAG_SET_FIREBASE_AUTH_ID = 'SET_FIREBASE_AUTH_ID'
-TAG_ADD_REVERSE = 'ADD_REVERSE'
+TAG_ERR = 'ERR'
+TAG_FIX = 'FIX'
+TAG_DEL = 'DEL'
 
-# Matches the length of the IDs that Firebase generates.
+# NOTE: Firebase accepts any string of 1 to 128 characters as a uid. This
+# length is used only so that generated IDs look like the ones Firebase
+# generates.
 _FIREBASE_AUTH_ID_LENGTH = 28
 
 
-class UserModels(TypedDict):
-    """The models of one user, grouped by kind.
+class CoGroupByKeyModels(TypedDict):
+    """The models that CoGroupByKey grouped under one user ID.
 
     NOTE: CoGroupByKey only promises iterables, which may be read only once.
+
+    Attributes:
+        auth: Iterable(UserAuthDetailsModel). The user's auth model, if any.
+            Its ID is the user ID, so there is at most one.
+        settings: Iterable(UserSettingsModel). The user's settings model, if
+            any. Its ID is the user ID, so there is at most one.
+        backlinks: Iterable(UserIdByFirebaseAuthIdModel). Every model whose
+            user_id is the user ID. There can be any number of them, because
+            their ID is a Firebase auth ID and the datastore doesn't enforce
+            that user_id is unique.
     """
 
     auth: abc.Iterable[auth_models.UserAuthDetailsModel]
     settings: abc.Iterable[user_models.UserSettingsModel]
-    reverse: abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel]
+    backlinks: abc.Iterable[auth_models.UserIdByFirebaseAuthIdModel]
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class GroupedUserModels:
+    """The fields of a user's models that this job needs.
+
+    Attributes:
+        user_id: str. The user ID that the models were grouped under.
+        auth_id: str|None. The firebase_auth_id of the user's
+            UserAuthDetailsModel, or None if the user has no such model or its
+            firebase_auth_id is empty.
+        email: str|None. The email of the user's UserSettingsModel, or None if
+            the user has no such model or its email is empty.
+        backlink_ids: frozenset(str). The IDs (Firebase auth IDs) of every
+            UserIdByFirebaseAuthIdModel whose user_id is the user ID.
+    """
+
+    user_id: str
+    auth_id: str | None
+    email: str | None
+    backlink_ids: frozenset[str]
 
 
 class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
     """Gives users the auth models that FirebaseServerSyncJob needs.
 
+    A "user" is any user ID that has a UserAuthDetailsModel, a
+    UserSettingsModel, or a UserIdByFirebaseAuthIdModel pointing to it. Profiles
+    (users whose UserAuthDetailsModel have a parent_user_id) are skipped to stay
+    consistent with the FirebaseServerSyncJob.
+
+    After a run with DRY_RUN=False that outputs no errors, every user (that is
+    not a profile) has ALL of the following, where USER_ID and FIREBASE_AUTH_ID
+    are consistent in all three models:
+
+    1. UserSettingsModel(id=USER_ID) with a unique email (ignoring case).
+    2. UserAuthDetailsModel(id=USER_ID, firebase_auth_id=FIREBASE_AUTH_ID).
+    3. UserIdByFirebaseAuthIdModel(id=FIREBASE_AUTH_ID, user_id=USER_ID), and
+       no other UserIdByFirebaseAuthIdModel with user_id=USER_ID.
+
+    FIREBASE_AUTH_ID is the user's existing firebase_auth_id if they have one,
+    otherwise a new one generated by `_get_deterministic_auth_id`.
+
+    The job never creates or changes a UserSettingsModel, and never updates an
+    existing firebase_auth_id. Users that break rule 1 are reported as errors
+    and left unchanged; fix them by hand and rerun the job.
+
+    The job outputs:
+        OK <n>: The number of users that already had all three models. Their
+            other UserIdByFirebaseAuthIdModels are still deleted.
+        ERR: <message> (stderr): One line per user that was not fixed.
+        PUT <n> / WOULD PUT <n>: The number of models created.
+        DEL <n> / WOULD DEL <n>: The number of UserIdByFirebaseAuthIdModels
+            deleted.
+
     Attributes:
-        DRY_RUN: bool. Whether to only report the repairs without saving them.
+        DRY_RUN: bool. Whether to only report the fixes without saving them.
     """
 
     DRY_RUN = True
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns the job's results, and saves the repairs unless DRY_RUN.
+        keyed_auth_models = (
+            self.pipeline
+            | 'Get Auth Models'
+            >> ndb_io.GetModels(auth_models.UserAuthDetailsModel.get_all())
+            | 'Key Auth Models' >> beam.Map(lambda m: (m.id, m))
+        )
+        keyed_settings_models = (
+            self.pipeline
+            | 'Get Settings Models'
+            >> ndb_io.GetModels(user_models.UserSettingsModel.get_all())
+            | 'Key Settings Models' >> beam.Map(lambda m: (m.id, m))
+        )
+        keyed_backlink_models = (
+            self.pipeline
+            | 'Get Backlink Models'
+            >> ndb_io.GetModels(
+                auth_models.UserIdByFirebaseAuthIdModel.get_all()
+            )
+            | 'Key Backlink Models' >> beam.Map(lambda m: (m.user_id, m))
+        )
 
-        Returns:
-            PCollection. The count of OK users, the count of repaired models,
-            and one error for each user that could not be safely repaired.
-        """
-        # NOTE: Deleted models are included because users that have them must
-        # not be repaired.
-        auth_models_by_user_id = (
-            self.pipeline
-            | 'Get UserAuthDetailsModels'
-            >> ndb_io.GetModels(
-                auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserAuthDetailsModels' >> beam.Map(lambda m: (m.id, m))
+        grouped_user_models = (
+            {
+                'auth': keyed_auth_models,
+                'settings': keyed_settings_models,
+                'backlinks': keyed_backlink_models,
+            }
+            | beam.CoGroupByKey()
+            | beam.FlatMapTuple(_build_grouped_user_models)
         )
-        settings_models_by_user_id = (
-            self.pipeline
-            | 'Get UserSettingsModels'
-            >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserSettingsModels' >> beam.Map(lambda m: (m.id, m))
-        )
-        reverse_models_by_user_id = (
-            self.pipeline
-            | 'Get UserIdByFirebaseAuthIdModels'
-            >> ndb_io.GetModels(
-                auth_models.UserIdByFirebaseAuthIdModel.get_all(
-                    include_deleted=True
-                )
-            )
-            | 'Key UserIdByFirebaseAuthIdModels'
-            >> beam.Map(lambda m: (m.user_id, m))
-        )
-        users = {
-            'auth': auth_models_by_user_id,
-            'settings': settings_models_by_user_id,
-            'reverse': reverse_models_by_user_id,
-        } | 'Join models by user id' >> beam.CoGroupByKey()
 
-        # NOTE: Users that share an email block FirebaseServerSyncJob, so they
-        # must not be repaired.
+        # NOTE: Emails are lowercased because Firebase ignores their case.
         shared_emails = (
-            users
-            | 'Get Firebase emails' >> beam.FlatMap(_get_email)
-            | 'Count users per email' >> beam.combiners.Count.PerElement()
+            grouped_user_models
+            | 'Get emails'
+            >> beam.FlatMap(lambda g: [g.email.lower()] if g.email else [])
+            | 'Count emails' >> beam.combiners.Count.PerElement()
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
 
-        (
-            ok_users,
-            problems,
-            user_ids_missing_auth,
-            auth_models_missing_firebase_auth_id,
-            user_ids_missing_reverse,
-        ) = operator.itemgetter(
-            TAG_OK,
-            TAG_PROBLEMS,
-            TAG_ADD_AUTH,
-            TAG_SET_FIREBASE_AUTH_ID,
-            TAG_ADD_REVERSE,
+        oks, errs, needs_fix, needs_del = operator.itemgetter(
+            TAG_OK, TAG_ERR, TAG_FIX, TAG_DEL
         )(
-            users
-            | 'Diagnose users'
+            grouped_user_models
+            | 'Diagnose per-user actions'
             >> beam.FlatMap(
-                _diagnose_user, shared_emails=beam.pvalue.AsDict(shared_emails)
-            ).with_outputs(
-                TAG_OK,
-                TAG_PROBLEMS,
-                TAG_ADD_AUTH,
-                TAG_SET_FIREBASE_AUTH_ID,
-                TAG_ADD_REVERSE,
-            )
+                _diagnose_actions,
+                shared_emails=beam.pvalue.AsDict(shared_emails),
+            ).with_outputs(TAG_OK, TAG_ERR, TAG_FIX, TAG_DEL)
         )
 
-        repaired_models = (
-            user_ids_missing_auth
-            | 'Build UserAuthDetailsModels' >> beam.Map(_build_auth_model),
-            auth_models_missing_firebase_auth_id
-            | 'Set firebase_auth_ids' >> beam.Map(_set_firebase_auth_id),
-            user_ids_missing_reverse
-            | 'Build UserIdByFirebaseAuthIdModels'
-            >> beam.Map(_build_reverse_model),
-        ) | 'Merge repaired models' >> beam.Flatten()
+        outputs = [
+            oks
+            | 'count oks' >> beam.CombineGlobally(sum)
+            | 'format ok' >> beam.Map(lambda num: f'OK {num}')
+            | 'as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout),
+            errs
+            | 'format err' >> beam.Map(lambda msg: f'ERR: {msg}')
+            | 'as stderr' >> beam.Map(job_run_result.JobRunResult.as_stderr),
+        ]
 
-        if not self.DRY_RUN:
-            unused_put_result = (
-                repaired_models | 'Put repaired models' >> ndb_io.PutModels()
+        needs_put = needs_fix | 'Build fixed models' >> beam.FlatMap(
+            _fix_grouped_user_models
+        )
+
+        if self.DRY_RUN:
+            outputs.append(
+                needs_put
+                | 'Count fixed models'
+                >> job_result_transforms.CountObjectsToJobRunResult('WOULD PUT')
+            )
+            outputs.append(
+                needs_del
+                | 'Delete removeable models'
+                >> job_result_transforms.CountObjectsToJobRunResult('WOULD DEL')
+            )
+        else:
+            # NOTE: A deleted UserIdByFirebaseAuthIdModel can have the same key
+            # as a created one, e.g. when it pointed to the wrong user. The
+            # puts wait on the deletes so that the created model survives.
+            creation = (
+                needs_put
+                | 'Wait on deletion'
+                >> beam.WaitOn(deletion := needs_del | ndb_io.DeleteModels())
+                | ndb_io.PutModels()
             )
 
-        return (
-            ok_users
-            | 'Count OK users'
-            >> job_result_transforms.CountObjectsToJobRunResult(TAG_OK),
-            repaired_models
-            | 'Count repaired models'
-            >> job_result_transforms.CountObjectsToJobRunResult(
-                'WOULD PUT' if self.DRY_RUN else 'PUT'
-            ),
-            problems
-            | 'Report problems'
-            >> beam.Map(job_run_result.JobRunResult.as_stderr),
-        ) | 'Merge results' >> beam.Flatten()
+            outputs.append(
+                needs_del
+                | 'Delete removals' >> beam.WaitOn(deletion)
+                | job_result_transforms.CountObjectsToJobRunResult('DEL'),
+            )
+            outputs.append(
+                needs_put
+                | 'Write fixed models' >> beam.WaitOn(creation)
+                | job_result_transforms.CountObjectsToJobRunResult('PUT')
+            )
+
+        return outputs | 'Flatten outputs' >> beam.Flatten()
 
 
 class AuditMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
-    """Reports the repairs without saving them."""
+    """Reports the fixes without saving them."""
 
     DRY_RUN = True
 
 
 class RepairMissingUserAuthDetailsJob(RepairMissingUserAuthDetailsJobBase):
-    """Saves the repairs to the datastore."""
+    """Saves the fixes to the datastore."""
 
     DRY_RUN = False
 
 
-def _diagnose_user(
-    user: tuple[str, UserModels], shared_emails: abc.Mapping[str, int]
-) -> abc.Iterator[beam.TaggedOutput]:
-    """Tags the user as OK, as a problem, or with each repair it needs."""
-    user_id, user_models_by_kind = user
-    # NOTE: A user has at most one auth model and one settings model.
-    auth_model = next(iter(user_models_by_kind['auth']), None)
-    settings_model = next(iter(user_models_by_kind['settings']), None)
-    # NOTE: The reverse models are read several times, so they're copied.
-    reverse_models = list(user_models_by_kind['reverse'])
-    if settings_model is None:
-        yield beam.TaggedOutput(
-            TAG_PROBLEMS, f'{user_id} is missing its UserSettingsModel'
-        )
-        return
-    match auth_model, settings_model:
-        # NOTE: FirebaseServerSyncJob fails on users with only one of these
-        # models deleted.
-        case (
-            auth_models.UserAuthDetailsModel(deleted=True),
-            user_models.UserSettingsModel(deleted=False),
-        ):
-            yield beam.TaggedOutput(
-                TAG_PROBLEMS, f'{user_id} has a deleted UserAuthDetailsModel'
-            )
-            return
-        case (
-            auth_models.UserAuthDetailsModel(deleted=False),
-            user_models.UserSettingsModel(deleted=True),
-        ):
-            yield beam.TaggedOutput(
-                TAG_PROBLEMS, f'{user_id} has a deleted UserSettingsModel'
-            )
-            return
-        # NOTE: Profiles have no Firebase account to sync.
-        case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
-            yield beam.TaggedOutput(TAG_OK, user_id)
-            return
-        case _:
-            pass
-
-    # NOTE: IDs that came from Firebase are left alone. IDs that this job
-    # created also need their reverse model.
-    generated_id = _generate_firebase_auth_id(user_id)
-    has_live_reverse_model = any(
-        m.id == generated_id and not m.deleted for m in reverse_models
-    )
-    if (
-        auth_model is not None
-        and auth_model.firebase_auth_id
-        and (
-            auth_model.firebase_auth_id != generated_id
-            or has_live_reverse_model
-        )
-    ):
-        yield beam.TaggedOutput(TAG_OK, user_id)
-        return
-    if problem := _find_problem(
-        user_id, settings_model, reverse_models, shared_emails
-    ):
-        yield beam.TaggedOutput(TAG_PROBLEMS, f'{user_id} {problem}')
-        return
-    if auth_model is None:
-        yield beam.TaggedOutput(TAG_ADD_AUTH, user_id)
-    elif not auth_model.firebase_auth_id:
-        yield beam.TaggedOutput(TAG_SET_FIREBASE_AUTH_ID, auth_model)
-    # NOTE: Users with any other reverse models were reported above.
-    if not reverse_models:
-        yield beam.TaggedOutput(TAG_ADD_REVERSE, user_id)
-
-
-def _find_problem(
+def _build_grouped_user_models(
     user_id: str,
-    settings_model: user_models.UserSettingsModel,
-    reverse_models: list[auth_models.UserIdByFirebaseAuthIdModel],
-    shared_emails: abc.Mapping[str, int],
-) -> str | None:
-    """Returns why the user can't be safely repaired, or None if it can."""
-    if settings_model.deleted:
-        return 'has a deleted UserSettingsModel'
-    if any(
-        m.id != _generate_firebase_auth_id(user_id) or m.deleted
-        for m in reverse_models
-    ):
-        return 'has unexpected UserIdByFirebaseAuthIdModels'
-    if settings_model.email.lower() in shared_emails:
-        return 'shares its email with another user'
-    return None
+    group_dict: CoGroupByKeyModels,
+) -> abc.Iterator[GroupedUserModels]:
+    """Yields the fields of a user's models, unless the user is a profile.
+
+    NOTE: Profiles have no Firebase account, so they need no auth models.
+
+    Args:
+        user_id: str. The ID of the user.
+        group_dict: CoGroupByKeyModels. The user's models, grouped by kind.
+
+    Yields:
+        GroupedUserModels. The fields of the user's models.
+    """
+    auth_model = next(iter(group_dict['auth']), None)
+    if auth_model and auth_model.parent_user_id:
+        return
+    settings_model = next(iter(group_dict['settings']), None)
+    backlink_models = group_dict['backlinks']
+    yield GroupedUserModels(
+        user_id=user_id,
+        auth_id=auth_model.firebase_auth_id if auth_model else None,
+        email=settings_model.email if settings_model else None,
+        backlink_ids=frozenset(m.id for m in backlink_models),
+    )
 
 
-# NOTE: The builders below need an NDB context because NDB can't create models
-# without one.
-def _build_auth_model(user_id: str) -> auth_models.UserAuthDetailsModel:
+def _fix_grouped_user_models(
+    user: GroupedUserModels,
+) -> abc.Iterator[base_models.BaseModel]:
+    """Yields the auth models that the user is missing.
+
+    Args:
+        user: GroupedUserModels. The fields of the user's models.
+
+    Yields:
+        BaseModel. A new UserAuthDetailsModel or UserIdByFirebaseAuthIdModel.
+    """
+    auth_id = _get_deterministic_auth_id(user)
+    if not user.auth_id:
+        yield _build_missing_auth_model(user.user_id, auth_id)
+    if auth_id not in user.backlink_ids:
+        yield _build_missing_backlink_model(user.user_id, auth_id)
+
+
+def _diagnose_actions(
+    user: GroupedUserModels,
+    shared_emails: abc.Mapping[str, int] = types.MappingProxyType({}),
+) -> abc.Iterator[beam.TaggedOutput]:
+    """Tags the user as OK, as an error, or with the fixes it needs.
+
+    The first matching case applies:
+
+    1. The user has no email: TAG_ERR. This includes users with no
+       UserSettingsModel, since the job can't create one.
+    2. The user's email is shared with another user: TAG_ERR, for every user
+       that shares it. This applies even to users that are otherwise OK,
+       because FirebaseServerSyncJob can't sync any of them.
+    3. The user has no firebase_auth_id, or no UserIdByFirebaseAuthIdModel
+       with that ID: TAG_FIX with the user, plus TAG_DEL with each of the
+       user's other UserIdByFirebaseAuthIdModels, since none of them matches
+       the firebase_auth_id that the user will have.
+    4. Otherwise: TAG_OK, plus TAG_DEL with each of the user's
+       UserIdByFirebaseAuthIdModels whose ID isn't their firebase_auth_id.
+
+    Args:
+        user: GroupedUserModels. The fields of the user's models.
+        shared_emails: Mapping(str, int). The number of users with each
+            lowercased email, for emails that more than one user has.
+
+    Yields:
+        TaggedOutput. TAG_OK with 1, TAG_ERR with an error message, TAG_DEL
+        with the key of a stray UserIdByFirebaseAuthIdModel, or TAG_FIX with
+        the user.
+    """
+    if not user.email:
+        yield beam.TaggedOutput(
+            TAG_ERR,
+            f'UserSettingsModel(id={user.user_id}) is missing an email',
+        )
+    elif user.email.lower() in shared_emails:
+        yield beam.TaggedOutput(
+            TAG_ERR,
+            f'UserSettingsModel(id={user.user_id}) is sharing an email',
+        )
+    elif not user.auth_id or user.auth_id not in user.backlink_ids:
+        auth_id = _get_deterministic_auth_id(user)
+        for backlink_id in user.backlink_ids - {auth_id}:
+            yield beam.TaggedOutput(TAG_DEL, _build_backlink_key(backlink_id))
+        yield beam.TaggedOutput(TAG_FIX, user)
+    else:
+        for backlink_id in user.backlink_ids - {user.auth_id}:
+            yield beam.TaggedOutput(TAG_DEL, _build_backlink_key(backlink_id))
+        yield beam.TaggedOutput(TAG_OK, 1)
+
+
+def _build_backlink_key(backlink_id: str) -> datastore_services.Key:
+    """Returns the key of the UserIdByFirebaseAuthIdModel with the given ID."""
+    with datastore_services.get_ndb_context():
+        return datastore_services.Key(
+            auth_models.UserIdByFirebaseAuthIdModel, backlink_id
+        )
+
+
+def _build_missing_auth_model(
+    user_id: str, auth_id: str
+) -> auth_models.UserAuthDetailsModel:
     """Returns a new UserAuthDetailsModel for the user."""
     with datastore_services.get_ndb_context():
         model = auth_models.UserAuthDetailsModel(
-            id=user_id, firebase_auth_id=_generate_firebase_auth_id(user_id)
+            id=user_id,
+            firebase_auth_id=auth_id,
         )
         model.update_timestamps()
     return model
 
 
-def _set_firebase_auth_id(
-    auth_model: auth_models.UserAuthDetailsModel,
-) -> auth_models.UserAuthDetailsModel:
-    """Returns a copy of the model with the user's firebase_auth_id set.
-
-    NOTE: Beam inputs must not be changed, so we change a copy.
-    """
-    with datastore_services.get_ndb_context():
-        model = job_utils.clone_model(
-            auth_model,
-            firebase_auth_id=_generate_firebase_auth_id(auth_model.id),
-        )
-        model.update_timestamps()
-    return model
-
-
-def _build_reverse_model(
-    user_id: str,
+def _build_missing_backlink_model(
+    user_id: str, auth_id: str
 ) -> auth_models.UserIdByFirebaseAuthIdModel:
     """Returns a new UserIdByFirebaseAuthIdModel for the user."""
     with datastore_services.get_ndb_context():
         model = auth_models.UserIdByFirebaseAuthIdModel(
-            id=_generate_firebase_auth_id(user_id), user_id=user_id
+            id=auth_id,
+            user_id=user_id,
         )
         model.update_timestamps()
     return model
 
 
-def _get_email(user: tuple[str, UserModels]) -> abc.Iterator[str]:
-    """Yields the user's email if the user may have a Firebase account.
+def _get_deterministic_auth_id(user: GroupedUserModels) -> str:
+    """Returns the user's firebase_auth_id, or the one this job gives them.
 
-    NOTE: Deleted users keep a disabled Firebase account, so their email is
-    still taken. Emails are lowercased because Firebase ignores case.
+    The generated ID is a hash of the user ID, rather than one from Firebase,
+    because:
+
+    1. The Firebase Admin SDK can't reserve a uid without creating an account,
+       and these jobs must not touch Firebase. FirebaseServerSyncJob creates
+       the account later, with whatever uid the UserAuthDetailsModel has.
+    2. The same user always gets the same ID, so a rerun after an interrupted
+       run creates the same models instead of conflicting ones.
+
+    Args:
+        user: GroupedUserModels. The fields of the user's models.
+
+    Returns:
+        str. The user's firebase_auth_id if they have one, or else the
+        28-character hash of their user ID.
     """
-    _, user_models_by_kind = user
-    auth_model = next(iter(user_models_by_kind['auth']), None)
-    settings_model = next(iter(user_models_by_kind['settings']), None)
-    match auth_model, settings_model:
-        case auth_models.UserAuthDetailsModel(parent_user_id=str()), _:
-            # NOTE: Like FirebaseServerSyncJob, this skips profiles, which are
-            # the only users with a parent_user_id.
-            return
-        case _, user_models.UserSettingsModel(email=str() as email):
-            yield email.lower()
-        case _:
-            pass
-
-
-def _generate_firebase_auth_id(user_id: str) -> str:
-    """Returns the ID that this job gives the user, which never changes."""
-    return utils.convert_to_hash(user_id, _FIREBASE_AUTH_ID_LENGTH)
+    return user.auth_id or utils.convert_to_hash(
+        user.user_id, _FIREBASE_AUTH_ID_LENGTH
+    )
