@@ -691,7 +691,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Type an expression here.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Type code in the editor",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Go the code editor",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Drag and drop items",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Abeg no put 0 for di denominator",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Enter the fraction for this form \"x/y\", or as mixed number for this form \"A x/y\".",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Enter fraction wey dey in the form x/y.",

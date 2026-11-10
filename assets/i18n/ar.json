@@ -710,7 +710,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "أكتب معادلة هنا.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "اكتب التعليمات البرمجية في المحرر",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "انتقل إلى محرر التعليمات البرمجية",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "اسحب واسقط العناصر",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "من فضلك لا تضع 0 في المقام",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "أدخل كسر عشري في الصيغة «ب/م» أو رقم مختلط في الصيغة «ع ب/م».",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "أدخل كسر عشري في الصيغة ب/م.",

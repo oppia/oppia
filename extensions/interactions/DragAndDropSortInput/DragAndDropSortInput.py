@@ -33,8 +33,6 @@ class DragAndDropSortInput(base.BaseInteraction):
     is_trainable: bool = False
     _dependency_ids: List[str] = []
     answer_type: str = 'ListOfSetsOfTranslatableHtmlContentIds'
-    instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
-    narrow_instructions: str = 'I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION'
     needs_summary: bool = True
     can_have_solution: bool = True
     show_generic_submit_button: bool = True

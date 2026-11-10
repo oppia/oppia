@@ -627,7 +627,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Πληκτρολόγησε μία έκφραση εδώ.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Πληκτρολόγησε τον κώδικα στον επεξεργαστή",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Πηγαίνετε στον επεξεργαστή κώδικα",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Σύρετε και αποθέστε στοιχεία",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Παρακαλώ μην βάζεις 0 στον παρονομαστή",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Εισήγαγε ένα κλάσμα στην μορφή \"x/y\", ή έναν μεικτό αριθμό στην μορφή \"A x/y\".",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Εισήγαγε ένα κλάσμα στη μορφή x/y.",
