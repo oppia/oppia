@@ -840,16 +840,16 @@ describe('Library Page Component', () => {
     expect(componentInstance.dots).toEqual([0, 0, 1]);
 
     componentInstance.currentCardIndex = 0;
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
 
     componentInstance.currentCardIndex = 2;
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      true
-    );
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
   });
 
   it('should record analytics when classroom card is clicked', () => {
@@ -963,14 +963,14 @@ describe('Library Page Component', () => {
 
     componentInstance.scroll(ind, isLeftScroll);
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(true);
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeTrue();
 
     for (let i = 0; i <= 5; i++) {
       currentTime += 160;
       tick(160);
     }
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(false);
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeFalse();
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
 

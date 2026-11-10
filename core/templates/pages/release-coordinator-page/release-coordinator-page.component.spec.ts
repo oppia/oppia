@@ -433,9 +433,9 @@ describe('Release coordinator page', () => {
           component.userGroups[0]
         );
         component.resetUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].memberUsernames.includes('User10')).toBe(
-          true
-        );
+        expect(
+          component.userGroups[0].memberUsernames.includes('User10')
+        ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User10');
       }));
@@ -451,9 +451,9 @@ describe('Release coordinator page', () => {
           new UserGroup('usr_group_1', 'UserGroup1', [])
         );
 
-        expect(component.userGroups[0].memberUsernames.includes('')).toBe(
-          false
-        );
+        expect(
+          component.userGroups[0].memberUsernames.includes('')
+        ).toBeFalse();
       }));
 
       it('should save the new user', fakeAsync(() => {
@@ -466,16 +466,16 @@ describe('Release coordinator page', () => {
           },
         } as ElementRef;
 
-        expect(component.userGroups[0].memberUsernames.includes('User11')).toBe(
-          false
-        );
+        expect(
+          component.userGroups[0].memberUsernames.includes('User11')
+        ).toBeFalse();
         component.addUserToUserGroup(
           {value: 'User11'},
           component.userGroups[0]
         );
-        expect(component.userGroups[0].memberUsernames.includes('User11')).toBe(
-          true
-        );
+        expect(
+          component.userGroups[0].memberUsernames.includes('User11')
+        ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User11');
       }));
@@ -581,18 +581,18 @@ describe('Release coordinator page', () => {
       tick();
       component.removeUserFromUserGroup(component.userGroups[1], 'User5');
 
-      expect(component.userGroups[1].memberUsernames.includes('User5')).toBe(
-        false
-      );
+      expect(
+        component.userGroups[1].memberUsernames.includes('User5')
+      ).toBeFalse();
     }));
 
     it('should toggle the user group detail section', fakeAsync(() => {
       component.ngOnInit();
       tick();
 
-      expect(component.userGroupIdsToDetailsShowRecord.userGroupId1).toBe(
-        false
-      );
+      expect(
+        component.userGroupIdsToDetailsShowRecord.userGroupId1
+      ).toBeFalse();
       component.toggleUserGroupDetailsSection('userGroupId1');
       expect(component.userGroupIdsToDetailsShowRecord.userGroupId1).toBeTrue();
 

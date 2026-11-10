@@ -595,7 +595,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBeTrue();
+        ).toBe(true);
       }
     );
 
@@ -611,7 +611,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBeFalse();
+        ).toBe(false);
       }
     );
 
@@ -627,7 +627,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBeTrue();
+        ).toBe(true);
       }
     );
 
@@ -643,7 +643,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBeTrue();
+        ).toBe(true);
       }
     );
 
@@ -659,7 +659,7 @@ describe('Release coordinator page feature tab', function () {
             searchQuery: '',
             filteredUserGroups: [],
           } as FeatureFlagViewModel)
-        ).toBeFalse();
+        ).toBe(false);
       }
     );
 
@@ -672,7 +672,7 @@ describe('Release coordinator page feature tab', function () {
           searchQuery: '',
           filteredUserGroups: [],
         } as FeatureFlagViewModel)
-      ).toBeFalse();
+      ).toBe(false);
     });
   });
 
