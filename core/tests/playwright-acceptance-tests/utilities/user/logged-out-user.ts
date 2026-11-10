@@ -57,6 +57,7 @@ const saveProgressBtnTooltipSelector = '.save-progress-btn-tooltip';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const signInButton = '.conversation-skin-login-button-text';
 const singInButtonInProgressModal = '.sign-in-link';
+const loginButtonSelector = '.e2e-mobile-test-login';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 const generateAttributionSelector = '.e2e-test-generate-attribution';
@@ -749,6 +750,24 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     const explorationPlayerUtils = new ExplorationEditorUtils(this);
     await explorationPlayerUtils.continueToNextCard(skipVerification);
+  }
+
+  /**
+   * Function to navigate to the next card in the exploration player.
+   */
+  async continueToNextCard(): Promise<void> {
+    const continueBtn = this.page.locator(nextCardButton);
+
+    await this.page
+      .locator(`${nextCardButton}, ${nextCardArrowButton}`)
+      .first()
+      .waitFor({state: 'visible'});
+
+    if (await continueBtn.isVisible()) {
+      await this.clickOnElementWithSelector(nextCardButton);
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
+    }
   }
 
   /**
@@ -2179,6 +2198,20 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(generateAttributionSelector);
     await this.clickOnElementWithSelector(generateAttributionSelector);
     await this.expectElementToBeVisible(attributionHtmlSectionSelector);
+  }
+
+  /**
+   * Signs up a new user from the lesson player.
+   * @param {string} email - User's email.
+   * @param {string} username - User's chosen username.
+   */
+  async signUpFromTheLessonPlayer(
+    email: string,
+    username: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(loginButtonSelector);
+    await this.clickOnElementWithSelector(loginButtonSelector);
+    await this.goThroughSignUpProcess(email, username);
   }
 
   /**
