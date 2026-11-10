@@ -16,8 +16,6 @@
  * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
-// @ts-nocheck
-
 import {HttpErrorResponse} from '@angular/common/http';
 import {
   HttpClientTestingModule,
@@ -70,15 +68,9 @@ describe('Topic creation backend api service', () => {
       },
     ];
 
-    // This throws "Argument of type '() -> Promise<unknown>'
-    // is not assignable to parameter of type 'PromiseLike<string>'.".
-    // We need to suppress this error because we need to mock the
-    // `getTokenAsync` function for testing purposes.
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(async () => {
-      return new Promise(resolve => {
-        resolve('sample-csrf-token');
-      });
-    });
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
   });
 
   afterEach(() => {
