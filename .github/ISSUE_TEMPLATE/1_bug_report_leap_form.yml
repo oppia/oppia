@@ -1,7 +1,8 @@
-name: Bug report
-description: Create a report to help us improve
+name: Bug report (external users)
+description: Report a bug that primarily affects external users like learners, educators, and/or parents
 title: "[BUG]: "
 labels: [triage needed, bug]
+projects: "oppia/3"
 body:
   - type: markdown
     attributes:
