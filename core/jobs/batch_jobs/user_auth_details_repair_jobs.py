@@ -34,7 +34,9 @@ with another user, because FirebaseServerSyncJob can't sync them either way. A
 user whose UserAuthDetailsModel is marked as deleted is also reported instead
 of fixed, so that the deleted model isn't overwritten. So is a user who shares
 a Firebase auth ID with another user, through either model, since only one of
-them can have the UserIdByFirebaseAuthIdModel with that ID.
+them can have the UserIdByFirebaseAuthIdModel with that ID. So is a user with
+no firebase_auth_id whose UserIdByFirebaseAuthIdModels this job didn't create,
+since a Firebase account may still sign in through them.
 """
 
 from __future__ import annotations
@@ -147,9 +149,10 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
 
     The job never creates or changes a UserSettingsModel, and never updates an
     existing firebase_auth_id. Users that break rule 1, whose
-    UserAuthDetailsModel is marked as deleted, or who share a Firebase auth ID
-    with another user are reported as errors and left unchanged; fix them by
-    hand and rerun the job.
+    UserAuthDetailsModel is marked as deleted, who share a Firebase auth ID
+    with another user, or who have no firebase_auth_id but have a
+    UserIdByFirebaseAuthIdModel that this job didn't create, are reported as
+    errors and left unchanged; fix them by hand and rerun the job.
 
     The job outputs:
         OK <n>: The number of users that already had all three models. Their
@@ -381,6 +384,18 @@ def _diagnose_user_models(
     elif any(i in shared_auth_ids for i in user.backlink_ids | {user.auth_id}):
         yield beam.TaggedOutput(
             TAG_ERR, f'User(id={user.user_id}) is sharing a Firebase auth ID'
+        )
+    elif not user.auth_id and (
+        surviving_ids := user.backlink_ids - {_get_deterministic_auth_id(user)}
+    ):
+        # NOTE: These backlinks may belong to Firebase accounts that still sign
+        # in as the user. Only the deterministic ID is known to come from an
+        # earlier run of this job, so the others need manual reconciliation.
+        backlink_ids = ', '.join(sorted(surviving_ids))
+        yield beam.TaggedOutput(
+            TAG_ERR,
+            f'UserAuthDetailsModel(id={user.user_id}) has no firebase_auth_id, '
+            f'but UserIdByFirebaseAuthIdModel(id={backlink_ids}) points to it',
         )
     elif not user.auth_id or user.auth_id not in user.backlink_ids:
         auth_id = user.auth_id or _get_deterministic_auth_id(user)

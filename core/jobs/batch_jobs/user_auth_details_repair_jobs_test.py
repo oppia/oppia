@@ -396,21 +396,26 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
     def test_job_builds_its_pipeline(self) -> None:
         self.run_job()
 
-    def test_stray_reverse_model_is_deleted(self) -> None:
+    def test_reverse_model_of_user_without_auth_id_is_reported(self) -> None:
+        # NOTE: The Firebase account fb_x may still sign in as uid_a, so giving
+        # uid_a a generated ID instead would lock that account out.
         self.put_settings_model('uid_a')
         self.put_reverse_model('fb_x', 'uid_a')
 
         self.assert_job_output_is(
             [
                 stdout('OK 0'),
-                stdout('PUT SUCCESS: 2'),
-                stdout('DEL SUCCESS: 1'),
+                stderr(
+                    'ERR: UserAuthDetailsModel(id=uid_a) has no '
+                    'firebase_auth_id, but UserIdByFirebaseAuthIdModel(id=fb_x) '
+                    'points to it'
+                ),
             ]
         )
-        self.assert_repaired('uid_a', FB_A)
-        self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id('fb_x')
-        )
+        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id('uid_a'))
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertEqual(reverse_model_class.get('fb_x').user_id, 'uid_a')
+        self.assertIsNone(reverse_model_class.get_by_id(FB_A))
 
     def test_reverse_model_of_another_users_auth_id_is_reported(self) -> None:
         # NOTE: The Firebase account fb_b signs in as uid_a, so pointing
@@ -497,15 +502,11 @@ class AuditMissingUserAuthDetailsJobTests(RepairJobTestBase):
     def test_stray_reverse_model_is_reported_without_deleting_it(
         self,
     ) -> None:
-        self.put_settings_model('uid_a')
+        self.put_healthy_user('uid_a', 'fb_a')
         self.put_reverse_model('fb_x', 'uid_a')
 
         self.assert_job_output_is(
-            [
-                stdout('OK 0'),
-                stdout('WOULD PUT SUCCESS: 2'),
-                stdout('WOULD DEL SUCCESS: 1'),
-            ]
+            [stdout('OK 0'), stdout('WOULD DEL SUCCESS: 1')]
         )
         reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
         self.assertIsNotNone(reverse_model_class.get_by_id('fb_x'))
