@@ -51,9 +51,23 @@ class AndroidEvaluationContextTests(test_utils.GenericTestBase):
         )
         context.validate()
 
+    def test_validate_accepts_release_candidate_version(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext(
+            '0.19-rc03-alpha-9faec1d609', 'alpha'
+        )
+        context.validate()
+
     def test_validate_rejects_invalid_version(self) -> None:
         context = parameter_domain.AndroidEvaluationContext(
             '12.x-5f58b8fbeb-dev', 'beta'
+        )
+
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
+            context.validate()
+
+    def test_validate_rejects_release_candidate_without_number(self) -> None:
+        context = parameter_domain.AndroidEvaluationContext(
+            '0.19-rc-alpha-9faec1d609', 'alpha'
         )
 
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid Android'):
@@ -161,6 +175,14 @@ class AndroidPlatformParameterFilterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid Android app version expression'
         ):
             filter_domain.validate()
+
+    def test_validate_accepts_release_candidate_version_condition(
+        self,
+    ) -> None:
+        filter_domain = parameter_domain.AndroidPlatformParameterFilter(
+            'app_min_version', [['=', '0.19-rc03-alpha-9faec1d609']]
+        )
+        filter_domain.validate()
 
     def test_validate_rejects_invalid_flavour_condition(self) -> None:
         filter_domain = parameter_domain.AndroidPlatformParameterFilter(

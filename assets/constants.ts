@@ -6647,10 +6647,11 @@ export default {
   // e.g. "12.5".
   "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITHOUT_SUFFIX_REGEXP":
     "^(\\d+(?:\\.\\d+)+)$",
-  // Also allows an optional lowercase alphanumeric build label and suffix,
+  // Allows a release-candidate version followed by its flavor and build hash,
+  // e.g. "0.19-rc03-alpha-9faec1d609", as well as a build label and suffix,
   // e.g. "12.5-5f58b8fbeb-dev".
   "ANDROID_PLATFORM_PARAMETER_APP_VERSION_WITH_SUFFIX_REGEXP":
-    "^(\\d+(?:\\.\\d+)+)(?:-[a-z0-9]+)?(?:-(.+))?$",
+    "^(\\d+(?:\\.\\d+)+)(?:-rc\\d+-[a-z0-9]+-[a-z0-9]+|(?!-rc)(?:-[a-z0-9]+)?(?:-(.+))?)?$",
 
   // Maximum allowed commit message length. 375 characters because indexed
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
