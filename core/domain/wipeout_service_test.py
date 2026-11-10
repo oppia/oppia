@@ -27,7 +27,6 @@ from core.domain import (
     email_manager,
     exp_services,
     fs_services,
-    platform_parameter_list,
     question_domain,
     question_services,
     rights_domain,
@@ -44,6 +43,7 @@ from core.domain import (
     translation_domain,
     user_domain,
     user_services,
+    web_platform_parameter_list,
     wipeout_domain,
     wipeout_service,
 )
@@ -804,7 +804,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -858,7 +858,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -1368,7 +1368,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        param_model = config_models.PlatformParameterModel.create(
+        param_model = config_models.WebPlatformParameterConfigModel.create(
             param_name=self.CONFIG_1_ID,
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
@@ -1392,10 +1392,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID]
@@ -1458,10 +1456,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
 
         # Return metadata model to the original user ID.
-        metadata_model = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         metadata_model.committer_id = self.user_1_id
         metadata_model.update_timestamps()
@@ -1482,7 +1478,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
 
     def test_multiple_config_properties_are_pseudonymized(self) -> None:
-        param_model = config_models.PlatformParameterModel.create(
+        param_model = config_models.WebPlatformParameterConfigModel.create(
             param_name=self.CONFIG_2_ID,
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
@@ -1501,19 +1497,15 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings[self.CONFIG_1_ID]
         )
 
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(
             metadata_model_2.committer_id, config_mappings[self.CONFIG_2_ID]
@@ -1522,7 +1514,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_multiple_config_properties_with_multiple_users_are_pseudonymized(
         self,
     ) -> None:
-        param_model = config_models.PlatformParameterModel.create(
+        param_model = config_models.WebPlatformParameterConfigModel.create(
             param_name=self.CONFIG_2_ID,
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
@@ -1542,20 +1534,16 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings_1[self.CONFIG_1_ID]
         )
 
         # Verify second user is not yet deleted.
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(metadata_model_2.committer_id, self.user_2_id)
 
@@ -1567,10 +1555,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_2_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_3 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_2_ID
-            )
+        metadata_model_3 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_2_ID
         )
         self.assertEqual(
             metadata_model_3.committer_id, config_mappings_2[self.CONFIG_2_ID]
@@ -1579,7 +1565,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_one_config_property_with_multiple_users_is_pseudonymized(
         self,
     ) -> None:
-        param_model = config_models.PlatformParameterModel.get_by_id(
+        param_model = config_models.WebPlatformParameterConfigModel.get_by_id(
             self.CONFIG_1_ID
         )
         param_model.commit(
@@ -1594,20 +1580,16 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_1_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_1 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.CONFIG_1_ID
-            )
+        metadata_model_1 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings_1[self.CONFIG_1_ID]
         )
 
         # Verify second user is not yet deleted.
-        metadata_model_2 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-2' % self.CONFIG_1_ID
-            )
+        metadata_model_2 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-2' % self.CONFIG_1_ID
         )
         self.assertEqual(metadata_model_2.committer_id, self.user_2_id)
 
@@ -1619,10 +1601,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = user_models.PendingDeletionRequestModel.get_by_id(
             self.user_2_id
         ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
-        metadata_model_3 = (
-            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
-                '%s-2' % self.CONFIG_1_ID
-            )
+        metadata_model_3 = config_models.WebPlatformParameterConfigSnapshotMetadataModel.get_by_id(
+            '%s-2' % self.CONFIG_1_ID
         )
         self.assertEqual(
             metadata_model_3.committer_id, config_mappings_2[self.CONFIG_1_ID]
@@ -1641,7 +1621,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        param_model = config_models.PlatformParameterModel.create(
+        param_model = config_models.WebPlatformParameterConfigModel.create(
             param_name=self.CONFIG_2_ID,
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
@@ -1672,7 +1652,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-        param_model = config_models.PlatformParameterModel.create(
+        param_model = config_models.WebPlatformParameterConfigModel.create(
             param_name=self.CONFIG_2_ID,
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
@@ -6414,7 +6394,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -6444,7 +6424,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]
@@ -6536,17 +6516,20 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName'),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'senderName',
+            ),
+            (
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]
@@ -6573,7 +6556,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]

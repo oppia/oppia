@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import moderator_services, platform_parameter_list
+from core.domain import moderator_services, web_platform_parameter_list
 from core.tests import test_utils
 
 
@@ -54,18 +54,21 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, email_footer),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, email_footer),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'moderator',
+            ),
+            (
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
             (
-                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
         ]

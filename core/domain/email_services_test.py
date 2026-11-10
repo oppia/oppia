@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import textwrap
 
-from core.domain import email_services, platform_parameter_list
+from core.domain import email_services, web_platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 
@@ -36,10 +36,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
         ]
@@ -62,10 +62,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
         ]
@@ -89,8 +89,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_email_not_sent_if_email_addresses_are_malformed(self) -> None:
@@ -187,10 +187,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (web_platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (web_platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
         ]
@@ -226,11 +226,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
         ]

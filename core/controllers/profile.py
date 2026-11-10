@@ -28,13 +28,13 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
     feature_flag_services,
-    platform_parameter_list,
-    platform_parameter_services,
     role_services,
     subscription_services,
     summary_services,
     takeout_service,
     user_services,
+    web_platform_parameter_list,
+    web_platform_parameter_services,
     wipeout_service,
 )
 
@@ -164,10 +164,8 @@ class BulkEmailWebhookEndpoint(
     def post(self, unused_secret: str) -> None:
         """Handles POST requests."""
         assert self.normalized_request is not None
-        mailchimp_audience_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
+        mailchimp_audience_id = web_platform_parameter_services.get_web_platform_parameter_value(
+            web_platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
         )
         if self.normalized_request['data[list_id]'] != mailchimp_audience_id:
             self.render_json({})
@@ -720,8 +718,8 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
-                % platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                % web_platform_parameter_services.get_web_platform_parameter_value(
+                    web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
                 )
             )
             user_images = []

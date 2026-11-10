@@ -24,9 +24,10 @@ import uuid
 from types import SimpleNamespace
 
 from core import constants, feconf, schema_utils
-from core.domain import exp_domain, exp_fetchers, exp_services
-from core.domain import platform_parameter_list as param_list
 from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
     state_domain,
     story_domain,
     story_services,
@@ -41,6 +42,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
+from core.domain import web_platform_parameter_list as param_list
 from core.platform import models
 from core.tests import test_utils
 

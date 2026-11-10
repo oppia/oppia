@@ -32,9 +32,6 @@ from core.domain import (
     exp_services,
     fs_services,
     opportunity_services,
-    platform_parameter_domain,
-    platform_parameter_list,
-    platform_parameter_registry,
     question_fetchers,
     question_services,
     recommendations_services,
@@ -54,6 +51,9 @@ from core.domain import (
     translation_domain,
     user_services,
     voiceover_services,
+    web_platform_parameter_domain,
+    web_platform_parameter_list,
+    web_platform_parameter_registry,
     wipeout_service,
 )
 from core.platform import models
@@ -109,9 +109,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.admin_email_address = 'testadmin@example.com'
 
         self.original_parameter_registry = (
-            platform_parameter_registry.Registry.parameter_registry.copy()
+            web_platform_parameter_registry.Registry.parameter_registry.copy()
         )
-        platform_parameter_registry.Registry.parameter_registry.clear()
+        web_platform_parameter_registry.Registry.parameter_registry.clear()
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
             None,
@@ -126,7 +126,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        platform_parameter_registry.Registry.parameter_registry = (
+        web_platform_parameter_registry.Registry.parameter_registry = (
             self.original_parameter_registry
         )
 
@@ -136,15 +136,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def _create_dummy_param(
         self,
-    ) -> platform_parameter_domain.PlatformParameter:
+    ) -> web_platform_parameter_domain.PlatformParameter:
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
-        # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamName.
-        return platform_parameter_registry.Registry.create_platform_parameter(
+        # names for our tests and create_web_platform_parameter only accepts
+        # platform parameter name of type web_platform_parameter_list.ParamName.
+        return web_platform_parameter_registry.Registry.create_web_platform_parameter(
             ParamName.TEST_PARAMETER_1,  # type: ignore[arg-type]
             'Param for test.',
-            platform_parameter_domain.DataTypes.BOOL,
+            web_platform_parameter_domain.DataTypes.BOOL,
         )
 
     def test_cannot_reload_exploration_in_production_mode(self) -> None:
@@ -1694,7 +1694,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1704,7 +1704,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1713,7 +1713,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             response_dict['platform_params_dicts'], [param.to_dict()]
         )
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
+        web_platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name
+        )
         self.logout()
 
     def test_get_handler_includes_all_stories(self) -> None:
@@ -1754,7 +1756,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1774,7 +1776,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1792,19 +1794,21 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         rule_dicts = [
             rule.to_dict()
-            for rule in platform_parameter_registry.Registry.get_platform_parameter(
+            for rule in web_platform_parameter_registry.Registry.get_web_platform_parameter(
                 param.name
             ).rules
         ]
         self.assertEqual(rule_dicts, new_rule_dicts)
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
+        web_platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name
+        )
         self.logout()
 
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1815,7 +1819,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
+        web_platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -1827,7 +1831,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1852,13 +1856,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             rules = response_dict['platform_params_dicts'][0]['rules']
             self.assertEqual(rules, new_rule_dicts)
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
+        web_platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name
+        )
         self.logout()
 
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             )
         ]
@@ -1879,7 +1885,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_parameter_list,
+            web_platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
         ):
@@ -1907,7 +1913,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
+        web_platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -2061,7 +2067,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        platform_parameter_registry.Registry.parameter_registry[
+        web_platform_parameter_registry.Registry.parameter_registry[
             param.name
         ] = None  # type: ignore[assignment]
         response = self.post_json(
@@ -2081,7 +2087,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '\'NoneType\' object has no attribute \'serialize\'',
         )
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
+        web_platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name
+        )
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
@@ -4600,14 +4608,14 @@ class SendDummyMailTest(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                web_platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (web_platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
     )
     def test_can_send_dummy_mail(self) -> None:
