@@ -211,18 +211,16 @@ class RepairMissingUserAuthDetailsJobBase(base_jobs.JobBase):
             | 'Keep shared emails' >> beam.Filter(lambda kv: kv[1] > 1)
         )
 
-        # NOTE: A user holds their firebase_auth_id and the ID of every
-        # UserIdByFirebaseAuthIdModel pointing to them, since a Firebase account
-        # with any of those IDs signs in as them. Writing a backlink for an ID
-        # that two users hold would sign one in as the other. Deleted
-        # UserAuthDetailsModels are counted too, because they still hold their
-        # firebase_auth_id.
+        # NOTE: A user holds the ID of every UserIdByFirebaseAuthIdModel
+        # pointing to them, since a Firebase account with any of those IDs
+        # signs in as them. They also hold their firebase_auth_id, or else the
+        # ID this job would generate for them, since the job writes a backlink
+        # for it. Writing a backlink for an ID that two users hold would sign
+        # one in as the other. Deleted UserAuthDetailsModels are counted too,
+        # because they still hold their firebase_auth_id.
         shared_auth_ids = (
             grouped_user_models
-            | 'Get auth IDs'
-            >> beam.FlatMap(
-                lambda g: g.backlink_ids | ({g.auth_id} if g.auth_id else set())
-            )
+            | 'Get auth IDs' >> beam.FlatMap(_get_held_auth_ids)
             | 'Count auth IDs' >> beam.combiners.Count.PerElement()
             | 'Keep shared auth IDs' >> beam.Filter(lambda kv: kv[1] > 1)
         )
@@ -357,8 +355,9 @@ def _diagnose_user_models(
         user: GroupedUserModels. The fields of the user's models.
         shared_emails: Mapping(str, int). The number of users with each
             lowercased email, for emails that more than one user has.
-        shared_auth_ids: Mapping(str, int). The number of users with each
-            firebase_auth_id, for IDs that more than one user has.
+        shared_auth_ids: Mapping(str, int). The number of users holding each
+            Firebase auth ID (see _get_held_auth_ids), for IDs that more than
+            one user holds.
 
     Yields:
         TaggedOutput. TAG_OK with 1, TAG_ERR with an error messages, TAG_DEL
@@ -381,7 +380,7 @@ def _diagnose_user_models(
             TAG_ERR,
             f'UserSettingsModel(id={user.user_id}) is sharing an email',
         )
-    elif any(i in shared_auth_ids for i in user.backlink_ids | {user.auth_id}):
+    elif any(i in shared_auth_ids for i in _get_held_auth_ids(user)):
         yield beam.TaggedOutput(
             TAG_ERR, f'User(id={user.user_id}) is sharing a Firebase auth ID'
         )
@@ -409,6 +408,20 @@ def _diagnose_user_models(
             yield beam.TaggedOutput(TAG_DEL, _build_backlink_key(backlink_id))
         if not any_dels:
             yield beam.TaggedOutput(TAG_OK, 1)
+
+
+def _get_held_auth_ids(user: GroupedUserModels) -> frozenset[str]:
+    """Returns the Firebase auth IDs that would sign in as the user.
+
+    Args:
+        user: GroupedUserModels. The fields of the user's models.
+
+    Returns:
+        frozenset(str). The IDs of the user's UserIdByFirebaseAuthIdModels,
+        plus their firebase_auth_id or, if they have none, the ID that this job
+        would generate for them.
+    """
+    return user.backlink_ids | {_get_deterministic_auth_id(user)}
 
 
 def _build_backlink_key(backlink_id: str) -> datastore_services.Key:
