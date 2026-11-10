@@ -229,6 +229,23 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is([stdout('OK 0'), stdout('PUT SUCCESS: 1')])
         self.assert_repaired('uid_a', FB_A)
 
+    def test_stray_reverse_model_is_replaced_by_missing_one(self) -> None:
+        self.put_auth_model('uid_a', FB_A)
+        self.put_settings_model('uid_a')
+        self.put_reverse_model('fb_x', 'uid_a')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK 0'),
+                stdout('PUT SUCCESS: 1'),
+                stdout('DEL SUCCESS: 1'),
+            ]
+        )
+        self.assert_repaired('uid_a', FB_A)
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_id('fb_x')
+        )
+
     def test_missing_settings_model_is_reported(self) -> None:
         self.put_auth_model('uid_a', 'fb_a')
         self.put_reverse_model('fb_a', 'uid_a')
