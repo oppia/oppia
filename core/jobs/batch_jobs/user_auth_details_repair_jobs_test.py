@@ -293,6 +293,38 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is([stdout('OK 0'), stdout('PUT SUCCESS: 2')])
         self.assert_repaired('uid_a', FB_A)
 
+    def test_user_with_deleted_auth_model_is_reported_unchanged(self) -> None:
+        # NOTE: The deleted auth model is a tombstone, which a repair must not
+        # overwrite with a live model.
+        self.put_auth_model('uid_a', 'fb_a', deleted=True)
+        self.put_settings_model('uid_a')
+        self.put_reverse_model('fb_x', 'uid_a')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK 0'),
+                stderr(
+                    'ERR: UserAuthDetailsModel(id=uid_a) is marked as deleted'
+                ),
+            ]
+        )
+        auth_model = auth_models.UserAuthDetailsModel.get_by_id('uid_a')
+        self.assertTrue(auth_model.deleted)
+        self.assertEqual(auth_model.firebase_auth_id, 'fb_a')
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertIsNone(reverse_model_class.get_by_id('fb_a'))
+        self.assertIsNone(reverse_model_class.get_by_id(FB_A))
+        self.assertIsNotNone(reverse_model_class.get_by_id('fb_x'))
+
+    def test_deleted_profile_is_skipped(self) -> None:
+        self.put_auth_model('uid_p', parent_user_id='uid_a', deleted=True)
+        self.put_settings_model('uid_p')
+
+        self.assert_job_output_is([stdout('OK 0')])
+        auth_model = auth_models.UserAuthDetailsModel.get_by_id('uid_p')
+        self.assertTrue(auth_model.deleted)
+        self.assertEqual(auth_model.parent_user_id, 'uid_a')
+
     def test_healthy_users_sharing_email_are_reported(self) -> None:
         # NOTE: Shared emails block FirebaseServerSyncJob, so they're reported
         # even when the users need no fix.
