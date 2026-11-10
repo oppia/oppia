@@ -41,6 +41,7 @@ class FeatureNames(enum.Enum):
         'serial_chapter_launch_curriculum_admin_view'
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
@@ -184,6 +185,8 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -205,6 +208,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
+        (
+            'This flag is to show redesigned learner dashboard.',
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
