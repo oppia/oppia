@@ -45,14 +45,21 @@ FB_B = 'gCwxWz2BUfDbQ9W7u9wRTTwiSWkc'
 T = TypeVar('T')
 
 
-class OnlyIterable(Generic[T]):
-    """Wraps a list so that only iterating over it works."""
+class OnceIterable(Generic[T]):
+    """Wraps a list so that it can be iterated over exactly once.
+
+    NOTE: A second iteration raises instead of yielding nothing, so that code
+    which reads the values twice fails loudly instead of seeing no values.
+    """
 
     def __init__(self, items: List[T]) -> None:
-        self._items = items
+        self._items: abc.Iterator[T] | None = iter(items)
 
     def __iter__(self) -> abc.Iterator[T]:
-        return iter(self._items)
+        if self._items is None:
+            raise RuntimeError('OnceIterable can only be iterated over once')
+        items, self._items = self._items, None
+        return items
 
 
 # Here we use MyPy ignore because beam does not provide API types.
@@ -65,7 +72,7 @@ class IterableCoGroupByKey(beam.CoGroupByKey):  # type: ignore[misc]
 
     def expand(
         self, pcolls: Dict[str, beam.PCollection[Tuple[str, T]]]
-    ) -> beam.PCollection[Tuple[str, Dict[str, OnlyIterable[T]]]]:
+    ) -> beam.PCollection[Tuple[str, Dict[str, OnceIterable[T]]]]:
         """Groups the values of each key by tag, like CoGroupByKey.
 
         Args:
@@ -78,7 +85,7 @@ class IterableCoGroupByKey(beam.CoGroupByKey):  # type: ignore[misc]
             lambda key, values_by_tag: (
                 key,
                 {
-                    tag: OnlyIterable(list(values))
+                    tag: OnceIterable(list(values))
                     for tag, values in values_by_tag.items()
                 },
             )
