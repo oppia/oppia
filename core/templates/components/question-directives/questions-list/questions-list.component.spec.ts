@@ -570,7 +570,7 @@ describe('Questions List Component', () => {
   it(
     'should not save and publish question if there are' + ' validation errors',
     () => {
-      component.question = question as Question;
+      component.question = question;
       spyOn(alertsService, 'addWarning');
       spyOn(
         questionValidationService,
@@ -591,7 +591,7 @@ describe('Questions List Component', () => {
     'should show an error and not save question if there are' +
       ' errors from question backend api service',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = false;
       spyOn(
         editableQuestionBackendApiService,
@@ -615,7 +615,7 @@ describe('Questions List Component', () => {
       ' error on saving and publishing a question when question is not already' +
       ' being updated',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = false;
       component.skillLinkageModificationsArray = [
         {
@@ -682,7 +682,7 @@ describe('Questions List Component', () => {
   );
 
   it('should save question when another question is being updated', fakeAsync(() => {
-    component.question = question as Question;
+    component.question = question;
     component.questionIsBeingUpdated = true;
 
     spyOn(
@@ -716,7 +716,7 @@ describe('Questions List Component', () => {
     'should show error if saving question fails when another question' +
       ' is being updated',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -753,7 +753,7 @@ describe('Questions List Component', () => {
     'should display warning if commit message is not given while saving' +
       ' a question',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -1160,7 +1160,7 @@ describe('Questions List Component', () => {
     // The question is not set until one is created or opened for editing.
     expect(component.showSolutionCheckpoint()).toBe(false);
 
-    component.question = question as Question;
+    component.question = question;
     spyOn(component.question, 'getStateData').and.returnValue({
       interaction: {
         id: 'TextInput',
