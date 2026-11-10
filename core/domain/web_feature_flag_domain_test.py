@@ -1,0 +1,352 @@
+# coding: utf-8
+#
+# Copyright 2023 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for the domain objects relating to web feature flags."""
+
+from __future__ import annotations
+
+from core import feconf, utils
+from core.constants import constants
+from core.domain import web_feature_flag_domain
+from core.tests import test_utils
+
+
+class WebFeatureFlagSpecTests(test_utils.GenericTestBase):
+    """Tests for WebFeatureFlagSpec."""
+
+    def test_create_from_dict_returns_correct_instance(self) -> None:
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+            {
+                'description': 'for test',
+                'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
+            }
+        )
+        self.assertIsInstance(
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+        )
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
+        self.assertEqual(
+            web_feature_flag_spec.feature_stage,
+            web_feature_flag_domain.FeatureStages.DEV,
+        )
+
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+            {
+                'description': 'for test',
+                'feature_stage': web_feature_flag_domain.FeatureStages.TEST.value,
+            }
+        )
+        self.assertIsInstance(
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+        )
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
+        self.assertEqual(
+            web_feature_flag_spec.feature_stage,
+            web_feature_flag_domain.FeatureStages.TEST,
+        )
+
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+            {
+                'description': 'for test',
+                'feature_stage': web_feature_flag_domain.FeatureStages.PROD.value,
+            }
+        )
+        self.assertIsInstance(
+            web_feature_flag_spec, web_feature_flag_domain.WebFeatureFlagSpec
+        )
+        self.assertEqual(web_feature_flag_spec.description, 'for test')
+        self.assertEqual(
+            web_feature_flag_spec.feature_stage,
+            web_feature_flag_domain.FeatureStages.PROD,
+        )
+
+    def test_from_dict_raises_error_when_invalid_feature_stage(self) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid feature stage, should be one of ServerMode.DEV, '
+            'ServerMode.TEST or ServerMode.PROD.',
+        ):
+            web_feature_flag_domain.WebFeatureFlagSpec.from_dict(
+                {'description': 'for test', 'feature_stage': 'invalid'}
+            )
+
+    def test_to_dict_returns_correct_dict(self) -> None:
+        web_feature_flag_spec_dict: (
+            web_feature_flag_domain.WebFeatureFlagSpecDict
+        ) = {
+            'description': 'for test',
+            'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
+        }
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+            'for test', web_feature_flag_domain.FeatureStages.DEV
+        )
+        self.assertDictEqual(
+            web_feature_flag_spec.to_dict(), web_feature_flag_spec_dict
+        )
+
+
+class WebFeatureFlagConfigTests(test_utils.GenericTestBase):
+    """Tests for WebFeatureFlagConfig."""
+
+    def test_create_from_dict_returns_correct_instance(self) -> None:
+        current_time = utils.get_current_utc_datetime()
+        web_feature_flag_config = (
+            web_feature_flag_domain.WebFeatureFlagConfig.from_dict(
+                {
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 0,
+                    'user_group_ids': [],
+                    'last_updated': utils.convert_naive_datetime_to_string(
+                        current_time
+                    ),
+                }
+            )
+        )
+
+        self.assertIsInstance(
+            web_feature_flag_config,
+            web_feature_flag_domain.WebFeatureFlagConfig,
+        )
+        self.assertFalse(web_feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(web_feature_flag_config.rollout_percentage, 0)
+        self.assertEqual(web_feature_flag_config.user_group_ids, [])
+        self.assertEqual(web_feature_flag_config.last_updated, current_time)
+
+    def test_to_dict_returns_correct_dict(self) -> None:
+        current_time = utils.get_current_utc_datetime()
+        web_feature_flag_config_dict: (
+            web_feature_flag_domain.WebFeatureFlagConfigDict
+        ) = {
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 0,
+            'user_group_ids': [],
+            'last_updated': utils.convert_naive_datetime_to_string(
+                current_time
+            ),
+        }
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], current_time
+        )
+        self.assertDictEqual(
+            web_feature_flag_config.to_dict(), web_feature_flag_config_dict
+        )
+
+    def test_set_object_values_correctly(self) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        current_time = utils.get_current_utc_datetime()
+        web_feature_flag_config.set_force_enable_for_all_users(True)
+        web_feature_flag_config.set_rollout_percentage(50)
+        web_feature_flag_config.set_user_group_ids(
+            ['user_group_1', 'user_group_2']
+        )
+        web_feature_flag_config.set_last_updated(current_time)
+
+        self.assertTrue(web_feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(web_feature_flag_config.rollout_percentage, 50)
+        self.assertEqual(
+            web_feature_flag_config.user_group_ids,
+            ['user_group_1', 'user_group_2'],
+        )
+        self.assertEqual(web_feature_flag_config.last_updated, current_time)
+
+    def test_validate_web_feature_flag_config_passes_without_exception(
+        self,
+    ) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        web_feature_flag_config.validate(web_feature_flag_domain.ServerMode.DEV)
+
+    def test_validate_feature_flag_with_percentage_less_than_0_raises_exception(
+        self,
+    ) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, -1, [], utils.get_current_utc_datetime()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.',
+        ):
+            web_feature_flag_config.validate(
+                web_feature_flag_domain.ServerMode.DEV
+            )
+
+    def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
+        self,
+    ) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 101, [], utils.get_current_utc_datetime()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.',
+        ):
+            web_feature_flag_config.validate(
+                web_feature_flag_domain.ServerMode.DEV
+            )
+
+    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature flag in dev stage cannot be updated in test '
+                    'environment.',
+                ):
+                    web_feature_flag_config.validate(
+                        web_feature_flag_domain.ServerMode.DEV
+                    )
+
+    def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature flag in dev stage cannot be updated in prod '
+                    'environment.',
+                ):
+                    web_feature_flag_config.validate(
+                        web_feature_flag_domain.ServerMode.DEV
+                    )
+
+    def test_validate_test_feature_for_prod_env_raises_exception(self) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature flag in test stage cannot be updated in prod '
+                    'environment.',
+                ):
+                    web_feature_flag_config.validate(
+                        web_feature_flag_domain.ServerMode.TEST
+                    )
+
+
+class WebFeatureFlagTests(test_utils.GenericTestBase):
+    """Tests for WebFeatureFlag."""
+
+    def test_create_from_dict_returns_correct_instance(self) -> None:
+        current_time = utils.get_current_utc_datetime()
+        feature_flag = web_feature_flag_domain.FeatureFlag.from_dict(
+            {
+                'name': 'feature_a',
+                'description': 'for test',
+                'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+                'last_updated': utils.convert_naive_datetime_to_string(
+                    current_time
+                ),
+            }
+        )
+
+        self.assertIsInstance(feature_flag, web_feature_flag_domain.FeatureFlag)
+        self.assertEqual(feature_flag.name, 'feature_a')
+        self.assertEqual(
+            feature_flag.web_feature_flag_spec.description, 'for test'
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_spec.feature_stage,
+            web_feature_flag_domain.FeatureStages.DEV,
+        )
+        self.assertFalse(
+            feature_flag.web_feature_flag_config.force_enable_for_all_users
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.rollout_percentage, 0
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.user_group_ids, []
+        )
+        self.assertEqual(
+            feature_flag.web_feature_flag_config.last_updated, current_time
+        )
+
+    def test_to_dict_returns_correct_dict(self) -> None:
+        current_time = utils.get_current_utc_datetime()
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], current_time
+        )
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+            'for test', web_feature_flag_domain.FeatureStages.DEV
+        )
+        feature_flag_dict: web_feature_flag_domain.WebFeatureFlagDict = {
+            'name': 'feature_a',
+            'description': 'for test',
+            'feature_stage': web_feature_flag_domain.FeatureStages.DEV.value,
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 0,
+            'user_group_ids': [],
+            'last_updated': utils.convert_naive_datetime_to_string(
+                current_time
+            ),
+        }
+        feature_flag = web_feature_flag_domain.FeatureFlag(
+            'feature_a', web_feature_flag_spec, web_feature_flag_config
+        )
+        feature_flag.validate()
+        self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
+
+    def test_validate_feature_flag_with_invalid_name_raises_exception(
+        self,
+    ) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 0, [], utils.get_current_utc_datetime()
+        )
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+            'for test', web_feature_flag_domain.FeatureStages.DEV
+        )
+        feature_flag = web_feature_flag_domain.FeatureFlag(
+            'Invalid~Name', web_feature_flag_spec, web_feature_flag_config
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid feature flag name \'%s\'' % feature_flag.name,
+        ):
+            feature_flag.validate()
+
+    def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
+        self,
+    ) -> None:
+        web_feature_flag_config = web_feature_flag_domain.WebFeatureFlagConfig(
+            False, 101, [], utils.get_current_utc_datetime()
+        )
+        web_feature_flag_spec = web_feature_flag_domain.WebFeatureFlagSpec(
+            'Feature Description', web_feature_flag_domain.ServerMode.DEV
+        )
+        feature_flag = web_feature_flag_domain.FeatureFlag(
+            'Feature', web_feature_flag_spec, web_feature_flag_config
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.',
+        ):
+            feature_flag.validate()

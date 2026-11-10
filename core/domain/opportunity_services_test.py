@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import unittest.mock
 
-from core import feature_flag_list, feconf
+from core import feconf, web_feature_flag_list
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -951,7 +951,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 0)
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+        [
+            web_feature_flag_list.WebFeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS
+        ]
     )
     def test_publish_story_creates_exploration_opportunity(self) -> None:
         self.add_exploration_0_to_story()
@@ -1855,7 +1857,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_create_and_delete_translation_opportunities(self) -> None:
@@ -1928,7 +1930,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_create_translation_opportunity_with_topic_ids(self) -> None:
@@ -1948,7 +1950,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_regenerate_opportunities_related_to_topic_with_new_models(
@@ -1968,7 +1970,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunities_with_nonexistent_topic_name_returns_empty(
@@ -1983,7 +1985,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_update_translation_opportunity_with_accepted_suggestion(
@@ -2022,7 +2024,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_compute_translation_opportunity_models_with_updated_entity(
@@ -2044,7 +2046,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_compute_translation_opportunity_models_with_missing_topic_id_raises_value_error(
@@ -2123,7 +2125,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_compute_translation_opp_models_creates_model_when_not_exists(
@@ -2137,7 +2139,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_save_multi_translation_opportunities_updates_changed_model(
@@ -2171,7 +2173,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_update_translation_opp_returns_when_model_is_none(self) -> None:
@@ -2183,7 +2185,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_update_translation_opp_removes_entity_language_from_incomplete(
@@ -2247,7 +2249,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunities_with_valid_topic_name_filter(
@@ -2271,7 +2273,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunities_with_translations_in_review(
@@ -2318,7 +2320,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunity_cards_by_entity_ids_with_new_models_empty_entity_ids(
@@ -2331,7 +2333,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunity_cards_by_entity_ids_with_new_models_nonexistent(
@@ -2344,7 +2346,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunity_cards_by_entity_ids_with_new_models_valid(
@@ -2401,7 +2403,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunity_cards_by_entity_ids_with_new_models_unmatched_and_missing_branches(
@@ -2488,7 +2490,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunity_cards_by_entity_ids_with_new_models_missing_story_node(
@@ -2655,7 +2657,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_remove_topic_from_translation_opportunities_updates_multi_topics(
@@ -2679,7 +2681,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_remove_topic_from_translation_opportunities_retains_model_when_empty(
@@ -2770,7 +2772,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags(
         [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+            web_feature_flag_list.WebFeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
     def test_get_translation_opportunities_count_with_new_models(self) -> None:

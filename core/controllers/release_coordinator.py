@@ -20,15 +20,14 @@ import logging
 
 from core import feconf, utils
 from core.controllers import acl_decorators, base
-from core.domain import caching_services, feature_flag_domain
-from core.domain import feature_flag_services as feature_services
-from core.domain import user_services
+from core.domain import caching_services, user_services, web_feature_flag_domain
+from core.domain import web_feature_flag_services as feature_services
 
 from typing import Dict, List, TypedDict
 
 
-class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Handler for memory cache profile."""
+class WebMemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler for the web memory cache profile."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -129,8 +128,8 @@ class UserGroupHandler(
         self.render_json(self.values)
 
 
-class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of FeatureFlag's normalized_payload
+class WebFeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of WebFeatureFlagsHandler's normalized_payload
     dictionary.
     """
 
@@ -141,10 +140,12 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     user_group_ids: List[str]
 
 
-class FeatureFlagsHandler(
-    base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
+class WebFeatureFlagsHandler(
+    base.BaseHandler[
+        WebFeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
 ):
-    """Handler for feature-flags."""
+    """Handler for web feature-flags."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -154,7 +155,7 @@ class FeatureFlagsHandler(
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': ['update_feature_flag'],
+                    'choices': ['update_web_feature_flag'],
                 },
                 'default_value': None,
             },
@@ -186,7 +187,7 @@ class FeatureFlagsHandler(
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
-        feature_flags = feature_services.get_all_feature_flags()
+        feature_flags = feature_services.get_all_web_feature_flags()
         feature_flags_dict = []
         for feature_flag in feature_flags:
             feature_flags_dict.append(feature_flag.to_dict())
@@ -197,7 +198,7 @@ class FeatureFlagsHandler(
         self.render_json(
             {
                 'feature_flags': feature_flags_dict,
-                'server_stage': feature_flag_domain.get_server_mode().value,
+                'server_stage': web_feature_flag_domain.get_server_mode().value,
                 'user_group_dicts': user_group_dicts,
             }
         )
@@ -211,14 +212,14 @@ class FeatureFlagsHandler(
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the
             # schema, a Bad Request error will be thrown. Hence, 'action'
-            # must be 'update_feature_flag' if this branch is
+            # must be 'update_web_feature_flag' if this branch is
             # executed.
-            assert action == 'update_feature_flag'
+            assert action == 'update_web_feature_flag'
             feature_flag_name = self.normalized_payload.get('feature_flag_name')
             if feature_flag_name is None:
                 raise Exception(
                     'The \'feature_flag_name\' must be provided when the action'
-                    ' is update_feature_flag.'
+                    ' is update_web_feature_flag.'
                 )
 
             force_enable_for_all_users = self.normalized_payload.get(
@@ -238,7 +239,7 @@ class FeatureFlagsHandler(
             # type checking.
             assert user_group_ids is not None
             try:
-                feature_services.update_feature_flag(
+                feature_services.update_web_feature_flag(
                     feature_flag_name,
                     force_enable_for_all_users,
                     rollout_percentage,
@@ -246,7 +247,7 @@ class FeatureFlagsHandler(
                 )
             except (
                 utils.ValidationError,
-                feature_services.FeatureFlagNotFoundException,
+                feature_services.WebFeatureFlagNotFoundException,
             ) as e:
                 raise self.InvalidInputException(e)
 
