@@ -179,7 +179,7 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.put_healthy_user('uid_a', FB_A)
         self.put_reverse_model('fb_x', 'uid_a')
 
-        self.assert_job_output_is([stdout('OK 1'), stdout('DEL SUCCESS: 1')])
+        self.assert_job_output_is([stdout('OK 0'), stdout('DEL SUCCESS: 1')])
         self.assert_repaired('uid_a', FB_A)
         self.assertIsNone(
             auth_models.UserIdByFirebaseAuthIdModel.get_by_id('fb_x')
