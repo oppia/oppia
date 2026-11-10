@@ -320,7 +320,12 @@ export class ExplorationEditor extends BaseUser {
     // Math Formula.
     await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
-    await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    if (textareaElement) {
+      await this.typeInInputField(textareaElement, 'x^2 + y^2 = z^2');
+    }
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
@@ -328,7 +333,10 @@ export class ExplorationEditor extends BaseUser {
     // Concept Card.
     await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
-    await this.typeInInputField(skillNameInput, 'Math');
+    const skillSearchElement = await this.page.$(skillNameInput);
+    if (skillSearchElement) {
+      await this.typeInInputField(skillSearchElement, 'Math');
+    }
     await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
@@ -352,20 +360,24 @@ export class ExplorationEditor extends BaseUser {
    * a story in both desktop and mobile acceptance runs.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
+    // Click on RTE.
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
 
     const rteEditor = new RTEEditor(this);
+    // Add Bold text.
     await rteEditor.clickOnRTEOptionWithTitle('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
     await rteEditor.clickOnRTEOptionWithTitle('Bold');
 
+    // Add Italic text.
     await rteEditor.clickOnRTEOptionWithTitle('Italic');
     await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
     await rteEditor.clickOnRTEOptionWithTitle('Italic');
 
+    // Add Numbered List.
     await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
@@ -373,6 +385,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
+    // Add Bulleted List.
     await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
@@ -380,16 +393,19 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
+    // Add Pre formatted Text.
     await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.typeInInputField(stateContentInputField, 'Pre formatted text');
     await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
+    // Add Block Quote.
     await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
     await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
     await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
 
+    // Add Image.
     await rteEditor.addImageRTE(
       testConstants.data.profilePicture,
       'Test Image',
@@ -398,6 +414,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
+    // Math Formula.
     await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
     await this.typeInInputField(mathExpressionInput, 'x^2 + y^2 = z^2');
@@ -405,6 +422,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
     await this.page.keyboard.press('Enter');
 
+    // Concept Card.
     await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
     await this.typeInInputField(skillNameInput, 'Math');
@@ -414,6 +432,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
     await this.page.keyboard.press('Enter');
 
+    // Save content.
     await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(saveContentButton, false);
   }

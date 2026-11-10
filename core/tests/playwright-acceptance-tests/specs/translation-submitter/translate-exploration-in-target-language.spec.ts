@@ -63,6 +63,7 @@ test.describe('Translation Submitter', function () {
     // minutes on a cold development server.
     test.setTimeout(2_100_000);
 
+    // Create users.
     translationSubmitter = await UserFactory.createNewUser(
       'translator',
       'translator@example.com',
@@ -136,6 +137,7 @@ test.describe('Translation Submitter', function () {
   });
 
   test('should be able to navigate to contribution page', async function () {
+    // Navigate to the contributor dashboard.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     // Username is only visible in desktop view.
     if (!translationSubmitter.isViewportAtMobileWidth()) {
@@ -143,6 +145,7 @@ test.describe('Translation Submitter', function () {
     }
     await translationSubmitter.expectScreenshotToMatch('contributorDashboard');
 
+    // Switch to the translation tab.
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
@@ -155,15 +158,18 @@ test.describe('Translation Submitter', function () {
       'translationTabInContributionDashboard'
     );
 
+    // Should be able to show correct featured languages.
     await translationSubmitter.clickOnLanguageFilterDropdown();
     await translationSubmitter.expectFeaturedLanguagesToContain([
       ...FEATURED_LANGUAGES,
     ]);
+    // Verify featured language tooltip.
     await translationSubmitter.mouseOverFeaturedLanguageTooltip(
       0,
       'For learners in Brazil, Angola and Mozambique.'
     );
 
+    // Change the translation language to hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.expectTranslationOpportunitiesToBePresent();
     await translationSubmitter.expectOpportunityToBePresent(
@@ -171,11 +177,13 @@ test.describe('Translation Submitter', function () {
       'Fractions - The Picnic Problem'
     );
 
+    // Check if pagination works properly.
     await translationSubmitter.expectPaginationButtonToBeVisible('next');
     await translationSubmitter.expectPaginationButtonToBeVisible(
       'previous',
       false
     );
+    // Navigate to the next page.
     await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
       'next'
     );
@@ -187,6 +195,7 @@ test.describe('Translation Submitter', function () {
       false
     );
 
+    // Change the subject.
     await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
       'previous'
     );
@@ -204,6 +213,7 @@ test.describe('Translation Submitter', function () {
       'Fractions - The Picnic Problem'
     );
 
+    // Bold Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.BOLD
     );
@@ -212,6 +222,7 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.BOLD
     );
 
+    // Italic Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.ITALIC
     );
@@ -220,6 +231,7 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.ITALIC
     );
 
+    // Numbered List, Increase Indent, and Decrease Indent.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.NUMBERED_LIST
     );
@@ -236,6 +248,7 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.NUMBERED_LIST
     );
 
+    // Bulleted List.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.BULLETED_LIST
     );
@@ -244,10 +257,13 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.BULLETED_LIST
     );
 
+    // Pre formatted Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.PRE
     );
     await translationSubmitter.typeTextForRTE('Pre स्वरूपित पाठ');
+
+    // Block Quote.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       HINDI_RTE_BUTTON_TITLES.BLOCK_QUOTE
     );
@@ -256,14 +272,17 @@ test.describe('Translation Submitter', function () {
       HINDI_RTE_BUTTON_TITLES.BLOCK_QUOTE
     );
 
+    // Image.
     await translationSubmitter.addImageToTranslation(
       testConstants.data.profilePicture,
       'छवि विवरण',
       'तस्वीर का शीर्षक'
     );
 
+    // Math Formula.
     await translationSubmitter.addMathFormulaToTranslation('\\frac{x}{y}');
 
+    // Concept Card.
     await translationSubmitter.addConceptCardToTranslation(
       'संक्षिप्त होने वाला ब्लॉक खोल लिया है।',
       'Math'
@@ -271,6 +290,7 @@ test.describe('Translation Submitter', function () {
   });
 
   test('should be able to use copy tool', async function () {
+    // Check if anchor text for copy tool works properly.
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
     );
@@ -305,6 +325,7 @@ test.describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
+    // Check for awaiting review.
     await translationSubmitter.expectContributionStatusToBe(
       'बोल्ड टेक्स्ट इटैलिक टेक्स्...',
       'Fractions / The Picnic',
