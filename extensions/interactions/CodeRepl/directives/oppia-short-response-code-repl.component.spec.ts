@@ -19,12 +19,14 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ShortResponseCodeRepl} from './oppia-short-response-code-repl.component';
 import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 
 describe('ShortResponseCodeRepl', () => {
   let component: ShortResponseCodeRepl;
   let fixture: ComponentFixture<ShortResponseCodeRepl>;
+  let focusManagerService: FocusManagerService;
 
   class mockHtmlEscaperService {
     escapedJsonToObj(answer: string): Object {
@@ -46,6 +48,7 @@ describe('ShortResponseCodeRepl', () => {
   }));
 
   beforeEach(() => {
+    focusManagerService = TestBed.inject(FocusManagerService);
     fixture = TestBed.createComponent(ShortResponseCodeRepl);
     component = fixture.componentInstance;
   });
@@ -73,5 +76,24 @@ describe('ShortResponseCodeRepl', () => {
       evaluation: '',
       output: 'hello\n',
     } as string);
+  });
+
+  it('should set focus on the error message when compilation fails', () => {
+    component.answer =
+      '{' +
+      '  "code": "# Type your code here.\\nprint(\'hello\')",' +
+      '  "error": "SyntaxError: bad token on line 2",' +
+      '  "evaluation": "",' +
+      '  "output": ""' +
+      '}';
+    spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
+      'focusLabel'
+    );
+    spyOn(focusManagerService, 'setFocus');
+
+    component.ngOnInit();
+
+    expect(component.errorFocusLabel).toBe('focusLabel');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith('focusLabel');
   });
 });

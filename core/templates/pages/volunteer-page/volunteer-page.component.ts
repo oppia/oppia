@@ -29,6 +29,15 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
+// VOLUNTEER_PREFERRED_SKILLS is declared with `as const` in AppConstants, so
+// its arrays are inferred as fixed-length tuples and the template's `length`
+// checks would be flagged as always-false. Widening the fields to (readonly)
+// array types preserves the runtime values while widening `length` to `number`.
+interface VolunteerSkillGroup {
+  title: string;
+  skills: readonly string[];
+}
+
 @Component({
   selector: 'volunteer-page',
   templateUrl: './volunteer-page.component.html',
@@ -76,13 +85,15 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
   volunteerExpectations = AppConstants.VOLUNTEER_EXPECTATIONS;
 
-  outreachSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.OUTREACH;
+  outreachSkills: readonly VolunteerSkillGroup[] =
+    AppConstants.VOLUNTEER_PREFERRED_SKILLS.OUTREACH;
 
   softwareSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.SOFTWARE;
 
   artAndDesignSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.ART_AND_DESIGN;
 
-  translationSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.TRANSLATION;
+  translationSkills: readonly VolunteerSkillGroup[] =
+    AppConstants.VOLUNTEER_PREFERRED_SKILLS.TRANSLATION;
 
   lessonCreationSkills =
     AppConstants.VOLUNTEER_PREFERRED_SKILLS.LESSON_CREATION;
