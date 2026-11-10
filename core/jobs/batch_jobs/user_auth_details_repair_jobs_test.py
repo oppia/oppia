@@ -293,6 +293,43 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assert_job_output_is([stdout('OK 0'), stdout('PUT SUCCESS: 2')])
         self.assert_repaired('uid_a', FB_A)
 
+    def test_users_sharing_auth_id_are_reported(self) -> None:
+        # NOTE: Both users need UserIdByFirebaseAuthIdModel(id=fb_x), so
+        # repairing uid_b would take it away from uid_a.
+        self.put_healthy_user('uid_a', 'fb_x')
+        self.put_auth_model('uid_b', 'fb_x')
+        self.put_settings_model('uid_b')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK 0'),
+                stderr('ERR: User(id=uid_a) is sharing a Firebase auth ID'),
+                stderr('ERR: User(id=uid_b) is sharing a Firebase auth ID'),
+            ]
+        )
+        reverse_model = auth_models.UserIdByFirebaseAuthIdModel.get('fb_x')
+        self.assertEqual(reverse_model.user_id, 'uid_a')
+
+    def test_auth_id_shared_with_deleted_auth_model_is_reported(self) -> None:
+        # NOTE: The deleted model still holds the ID, so it isn't safe to give
+        # it to another user.
+        self.put_auth_model('uid_d', 'fb_x', deleted=True)
+        self.put_settings_model('uid_d')
+        self.put_auth_model('uid_a', 'fb_x')
+        self.put_settings_model('uid_a')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK 0'),
+                stderr(
+                    'ERR: UserAuthDetailsModel(id=uid_d) is marked as deleted'
+                ),
+                stderr('ERR: User(id=uid_a) is sharing a Firebase auth ID'),
+            ]
+        )
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertIsNone(reverse_model_class.get_by_id('fb_x'))
+
     def test_user_with_deleted_auth_model_is_reported_unchanged(self) -> None:
         # NOTE: The deleted auth model is a tombstone, which a repair must not
         # overwrite with a live model.
@@ -374,6 +411,25 @@ class RepairMissingUserAuthDetailsJobTests(RepairJobTestBase):
         self.assertIsNone(
             auth_models.UserIdByFirebaseAuthIdModel.get_by_id('fb_x')
         )
+
+    def test_reverse_model_of_another_users_auth_id_is_reported(self) -> None:
+        # NOTE: The Firebase account fb_b signs in as uid_a, so pointing
+        # UserIdByFirebaseAuthIdModel(id=fb_b) to uid_b would sign that account
+        # in as uid_b instead.
+        self.put_healthy_user('uid_a', 'fb_a')
+        self.put_reverse_model('fb_b', 'uid_a')
+        self.put_auth_model('uid_b', 'fb_b')
+        self.put_settings_model('uid_b')
+
+        self.assert_job_output_is(
+            [
+                stdout('OK 0'),
+                stderr('ERR: User(id=uid_a) is sharing a Firebase auth ID'),
+                stderr('ERR: User(id=uid_b) is sharing a Firebase auth ID'),
+            ]
+        )
+        reverse_model_class = auth_models.UserIdByFirebaseAuthIdModel
+        self.assertEqual(reverse_model_class.get('fb_b').user_id, 'uid_a')
 
     def test_missing_reverse_model_of_firebase_issued_id_is_created(
         self,
