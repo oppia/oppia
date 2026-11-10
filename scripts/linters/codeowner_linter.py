@@ -48,6 +48,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/.github/CODEOWNERS',
     '/.github/stale.yml',
     '/.github/workflows/',
+    '/core/android_feature_flag_list*.py',
     '/core/android_validation_constants*.py',
     '/extensions/interactions/rule_templates.json',
     '/core/templates/services/svg-sanitizer.service.ts',

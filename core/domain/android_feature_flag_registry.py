@@ -30,8 +30,9 @@ if MYPY:  # pragma: no cover
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
-android_feature_registry = (
-    android_feature_flag_list.ANDROID_FEATURE_FLAG_DEFAULT_CONFIGS
+AndroidFeatureFlagNames = android_feature_flag_list.AndroidFeatureFlagNames
+ANDROID_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    android_feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
 
 
@@ -41,7 +42,10 @@ class Registry:
     @classmethod
     def _validate_feature_flag_name(cls, name: str) -> None:
         """Raises an exception if the name is not registered."""
-        if name not in android_feature_registry:
+        if (
+            name
+            not in ANDROID_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+        ):
             raise Exception('Android feature flag not found: %s.' % name)
 
     @classmethod
@@ -70,8 +74,13 @@ class Registry:
         if stored_flag is not None:
             flag = stored_flag
         else:
-            flag = android_feature_flag_domain.AndroidFeatureFlagConfig.deserialize(
-                android_feature_registry[name].serialize()
+            flag = android_feature_flag_domain.AndroidFeatureFlagConfig(
+                ANDROID_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[
+                    name
+                ][1],
+                '0.0',
+                None,
+                0,
             )
 
         caching_services.set_multi(
@@ -224,4 +233,4 @@ class Registry:
     @classmethod
     def get_all_feature_flag_names(cls) -> List[str]:
         """Returns all registered Android feature-flag names."""
-        return list(android_feature_registry)
+        return list(ANDROID_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE)
