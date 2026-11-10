@@ -288,7 +288,7 @@ test.describe('Exploration Editor', function () {
     // Add feedback for correct response.
     await explorationEditor.updateDragAndDropSortLearnersAnswerInResponseModal(
       'is equal to ordering ...',
-      [2, 3, 1]
+      [3, 1, 2]
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',

@@ -1106,15 +1106,19 @@ export class ExplorationEditor extends BaseUser {
    * @param {boolean} retry - Whether to retry navigation if it fails (default: true).
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
-    const headingName = !cardName.trimEnd().endsWith('...')
+    const isTruncated = cardName.trimEnd().endsWith('...');
+    const headingName = !isTruncated
       ? cardName
       : cardName.trimEnd().slice(0, -3);
 
     const currentCardHeading = await this.page
-      .locator(currentCardNameContainerSelector)
-      .textContent()
-      .catch(() => null);
-    if (currentCardHeading?.includes(headingName)) {
+      .locator(`${currentCardNameContainerSelector} strong`)
+      .textContent();
+    if (
+      isTruncated
+        ? currentCardHeading?.trim().startsWith(headingName)
+        : currentCardHeading?.trim() === headingName
+    ) {
       if (this.isViewportAtMobileWidth()) {
         const graphModal = this.page.locator(
           explorationStateGraphModalSelector
@@ -1184,11 +1188,16 @@ export class ExplorationEditor extends BaseUser {
 
     try {
       await this.page.waitForFunction(
-        ({selector, value}: {selector: string; value: string}) => {
+        ({selector, value, truncated}) => {
           const element = document.querySelector(selector);
-          return element?.textContent?.includes(value);
+          const heading = element?.textContent?.trim();
+          return truncated ? heading?.startsWith(value) : heading === value;
         },
-        {selector: currentCardNameContainerSelector, value: headingName}
+        {
+          selector: `${currentCardNameContainerSelector} strong`,
+          value: headingName,
+          truncated: isTruncated,
+        }
       );
       if (this.isViewportAtMobileWidth()) {
         await this.expectElementToBeVisible(
