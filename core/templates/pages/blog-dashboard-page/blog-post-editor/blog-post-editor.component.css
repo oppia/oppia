@@ -142,9 +142,15 @@
 }
 
 .sub-text {
+  -webkit-box-orient: vertical;
   color: #555;
+  display: -webkit-box;
   font: italic normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
-  margin: 0
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tag {
