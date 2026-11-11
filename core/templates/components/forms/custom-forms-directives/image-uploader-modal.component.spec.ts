@@ -58,6 +58,8 @@ describe('Image Uploader Modal', () => {
   let mockedFileReadShouldError = false;
   let mockFileReader: MockFileReader;
   let mockImage: MockImage;
+  let originalFileReader: typeof FileReader;
+  let originalImage: typeof Image;
 
   class MockFileReader {
     result: string | null = null;
@@ -125,14 +127,18 @@ describe('Image Uploader Modal', () => {
     mockedFileReadShouldError = false;
     mockFileReader = new MockFileReader();
     mockImage = new MockImage();
-    // Jasmine's returnValue spies are constructable, which is required here
-    // because the component calls `new FileReader()` and `new Image()`.
-    spyOn(window, 'FileReader').and.returnValue(
-      mockFileReader as unknown as FileReader
-    );
-    spyOn(window, 'Image').and.returnValue(
-      mockImage as unknown as HTMLImageElement
-    );
+    // Assign constructable mocks directly instead of using spyOn so that
+    // individual tests (present or future) can still spyOn these globals.
+    // The component calls `new FileReader()` and `new Image()`, so the
+    // assigned functions must be constructable.
+    originalFileReader = window.FileReader;
+    originalImage = window.Image;
+    window.FileReader = function () {
+      return mockFileReader;
+    } as unknown as typeof FileReader;
+    window.Image = function () {
+      return mockImage;
+    } as unknown as typeof Image;
     fixture = TestBed.createComponent(ImageUploaderModalComponent);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     componentInstance = fixture.componentInstance;
@@ -152,6 +158,13 @@ describe('Image Uploader Modal', () => {
       previewImageUrl: '',
       previewTitle: '',
     };
+  });
+
+  afterEach(() => {
+    // Restore the real globals so the override cannot leak into or collide
+    // with other spec files.
+    window.FileReader = originalFileReader;
+    window.Image = originalImage;
   });
 
   it('should create', () => {

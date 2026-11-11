@@ -56,10 +56,6 @@ describe('PageContext service', () => {
   let windowRef: MockWindowRef;
   let blogPostPageService: BlogPostPageService;
 
-  afterEach(() => {
-    ecs.removeCustomEntityContext();
-  });
-
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
@@ -184,7 +180,6 @@ describe('PageContext service', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
-      spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
@@ -201,6 +196,7 @@ describe('PageContext service', () => {
     });
 
     it('should correctly set and retrieve the topic id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
@@ -211,6 +207,7 @@ describe('PageContext service', () => {
     it('should correctly set and retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('topic');
     });
 
@@ -249,12 +246,12 @@ describe('PageContext service', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
-      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
       ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the values in topic editor', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
 
       expect(ecs.getEntityType()).toBe('question');
       expect(ecs.getEntityId()).toBe('questionId');
@@ -262,6 +259,7 @@ describe('PageContext service', () => {
 
     it('should correctly retrieve the values in skill editor', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
 
       expect(ecs.getEntityType()).toBe('question');
       expect(ecs.getEntityId()).toBe('questionId');
@@ -284,7 +282,6 @@ describe('PageContext service', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
-      spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
@@ -294,6 +291,7 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the story id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
@@ -324,7 +322,6 @@ describe('PageContext service', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
-      spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
@@ -334,6 +331,7 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the skill id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
@@ -344,6 +342,7 @@ describe('PageContext service', () => {
     it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('skill');
     });
 
@@ -364,11 +363,11 @@ describe('PageContext service', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
-      spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the blog post id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
@@ -415,7 +414,6 @@ describe('PageContext service', () => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
       blogPostPageService = TestBed.inject(BlogPostPageService);
-      spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
@@ -428,6 +426,7 @@ describe('PageContext service', () => {
     });
 
     it('should correctly retrieve the blog post id', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/blog');
@@ -561,13 +560,10 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in other pages', () => {
-    let getHashSpy: jasmine.Spy;
-
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
       urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
-      getHashSpy = spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
 
@@ -583,25 +579,29 @@ describe('PageContext service', () => {
     });
 
     it('should detect editor tab context is preview', () => {
-      getHashSpy.and.returnValue('#/settings');
+      let urlServiceGetHash = spyOn(urlService, 'getHash');
+      urlServiceGetHash.and.returnValue('#/settings');
       expect(ecs.getEditorTabContext()).toBeNull();
 
-      getHashSpy.and.returnValue('#/preview');
+      urlServiceGetHash.and.returnValue('#/preview');
       expect(ecs.getEditorTabContext()).toBe('preview');
     });
 
     it('should detect editor tab context is editor', () => {
-      getHashSpy.and.returnValue('#/gui');
+      let urlServiceGetHash = spyOn(urlService, 'getHash');
+
+      urlServiceGetHash.and.returnValue('#/gui');
       expect(ecs.getEditorTabContext()).toBe('editor');
 
-      getHashSpy.and.returnValue('');
+      urlServiceGetHash.and.returnValue('');
       expect(ecs.getEditorTabContext()).toBe('editor');
 
-      getHashSpy.and.returnValue('#/');
+      urlServiceGetHash.and.returnValue('#/');
       expect(ecs.getEditorTabContext()).toBe('editor');
     });
 
     it('should set and get custom entity id and type', () => {
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityId()).toBe('undefined');
       expect(ecs.getEntityType()).toBeUndefined();
       ecs.setCustomEntityContext('other', '100');
