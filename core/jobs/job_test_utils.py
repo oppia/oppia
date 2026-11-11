@@ -227,27 +227,6 @@ class JobTestBase(PipelinedTestBase):
         )
         datastore_services.put_multi(model_list)
 
-    # Here we use type Any because this method forwards its properties to
-    # create_model, which accepts properties of any type.
-    def put_model(
-        self, model_class: Type[base_models.SELF_BASE_MODEL], **properties: Any
-    ) -> base_models.SELF_BASE_MODEL:
-        """Creates a model with create_model and puts it into the datastore.
-
-        This is shorthand for put_multi([create_model(...)]), for tests that
-        set up many models one at a time.
-
-        Args:
-            model_class: *. A subclass of BaseModel.
-            **properties: dict(str: *). Properties to assign to the model.
-
-        Returns:
-            *. The model that was put into the datastore.
-        """
-        model = self.create_model(model_class, **properties)
-        self.put_multi([model])
-        return model
-
     def assert_job_output_is(self, expected: beam.PCollection) -> None:
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
 
