@@ -358,6 +358,25 @@ describe('Skill Editor Navbar Component', () => {
       expect(component.getWarningsCount()).toBe(3);
     }
   );
+  it('should return all skill validation warnings separated by newlines', () => {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues').and.returnValue([
+      'There should be review material in the concept card.',
+      'All 3 difficulties should be addressed in rubrics.',
+    ]);
+
+    expect(component.getAllSkillWarnings()).toBe(
+      'There should be review material in the concept card.\n' +
+        'All 3 difficulties should be addressed in rubrics.'
+    );
+  });
+
+  it('should return an empty string when there are no skill warnings', () => {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues').and.returnValue(
+      []
+    );
+
+    expect(component.getAllSkillWarnings()).toBe('');
+  });
 
   it(
     'should check whether the skill is saveable when ' +

@@ -45,7 +45,6 @@ import {I18nService} from 'i18n/i18n.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -73,6 +72,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() subheaderText!: string;
 
   impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2025,
+      year: '2025',
+    },
     {
       link: AppConstants.IMPACT_REPORT_LINK_2024,
       year: '2024',
@@ -211,7 +214,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
     private signInEventService: SignInEventService,
     private contentTranslationManagerService: ContentTranslationManagerService
@@ -246,13 +248,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    if (this.currentUrl !== 'signup') {
-      this.learnerGroupBackendApiService
-        .isLearnerGroupFeatureEnabledAsync()
-        .then(featureIsEnabled => {
-          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-        });
-    }
+    this.LEARNER_GROUPS_FEATURE_IS_ENABLED =
+      this.platformFeatureService.status.LearnerGroupsAreEnabled.isEnabled;
 
     this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
       this.urlService.getPathname().includes(path)
@@ -495,8 +492,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * open/close action to be performed (aboutMenu,profileMenu).
    */
   openSubmenu(evt: Event, menuName: string): void {
-    // Focus on the current target before opening its submenu.
-    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
+    // The navigation service only needs the event to set the active menu
+    // name, so the generic Event type is sufficient.
+    this.navigationService.openSubmenu(evt, menuName);
     if (menuName === 'learnMenu') {
       this.updateLearnDropdownOffset();
     } else if (menuName === 'getInvolvedMenu') {
@@ -505,7 +503,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   closeSubmenu(evt: Event): void {
-    this.navigationService.closeSubmenu(evt as KeyboardEvent);
+    this.navigationService.closeSubmenu(evt);
   }
 
   closeSubmenuIfNotMobile(evt: Event): void {
@@ -529,13 +527,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onMenuKeypress(
     evt: KeyboardEvent,
     menuName: string,
-    eventsTobeHandled: Record<string, string>
+    eventsTobeHandled: EventToCodes
   ): void {
-    this.navigationService.onMenuKeypress(
-      evt,
-      menuName,
-      eventsTobeHandled as unknown as EventToCodes
-    );
+    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 

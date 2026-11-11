@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     opportunity_domain,
     opportunity_services,
+    question_domain,
     skill_fetchers,
     state_domain,
     story_domain,
@@ -47,7 +48,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, cast
+from typing import Dict, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -132,18 +133,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_1 = {
             'id': self.skill_id_1,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic',
+            'questions_in_review_count': 0,
         }
         self.expected_skill_opportunity_dict_2 = {
             'id': self.skill_id_2,
             'skill_description': 'skill_description',
             'question_count': 0,
             'topic_name': 'topic1',
+            'questions_in_review_count': 0,
         }
 
         # The content_count is 2 for the expected dicts below since each
@@ -190,6 +194,60 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'],
             [
                 self.expected_skill_opportunity_dict_0,
+                self.expected_skill_opportunity_dict_1,
+            ],
+        )
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
+
+    def test_get_skill_opportunity_data_with_in_review_suggestions(
+        self,
+    ) -> None:
+        # Here we use cast because we need to bypass TypedDict checks for the
+        # empty question state data dict in the test context.
+        change_cmd: Dict[
+            str, Union[str, question_domain.QuestionDict, float]
+        ] = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': cast(state_domain.StateDict, {}),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ),
+                'linked_skill_ids': [self.skill_id_0],
+                'inapplicable_skill_misconception_ids': [],
+                'next_content_id_index': 0,
+            },
+            'skill_id': self.skill_id_0,
+            'skill_difficulty': 0.3,
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            self.skill_id_0,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.owner_id,
+            self.OWNER_USERNAME,
+            change_cmd,
+            'score_category',
+            'suggestion_id_1',
+            constants.DEFAULT_LANGUAGE_CODE,
+        )
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
+        )
+        self.assertEqual(len(response['opportunities']), 2)
+        expected_dict = self.expected_skill_opportunity_dict_0.copy()
+        expected_dict['questions_in_review_count'] = 1
+        self.assertEqual(
+            response['opportunities'],
+            [
+                expected_dict,
                 self.expected_skill_opportunity_dict_1,
             ],
         )
@@ -373,18 +431,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_4,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                     {
                         'id': skill_id_5,
                         'skill_description': 'skill_description',
                         'question_count': 0,
                         'topic_name': topic_name,
+                        'questions_in_review_count': 0,
                     },
                 ],
             )
@@ -1921,6 +1982,70 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         }
         self.assertEqual(output, expected_output)
 
+    def test_handler_skips_machine_translation_for_list_content(self) -> None:
+        """Test that list content is skipped while string content is translated."""
+        translatable_contents = {
+            'Introduction': {
+                'normalized_strings': translation_domain.TranslatableContent(
+                    'normalized_strings',
+                    translation_domain.ContentType.RULE,
+                    translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING,
+                    ['one', 'two'],
+                ),
+                'unicode_strings': translation_domain.TranslatableContent(
+                    'unicode_strings',
+                    translation_domain.ContentType.RULE,
+                    translation_domain.TranslatableContentFormat.SET_OF_UNICODE_STRING,
+                    ['three', 'four'],
+                ),
+                'text': translation_domain.TranslatableContent(
+                    'text',
+                    translation_domain.ContentType.CONTENT,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    '<p>Please continue.</p>',
+                ),
+            }
+        }
+
+        with (
+            unittest.mock.patch.object(
+                translation_services,
+                'get_translatable_text',
+                return_value=translatable_contents,
+            ),
+            unittest.mock.patch.object(
+                translation_services,
+                'get_and_cache_machine_translation',
+                return_value='<p>Por favor continua.</p>',
+            ) as mock_machine_translation,
+        ):
+            output = self.get_json(
+                '/machine_translated_state_texts_handler',
+                params={
+                    'exp_id': self.exp_id,
+                    'state_name': 'Introduction',
+                    'content_ids': (
+                        '["normalized_strings", "unicode_strings", "text"]'
+                    ),
+                    'target_language_code': 'es',
+                },
+                expected_status_int=200,
+            )
+
+        self.assertEqual(
+            output,
+            {
+                'translated_texts': {
+                    'normalized_strings': None,
+                    'unicode_strings': None,
+                    'text': '<p>Por favor continua.</p>',
+                }
+            },
+        )
+        mock_machine_translation.assert_called_once_with(
+            'en', 'es', '<p>Please continue.</p>'
+        )
+
 
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
@@ -2177,7 +2302,16 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [
+                            {
+                                'name': 'topic 1',
+                                'id': topic_id_1,
+                                'completeness': None,
+                            }
+                        ],
+                    }
                 ]
             },
         )
@@ -2226,10 +2360,90 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             response,
             {
                 'topic_names_per_classroom': [
-                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                    {
+                        'classroom': 'Class 1',
+                        'topics': [
+                            {
+                                'name': 'topic 1',
+                                'id': topic_id_1,
+                                'completeness': None,
+                            }
+                        ],
+                    }
                 ]
             },
         )
+
+    def test_topics_are_annotated_and_sorted_by_completeness_with_language(
+        self,
+    ) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='topic low',
+            abbreviated_name='abbrev-low',
+            url_fragment='topic-low',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.admin_id,
+            name='topic high',
+            abbreviated_name='abbrev-high',
+            url_fragment='topic-high',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id,
+            name='Class 1',
+            topic_id_to_prerequisite_topic_ids={topic_id_1: [], topic_id_2: []},
+        )
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_low',
+            topic_id=topic_id_1,
+            topic_name='topic low',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 2},
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_high',
+            topic_id=topic_id_2,
+            topic_name='topic high',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=10,
+            translation_counts={'hi': 9},
+        ).put()
+
+        response = self.get_json(
+            '/gettranslatabletopicnamesperclassroom',
+            params={'language_code': 'hi'},
+        )
+
+        topics = response['topic_names_per_classroom'][0]['topics']
+        # Highest completeness first: topic high (90%) before topic low (20%).
+        self.assertEqual(topics[0]['name'], 'topic high')
+        self.assertEqual(topics[0]['completeness'], 90.0)
+        self.assertEqual(topics[1]['name'], 'topic low')
+        self.assertEqual(topics[1]['completeness'], 20.0)
 
     def test_topic_without_classroom_should_also_be_returned(self) -> None:
         # Create topics.
@@ -2866,11 +3080,13 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             {
                 'from_date': from_date.strftime('%d %b %Y'),
                 'to_date': to_date.strftime('%d %b %Y'),
-                'contribution_hours': '0.01',
+                'contribution_hours': 0.01,
                 'contribution_word_count': 3,
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi',
                 'certificate_profile_name': self.OWNER_USERNAME,
+                'translated_word_count': 3,
+                'reviewed_word_count': 0,
             },
         )
 

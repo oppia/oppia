@@ -301,10 +301,8 @@ describe('Goals tab Component', () => {
     component.untrackedTopics = {};
     component.learntToPartiallyLearntTopics = [];
     component.currentGoalsStoryIsShown = [];
-    component.topicBelongToCurrentGoals = [];
     component.topicIdsInCompletedGoals = [];
     component.topicIdsInCurrentGoals = [];
-    component.activityType = 'learntopic';
 
     sampleTopic = LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1

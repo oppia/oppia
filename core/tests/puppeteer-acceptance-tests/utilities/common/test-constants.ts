@@ -72,6 +72,8 @@ export default {
       'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
     ImpactReport2024Url:
       'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
+    ImpactReport2025Url:
+      'https://drive.google.com/file/d/1ivdiZmr6RyL4ecNwwcwxUTsgIt8uR-Wk/view',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
