@@ -1596,6 +1596,28 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds rows and enters options in the schema-based list editor.
+   *
+   * @param {string[]} options - Array of response option strings to add.
+   */
+  private async addResponseOptions(options: string[]): Promise<void> {
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+      await this.page.waitForSelector(
+        `#e2e-test-schema-based-list-editor-table-row-${i + 1}`,
+        {visible: true}
+      );
+    }
+
+    for (let i = 0; i < options.length; i++) {
+      const optionInputSelector = `#e2e-test-schema-based-list-editor-table-row-${i} ${stateContentInputField}`;
+      await this.page.waitForSelector(optionInputSelector, {visible: true});
+      await this.typeInInputField(optionInputSelector, `${options[i]}`);
+    }
+  }
+
+  /**
    * Customizes the item selection interaction.
    * @param {string[]} options - The options to be selected.
    * @param {number} minimumNumberOfSelections - The minimum number of selections.
@@ -1637,21 +1659,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Add options.
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-      await this.page.waitForSelector(
-        `#e2e-test-schema-based-list-editor-table-row-${i + 1}`,
-        {visible: true}
-      );
-    }
-
-    for (let i = 0; i < options.length; i++) {
-      const optionInputSelector = `#e2e-test-schema-based-list-editor-table-row-${i} ${stateContentInputField}`;
-      await this.page.waitForSelector(optionInputSelector, {visible: true});
-      await this.clickOnElementWithSelector(optionInputSelector);
-      await this.typeInInputField(optionInputSelector, `${options[i]}`);
-    }
+    await this.addResponseOptions(options);
 
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -3202,21 +3210,7 @@ export class ExplorationEditor extends BaseUser {
       'Customize Interaction (Multiple Choice)'
     );
 
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-      await this.page.waitForSelector(
-        `#e2e-test-schema-based-list-editor-table-row-${i + 1}`,
-        {visible: true}
-      );
-    }
-
-    for (let i = 0; i < options.length; i++) {
-      const optionInputSelector = `#e2e-test-schema-based-list-editor-table-row-${i} ${stateContentInputField}`;
-      await this.page.waitForSelector(optionInputSelector, {visible: true});
-      await this.clickOnElementWithSelector(optionInputSelector);
-      await this.typeInInputField(optionInputSelector, `${options[i]}`);
-    }
+    await this.addResponseOptions(options);
 
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
