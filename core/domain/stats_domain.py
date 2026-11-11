@@ -72,6 +72,12 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+# Allowed play types for event models.
+ALLOWED_PLAY_TYPES: Final = (
+    feconf.PLAY_TYPE_NORMAL,
+    feconf.PLAY_TYPE_PLAYTEST,
+)
+
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
 ]
@@ -2488,7 +2494,7 @@ class StateHitEventLogEntry:
                 'Expected exp_id to be a string, received %s'
                 % type(self.exp_id)
             )
-        if not bool(re.match(constants.ENTITY_ID_REGEX, self.exp_id)):
+        if not re.match(constants.ENTITY_ID_REGEX, self.exp_id):
             raise utils.ValidationError(
                 'Invalid exp_id %s: does not match %s'
                 % (self.exp_id, constants.ENTITY_ID_REGEX)
@@ -2545,14 +2551,10 @@ class StateHitEventLogEntry:
                 'Expected play_type to be a string, received %s'
                 % type(self.play_type)
             )
-        allowed_play_types = [
-            feconf.PLAY_TYPE_PLAYTEST,
-            feconf.PLAY_TYPE_NORMAL,
-        ]
-        if self.play_type not in allowed_play_types:
+        if self.play_type not in ALLOWED_PLAY_TYPES:
             raise utils.ValidationError(
                 'Expected play_type to be one of %s, received %s'
-                % (allowed_play_types, self.play_type)
+                % (list(ALLOWED_PLAY_TYPES), self.play_type)
             )
 
         if not isinstance(self.event_schema_version, int) or isinstance(
