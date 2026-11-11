@@ -394,8 +394,9 @@ describe('Image Uploader Modal', () => {
   );
 
   it('should handle viewDestroyedError when detectChanges throws', fakeAsync(() => {
-    const changeDetectorRef =
-      fixture.debugElement.injector.get(ChangeDetectorRef);
+    // Access the private changeDetectorRef to spy on the component's internal ViewRef.
+    // eslint-disable-next-line dot-notation
+    const changeDetectorRef = componentInstance['changeDetectorRef'];
     spyOn(changeDetectorRef, 'detectChanges').and.throwError(
       'Attempt to use a destroyed view: detectChanges thrown.'
     );
