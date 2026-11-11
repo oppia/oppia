@@ -312,16 +312,20 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
-                    'a feature in dev stage',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in dev stage',
+                        FeatureStages.DEV,
+                    )
                 ),
                 FeatureNames.TEST_FEATURE_2.value: (
-                    'a feature in test stage',
-                    FeatureStages.TEST,
-                    'test developer notes',
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in test stage',
+                        FeatureStages.TEST,
+                        developer_notes='test developer notes',
+                    )
                 ),
             },
         )
@@ -377,11 +381,13 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
-                    'a feature in dev stage',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in dev stage',
+                        FeatureStages.DEV,
+                    )
                 )
             },
         )
@@ -443,11 +449,13 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         )
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.TEST_FEATURE_1.value: (
-                    'a feature in dev stage',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in dev stage',
+                        FeatureStages.DEV,
+                    )
                 )
             },
         )
@@ -478,11 +486,13 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.TEST_FEATURE_2.value: (
-                    'a feature in dev stage',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in dev stage',
+                        FeatureStages.DEV,
+                    )
                 )
             },
         )

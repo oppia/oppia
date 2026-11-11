@@ -22,7 +22,7 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List
 
 
 class FeatureNames(enum.Enum):
@@ -187,75 +187,71 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
-FeatureFlagSpecTuple = Union[
-    Tuple[str, feature_flag_domain.ServerMode],
-    Tuple[str, feature_flag_domain.ServerMode, Optional[str]],
-]
-
-# A mapping from feature flag name to a tuple specifying the feature flag spec.
-# Each entry is a tuple of (description, feature_stage) or
-# (description, feature_stage, developer_notes).
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
-    str, FeatureFlagSpecTuple
-] = {
+# A mapping from feature flag name to its FeatureFlagSpec domain object.
+FEATURE_FLAG_NAME_TO_SPEC: Dict[str, feature_flag_domain.FeatureFlagSpec] = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This is a dummy feature flag for the e2e tests.',
             feature_flag_domain.ServerMode.PROD,
-            'This flag does nothing and is only used for e2e tests.',
+            developer_notes=(
+                'This flag does nothing and is only used for e2e tests.'
+            ),
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag is for serial chapter launch feature and making changes '
             'only in the curriculum admin view.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag is to show redesigned learner dashboard.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag is to show new contributor admin dashboard.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'Exposes the Improvements Tab for creators in the exploration '
             'editor.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
-        ('Enable learner groups feature', feature_flag_domain.ServerMode.PROD)
+        feature_flag_domain.FeatureFlagSpec(
+            'Enable learner groups feature',
+            feature_flag_domain.ServerMode.PROD,
+        )
     ),
     FeatureNames.NEW_LESSON_PLAYER.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag is to enable the exploration player redesign.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
@@ -263,7 +259,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag allows exploration editors to view a list of '
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
@@ -271,27 +267,27 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'The flag enables the voiceover tab for non-curated explorations.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'Allows the creators to access the updated study guide editor page '
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
@@ -300,21 +296,21 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables the highlighting of sentences during the '
             'automatic voiceover playback in the exploration player and '
             'editor pages.',
@@ -322,52 +318,59 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         )
     ),
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (
-        (
-            'This flag enables the financial literacy campaign banner for the fundraising campaign.',
+        feature_flag_domain.FeatureFlagSpec(
+            'This flag enables the financial literacy campaign banner for the '
+            'fundraising campaign.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE.value: (
-        (
-            'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
+        feature_flag_domain.FeatureFlagSpec(
+            'This flag enables the financial literacy campaign banner for the '
+            'fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'Enables automatic AI-generated translation suggestions in the '
             'Contributor Dashboard to assist translators.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
-        (
-            'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
+        feature_flag_domain.FeatureFlagSpec(
+            'Enables the certificate assessment feature, allowing curriculum '
+            'admins to create certificate offerings and learners to take '
+            'certificate assessments.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED.value: (
-        (
-            'This flag enables the feedback entrypoints and their respective modals, allowing learners to provide feedback, report an issue and give suggestion on lessons and on the site. ',
+        feature_flag_domain.FeatureFlagSpec(
+            'This flag enables the feedback entrypoints and their respective '
+            'modals, allowing learners to provide feedback, report an issue '
+            'and give suggestion on lessons and on the site. ',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables the new creator feedback tab experience in '
-            'the exploration editor along with the updated feedback updates page UI.',
+            'the exploration editor along with the updated feedback updates '
+            'page UI.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
@@ -375,14 +378,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         )
     ),
     FeatureNames.STORY_EDITOR_ARCS.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables arc-based chapter groupings in the story editor, '
             'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_DROPDOWN_PAGINATION.value: (
-        (
+        feature_flag_domain.FeatureFlagSpec(
             'This flag enables dropdown-based page navigation on the '
             'Contributor Dashboard, replacing the simple Previous/Next '
             'pagination buttons with a page selector dropdown.',

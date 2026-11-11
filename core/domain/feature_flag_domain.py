@@ -156,7 +156,7 @@ class FeatureFlag:
             {
                 'description': feature_dict['description'],
                 'feature_stage': feature_dict['feature_stage'],
-                'developer_notes': feature_dict.get('developer_notes'),
+                'developer_notes': feature_dict['developer_notes'],
             }
         )
         feature_flag_config = FeatureFlagConfig.from_dict(
@@ -262,7 +262,7 @@ class FeatureFlagSpec:
         return cls(
             feature_dict['description'],
             feature_stage,
-            feature_dict.get('developer_notes'),
+            feature_dict['developer_notes'],
         )
 
 

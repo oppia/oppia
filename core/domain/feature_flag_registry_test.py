@@ -40,19 +40,21 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_name_to_description_feature_stage_dict = self.swap(
+        self.swap_name_to_spec_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.FEATURE_A.value: (
-                    'test description',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'test description',
+                        FeatureStages.DEV,
+                    )
                 )
             },
         )
 
     def test_get_feature_flag(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             feature_flag = registry.Registry.get_feature_flag(
                 FeatureNames.FEATURE_A.value
             )
@@ -62,12 +64,14 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
         swap_with_notes = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.FEATURE_A.value: (
-                    'test description',
-                    FeatureStages.DEV,
-                    'developer note',
+                    feature_flag_domain.FeatureFlagSpec(
+                        'test description',
+                        FeatureStages.DEV,
+                        developer_notes='developer note',
+                    )
                 )
             },
         )
@@ -87,7 +91,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             registry.Registry.get_feature_flag('feature_d')
 
     def test_existing_feature_gets_updated(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             self.assertIsNone(
                 registry.Registry.load_feature_flag_config_from_storage(
                     FeatureNames.FEATURE_A.value
@@ -126,7 +130,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             )
 
     def test_update_feature_flag(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             registry.Registry.update_feature_flag(
                 FeatureNames.FEATURE_A.value,
                 True,
@@ -149,7 +153,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
 
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
@@ -167,7 +171,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         )
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
@@ -185,17 +189,19 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         )
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_spec_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.FEATURE_A.value: (
-                    'test description',
-                    FeatureStages.TEST,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'test description',
+                        FeatureStages.TEST,
+                    )
                 )
             },
         )
-        with swap_name_to_description_feature_stage_dict:
+        with swap_name_to_spec_dict:
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
@@ -213,7 +219,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         )
 
     def test_updated_feature_is_saved_in_storage(self) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_spec_dict:
             self.assertIsNone(
                 registry.Registry.load_feature_flag_config_from_storage(
                     FeatureNames.FEATURE_A.value

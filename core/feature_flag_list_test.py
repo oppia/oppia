@@ -73,7 +73,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+                feature_flag_list.FEATURE_FLAG_NAME_TO_SPEC
             ):
                 missing_names.append(feature.value)
         self.assertTrue(
