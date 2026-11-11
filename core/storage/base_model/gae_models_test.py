@@ -26,7 +26,7 @@ from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Set, Union, cast
+from typing import Dict, List, Optional, Set, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -137,7 +137,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 1)
-        base_model = all_models.get()
+        base_model: Optional[base_models.BaseModel] = all_models.get()
 
         # Ruling out the possibility of None for mypy type checking.
         assert base_model is not None
