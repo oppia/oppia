@@ -25,6 +25,12 @@ jobs:
               repo: context.repo.repo,
               pull_number: pr.number
             });
+
+            if (pullRequest.state !== 'open') {
+              core.info(`PR #${pr.number} is ${pullRequest.state}, skipping description check.`);
+              return;
+            }
+
             const prDescription = pullRequest.body || '';
 
             const requiredSections = [
