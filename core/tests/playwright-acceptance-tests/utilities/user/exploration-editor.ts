@@ -36,6 +36,7 @@ const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
 const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const MAX_NODE_LABEL_LENGTH = 15;
 const languageUpdateDropdown =
   'mat-select.e2e-test-exploration-language-select';
 const languageDropdownValueSelector =
@@ -1193,7 +1194,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the exploration preview tab.
    */
   async navigateToExplorationEditorPreviewTab(): Promise<void> {
-    await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.openMobileNavbarDropdown();
       await this.clickOnElementWithSelector(mobilePreviewTabButton);
@@ -1942,9 +1942,9 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(contentBoxSelector);
     const cardContent =
       (await this.page.locator(contentBoxSelector).textContent())?.trim() || '';
-    if (!cardContent.includes(expectedCardContent)) {
+    if (cardContent !== expectedCardContent) {
       throw new Error(
-        `Expected card content to include "${expectedCardContent}", but got "${cardContent}".`
+        `Expected card content to be "${expectedCardContent}", but got "${cardContent}".`
       );
     }
   }
@@ -1997,13 +1997,19 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Helper function to truncate card name if longer than 14 characters.
-   * @param {string} cardName - The card name to truncate.
+   * Truncates a card name the same way the frontend graph visualization does.
+   * Matches the behavior of TruncatePipe with MAX_NODE_LABEL_LENGTH.
+   * @param {string} cardName - The card name to potentially truncate.
+   * @returns {string} The truncated card name if it exceeds MAX_NODE_LABEL_LENGTH, otherwise the original name.
    */
-  truncateCardName(cardName: string): string {
-    return cardName.length > 14
-      ? cardName.slice(0, 10) + '...' + cardName.slice(-1)
-      : cardName;
+  private truncateCardName(cardName: string): string {
+    if (!cardName || cardName.length <= MAX_NODE_LABEL_LENGTH) {
+      return cardName;
+    }
+    const suffix = '...';
+    return (
+      cardName.substring(0, MAX_NODE_LABEL_LENGTH - suffix.length) + suffix
+    );
   }
 
   /**
@@ -2113,14 +2119,12 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(firstCardSettingsSelector);
     await this.clickOnElementWithSelector(firstCardSettingsSelector);
 
-    const autosavePromise = this.page
-      .waitForResponse(
-        response =>
-          response.url().includes('/createhandler/autosave_draft/') &&
-          response.status() === 200,
-        {timeout: 30000}
-      )
-      .catch(() => null);
+    const autosavePromise = this.page.waitForResponse(
+      response =>
+        response.url().includes('/createhandler/autosave_draft/') &&
+        response.status() === 200,
+      {timeout: 30000}
+    );
 
     await this.selectMatOption(cardName);
     await autosavePromise;
