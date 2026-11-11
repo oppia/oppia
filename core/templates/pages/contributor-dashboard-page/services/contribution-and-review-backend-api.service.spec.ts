@@ -126,8 +126,73 @@ describe('Contribution and review backend API service', () => {
         'translate_content',
         AppConstants.OPPORTUNITIES_PAGE_SIZE,
         0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        null,
+        null
       );
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should fetch submitted translation suggestions filtered by topic and language', fakeAsync(() => {
+      spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
+      const url =
+        '/getsubmittedsuggestions/all/translate_content' +
+        '?limit=10&offset=0&sort_key=Date&topic_name=Fractions&language_code=hi';
+
+      carbas
+        .fetchSuggestionsAsync(
+          'SUBMITTED_TRANSLATION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          null,
+          'Fractions',
+          undefined,
+          'hi'
+        )
+        .then(successHandler, failureHandler);
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(suggestionsBackendObject);
+      flushMicrotasks();
+
+      expect(carbas.fetchSubmittedSuggestionsAsync).toHaveBeenCalledWith(
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
+        'translate_content',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0,
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        'Fractions',
+        'hi'
+      );
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should omit All topic and empty language from submitted suggestion params', fakeAsync(() => {
+      spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
+      const url =
+        '/getsubmittedsuggestions/all/translate_content' +
+        '?limit=10&offset=0&sort_key=Date';
+
+      carbas
+        .fetchSuggestionsAsync(
+          'SUBMITTED_TRANSLATION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          null,
+          AppConstants.TOPIC_SENTINEL_NAME_ALL,
+          undefined,
+          null
+        )
+        .then(successHandler, failureHandler);
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(suggestionsBackendObject);
+      flushMicrotasks();
+
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));

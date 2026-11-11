@@ -204,7 +204,18 @@ indexes:
   properties:
   - name: author_id
   - name: deleted
+  - name: language_code
   - name: suggestion_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: language_code
+  - name: suggestion_type
+  - name: target_type
   - name: created_on
     direction: desc
 

@@ -4609,6 +4609,84 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             response['target_id_to_opportunity_dict'][self.SKILL_ID], None
         )
 
+    def test_submitted_translations_are_filtered_by_language(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        matching_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'language_code': 'hi',
+            },
+        )
+        self.assertEqual(len(matching_response['suggestions']), 1)
+
+        filtered_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'language_code': 'fr',
+            },
+        )
+        self.assertEqual(len(filtered_response['suggestions']), 0)
+
+        self.logout()
+
+    def test_submitted_translations_are_filtered_by_topic(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_ID,
+            topic_id=self.TOPIC_ID,
+            topic_name='topic',
+            story_id=self.STORY_ID,
+            story_title='A story',
+            chapter_title='Node1',
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[],
+        ).put()
+
+        matching_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic',
+            },
+        )
+        self.assertEqual(len(matching_response['suggestions']), 1)
+
+        all_topics_response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': constants.TOPIC_SENTINEL_NAME_ALL,
+            },
+        )
+        self.assertEqual(len(all_topics_response['suggestions']), 1)
+
+        self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'not-a-real-topic',
+            },
+            expected_status_int=400,
+        )
+
+        self.logout()
+
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ReviewableSuggestionsHandler."""

@@ -173,6 +173,32 @@ describe('Translation language selector', () => {
     expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
   });
 
+  it('should prepend All languages when includeAllOption is true', () => {
+    component.includeAllOption = true;
+    component.activeLanguageCode = null;
+
+    component.ngOnInit();
+
+    expect(component.options[0]).toEqual({
+      id: '',
+      description: 'All languages',
+    });
+    expect(component.languageSelection).toBe('All languages');
+  });
+
+  it('should not save preferred language when includeAllOption is true', () => {
+    component.includeAllOption = true;
+    const saveSpy = spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'savePreferredTranslationLanguageAsync'
+    );
+
+    component.selectOption('fr');
+    component.selectOption('');
+
+    expect(saveSpy).not.toHaveBeenCalled();
+  });
+
   it('should show details of featured language', fakeAsync(() => {
     clickDropdown();
 
