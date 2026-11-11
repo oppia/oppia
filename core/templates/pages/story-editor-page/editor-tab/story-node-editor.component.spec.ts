@@ -366,6 +366,32 @@ describe('Story node editor component', () => {
       expect(query('.e2e-test-exploration-id-input')).toBeNull();
     });
 
+    it('should label the view-only link and edit button group in view mode', () => {
+      renderChapterWithExploration('exp_1');
+
+      // There is no input field to point to, so the label names the group.
+      expect(query('.e2e-test-exploration-id-label')?.hasAttribute('for')).toBe(
+        false
+      );
+      const group = query('.e2e-test-exploration-id-display');
+      expect(group?.getAttribute('role')).toEqual('group');
+      expect(group?.getAttribute('aria-labelledby')).toEqual(
+        'storyNodeExplorationIdLabel'
+      );
+    });
+
+    it('should point the label to the input field while editing', () => {
+      renderChapterWithExploration('exp_1');
+
+      component.openExplorationIdEditor();
+      fixture.detectChanges();
+
+      expect(
+        query('.e2e-test-exploration-id-label')?.getAttribute('for')
+      ).toEqual('storyNodeExplorationId');
+      expect(query('#storyNodeExplorationId')).not.toBeNull();
+    });
+
     it('should show the input field when no exploration is linked', () => {
       renderChapterWithExploration(null);
 
@@ -424,7 +450,7 @@ describe('Story node editor component', () => {
       expect(updateExplorationIdSpy).toHaveBeenCalledWith('exp_2');
     });
 
-    it('should show the delete icon while editing if the story is not published', () => {
+    it('should show the delete button while editing if the story is not published', () => {
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
       renderChapterWithExploration('exp_1');
 
@@ -432,10 +458,29 @@ describe('Story node editor component', () => {
       fixture.detectChanges();
 
       expect(component.isStoryPublished()).toBe(false);
-      expect(query('.story-node-exploration .fa-trash-alt')).not.toBeNull();
+      const deleteButton = query('.e2e-test-delete-exploration-id-button');
+      // A real button, so that it is reachable with the keyboard and has an
+      // accessible name.
+      expect(deleteButton?.tagName).toEqual('BUTTON');
+      expect(deleteButton?.getAttribute('type')).toEqual('button');
+      expect(deleteButton?.getAttribute('aria-label')).toEqual(
+        'Remove the exploration from this chapter'
+      );
     });
 
-    it('should not show the delete icon while editing if the story is published', () => {
+    it('should remove the exploration when the delete button is clicked', () => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+      renderChapterWithExploration('exp_1');
+      component.openExplorationIdEditor();
+      fixture.detectChanges();
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+
+      query('.e2e-test-delete-exploration-id-button')?.click();
+
+      expect(updateExplorationIdSpy).toHaveBeenCalledWith(null);
+    });
+
+    it('should not show the delete button while editing if the story is published', () => {
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
       renderChapterWithExploration('exp_1');
 
@@ -443,7 +488,7 @@ describe('Story node editor component', () => {
       fixture.detectChanges();
 
       expect(component.isStoryPublished()).toBe(true);
-      expect(query('.story-node-exploration .fa-trash-alt')).toBeNull();
+      expect(query('.e2e-test-delete-exploration-id-button')).toBeNull();
     });
 
     it('should keep the input field when the edit is cancelled and no exploration is linked', () => {

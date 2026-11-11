@@ -134,6 +134,15 @@
 .exploration-id-edit-button:focus-visible {
   color: #00645c;
 }
+.exploration-id-delete-button {
+  color: #333;
+  margin-right: 4px;
+  padding: 4px 8px;
+}
+.exploration-id-delete-button:hover,
+.exploration-id-delete-button:focus-visible {
+  color: #c62828;
+}
 .save-button-container {
   text-align: right;
 }
