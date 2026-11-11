@@ -1654,14 +1654,6 @@ describe('ImageEditor', () => {
   });
 
   it("should crop svg when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake(
-      (
-        obj: {images: string[]},
-        func: (response: {image: string[]}) => void
-      ) => {
-        func({image: obj.images});
-      }
-    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,
@@ -1686,14 +1678,6 @@ describe('ImageEditor', () => {
   });
 
   it("should crop png when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake(
-      (
-        obj: {images: string[]},
-        func: (response: {image: string[]}) => void
-      ) => {
-        func({image: obj.images});
-      }
-    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,

@@ -332,7 +332,6 @@ describe('Image Uploader Modal', () => {
   );
 
   it('should not initialize cropper when croppableImageRef is not defined', () => {
-    componentInstance.croppableImageRef = undefined as never;
     componentInstance.initializeCropper();
     expect(componentInstance.cropper).toBeUndefined();
   });
@@ -406,6 +405,7 @@ describe('Image Uploader Modal', () => {
       componentInstance.onFileChanged(file);
       tick();
     }).not.toThrowError();
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalled();
   }));
 
   it('should update windowIsNarrow on window resize', () => {
