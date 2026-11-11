@@ -116,6 +116,10 @@ class FirebaseRecord:
             )
         return FirebaseRecord(
             auth_id=user_auth_details_model.firebase_auth_id,
-            email=user_settings_model.email,
+            # NOTE: Firebase stores emails in lowercase, so the email is
+            # lowercased to match the records exported from Firebase. This also
+            # makes emails that differ only by case collide, as they do in
+            # Firebase.
+            email=user_settings_model.email.lower(),
             disabled=user_settings_model.deleted,
         )
