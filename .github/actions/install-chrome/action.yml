@@ -23,12 +23,13 @@ runs:
         # (#26054). Also, with retry_on: error, the action does not retry an
         # attempt that hit its own timeout. So a hang must end the attempt
         # with an error before the outer timeout fires. The inner limits add up
-        # to 570 seconds, which is below timeout_minutes.
+        # to 3 * (120 + 10) + 180 = 570 seconds, which is below timeout_minutes.
         #
         # Other failures are deliberately not fatal here (e.g. apt-get update
         # fails if any one apt source is briefly unreachable). If the install
         # really fails, the version check on the last line fails, and that
-        # attempt is retried.
+        # attempt is retried. curl uses --fail so that an HTTP error shows up
+        # in the logs instead of being saved as the package file.
         command: |
           sudo_with_timeout() {
             sudo timeout --kill-after=10 120 "$@"
@@ -42,7 +43,7 @@ runs:
           }
           sudo_with_timeout apt-get update
           sudo_with_timeout apt-get install libappindicator3-1
-          curl -L --max-time 180 -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_${{ env.CHROME_VERSION }}_amd64.deb
+          curl -L --fail --max-time 180 -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_${{ env.CHROME_VERSION }}_amd64.deb
           sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
           sudo_with_timeout dpkg -i google-chrome.deb
           chrome_version=$(google-chrome --version 2>&1 | tr -cd '[:digit:].')
