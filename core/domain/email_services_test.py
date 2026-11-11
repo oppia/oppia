@@ -97,25 +97,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Tests that email is not sent if recipient email address is
         malformed.
         """
-        # Case when malformed_recipient_email is None when calling send_mail.
-        malformed_recipient_email = None
-        email_exception = self.assertRaisesRegex(
-            ValueError,
-            'Malformed recipient email address: %s' % malformed_recipient_email,
-        )
-        with email_exception:
-            # TODO(#13528): Here we use MyPy ignore because we remove this test
-            # after the backend is fully type-annotated. send_mail() method
-            # doesn't expect recipient_email to be None, and the case when
-            # the recipient_email is malformed must be tested this is why
-            # ignore[arg-type] is used here.
-            email_services.send_mail(
-                'sender@example.com',
-                malformed_recipient_email,  # type: ignore[arg-type]
-                'subject',
-                'body',
-                'html',
-            )
 
         # Case when malformed_recipient_email is an empty string when
         # calling send_mail.
