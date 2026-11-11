@@ -3960,7 +3960,7 @@ export class LoggedOutUser extends BaseUser {
       readOurBlogButtonInDonationModal,
       'Read our blog'
     );
-    await this.clickAndWaitForNavigation(readOurBlogButtonInDonationModal);
+    await this.clickOnElementWithSelector(readOurBlogButtonInDonationModal);
     await this.expectElementToBeVisible(blogWelcomeHeadingSelector);
     showMessage('The Read Our Blog button opens the blog page.');
   }
