@@ -3,7 +3,7 @@
               class="{{ e2eTestClass }}"
               [value]="preferredLanguageCode"
               (valueChange)="updateLanguage($event)">
-    <mat-option [aria-label]="'I18N_PREFERENCES_SEARCH_LABEL' | translate">
+    <mat-option [attr.aria-label]="'I18N_PREFERENCES_SEARCH_LABEL' | translate">
       <ngx-mat-select-search ngModel
                              (ngModelChange)="filterChoices($event)"
                              placeholderLabel="{{ 'I18N_PREFERENCES_SEARCH_LABEL' | translate }}"

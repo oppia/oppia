@@ -30,6 +30,8 @@ import {PreferencesPageRoutingModule} from './preferences-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
 import {RouterModule} from '@angular/router';
+Import { MatSelectModule } from '@angular/material/select';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
   imports: [
@@ -40,6 +42,8 @@ import {RouterModule} from '@angular/router';
     SharedComponentsModule,
     PreferencesPageRoutingModule,
     Error404PageModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
   ],
   declarations: [
     EditProfilePictureModalComponent,
