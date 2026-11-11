@@ -142,13 +142,19 @@
 }
 
 .sub-text {
-  -webkit-box-orient: vertical;
   color: #555;
-  display: -webkit-box;
   font: italic normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
+  margin: 0;
+}
+
+/* Reserve 2 lines (2 * 1.4rem) and clamp overflow so date length changes do
+   not shift elements below the timestamp. */
+mat-card-subtitle.sub-text {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  margin: 0;
+  min-height: 2.8rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
