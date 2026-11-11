@@ -124,6 +124,22 @@ class FirebaseRecordTests(test_utils.GenericTestBase):
             ),
         )
 
+    def test_from_oppia_models_lowercases_email(self) -> None:
+        auth_details = auth_models.UserAuthDetailsModel(
+            id='uid_a', firebase_auth_id='fb_a', deleted=False
+        )
+        settings = user_models.UserSettingsModel(
+            id='uid_a', email='A@a.com', deleted=False
+        )
+        self.assertEqual(
+            firebase_domain.FirebaseRecord.from_oppia_models(
+                auth_details, settings
+            ),
+            firebase_domain.FirebaseRecord(
+                auth_id='fb_a', email='a@a.com', disabled=False
+            ),
+        )
+
     def test_from_oppia_models_with_parent_user_id_returns_none(self) -> None:
         auth_details = auth_models.UserAuthDetailsModel(
             id='uid_a',
