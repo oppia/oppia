@@ -127,7 +127,7 @@
           </div>
         </div>
       </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
     </div>
     <div class="dashboard-content-mobile"
          *ngIf="checkMobileView() && activeTab !== TAB_NAME_TRANSLATION_CONFIGURATION">
@@ -191,7 +191,7 @@
           </oppia-topic-filter>
         </div>
       </div>
-      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }" (rightsUpdated)="refreshQuestionReviewersCount()"></contributor-admin-stats-table>
     </div>
   </div>
 </div>

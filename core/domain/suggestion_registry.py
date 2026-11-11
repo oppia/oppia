@@ -2062,6 +2062,8 @@ class ContributorCertificateInfoDict(TypedDict):
     contribution_word_count: int
     language: Optional[str]
     certificate_profile_name: str
+    translated_word_count: int
+    reviewed_word_count: int
 
 
 class ContributorCertificateInfo:
@@ -2078,6 +2080,8 @@ class ContributorCertificateInfo:
         contribution_word_count: int,
         language: Optional[str],
         certificate_profile_name: str,
+        translated_word_count: int = 0,
+        reviewed_word_count: int = 0,
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
@@ -2086,6 +2090,8 @@ class ContributorCertificateInfo:
         self.contribution_word_count = contribution_word_count
         self.language = language
         self.certificate_profile_name = certificate_profile_name
+        self.translated_word_count = translated_word_count
+        self.reviewed_word_count = reviewed_word_count
 
     def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
@@ -2103,6 +2109,8 @@ class ContributorCertificateInfo:
             'contribution_word_count': self.contribution_word_count,
             'language': self.language,
             'certificate_profile_name': self.certificate_profile_name,
+            'translated_word_count': self.translated_word_count,
+            'reviewed_word_count': self.reviewed_word_count,
         }
 
 

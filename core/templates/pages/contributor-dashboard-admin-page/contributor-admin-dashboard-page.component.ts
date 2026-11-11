@@ -28,6 +28,7 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
+import {ContributorAdminStatsTable} from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {
@@ -96,6 +97,9 @@ export class ContributorAdminDashboardPageComponent
   implements OnInit, OnChanges
 {
   @Input() showTranslationConfigurationTab: boolean = false;
+
+  @ViewChild(ContributorAdminStatsTable, {static: false})
+  statsTable?: ContributorAdminStatsTable;
 
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
@@ -401,6 +405,14 @@ export class ContributorAdminDashboardPageComponent
     }
   }
 
+  refreshQuestionReviewersCount(): void {
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchCommunityStats()
+      .then(response => {
+        this.questionReviewersCount = response.question_reviewers_count;
+      });
+  }
+
   openUsernameInputModal(): void {
     const modalRef = this.modalService.open(UsernameInputModal);
     modalRef.componentInstance.activeTab = this.activeTab;
@@ -425,14 +437,16 @@ export class ContributorAdminDashboardPageComponent
           isQuestionReviewer: response.can_review_questions,
         };
         modelRef.result.then(
-          results => {
-            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
+          async results => {
+            await this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
               username,
               results.isQuestionSubmitter,
               results.isQuestionReviewer,
               response.can_submit_questions,
               response.can_review_questions
             );
+            this.statsTable?.refreshPagination();
+            this.refreshQuestionReviewersCount();
           },
           () => {
             // Note to developers:
