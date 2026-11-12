@@ -73,14 +73,13 @@ class AwareDateTimeProperty(ndb.DateTimeProperty):
     datetimes consistently.
     """
 
-    # Here we use object because this hook receives whatever value the caller
-    # assigns to the property, before any validation has narrowed its type. The
-    # isinstance check below rejects anything that is not a datetime.
-    def _validate(self, value: object) -> datetime.datetime:
+    def _validate(self, value: datetime.datetime) -> datetime.datetime:
         """Normalise input to an aware UTC datetime.
 
         Args:
-            value: datetime.datetime. The value to check.
+            value: datetime.datetime. The value to check. Subclasses of
+                datetime.datetime are also accepted, since Datastore returns
+                values as DatetimeWithNanoseconds.
 
         Returns:
             datetime.datetime. An aware UTC datetime.
@@ -88,6 +87,9 @@ class AwareDateTimeProperty(ndb.DateTimeProperty):
         Raises:
             ndb.exceptions.BadValueError. If value is not a datetime instance.
         """
+        # NDB invokes this hook with whatever value the caller assigned or used
+        # in a query filter, so the check is kept at runtime to reject
+        # non-datetimes the same way ndb.DateTimeProperty._validate does.
         if not isinstance(value, datetime.datetime):
             raise ndb_exceptions.BadValueError(
                 'Expected datetime, got %r' % value
