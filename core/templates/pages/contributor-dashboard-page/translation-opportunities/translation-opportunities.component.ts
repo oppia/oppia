@@ -99,10 +99,6 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
       const inReviewCount =
         opportunity.getTranslationsInReviewCount(languageCode);
 
-      if (!this.userIsReviewer) {
-        totalCount -= reviewerOnlyContentCount;
-      }
-
       let progressPercentage = 0;
       if (totalCount > 0) {
         progressPercentage = Math.min(
