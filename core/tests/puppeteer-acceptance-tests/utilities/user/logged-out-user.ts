@@ -141,9 +141,7 @@ const watchAVideoButton =
 const readOurBlogButton =
   'a.e2e-test-thanks-for-donating-page-read-our-blog-button';
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
-// Scoped to the body so that other elements with a `modal-open` class cannot
-// affect the modal visibility checks.
-const thanksForDonatingClass = 'body.modal-open';
+const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 const aboutPage = '.e2e-test-about-page';
 
@@ -1570,11 +1568,11 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    // External pages can keep network connections open and subresources
-    // pending, so waiting for network idle or the load event can time out even
-    // after the navigation has completed. Wait only for the DOM to be parsed.
+    // The Facebook video page keeps network connections open, so waiting for
+    // network idle can time out even after the page has loaded. Wait only for
+    // the load event instead.
     await this.clickAndWaitForNavigation(watchAVideoButton, true, {
-      waitUntil: 'domcontentloaded',
+      waitUntil: 'load',
       timeout: 60000,
     });
 
@@ -1601,12 +1599,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    // Wait only for the DOM to be parsed, so that pending subresources cannot
-    // keep the navigation from resolving.
-    await this.clickAndWaitForNavigation(readOurBlogButton, true, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60000,
-    });
+    await this.clickAndWaitForNavigation(readOurBlogButton, true);
 
     if (this.page.url() !== blogUrl) {
       throw new Error(
