@@ -20,6 +20,7 @@ from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
+    exp_fetchers,
     platform_parameter_list,
     question_services,
     skill_services,
@@ -29,7 +30,9 @@ from core.domain import (
     topic_domain,
     topic_services,
     translation_domain,
+    translation_services,
     user_services,
+    voiceover_services,
 )
 from core.tests import test_utils
 
@@ -307,6 +310,12 @@ class TopicPageDataHandlerTests(
         )
         self.publish_exploration(self.admin_id, no_translation_exploration_id)
 
+        additional_story_exploration_id = 'exp_id_3'
+        self.save_new_valid_exploration(
+            additional_story_exploration_id, self.admin_id, end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, additional_story_exploration_id)
+
         change_list = [
             story_domain.StoryChange(
                 {
@@ -363,10 +372,81 @@ class TopicPageDataHandlerTests(
             self.admin_id, self.story_id_1, change_list, 'Added nodes.'
         )
 
-        self.login(self.NEW_USER_EMAIL)
-        json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        additional_story_change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Node 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': additional_story_exploration_id,
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': 'node_1',
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id,
+            self.story_id_2,
+            additional_story_change_list,
+            'Added additional story node.',
         )
+
+        self.login(self.NEW_USER_EMAIL)
+        get_explorations_swap = self.swap_with_checks(
+            exp_fetchers,
+            'get_multiple_explorations_by_id',
+            lambda *unused_args, **unused_kwargs: {},
+            called=False,
+        )
+        get_translation_languages_swap = self.swap_with_checks(
+            translation_services,
+            'get_displayable_translation_languages',
+            lambda *unused_args, **unused_kwargs: [],
+            called=False,
+        )
+        get_all_accent_codes_swap = self.swap_with_checks(
+            voiceover_services,
+            'get_all_language_accent_codes_for_voiceovers',
+            lambda *unused_args, **unused_kwargs: {},
+            called=False,
+        )
+        get_entity_voiceovers_swap = self.swap_with_checks(
+            voiceover_services,
+            'get_entity_voiceovers_for_given_exploration',
+            lambda *unused_args, **unused_kwargs: [],
+            called=False,
+        )
+        get_accent_descriptions_swap = self.swap_with_checks(
+            voiceover_services,
+            'get_language_accent_codes_to_descriptions',
+            lambda *unused_args, **unused_kwargs: {},
+            called=False,
+        )
+        with (
+            get_explorations_swap,
+            get_translation_languages_swap,
+            get_all_accent_codes_swap,
+            get_entity_voiceovers_swap,
+            get_accent_descriptions_swap,
+        ):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+            )
 
         canonical_stories = json_response['canonical_story_dicts']
         story_with_nodes = [
@@ -399,6 +479,28 @@ class TopicPageDataHandlerTests(
         self.assertEqual(second_node_dict['id'], 'node_2')
         self.assertEqual(
             second_node_dict['exploration_id'], no_translation_exploration_id
+        )
+
+        additional_story = story_fetchers.get_story_by_id(self.story_id_2)
+        expected_additional_node_dicts = {
+            node.id: node.to_dict()
+            for node in additional_story.story_contents.nodes
+        }
+        additional_story_dicts = json_response['additional_story_dicts']
+        additional_story_with_nodes = [
+            s for s in additional_story_dicts if s['id'] == self.story_id_2
+        ]
+        self.assertEqual(len(additional_story_with_nodes), 1)
+        additional_story_dict = additional_story_with_nodes[0]
+        self.assertEqual(len(additional_story_dict['all_node_dicts']), 1)
+        additional_node_dict = additional_story_dict['all_node_dicts'][0]
+        self.assertEqual(
+            additional_node_dict, expected_additional_node_dicts['node_1']
+        )
+        self.assertEqual(additional_node_dict['id'], 'node_1')
+        self.assertEqual(
+            additional_node_dict['exploration_id'],
+            additional_story_exploration_id,
         )
         self.logout()
 
