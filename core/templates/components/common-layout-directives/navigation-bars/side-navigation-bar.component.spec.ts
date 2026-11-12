@@ -166,13 +166,11 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should close sidebar on swipe left', () => {
-    spyOn(sidebarStatusService, 'closeSidebar');
+  it('should close sidebar on swipe left and restore body scrolling', () => {
     mockWindowRef.nativeWindow.document.body.style.overflowY = 'hidden';
 
     componentInstance.closeSidebarOnSwipeleft();
 
-    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
     expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
       'auto'
     );

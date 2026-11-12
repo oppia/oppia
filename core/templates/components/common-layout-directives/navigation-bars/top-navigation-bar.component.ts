@@ -331,7 +331,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         // Keep the sidebar open when mobile browser controls resize the viewport.
         if (!this.windowIsNarrow) {
           this.sidebarStatusService.closeSidebar();
-          this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
         }
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();

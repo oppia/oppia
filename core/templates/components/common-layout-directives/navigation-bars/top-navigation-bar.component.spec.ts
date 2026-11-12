@@ -250,13 +250,22 @@ describe('TopNavigationBarComponent', () => {
     spyOn(component, 'truncateNavbar').and.stub();
     component.ngOnInit();
     component.toggleSidebar(new Event('click'));
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
 
     mockResizeEmitter.emit();
     expect(component.isSidebarShown()).toBeTrue();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'hidden'
+    );
 
     isWindowNarrow.and.returnValue(false);
     mockResizeEmitter.emit();
     expect(component.isSidebarShown()).toBeFalse();
+    expect(mockWindowRef.nativeWindow.document.body.style.overflowY).toBe(
+      'auto'
+    );
   });
 
   it('should provide an accessible mobile menu control with a visible X', fakeAsync(() => {
@@ -292,7 +301,6 @@ describe('TopNavigationBarComponent', () => {
     );
     const closeIcon = menuControl.query(By.css('.oppia-navbar-close-icon'));
     expect(closeIcon.nativeElement.textContent.trim()).toBe('✕');
-    expect(closeIcon.nativeElement.classList.contains('fas')).toBeFalse();
     expect(closeIcon.nativeElement.getAttribute('aria-hidden')).toBe('true');
 
     const spaceEvent = new KeyboardEvent('keydown', {

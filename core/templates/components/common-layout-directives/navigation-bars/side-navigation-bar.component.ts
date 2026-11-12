@@ -106,7 +106,6 @@ export class SideNavigationBarComponent {
 
   closeSidebarOnSwipeleft(): void {
     this.sidebarStatusService.closeSidebar();
-    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
   }
 
   togglelearnSubmenu(): void {

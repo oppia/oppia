@@ -231,13 +231,11 @@ describe('Base Content Component', () => {
     expect(bottomNavbarStatusService.isBottomNavbarEnabled).toHaveBeenCalled();
   });
 
-  it('should close sidebar on swipe', () => {
-    spyOn(sidebarStatusService, 'closeSidebar');
+  it('should close sidebar on swipe and restore body scrolling', () => {
     windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
 
     componentInstance.closeSidebarOnSwipe();
 
-    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
     expect(windowRef.nativeWindow.document.body.style.overflowY).toBe('auto');
   });
 
