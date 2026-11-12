@@ -206,6 +206,22 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(updated_group.story_ids, ['story_id_1', 'story_id_2'])
 
+    def test_get_missing_subtopic_page_ids(self) -> None:
+        self.assertEqual(
+            learner_group_services.get_missing_subtopic_page_ids([]), []
+        )
+        self.assertEqual(
+            learner_group_services.get_missing_subtopic_page_ids(
+                [
+                    '%s:1' % self.TOPIC_ID_0,
+                    '%s:5' % self.TOPIC_ID_0,
+                    'missing_topic_id:1',
+                    'subtopic_id_1',
+                ]
+            ),
+            ['%s:5' % self.TOPIC_ID_0, 'missing_topic_id:1', 'subtopic_id_1'],
+        )
+
     def test_is_user_facilitator(self) -> None:
         self.assertTrue(
             learner_group_services.is_user_facilitator(

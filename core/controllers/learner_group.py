@@ -127,6 +127,17 @@ class CreateLearnerGroupHandler(
             invited_learner_usernames, strict=True
         )
 
+        missing_subtopic_page_ids = (
+            learner_group_services.get_missing_subtopic_page_ids(
+                subtopic_page_ids
+            )
+        )
+        if missing_subtopic_page_ids:
+            raise self.InvalidInputException(
+                'These subtopic pages do not exist: %s'
+                % ', '.join(missing_subtopic_page_ids)
+            )
+
         new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group = learner_group_services.create_learner_group(
@@ -224,6 +235,28 @@ class LearnerGroupHandler(
         invited_learner_ids = user_services.get_multi_user_ids_from_usernames(
             invited_learner_usernames, strict=True
         )
+
+        # Only newly added subtopic pages are checked. A page that is already
+        # in the group may belong to a topic that was deleted later, and the
+        # facilitator should still be able to edit the group.
+        existing_learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id, strict=True
+        )
+        missing_subtopic_page_ids = (
+            learner_group_services.get_missing_subtopic_page_ids(
+                [
+                    subtopic_page_id
+                    for subtopic_page_id in subtopic_page_ids
+                    if subtopic_page_id
+                    not in existing_learner_group.subtopic_page_ids
+                ]
+            )
+        )
+        if missing_subtopic_page_ids:
+            raise self.InvalidInputException(
+                'These subtopic pages do not exist: %s'
+                % ', '.join(missing_subtopic_page_ids)
+            )
 
         learner_group = learner_group_services.update_learner_group(
             learner_group_id,

@@ -636,6 +636,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(summaries, expected_summaries)
 
+    def test_syllabus_summaries_skip_subtopic_pages_of_missing_topics(
+        self,
+    ) -> None:
+        summaries = subtopic_page_services.get_learner_group_syllabus_subtopic_page_summaries(
+            ['missing_topic_id:1', '{}:{}'.format(self.TOPIC_ID_1, 1)]
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0]['parent_topic_id'], self.TOPIC_ID_1)
+        self.assertEqual(summaries[0]['subtopic_id'], 1)
+
     def test_populate_subtopic_page_model_fields(self) -> None:
         model = subtopic_models.SubtopicPageModel(
             id=self.subtopic_id,
