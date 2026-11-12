@@ -1428,6 +1428,32 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_get_learner_group_syllabus_with_missing_topic(self) -> None:
+        learner_group_services.update_learner_group(
+            self.learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.facilitator_id],
+            [],
+            [self.LEARNER_ID],
+            ['missing_topic_id:1', self.SUBTOPIC_PAGE_ID],
+            [self.STORY_ID],
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        response = self.get_json(
+            '/learner_group_syllabus_handler/%s' % self.learner_group_id
+        )
+
+        subtopic_summary_dicts = response['subtopic_summary_dicts']
+        self.assertEqual(len(subtopic_summary_dicts), 1)
+        self.assertEqual(
+            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID
+        )
+        self.assertEqual(len(response['story_summary_dicts']), 1)
+
+        self.logout()
+
     def test_get_learner_group_syllabus_for_invalid_group(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
