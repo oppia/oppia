@@ -232,9 +232,17 @@ describe('InsertScriptService', () => {
       }
     );
 
+    let hasLoadCallbackRun = false;
     const result = insertScriptService.loadScript(
       KNOWN_SCRIPTS.PENCILCODE,
       () => {
+        // The service invokes the on-load callback from both the script's
+        // load handler and the load promise, so ignore repeat invocations to
+        // avoid calling done() twice.
+        if (hasLoadCallbackRun) {
+          return;
+        }
+        hasLoadCallbackRun = true;
         expect(mockScriptElement.src).toContain(
           'https://pencilcode.net/lib/pencilcodeembed.js'
         );

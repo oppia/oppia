@@ -56,32 +56,49 @@ describe('Image Uploader Modal', () => {
   const MOCKED_IMAGE_WIDTH = 30;
   let mockedFileReadResult = '';
   let mockedFileReadShouldError = false;
-  let mockFileReader: MockFileReader;
-  let mockImage: MockImage;
   let originalFileReader: typeof FileReader;
   let originalImage: typeof Image;
 
-  class MockFileReader {
-    result: string | null = null;
-    onload: ((ev: ProgressEvent<FileReader>) => void) | null = null;
-    onerror: (() => void) | null = null;
+  // A real ProgressEvent whose target is typed as the mock reader, so the
+  // component's onload/onerror handlers receive a genuine
+  // ProgressEvent<FileReader> without any casts.
+  class MockProgressEvent extends ProgressEvent {
+    constructor(
+      type: string,
+      private readonly eventTarget: MockFileReader
+    ) {
+      super(type);
+    }
 
-    readAsDataURL(): void {
-      if (mockedFileReadShouldError) {
-        this.onerror?.();
-        return;
-      }
-      this.onload?.({
-        target: {result: mockedFileReadResult},
-      } as unknown as ProgressEvent<FileReader>);
+    get target(): MockFileReader {
+      return this.eventTarget;
     }
   }
 
-  class MockImage {
+  // The mocks extend the real APIs so that they remain complete,
+  // type-checked implementations instead of partial objects hidden behind
+  // casts.
+  class MockFileReader extends FileReader {
+    get result(): string | ArrayBuffer | null {
+      return mockedFileReadResult;
+    }
+
+    readAsDataURL(): void {
+      // Call the handler directly instead of dispatching an event: zone.js
+      // wraps FileReader and forwards dispatchEvent to an internal reader
+      // whose result is always null.
+      if (mockedFileReadShouldError) {
+        this.onerror?.(new MockProgressEvent('error', this));
+        return;
+      }
+      this.onload?.(new MockProgressEvent('load', this));
+    }
+  }
+
+  class MockImage extends Image {
     height = MOCKED_IMAGE_HEIGHT;
     width = MOCKED_IMAGE_WIDTH;
-    onload: (() => void) | null = null;
-    sourceUrl = '';
+    private sourceUrl = '';
 
     get src(): string {
       return this.sourceUrl;
@@ -91,7 +108,7 @@ describe('Image Uploader Modal', () => {
       this.sourceUrl = value;
       // Fire onload synchronously so that the image-load handling in
       // onFileChanged is always exercised, regardless of test order.
-      this.onload?.();
+      this.onload?.(new Event('load'));
     }
   }
 
@@ -125,20 +142,12 @@ describe('Image Uploader Modal', () => {
   beforeEach(() => {
     mockedFileReadResult = '';
     mockedFileReadShouldError = false;
-    mockFileReader = new MockFileReader();
-    mockImage = new MockImage();
-    // Assign constructable mocks directly instead of using spyOn so that
-    // individual tests (present or future) can still spyOn these globals.
-    // The component calls `new FileReader()` and `new Image()`, so the
-    // assigned functions must be constructable.
+    // Assign type-checked subclasses directly instead of using spyOn so that
+    // individual tests (present or future) can still spy on these globals.
     originalFileReader = window.FileReader;
     originalImage = window.Image;
-    window.FileReader = function () {
-      return mockFileReader;
-    } as unknown as typeof FileReader;
-    window.Image = function () {
-      return mockImage;
-    } as unknown as typeof Image;
+    window.FileReader = MockFileReader;
+    window.Image = MockImage;
     fixture = TestBed.createComponent(ImageUploaderModalComponent);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     componentInstance = fixture.componentInstance;
