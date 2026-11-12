@@ -249,7 +249,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
             'These subtopic pages do not exist: missing_topic_id:1',
         )
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-            self.learner_group_id, strict=True
+            self.learner_group.group_id, strict=True
         )
         self.assertEqual(learner_group.title, 'Learner Group Title')
         self.assertEqual(learner_group.subtopic_page_ids, ['subtopic_id_1'])
