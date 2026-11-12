@@ -95,7 +95,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
-      null,
       null
     );
     component.outcome = outcome;
@@ -158,7 +157,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
         true,
         [],
-        null,
         null
       );
       component.outcome = new Outcome(
@@ -167,7 +165,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Outcome</p>', 'Id'),
         true,
         [],
-        null,
         null
       );
 
@@ -238,7 +235,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       true,
       [],
-      '',
       ''
     );
     component.outcome = new Outcome(
@@ -247,7 +243,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
-      '',
       ''
     );
 
@@ -283,7 +278,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
         true,
         [],
-        'ExpId',
         'SkillId'
       );
       component.outcome = new Outcome(
@@ -292,7 +286,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Outcome</p>', 'Id'),
         true,
         [],
-        '',
         ''
       );
 
@@ -337,7 +330,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
-      null,
       null
     );
     component.outcome = outcome;
@@ -351,7 +343,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
-      null,
       null
     );
     component.outcome = outcome;
@@ -413,7 +404,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
-      null,
       null
     );
 
@@ -455,7 +445,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       false,
       [],
-      'ExpId',
       'SkillId'
     );
     component.outcome = new Outcome(
@@ -464,7 +453,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
-      '',
       ''
     );
     component.openDestinationIfStuckEditor();
@@ -479,7 +467,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       false,
       [],
-      'ExpId',
       'SkillId'
     );
     component.outcome = new Outcome(
@@ -488,7 +475,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
-      '',
       ''
     );
 
@@ -504,7 +490,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
-      'ExpId',
       'SkillId'
     );
     component.outcome = new Outcome(
@@ -513,7 +498,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
-      '',
       ''
     );
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
@@ -531,7 +515,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
-      'ExpId',
       'SkillId'
     );
     component.outcome = new Outcome(
@@ -540,7 +523,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
-      '',
       ''
     );
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
@@ -561,7 +543,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
         false,
         [],
-        'ExpId',
         ''
       );
       component.outcome = new Outcome(
@@ -570,7 +551,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Outcome</p>', 'contentId'),
         true,
         [],
-        'OutcomeExpId',
         'SkillId'
       );
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Dest1');
@@ -593,7 +573,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
         false,
         [],
-        'ExpId',
         ''
       );
       component.outcome = new Outcome(
@@ -602,7 +581,6 @@ describe('Outcome Editor Component', () => {
         new SubtitledHtml('<p>Outcome</p>', 'contentId'),
         true,
         [],
-        'OutcomeExpId',
         'SkillId'
       );
 
@@ -619,7 +597,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('a'.repeat(10000), 'contentId'),
       true,
       [],
-      'OutcomeExpId',
       'SkillId'
     );
     expect(component.isFeedbackLengthExceeded()).toBeFalse();
@@ -630,7 +607,6 @@ describe('Outcome Editor Component', () => {
       new SubtitledHtml('a'.repeat(10001), 'contentId'),
       true,
       [],
-      'OutcomeExpId',
       'SkillId'
     );
     expect(component.isFeedbackLengthExceeded()).toBeTrue();

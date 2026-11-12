@@ -76,7 +76,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -332,7 +331,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -346,7 +344,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
     spyOn(component.getChanges, 'emit');
@@ -373,7 +370,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
     component.currentStateName = 'Introduction';

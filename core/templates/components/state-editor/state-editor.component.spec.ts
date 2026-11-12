@@ -99,7 +99,6 @@ describe('State Editor Component', () => {
         new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
         true,
         [],
-        null,
         null
       )
     );
@@ -150,7 +149,6 @@ describe('State Editor Component', () => {
         new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
         true,
         [],
-        null,
         null
       ),
       [],

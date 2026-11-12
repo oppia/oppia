@@ -72,7 +72,6 @@ describe('CertificateAssessmentPlayerPageRootComponent', () => {
         feedback: {content_id: 'f', html: '<p>f</p>'},
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       },
       hints: [],

@@ -274,7 +274,6 @@ describe('Responses Service', () => {
         new SubtitledHtml('', 'This is a new feedback text'),
         true,
         [],
-        'test',
         'test_skill_id'
       ),
       ['This is training data text'],

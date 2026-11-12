@@ -116,7 +116,6 @@ describe('Training Panel Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
         true,
         [],
-        '',
         ''
       ),
     };
@@ -151,7 +150,6 @@ describe('Training Panel Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
         true,
         [],
-        '',
         ''
       ),
       new Outcome(
@@ -160,7 +158,6 @@ describe('Training Panel Component', () => {
         new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
         true,
         [],
-        '',
         ''
       ),
     ];

@@ -229,7 +229,6 @@ describe('Exploration Summary Tile Component', () => {
     component.isCommunityOwned = true;
     component.isCollectionPreviewTile = true;
     component.isPlaylistTile = true;
-    component.parentExplorationIds = ['1', '2', '3'];
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
     fixture.detectChanges();

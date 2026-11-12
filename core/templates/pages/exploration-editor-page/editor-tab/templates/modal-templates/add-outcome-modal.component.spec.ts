@@ -64,7 +64,6 @@ describe('Add Outcome Modal Component', () => {
       new SubtitledHtml('a'.repeat(100), 'contentId'),
       true,
       [],
-      'OutcomeExpId',
       'SkillId'
     );
     spyOn(ngbActiveModal, 'close');
@@ -83,7 +82,6 @@ describe('Add Outcome Modal Component', () => {
       new SubtitledHtml('a'.repeat(100), 'contentId'),
       true,
       [],
-      'OutcomeExpId',
       'SkillId'
     );
 
@@ -97,7 +95,6 @@ describe('Add Outcome Modal Component', () => {
       new SubtitledHtml('a'.repeat(10001), 'contentId'),
       true,
       [],
-      'OutcomeExpId',
       'SkillId'
     );
 
