@@ -1,0 +1,34 @@
+body:
+- type: textarea
+  id: contact
+  attributes:
+    label: Who are you trying to contact?
+    description: "Please describe the person, team, or role you are trying to reach."
+  validations:
+    required: true
+- type: textarea
+  id: reason
+  attributes:
+    label: Why do you need to contact them?
+    description: "Please explain what you need help with and why you believe this person or team is the appropriate contact."
+  validations:
+    required: true
+- type: textarea
+  id: attempts
+  attributes:
+    label: What have you already tried?
+    description: "Please describe any documentation, communication channels, or contacts you have already tried."
+  validations:
+    required: false
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional information
+    description: |
+        Add any other context that may help others direct you to the appropriate person or channel.
+
+        Before posting, please also review:
+        https://github.com/oppia/oppia/wiki/Debugging-Docs
+        https://github.com/oppia/oppia/wiki/Get-help#how-to-ask-good-questions
+  validations:
+    required: false

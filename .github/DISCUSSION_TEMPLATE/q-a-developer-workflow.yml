@@ -1,0 +1,36 @@
+body:
+- type: textarea
+  id: steps
+  attributes:
+    label: Steps to reproduce the issue
+    description: |
+        Please describe the steps that led to the problem.
+        These should be detailed enough for someone else to follow them.
+  validations:
+    required: true
+- type: textarea
+  id: error
+  attributes:
+    label: Error message or unexpected behavior
+    description: "Please provide the exact error message or describe what happened."
+  validations:
+    required: true
+- type: textarea
+  id: approaches
+  attributes:
+    label: Approaches already used to resolve the issue
+    description: "What have you already tried, and what conclusions have you drawn?"
+  validations:
+    required: true
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional information
+    description: |
+        Add any other context that might help diagnose the problem.
+
+        Before posting, please also review:
+        https://github.com/oppia/oppia/wiki/Debugging-Docs
+        https://github.com/oppia/oppia/wiki/Get-help#how-to-ask-good-questions
+  validations:
+    required: false
