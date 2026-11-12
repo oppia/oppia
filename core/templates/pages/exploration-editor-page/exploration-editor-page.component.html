@@ -182,7 +182,8 @@
                                   class="e2e-test-exploration-main-tab">
     </oppia-exploration-editor-tab>
 
-    <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
+    <!-- Keep the translation tab uncreated until the exploration language is initialized, so voiceover mode does not treat an unset language code as the original language. -->
+    <oppia-translation-tab *ngIf="explorationEditorPageHasInitialized && getActiveTabName() === 'translation'">
     </oppia-translation-tab>
     <!-- This is an *ngIf, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
     <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
