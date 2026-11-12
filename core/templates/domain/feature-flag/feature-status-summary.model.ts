@@ -26,7 +26,6 @@ export enum FeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
-  ShowTranslationSize = 'show_translation_size',
   ShowRedesignedLearnerDashboard = 'show_redesigned_learner_dashboard',
   IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',

@@ -1635,7 +1635,8 @@ def _get_translation_opportunity_cards_from_models(
             if skill_val_obj:
                 entity_description = skill_val_obj.description
 
-        elif model_entity_type == feconf.ENTITY_TYPE_TOPIC:
+        else:
+            assert model_entity_type == feconf.ENTITY_TYPE_TOPIC
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )
@@ -2356,13 +2357,14 @@ def update_pinned_opportunity_model(
             entity_type=entity_type,
         )
     else:
-        if pinned_opportunity:
-            # Update the model's opportunity_id and entity_type.
-            pinned_opportunity.opportunity_id = lesson_id
-            if lesson_id is not None:
-                pinned_opportunity.entity_type = entity_type
-            pinned_opportunity.update_timestamps()
-            pinned_opportunity.put()
+        # The checks above guarantee that the model exists here.
+        assert pinned_opportunity is not None
+        # Update the model's opportunity_id and entity_type.
+        pinned_opportunity.opportunity_id = lesson_id
+        if lesson_id is not None:
+            pinned_opportunity.entity_type = entity_type
+        pinned_opportunity.update_timestamps()
+        pinned_opportunity.put()
 
 
 def get_pinned_lesson(
