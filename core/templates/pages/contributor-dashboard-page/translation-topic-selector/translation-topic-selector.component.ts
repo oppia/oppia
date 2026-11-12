@@ -19,6 +19,8 @@
 import {
   Component,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   Input,
   Output,
   EventEmitter,
@@ -31,7 +33,7 @@ import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/co
 import {
   ALL_TOPICS_OPTION,
   ContributionOpportunitiesBackendApiService,
-  TranslatableTopic,
+  TranslatableTopicWithCompleteness,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 
@@ -40,16 +42,19 @@ import {
   templateUrl: './translation-topic-selector.component.html',
   styleUrls: ['./translation-topic-selector.component.css'],
 })
-export class TranslationTopicSelectorComponent implements OnInit {
+export class TranslationTopicSelectorComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeTopicId!: string;
+  @Input() activeLanguageCode!: string;
   @Output() setActiveTopicId: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
 
   dropdownShown = false;
-  topicsPerClassroomMap: Record<string, TranslatableTopic[]> = {};
+  topicsPerClassroomMap: Record<string, TranslatableTopicWithCompleteness[]> =
+    {};
+
   // Maps topic IDs to topic names, so that the name of the active topic can
   // be displayed while only its ID is tracked.
   private topicIdToName: Record<string, string> = {
@@ -61,16 +66,7 @@ export class TranslationTopicSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicsPerClassroomAsync()
-      .then(topicsPerClassroom => {
-        topicsPerClassroom.forEach(({classroom, topics}) => {
-          this.topicsPerClassroomMap[classroom] = topics;
-          topics.forEach(topic => {
-            this.topicIdToName[topic.id] = topic.name;
-          });
-        });
-      });
+    this.fetchTopics();
 
     // Set the initial active topic to "All".
     this.activeTopicId = ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL;
@@ -79,6 +75,28 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   getActiveTopicName(): string {
     return this.topicIdToName[this.activeTopicId] ?? '';
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Refetch when the language changes so percentages/sort update.
+    // Skip the first change; ngOnInit already does the initial fetch.
+    if (changes.activeLanguageCode && !changes.activeLanguageCode.firstChange) {
+      this.fetchTopics();
+    }
+  }
+
+  fetchTopics(): void {
+    this.contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicsPerClassroomAsync(this.activeLanguageCode)
+      .then(topicsPerClassroom => {
+        this.topicsPerClassroomMap = {};
+        topicsPerClassroom.forEach(({classroom, topics}) => {
+          this.topicsPerClassroomMap[classroom] = topics;
+          topics.forEach(topic => {
+            this.topicIdToName[topic.id] = topic.name;
+          });
+        });
+      });
   }
 
   toggleDropdown(): void {

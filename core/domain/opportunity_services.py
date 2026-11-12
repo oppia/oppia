@@ -1623,7 +1623,8 @@ def _get_translation_opportunity_cards_from_models(
             if skill_val_obj:
                 entity_description = skill_val_obj.description
 
-        elif model_entity_type == feconf.ENTITY_TYPE_TOPIC:
+        else:
+            assert model_entity_type == feconf.ENTITY_TYPE_TOPIC
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )
@@ -1861,6 +1862,41 @@ def get_exploration_opportunity_summary_by_id(
     return get_exploration_opportunity_summary_from_model(
         exp_opportunity_summary_model
     )
+
+
+def get_topic_id_to_translation_completeness(
+    language_code: str,
+) -> Dict[str, float]:
+    """Returns a map from topic id to translation completeness percentage
+    (0-100) for the given language, aggregated over all exploration
+    opportunity summaries in that topic.
+
+    Args:
+        language_code: str. The language to compute completeness for.
+
+    Returns:
+        dict(str, float). Map of topic id to completeness percentage.
+    """
+    all_summaries: Sequence[
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ] = opportunity_models.ExplorationOpportunitySummaryModel.get_all().fetch()
+
+    topic_id_to_content_count: Dict[str, int] = collections.defaultdict(int)
+    topic_id_to_translation_count: Dict[str, int] = collections.defaultdict(int)
+    for summary in all_summaries:
+        topic_id_to_content_count[summary.topic_id] += summary.content_count
+        topic_id_to_translation_count[summary.topic_id] += (
+            summary.translation_counts or {}
+        ).get(language_code, 0)
+
+    topic_id_to_completeness: Dict[str, float] = {}
+    for topic_id, content_count in topic_id_to_content_count.items():
+        topic_id_to_completeness[topic_id] = (
+            topic_id_to_translation_count[topic_id] / content_count * 100
+            if content_count > 0
+            else 0
+        )
+    return topic_id_to_completeness
 
 
 def get_exploration_opportunity_summaries_by_topic_id(
@@ -2344,13 +2380,14 @@ def update_pinned_opportunity_model(
             entity_type=entity_type,
         )
     else:
-        if pinned_opportunity:
-            # Update the model's opportunity_id and entity_type.
-            pinned_opportunity.opportunity_id = lesson_id
-            if lesson_id is not None:
-                pinned_opportunity.entity_type = entity_type
-            pinned_opportunity.update_timestamps()
-            pinned_opportunity.put()
+        # The checks above guarantee that the model exists here.
+        assert pinned_opportunity is not None
+        # Update the model's opportunity_id and entity_type.
+        pinned_opportunity.opportunity_id = lesson_id
+        if lesson_id is not None:
+            pinned_opportunity.entity_type = entity_type
+        pinned_opportunity.update_timestamps()
+        pinned_opportunity.put()
 
 
 def get_pinned_lesson(

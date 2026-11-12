@@ -191,12 +191,18 @@ describe('Contribution Opportunities backend API service', function () {
       {
         classroom: 'Class 1',
         topics: [
-          {id: 'topic_id_1', name: 'Topic 1'},
-          {id: 'topic_id_2', name: 'Topic 2'},
+          {id: 'topic_id_1', name: 'Topic 1', completeness: 20},
+          {id: 'topic_id_2', name: 'Topic 2', completeness: 80},
         ],
       },
-      {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
-      {classroom: '', topics: [{id: 'topic_id_4', name: 'Topic 4'}]},
+      {
+        classroom: 'Class 2',
+        topics: [{id: 'topic_id_3', name: 'Topic 3', completeness: 50}],
+      },
+      {
+        classroom: '',
+        topics: [{id: 'topic_id_4', name: 'Topic 4', completeness: 30}],
+      },
     ],
   };
 
@@ -1325,18 +1331,44 @@ describe('Contribution Opportunities backend API service', function () {
       {
         classroom: 'Class 1',
         topics: [
-          {id: 'topic_id_1', name: 'Topic 1'},
-          {id: 'topic_id_2', name: 'Topic 2'},
+          {id: 'topic_id_1', name: 'Topic 1', completeness: 20},
+          {id: 'topic_id_2', name: 'Topic 2', completeness: 80},
         ],
       },
-      {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
+      {
+        classroom: 'Class 2',
+        topics: [{id: 'topic_id_3', name: 'Topic 3', completeness: 50}],
+      },
       {
         classroom: '',
-        topics: [ALL_TOPICS_OPTION, {id: 'topic_id_4', name: 'Topic 4'}],
+        topics: [
+          {...ALL_TOPICS_OPTION, completeness: null},
+          {id: 'topic_id_4', name: 'Topic 4', completeness: 30},
+        ],
       },
     ];
 
     expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should pass language_code when fetching topics for a language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicsPerClassroomAsync('hi')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletopicnamesperclassroom?language_code=hi'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(sampleTopicsPerClassroomBackendDict);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

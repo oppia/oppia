@@ -17,7 +17,7 @@
  * contributors to contribute.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {
@@ -98,9 +98,16 @@ export interface TranslatableTopic {
   name: string;
 }
 
+// A translatable topic annotated with how much of it has been translated
+// into a given language. The completeness is null when no language was
+// requested.
+export interface TranslatableTopicWithCompleteness extends TranslatableTopic {
+  completeness: number | null;
+}
+
 export interface TranslatableTopicsPerClassroom {
   classroom: string;
-  topics: TranslatableTopic[];
+  topics: TranslatableTopicWithCompleteness[];
 }
 
 interface TranslatableTopicsBackendDict {
@@ -401,20 +408,28 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchTranslatableTopicsPerClassroomAsync(): Promise<
-    TranslatableTopicsPerClassroom[]
-  > {
+  async fetchTranslatableTopicsPerClassroomAsync(
+    languageCode?: string
+  ): Promise<TranslatableTopicsPerClassroom[]> {
     try {
+      let params = new HttpParams();
+      if (languageCode) {
+        params = params.set('language_code', languageCode);
+      }
       const response = await this.http
         .get<TranslatableTopicsPerClassroomBackendDict>(
-          '/gettranslatabletopicnamesperclassroom'
+          '/gettranslatabletopicnamesperclassroom',
+          {params}
         )
         .toPromise();
 
       const topicsPerClassroom = response.topics_per_classroom.map(
         ({classroom, topics}) => ({
           classroom,
-          topics: classroom === '' ? [ALL_TOPICS_OPTION, ...topics] : topics,
+          topics:
+            classroom === ''
+              ? [{...ALL_TOPICS_OPTION, completeness: null}, ...topics]
+              : topics,
         })
       );
 

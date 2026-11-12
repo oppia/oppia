@@ -38,14 +38,20 @@ describe('Translation topic selector', () => {
     {
       classroom: 'Class 1',
       topics: [
-        {id: 'topic_id_1', name: 'Topic 1'},
-        {id: 'topic_id_2', name: 'Topic 2'},
+        {id: 'topic_id_1', name: 'Topic 1', completeness: 20},
+        {id: 'topic_id_2', name: 'Topic 2', completeness: 80},
       ],
     },
-    {classroom: 'Class 2', topics: [{id: 'topic_id_3', name: 'Topic 3'}]},
+    {
+      classroom: 'Class 2',
+      topics: [{id: 'topic_id_3', name: 'Topic 3', completeness: 50}],
+    },
     {
       classroom: '',
-      topics: [ALL_TOPICS_OPTION, {id: 'topic_id_4', name: 'Topic 4'}],
+      topics: [
+        {...ALL_TOPICS_OPTION, completeness: null},
+        {id: 'topic_id_4', name: 'Topic 4', completeness: 30},
+      ],
     },
   ];
 
@@ -141,7 +147,11 @@ describe('Translation topic selector', () => {
       '.oppia-translation-topic-selector-dropdown-option-selected'
     );
     expect(selectedOptions.length).toBe(1);
-    expect(selectedOptions[0].textContent.trim()).toBe('Topic 2');
+    expect(
+      selectedOptions[0]
+        .querySelector('.e2e-test-topic-name')
+        .textContent.trim()
+    ).toBe('Topic 2');
   });
 
   it('should correctly display topics organized by classroom', async () => {
@@ -214,11 +224,64 @@ describe('Translation topic selector', () => {
       )
     );
     const topic4Option = options.find(
-      option => option.textContent?.trim() === 'Topic 4'
+      option =>
+        option.querySelector('.e2e-test-topic-name')?.textContent?.trim() ===
+        'Topic 4'
     );
     topic4Option?.click();
 
     expect(component.setActiveTopicId.emit).toHaveBeenCalledWith('topic_id_4');
     expect(component.dropdownShown).toBe(false);
+  });
+
+  it('should display completeness percentage next to topics', async () => {
+    component.activeLanguageCode = 'hi';
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    clickDropdown();
+
+    const completenessEls = fixture.debugElement.nativeElement.querySelectorAll(
+      '.oppia-translation-topic-selector-completeness'
+    );
+    // 4 real topics have a percentage; the "All" sentinel (null) does not.
+    expect(completenessEls.length).toBe(4);
+  });
+
+  it('should refetch topics when the language changes', () => {
+    const fetchSpy = spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'fetchTranslatableTopicsPerClassroomAsync'
+    ).and.returnValue(Promise.resolve(topicsPerClassroom));
+
+    component.activeLanguageCode = 'ar';
+    component.ngOnChanges({
+      activeLanguageCode: {
+        currentValue: 'ar',
+        previousValue: 'hi',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith('ar');
+  });
+
+  it('should not refetch topics on the first language change', () => {
+    const fetchSpy = spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'fetchTranslatableTopicsPerClassroomAsync'
+    ).and.returnValue(Promise.resolve(topicsPerClassroom));
+
+    component.ngOnChanges({
+      activeLanguageCode: {
+        currentValue: 'hi',
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    });
+
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
