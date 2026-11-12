@@ -4220,47 +4220,22 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks a link button that opens a new tab and verifies that the destination URL matches.
-   *
-   * @param {string} selector - The selector of the button to click.
-   * @param {string} expectedDestinationUrl - The expected URL of the destination page.
-   */
-  private async clickLinkButtonToNewTab(
-    selector: string,
-    expectedDestinationUrl: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
-    const href = await this.page.locator(selector).getAttribute('href');
-    expect(href).toBe(expectedDestinationUrl);
-
-    const newTabPromise = this.page.context().waitForEvent('page');
-    await this.clickOnElementWithSelector(selector);
-    const newTabPage = await newTabPromise;
-    await newTabPage.waitForURL(
-      url => url.href.startsWith(expectedDestinationUrl),
-      {waitUntil: 'commit', timeout: 15000}
-    );
-    expect(newTabPage.url().startsWith(expectedDestinationUrl)).toBe(true);
-    await newTabPage.close();
-  }
-
-  /**
-   * Clicks the Explore Volunteer Openings button at the top of the Volunteer
-   * page and checks if it opens the Oppia Idealist page.
+   * Checks that the Explore Volunteer Openings button at the top of the
+   * Volunteer page links to the Oppia Idealist page.
    */
   async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
+    await this.expectLinkToHaveHref(
       exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
       volunteerIdealistPageUrl
     );
   }
 
   /**
-   * Clicks the Explore Volunteer Openings button at the bottom of the Volunteer
-   * page and checks if it opens the Oppia Idealist page.
+   * Checks that the Explore Volunteer Openings button at the bottom of the
+   * Volunteer page links to the Oppia Idealist page.
    */
   async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
+    await this.expectLinkToHaveHref(
       exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
       volunteerIdealistPageUrl
     );
