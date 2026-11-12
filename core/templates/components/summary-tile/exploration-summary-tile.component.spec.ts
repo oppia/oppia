@@ -287,12 +287,10 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService,
       'getWidth'
     ).and.callThrough();
-    spyOn(
-      i18nLanguageCodeService,
-      'isHackyTranslationAvailable'
-    ).and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
-      false,
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable').and.callFake(
+      key => key === component.expObjectiveTranslationKey
+    );
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       false
     );
 
@@ -542,7 +540,7 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
 
-      expect(result).toBe('/explore/1?collection_id=1&parent=1&parent=2');
+      expect(result).toBe('/explore/1?collection_id=1');
       expect(urlParamsSpy).toHaveBeenCalled();
       expect(addFieldSpy).toHaveBeenCalled();
     })

@@ -1161,7 +1161,7 @@ describe('Exploration engine service ', () => {
       );
 
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
-      expect(submitAnswerSuccessCb.calls.mostRecent().args[10]).toBeNull();
+      expect(submitAnswerSuccessCb.calls.mostRecent().args[9]).toBeNull();
     }));
 
     it('should show warning message if the parameters ' + 'are empty', () => {
@@ -2420,10 +2420,10 @@ describe('Exploration engine service ', () => {
       submitCb
     );
 
-    // The callback fires and the stuck card arg (index 10) is a StateCard.
+    // The callback fires and the stuck card arg (index 9) is a StateCard.
     expect(submitCb).toHaveBeenCalled();
     const callArgs = submitCb.calls.mostRecent().args;
-    expect(callArgs[10]).not.toBeNull();
+    expect(callArgs[9]).not.toBeNull();
     expect(makeParamsSpy.calls.count() - makeParamsCallCountBeforeSubmit).toBe(
       1
     );
@@ -2619,10 +2619,10 @@ describe('Exploration engine service ', () => {
 
     // The main submitAnswer callback still fires even when stuck card is null.
     expect(submitCb).toHaveBeenCalled();
-    // Arg at index 10 is nextCardIfReallyStuck; it should be null because
+    // Arg at index 9 is nextCardIfReallyStuck; it should be null because
     // the stuck state's contentId is null (line 972 returns null).
     const callArgs = submitCb.calls.mostRecent().args;
-    expect(callArgs[10]).toBeNull();
+    expect(callArgs[9]).toBeNull();
   }));
 
   it('should return feedback html when interaction is not TextInput (_getFeedback line 205 branch)', () => {

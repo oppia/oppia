@@ -948,6 +948,7 @@ export class ConversationFlowService {
 
     if (feedbackHtml) {
       if (
+        nextCard &&
         this.playerTranscriptService.hasEncounteredStateBefore(
           nextCard.getStateName()
         )

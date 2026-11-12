@@ -486,7 +486,6 @@ class DraftUpgradeBranchUnitTests(test_utils.TestBase):
                         False,
                         [],
                         None,
-                        None,
                     ),
                     [state_domain.RuleSpec(rule_type, {'x': 'x'})],
                     [],
@@ -560,7 +559,6 @@ class DraftUpgradeBranchUnitTests(test_utils.TestBase):
                 state_domain.SubtitledHtml('feedback', '<p>Feedback</p>'),
                 False,
                 [],
-                None,
                 None,
             ),
             [
