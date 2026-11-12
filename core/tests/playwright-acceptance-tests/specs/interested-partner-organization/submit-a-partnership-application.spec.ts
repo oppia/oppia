@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,36 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
- *
- * IO.PP. Partner submits a partnerships application.
+ * @fileoverview Acceptance test for Interested Partner Organization.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
+import {test} from '@playwright/test';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {UserFactory} from '../../utilities/common/user-factory';
 
-describe('Interested Partner Organization', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Partner Organization', function () {
   let partnerOrganizationUser: LoggedOutUser;
 
-  beforeAll(async function () {
-    partnerOrganizationUser = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    partnerOrganizationUser = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it("should be able to learn about Oppia's partnership program", async function () {
-    // Navigate to splash tab and veirfy it.
-    await partnerOrganizationUser.navigateToSplashPage();
-    await partnerOrganizationUser.expectScreenshotToMatch(
-      'homePage',
-      __dirname
-    );
+  test("should be able to learn about Oppia's partnership program", async function () {
+    // Navigate to splash page and verify screenshot.
+    await partnerOrganizationUser.navigateToSplashPageAsLoggedOutUser();
+    await partnerOrganizationUser.expectScreenshotToMatch('homePage');
 
     // Go to partnerships page and verify required elements.
-    await partnerOrganizationUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
-    await partnerOrganizationUser.expectScreenshotToMatch(
-      'partnershipsPage',
-      __dirname
-    );
+    await partnerOrganizationUser.navigateToPartnershipsPage();
+    await partnerOrganizationUser.expectScreenshotToMatch('partnershipsPage');
+
     await partnerOrganizationUser.expectPartnershipHeadingToBe(
       'Partnerships with the Oppia Foundation'
     );
@@ -73,26 +68,27 @@ describe('Interested Partner Organization', function () {
     // Download Brochure.
     await partnerOrganizationUser.verifyDownloadBrochureButtonInPartnershipsPage();
 
-    // Special foundation video.
+    // Verify YouTube video embed.
     await partnerOrganizationUser.expectYouTubeVideoInPartnershipWithVideoID(
       'mDfiDLn2Rko'
     );
 
-    // Read More stories.
+    // Read More stories navigation.
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
 
-    // Learner stories crousal.
+    // Learner stories carousel.
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.verifyLearnerStoriesCarouselInPartnershipPageWorksProperly();
   });
 
-  it('should be able to open partnership form', async function () {
+  test('should be able to open partnership form', async function () {
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.clickPartnerWithUsButtonInPartnershipsPage();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
+
