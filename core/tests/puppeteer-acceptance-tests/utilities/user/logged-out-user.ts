@@ -1579,13 +1579,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * @deprecated Use verifyWatchAVideoButtonInDonationThanksModalOnDonatePage instead.
-   */
-  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
-    await this.verifyWatchAVideoButtonInDonationThanksModalOnDonatePage();
-  }
-
-  /**
    * Function to click the Read Our Blog button
    * in the Donation thanks modal on donate page and check if it opens the Blog page.
    */
