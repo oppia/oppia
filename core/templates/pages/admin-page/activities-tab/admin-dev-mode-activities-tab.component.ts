@@ -157,6 +157,16 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   generateDummyExplorations(): void {
+    // Add max limit validation.
+    if (this.numDummyExpsToGenerate > 500) {
+      this.setStatusMessage.emit(
+        'Cannot generate more than 500 dummy explorations at once. ' +
+          `Requested: ${this.numDummyExpsToGenerate}. ` +
+          'Please try generating explorations in smaller batches.'
+      );
+      return;
+    }
+
     // Generate dummy explorations with random title.
     if (this.numDummyExpsToPublish > this.numDummyExpsToGenerate) {
       this.setStatusMessage.emit(
@@ -164,25 +174,59 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       );
       return;
     }
+
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.adminBackendApiService
-      .generateDummyExplorationsAsync(
-        this.numDummyExpsToGenerate,
-        this.numDummyExpsToPublish
-      )
-      .then(
-        () => {
-          this.getDataAsync();
-          this.setStatusMessage.emit(
-            'Dummy explorations generated successfully.'
-          );
-        },
-        errorResponse => {
-          this.setStatusMessage.emit('Server error: ' + errorResponse);
-        }
+
+    const BATCH_SIZE = 25;
+    let totalToGenerate = this.numDummyExpsToGenerate;
+    let totalToPublish = this.numDummyExpsToPublish;
+
+    let generatedSoFar = 0;
+    let publishedSoFar = 0;
+
+    const processNextBatch = (): void => {
+      if (generatedSoFar >= totalToGenerate) {
+        this.getDataAsync();
+        this.setStatusMessage.emit(
+          'Dummy explorations generated successfully.'
+        );
+        this.adminTaskManagerService.finishTask();
+        return;
+      }
+
+      let currentBatchGenerate = Math.min(
+        BATCH_SIZE,
+        totalToGenerate - generatedSoFar
       );
-    this.adminTaskManagerService.finishTask();
+      let currentBatchPublish = Math.max(
+        0,
+        Math.min(currentBatchGenerate, totalToPublish - publishedSoFar)
+      );
+
+      this.setStatusMessage.emit(
+        `Processing... (${generatedSoFar}/${totalToGenerate} generated)`
+      );
+
+      this.adminBackendApiService
+        .generateDummyExplorationsAsync(
+          currentBatchGenerate,
+          currentBatchPublish
+        )
+        .then(
+          () => {
+            generatedSoFar += currentBatchGenerate;
+            publishedSoFar += currentBatchPublish;
+            processNextBatch();
+          },
+          errorResponse => {
+            this.setStatusMessage.emit('Server error: ' + errorResponse);
+            this.adminTaskManagerService.finishTask();
+          }
+        );
+    };
+
+    processNextBatch();
   }
 
   generateDummyTranslationOpportunities(): void {

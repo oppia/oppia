@@ -17,7 +17,13 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {By} from '@angular/platform-browser';
@@ -358,6 +364,48 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateDummyExploration', () => {
+    it('should not generate dummy exploration if more than 500 explorations are requested', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      );
+
+      component.numDummyExpsToGenerate = 501;
+      component.numDummyExpsToPublish = 500;
+
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Cannot generate more than 500 dummy explorations at once. ' +
+          'Requested: 501. ' +
+          'Please try generating explorations in smaller batches.'
+      );
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it('should generate dummy explorations across multiple batches', fakeAsync(() => {
+      component.numDummyExpsToPublish = 30;
+      component.numDummyExpsToGenerate = 50;
+
+      let adminBackendSpy = spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+      tick();
+
+      expect(adminBackendSpy).toHaveBeenCalledTimes(2);
+      expect(adminBackendSpy.calls.argsFor(0)).toEqual([25, 25]);
+      expect(adminBackendSpy.calls.argsFor(1)).toEqual([25, 5]);
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Dummy explorations generated successfully.'
+      );
+    }));
+
     it(
       'should not generate dummy exploration if publish count is greater' +
         'than generate count',

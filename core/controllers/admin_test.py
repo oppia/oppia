@@ -2295,6 +2295,87 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(generated_exps), 0)
         self.assertEqual(len(published_exps), 0)
 
+    def test_generate_count_less_than_or_equal_to_zero(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 0,
+                'num_dummy_exps_to_publish': 0,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.assertEqual(
+            response['error'], 'Generate count must be greater than 0'
+        )
+
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': -5,
+                'num_dummy_exps_to_publish': 0,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.assertEqual(
+            response['error'], 'Generate count must be greater than 0'
+        )
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(len(generated_exps), 0)
+        self.assertEqual(len(published_exps), 0)
+        self.logout()
+
+    def test_generate_count_greater_than_max_limit(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 51,
+                'num_dummy_exps_to_publish': 5,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.assertEqual(
+            response['error'],
+            'Cannot generate more than 50 dummy explorations in a single '
+            'request. Requested: 51.',
+        )
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(len(generated_exps), 0)
+        self.assertEqual(len(published_exps), 0)
+        self.logout()
+
+    def test_generate_dummy_explorations_up_to_max_limit(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 25,
+                'num_dummy_exps_to_publish': 10,
+            },
+            csrf_token=csrf_token,
+        )
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(15)
+        self.assertEqual(len(generated_exps), 25)
+        self.assertEqual(len(published_exps), 10)
+        self.logout()
+
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(
         self,
     ) -> None:
