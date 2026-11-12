@@ -27,11 +27,9 @@ import {PageContextService} from 'services/page-context.service';
 import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationEngineService} from './exploration-engine.service';
-import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
 import {
   ExplorationFeatures,
   ExplorationFeaturesBackendApiService,
@@ -41,7 +39,6 @@ import {PlaythroughService} from 'services/playthrough.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationModeService} from './exploration-mode.service';
-import {Question} from 'domain/question/question.model';
 
 @Injectable({
   providedIn: 'root',
@@ -51,11 +48,9 @@ export class ExplorationInitializationService {
     private pageContextService: PageContextService,
     private urlService: UrlService,
     private explorationEngineService: ExplorationEngineService,
-    private questionPlayerEngineService: QuestionPlayerEngineService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
     private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
     private statsReportingService: StatsReportingService,
     private playthroughService: PlaythroughService,
@@ -100,9 +95,9 @@ export class ExplorationInitializationService {
     });
   }
 
-  private async initExplorationPlayer(
+  private initExplorationPlayer(
     callback: (stateCard: StateCard, str: string) => void
-  ): Promise<void> {
+  ): void {
     let explorationId = this.pageContextService.getExplorationId();
     let version = this.pageContextService.getExplorationVersion();
     let explorationDataPromise = version
@@ -113,15 +108,6 @@ export class ExplorationInitializationService {
       : this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
           explorationId
         );
-    let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
-    let pretestQuestionsData: Question[] = [];
-    if (storyUrlFragment) {
-      pretestQuestionsData =
-        await this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
-          explorationId,
-          storyUrlFragment
-        );
-    }
     Promise.all([
       explorationDataPromise,
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -136,23 +122,15 @@ export class ExplorationInitializationService {
         },
         featuresData
       );
-      if (pretestQuestionsData.length > 0) {
-        this.explorationModeService.setPretestMode();
-        this.initializeExplorationServices(explorationData, true, callback);
-        this.questionPlayerEngineService.initializePretestServices(
-          pretestQuestionsData,
-          callback
-        );
-      } else if (
+      if (
         this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
         this.urlService.getUrlParams().hasOwnProperty('node_id')
       ) {
         this.explorationModeService.setStoryChapterMode();
-        this.initializeExplorationServices(explorationData, false, callback);
       } else {
         this.explorationModeService.setExplorationMode();
-        this.initializeExplorationServices(explorationData, false, callback);
       }
+      this.initializeExplorationServices(explorationData, callback);
     });
   }
 
@@ -169,7 +147,6 @@ export class ExplorationInitializationService {
 
   private initializeExplorationServices(
     returnDict: FetchExplorationBackendResponse,
-    arePretestsAvailable: boolean,
     callback: (stateCard: StateCard, str: string) => void
   ): void {
     let explorationId = this.pageContextService.getExplorationId();
@@ -210,7 +187,7 @@ export class ExplorationInitializationService {
       returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
       returnDict.displayable_language_codes,
-      arePretestsAvailable ? () => {} : callback
+      callback
     );
   }
 }

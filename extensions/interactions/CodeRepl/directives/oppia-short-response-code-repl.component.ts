@@ -22,6 +22,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {Answer} from './oppia-response-code-repl.component';
 
 @Component({
@@ -35,11 +36,19 @@ export class ShortResponseCodeRepl implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   escapedAnswer!: Answer;
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  errorFocusLabel!: string;
+  constructor(
+    private htmlEscaperService: HtmlEscaperService,
+    private focusManagerService: FocusManagerService
+  ) {}
 
   ngOnInit(): void {
     this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
       this.answer
     ) as Answer;
+    if (this.escapedAnswer.error) {
+      this.errorFocusLabel = this.focusManagerService.generateFocusLabel();
+      this.focusManagerService.setFocus(this.errorFocusLabel);
+    }
   }
 }
