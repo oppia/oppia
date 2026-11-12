@@ -72,12 +72,12 @@
                           (blur)="updateStoryMetaTagContent(editableMetaTagContent)"
                           placeholder="Enter the meta tag content for the story"
                           maxlength="{{ MAX_CHARS_IN_META_TAG_CONTENT }}"
-                          [oppiaFocusOn]="metaTagInputField">
+                          [oppiaFocusOn]="'metaTagInputField'">
                 </textarea>
               </div>
               <url-fragment-editor-component label="Url Fragment"
                                              placeholder="Enter the URL fragment for the story."
-                                             maxLength="{{ MAX_CHARS_IN_STORY_URL_FRAGMENT }}"
+                                             [maxLength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
                                              fragmentType="story"
                                              [generatedUrlPrefix]="generatedUrlPrefix"
                                              [fragmentIsDuplicate]="storyUrlFragmentExists"
@@ -350,7 +350,7 @@
                         <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
                         <td class="chapter-status e2e-test-chapter-status">{{ node.getStatus() }}</td>
                         <td class="chapter-last-modified">
-                          {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                          {{ getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
                           <div *ngIf="node.getStatus() === 'Published'">(published)</div>
                           <div *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
                           <div *ngIf="node.getStatus() === 'Draft'">(draft added)</div>
@@ -523,7 +523,7 @@
                         {{ node.getStatus() }}
                       </td>
                       <td class="col-modified arc-chapter-modified">
-                        {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                        {{ getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
                         <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Published'">(published)</div>
                         <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
                         <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Draft'">(draft added)</div>

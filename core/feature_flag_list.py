@@ -42,7 +42,6 @@ class FeatureNames(enum.Enum):
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
-    SHOW_TRANSLATION_SIZE = 'show_translation_size'
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -82,7 +81,6 @@ class FeatureNames(enum.Enum):
     ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
         'enable_background_voiceover_synthesis'
     )
-    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
         'enable_financial_literacy_campaign_banner'
     )
@@ -131,8 +129,6 @@ class FeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
@@ -216,13 +212,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag is to show redesigned learner dashboard.',
             feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.SHOW_TRANSLATION_SIZE.value: (
-        (
-            'This flag is to show translation size on translation cards in '
-            'contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
@@ -326,12 +315,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
-        (
-            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
-            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (

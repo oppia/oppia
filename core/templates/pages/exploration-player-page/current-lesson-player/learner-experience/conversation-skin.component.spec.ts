@@ -1427,10 +1427,6 @@ describe('Conversation skin component', () => {
         skillDescriptions: [],
         questionCount: 0,
         questionsSortedByDifficulty: false,
-        questionPlayerMode: {
-          modeType: 'PASS_FAIL',
-          passCutoff: 0.75,
-        },
       };
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
@@ -1684,7 +1680,6 @@ describe('Conversation skin component', () => {
       'recordChapterCompletionAsync'
     ).and.returnValue(
       Promise.resolve({
-        readyForReviewTest: true,
         nextNodeId: '',
         summaries: [],
       })
@@ -1869,10 +1864,6 @@ describe('Conversation skin component', () => {
       skillDescriptions: [],
       questionCount: 0,
       questionsSortedByDifficulty: false,
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 0.75,
-      },
     };
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
