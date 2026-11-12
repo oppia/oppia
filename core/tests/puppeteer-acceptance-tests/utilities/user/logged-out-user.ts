@@ -1568,13 +1568,8 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    // The Facebook video page keeps network connections open, so waiting for
-    // network idle can time out even after the page has loaded. Wait only for
-    // the load event instead.
-    await this.clickAndWaitForNavigation(watchAVideoButton, true, {
-      waitUntil: 'load',
-      timeout: 60000,
-    });
+    await this.clickAndWaitForNavigation(watchAVideoButton, true);
+    await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
     if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
