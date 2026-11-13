@@ -428,7 +428,7 @@
             </strong>
           </a>
         </li>
-        <hr class="oppia-top-right-menu-item-separator">
+        <hr class="oppia-top-right-menu-item-separator" aria-hidden="true">
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/creator-dashboard"
@@ -530,7 +530,7 @@
             <span [innerHTML]="'I18N_TOPNAV_ADMIN_PAGE' | translate"></span>
           </a>
         </li>
-        <hr class="oppia-top-right-menu-item-separator" *ngIf="isWebFeedbackModalEnabled">
+        <hr class="oppia-top-right-menu-item-separator" aria-hidden="true" *ngIf="isWebFeedbackModalEnabled">
         <li class="nav-item"
             *ngIf="isWebFeedbackModalEnabled">
           <a (click)="openSiteFeedbackModal()"
@@ -538,7 +538,7 @@
               {{'I18N_FOOTER_REPORT_WEBSITE_ISSUE' | translate}}
           </a>
         </li>
-        <hr class="oppia-top-right-menu-item-separator">
+        <hr class="oppia-top-right-menu-item-separator" aria-hidden="true">
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              (blur)="profileDropdown.close()"
