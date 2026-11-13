@@ -2173,6 +2173,7 @@ describe('Contributions and review component', () => {
           10,
           {},
           {},
+          {},
           'en',
           true,
           0
@@ -2185,6 +2186,7 @@ describe('Contributions and review component', () => {
           10,
           {},
           {},
+          {},
           'en',
           false,
           0
@@ -2195,6 +2197,7 @@ describe('Contributions and review component', () => {
           'Story 1',
           'heading',
           10,
+          {},
           {},
           {},
           'en',
@@ -2236,6 +2239,7 @@ describe('Contributions and review component', () => {
             10,
             {},
             {},
+            {},
             'en',
             true,
             0
@@ -2248,6 +2252,7 @@ describe('Contributions and review component', () => {
             10,
             {},
             {},
+            {},
             'en',
             false,
             0
@@ -2258,6 +2263,7 @@ describe('Contributions and review component', () => {
             'Story 1',
             'heading',
             10,
+            {},
             {},
             {},
             'en',

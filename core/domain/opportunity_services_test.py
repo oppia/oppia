@@ -1615,6 +1615,7 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
                     self.new_incomplete_translation_language_codes
                 ),
                 translation_counts={},
+                translation_missing_reasons={},
                 language_codes_needing_voice_artists=['en'],
                 language_codes_with_assigned_voice_artists=[],
             )
@@ -2067,6 +2068,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=1,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         with self.assertRaisesRegex(
@@ -2554,6 +2556,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         opportunity_models.TranslationOpportunityModel.create_new(
@@ -2563,6 +2566,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         opportunity_models.TranslationOpportunityModel.create_new(
@@ -2572,6 +2576,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         opportunity_models.TranslationOpportunityModel.create_new(
@@ -2581,6 +2586,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=2,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
+            translation_missing_reasons={},
         ).put()
 
         # Call with explorations including unmatched ones.
@@ -2922,6 +2928,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             content_count=10,
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 5},
+            translation_missing_reasons={'hi': []},
         ).put()
 
         self.assertEqual(
