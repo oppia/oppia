@@ -2596,6 +2596,23 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
+   */
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
+    await this.openFeedbackPopup();
+    await this.writeAndSubmitFeedback(feedback, stayAnonymous ?? false);
+  }
+
+  /**
    * Searches for a specific lesson in the search results and opens it.
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
