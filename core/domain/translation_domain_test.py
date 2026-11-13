@@ -24,8 +24,8 @@ import re
 from core import feconf, utils
 from core.domain import (
     translatable_object_registry,  # pylint: disable=invalid-import-from
+    translation_domain,
 )
-from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import Any
