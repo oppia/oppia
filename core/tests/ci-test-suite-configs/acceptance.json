@@ -302,8 +302,8 @@
     },
     {
       "name": "logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/sign-in-and-save-exploration-progress",

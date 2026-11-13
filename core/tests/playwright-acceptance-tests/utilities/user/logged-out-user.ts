@@ -50,6 +50,7 @@ const validityInfoTextSelector = '.guide-text';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const previousCardButton = '.e2e-test-back-button';
+const mainContentSelector = '.e2e-test-main-content';
 const lessonLanguageSelector = '.oppia-content-language-selector';
 const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
 const saveProgressButton = '.save-progress-btn';
@@ -749,6 +750,13 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     const explorationPlayerUtils = new ExplorationEditorUtils(this);
     await explorationPlayerUtils.continueToNextCard(skipVerification);
+  }
+
+  /**
+   * Alias for continueToNextCardAsLoggedOutUser matching Puppeteer API.
+   */
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    await this.continueToNextCardAsLoggedOutUser(skipVerification);
   }
 
   /**
@@ -4107,6 +4115,79 @@ export class LoggedOutUser extends BaseUser {
     ) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async simulateKeyboardShortcut(shortcut: string): Promise<void> {
+    const keys = shortcut.split('+');
+    for (const key of keys) {
+      await this.page.keyboard.down(key);
+    }
+    for (const key of keys) {
+      await this.page.keyboard.up(key);
+    }
+
+    try {
+      await this.page.waitForLoadState('networkidle', {timeout: 5000});
+    } catch {
+      // Navigation might not happen for all shortcuts, which is expected.
+    }
+  }
+
+  /**
+   * Verifies that the current page URL includes the expected page pathname.
+   * @param {string} expectedPage - The expected page pathname (e.g., 'get started').
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+    await this.page.waitForFunction(
+      (expected: string) => {
+        return window.location.href.toLowerCase().includes(expected.toLowerCase());
+      },
+      expectedPageInUrl,
+      {timeout: 10000}
+    );
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut and verifies that the expected element is focused.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.simulateKeyboardShortcut(shortcut);
+
+    let selector = '';
+    switch (shortcut) {
+      case 's':
+        selector = mainContentSelector;
+        break;
+      case 'j':
+        selector = `${nextCardArrowButton}, ${nextCardButton}`;
+        break;
+      case 'k':
+        selector = previousCardButton;
+        break;
+      default:
+        throw new Error(`Unsupported shortcut: ${shortcut}`);
+    }
+
+    await this.page.waitForFunction(
+      (sel: string) => {
+        return Boolean(document.activeElement?.matches(sel));
+      },
+      selector,
+      {timeout: 5000}
+    );
+
+    // Remove focus from the focused element.
+    await this.page.evaluate(() => {
+      (document.activeElement as HTMLElement)?.blur();
+    });
   }
 }
 

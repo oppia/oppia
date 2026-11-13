@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
  * Tests cover the usage of keyboard shortcuts for navigation and ensuring the correct element is focused.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const CONCEPT_CARD_CONTENT_EN = 'Numbers can be positive, negative, or zero.';
@@ -36,17 +36,18 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-// This console would occur as we are try to access some of the pages only accessible to logged-in users being logged-out.
-ConsoleReporter.setConsoleErrorsToIgnore([/.*401.*Unauthorized.*/]);
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-out User', function () {
+test.describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(DEFAULT_SPEC_TIMEOUT_MSECS);
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -84,56 +85,53 @@ describe('Logged-out User', function () {
       'Algebra'
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
+  });
 
-  it(
-    'should be able to navigate the site using keyboard shortcuts, check focus, and interact with the exploration player.',
-    async function () {
-      // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
-      await loggedOutUser.expectToBeOnPage('get started');
+  test('should be able to navigate the site using keyboard shortcuts, check focus, and interact with the exploration player.', async function () {
+    test.setTimeout(DEFAULT_SPEC_TIMEOUT_MSECS);
+    // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
+    await loggedOutUser.expectToBeOnPage('get started');
 
-      // Navigate to the About page using the ‘Ctrl+4’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
-      await loggedOutUser.expectToBeOnPage('about');
+    // Navigate to the About page using the ‘Ctrl+4’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
+    await loggedOutUser.expectToBeOnPage('about');
 
-      // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
-      await loggedOutUser.expectToBeOnPage('login');
+    // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
+    await loggedOutUser.expectToBeOnPage('login');
 
-      // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
-      await loggedOutUser.expectToBeOnPage('login');
+    // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
+    await loggedOutUser.expectToBeOnPage('login');
 
-      // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
-      await loggedOutUser.expectToBeOnPage('login');
+    // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
+    await loggedOutUser.expectToBeOnPage('login');
 
-      // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
-      await loggedOutUser.expectToBeOnPage('community library');
+    // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
+    await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
+    await loggedOutUser.expectToBeOnPage('community library');
 
-      // Skips to the main content.
-      await loggedOutUser.verifyFocusAfterShortcut('s');
+    // Skips to the main content.
+    await loggedOutUser.verifyFocusAfterShortcut('s');
 
-      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+    await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
-      // Skips to the main content.
-      await loggedOutUser.verifyFocusAfterShortcut('s');
+    // Skips to the main content.
+    await loggedOutUser.verifyFocusAfterShortcut('s');
 
-      await loggedOutUser.continueToNextCard();
+    await loggedOutUser.continueToNextCard();
 
-      // Expects the focus to be on the back button in lesson player.
-      await loggedOutUser.verifyFocusAfterShortcut('j');
+    // Expects the focus to be on the back button in lesson player.
+    await loggedOutUser.verifyFocusAfterShortcut('j');
 
-      // Expects the focus to be on the continue or next button in lesson player.
-      await loggedOutUser.verifyFocusAfterShortcut('k');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Expects the focus to be on the continue or next button in lesson player.
+    await loggedOutUser.verifyFocusAfterShortcut('k');
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
