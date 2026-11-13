@@ -21,6 +21,7 @@
 import {Browser} from '@playwright/test';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
+import {ModeratorFactory} from '../user/moderator';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
@@ -52,6 +53,7 @@ const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptanc
 const USER_ROLE_MAPPING = {
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
+  [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
