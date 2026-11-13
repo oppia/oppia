@@ -184,8 +184,8 @@
 
     <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
     </oppia-translation-tab>
-    <!-- This is an *ngIf, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-    <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
+    <!-- Wait for the editor's shared services before creating the preview. Recreate it on each visit to load the latest exploration. -->
+    <oppia-preview-tab *ngIf="explorationEditorPageHasInitialized && getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
     </oppia-preview-tab>
 
     <oppia-statistics-tab *ngIf="getActiveTabName() === 'stats'">
