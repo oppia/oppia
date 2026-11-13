@@ -215,6 +215,44 @@ describe('InsertScriptService', () => {
     expect(result).toBe(true);
   });
 
+  it('should load PENCILCODE script correctly', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    let hasLoadCallbackRun = false;
+    const result = insertScriptService.loadScript(
+      KNOWN_SCRIPTS.PENCILCODE,
+      () => {
+        // The service invokes the on-load callback from both the script's
+        // load handler and the load promise, so ignore repeat invocations to
+        // avoid calling done() twice.
+        if (hasLoadCallbackRun) {
+          return;
+        }
+        hasLoadCallbackRun = true;
+        expect(mockScriptElement.src).toContain(
+          'https://pencilcode.net/lib/pencilcodeembed.js'
+        );
+        done();
+      }
+    );
+
+    expect(result).toBe(true);
+  });
+
   it('should insert script into html', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,

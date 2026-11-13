@@ -79,6 +79,7 @@ import {LanguageCodeToEntityTranslations} from '../../services/entity-translatio
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {InsertScriptService} from 'services/insert-script.service';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -101,6 +102,16 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
   };
+}
+
+class MockInsertScriptService {
+  // The real service appends an external PencilCode script during ngOnInit.
+  // Loading it in unit tests can surface a cross-origin "Script error." that
+  // gets attributed to an unrelated spec (see #26940), so stub the service
+  // instead of patching document.body.appendChild.
+  loadScript(): boolean {
+    return true;
+  }
 }
 
 describe('Exploration editor page component', () => {
@@ -308,6 +319,10 @@ describe('Exploration editor page component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
+        },
+        {
+          provide: InsertScriptService,
+          useClass: MockInsertScriptService,
         },
         {
           provide: PlatformFeatureService,

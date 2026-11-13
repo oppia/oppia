@@ -48,6 +48,7 @@ describe('NoninteractiveVideo', () => {
       isFirstChange: () => false,
     },
   };
+  let originalAppendChild: typeof document.body.appendChild;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,10 +69,28 @@ describe('NoninteractiveVideo', () => {
 
     fixture = TestBed.createComponent(NoninteractiveVideo);
     component = fixture.componentInstance;
+    // Prevent the real YouTube iframe API script from being appended. A
+    // cross-origin script error would otherwise surface as an opaque
+    // "Script error." and be reported against an unrelated spec (see #26940).
+    // Only script elements are dropped; other elements are appended normally
+    // so that the test harness can still insert the fixture into the body.
+    // Assigning directly (instead of using spyOn) keeps the property spy-able
+    // by individual tests and avoids leaking the override into other specs.
+    originalAppendChild = document.body.appendChild;
+    document.body.appendChild = ((node: Node) => {
+      if (node instanceof HTMLScriptElement) {
+        return node;
+      }
+      return originalAppendChild.call(document.body, node);
+    }) as typeof document.body.appendChild;
     component.autoplayWithValue = 'true';
     component.endWithValue = '100';
     component.startWithValue = '20';
     component.videoIdWithValue = '&quot;mCtXAVZGjwk&quot;';
+  });
+
+  afterEach(() => {
+    document.body.appendChild = originalAppendChild;
   });
 
   it('should initialize component when video is added to the RTE', () => {
