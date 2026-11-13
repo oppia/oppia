@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.5.3",
+  "version": "3.5.4",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,7 +16,10 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
-    "*.py": "black"
+    "*.py": [
+      "ruff check --select I --fix",
+      "black"
+    ]
   },
   "homepage": "https://github.com/oppia/oppia#readme",
   "devDependencies": {
