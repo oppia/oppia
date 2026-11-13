@@ -178,12 +178,25 @@ const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
 const totalPlaysCardSelector = '.total-plays';
-const openFeedbackCardSelector = '.total-open-feedback';
-const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
+const openFeedbackCardSelector =
+  '.stats-card:has(.e2e-test-oppia-open-feedback)';
+const subscriberCountCardSelector =
+  '.stats-card:has(.e2e-test-oppia-total-subscribers)';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationDashboardCardSelector = '.e2e-test-exploration-dashboard-card';
 const averageRatingsCardSelector = '.average-ratings';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const emptyCreatorDashboardMessageSelector = '.oppia-dashboard-empty-text p';
+const gridRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const gridFeedbackSelector = '.e2e-test-exp-summary-tile-open-feedback';
+const gridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
+const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
+const explorationListSelector = '.oppia-dashboard-table';
+const explorationListItemSelector = '.exploration-list-item';
+const listTitleSelector = '.e2e-test-exp-summary-row-title';
+const listRatingSelector = '.e2e-test-exp-summary-row-rating';
+const listFeedbackSelector = '.e2e-test-exp-summary-row-open-feedback';
+const listViewsSelector = '.e2e-test-exp-summary-row-num-views';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -1652,28 +1665,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.expectElementToBeVisible(totalPlaysCardSelector);
-    const totalPlaysElements = await this.page.$$(
-      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
-        `${totalPlaysCardSelector} .stat-value-without-rating`
+    await this.expectTextContentToBe(
+      `${totalPlaysCardSelector} h2:not([hidden])`,
+      String(number)
     );
-    let numberOfTotalPlays = 0;
-    for (const el of totalPlaysElements) {
-      const rect = await el.boundingBox();
-      if (!rect || rect.width === 0 || rect.height === 0) {
-        continue;
-      }
-      const text = await el.evaluate(
-        element => (element as HTMLElement).innerText.trim() || '0'
-      );
-      numberOfTotalPlays = parseInt(text, 10) || 0;
-      break;
-    }
-    if (numberOfTotalPlays !== number) {
-      throw new Error(
-        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
-      );
-    }
   }
 
   /**
@@ -1681,33 +1676,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.expectElementToBeVisible(openFeedbackCardSelector);
-    const numberOfOpenFeedbacks = await this.page.$eval(
-      openFeedbackCardSelector,
-      card => {
-        const statValue = Array.from(
-          (card as HTMLElement).querySelectorAll(
-            '.stat-value-with-rating, .stat-value-without-rating'
-          )
-        ).find(element => {
-          const htmlElement = element as HTMLElement;
-          const style = window.getComputedStyle(htmlElement);
-          const rect = htmlElement.getBoundingClientRect();
-          return (
-            style.display !== 'none' &&
-            style.visibility !== 'hidden' &&
-            rect.width > 0 &&
-            rect.height > 0
-          );
-        }) as HTMLElement | undefined;
-        return parseInt(statValue?.innerText.trim() || '0', 10);
-      }
+    await this.expectTextContentToBe(
+      `${openFeedbackCardSelector} h2:not([hidden])`,
+      String(number)
     );
-    if (numberOfOpenFeedbacks !== number) {
-      throw new Error(
-        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
-      );
-    }
   }
 
   /**
@@ -1715,18 +1687,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} subscriberCount - The expected number of subscribers.
    */
   async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
-    await this.expectElementToBeVisible(subscriberCountLabel);
-    const currentSubscriberCount = await this.page.$eval(
-      subscriberCountLabel,
-      element => element.textContent?.trim() || '0'
+    await this.expectTextContentToBe(
+      `${subscriberCountCardSelector} h2:not([hidden])`,
+      String(subscriberCount)
     );
-    if (parseInt(currentSubscriberCount, 10) === subscriberCount) {
-      showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
-    } else {
-      throw new Error(
-        `Expected ${subscriberCount} subscribers, but found ${currentSubscriberCount}.`
-      );
-    }
   }
 
   /**
@@ -1785,51 +1749,128 @@ export class ExplorationEditor extends BaseUser {
     expectedRating: number | string,
     expectedUsers: number
   ): Promise<void> {
-    await this.expectElementToBeVisible(averageRatingsCardSelector);
-    const ratingElements = await this.page.$$(
-      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
-        `${averageRatingsCardSelector} .stat-value-without-rating`
+    await this.expectTextContentToBe(
+      `${averageRatingsCardSelector} h2:not([hidden])`,
+      String(expectedRating)
     );
-    let ratingText = '';
-    for (const element of ratingElements) {
-      const rect = await element.boundingBox();
-      if (!rect || rect.width === 0 || rect.height === 0) {
-        continue;
-      }
-      ratingText = await element.evaluate(
-        el => (el as HTMLElement).innerText.trim() || ''
-      );
-      break;
-    }
-    // Handle "N/A" case.
-    if (expectedRating === 'N/A') {
-      if (ratingText !== 'N/A') {
-        throw new Error(
-          `Expected average rating to be "N/A", but found "${ratingText}".`
-        );
-      }
+
+    if (expectedUsers === 0) {
+      await this.expectElementToBeVisible(usersCountInRatingSelector, false);
     } else {
-      const ratingValue = parseFloat(ratingText);
-      if (ratingValue !== expectedRating) {
-        throw new Error(
-          `Expected average rating to be ${expectedRating}, ` +
-            `but found ${ratingValue}.`
-        );
-      }
-    }
-    const totalUsersText = await this.page.$eval(
-      usersCountInRatingSelector,
-      el => (el as HTMLElement).innerText.trim() || ''
-    );
-    // Extract number from text (e.g., "by 3 users" → 3).
-    const totalUsersMatch = totalUsersText.match(/\d+/);
-    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
-    if (totalUsers !== expectedUsers) {
-      throw new Error(
-        `Expected ${expectedUsers} users to have submitted ratings, ` +
-          `but found ${totalUsers} instead.`
+      await this.expectElementToBeVisible(usersCountInRatingSelector);
+      await this.expectTextContentToBe(
+        usersCountInRatingSelector,
+        `(by ${expectedUsers} ${expectedUsers === 1 ? 'user' : 'users'})`
       );
     }
+  }
+
+  /**
+   * Checks the empty creator dashboard message.
+   *
+   * @param {string} message - The expected empty dashboard message.
+   */
+  async expectCreatorDashboardMessageToBe(message: string): Promise<void> {
+    await this.expectTextContentToBe(
+      emptyCreatorDashboardMessageSelector,
+      message
+    );
+  }
+
+  /**
+   * Checks the order of exploration cards in the grid view.
+   *
+   * @param {string[]} titles - The expected exploration titles in order.
+   */
+  async expectExplorationsInGridInOrder(titles: string[]): Promise<void> {
+    await this.expectElementToBeVisible(explorationDashboardCardSelector);
+    await this.expectNumberOfElementsToBe(
+      explorationDashboardCardSelector,
+      titles.length
+    );
+    const cards = await this.page.$$(explorationDashboardCardSelector);
+    for (let i = 0; i < titles.length; i++) {
+      await this.expectTextContentToBe(
+        explorationSummaryTileTitleSelector,
+        titles[i],
+        cards[i]
+      );
+    }
+  }
+
+  /**
+   * Checks the statistics of an exploration card in grid view.
+   *
+   * @param {number} index - The index of the card to check.
+   * @param {string} rating - The expected rating.
+   * @param {string} feedback - The expected feedback count.
+   * @param {string} views - The expected number of views.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    rating: string,
+    feedback: string,
+    views: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationDashboardCardSelector);
+    const cards = await this.page.$$(explorationDashboardCardSelector);
+    if (!cards[index]) {
+      throw new Error(`Exploration card at index ${index} not found.`);
+    }
+    const card = cards[index];
+    await this.expectTextContentToBe(gridRatingSelector, rating, card);
+    await this.expectTextContentToBe(gridFeedbackSelector, feedback, card);
+    await this.expectTextContentToBe(gridViewsSelector, views, card);
+  }
+
+  /**
+   * Switches the creator dashboard to list view.
+   */
+  async switchToListView(): Promise<void> {
+    await this.clickOnElementWithSelector(listViewButtonSelector);
+    await this.expectElementToBeVisible(explorationListSelector);
+  }
+
+  /**
+   * Checks the order of exploration rows in list view.
+   *
+   * @param {string[]} titles - The expected exploration titles in order.
+   */
+  async expectExplorationsInListInOrder(titles: string[]): Promise<void> {
+    await this.expectElementToBeVisible(explorationListItemSelector);
+    await this.expectNumberOfElementsToBe(
+      explorationListItemSelector,
+      titles.length
+    );
+    const rows = await this.page.$$(explorationListItemSelector);
+    for (let i = 0; i < titles.length; i++) {
+      await this.expectTextContentToBe(listTitleSelector, titles[i], rows[i]);
+    }
+  }
+
+  /**
+   * Checks the statistics of an exploration row in list view.
+   *
+   * @param {number} index - The index of the row to check.
+   * @param {string} rating - The expected rating.
+   * @param {string} feedback - The expected feedback count.
+   * @param {string} views - The expected views count.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    rating: string,
+    feedback: string,
+    views: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationListItemSelector);
+    const rows = await this.page.$$(explorationListItemSelector);
+    if (!rows[index]) {
+      throw new Error(`Exploration row at index ${index} not found.`);
+    }
+    const row = rows[index];
+    await this.expectTextContentToBe(listRatingSelector, rating, row);
+    await this.expectTextContentToBe(listFeedbackSelector, feedback, row);
+    await this.expectTextContentToBe(listViewsSelector, views, row);
   }
 
   /**

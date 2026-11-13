@@ -109,6 +109,8 @@ const filledRatingStarSelector = '.fas.fa-star';
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const creatorDashboardContainer = '.e2e-test-creator-dashboard-container';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
@@ -788,6 +790,17 @@ export class LoggedInUser extends BaseUser {
       newError.stack = (error as Error).stack;
       throw newError;
     }
+  }
+
+  /**
+   * Navigates to the creator dashboard through the profile menu.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.clickOnElementWithSelector(profileDropdown);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(creatorDashboardContainer);
   }
 
   /**
@@ -2049,7 +2062,22 @@ export class LoggedInUser extends BaseUser {
     try {
       await this.expectElementToBeVisible(ratingsHeaderSelector);
       const ratingStars = await this.page.$$(ratingStarSelector);
+      const ratingResponsePromise = this.page.waitForResponse(
+        response =>
+          response.url().includes('/explorehandler/rating/') &&
+          response.request().method() === 'PUT' &&
+          response.status() === 200,
+        {timeout: 30000}
+      );
       await this.clickOnElement(ratingStars[rating - 1]);
+      await ratingResponsePromise;
+
+      if (!feedback.trim()) {
+        // Ratings are saved when a star is clicked; feedback is optional.
+        showMessage('No feedback provided; skipping feedback submission.');
+        await this.waitForNetworkIdle();
+        return;
+      }
 
       await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
@@ -2058,25 +2086,11 @@ export class LoggedInUser extends BaseUser {
 
       await this.clickOnElementWithSelector(submitButtonSelector);
 
-      // Fix for flaky test (#23488). This uses a single, atomic page.$eval()
-      // call to prevent a race condition where the element could be removed
-      // from the DOM before its text was read. Using textContent is also
-      // more reliable than innerText for automated tests.
-      // Explicitly wait for the submitted message to be visible on the page.
-      await this.expectElementToBeVisible(submittedMessageSelector);
-      // Now that we know it's visible, we can safely get its text content.
-      const submittedMessageText = await this.page.$eval(
+      await this.expectTextContentToBe(
         submittedMessageSelector,
-        (el: Element) => el.textContent
+        'Thank you for the feedback!'
       );
-      if (
-        !submittedMessageText ||
-        submittedMessageText.trim() !== 'Thank you for the feedback!'
-      ) {
-        throw new Error(
-          `Unexpected submitted message text: ${submittedMessageText}`
-        );
-      }
+      await this.waitForNetworkIdle();
     } catch (error) {
       const newError = new Error(`Failed to rate exploration: ${error}`);
       newError.stack = (error as Error).stack;
