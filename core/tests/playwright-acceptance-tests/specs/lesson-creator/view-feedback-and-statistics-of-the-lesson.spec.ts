@@ -19,6 +19,8 @@
  * LC.6. View Feedback and Statistics of the Lesson
  */
 
+import {test} from '@playwright/test';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -26,29 +28,32 @@ import {
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Lesson Creator', function () {
-  let lessonCreator: ExplorationEditor & LoggedInUser;
+test.describe('Lesson Creator', function () {
+  let lessonCreator: ExplorationEditor & CurriculumAdmin;
   let learner1: LoggedInUser & LoggedOutUser;
   let learner2: LoggedInUser & LoggedOutUser;
   let explorationId: string;
   const EXPLORATION_TITLE = 'Simple Addition Exploration';
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600000);
     lessonCreator = await UserFactory.createNewUser(
       'LessonCreator',
-      'lessoncreator@example.com'
+      'lessoncreator@example.com',
+      browser
     );
     learner1 = await UserFactory.createNewUser(
       'Learner1',
-      'learner1@example.com'
+      'learner1@example.com',
+      browser
     );
     learner2 = await UserFactory.createNewUser(
       'Learner2',
-      'learner2@example.com'
+      'learner2@example.com',
+      browser
     );
 
     await lessonCreator.navigateToCreatorDashboardPage();
@@ -61,9 +66,9 @@ describe('Lesson Creator', function () {
 
     await lessonCreator.customizeNumberInputInteraction(true);
 
-    await lessonCreator.fillValueInInteractionResponseModal('3', 'input');
-
-    await lessonCreator.addResponseDetailsInResponseModal(
+    await lessonCreator.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      '3',
       'Correct',
       'Second',
       true,
@@ -81,9 +86,9 @@ describe('Lesson Creator', function () {
 
     await lessonCreator.customizeNumberInputInteraction(true);
 
-    await lessonCreator.fillValueInInteractionResponseModal('110', 'input');
-
-    await lessonCreator.addResponseDetailsInResponseModal(
+    await lessonCreator.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      '110',
       'Correct',
       'Final',
       true,
@@ -109,10 +114,10 @@ describe('Lesson Creator', function () {
     await learner1.playLessonFromSearchResults(EXPLORATION_TITLE);
 
     await learner1.submitAnswer('3');
-    await learner1.continueToNextCard();
+    await learner1.continueToNextCardAsLoggedOutUser();
 
     await learner1.submitAnswer('110');
-    await learner1.continueToNextCard();
+    await learner1.continueToNextCardAsLoggedOutUser();
 
     await learner1.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -121,44 +126,34 @@ describe('Lesson Creator', function () {
 
     await learner2.navigateToCommunityLibraryPage();
     await learner2.playLessonFromSearchResults(EXPLORATION_TITLE);
-  }, 600000);
+    await learner2.expectCardContentToMatch('What is 1 + 2?');
+  });
 
-  it(
-    'should view and reply to exploration feedback',
-    async function () {
-      await lessonCreator.navigateToFeedbackTab();
-      await lessonCreator.expectFeedbackPageTobeVisible();
+  test('should view and reply to exploration feedback', async function () {
+    const subject = 'Feedback Subject';
+    await lessonCreator.navigateToFeedbackTab();
+    await lessonCreator.startAFeedbackThread(
+      subject,
+      'Initial feedback message'
+    );
+    await lessonCreator.expectFeedbackStatusInList(subject, 'Open');
+    await lessonCreator.viewFeedbackThread(subject);
+    await lessonCreator.replyToFeedback('Thanks, issue noted.');
+    await lessonCreator.goBackToTheFeedbackTab();
+    await lessonCreator.expectFeedbackReplyDetailsToBeVisible(
+      subject,
+      'LessonCreator'
+    );
+    await lessonCreator.expectFeedbackStatusInList(subject, 'Fixed');
+  });
 
-      await lessonCreator.startAFeedbackThread(
-        'Feedback Subject',
-        'Initial feedback message'
-      );
-      await lessonCreator.expectFeedbackThreadToBePresent('Feedback Subject');
+  test('should view exploration statistics', async function () {
+    await lessonCreator.navigateToExplorationEditor(explorationId);
+    await lessonCreator.navigateToStatsTab();
+    await lessonCreator.expectNumberOfPassersToBe(1);
+  });
 
-      await lessonCreator.expectFeedbackStatusInList(1, 'Open');
-
-      await lessonCreator.viewFeedbackThread(1);
-      await lessonCreator.changeFeedbackStatus('fixed');
-      await lessonCreator.replyToSuggestion('Thanks, issue noted.');
-
-      await lessonCreator.goBackToTheFeedbackTab();
-      await lessonCreator.expectFeedbackReplyDetailsToBeVisible();
-      await lessonCreator.expectFeedbackStatusInList(1, 'Fixed');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should view exploration statistics and take action based on thems',
-    async function () {
-      await lessonCreator.navigateToExplorationEditor(explorationId);
-      await lessonCreator.navigateToStatsTab();
-      await lessonCreator.expectNumberOfPassersToBe(1);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
