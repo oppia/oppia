@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 import numbers
+import re
 import sys
 
 from core import feconf, utils
@@ -202,6 +203,17 @@ class AggregatedStatsDict(TypedDict):
     num_actual_starts: int
     num_completions: int
     state_stats_mapping: Dict[str, Dict[str, int]]
+
+
+class StateCounterDict(TypedDict):
+    """Dictionary representing the StateCounter object."""
+
+    exploration_id: str
+    state_name: str
+    first_entry_count: int
+    subsequent_entries_count: int
+    resolved_answer_count: int
+    active_answer_count: int
 
 
 class ExplorationStats:
@@ -2388,3 +2400,237 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+
+class StateCounter:
+    """Domain object representing a set of counts for one state
+    of an exploration.
+    """
+
+    def __init__(
+        self,
+        exploration_id: str,
+        state_name: str,
+        first_entry_count: int,
+        subsequent_entries_count: int,
+        resolved_answer_count: int,
+        active_answer_count: int,
+    ) -> None:
+        """Constructs a StateCounter domain object.
+
+        Args:
+            exploration_id: str. ID of the exploration.
+            state_name: str. Name of the state.
+            first_entry_count: int. Times the state was entered
+                for the first time in a reader session.
+            subsequent_entries_count: int. Times the state was
+                entered for the second time or later.
+            resolved_answer_count: int. Times an answer for this
+                state was resolved by an admin and removed from
+                the answer logs.
+            active_answer_count: int. Times an answer was
+                entered for this state and was not subsequently
+                resolved.
+        """
+        self.exploration_id = exploration_id
+        self.state_name = state_name
+        self.first_entry_count = first_entry_count
+        self.subsequent_entries_count = subsequent_entries_count
+        self.resolved_answer_count = resolved_answer_count
+        self.active_answer_count = active_answer_count
+
+    def validate(self) -> None:
+        """Validates the StateCounter domain object.
+
+        Raises:
+            ValidationError. The exploration_id is not a string.
+            ValidationError. The exploration_id does not match ENTITY_ID_REGEX.
+            ValidationError. The state_name is not a valid state name.
+            ValidationError. A count field is not an int, is a bool, or is
+                negative.
+        """
+        # Check 1: exploration_id must be a string.
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration_id to be a string, received %s'
+                % (self.exploration_id)
+            )
+
+        # Check 2: exploration_id must match the entity ID regex.
+        if not re.match(constants.ENTITY_ID_REGEX, self.exploration_id):
+            raise utils.ValidationError(
+                'Expected exploration_id to match %s, received %s'
+                % (constants.ENTITY_ID_REGEX, self.exploration_id)
+            )
+
+        # Check 3: state_name must be a valid name.
+        utils.require_valid_name(self.state_name, 'a state name')
+
+        # Check 4: each count must be a non-negative int (bool rejected).
+        # Note: bool is a subclass of int in Python, so isinstance(True, int)
+        # is True. We deliberately strengthen the check here to reject bools,
+        # since a bool count value almost certainly indicates a caller bug.
+        for prop in (
+            'first_entry_count',
+            'subsequent_entries_count',
+            'resolved_answer_count',
+            'active_answer_count',
+        ):
+            value = getattr(self, prop)
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise utils.ValidationError(
+                    'Expected %s to be an int, received %s' % (prop, value)
+                )
+            if value < 0:
+                raise utils.ValidationError(
+                    '%s cannot have negative values' % (prop)
+                )
+
+    def to_dict(self) -> StateCounterDict:
+        """Returns a dict representation of the domain object.
+
+        Returns:
+            StateCounterDict. A dict representation of the
+            StateCounter domain object.
+        """
+        return {
+            'exploration_id': self.exploration_id,
+            'state_name': self.state_name,
+            'first_entry_count': self.first_entry_count,
+            'subsequent_entries_count': self.subsequent_entries_count,
+            'resolved_answer_count': self.resolved_answer_count,
+            'active_answer_count': self.active_answer_count,
+        }
+
+    @classmethod
+    def from_dict(
+        cls, state_counter_dict: StateCounterDict
+    ) -> StateCounter:
+        """Constructs a StateCounter domain object from a dict.
+
+        Args:
+            state_counter_dict: StateCounterDict. A dict
+                representation of a StateCounter.
+
+        Returns:
+            StateCounter. A StateCounter domain object.
+
+        Raises:
+            ValidationError. The dict contains invalid data.
+        """
+        state_counter = cls(
+            state_counter_dict['exploration_id'],
+            state_counter_dict['state_name'],
+            state_counter_dict['first_entry_count'],
+            state_counter_dict['subsequent_entries_count'],
+            state_counter_dict['resolved_answer_count'],
+            state_counter_dict['active_answer_count'],
+        )
+        state_counter.validate()
+        return state_counter
+
+    @classmethod
+    def create_default(
+        cls, exploration_id: str, state_name: str
+    ) -> StateCounter:
+        """Creates a StateCounter with all counts set to 0.
+
+        Args:
+            exploration_id: str. ID of the exploration.
+            state_name: str. Name of the state.
+
+        Returns:
+            StateCounter. A StateCounter domain object with all
+            counts initialised to zero.
+        """
+        return cls(exploration_id, state_name, 0, 0, 0, 0)
+
+    def clone(self) -> StateCounter:
+        """Returns a clone of this StateCounter instance.
+
+        Returns:
+            StateCounter. A new StateCounter with the same field
+            values. Mutating the clone does not affect this
+            instance.
+        """
+        return self.from_dict(self.to_dict())
+
+    # NOTE: Here we use type Any because of:
+    # https://github.com/python/mypy/issues/363#issue-39383094
+    def __eq__(self, other: Any) -> Any:
+        """Implements == comparison between two StateCounter instances.
+
+        Args:
+            other: StateCounter. The other instance to compare.
+
+        Returns:
+            bool. Whether the two instances hold the same values.
+        """
+        if not isinstance(other, StateCounter):
+            # https://docs.python.org/3.7/library/constants.html
+            return NotImplemented
+        return (
+            self.exploration_id,
+            self.state_name,
+            self.first_entry_count,
+            self.subsequent_entries_count,
+            self.resolved_answer_count,
+            self.active_answer_count,
+        ) == (
+            other.exploration_id,
+            other.state_name,
+            other.first_entry_count,
+            other.subsequent_entries_count,
+            other.resolved_answer_count,
+            other.active_answer_count,
+        )
+
+    def __hash__(self) -> int:
+        """Disallow hashing since the object is mutable by design.
+
+        Raises:
+            TypeError. StateCounter is unhashable.
+        """
+        raise TypeError('%s is unhashable' % self.__class__.__name__)
+
+    def __repr__(self) -> str:
+        """Returns a detailed string representation of this instance.
+
+        Returns:
+            str. A string representation of this StateCounter.
+        """
+        props = [
+            'exploration_id',
+            'state_name',
+            'first_entry_count',
+            'subsequent_entries_count',
+            'resolved_answer_count',
+            'active_answer_count',
+        ]
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join(
+                '%s=%r' % (prop, getattr(self, prop)) for prop in props
+            ),
+        )
+
+    def __str__(self) -> str:
+        """Returns a string representation of this instance.
+
+        Returns:
+            str. A string representation of this StateCounter.
+        """
+        props = [
+            'exploration_id',
+            'state_name',
+            'first_entry_count',
+            'subsequent_entries_count',
+            'resolved_answer_count',
+            'active_answer_count',
+        ]
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join(
+                '%s=%r' % (prop, getattr(self, prop)) for prop in props
+            ),
+        )
