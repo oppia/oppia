@@ -24,10 +24,10 @@ import re
 
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    fs_services,  # pylint: disable=invalid-import-from
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
 )
 
@@ -2344,7 +2344,7 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        next_node_id = None
+        next_node_id: Optional[str] = None
         for node in reversed(story_contents_dict['nodes']):
             if next_node_id:
                 node['destination_node_ids'] = [next_node_id]
