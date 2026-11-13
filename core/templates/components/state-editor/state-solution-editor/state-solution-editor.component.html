@@ -72,7 +72,7 @@
           </ul>
           <div *ngIf="!savedMemento()" class="oppia-empty-solution-warning">
             <i class="material-icons oppia-empty-solution-warning-icon">&#xe002;</i>
-            <span [innerHTML]="'I18N_EMPTY_SOLUTION_MESSAGE' | translate" tabindex="0"></span>
+            <span tabindex="0">{{ 'I18N_EMPTY_SOLUTION_MESSAGE' | translate }}</span>
           </div>
         </div>
       </div>

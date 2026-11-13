@@ -9,7 +9,7 @@
 </div>
 <div class="modal-body">
   <div class="group-title">
-    <b [innerHTML]="'I18N_LEARNER_GROUP_JOINING_MESSAGE' | translate:{groupName: learnerGroup.title, messageFormat: true}"></b>
+    <b>{{ 'I18N_LEARNER_GROUP_JOINING_MESSAGE' | translate:{groupName: learnerGroup.title, messageFormat: true} }}</b>
   </div>
   <div class="group-description">
     <b>
@@ -18,7 +18,7 @@
     <div>{{ learnerGroup.description }}</div>
   </div>
   <div class="group-facilitator">
-    <b [innerHTML]="'I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT' | translate"></b>
+    <b>{{ 'I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT' | translate }}</b>
     <div>
       <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames; let last = last">
         <span *ngIf="last">{{ facilitator }}</span>
@@ -27,8 +27,8 @@
     </div>
   </div>
   <div class="learner-groups-progress-sharing-info">
-    <b [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate"></b>
-    <p [innerHTML]="'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT' | translate"></p>
+    <b>{{ 'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TITLE' | translate }}</b>
+    <p>{{ 'I18N_LEARNER_GROUP_PROGRESS_SHARING_INFO_TEXT' | translate }}</p>
   </div>
   <div>
     <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" [value]="true" [checked]="progressSharingPermission" (change)="toggleProgressSharingPermission()" attr.aria-label="{{'I18N_LEARNER_GROUP_PROGRESS_SHARING_OPTION_TRUE' | translate}}">
@@ -40,6 +40,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
-  <button class="btn btn-primary" (click)="confirm()" [innerHTML]="'I18N_JOIN_LEARNER_GROUP_BUTTON' | translate"></button>
+  <button class="btn btn-secondary" (click)="cancel()">{{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}</button>
+  <button class="btn btn-primary" (click)="confirm()">{{ 'I18N_JOIN_LEARNER_GROUP_BUTTON' | translate }}</button>
 </div>

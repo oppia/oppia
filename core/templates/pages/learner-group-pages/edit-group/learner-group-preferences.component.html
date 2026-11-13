@@ -19,7 +19,7 @@
       <div class="preferences-tab-sections-header-title"
            [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)}"
            (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)">
-        <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate: {learnersCount: 0, messageFormat: true}"></span>
+        <span>{{ 'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate: {learnersCount: 0, messageFormat: true} }}</span>
       </div>
     </div>
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)" class="edit-learner-group-details-section">

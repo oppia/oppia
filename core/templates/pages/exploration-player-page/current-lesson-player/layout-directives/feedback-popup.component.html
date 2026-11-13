@@ -15,7 +15,7 @@
                 [attr.aria-label]="('I18N_PLAYER_LEAVE_FEEDBACK' | translate)+ '. ' +('I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH })" placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
       </textarea>
       <span class="oppia-input-box-subtitle">
-        <em [innerHTML]="'I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH }"></em>
+        <em>{{ 'I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH } }}</em>
       </span>
     </div>
     <div class="oppia-feedback-popover-bottom-container">

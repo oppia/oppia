@@ -11,7 +11,7 @@
       <div class="float-end">
         <ul>
           <li>
-            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer e2e-test-share-collection-footer"></h4>
+            <h4 class="oppia-share-collection-footer e2e-test-share-collection-footer">{{ 'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate }}</h4>
           </li>
           <li>
             <sharing-links (click)="$event.stopPropagation()"

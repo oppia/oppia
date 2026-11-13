@@ -52,30 +52,33 @@
           </span>
         </div>
         <div *ngIf="!objective" class="objective">
-          <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
+          <span>
+            {{ 'I18N_LIBRARY_NO_OBJECTIVE' | translate }}
           </span>
         </div>
         <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-row">
           <li>
             <span class="e2e-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
               <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate" placement="top" container="body">
-                <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
+                <span class="oppia-icon-accessibility-label">{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}</span>
               </span>
               <span *ngIf="avgRating">
                 {{ avgRating | number:'1.1-1' }}
               </span>
-              <span *ngIf="!avgRating" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!avgRating" class="oppia-inactive-summary-tile-attribute">
+                {{ 'I18N_LIBRARY_N/A' | translate }}
               </span>
             </span>
           </li>
           <li>
             <span class="far fa-eye" [ngbTooltip]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
-              <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
+              <span class="oppia-icon-accessibility-label">{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}</span>
             </span>
             <span *ngIf="numViews" class="e2e-test-exp-summary-tile-views">
               {{ numViews | summarizeNonnegativeNumber }}
             </span>
-            <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+            <span *ngIf="!numViews" class="oppia-inactive-summary-tile-attribute">
+              {{ 'I18N_LIBRARY_N/A' | translate }}
             </span>
           </li>
           <li>
@@ -83,7 +86,8 @@
               <span class="oppia-icon-accessibility-label">Last Updated</span>
               {{ lastUpdatedDateTime }}
             </span>
-            <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+            <span *ngIf="!lastUpdatedDateTime" class="oppia-inactive-summary-tile-attribute">
+              {{ 'I18N_LIBRARY_N/A' | translate }}
             </span>
           </li>
         </ul>
@@ -93,7 +97,7 @@
           </span>
         </div>
         <button *ngIf="isCollectionPreviewTile" class="oppia-learner-confirm-button oppia-play-exploration-button mat-button  mat-default-theme e2e-test-play-exploration-button">
-          <span [innerHTML]="'I18N_PLAYER_PLAY_EXPLORATION' | translate"></span>
+          <span>{{ 'I18N_PLAYER_PLAY_EXPLORATION' | translate }}</span>
         </button>
       </div>
     </a>
@@ -121,7 +125,8 @@
           <ul *ngIf="!isCollectionPreviewTile" class="mobile-activity-card-summary-elements">
             <li>
               <span *ngIf="numViews">{{ numViews | summarizeNonnegativeNumber }}</span>
-              <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!numViews" class="oppia-inactive-summary-tile-attribute">
+                {{ 'I18N_LIBRARY_N/A' | translate }}
               </span>
               <span *ngIf="numViews === 1"  class="views-text">view</span>
               <span *ngIf="numViews !== 1" class="views-text">views</span>
@@ -136,7 +141,8 @@
                 <span class="oppia-icon-accessibility-label">Last Updated</span>
                 {{ relativeLastUpdatedDateTime }}
               </span>
-              <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!lastUpdatedDateTime" class="oppia-inactive-summary-tile-attribute">
+                {{ 'I18N_LIBRARY_N/A' | translate }}
               </span>
             </li>
           </ul>

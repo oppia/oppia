@@ -31,7 +31,7 @@
             type="button"
             class="oppia-attribution-link oppia-attribution-guide-text e2e-test-generate-attribution"
             (click)="showAttributionModal()">
-      <span [innerHTML]="'I18N_GENERATE_ATTRIBUTION' | translate"></span>
+      <span>{{ 'I18N_GENERATE_ATTRIBUTION' | translate }}</span>
     </button>
   </div>
   <div *ngIf="getAttributionModalStatus()" class="attribution-modal-container">
@@ -43,14 +43,14 @@
         </button>
         <div class="container pt-4">
           <div class="fw-bold">
-            <span [innerHTML]="'I18N_ATTRIBUTION_TITLE' | translate" tabindex="0"></span>
+            <span tabindex="0">{{ 'I18N_ATTRIBUTION_TITLE' | translate }}</span>
           </div>
           <div class="attribution-html-section" tabindex="0">
             <div class="fw-bold">
-              <span [innerHTML]="'I18N_ATTRIBUTION_HTML_TITLE' | translate"></span>
+              <span>{{ 'I18N_ATTRIBUTION_HTML_TITLE' | translate }}</span>
             </div>
             <ol class="attribute-instructions">
-              <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate"></span></li>
+              <li><span>{{ 'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate }}</span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_TWO' | translate: { linkText: '<u>Oppia</u> // <u>CC BY SA 4.0</u>' }"></span></li>
             </ol>
             <div ngbTooltip="Copied!"
@@ -65,9 +65,9 @@
             <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-html-code', htmlAttributionTooltip)">COPY</button>
           </div>
           <div class="attribution-print-section" tabindex="0">
-            <div class="fw-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
+            <div class="fw-bold"><span>{{ 'I18N_ATTRIBUTION_PRINT_TITLE' | translate }}</span></div>
             <ol class="attribute-instructions">
-              <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
+              <li><span>{{ 'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate }}</span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_TWO' | translate: { link: printAttributionLink }"></span></li>
             </ol>
             <div ngbTooltip="Copied!"
@@ -82,7 +82,7 @@
             <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-print-text', printAttributionTooltip)">COPY</button>
           </div>
           <div class="sharing-section">
-            <div class="fw-bold"><span [innerHTML]="'I18N_SHARE_LESSON' | translate"></span></div>
+            <div class="fw-bold"><span>{{ 'I18N_SHARE_LESSON' | translate }}</span></div>
             <sharing-links [layoutType]="'row center'"
                            [layoutAlignType]="'end'"
                            [shareType]="'exploration'"
