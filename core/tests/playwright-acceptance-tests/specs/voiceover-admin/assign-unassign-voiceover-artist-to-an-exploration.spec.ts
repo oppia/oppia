@@ -86,9 +86,9 @@ test.describe('Voiceover Admin', function () {
 
   test('should be able to add voiceover artist to an exploration', async function () {
     const navigationUtils = new NavigationUtils(voiceoverAdmin);
-    const explorationEditor = new ExplorationEditorUtils(voiceoverAdmin);
+    const explorationEditorUtils = new ExplorationEditorUtils(voiceoverAdmin);
     await navigationUtils.navigateToExplorationEditor(explorationId);
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditorUtils.dismissWelcomeModal();
     await voiceoverAdmin.navigateToExplorationSettingsTab();
     await voiceoverAdmin.expectVoiceoverArtistsListToBeEmpty();
 
@@ -96,10 +96,9 @@ test.describe('Voiceover Admin', function () {
     await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
       'invalidUserId'
     );
-    await voiceoverAdmin.addVoiceoverArtistsToExploration(
-      ['invalidUserId'],
-      false
-    );
+    // The artist is not expected to be added, so the error raised by the
+    // server is asserted instead of the artist appearing in the list.
+    await voiceoverAdmin.submitVoiceoverArtistUsername('invalidUserId');
 
     await voiceoverAdmin.expectErrorModalToBeVisible();
     await voiceoverAdmin.expectErrorModalMessageToBe(

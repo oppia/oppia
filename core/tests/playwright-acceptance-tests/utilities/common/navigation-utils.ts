@@ -72,7 +72,7 @@ export class NavigationUtils {
 
   /**
    * Function to navigate to exploration editor.
-   * @param explorationUrl - url of the exploration.
+   * @param {string | null} explorationId - The ID of the exploration to navigate.
    */
   async navigateToExplorationEditor(
     explorationId: string | null
@@ -83,6 +83,7 @@ export class NavigationUtils {
     const editorUrl = `${baseURL}/create/${explorationId}#/`;
     await this.userInstance.goto(editorUrl);
   }
+
   /**
    * Navigates to the Moderator page.
    * @param {boolean} verifyUrl - Whether to verify the URL after navigation.

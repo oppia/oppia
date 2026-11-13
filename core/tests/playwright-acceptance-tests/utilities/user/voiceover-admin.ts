@@ -28,7 +28,6 @@ const voiceArtistUsernameInputBox = 'input#newVoiceArtistUsername';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
 
-const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
 const mobileVoiceoverArtistsHeader =
@@ -174,47 +173,47 @@ export class VoiceoverAdmin extends BaseUser {
         }
         return true;
       },
-      {selector: updatedVoiceoverArtist, artistUsername}
+      {selector: '.e2e-test-voiceArtist-role-names', artistUsername}
     );
   }
 
   /**
-   * Add voiceover artists to an exploration.
+   * Add voiceover artists to an exploration and verify that they are listed.
    * @param voiceArtists - The username list of the voiceover artists to add.
    */
   async addVoiceoverArtistsToExploration(
-    voiceArtists: string[],
-    verify: boolean = true
+    voiceArtists: string[]
   ): Promise<void> {
+    for (const voiceArtist of voiceArtists) {
+      await this.submitVoiceoverArtistUsername(voiceArtist);
+      // Verify that the artist is actually listed, so that a silently failed
+      // addition is reported as a test failure rather than a pass.
+      await this.expectElementToBeVisible(
+        `div.e2e-test-voice-artist-${voiceArtist}`
+      );
+      showMessage(`${voiceArtist} has been added as a voice artist.`);
+    }
+  }
+
+  /**
+   * Submit a username in the voiceover artist form without verifying that the
+   * artist was added. This is for submissions that are expected to fail, such
+   * as an invalid username, where the caller asserts the resulting error.
+   * @param voiceArtist - The username to submit.
+   */
+
+  async submitVoiceoverArtistUsername(voiceArtist: string): Promise<void> {
     if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
       await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
       await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
     }
-    for (let i = 0; i < voiceArtists.length; i++) {
-      await this.expectElementToBeVisible(editVoiceoverArtistButton);
-      await this.clickOnElementWithSelector(editVoiceoverArtistButton);
-      await this.clickOnElementWithSelector(voiceArtistUsernameInputBox);
-      await this.expectElementToBeVisible(voiceArtistUsernameInputBox, true);
-      await this.clearAllTextFrom(voiceArtistUsernameInputBox);
-      await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtists[i]);
-      await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
-      // Adding try catch here to avoid unnecessary waiting for selector if
-      // the added voice artist is not an user.
-      if (verify) {
-        try {
-          await this.expectElementToBeVisible(
-            `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-            true
-          );
-          showMessage(voiceArtists[i] + ' has been added as a voice artist.');
-        } catch (error) {
-          throw new Error(
-            `${voiceArtists[i]} is not added.\n` +
-              `Original Error: ${error.stack}`
-          );
-        }
-      }
-    }
+    await this.expectElementToBeVisible(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(voiceArtistUsernameInputBox);
+    await this.expectElementToBeVisible(voiceArtistUsernameInputBox);
+    await this.clearAllTextFrom(voiceArtistUsernameInputBox);
+    await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtist);
+    await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
   }
 
   /**
@@ -248,7 +247,7 @@ export class VoiceoverAdmin extends BaseUser {
   async expectVoiceoverArtistsListContains(
     artistUsername: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(updatedVoiceoverArtist);
+    await this.expectElementToBeVisible('.e2e-test-voiceArtist-role-names');
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
     if (!allVoiceoverArtists.includes(artistUsername)) {
       throw new Error(
@@ -264,7 +263,10 @@ export class VoiceoverAdmin extends BaseUser {
    * Checks if the voice artist list is empty.
    */
   async expectVoiceoverArtistsListToBeEmpty(): Promise<void> {
-    await this.expectElementToBeVisible(updatedVoiceoverArtist, false);
+    await this.expectElementToBeVisible(
+      '.e2e-test-no-voice-artists-message',
+      true
+    );
     showMessage('No voiceover artists are added to the exploration!');
   }
 
@@ -275,7 +277,7 @@ export class VoiceoverAdmin extends BaseUser {
   async getAllVoiceoverArtists(): Promise<string[]> {
     await this.expectElementToBeAttachedInDOM(allVoiceoverArtistsList);
     const voiceoverArtists = await this.page.$$eval(
-      updatedVoiceoverArtist,
+      '.e2e-test-voiceArtist-role-names',
       (elements: Element[]) =>
         elements.map((el: Element) => (el as HTMLElement).innerText.trim())
     );
