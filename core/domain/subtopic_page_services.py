@@ -513,10 +513,17 @@ def get_learner_group_syllabus_subtopic_page_summaries(
 
     Returns:
         list(SubtopicPageSummaryDict). The summary dicts corresponding to the
-        given subtopic page ids.
+        given subtopic page ids. Ids whose topic or subtopic does not exist
+        are skipped.
     """
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    # A learner group can still refer to a topic that no longer exists, so
+    # such topics are skipped instead of failing the whole syllabus.
+    topics = [
+        topic
+        for topic in topic_fetchers.get_topics_by_ids(topic_ids)
+        if topic is not None
+    ]
 
     all_learner_group_subtopic_page_summaries: List[
         subtopic_page_domain.SubtopicPageSummaryDict

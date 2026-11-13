@@ -51,6 +51,20 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
 
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id,
+            self.facilitator_id,
+            subtopics=[
+                topic_domain.Subtopic.create_default_subtopic(
+                    1, 'Subtopic 1', 'subtopic-one'
+                ),
+                topic_domain.Subtopic.create_default_subtopic(
+                    2, 'Subtopic 2', 'subtopic-two'
+                ),
+            ],
+            next_subtopic_id=3,
+        )
 
     def test_create_new_learner_group(self) -> None:
         self.login(self.NEW_USER_EMAIL)
@@ -63,7 +77,10 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
                 self.USER1_USERNAME,
                 self.USER2_USERNAME,
             ],
-            'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
+            'subtopic_page_ids': [
+                '%s:1' % self.topic_id,
+                '%s:2' % self.topic_id,
+            ],
             'story_ids': ['story_id_1', 'story_id_2'],
         }
         response = self.post_json(
@@ -84,6 +101,38 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(learner_group)
+
+        self.logout()
+
+    def test_create_learner_group_with_missing_subtopic_pages_fails(
+        self,
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'group_title': 'Learner Group Title',
+            'group_description': 'Learner Group Description',
+            'invited_learner_usernames': [],
+            'subtopic_page_ids': [
+                '%s:1' % self.topic_id,
+                '%s:5' % self.topic_id,
+                'missing_topic_id:1',
+            ],
+            'story_ids': [],
+        }
+        response = self.post_json(
+            '/create_learner_group_handler',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'These subtopic pages do not exist: %s:5, missing_topic_id:1'
+            % self.topic_id,
+        )
 
         self.logout()
 
@@ -119,6 +168,17 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
             ['subtopic_id_1'],
             ['story_id_1'],
         )
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id,
+            self.facilitator_id,
+            subtopics=[
+                topic_domain.Subtopic.create_default_subtopic(
+                    1, 'Subtopic 1', 'subtopic-one'
+                )
+            ],
+            next_subtopic_id=2,
+        )
 
     def test_update_learner_group_as_facilitator(self) -> None:
         self.login(self.NEW_USER_EMAIL)
@@ -129,7 +189,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
             'group_description': 'Learner Group Description',
             'learner_usernames': [],
             'invited_learner_usernames': [self.USER2_USERNAME],
-            'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
+            'subtopic_page_ids': ['subtopic_id_1', '%s:1' % self.topic_id],
             'story_ids': ['story_id_1', 'story_id_2'],
         }
         response = self.put_json(
@@ -145,8 +205,11 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
             response['invited_learner_usernames'], [self.USER2_USERNAME]
         )
         self.assertEqual(response['learner_usernames'], [])
+        # The page that was already in the group is kept, even though its
+        # topic does not exist, so that the group can still be edited.
         self.assertEqual(
-            response['subtopic_page_ids'], ['subtopic_id_1', 'subtopic_id_2']
+            response['subtopic_page_ids'],
+            ['subtopic_id_1', '%s:1' % self.topic_id],
         )
         self.assertEqual(response['story_ids'], ['story_id_1', 'story_id_2'])
 
@@ -157,6 +220,39 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400,
         )
+
+        self.logout()
+
+    def test_update_learner_group_with_missing_subtopic_pages_fails(
+        self,
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'group_title': 'Updated Learner Group Title',
+            'group_description': 'Learner Group Description',
+            'learner_usernames': [],
+            'invited_learner_usernames': [],
+            'subtopic_page_ids': ['subtopic_id_1', 'missing_topic_id:1'],
+            'story_ids': ['story_id_1'],
+        }
+        response = self.put_json(
+            '/update_learner_group_handler/%s' % self.learner_group_id,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'These subtopic pages do not exist: missing_topic_id:1',
+        )
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.learner_group.group_id, strict=True
+        )
+        self.assertEqual(learner_group.title, 'Learner Group Title')
+        self.assertEqual(learner_group.subtopic_page_ids, ['subtopic_id_1'])
 
         self.logout()
 
@@ -1329,6 +1425,32 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
             subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID
         )
         self.assertIsNone(subtopic_summary_dicts[0]['subtopic_mastery'])
+
+        self.logout()
+
+    def test_get_learner_group_syllabus_with_missing_topic(self) -> None:
+        learner_group_services.update_learner_group(
+            self.learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.facilitator_id],
+            [],
+            [self.LEARNER_ID],
+            ['missing_topic_id:1', self.SUBTOPIC_PAGE_ID],
+            [self.STORY_ID],
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        response = self.get_json(
+            '/learner_group_syllabus_handler/%s' % self.learner_group_id
+        )
+
+        subtopic_summary_dicts = response['subtopic_summary_dicts']
+        self.assertEqual(len(subtopic_summary_dicts), 1)
+        self.assertEqual(
+            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID
+        )
+        self.assertEqual(len(response['story_summary_dicts']), 1)
 
         self.logout()
 
