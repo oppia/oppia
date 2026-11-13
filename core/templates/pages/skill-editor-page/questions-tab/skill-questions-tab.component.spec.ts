@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Skill question tab Component.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   TestBed,
@@ -30,6 +28,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Skill} from 'domain/skill/skill.model';
 import {SkillQuestionsTabComponent} from './skill-questions-tab.component';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 describe('Skill question tab component', () => {
   let component: SkillQuestionsTabComponent;
@@ -120,6 +119,8 @@ describe('Skill question tab component', () => {
         untriagedSkillSummaries: [],
         topicSummaries: [],
         totalSkillCount: 0,
+        allClassroomNames: [],
+        mergeableSkillSummaries: [],
         canDeleteTopic: false,
         canCreateTopic: false,
         canDeleteSkill: false,
@@ -161,6 +162,8 @@ describe('Skill question tab component', () => {
         untriagedSkillSummaries: [],
         topicSummaries: [],
         totalSkillCount: 0,
+        allClassroomNames: [],
+        mergeableSkillSummaries: [],
         canDeleteTopic: false,
         canCreateTopic: false,
         canDeleteSkill: false,
@@ -178,7 +181,8 @@ describe('Skill question tab component', () => {
   it('should load skills categorized by topics', fakeAsync(() => {
     const mockCategorizedSkills = {
       'Test Topic': {
-        'Test Subtopic': [{id: 'skill1', description: 'Test Skill 1'}],
+        uncategorized: [],
+        'Test Subtopic': [ShortSkillSummary.create('skill1', 'Test Skill 1')],
       },
     };
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
@@ -192,6 +196,8 @@ describe('Skill question tab component', () => {
         untriagedSkillSummaries: [],
         topicSummaries: [],
         totalSkillCount: 0,
+        allClassroomNames: [],
+        mergeableSkillSummaries: [],
         canDeleteTopic: false,
         canCreateTopic: false,
         canDeleteSkill: false,

@@ -1,6 +1,11 @@
 .oppia-collection-editor-navbar {
   margin-left: 20px;
 }
+.oppia-collection-editor-navbar > li > button {
+  background: transparent;
+  border: 0;
+  padding: 13px 15px 10px;
+}
 .oppia-button-container {
   margin-right: 10px;
   margin-top: 8px;
