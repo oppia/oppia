@@ -110,7 +110,8 @@ link before completing the signup process, they will be logged out.
       <div tabindex="0">
         <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
         <br>
-        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"
+        <span class="oppia-signup-license-text"
+              innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"
               (click)="showLicenseExplanationModal($event)">
         </span>
       </div>
@@ -124,7 +125,8 @@ link before completing the signup process, they will be logged out.
                  [ngModelOptions]="{standalone: true}"
                  class="oppia-checkbox-margin e2e-test-agree-to-terms-checkbox"
                  id="terms-checkbox">
-          <span innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
+          <span class="oppia-signup-license-text"
+                innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
           </span>
         </label>
       </div>
