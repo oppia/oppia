@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for skill preview tab component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -42,6 +40,7 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {Question} from 'domain/question/question.model';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -236,9 +235,12 @@ describe('Skill Preview Tab Component', () => {
     let skillId = 'df432fe';
     spyOn(questionPlayerEngineService, 'init').and.callFake(
       (
-        questionObject: [],
-        successCallback: () => void,
-        errorCallback: () => void
+        questionObjects: Question[],
+        successCallback: (
+          initialCard: StateCard,
+          nextFocusLabel: string
+        ) => void,
+        errorCallback?: () => void
       ) => {}
     );
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue(skillId);

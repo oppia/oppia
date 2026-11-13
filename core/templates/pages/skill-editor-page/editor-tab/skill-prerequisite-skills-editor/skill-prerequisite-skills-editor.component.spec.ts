@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the skill prerequisite skills editor.
  */
 
-// @ts-nocheck
-
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -45,6 +43,39 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {of} from 'rxjs';
+import {FetchSkillResponse} from 'domain/skill/skill-backend-api.service';
+const createSkillWithId = (
+  skillId: string,
+  // The backend sends null when a skill has no superseding skill, but
+  // SkillBackendDict declares the field as string (see line 170 in this file).
+  supersedingSkillId: string | null = null
+): Skill =>
+  Skill.createFromBackendDict({
+    id: skillId,
+    description: 'Dummy Skill',
+    misconceptions: [],
+    rubrics: [],
+    skill_contents: {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {},
+      },
+    },
+    language_code: 'en',
+    version: 1,
+    next_misconception_id: 0,
+    prerequisite_skill_ids: [],
+    superseding_skill_id: supersedingSkillId as string,
+    all_questions_merged: false,
+  });
+const createFetchSkillResponse = (skill: Skill): FetchSkillResponse => ({
+  skill: skill,
+  assignedSkillTopicData: {},
+  groupedSkillSummaries: {},
+});
 
 describe('Skill editor main tab Component', () => {
   let component: SkillPrerequisiteSkillsEditorComponent;
@@ -399,34 +430,29 @@ describe('Skill editor main tab Component', () => {
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.callFake(
         (skillId: string) => {
           if (skillId === 'skill1') {
-            return Promise.resolve({skill: sampleSkill});
+            return Promise.resolve(createFetchSkillResponse(sampleSkill));
           } else if (skillId === 'skill2') {
-            return Promise.resolve({skill: skillWithSupersedingSkill});
+            return Promise.resolve(
+              createFetchSkillResponse(skillWithSupersedingSkill)
+            );
           } else if (skillId === 'BBB6dzfb5pPt') {
-            return Promise.resolve({
-              skill: {
-                getId: () => 'BBB6dzfb5pPt',
-                getSupersedingSkillId: () => null,
-              },
-            });
+            return Promise.resolve(
+              createFetchSkillResponse(createSkillWithId('BBB6dzfb5pPt'))
+            );
           } else if (skillId === 'D1FdmljJNXdt') {
-            return Promise.resolve({
-              skill: {
-                getId: () => 'D1FdmljJNXdt',
-                getSupersedingSkillId: () => 'some-id',
-              },
-            });
+            return Promise.resolve(
+              createFetchSkillResponse(
+                createSkillWithId('D1FdmljJNXdt', 'some-id')
+              )
+            );
           } else if (skillId === '4P77sLaU14DE') {
-            return Promise.resolve({
-              skill: {
-                getId: () => '4P77sLaU14DE',
-                getSupersedingSkillId: () => null,
-              },
-            });
+            return Promise.resolve(
+              createFetchSkillResponse(createSkillWithId('4P77sLaU14DE'))
+            );
           }
-          return Promise.resolve({
-            skill: {getId: () => skillId, getSupersedingSkillId: () => null},
-          });
+          return Promise.resolve(
+            createFetchSkillResponse(createSkillWithId(skillId))
+          );
         }
       );
 
@@ -499,9 +525,9 @@ describe('Skill editor main tab Component', () => {
       // Setup skillBackendApiService mock.
       const skillBackendApiService = TestBed.inject(SkillBackendApiService);
       const selfId = 'skill_self_test';
-      spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
-        skill: {getId: () => selfId, getSupersedingSkillId: () => null},
-      });
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo(
+        createFetchSkillResponse(createSkillWithId(selfId))
+      );
 
       // Setup modal mock.
       spyOn(ngbModal, 'open').and.callFake(() => {
@@ -542,12 +568,9 @@ describe('Skill editor main tab Component', () => {
         const skillBackendApiService = TestBed.inject(SkillBackendApiService);
         const mainSkillId = 'skill_main';
         const existingPrereqId = 'skill_already_there';
-        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
-          skill: {
-            getId: () => existingPrereqId,
-            getSupersedingSkillId: () => null,
-          },
-        });
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo(
+          createFetchSkillResponse(createSkillWithId(existingPrereqId))
+        );
 
         // Setup modal mock.
         spyOn(ngbModal, 'open').and.callFake(() => {
@@ -593,9 +616,9 @@ describe('Skill editor main tab Component', () => {
       fakeAsync(() => {
         // Setup skillBackendApiService mock.
         const skillBackendApiService = TestBed.inject(SkillBackendApiService);
-        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
-          skill: {getId: () => 'skillId', getSupersedingSkillId: () => null},
-        });
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo(
+          createFetchSkillResponse(createSkillWithId('skillId'))
+        );
 
         // Setup update service spy.
         const updateSpy = spyOn(
