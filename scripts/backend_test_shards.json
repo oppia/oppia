@@ -250,6 +250,7 @@
         "core.storage.auth.gae_models_test",
         "scripts.linters.html_linter_test",
         "scripts.linters.general_purpose_linter_test",
+        "scripts.linters.filename_linter_test",
         "core.storage.app_feedback_report.gae_models_test",
         "core.jobs.batch_jobs.model_validation_jobs_test",
         "core.jobs.batch_jobs.audit_topic_related_models_relation_jobs_test",

@@ -703,6 +703,34 @@ class GeneralLintTests(test_utils.LinterTestBase):
         )
         self.assertEqual(third_party_linter, None)
 
+    def test_filename_check_rejects_invalid_frontend_name(self) -> None:
+        filepath = 'core/templates/services/NewService.service.ts'
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [filepath], FILE_CACHE
+        )
+        report = linter.check_filename_patterns()
+        self.assertTrue(report.failed)
+        self.assertIn(filepath, report.messages[0])
+
+    def test_filename_check_is_registered(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_SERVICE_FILE_PATH], FILE_CACHE
+        )
+        reports = linter.perform_all_lint_checks()
+        filename_reports = [
+            report
+            for report in reports
+            if report.name == 'Filename conventions'
+        ]
+        self.assertEqual(len(filename_reports), 1)
+        self.assertFalse(filename_reports[0].failed)
+
+    def test_filename_check_accepts_valid_frontend_name(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['core/templates/services/lesson-data.service.ts'], FILE_CACHE
+        )
+        self.assertFalse(linter.check_filename_patterns().failed)
+
     def test_linter_ignore_pragma(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
             [VALID_PY_IGNORE_PRAGMA_FILEPATH], FILE_CACHE
