@@ -22,9 +22,9 @@ import json
 
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
     state_domain,
     translation_domain,
