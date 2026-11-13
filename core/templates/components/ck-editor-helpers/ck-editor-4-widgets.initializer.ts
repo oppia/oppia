@@ -86,15 +86,37 @@ import {Injectable} from '@angular/core';
 })
 export class CkEditorInitializerService {
   static initialized = true;
-  static ckEditorInitializer(
+
+  // The CKEditor library is ~1 MB, so importing it eagerly would put it in
+  // every page's bundle, including pages that never render a rich text
+  // editor. We therefore load it on demand, only when the initializer is
+  // actually invoked on a page that uses the RTE. The promise is cached so
+  // that concurrent calls share a single load.
+  private static ckEditorLoadPromise: Promise<void> | null = null;
+
+  private static loadCkEditor(): Promise<void> {
+    if (CkEditorInitializerService.ckEditorLoadPromise === null) {
+      CkEditorInitializerService.ckEditorLoadPromise = import(
+        'third-party-imports/ckeditor.import'
+      ).then(() => undefined);
+    }
+    return CkEditorInitializerService.ckEditorLoadPromise;
+  }
+
+  static async ckEditorInitializer(
     rteHelperService: RteHelperService,
     htmlEscaperService: HtmlEscaperService,
     pageContextService: PageContextService,
     ngZone: NgZone
-  ): void {
+  ): Promise<void> {
     if (rteHelperService === undefined) {
       return;
     }
+
+    // Loads the CKEditor library, and only then registers the widgets. This
+    // keeps CKEditor out of the initial bundle for pages without an RTE.
+    await CkEditorInitializerService.loadCkEditor();
+
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
       _RICH_TEXT_COMPONENTS.forEach(function (componentDefn) {

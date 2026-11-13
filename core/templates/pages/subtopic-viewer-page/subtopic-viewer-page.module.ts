@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {SubtopicViewerNavbarBreadcrumbComponent} from './navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 import {SubtopicViewerPageComponent} from './subtopic-viewer-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
@@ -28,10 +27,19 @@ import {SubtopicViewerAuthGuard} from './subtopic-viewer-auth.guard';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {SubtopicSummaryTileModule} from 'components/shared_parts/subtopic-summary-tile.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    SubtopicSummaryTileModule,
+    RichTextComponentsModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

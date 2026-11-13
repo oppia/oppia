@@ -21,7 +21,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {BlogAdminNavbarComponent} from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
@@ -30,13 +29,18 @@ import {BlogAdminPageComponent} from './blog-admin-page.component';
 import {BlogAdminPageRootComponent} from './blog-admin-page-root.component';
 import {BlogAdminAuthGuard} from './blog-admin-auth.guard';
 
+import {BaseModule} from 'base-components/base.module';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
 @NgModule({
   imports: [
+    SharedFormsModule,
+    NgbDropdownModule,
+    BaseModule,
     FormsModule,
     MatCardModule,
     CommonModule,
     ReactiveFormsModule,
-    SharedComponentsModule,
     AdminBlogAdminCommonModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

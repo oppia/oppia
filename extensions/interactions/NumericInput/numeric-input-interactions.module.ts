@@ -20,7 +20,6 @@ import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 
-import {MaterialModule} from 'modules/material.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {InteractiveNumericInput} from './directives/oppia-interactive-numeric-input.component';
 import {ResponseNumericInput} from './directives/oppia-response-numeric-input.component';
@@ -28,7 +27,7 @@ import {ShortResponseNumericInput} from './directives/oppia-short-response-numer
 import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, SharedFormsModule, TranslateModule],
+  imports: [CommonModule, SharedFormsModule, TranslateModule],
   declarations: [
     InteractiveNumericInput,
     ResponseNumericInput,

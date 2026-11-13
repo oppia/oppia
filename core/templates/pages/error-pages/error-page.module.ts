@@ -20,17 +20,21 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {TranslateModule} from '@ngx-translate/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {ToastrModule} from 'ngx-toastr';
 import {ErrorPageComponent} from './error-page.component';
 import {ErrorPageRootComponent} from './error-page-root.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    TranslateModule,
     CommonModule,
-    SharedComponentsModule,
     RouterModule.forChild([
       {
         path: '',

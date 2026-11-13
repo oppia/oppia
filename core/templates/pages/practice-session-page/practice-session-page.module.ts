@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
@@ -27,8 +26,18 @@ import {PracticeSessionPageComponent} from './practice-session-page.component';
 import {PracticeSessionAccessGuard} from './practice-session-page-auth.guard';
 import {PracticeSessionPageRootComponent} from './practice-session-page-root.component';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {ExplorationFooterModule} from 'components/shared_parts/exploration-footer.module';
+import {QuestionPlayerModule} from 'components/shared_parts/question-player.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
+    TranslateModule,
+    QuestionPlayerModule,
+    ExplorationFooterModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     InteractionExtensionsModule,
     RouterModule.forChild([
@@ -38,7 +47,6 @@ import {PracticeSessionPageRootComponent} from './practice-session-page-root.com
         canActivate: [PracticeSessionAccessGuard],
       },
     ]),
-    SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [

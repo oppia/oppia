@@ -22,6 +22,11 @@ handlers:
 - url: /build
   static_dir: build
   secure: always
+  # Compressed and uncompressed variants of these text responses share a URL.
+  # Without Vary, the Google Front End keeps a single cache entry per URL and
+  # can serve the wrong variant to a client.
+  http_headers:
+    Vary: Accept-Encoding
   expiration: "90d"
 - url: /third_party/static
   static_dir: third_party/static

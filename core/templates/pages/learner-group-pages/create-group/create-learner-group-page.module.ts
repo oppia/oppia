@@ -19,7 +19,6 @@
 import {NgModule} from '@angular/core';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
 
 import {CreateLearnerGroupPageComponent} from './create-learner-group-page.component';
@@ -27,9 +26,14 @@ import {CreateLearnerGroupPageRootComponent} from './create-learner-group-page-r
 import {CreateLearnerGroupPageAuthGuard} from './create-learner-group-page-auth.guard';
 import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shared-learner-group-component.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {CommonModule} from '@angular/common';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    CommonModule,
+    BaseModule,
     ToastrModule.forRoot(toastrConfig),
     SharedLearnerGroupComponentsModule,
     RouterModule.forChild([

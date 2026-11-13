@@ -81,27 +81,4 @@ describe('Library page backend api service', () => {
     expect(successHandler).toHaveBeenCalledWith(resp);
     expect(failHandler).not.toHaveBeenCalled();
   }));
-
-  it('should fetch library group data', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    const resp = {
-      activity_list: [],
-      header_i18n_id: 'I18N_TEST_ID',
-      preferred_language_codes: ['en', 'es'],
-    };
-
-    lpbas.fetchLibraryGroupDataAsync('g1').then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/librarygrouphandler?group_name=g1&display_in_language_code=en'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(resp);
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(resp);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
 });

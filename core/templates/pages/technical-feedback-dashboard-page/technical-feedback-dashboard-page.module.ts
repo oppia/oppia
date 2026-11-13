@@ -17,15 +17,19 @@
  */
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
 import {TechnicalFeedbackDashboardPageRootComponent} from './technical-feedback-dashboard-page-root.component';
 import {TechnicalFeedbackDashboardPageRoutingModule} from './technical-feedback-dashboard-page-routing.module';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    BaseModule,
+    BackgroundBannerModule,
     CommonModule,
     TechnicalFeedbackDashboardPageRoutingModule,
     FeedbackSharedModule,

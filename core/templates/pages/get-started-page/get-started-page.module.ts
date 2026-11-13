@@ -17,13 +17,22 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {GetStartedPageRootComponent} from './get-started-page-root.component';
 import {CommonModule} from '@angular/common';
 import {GetStartedPageRoutingModule} from './get-started-page-routing.module';
 
+import {BaseModule} from 'base-components/base.module';
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {TranslateModule} from '@ngx-translate/core';
+
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, GetStartedPageRoutingModule],
+  imports: [
+    BaseModule,
+    BackgroundBannerModule,
+    CommonModule,
+    GetStartedPageRoutingModule,
+    TranslateModule,
+  ],
   declarations: [GetStartedPageRootComponent],
 })
 export class GetStartedPageModule {}

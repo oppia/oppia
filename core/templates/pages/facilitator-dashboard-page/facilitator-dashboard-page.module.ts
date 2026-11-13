@@ -17,7 +17,6 @@
  */
 
 import {NgModule} from '@angular/core';
-import {SharedComponentsModule} from 'components/shared-component.module';
 import {FacilitatorDashboardPageComponent} from './facilitator-dashboard-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
@@ -25,9 +24,16 @@ import {RouterModule} from '@angular/router';
 import {FacilitatorDashboardPageRootComponent} from './facilitator-dashboard-page-root.component';
 import {FacilitatorDashboardPageAuthGuard} from './facilitator-dashboard-page-auth.guard';
 
+import {BackgroundBannerModule} from 'components/common-layout-directives/common-elements/background-banner.module';
+import {BaseModule} from 'base-components/base.module';
+import {CommonModule} from '@angular/common';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
-    SharedComponentsModule,
+    TranslateModule,
+    CommonModule,
+    BaseModule,
+    BackgroundBannerModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
