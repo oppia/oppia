@@ -144,14 +144,25 @@ export class FractionInputValidationService {
       }
       // An earlier IsEquivalentToAndInSimplestForm rule does not match
       // equivalent answers that are not in simplest form (e.g. 2/4 for 1/2),
-      // so a later IsEquivalentTo rule can still match them. This only holds
-      // if learners are allowed to submit answers not in simplest form.
+      // so a later IsEquivalentTo rule, or a later IsExactlyEqualTo rule whose
+      // fraction is not in simplest form, can still match them. This only
+      // holds if learners are allowed to submit answers not in simplest form.
       if (
         earlierRule.type === 'IsEquivalentToAndInSimplestForm' &&
-        laterRule.type === 'IsEquivalentTo' &&
         !shouldBeInSimplestForm
       ) {
-        return false;
+        if (laterRule.type === 'IsEquivalentTo') {
+          return false;
+        }
+        if (laterRule.type === 'IsExactlyEqualTo') {
+          const laterFraction = this.normalizeFractionToDict(
+            laterRule.inputs.f as FractionAnswer
+          );
+          return isEqual(
+            laterFraction,
+            Fraction.fromDict(laterFraction).convertToSimplestForm().toDict()
+          );
+        }
       }
       return true;
     };
