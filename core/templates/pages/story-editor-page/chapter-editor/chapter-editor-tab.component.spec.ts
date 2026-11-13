@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for chapter editor tab component.
  */
-// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -29,8 +28,8 @@ import {ChapterEditorTabComponent} from './chapter-editor-tab.component';
 describe('Chapter Editor Tab Component', () => {
   let component: ChapterEditorTabComponent;
   let fixture: ComponentFixture<ChapterEditorTabComponent>;
-  let storyInitializedEventEmitter: EventEmitter<void>;
-  let storyReinitializedEventEmitter: EventEmitter<void>;
+  let storyInitializedEventEmitter: EventEmitter<string>;
+  let storyReinitializedEventEmitter: EventEmitter<string>;
   let storyEditorStateService: StoryEditorStateService;
 
   class MockStoryEditorNavigationService {
@@ -107,8 +106,8 @@ describe('Chapter Editor Tab Component', () => {
       corresponding_topic_id: 'topic_id',
     } as StoryBackendDict);
 
-    storyInitializedEventEmitter = new EventEmitter();
-    storyReinitializedEventEmitter = new EventEmitter();
+    storyInitializedEventEmitter = new EventEmitter<string>();
+    storyReinitializedEventEmitter = new EventEmitter<string>();
 
     spyOnProperty(storyEditorStateService, 'onStoryInitialized').and.callFake(
       () => {

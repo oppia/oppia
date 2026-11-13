@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -327,7 +325,7 @@ describe('Create New Chapter Modal Component', () => {
       spyOn(
         curatedExplorationValidationService,
         'isExpPublishedAsync'
-      ).and.returnValue(false);
+      ).and.resolveTo(false);
       const categorySpy = spyOn(
         curatedExplorationValidationService,
         'isDefaultCategoryAsync'
