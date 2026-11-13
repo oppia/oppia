@@ -21,7 +21,7 @@ import {Rubric} from 'domain/skill/rubric.model';
 import {Skill} from 'domain/skill/skill.model';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Subscription} from 'rxjs';
-import {GroupedSkillSummaries} from 'components/question-directives/questions-list/questions-list.component';
+import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {
   CategorizedSkills,
   TopicsAndSkillsDashboardBackendApiService,
@@ -56,7 +56,7 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
     // one expected by the questions list, so the cast is required to bind
     // the value in the template.
     this.groupedSkillSummaries =
-      this.skillEditorStateService.getGroupedSkillSummaries() as GroupedSkillSummaries;
+      this.skillEditorStateService.getGroupedSkillSummaries();
     this.skillIdToRubricsObject = {};
     this.skillIdToRubricsObject[this.skill.getId()] = this.skill.getRubrics();
     this.topicsAndSkillsDashboardBackendApiService

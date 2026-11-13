@@ -22,7 +22,10 @@ import {HttpClient} from '@angular/common/http';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
-import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {
+  SkillSummary,
+  SkillSummaryBackendDict,
+} from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Observable} from 'rxjs';
 
@@ -36,14 +39,16 @@ interface FetchSkillBackendResponse {
   };
 }
 
+export interface SkillSummariesByTopic {
+  [topicName: string]: SkillSummary[];
+}
+
 export interface FetchSkillResponse {
   skill: Skill;
   assignedSkillTopicData: {
     [topicName: string]: string;
   };
-  groupedSkillSummaries: {
-    [topicName: string]: SkillSummaryBackendDict[];
-  };
+  groupedSkillSummaries: SkillSummariesByTopic;
 }
 
 interface FetchMultiSkillsBackendResponse {
@@ -85,12 +90,21 @@ export class SkillBackendApiService {
         .toPromise()
         .then(
           response => {
+            const groupedSkillSummaries: SkillSummariesByTopic =
+              Object.fromEntries(
+                Object.entries(response.grouped_skill_summaries).map(
+                  ([topicName, summaries]) => [
+                    topicName,
+                    summaries.map(summary =>
+                      SkillSummary.createFromBackendDict(summary)
+                    ),
+                  ]
+                )
+              );
             resolve({
               skill: Skill.createFromBackendDict(response.skill_dict),
               assignedSkillTopicData: response.assigned_skill_topic_data_dict,
-              // TODO(nishantwrp): Refactor this property to return SkillSummary
-              // domain objects instead of backend dicts.
-              groupedSkillSummaries: response.grouped_skill_summaries,
+              groupedSkillSummaries: groupedSkillSummaries,
             });
           },
           errorResponse => {
