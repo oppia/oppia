@@ -137,15 +137,15 @@
   "DragAndDropSortInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
+    "instructions": null,
     "is_trainable": false,
-    "narrow_instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
+    "narrow_instructions": null,
     "description": "Allows learners to drag and drop items for sorting.",
     "needs_summary": true,
     "name": "Drag And Drop Sort",
     "answer_type": "ListOfSetsOfTranslatableHtmlContentIds",
     "is_linear": false,
-    "display_mode": "supplemental",
+    "display_mode": "inline",
     "id": "DragAndDropSortInput",
     "customization_arg_specs": [
       {

@@ -690,7 +690,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Escriba una expresión aquí.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Escribe el código en el editor",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Ir al editor de código",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "Arrastrar y soltar elementos",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "Por favor no ponga 0 en el denominador",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Escribe una fracción en el formato «x/y» o un número mixto como «A x/y».",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Escribe una fracción en el formato «x/y».",

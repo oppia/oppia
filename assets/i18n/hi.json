@@ -692,7 +692,6 @@
   "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "यहाँ एक अभिव्यक्ति टाइप करें.",
   "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "एडिटर में कोड टाइप करें",
   "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "कोड एडिटर पर जाएँ",
-  "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION": "आइटम खींचें और छोड़ें",
   "I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO": "कृपया हर में 0 न डालें",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "अंश को \"x/y\" के रूप में दर्ज करें, या मिश्रित संख्या को \"A x/y\" के रूप में दर्ज करें",
   "I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "\nएक अंश को x/y के रूप में दर्ज करें।",
