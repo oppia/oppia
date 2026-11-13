@@ -3,14 +3,16 @@
      [class.oppia-lesson-player-navbar-breadcrumb-hidden]="!shouldShowBreadcrumb()">
   <i class="fa oppia-lesson-player-navbar-breadcrumb-separator"
      [ngClass]="isLanguageRTL() ? 'fa-angle-left' : 'fa-angle-right'"
-     aria-hidden="true"></i>
+     aria-hidden="true">
+  </i>
   <a class="oppia-lesson-player-navbar-breadcrumb-text"
      [href]="getClassroomUrl()">
     <bdi>{{ classroomName }}</bdi>
   </a>
   <i class="fa oppia-lesson-player-navbar-breadcrumb-separator"
      [ngClass]="isLanguageRTL() ? 'fa-angle-left' : 'fa-angle-right'"
-     aria-hidden="true"></i>
+     aria-hidden="true">
+  </i>
   <a class="oppia-lesson-player-navbar-breadcrumb-text"
      [href]="getTopicUrl()">
     <bdi>{{ topicName }}</bdi>
