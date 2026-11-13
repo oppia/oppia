@@ -36,8 +36,12 @@ describe('FractionInputValidationService', () => {
   let customizationArgs: FractionInputCustomizationArgs;
   let denominatorEqualsFiveRule: Rule,
     equalsOneAndHalfRule: Rule,
+    equalsHalfRule: Rule,
     equalsOneRule: Rule,
     equalsThreeByTwoRule: Rule,
+    equalsTwoByFourRule: Rule,
+    equivalentToHalfAndSimplestFormRule: Rule,
+    equivalentToHalfRule: Rule,
     equivalentToOneAndSimplestFormRule: Rule,
     equivalentToOneRule: Rule,
     exactlyEqualToOneAndNotInSimplestFormRule: Rule,
@@ -192,6 +196,46 @@ describe('FractionInputValidationService', () => {
         rule_type: 'IsEquivalentToAndInSimplestForm',
         inputs: {
           f: createFractionDict(false, 0, 10, 10),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToHalfAndSimplestFormRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentToAndInSimplestForm',
+        inputs: {
+          f: createFractionDict(false, 0, 1, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    equivalentToHalfRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          f: createFractionDict(false, 0, 1, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    equalsHalfRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsExactlyEqualTo',
+        inputs: {
+          f: createFractionDict(false, 0, 1, 2),
+        },
+      },
+      'FractionInput'
+    );
+
+    equalsTwoByFourRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsExactlyEqualTo',
+        inputs: {
+          f: createFractionDict(false, 0, 2, 4),
         },
       },
       'FractionInput'
@@ -391,6 +435,51 @@ describe('FractionInputValidationService', () => {
   });
 
   it(
+    'should not catch equivalent and in simplest form followed by ' +
+      'equivalent as redundant',
+    () => {
+      answerGroups[0].rules = [
+        equivalentToHalfAndSimplestFormRule,
+        equivalentToHalfRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([]);
+    }
+  );
+
+  it(
+    'should catch equivalent and in simplest form followed by equivalent ' +
+      'as redundant if require simplest form',
+    () => {
+      customizationArgs.requireSimplestForm.value = true;
+      answerGroups[0].rules = [
+        equivalentToHalfAndSimplestFormRule,
+        equivalentToHalfRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message:
+            'Learner answer 2 from Oppia response 1 will never be ' +
+            'matched because it is made redundant by answer 1 from ' +
+            'Oppia response 1',
+        },
+      ]);
+    }
+  );
+
+  it(
     'should catch equivalent followed by equals same value' + 'as redundant',
     function () {
       answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
@@ -411,8 +500,8 @@ describe('FractionInputValidationService', () => {
       ]);
 
       answerGroups[0].rules = [
-        equivalentToOneAndSimplestFormRule,
-        equalsOneRule,
+        equivalentToHalfAndSimplestFormRule,
+        equalsHalfRule,
       ];
       var warnings = validatorService.getAllWarnings(
         currentState,
@@ -429,6 +518,46 @@ describe('FractionInputValidationService', () => {
             'Oppia response 1',
         },
       ]);
+    }
+  );
+
+  it('should catch repeated equivalent and in simplest form as redundant', () => {
+    answerGroups[0].rules = [
+      equivalentToHalfAndSimplestFormRule,
+      equivalentToHalfAndSimplestFormRule,
+    ];
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          'matched because it is made redundant by answer 1 from ' +
+          'Oppia response 1',
+      },
+    ]);
+  });
+
+  it(
+    'should not catch equivalent and in simplest form followed by ' +
+      'equals a value not in simplest form as redundant',
+    () => {
+      answerGroups[0].rules = [
+        equivalentToHalfAndSimplestFormRule,
+        equalsTwoByFourRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArgs,
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([]);
     }
   );
 
