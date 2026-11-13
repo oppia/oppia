@@ -1608,7 +1608,10 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerPositionService, 'changeCurrentQuestion');
-    spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
+    spyOn(
+      explorationEngineService,
+      'getAuthorRecommendedExpIdsByStateName'
+    ).and.returnValue([]);
     const storyModeSpy = spyOn(
       explorationModeService,
       'isInStoryChapterMode'

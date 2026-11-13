@@ -657,9 +657,6 @@ export class ExplorationEngineService {
    * @returns {string[]} A list of recommended exploration IDs.
    */
   getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
-    if (!this.exploration) {
-      return [];
-    }
     let authorRecommendedExpIds =
       this.exploration.getAuthorRecommendedExpIds(stateName);
     return authorRecommendedExpIds ? authorRecommendedExpIds : [];
