@@ -71,7 +71,7 @@
       </button>
 
       <mat-menu #discardButton="matMenu" [ngStyle]="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength() || autosaveIsInProgress}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
+        <button mat-menu-item title="Discard all pending changes" (click)="discardChanges()" [disabled]="!connectedToInternet || !getChangeListLength() || autosaveIsInProgress"><a [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength() || autosaveIsInProgress}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
       </mat-menu>
     </div>
   </li>
