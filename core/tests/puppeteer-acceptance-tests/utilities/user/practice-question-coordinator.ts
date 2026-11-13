@@ -69,6 +69,13 @@ export class QuestionCoordinator extends BaseUser {
   }
 
   /**
+   * Checks that the question role editor modal is visible.
+   */
+  async expectQuestionRoleEditorModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(questionRoleEditorModalSelector);
+  }
+
+  /**
    * Saves and closes the question role editor modal.
    */
   async saveAndCloseQuestionRoleEditorModal(): Promise<void> {
@@ -87,6 +94,7 @@ export class QuestionCoordinator extends BaseUser {
     await saveButton.click();
 
     await this.expectElementToBeVisible(questionRoleEditorModalSelector, false);
+    await this.waitForNoModals();
   }
 
   /**
