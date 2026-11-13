@@ -41,9 +41,9 @@ describe('Logged-out User in Thanks for Donating page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the right page with the Watch A Video button.',
+    'should verify the Watch A Video button has the correct link.',
     async function () {
-      await loggedOutUser.clickWatchAVideoButtonInDonationThanksModalOnDonatePage();
+      await loggedOutUser.verifyWatchAVideoButtonInDonationThanksModalOnDonatePage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
