@@ -85,7 +85,6 @@ describe('Responses Service', () => {
               html: '',
               content_id: 'This is a new feedback text',
             },
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
             labelled_as_correct: true,
             param_changes: [],
@@ -104,7 +103,6 @@ describe('Responses Service', () => {
         },
         labelled_as_correct: true,
         param_changes: [],
-        refresher_exploration_id: 'test',
         missing_prerequisite_skill_id: 'test_skill_id',
       },
       confirmed_unclassified_answers: [],
@@ -143,7 +141,6 @@ describe('Responses Service', () => {
             },
             labelled_as_correct: true,
             param_changes: [],
-            refresher_exploration_id: '',
             missing_prerequisite_skill_id: '',
           },
           rule_specs: [
@@ -168,7 +165,6 @@ describe('Responses Service', () => {
         },
         labelled_as_correct: true,
         param_changes: [],
-        refresher_exploration_id: 'test',
         missing_prerequisite_skill_id: 'test_skill_id',
       },
       confirmed_unclassified_answers: [],
@@ -278,7 +274,6 @@ describe('Responses Service', () => {
         new SubtitledHtml('', 'This is a new feedback text'),
         true,
         [],
-        'test',
         'test_skill_id'
       ),
       ['This is training data text'],
@@ -305,7 +300,6 @@ describe('Responses Service', () => {
       outcome: {
         dest: 'State',
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
-        refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
         labelledAsCorrect: true,
         paramChanges: [],
@@ -318,7 +312,6 @@ describe('Responses Service', () => {
       feedback: new SubtitledHtml('', 'This is a new feedback text'),
       dest: 'State',
       destIfReallyStuck: 'destIfReallyStuck',
-      refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
       labelledAsCorrect: true,
       trainingData: ['This is training data text'],
@@ -343,8 +336,6 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
     expectedAnswerGroup[0].outcome.destIfReallyStuck =
       updatedAnswerGroup.destIfReallyStuck;
-    expectedAnswerGroup[0].outcome.refresherExplorationId =
-      updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
       updatedAnswerGroup.outcome.missingPrerequisiteSkillId;
     expectedAnswerGroup[0].outcome.labelledAsCorrect =
@@ -376,7 +367,6 @@ describe('Responses Service', () => {
         dest: 'State',
         destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
-        refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
         labelledAsCorrect: true,
         paramChanges: [],
@@ -389,7 +379,6 @@ describe('Responses Service', () => {
       feedback: 'This is a new feedback text',
       dest: 'State',
       dest_if_really_stuck: null,
-      refresherExplorationId: '',
       missingPrerequisiteSkillId: '',
       labelledAsCorrect: true,
       trainingData: ['This is training data text'],

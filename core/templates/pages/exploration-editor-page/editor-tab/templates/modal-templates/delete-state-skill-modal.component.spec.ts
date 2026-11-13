@@ -71,7 +71,6 @@ describe('Delete Topic Modal Component', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: 'test',
             missing_prerequisite_skill_id: 'test_skill_id',
           },
           training_data: [],

@@ -83,7 +83,6 @@ describe('Diagnostic test engine service', () => {
                   html: '<p>Try Again.</p>',
                 },
                 param_changes: [],
-                refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 labelled_as_correct: true,
               },
@@ -102,7 +101,6 @@ describe('Diagnostic test engine service', () => {
             dest_if_really_stuck: null,
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
             param_changes: [],
             feedback: {
               content_id: 'feedback_id',

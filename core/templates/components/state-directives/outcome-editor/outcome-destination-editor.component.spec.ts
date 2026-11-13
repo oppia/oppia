@@ -33,7 +33,6 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UserService} from 'services/user.service';
-import {UserInfo} from 'domain/user/user-info.model';
 import {OutcomeDestinationEditorComponent} from './outcome-destination-editor.component';
 
 describe('Outcome Destination Editor', () => {
@@ -44,7 +43,6 @@ describe('Outcome Destination Editor', () => {
   let editorFirstTimeEventsService: EditorFirstTimeEventsService;
   let stateGraphLayoutService: StateGraphLayoutService;
   let focusManagerService: FocusManagerService;
-  let userService: UserService;
   let PLACEHOLDER_OUTCOME_DEST = '/';
 
   beforeEach(waitForAsync(() => {
@@ -69,14 +67,12 @@ describe('Outcome Destination Editor', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
-    userService = TestBed.inject(UserService);
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
       null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -127,7 +123,6 @@ describe('Outcome Destination Editor', () => {
     tick(10);
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
-    expect(component.canEditRefresherExplorationId).toBeFalse();
     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s\-]+$/);
     expect(component.destinationChoices).toEqual([
       {
@@ -207,27 +202,6 @@ describe('Outcome Destination Editor', () => {
       expect(
         editorFirstTimeEventsService.registerFirstCreateSecondStateEvent
       ).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should allow admin and moderators to edit refresher' + ' exploration id',
-    fakeAsync(() => {
-      let userInfo = {
-        isCurriculumAdmin: () => true,
-        isModerator: () => false,
-      } as UserInfo;
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo)
-      );
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
-
-      expect(component.canEditRefresherExplorationId).toBeFalse();
-
-      component.ngOnInit();
-      tick(10);
-
-      expect(component.canEditRefresherExplorationId).toBeTrue();
     })
   );
 
@@ -354,7 +328,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
 
@@ -368,7 +341,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
     spyOn(component.getChanges, 'emit');
@@ -395,7 +367,6 @@ describe('Outcome Destination Editor', () => {
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
-      null,
       null
     );
     component.currentStateName = 'Introduction';

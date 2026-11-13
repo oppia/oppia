@@ -98,7 +98,6 @@ describe('State version history component', () => {
           },
           param_changes: [],
           labelled_as_correct: false,
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         hints: [],

@@ -229,7 +229,6 @@ describe('Exploration Summary Tile Component', () => {
     component.isCommunityOwned = true;
     component.isCollectionPreviewTile = true;
     component.isPlaylistTile = true;
-    component.parentExplorationIds = ['1', '2', '3'];
     component.isContainerNarrow = true;
     component.isOwnedByCurrentUser = true;
     fixture.detectChanges();
@@ -262,7 +261,6 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(component.activityType).toBe('exploration');
-    expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
     expect(component.expTitleTranslationKey).toBe(
       'I18N_EXPLORATION_123ab_TITLE'
@@ -289,12 +287,10 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService,
       'getWidth'
     ).and.callThrough();
-    spyOn(
-      i18nLanguageCodeService,
-      'isHackyTranslationAvailable'
-    ).and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
-      false,
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable').and.callFake(
+      key => key === component.expObjectiveTranslationKey
+    );
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       false
     );
 
@@ -415,34 +411,6 @@ describe('Exploration Summary Tile Component', () => {
 
     expect(component.explorationIsCurrentlyHoveredOver).toBe(false);
   });
-
-  it('should navigate to parent exploration', fakeAsync(() => {
-    const explorationLinkSpy = spyOn(
-      component,
-      'getExplorationLink'
-    ).and.returnValue('/parent/id/1');
-
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        _hash: '',
-        _hashChange: null,
-        _href: '',
-        hash: '',
-        href: '/parent/id/1',
-        reload: (val: string) => '',
-      },
-      onhashchange: null,
-    });
-
-    component.loadParentExploration();
-    let location = component.getExplorationLink();
-
-    tick();
-    fixture.detectChanges();
-
-    expect(explorationLinkSpy).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.location.href).toBe(location);
-  }));
 
   it('should get the average ratings of the exploration', fakeAsync(() => {
     component.ratings = {
@@ -572,7 +540,7 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
 
-      expect(result).toBe('/explore/1?collection_id=1&parent=1&parent=2');
+      expect(result).toBe('/explore/1?collection_id=1');
       expect(urlParamsSpy).toHaveBeenCalled();
       expect(addFieldSpy).toHaveBeenCalled();
     })

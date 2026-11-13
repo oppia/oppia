@@ -72,7 +72,6 @@ describe('Read only exploration backend API service', () => {
                 content_id: 'content',
               },
               labelled_as_correct: true,
-              refresher_exploration_id: 'exp',
               missing_prerequisite_skill_id: null,
             },
             confirmed_unclassified_answers: [],

@@ -58,7 +58,6 @@ describe('Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
-  let conversationFlowService: ConversationFlowService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -138,7 +137,6 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -393,23 +391,6 @@ describe('Ratings and recommendations component', () => {
       expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
     })
   );
-
-  it('should return the value from getIsRefresherExploration', () => {
-    spyOn(
-      conversationFlowService,
-      'getIsRefresherExploration'
-    ).and.callThrough();
-    componentInstance.getIsRefresherExploration();
-    expect(
-      conversationFlowService.getIsRefresherExploration
-    ).toHaveBeenCalled();
-  });
-
-  it('should return the value from getParentExplorationIds', () => {
-    spyOn(conversationFlowService, 'getParentExplorationIds').and.callThrough();
-    componentInstance.getParentExplorationIds();
-    expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
-  });
 
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');

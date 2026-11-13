@@ -58,7 +58,6 @@ describe('Interaction', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
     answerGroupsDict = [
@@ -73,7 +72,6 @@ describe('Interaction', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         training_data: ['training_data'],
@@ -154,7 +152,6 @@ describe('Interaction', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
     answerGroupsDict = [
@@ -169,7 +166,6 @@ describe('Interaction', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         training_data: ['training_data'],
@@ -619,7 +615,6 @@ describe('Interaction', () => {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       },
       training_data: ['training_data'],
@@ -638,7 +633,6 @@ describe('Interaction', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           training_data: ['training_data'],
@@ -667,7 +661,6 @@ describe('Interaction', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
     const newDefaultOutcome = Outcome.createFromBackendDict(
@@ -683,7 +676,6 @@ describe('Interaction', () => {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       })
     );
@@ -773,7 +765,6 @@ describe('Interaction', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
         training_data: ['training_data_new'],
@@ -789,7 +780,6 @@ describe('Interaction', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
     const newHintDict = [

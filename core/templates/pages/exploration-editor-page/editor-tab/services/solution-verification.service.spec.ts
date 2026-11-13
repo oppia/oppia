@@ -105,7 +105,6 @@ describe('Solution Verification Service', () => {
                   feedback: {content_id: 'feedback_1', html: ''},
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
                 rule_specs: [
                   {
@@ -131,7 +130,6 @@ describe('Solution Verification Service', () => {
               feedback: {content_id: 'default_outcome', html: ''},
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
             },
             hints: [
               {hint_content: {content_id: 'hint_1', html: 'one'}},

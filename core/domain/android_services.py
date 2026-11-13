@@ -732,7 +732,6 @@ def _create_dummy_question(
             True,
             [],
             None,
-            None,
         )
     )
     question = question_domain.Question(

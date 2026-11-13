@@ -28,18 +28,6 @@
   </form>
   <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text" tabindex="0">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
-  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !!outcome.refresherExplorationId" class="oppia-id-text">
-    <b>Refresher exploration ID (optional):</b>
-    <input type="text"
-           class="form-control e2e-test-add-refresher-exploration-id"
-           [(ngModel)]="outcome.refresherExplorationId"
-           [pattern]="explorationAndSkillIdPattern"
-           tabindex="0"
-           [attr.aria-invalid]="false">
-    <div class="refresher-error-message">
-      Refresher exploration id should be removed.
-    </div>
-  </div>
   <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
     <input class="form-control"

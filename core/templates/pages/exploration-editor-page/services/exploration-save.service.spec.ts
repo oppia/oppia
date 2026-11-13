@@ -648,7 +648,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
               dest_if_really_stuck: null,
@@ -662,7 +661,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         default_outcome: {
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'Hola',
           dest_if_really_stuck: null,
@@ -698,7 +696,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
               dest_if_really_stuck: null,
@@ -712,7 +709,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         default_outcome: {
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State',
           dest_if_really_stuck: null,
@@ -748,7 +744,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
               dest_if_really_stuck: null,
@@ -762,7 +757,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         default_outcome: {
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State2',
           dest_if_really_stuck: null,
@@ -798,7 +792,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
             outcome: {
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
               dest_if_really_stuck: null,
@@ -812,7 +805,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         default_outcome: {
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'State2',
           dest_if_really_stuck: null,

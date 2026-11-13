@@ -71,7 +71,6 @@ STATE_DICT_IN_V52 = {
             },
             'dest': 'Introduction',
             'dest_if_really_stuck': None,
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
             'labelled_as_correct': False,
         },

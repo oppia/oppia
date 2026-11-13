@@ -1,7 +1,6 @@
 <div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
             [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge}"
-            *ngIf="!isRefresherExploration"
             tabindex="0"
             [style.padding]="0"
             class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card oppia-focus-indicator-blue"
@@ -98,16 +97,10 @@
       </div>
     </a>
   </mat-card>
-  <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
-            *ngIf="isRefresherExploration" (click)="loadParentExploration()">
-    <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
-    <i class="fas fa-arrow-right oppia-arrow-icon">
-    </i>
-  </button>
 </div>
 
 <div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
-  <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
+  <mat-card class="mobile-activity-summary-card" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="mobile-exploration-card-image" [src]="thumbnailIcon" alt="{{ category }}">
@@ -144,12 +137,6 @@
       </div>
     </a>
   </mat-card>
-  <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
-            *ngIf="isRefresherExploration" (click)="loadParentExploration()">
-    <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
-    <i class="fas fa-arrow-right oppia-arrow-icon">
-    </i>
-  </button>
 </div>
 
 <a [href]="getExplorationLink()" *ngIf="isInNewLessonPlayer()">

@@ -62,7 +62,6 @@ describe('Outcome object factory', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: '1',
       missing_prerequisite_skill_id: '2',
     });
 
@@ -75,7 +74,6 @@ describe('Outcome object factory', () => {
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: '1',
       missing_prerequisite_skill_id: '2',
     });
   });

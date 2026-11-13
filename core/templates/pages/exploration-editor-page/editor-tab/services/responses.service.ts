@@ -52,9 +52,6 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
-  // Below property is null if no refresher exploration is available for
-  // the current state.
-  refresherExplorationId: string | null;
   // Below property is null if no missing prerequisite skill is available
   // for the current state.
   missingPrerequisiteSkillId: string | null;
@@ -212,13 +209,6 @@ export class ResponsesService {
       if (updates.hasOwnProperty('dest')) {
         let destUpdates = updates as UpdateActiveAnswerGroupDest;
         answerGroup.outcome.dest = destUpdates.dest;
-      }
-      if (updates.hasOwnProperty('refresherExplorationId')) {
-        let refresherExplorationIdUpdates = updates as {
-          refresherExplorationId: string;
-        };
-        answerGroup.outcome.refresherExplorationId =
-          refresherExplorationIdUpdates.refresherExplorationId;
       }
       if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
         let missingPrerequisiteSkillIdUpdates = updates as {
@@ -545,9 +535,6 @@ export class ResponsesService {
     }
     if (updates.hasOwnProperty('destIfReallyStuck')) {
       outcome.destIfReallyStuck = updates.destIfReallyStuck;
-    }
-    if (updates.hasOwnProperty('refresherExplorationId')) {
-      outcome.refresherExplorationId = updates.refresherExplorationId;
     }
     if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
       outcome.missingPrerequisiteSkillId = updates.missingPrerequisiteSkillId;

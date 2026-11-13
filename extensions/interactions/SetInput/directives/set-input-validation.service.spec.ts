@@ -64,7 +64,6 @@ describe('SetInputValidationService', () => {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     });
 

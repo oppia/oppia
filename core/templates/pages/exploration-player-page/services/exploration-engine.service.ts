@@ -688,7 +688,6 @@ export class ExplorationEngineService {
    *   - nextCard: The generated StateCard for the next state.
    *   - refreshInteraction: Whether the interaction should be refreshed.
    *   - feedbackHtml: HTML string representing feedback to the learner.
-   *   - refresherExplorationId: ID of an exploration to refer the learner to (if applicable).
    *   - missingPrerequisiteSkillId: ID of a missing skill (if applicable).
    *   - remainOnCurrentCard: Whether the learner remains on the same state.
    *   - taggedSkillMisconceptionId: ID of a tagged misconception (currently unused).
@@ -707,7 +706,6 @@ export class ExplorationEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
       taggedSkillMisconceptionId: string,
@@ -784,7 +782,6 @@ export class ExplorationEngineService {
       );
     }
 
-    let refresherExplorationId = outcome.refresherExplorationId;
     let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
     let newState = this.exploration.getState(newStateName);
     let isFirstHit = Boolean(
@@ -884,7 +881,6 @@ export class ExplorationEngineService {
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      refresherExplorationId,
       missingPrerequisiteSkillId ?? '',
       onSameCard,
       '',

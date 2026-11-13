@@ -266,7 +266,6 @@ describe('Translation tab component', () => {
                   },
                   labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null,
                 },
               },
             ],
@@ -280,7 +279,6 @@ describe('Translation tab component', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null,
             },
             solution: {
               correct_answer: 'This is the correct answer',

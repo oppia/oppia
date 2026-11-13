@@ -731,7 +731,6 @@ var constants = {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       },
       confirmed_unclassified_answers: [],

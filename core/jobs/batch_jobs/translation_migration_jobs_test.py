@@ -53,7 +53,6 @@ STATE_DICT_IN_V52 = {
                     'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
-                    'refresher_exploration_id': None,
                 },
                 'training_data': [],
                 'rule_specs': [
@@ -78,7 +77,6 @@ STATE_DICT_IN_V52 = {
             },
             'dest': 'Introduction',
             'dest_if_really_stuck': None,
-            'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
             'labelled_as_correct': False,
         },

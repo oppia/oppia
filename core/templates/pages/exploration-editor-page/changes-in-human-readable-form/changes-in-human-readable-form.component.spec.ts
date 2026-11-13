@@ -829,7 +829,6 @@ describe('Changes in Human Readable Form Component', () => {
             } as LostChangeValue,
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           } as OutcomeBackendDict),
           property_name: 'default_outcome',

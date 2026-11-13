@@ -101,10 +101,7 @@
           {{ outcome.dest }}
         </span>
         <span tabindex="0" *ngIf="isSelfLoop(outcome)" class="position-relative">
-          <span *ngIf="!outcome.refresherExplorationId">(try again)</span>
-          <span *ngIf="outcome.refresherExplorationId">
-            (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
-          </span>
+          (try again)
         </span>
         <div tabindex="0" class="oppia-prerequisite-skill-text" *ngIf="outcome && outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
           <strong class="oppia-outcome-heading"> Attached prerequisite skill for the current state: </strong>
