@@ -706,6 +706,12 @@ class MergeSkillHandler(
         assert self.normalized_payload is not None
         old_skill_id = self.normalized_payload['old_skill_id']
         new_skill_id = self.normalized_payload['new_skill_id']
+
+        if old_skill_id == new_skill_id:
+            raise self.InvalidInputException(
+                'old_skill_id and new_skill_id should not be the same.'
+            )
+
         skill_fetchers.get_skill_by_id(new_skill_id, strict=True)
         old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=True)
 

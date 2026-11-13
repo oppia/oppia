@@ -1301,6 +1301,56 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         self.logout()
 
+    def test_merge_skill_fails_when_old_and_new_skill_id_are_same(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_id = self.linked_skill_id
+        skill_before = skill_fetchers.get_skill_by_id(skill_id)
+        topic_before = topic_fetchers.get_topic_by_id(self.topic_id)
+        skill_with_prereq_before = skill_fetchers.get_skill_by_id(
+            self.skill_with_prerequisite
+        )
+        old_links_before = question_services.get_question_skill_links_of_skill(
+            skill_id, 'Old Description'
+        )
+
+        payload = {
+            'old_skill_id': skill_id,
+            'new_skill_id': skill_id,
+        }
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'old_skill_id and new_skill_id should not be the same.',
+        )
+
+        # Verify no skill, topic, prerequisite, or question updates occurred.
+        skill_after = skill_fetchers.get_skill_by_id(skill_id)
+        self.assertEqual(skill_after.version, skill_before.version)
+        self.assertEqual(
+            skill_after.superseding_skill_id, skill_before.superseding_skill_id
+        )
+
+        topic_after = topic_fetchers.get_topic_by_id(self.topic_id)
+        self.assertEqual(topic_after.version, topic_before.version)
+
+        skill_with_prereq_after = skill_fetchers.get_skill_by_id(
+            self.skill_with_prerequisite
+        )
+        self.assertEqual(
+            skill_with_prereq_after.prerequisite_skill_ids,
+            skill_with_prereq_before.prerequisite_skill_ids,
+        )
+
+        old_links_after = question_services.get_question_skill_links_of_skill(
+            skill_id, 'Old Description'
+        )
+        self.assertEqual(len(old_links_after), len(old_links_before))
+
+        self.logout()
+
 
 class TopicIdToDiagnosticTestSkillIdsHandlerTests(
     BaseTopicsAndSkillsDashboardTests

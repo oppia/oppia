@@ -1019,6 +1019,103 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             else:
                 self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])
 
+    def test_replace_skill_id_for_all_questions_with_existing_destination_link(
+        self,
+    ) -> None:
+        question_id_a = question_services.get_new_question_id()
+        content_id_generator_a = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id_a,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator_a),
+            ['skill_1', 'skill_2'],
+            content_id_generator_a.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_a, 'skill_1', 0.3
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_a, 'skill_2', 0.8
+        )
+
+        question_id_b = question_services.get_new_question_id()
+        content_id_generator_b = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id_b,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator_b),
+            ['skill_1'],
+            content_id_generator_b.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_b, 'skill_1', 0.5
+        )
+
+        question_id_c = question_services.get_new_question_id()
+        content_id_generator_c = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id_c,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator_c),
+            ['skill_2'],
+            content_id_generator_c.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_c, 'skill_2', 0.9
+        )
+
+        question_services.replace_skill_id_for_all_questions(
+            'skill_1', 'Skill Description 1', 'skill_2'
+        )
+
+        old_links = question_services.get_question_skill_links_of_skill(
+            'skill_1', 'Skill Description 1'
+        )
+        self.assertEqual(len(old_links), 0)
+
+        dest_links = question_services.get_question_skill_links_of_skill(
+            'skill_2', 'Skill Description 2'
+        )
+        self.assertEqual(len(dest_links), 3)
+
+        dest_link_by_qid = {
+            link.question_id: link.skill_difficulty for link in dest_links
+        }
+        # Question A: destination link preserved with original difficulty.
+        self.assertEqual(dest_link_by_qid[question_id_a], 0.8)
+        # Question B: destination link created using source difficulty.
+        self.assertEqual(dest_link_by_qid[question_id_b], 0.5)
+        # Question C: destination link preserved with original difficulty.
+        self.assertEqual(dest_link_by_qid[question_id_c], 0.9)
+
+        questions = question_fetchers.get_questions_by_ids(
+            [question_id_a, question_id_b, question_id_c]
+        )
+        question_by_id = {q.id: q for q in questions if q is not None}
+        # Question A: linked_skill_ids has no duplicates and contains skill_2.
+        self.assertEqual(
+            question_by_id[question_id_a].linked_skill_ids, ['skill_2']
+        )
+        # Question B: linked_skill_ids updated to skill_2.
+        self.assertEqual(
+            question_by_id[question_id_b].linked_skill_ids, ['skill_2']
+        )
+        # Question C: linked_skill_ids unchanged.
+        self.assertEqual(
+            question_by_id[question_id_c].linked_skill_ids, ['skill_2']
+        )
+
+    def test_replace_skill_id_for_all_questions_fails_when_skill_ids_are_same(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Current skill ID and new skill ID should not be the same.',
+        ):
+            question_services.replace_skill_id_for_all_questions(
+                'skill_1', 'Skill Description 1', 'skill_1'
+            )
+
     def test_compute_summary_of_question(self) -> None:
         question = question_services.get_question_by_id(self.question_id)
         question_summary = question_services.compute_summary_of_question(
@@ -1683,8 +1780,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we need to test
         # populate_question_summary_model_fields when the there is no
         # input QuestionSummaryModel.
-        populated_model = question_services.populate_question_summary_model_fields(
-            None, question_summary  # type: ignore[arg-type]
+        populated_model = (
+            question_services.populate_question_summary_model_fields(
+                None, question_summary  # type: ignore[arg-type]
+            )
         )
         self.assertEqual(
             populated_model.question_model_last_updated,
