@@ -98,6 +98,11 @@ label.image-receiver-upload-label-button:active {
   padding: 4px 8px;
 }
 
+.image-receiver-file-input:focus-visible + label.image-receiver-upload-label-button {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
 .image-receiver-error-message {
   color: red;
   display: inline-block;
