@@ -362,6 +362,9 @@ describe('Story node editor component', () => {
       expect(link?.getAttribute('target')).toEqual('_blank');
       expect(link?.getAttribute('rel')).toEqual('noopener');
       expect(link?.textContent?.trim()).toEqual('exp_1');
+      expect(link?.getAttribute('aria-label')).toEqual(
+        'exp_1 (opens the exploration editor in a new tab)'
+      );
       expect(query('.e2e-test-edit-exploration-id-button')).not.toBeNull();
       expect(query('.e2e-test-exploration-id-input')).toBeNull();
     });
@@ -414,8 +417,11 @@ describe('Story node editor component', () => {
       expect(setFocusSpy).toHaveBeenCalledWith('storyNodeExplorationId');
       expect(query('.e2e-test-exploration-id-input')).not.toBeNull();
       expect(
-        query('.e2e-test-cancel-exploration-id-edit-button')
-      ).not.toBeNull();
+        query('.e2e-test-cancel-exploration-id-edit-button')?.classList
+      ).toContain('btn-sm');
+      expect(
+        query('.e2e-test-exploration-id-save-button')?.classList
+      ).toContain('btn-sm');
       expect(query('.e2e-test-exploration-id-link')).toBeNull();
       flush();
     }));
@@ -450,6 +456,82 @@ describe('Story node editor component', () => {
       expect(updateExplorationIdSpy).toHaveBeenCalledWith('exp_2');
     });
 
+    it('should save an emptied exploration ID on submit, so that the existing message is shown', () => {
+      renderChapterWithExploration('exp_1');
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      component.explorationId = '';
+
+      component.submitExplorationId();
+
+      expect(updateExplorationIdSpy).toHaveBeenCalledWith('');
+    });
+
+    it('should not save an invalid exploration ID on submit', () => {
+      renderChapterWithExploration('exp_1');
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      // The (change) event, which updates expIdCanBeSaved, has not run yet.
+      component.expIdCanBeSaved = true;
+      component.explorationId = 'invalid id!';
+
+      component.submitExplorationId();
+
+      expect(updateExplorationIdSpy).not.toHaveBeenCalled();
+      expect(component.expIdCanBeSaved).toBe(false);
+      expect(component.invalidExpErrorIsShown).toBe(true);
+    });
+
+    it('should not save an unchanged exploration ID on submit', () => {
+      renderChapterWithExploration('exp_1');
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+
+      component.submitExplorationId();
+
+      expect(updateExplorationIdSpy).not.toHaveBeenCalled();
+      expect(component.invalidExpErrorIsShown).toBe(false);
+    });
+
+    it('should not save a null exploration ID on submit', () => {
+      // An exploration is only removed with the delete button, since the
+      // input field gives an empty string when it is cleared.
+      renderChapterWithExploration('exp_1');
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      component.explorationId = null;
+
+      component.submitExplorationId();
+
+      expect(updateExplorationIdSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not save a cleared input field on submit when no exploration is linked', () => {
+      renderChapterWithExploration(null);
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      // Something was typed and then erased.
+      component.explorationId = '';
+
+      component.submitExplorationId();
+
+      expect(updateExplorationIdSpy).not.toHaveBeenCalled();
+      expect(component.invalidExpErrorIsShown).toBe(false);
+    });
+
+    it('should treat an empty input field as no exploration when checking for changes', () => {
+      renderChapterWithExploration(null);
+      component.explorationId = '';
+      expect(component.isExplorationIdChanged()).toBe(false);
+
+      component.explorationId = 'exp_2';
+      expect(component.isExplorationIdChanged()).toBe(true);
+
+      component.currentExplorationId = 'exp_1';
+      component.explorationId = 'exp_1';
+      expect(component.isExplorationIdChanged()).toBe(false);
+
+      // Clearing the field of a linked exploration is a change, so that the
+      // existing message about the delete button is shown.
+      component.explorationId = '';
+      expect(component.isExplorationIdChanged()).toBe(true);
+    });
+
     it('should show the delete button while editing if the story is not published', () => {
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
       renderChapterWithExploration('exp_1');
@@ -463,6 +545,7 @@ describe('Story node editor component', () => {
       // accessible name.
       expect(deleteButton?.tagName).toEqual('BUTTON');
       expect(deleteButton?.getAttribute('type')).toEqual('button');
+      expect(deleteButton?.classList).toContain('btn-sm');
       expect(deleteButton?.getAttribute('aria-label')).toEqual(
         'Remove the exploration from this chapter'
       );

@@ -59,7 +59,8 @@
                  [href]="getExplorationEditorUrl(currentExplorationId)"
                  target="_blank"
                  rel="noopener"
-                 title="Open the exploration editor in a new tab">
+                 title="Open the exploration editor in a new tab"
+                 [attr.aria-label]="currentExplorationId + ' (opens the exploration editor in a new tab)'">
                 {{ currentExplorationId }}
                 <i class="fas fa-external-link-alt exploration-id-link-icon" aria-hidden="true"></i>
               </a>
@@ -71,22 +72,22 @@
                 <i class="fas fa-pen" aria-hidden="true"></i>
               </button>
             </div>
-            <form class="form-horizontal" *ngIf="explorationIdEditorIsShown" (ngSubmit)="updateExplorationId(explorationId)">
+            <form class="form-horizontal" *ngIf="explorationIdEditorIsShown" (ngSubmit)="submitExplorationId()">
               <input id="storyNodeExplorationId" class="form-control e2e-test-exploration-id-input" type="text" [(ngModel)]="explorationId" [ngModelOptions]="{standalone: true}" (change)="checkCanSaveExpId()"
                      [oppiaFocusOn]="'storyNodeExplorationId'">
               <div class="save-button-container">
                 <button type="button"
                         *ngIf="!isStoryPublished() && currentExplorationId"
-                        class="btn exploration-id-delete-button e2e-test-delete-exploration-id-button"
+                        class="btn btn-sm exploration-id-delete-button e2e-test-delete-exploration-id-button"
                         (click)="updateExplorationId(null)"
                         title="Remove the exploration from this chapter"
                         aria-label="Remove the exploration from this chapter">
                   <i class="fas fa-trash-alt" aria-hidden="true"></i>
                 </button>
-                <button type="button" class="btn btn-secondary e2e-test-cancel-exploration-id-edit-button" *ngIf="currentExplorationId" (click)="cancelExplorationIdEdit()">Cancel</button>
+                <button type="button" class="btn btn-secondary btn-sm e2e-test-cancel-exploration-id-edit-button" *ngIf="currentExplorationId" (click)="cancelExplorationIdEdit()">Cancel</button>
                 <button type="submit"
                         class="e2e-test-exploration-id-save-button btn btn-success btn-sm"
-                        [disabled]="!expIdCanBeSaved || (explorationId === currentExplorationId)">
+                        [disabled]="!expIdCanBeSaved || !isExplorationIdChanged()">
                   Save
                 </button>
               </div>

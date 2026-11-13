@@ -617,6 +617,27 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
+  // An empty input field counts as "no exploration".
+  isExplorationIdChanged(): boolean {
+    return (this.explorationId || null) !== (this.currentExplorationId || null);
+  }
+
+  // The ID is checked again here because pressing Enter can submit the form
+  // before the Save button's disabled state is updated on (change).
+  submitExplorationId(): void {
+    this.checkCanSaveExpId();
+    if (!this.expIdCanBeSaved) {
+      this.invalidExpErrorIsShown = true;
+      return;
+    }
+    // The input field gives an empty string (not null) when it is cleared,
+    // since an exploration is only removed with the delete button.
+    if (this.explorationId === null || !this.isExplorationIdChanged()) {
+      return;
+    }
+    this.updateExplorationId(this.explorationId);
+  }
+
   openExplorationIdEditor(): void {
     this.explorationIdEditorIsShown = true;
     this.focusManagerService.setFocus('storyNodeExplorationId');
