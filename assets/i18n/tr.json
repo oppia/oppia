@@ -1312,8 +1312,6 @@
   "I18N_QUESTION_PLAYER_SCORE_CALCULATION": "Bu puan, bu oturum sırasında kullandığınız ipuçlarının ve verdiğiniz yanlış yanıtların sayısına göre hesaplanır.",
   "I18N_QUESTION_PLAYER_TEST_PASSED": "Oturum tamamlandı. Aferin!",
   "I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE": "Burada biraz zorlanmış gibisiniz. Kavramları kısa bir tekrar çalışmasıyla gözden geçirelim.",
-  "I18N_REFRESHER_EXPLORATION_MODAL_BODY": "Bu soruda biraz zorlanıyor gibisiniz. Bilgilerinizi tazelemek için kısa bir keşif yapmak ve tamamladıktan sonra buraya dönmek ister misiniz?",
-  "I18N_REFRESHER_EXPLORATION_MODAL_TITLE": "Kısa bir tekrar yapmak ister misiniz?",
   "I18N_REGISTRATION_SESSION_EXPIRED_HEADING": "Kayıt Oturumu Sona Erdi",
   "I18N_REGISTRATION_SESSION_EXPIRED_MESSAGE": "Üzgünüz, kayıt oturumunuzun süresi doldu. İşlemi yeniden başlatmak için lütfen \"Kaydı Devam Et\"i tıklayın.",
   "I18N_RELEASE_COORDINATOR_PAGE_TITLE": "Oppia Sürüm Koordinatörü Paneli",

@@ -827,7 +827,9 @@ describe('Conversation flow service', () => {
       explorationEngineService,
       'getAuthorRecommendedExpIdsByStateName'
     ).and.returnValue(['recExpId']);
-    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(false);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
     spyOn(
       explorationRecommendationsService,
       'getRecommendedSummaryDicts'
@@ -840,11 +842,7 @@ describe('Conversation flow service', () => {
 
     expect(
       explorationRecommendationsService.getRecommendedSummaryDicts
-    ).toHaveBeenCalledWith(
-      ['recExpId'],
-      true,
-      jasmine.any(Function)
-    );
+    ).toHaveBeenCalledWith(['recExpId'], true, jasmine.any(Function));
     expect(conversationFlowService.recommendedExplorationSummaries.length).toBe(
       1
     );
