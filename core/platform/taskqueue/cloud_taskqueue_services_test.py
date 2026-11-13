@@ -150,3 +150,109 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 scheduled_for=datetime_to_execute_task,
                 task_name=task_name,
             )
+
+
+class CloudTaskqueueGenericTestBaseTests(test_utils.TestBase):
+
+    def test_http_task_without_payload_or_optional_fields(self) -> None:
+        class Response:
+            """Mock response class."""
+
+            name = 'task_without_optional_fields'
+
+        # Here we use type Any because CLIENT.create_task accepts a task
+        # dictionary with values of any type.
+        def mock_create_task(
+            parent: str,
+            task: Dict[str, Any],
+            retry: Optional[retry_lib.Retry] = None,
+        ) -> Response:
+            self.assertEqual(
+                parent,
+                'projects/dev-project-id/locations/us-central1/queues/queue',
+            )
+            self.assertIsInstance(retry, retry_lib.Retry)
+            self.assertEqual(
+                task,
+                {
+                    'app_engine_http_request': {
+                        'http_method': tasks_v2.types.HttpMethod.POST,
+                        'relative_uri': '/task/dummy_handler',
+                    }
+                },
+            )
+            return Response()
+
+        with self.swap(
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        ):
+            response = cloud_taskqueue_services.create_http_task(
+                'queue', '/task/dummy_handler'
+            )
+
+        self.assertEqual(response.name, 'task_without_optional_fields')
+
+    def test_http_task_with_non_dict_payload_omits_json_headers(self) -> None:
+        class Response:
+            """Mock response class."""
+
+            name = 'task_with_non_dict_payload'
+
+        # Here we use type Any because CLIENT.create_task accepts a task
+        # dictionary with values of any type.
+        def mock_create_task(
+            parent: str,
+            task: Dict[str, Any],
+            retry: Optional[retry_lib.Retry] = None,
+        ) -> Response:
+            self.assertEqual(
+                parent,
+                'projects/dev-project-id/locations/us-central1/queues/queue',
+            )
+            self.assertIsInstance(retry, retry_lib.Retry)
+            self.assertEqual(task['app_engine_http_request']['body'], b'')
+            self.assertNotIn('headers', task['app_engine_http_request'])
+            return Response()
+
+        with self.swap(
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        ):
+            cloud_taskqueue_services.create_http_task(
+                'queue',
+                '/task/dummy_handler',
+                # Here we use MyPy ignore because this test covers a
+                # non-dictionary payload.
+                payload='not a dictionary',  # type: ignore[arg-type]
+            )
+
+    def test_http_task_with_empty_dict_serializes_payload(self) -> None:
+        class Response:
+            """Mock response class."""
+
+            name = 'task_with_empty_payload'
+
+        # Here we use type Any because CLIENT.create_task accepts a task
+        # dictionary with values of any type.
+        def mock_create_task(
+            parent: str,
+            task: Dict[str, Any],
+            retry: Optional[retry_lib.Retry] = None,
+        ) -> Response:
+            self.assertEqual(
+                parent,
+                'projects/dev-project-id/locations/us-central1/queues/queue',
+            )
+            self.assertIsInstance(retry, retry_lib.Retry)
+            self.assertEqual(
+                task['app_engine_http_request']['headers'],
+                {'Content-type': 'application/json'},
+            )
+            self.assertEqual(task['app_engine_http_request']['body'], b'{}')
+            return Response()
+
+        with self.swap(
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        ):
+            cloud_taskqueue_services.create_http_task(
+                'queue', '/task/dummy_handler', payload={}
+            )
