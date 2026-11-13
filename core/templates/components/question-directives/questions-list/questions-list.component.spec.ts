@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Questions List Component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -34,6 +32,7 @@ import {
   FetchQuestionResponse,
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
+import {QuestionSummaryForOneSkill} from 'domain/question/question-summary-for-one-skill-object.model';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
 import {Question} from 'domain/question/question.model';
 import {Misconception} from 'domain/skill/misconception.model';
@@ -93,8 +92,8 @@ describe('Questions List Component', () => {
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skill: Skill;
-  let question: Question | null = null;
-  let questionStateData: State | null = null;
+  let question: Question;
+  let questionStateData: State;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -571,7 +570,7 @@ describe('Questions List Component', () => {
   it(
     'should not save and publish question if there are' + ' validation errors',
     () => {
-      component.question = question as Question;
+      component.question = question;
       spyOn(alertsService, 'addWarning');
       spyOn(
         questionValidationService,
@@ -592,7 +591,7 @@ describe('Questions List Component', () => {
     'should show an error and not save question if there are' +
       ' errors from question backend api service',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = false;
       spyOn(
         editableQuestionBackendApiService,
@@ -616,7 +615,7 @@ describe('Questions List Component', () => {
       ' error on saving and publishing a question when question is not already' +
       ' being updated',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = false;
       component.skillLinkageModificationsArray = [
         {
@@ -683,7 +682,7 @@ describe('Questions List Component', () => {
   );
 
   it('should save question when another question is being updated', fakeAsync(() => {
-    component.question = question as Question;
+    component.question = question;
     component.questionIsBeingUpdated = true;
 
     spyOn(
@@ -717,7 +716,7 @@ describe('Questions List Component', () => {
     'should show error if saving question fails when another question' +
       ' is being updated',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -754,7 +753,7 @@ describe('Questions List Component', () => {
     'should display warning if commit message is not given while saving' +
       ' a question',
     fakeAsync(() => {
-      component.question = question as Question;
+      component.question = question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -1158,7 +1157,10 @@ describe('Questions List Component', () => {
   });
 
   it('should show solution if interaction can have solution', () => {
-    component.question = question as Question;
+    // The question is not set until one is created or opened for editing.
+    expect(component.showSolutionCheckpoint()).toBe(false);
+
+    component.question = question;
     spyOn(component.question, 'getStateData').and.returnValue({
       interaction: {
         id: 'TextInput',
@@ -1166,12 +1168,6 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-    // This throws "Type 'null' is not assignable to type 'Question'.". We need to
-    // suppress this error because we are testing the component's behavior when
-    // question is null.
-    // @ts-expect-error
-    component.question = null;
-    expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
   it('should show info message if skills is already linked to question', fakeAsync(() => {
@@ -1422,11 +1418,18 @@ describe('Questions List Component', () => {
   }));
 
   it('should get cached question summaries for one skill', () => {
+    const cachedQuestionSummaries: QuestionSummaryForOneSkill[] = [];
     spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
-      undefined
+      cachedQuestionSummaries
     );
 
-    expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();
+    component.getQuestionSummariesForOneSkill();
+
+    // The component's list also starts out empty, so toBe() is used to check
+    // that it now holds the exact array returned by the service.
+    expect(component.questionSummariesForOneSkill).toBe(
+      cachedQuestionSummaries
+    );
   });
 
   it('should not toggle difficulty card if window is not narrow', () => {

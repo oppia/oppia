@@ -56,8 +56,6 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
               topicStats.total_related_questions,
               topicStats.total_correct_questions
             ),
-            totalCorrectQuestions: topicStats.total_correct_questions,
-            totalRelatedQuestions: topicStats.total_related_questions,
           })
         );
         this.result = {

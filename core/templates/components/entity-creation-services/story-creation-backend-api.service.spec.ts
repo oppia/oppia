@@ -16,8 +16,6 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
-// @ts-nocheck
-
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -38,6 +36,14 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {StoryCreationBackendApiService} from './story-creation-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+  };
+}
+
 describe('Story Creation Backend Api Service', () => {
   let scbas: StoryCreationBackendApiService;
   let topicEditorStateService: TopicEditorStateService;
@@ -47,17 +53,16 @@ describe('Story Creation Backend Api Service', () => {
   let ngbModal: NgbModal;
   let httpTestingController: HttpTestingController;
   let topic: Topic;
-  let windowRef: WindowRef;
-  let mockWindow = {
-    location: {
-      href: '',
-    },
-  };
+  let mockWindowRef: MockWindowRef;
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StoryCreationBackendApiService],
+      providers: [
+        StoryCreationBackendApiService,
+        {provide: WindowRef, useValue: mockWindowRef},
+      ],
     });
   }));
 
@@ -116,7 +121,6 @@ describe('Story Creation Backend Api Service', () => {
       },
     };
 
-    windowRef = TestBed.inject(WindowRef);
     scbas = TestBed.inject(StoryCreationBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -133,7 +137,6 @@ describe('Story Creation Backend Api Service', () => {
       return 'id';
     };
 
-    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
       {
         filename: 'Image1',
@@ -201,7 +204,7 @@ describe('Story Creation Backend Api Service', () => {
         }),
       } as NgbModalRef);
 
-      expect(mockWindow.location.href).toBe('');
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
       scbas.createNewCanonicalStory();
       tick();
 
@@ -214,7 +217,7 @@ describe('Story Creation Backend Api Service', () => {
       flush();
       flushMicrotasks();
 
-      expect(mockWindow.location.href).toBe('/story_editor/id');
+      expect(mockWindowRef.nativeWindow.location.href).toBe('/story_editor/id');
     })
   );
 

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CertificateAssessmentResultCardComponent.
  */
 
-// @ts-nocheck
-
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -136,14 +134,10 @@ describe('CertificateAssessmentResultCardComponent', () => {
         {
           topicName: 'Place Values',
           scorePercentage: 80,
-          totalCorrectQuestions: 4,
-          totalRelatedQuestions: 5,
         },
         {
           topicName: 'Multiplication',
           scorePercentage: 50,
-          totalCorrectQuestions: 2,
-          totalRelatedQuestions: 4,
         },
       ],
       timeTakenMinutes: 35,
@@ -157,6 +151,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
         certificate_id: 'cert-1',
         title: 'Test Certificate',
         total_score: 99,
+        time_taken_in_minutes: null,
         attempt_data: {
           topic_1: {
             topic_name: 'Place Values',
@@ -177,8 +172,6 @@ describe('CertificateAssessmentResultCardComponent', () => {
       {
         topicName: 'Place Values',
         scorePercentage: 0,
-        totalCorrectQuestions: 0,
-        totalRelatedQuestions: 0,
       },
     ]);
   });
@@ -231,6 +224,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
         certificate_id: 'cert-1',
         title: 'Test Certificate',
         total_score: 50,
+        time_taken_in_minutes: null,
         attempt_data: {
           topic_1: {
             topic_name: 'Place Values',
