@@ -204,3 +204,9 @@
     top: -160px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    display: none;
+  }
+}

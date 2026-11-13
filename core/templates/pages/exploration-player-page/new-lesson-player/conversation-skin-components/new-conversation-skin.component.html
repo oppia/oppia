@@ -22,7 +22,7 @@
           <oppia-card-interaction-controls (submit)="submitAnswerFromProgressNav()"
                               [isLearnAgainButton]="isLearnAgainButton()"
                               [displayedCard]="getDisplayedCard()"
-                              [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible && !getDisplayedCard().isCompleted()"
+                              [submitButtonIsShown]="isSubmitButtonShown()"
                               [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                               (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
                               (skipQuestion)="skipCurrentQuestion()">

@@ -28,6 +28,7 @@ import {UrlService} from '../../../../services/contextual/url.service';
 import {LoggerService} from '../../../../services/contextual/logger.service';
 import {CapitalizePipe} from '../../../../filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from '../../../../domain/classroom/classroom-backend-api.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {LessonPlayerNavbarBreadcrumbComponent} from './lesson-player-navbar-breadcrumb.component';
 
@@ -249,6 +250,21 @@ describe('Lesson player navbar breadcrumb component', () => {
       componentInstance.topicName = 'Topic Name 1';
 
       expect(componentInstance.shouldShowBreadcrumb()).toBe(true);
+    });
+  });
+
+  describe('isLanguageRTL', () => {
+    it('should delegate to the language code service', () => {
+      const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+      const rtlSpy = spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageRTL'
+      ).and.returnValue(true);
+
+      expect(componentInstance.isLanguageRTL()).toBeTrue();
+
+      rtlSpy.and.returnValue(false);
+      expect(componentInstance.isLanguageRTL()).toBeFalse();
     });
   });
 

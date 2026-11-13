@@ -17,12 +17,12 @@
  **/
 
 import {Component, OnInit} from '@angular/core';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
-import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {PlayerTopicNameService} from '../../services/player-topic-name.service';
 import {UrlService} from 'services/contextual/url.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-lesson-player-navbar-breadcrumb',
@@ -44,7 +44,8 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
     private loggerService: LoggerService,
     private capitalizePipe: CapitalizePipe,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService
+    private playerTopicNameService: PlayerTopicNameService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -59,12 +60,11 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
 
     // If either fetch fails (for example, a 404 for an unknown fragment),
     // the corresponding name stays empty and the breadcrumb stays hidden.
-
-    this.topicViewerBackendApiService
-      .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
+    this.playerTopicNameService
+      .getTopicNameAsync(this.topicUrlFragment, this.classroomUrlFragment)
       .then(
-        (readOnlyTopic: ReadOnlyTopic) => {
-          this.topicName = readOnlyTopic.getTopicName();
+        (topicName: string) => {
+          this.topicName = topicName;
         },
         () => {
           this.loggerService.error(
@@ -114,6 +114,10 @@ export class LessonPlayerNavbarBreadcrumbComponent implements OnInit {
     return Boolean(
       this.isLinkedToTopic && this.classroomName && this.topicName
     );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getClassroomUrl(): string {

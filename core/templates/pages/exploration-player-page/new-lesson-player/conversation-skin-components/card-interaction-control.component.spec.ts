@@ -40,6 +40,7 @@ import {
   PlayerPositionService,
 } from '../../services/player-position.service';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {CardInteractionControlsComponent} from './card-interaction-controls.component';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
@@ -49,6 +50,7 @@ describe('Card interaction controls component', () => {
   let componentInstance: CardInteractionControlsComponent;
   let currentInteractionService: CurrentInteractionService;
   let playerPositionService: PlayerPositionService;
+  let playerTranscriptService: PlayerTranscriptService;
   let explorationModeService: ExplorationModeService;
   let focusManagerService: FocusManagerService;
   let pageContextService: PageContextService;
@@ -74,6 +76,7 @@ describe('Card interaction controls component', () => {
         ExplorationModeService,
         FocusManagerService,
         PlayerPositionService,
+        PlayerTranscriptService,
         UrlService,
         PageContextService,
         ConversationFlowService,
@@ -90,6 +93,7 @@ describe('Card interaction controls component', () => {
     componentInstance = fixture.componentInstance;
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerPositionService = TestBed.inject(PlayerPositionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
     pageContextService = TestBed.inject(PageContextService);
@@ -343,6 +347,8 @@ describe('Card interaction controls component', () => {
 
   it('should disable submit when the interaction service says so', () => {
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
     spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
       true
     );
@@ -352,6 +358,8 @@ describe('Card interaction controls component', () => {
 
   it('should disable submit when there is no response error', () => {
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
     spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
       false
     );
@@ -363,6 +371,8 @@ describe('Card interaction controls component', () => {
 
   it('should disable submit when the response is invalid', () => {
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
     spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
       false
     );
@@ -374,11 +384,26 @@ describe('Card interaction controls component', () => {
 
   it('should enable submit when there are no errors', () => {
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
     spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
       false
     );
     spyOn(mockDisplayedCard, 'showNoResponseError').and.returnValue(false);
     spyOn(mockDisplayedCard, 'showInvalidResponseError').and.returnValue(false);
+
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(false);
+  });
+
+  it('should not disable submit when the displayed card is not the last card', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      true
+    );
+    spyOn(mockDisplayedCard, 'showNoResponseError').and.returnValue(true);
+    spyOn(mockDisplayedCard, 'showInvalidResponseError').and.returnValue(true);
 
     expect(componentInstance.isSubmitButtonDisabled()).toBe(false);
   });

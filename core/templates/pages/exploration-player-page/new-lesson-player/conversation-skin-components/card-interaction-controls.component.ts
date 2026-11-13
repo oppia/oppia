@@ -45,6 +45,7 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
 import {PlayerPositionService} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 
 @Component({
   selector: 'oppia-card-interaction-controls',
@@ -99,6 +100,7 @@ export class CardInteractionControlsComponent {
     private explorationModeService: ExplorationModeService,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
@@ -192,6 +194,14 @@ export class CardInteractionControlsComponent {
   }
 
   isSubmitButtonDisabled(): boolean {
+    // When returning to the current card after navigating through previous
+    // cards, the interaction service can still hold the state of a different
+    // card, which used to leave the Submit button falsely disabled. A learner's
+    // answer is always on the last card, so only check the state there.
+    const currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    if (!this.playerTranscriptService.isLastCard(currentIndex)) {
+      return false;
+    }
     return (
       this.currentInteractionService.isSubmitButtonDisabled() ||
       this.displayedCard.showNoResponseError() ||
