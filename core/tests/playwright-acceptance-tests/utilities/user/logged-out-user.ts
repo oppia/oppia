@@ -30,6 +30,13 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const termsUrl = testConstants.URLs.Terms;
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const oppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
+const privacyPolicyLinkInTermsPage = '.e2e-test-privacy-policy-link';
+const googleGroupSignUpLinkInTermsPage =
+  '.e2e-test-oppia-announce-google-group-link';
+const bookmarkMenuInTermsPage = '.oppia-terms-right-menu';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -3958,6 +3965,61 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToBlogPage(): Promise<void> {
     await this.goto(blogUrl);
+  }
+
+  /**
+   * Navigates to the Terms of Use page.
+   */
+  async navigateToTermsPage(): Promise<void> {
+    await this.goto(termsUrl);
+  }
+
+  /**
+   * Checks that the "oppia-announce" Google Group sign-up link on the Terms
+   * page points to the expected page. The link is not opened, since it leads
+   * to an external site.
+   */
+  async expectGoogleGroupSignUpLinkInTermsPageToBeCorrect(): Promise<void> {
+    await this.expectLinkToHaveHref(
+      googleGroupSignUpLinkInTermsPage,
+      oppiaAnnounceGoogleGroupUrl
+    );
+  }
+
+  /**
+   * Clicks the Privacy Policy link on the Terms page and checks that it opens
+   * the Privacy Policy page.
+   */
+  async clickPrivacyPolicyLinkInTermsPage(): Promise<void> {
+    await this.expectElementToBeVisible(privacyPolicyLinkInTermsPage);
+    await this.clickButtonToNavigateToNewPage(
+      privacyPolicyLinkInTermsPage,
+      privacyPolicyUrl
+    );
+  }
+
+  /**
+   * Clicks a bookmark in the "Terms of Use" menu on the Terms page and checks
+   * that the page scrolls to the corresponding section.
+   * @param {string} bookmark - The text of the bookmark to click.
+   */
+  async clickBookmarkInTermsPage(bookmark: string): Promise<void> {
+    const bookmarkLink = this.page
+      .locator(bookmarkMenuInTermsPage)
+      .getByText(bookmark, {exact: true});
+    await expect(bookmarkLink).toBeVisible();
+    await bookmarkLink.click();
+
+    // The "Hosted Created Content and IP" bookmark has a shorter label than
+    // the heading of its section.
+    const heading =
+      bookmark === 'Hosted Created Content and IP'
+        ? 'Hosted Created Content and Intellectual Property'
+        : bookmark;
+    await expect(
+      this.page.getByRole('heading', {level: 2, name: heading, exact: true})
+    ).toBeInViewport({ratio: 1});
+    showMessage(`Scrolled successfully to the bookmark: ${bookmark}`);
   }
 
   /**
