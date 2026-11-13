@@ -22,6 +22,7 @@ import {expect} from '@playwright/test';
 import {BaseUser} from './playwright-utils';
 import testConstants from './test-constants';
 
+const baseURL = testConstants.URLs.BaseURL;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
@@ -67,6 +68,20 @@ export class NavigationUtils {
         homeTabSectionInLearnerDashboard
       );
     }
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   * @param {string | null} explorationId - The ID of the exploration to navigate.
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseURL}/create/${explorationId}#/`;
+    await this.userInstance.goto(editorUrl);
   }
 
   /**

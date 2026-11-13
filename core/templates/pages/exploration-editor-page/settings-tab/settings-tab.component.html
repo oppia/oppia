@@ -389,7 +389,7 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card e2e-test-voice-artists-content" *ngIf="voiceArtistsCardIsShown">
         <div>
-          <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
+          <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message e2e-test-no-voice-artists-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
           </div>
           <div *ngIf="canManageVoiceArtist" [hidden]="isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
