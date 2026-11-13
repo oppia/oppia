@@ -266,6 +266,27 @@ export class DragAndDropSortInputValidationService {
           default:
         }
 
+        // A rule identical to an earlier one (same type and inputs) can
+        // never be matched, and the backend rejects it on save.
+        for (var k = 0; k < ranges.length; k++) {
+          const previousRule =
+            answerGroups[ranges[k].answerGroupIndex].rules[ranges[k].ruleIndex];
+          if (
+            previousRule.type === rule.type &&
+            isEqual(previousRule.inputs, rule.inputs)
+          ) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message:
+                `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                'will never be matched because it is identical to ' +
+                `answer ${ranges[k].ruleIndex + 1} from response ` +
+                `${ranges[k].answerGroupIndex + 1}`,
+            });
+            break;
+          }
+        }
+
         for (var k = 0; k < ranges.length; k++) {
           var earlierRule =
             answerGroups[ranges[k].answerGroupIndex].rules[ranges[k].ruleIndex];

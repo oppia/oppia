@@ -227,9 +227,23 @@ describe('DragAndDropSortInputValidationService', () => {
         'DragAndDropSortInput'
       ),
     ];
+    var otherRules = [
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEqualToOrdering',
+          inputs: {
+            x: [
+              ['ca_2', 'ca_3'],
+              ['ca_0', 'ca_1'],
+            ],
+          },
+        },
+        'DragAndDropSortInput'
+      ),
+    ];
     answerGroups = [
       AnswerGroup.createNew(rules, customOutcome, [], null),
-      AnswerGroup.createNew(rules, customOutcome, [], null),
+      AnswerGroup.createNew(otherRules, customOutcome, [], null),
     ];
     var warnings = validatorService.getAllWarnings(
       currentState,
@@ -380,6 +394,141 @@ describe('DragAndDropSortInputValidationService', () => {
           'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
+  });
+
+  it('should catch identical rules in different responses', () => {
+    var duplicateOfGoodRule1 = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEqualToOrdering',
+        inputs: {
+          x: [['ca_0'], ['ca_1'], ['ca_2'], ['ca_3']],
+        },
+      },
+      'DragAndDropSortInput'
+    );
+    answerGroups = [
+      AnswerGroup.createNew([goodRule1], customOutcome, [], null),
+      AnswerGroup.createNew(
+        [duplicateOfGoodRule1],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 1 from Oppia response 2 will never be ' +
+          'matched because it is identical to answer 1 from response 1',
+      },
+    ]);
+  });
+
+  it('should report each repeated rule only once', () => {
+    answerGroups = [
+      AnswerGroup.createNew(
+        [goodRule1, goodRule1, goodRule1],
+        customOutcome,
+        [],
+        null
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          'matched because it is identical to answer 1 from response 1',
+      },
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 3 from Oppia response 1 will never be ' +
+          'matched because it is identical to answer 1 from response 1',
+      },
+    ]);
+  });
+
+  it('should catch identical rules of other rule types', () => {
+    var createHasXBeforeYRule = () =>
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'HasElementXBeforeElementY',
+          inputs: {
+            x: 'ca_0',
+            y: 'ca_1',
+          },
+        },
+        'DragAndDropSortInput'
+      );
+    answerGroups = [
+      AnswerGroup.createNew([createHasXBeforeYRule()], customOutcome, [], null),
+      AnswerGroup.createNew(
+        [createHasXBeforeYRule()],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 1 from Oppia response 2 will never be ' +
+          'matched because it is identical to answer 1 from response 1',
+      },
+    ]);
+  });
+
+  it('should not flag rules with the same inputs but different types', () => {
+    var oneItemAtIncorrectPositionRule = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+        inputs: {
+          x: [['ca_0'], ['ca_1'], ['ca_2'], ['ca_3']],
+        },
+      },
+      'DragAndDropSortInput'
+    );
+    answerGroups = [
+      AnswerGroup.createNew([goodRule1], customOutcome, [], null),
+      AnswerGroup.createNew(
+        [oneItemAtIncorrectPositionRule],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
   });
 
   it('should catch non-distinct selected choices', () => {
