@@ -33,7 +33,6 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UserService} from 'services/user.service';
-import {UserInfo} from 'domain/user/user-info.model';
 import {OutcomeDestinationEditorComponent} from './outcome-destination-editor.component';
 
 describe('Outcome Destination Editor', () => {
@@ -44,7 +43,6 @@ describe('Outcome Destination Editor', () => {
   let editorFirstTimeEventsService: EditorFirstTimeEventsService;
   let stateGraphLayoutService: StateGraphLayoutService;
   let focusManagerService: FocusManagerService;
-  let userService: UserService;
   let PLACEHOLDER_OUTCOME_DEST = '/';
 
   beforeEach(waitForAsync(() => {
@@ -69,7 +67,6 @@ describe('Outcome Destination Editor', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
-    userService = TestBed.inject(UserService);
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
       null,

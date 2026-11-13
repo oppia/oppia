@@ -19,7 +19,6 @@ from __future__ import annotations
 import copy
 import datetime
 import re
-from typing import Any, Dict, List, Union, cast
 
 from core import feconf, utils
 from core.domain import (
@@ -29,6 +28,7 @@ from core.domain import (
     translation_domain,
 )
 from core.tests import test_utils
+from typing import Any, Dict, List, Union, cast
 
 
 class QuestionChangeTest(test_utils.GenericTestBase):

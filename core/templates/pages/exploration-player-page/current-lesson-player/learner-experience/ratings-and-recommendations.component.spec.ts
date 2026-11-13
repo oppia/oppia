@@ -58,7 +58,6 @@ describe('Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
-  let conversationFlowService: ConversationFlowService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -138,7 +137,6 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
