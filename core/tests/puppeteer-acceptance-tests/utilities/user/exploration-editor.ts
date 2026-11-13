@@ -1018,7 +1018,15 @@ export class ExplorationEditor extends BaseUser {
         })
         .catch(async () => {
           await this.clickOnElementWithSelector(addNewResponseButton);
+          await this.page.waitForSelector(responseModalHeaderSelector, {
+            hidden: true,
+          });
         });
+      await this.page.waitForFunction(
+        (selector: string) => document.querySelectorAll(selector).length === 0,
+        {},
+        activeModalBackdropSelector
+      );
     } else {
       await this.clickOnElementWithSelector(addAnotherResponseButton);
       // The waitForNetworkIdle method waits for the response
@@ -1588,6 +1596,28 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds rows and enters options in the schema-based list editor.
+   *
+   * @param {string[]} options - Array of response option strings to add.
+   */
+  private async addResponseOptions(options: string[]): Promise<void> {
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+      await this.page.waitForSelector(
+        `#e2e-test-schema-based-list-editor-table-row-${i + 1}`,
+        {visible: true}
+      );
+    }
+
+    for (let i = 0; i < options.length; i++) {
+      const optionInputSelector = `#e2e-test-schema-based-list-editor-table-row-${i} ${stateContentInputField}`;
+      await this.page.waitForSelector(optionInputSelector, {visible: true});
+      await this.typeInInputField(optionInputSelector, `${options[i]}`);
+    }
+  }
+
+  /**
    * Customizes the item selection interaction.
    * @param {string[]} options - The options to be selected.
    * @param {number} minimumNumberOfSelections - The minimum number of selections.
@@ -1629,15 +1659,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Add options.
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-    }
-
-    const responseInputs = await this.page.$$(stateContentInputField);
-    for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(`${options[i]}`);
-    }
+    await this.addResponseOptions(options);
 
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -3048,6 +3070,7 @@ export class ExplorationEditor extends BaseUser {
       timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
+    await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOnElementWithSelector(saveContentButton);
@@ -3187,15 +3210,7 @@ export class ExplorationEditor extends BaseUser {
       'Customize Interaction (Multiple Choice)'
     );
 
-    for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOnElementWithSelector(addResponseOptionButton);
-    }
-
-    const responseInputs = await this.page.$$(stateContentInputField);
-    for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(`${options[i]}`);
-    }
+    await this.addResponseOptions(options);
 
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -4150,10 +4165,15 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.click(closeModalButtonSelector);
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
+      );
+      await this.page.waitForFunction(
+        (selector: string) => document.querySelectorAll(selector).length === 0,
+        {},
+        activeModalBackdropSelector
       );
     }
   }
@@ -4191,10 +4211,12 @@ export class ExplorationEditor extends BaseUser {
       if (!stateGraphModalIsOpen) {
         // Wait for any blocking modal to close first before clicking the
         // resize button.
-        const blockingModal = await this.page.$('div.modal-content');
-        if (blockingModal) {
-          await this.page.waitForSelector('div.modal-content', {hidden: true});
-        }
+        await this.page.waitForFunction(
+          (selector: string) =>
+            document.querySelectorAll(selector).length === 0,
+          {},
+          activeModalBackdropSelector
+        );
         await this.page.waitForSelector(mobileStateGraphResizeButton, {
           visible: true,
         });
@@ -4350,8 +4372,27 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
-      await this.page.select(destinationSelectorDropdown, destinationValue);
-      await this.page.click(saveDestinationButtonSelector);
+      await this.page.waitForSelector(destinationSelectorDropdown, {
+        visible: true,
+      });
+      await this.page.waitForFunction(
+        (selector: string, expectedVal: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          if (!select || select.options.length === 0) {
+            return false;
+          }
+          return Array.from(select.options).some(
+            opt => opt.value === expectedVal || opt.text.trim() === expectedVal
+          );
+        },
+        {},
+        destinationSelectorDropdown,
+        destinationValue
+      );
+      await this.select(destinationSelectorDropdown, destinationValue);
+      await this.clickOnElementWithSelector(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
@@ -6733,6 +6774,20 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(destinationSelectorDropdown, {
         visible: true,
       });
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const select = document.querySelector(
+            selector
+          ) as HTMLSelectElement | null;
+          return (
+            select !== null &&
+            select.options.length > 0 &&
+            select.querySelector('option:checked') !== null
+          );
+        },
+        {},
+        destinationSelectorDropdown
+      );
 
       try {
         const selectedDestinationText = await this.page.$eval(
@@ -6758,6 +6813,10 @@ export class ExplorationEditor extends BaseUser {
         if (cancelDestinationButton) {
           await this.clickOnElementWithSelector(
             '.e2e-test-cancel-outcome-dest'
+          );
+          await this.expectElementToBeVisible(
+            '.e2e-test-cancel-outcome-dest',
+            false
           );
         }
       }
@@ -6836,10 +6895,15 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.click(closeModalButtonSelector);
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
+      );
+      await this.page.waitForFunction(
+        (selector: string) => document.querySelectorAll(selector).length === 0,
+        {},
+        activeModalBackdropSelector
       );
     }
   }
@@ -8132,6 +8196,11 @@ export class ExplorationEditor extends BaseUser {
         explorationStateGraphModalSelector,
         false
       );
+      await this.page.waitForFunction(
+        (selector: string) => document.querySelectorAll(selector).length === 0,
+        {},
+        activeModalBackdropSelector
+      );
     }
   }
 
@@ -8400,6 +8469,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
+    await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clearAllTextFrom(stateContentInputField);
 
     // Insert mathematical formula via the RTE toolbar.

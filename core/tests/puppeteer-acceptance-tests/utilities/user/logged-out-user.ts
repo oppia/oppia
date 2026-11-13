@@ -364,6 +364,7 @@ const singInButtonInProgressModal = '.sign-in-link';
 const lessonInfoButton = '.oppia-lesson-info';
 const lessonInfoCardSelector = '.oppia-lesson-info-card';
 const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const lessonInfoModalSelector = '.oppia-modal-lesson-information-card';
 const resumeExplorationButton = '.resume-button';
 const restartExplorationButton = '.restart-button';
 const saveProgressButton = '.save-progress-btn';
@@ -5406,6 +5407,11 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(closeLessonInfoButton, {visible: true});
     await this.clickOnElementWithSelector(closeLessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {hidden: true});
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {},
+      lessonInfoModalSelector
+    );
   }
 
   /**
