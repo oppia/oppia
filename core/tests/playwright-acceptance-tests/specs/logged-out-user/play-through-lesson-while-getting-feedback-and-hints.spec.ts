@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,16 @@
  * - User Journey: Navigation to the exploration, interaction with different types of questions, receiving feedback, using hints, viewing previous responses, and reaching a checkpoint by a logged-out user.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const STUDY_GUIDE_CONTENT =
   'Remember, a fraction represents a part of a whole. It consists of a numerator and a denominator.';
-
-enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
-  NUMERIC_INPUT = 'Number Input',
-  FRACTION_INPUT = 'Fraction Input',
-  END_EXPLORATION = 'End Exploration',
-}
 
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
@@ -44,24 +38,23 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /https:\/\/pencilcode\.net\/lib\/pencilcodeembed\.js Failed to load resource: net::ERR_CERT_.*/,
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'./,
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'./,
-]);
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-out User', function () {
+test.describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -155,65 +148,63 @@ describe('Logged-out User', function () {
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should be able to interact with different interactions,receive feedback, navigates through cards, uses hints, views previous responses, and reaches a checkpoint',
-    async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
-      await loggedOutUser.continueToNextCard();
+  test('should be able to interact with different interactions, receive feedback, navigate through cards, use hints, view previous responses, and reach a checkpoint', async function () {
+    test.setTimeout(900000);
 
-      // Wrong answer is submitted number of times to get to see hints.
-      await loggedOutUser.submitAnswer('40');
-      await loggedOutUser.expectOppiaFeedbackToBe('Wrong, try again!');
-      await loggedOutUser.submitAnswer('5');
-      await loggedOutUser.viewHint();
-      await loggedOutUser.closeHintModal();
+    await loggedOutUser.navigateToCommunityLibraryPage();
+    await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
+    await loggedOutUser.continueToNextCard();
 
-      // Again wrong answer is submitted number of times to get stuck and get to see the solution.
-      await loggedOutUser.submitAnswer('69');
-      await loggedOutUser.submitAnswer('39');
-      await loggedOutUser.simulateDelayToAvoidFatigueDetection();
-      await loggedOutUser.submitAnswer('59');
-      await loggedOutUser.viewSolution();
-      await loggedOutUser.closeSolutionModal();
+    // Wrong answer is submitted number of times to get to see hints.
+    await loggedOutUser.submitAnswer('40');
+    await loggedOutUser.expectOppiaFeedbackToBe('Wrong, try again!');
+    await loggedOutUser.submitAnswer('5');
+    await loggedOutUser.viewHint();
+    await loggedOutUser.closeHintModal();
 
-      await loggedOutUser.submitAnswer('-39');
-      await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyCheckpointModalAppears();
-      await loggedOutUser.goBackToPreviousCard();
-      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
-      await loggedOutUser.continueToNextCard();
+    // Again wrong answer is submitted number of times to get stuck and get to see the solution.
+    await loggedOutUser.submitAnswer('69');
+    await loggedOutUser.submitAnswer('39');
+    await loggedOutUser.simulateDelayToAvoidFatigueDetection();
+    await loggedOutUser.submitAnswer('59');
+    await loggedOutUser.viewSolution();
+    await loggedOutUser.closeSolutionModal();
 
-      // Wrong answer is submitted to get to see hints.
-      await loggedOutUser.submitAnswer('1/4');
-      await loggedOutUser.submitAnswer('1/3');
-      await loggedOutUser.viewHint();
-      await loggedOutUser.closeHintModal();
+    await loggedOutUser.submitAnswer('-39');
+    await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
+    await loggedOutUser.continueToNextCard();
+    await loggedOutUser.verifyCheckpointModalAppears();
+    await loggedOutUser.goBackToPreviousCard();
+    await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
+    await loggedOutUser.continueToNextCard();
 
-      // Again wrong answer is submitted number of times to get stuck and navigate to Study Guide.
-      await loggedOutUser.submitAnswer('1/3');
-      await loggedOutUser.submitAnswer('1/4');
-      await loggedOutUser.simulateDelayToAvoidFatigueDetection();
-      await loggedOutUser.submitAnswer('1/5');
-      await loggedOutUser.viewPreviousResponses();
-      await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
-      await loggedOutUser.continueToNextCard();
+    // Wrong answer is submitted to get to see hints.
+    await loggedOutUser.submitAnswer('1/4');
+    await loggedOutUser.submitAnswer('1/3');
+    await loggedOutUser.viewHint();
+    await loggedOutUser.closeHintModal();
 
-      // Verifying if navigated to the expected card after getting stuck.
-      await loggedOutUser.expectCardContentToMatch(STUDY_GUIDE_CONTENT);
-      await loggedOutUser.continueToNextCard();
+    // Again wrong answer is submitted number of times to get stuck and navigate to Study Guide.
+    await loggedOutUser.submitAnswer('1/3');
+    await loggedOutUser.submitAnswer('1/4');
+    await loggedOutUser.simulateDelayToAvoidFatigueDetection();
+    await loggedOutUser.submitAnswer('1/5');
+    await loggedOutUser.viewPreviousResponses();
+    await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
+    await loggedOutUser.continueToNextCard();
 
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Verifying if navigated to the expected card after getting stuck.
+    await loggedOutUser.expectCardContentToMatch(STUDY_GUIDE_CONTENT);
+    await loggedOutUser.continueToNextCard();
 
-  afterAll(async function () {
+    await loggedOutUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+  });
+
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

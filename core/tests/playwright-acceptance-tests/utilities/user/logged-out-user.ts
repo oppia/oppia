@@ -111,6 +111,9 @@ const submitResponseToInteractionTextArea =
   'oppia-interaction-display textarea';
 
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
+const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
+const responseSelector = 'oppia-interaction-display';
+const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const formErrorContainer = '.e2e-test-form-error-container';
 const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
 const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
@@ -749,6 +752,88 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     const explorationPlayerUtils = new ExplorationEditorUtils(this);
     await explorationPlayerUtils.continueToNextCard(skipVerification);
+  }
+
+  /**
+   * Function to navigate to the next card in the exploration player.
+   */
+  async continueToNextCard(): Promise<void> {
+    const continueBtn = this.page.locator(nextCardButton);
+
+    await this.page
+      .locator(`${nextCardButton}, ${nextCardArrowButton}`)
+      .first()
+      .waitFor({state: 'visible'});
+
+    if (await continueBtn.isVisible()) {
+      await this.clickOnElementWithSelector(nextCardButton);
+    } else {
+      await this.clickOnElementWithSelector(nextCardArrowButton);
+    }
+  }
+
+  /**
+   * Function to navigate back to the previous card in the exploration player.
+   */
+  async goBackToPreviousCard(): Promise<void> {
+    await this.expectElementToBeVisible(previousCardButton);
+    await this.clickOnElementWithSelector(previousCardButton);
+    await this.expectElementToBeVisible(nextCardArrowButton);
+  }
+
+  /**
+   * Function to verify if the page does not have any input fields.
+   */
+  async verifyCannotAnswerPreviouslyAnsweredQuestion(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const inputCount = await this.page.locator('input').count();
+    if (inputCount > 0) {
+      throw new Error('The page should not have any input fields.');
+    }
+    showMessage('The page does not have any input fields, as expected.');
+  }
+
+  /**
+   * Function to delay execution to avoid fatigue detection.
+   */
+  async simulateDelayToAvoidFatigueDetection(): Promise<void> {
+    await this.page.waitForTimeout(10000);
+  }
+
+  /**
+   * Function to view previous responses by expanding the responses dropdown.
+   */
+  async viewPreviousResponses(): Promise<void> {
+    await this.expectElementToBeVisible(responsesDropdownSelector);
+    const divCounts = await this.page
+      .locator(`${learnerViewCardSelector} div`)
+      .count();
+    await this.clickOnElementWithSelector(responsesDropdownSelector);
+    const newDivCounts = await this.page
+      .locator(`${learnerViewCardSelector} div`)
+      .count();
+
+    if (newDivCounts <= divCounts) {
+      throw new Error(
+        'No additional responses found. The dropdown did not expand.'
+      );
+    }
+  }
+
+  /**
+   * Function to verify the number of previous responses displayed.
+   * @param {number} expectedNumberOfResponses - Expected number of previous responses.
+   */
+  async verifyNumberOfPreviousResponsesDisplayed(
+    expectedNumberOfResponses: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(responseSelector);
+    const count = await this.page.locator(responseSelector).count();
+    if (count !== expectedNumberOfResponses) {
+      throw new Error(
+        `Expected ${expectedNumberOfResponses} responses, but got ${count}.`
+      );
+    }
   }
 
   /**
