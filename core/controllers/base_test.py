@@ -705,12 +705,7 @@ class MissingHandlerArgsTests(test_utils.GenericTestBase):
 
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({})
 
@@ -953,12 +948,7 @@ class EscapingTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
 
@@ -1344,25 +1334,25 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
 
-            if handler.get != base.BaseHandler.get:
+            if hasattr(handler, 'get'):
                 handler_is_decorated = hasattr(handler.get, '__wrapped__')
                 handlers_checked.append(
                     (handler.__name__, 'GET', handler_is_decorated)
                 )
 
-            if handler.post != base.BaseHandler.post:
+            if hasattr(handler, 'post'):
                 handler_is_decorated = hasattr(handler.post, '__wrapped__')
                 handlers_checked.append(
                     (handler.__name__, 'POST', handler_is_decorated)
                 )
 
-            if handler.put != base.BaseHandler.put:
+            if hasattr(handler, 'put'):
                 handler_is_decorated = hasattr(handler.put, '__wrapped__')
                 handlers_checked.append(
                     (handler.__name__, 'PUT', handler_is_decorated)
                 )
 
-            if handler.delete != base.BaseHandler.delete:
+            if hasattr(handler, 'delete'):
                 handler_is_decorated = hasattr(handler.delete, '__wrapped__')
                 handlers_checked.append(
                     (handler.__name__, 'DELETE', handler_is_decorated)
@@ -1821,13 +1811,13 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             handler_request_methods = []
-            if handler.get != base.BaseHandler.get:
+            if hasattr(handler, 'get'):
                 handler_request_methods.append('GET')
-            if handler.put != base.BaseHandler.put:
+            if hasattr(handler, 'put'):
                 handler_request_methods.append('PUT')
-            if handler.post != base.BaseHandler.post:
+            if hasattr(handler, 'post'):
                 handler_request_methods.append('POST')
-            if handler.delete != base.BaseHandler.delete:
+            if hasattr(handler, 'delete'):
                 handler_request_methods.append('DELETE')
             methods_defined_in_schema = handler.HANDLER_ARGS_SCHEMAS.keys()
 
@@ -2192,12 +2182,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'put' method does
-        # not match with the signature of super class's (BaseHandler) 'put'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def put(self) -> None:  # type: ignore[override]
+        def put(self) -> None:
             assert self.normalized_payload is not None
             exploration_id = self.normalized_payload['exploration_id']
             if exploration_id != 'random_exp_id':
@@ -2320,12 +2305,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
             'POST': {'arg_a': {'schema': {'type': 'basestring'}}}
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.render_json({})
 
     def setUp(self) -> None:
@@ -2406,6 +2386,7 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, str] = {}
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     def setUp(self) -> None:
         super(
@@ -2421,7 +2402,45 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
-            self.get_json('/mock', expected_status_int=404)
+            self.get_json('/mock', expected_status_int=405)
+
+    def test_post_request_on_handler_without_post_returns_405(self) -> None:
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock',
+                {},
+                expected_status_int=405,
+            )
+
+
+class HeadRequestWithoutGetTests(test_utils.GenericTestBase):
+    """Tests HEAD requests on a handler that does not support GET."""
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock handler that only supports POST."""
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+        def post(self) -> None:
+            """Handles POST requests."""
+            self.render_json({})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_head_request_without_get_returns_405_with_allow(self) -> None:
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.head('/mock', status=405)
+            self.assertEqual(response.headers['Allow'], 'POST')
 
 
 class MockHandlerNormalizedRequestDict(TypedDict):
@@ -2450,12 +2469,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
@@ -2558,12 +2572,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self, entity_type: str, entity_id: str) -> None:  # type: ignore[override]
+        def post(self, entity_type: str, entity_id: str) -> None:
             """Saves an image uploaded by a content creator."""
             assert self.normalized_payload is not None
             assert self.normalized_request is not None
@@ -2680,12 +2689,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             'POST': {'mock_int': {'schema': {'type': 'int'}}}
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 
@@ -2694,12 +2698,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     ):
         """Mock handler without schema."""
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 

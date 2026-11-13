@@ -244,6 +244,10 @@ class BaseHandler(
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    # Status code used when the handler does not define the requested HTTP
+    # method. Handlers that stand for a missing resource override this to 404.
+    UNSUPPORTED_METHOD_STATUS_CODE = 405
+
     # Here we use type Any because the sub-classes of BaseHandler can contain
     # different schemas with different types of values, like str, complex Dicts
     # and etc.
@@ -478,7 +482,8 @@ class BaseHandler(
         if not schema_validation_succeeded:
             return
 
-        super().dispatch()
+        if not self._handled_as_unsupported_method():
+            super().dispatch()
 
     def validate_and_normalize_args(self) -> None:
         """Validates schema for controller layer handler class arguments.
@@ -563,9 +568,8 @@ class BaseHandler(
         # This check ensures that if a request method is not defined
         # in the handler class then schema validation will not raise
         # NotImplementedError for that corresponding request method.
-        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
-            getattr(self.__class__, request_method.lower())
-            == getattr(BaseHandler, request_method.lower())
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and not hasattr(
+            self.__class__, request_method.lower()
         ):
             return
 
@@ -671,57 +675,71 @@ class BaseHandler(
             or self.current_user_is_site_maintainer
         )
 
-    # Here we use type Any because the sub-classes of 'Basehandler' can have
-    # 'get' method with different number of arguments and types.
-    def get(
-        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
-    ) -> None:
-        """Base method to handle GET requests."""
-        logging.warning('Invalid URL requested: %s', self.request.uri)
-        self.error(404)
-        values: ResponseValueDict = {
-            'error': 'Could not find the resource %s.' % self.request.uri,
-            'status_code': 404,
-        }
-        self._render_exception(values)
+    def _handled_as_unsupported_method(self) -> bool:
+        """Responds with Oppia's 404 if this handler lacks the requested
+        HTTP method.
 
-    # Here we use type Any because the sub-classes of 'Basehandler' can have
-    # 'post' method with different number of arguments and types.
-    def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
-        """Base method to handle POST requests.
-
-        Raises:
-            NotFoundException. Resource not found error (error code 404).
+        Returns:
+            bool. Whether the request was handled as an unsupported method.
         """
-        raise self.NotFoundException
+        http_method = self.request.method.lower()
+        if http_method in ('get', 'post', 'put', 'delete') and not hasattr(
+            self.__class__, http_method
+        ):
+            self._handle_unsupported_method(http_method)
+            return True
+        return False
 
-    # Here we use type Any because the sub-classes of 'Basehandler' can have
-    # 'put' method with different number of arguments and types.
-    def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
-        """Base method to handle PUT requests.
+    def _handle_unsupported_method(self, method_name: str) -> None:
+        """Responds with an error for an HTTP method that this handler does
+        not define: 405 with an Allow header, or 404 for handlers that
+        represent a missing resource (see Error404Handler).
 
-        Raises:
-            NotFoundException. Resource not found error (error code 404).
+        Args:
+            method_name: str. Lowercase HTTP method name.
         """
-        raise self.NotFoundException
-
-    # Here we use type Any because the sub-classes of 'Basehandler' can have
-    # 'delete' method with different number of arguments and types.
-    def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
-        """Base method to handle DELETE requests.
-
-        Raises:
-            NotFoundException. Resource not found error (error code 404).
-        """
-        raise self.NotFoundException
+        if self.UNSUPPORTED_METHOD_STATUS_CODE == 404:
+            logging.warning('Invalid URL requested: %s', self.request.uri)
+            self.error(404)
+            self._render_exception(
+                {
+                    'error': 'Could not find the resource %s.'
+                    % self.request.uri,
+                    'status_code': 404,
+                }
+            )
+            return
+        allowed = [
+            method.upper()
+            for method in ('get', 'post', 'put', 'delete')
+            if hasattr(self.__class__, method)
+        ]
+        if 'GET' in allowed:
+            allowed.append('HEAD')
+        logging.warning(
+            'Method %s not allowed for %s', method_name, self.request.uri
+        )
+        self.error(405)
+        self._render_exception(
+            {
+                'error': 'Method %s not allowed for %s.'
+                % (method_name.upper(), self.request.uri),
+                'status_code': 405,
+            }
+        )
+        self.response.headers['Allow'] = ', '.join(allowed)
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
     def head(self, *args: Any, **kwargs: Any) -> None:
-        """Method to handle HEAD requests. The webapp library automatically
-        makes sure that HEAD only returns the headers of GET request.
+        """Handles HEAD requests as GET, minus the body (RFC 9110 9.3.2).
+        If GET is not supported, responds with 405 and an accurate Allow
+        header.
         """
-        return self.get(*args, **kwargs)
+        if not hasattr(self.__class__, 'get'):
+            self._handle_unsupported_method('head')
+            return
+        getattr(self, 'get')(*args, **kwargs)
 
     # TODO(#16539): Once all the places are fixed with the type of value
     # that is rendered to JSON, then please remove Sequence[Mapping[str, Any]]
@@ -1056,7 +1074,9 @@ class BaseHandler(
 class Error404Handler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles 404 errors."""
 
-    pass
+    # This handler is the catch-all for URLs that match no route, so every
+    # request method must be answered with a 404 rather than a 405.
+    UNSUPPORTED_METHOD_STATUS_CODE = 404
 
 
 class RaiseErrorOnGet:
@@ -1203,6 +1223,7 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     def get(self) -> None:
+        """Handles GET requests."""
         csrf_token = CsrfTokenManager.create_csrf_token(self.user_id)
         self.render_json(
             {

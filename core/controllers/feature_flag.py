@@ -51,6 +51,7 @@ class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         # This handler is gated by the dummy_feature_flag_for_e2e_tests flag,
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
