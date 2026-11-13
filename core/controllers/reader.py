@@ -2413,6 +2413,11 @@ class StateVersionHistoryHandler(
         if version_history is None:
             raise self.NotFoundException
 
+        # The editor can ask about a card that is not in this version, e.g. a
+        # card that was added or renamed in changes that are not saved yet.
+        if state_name not in version_history.state_version_history:
+            raise self.NotFoundException
+
         state_version_history = version_history.state_version_history[
             state_name
         ]

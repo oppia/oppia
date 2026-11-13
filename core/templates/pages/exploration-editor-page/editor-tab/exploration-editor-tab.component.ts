@@ -55,6 +55,7 @@ import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from '../services/change-list.service';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -74,6 +75,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
+  stateIsNotSavedYet: boolean = false;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -99,7 +101,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
     private alertsService: AlertsService,
-    private applicationRef: ApplicationRef
+    private applicationRef: ApplicationRef,
+    private changeListService: ChangeListService
   ) {}
 
   private smoothScrollTo(targetY: number, duration: number): void {
@@ -550,11 +553,18 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
       const latestVersion =
         this.versionHistoryService.getLatestVersionOfExploration();
-      if (latestVersion !== null) {
+      // A card that was added or renamed in the unsaved changes is not in the
+      // latest saved version under its current name. A renamed card's history
+      // is fetched by its saved name, and a new card has no history yet.
+      const savedStateName = this.changeListService.getSavedStateName(
+        this.stateName
+      );
+      this.stateIsNotSavedYet = savedStateName === null;
+      if (latestVersion !== null && savedStateName !== null) {
         this.versionHistoryBackendApiService
           .fetchStateVersionHistoryAsync(
             this.pageContextService.getExplorationId() ?? '',
-            stateData.name ?? '',
+            savedStateName,
             latestVersion
           )
           .then(response => {
