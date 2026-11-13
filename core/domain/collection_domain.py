@@ -1777,3 +1777,261 @@ class CollectionSummary:
             )
 
         self.contributor_ids = list(self.contributors_summary.keys())
+
+
+# The list of supported commit types for a snapshot metadata model.
+# Matches VersionedModel.COMMIT_TYPE_CHOICES.
+SUPPORTED_COMMIT_TYPES: Final[List[str]] = [
+    feconf.COMMIT_TYPE_CREATE,
+    feconf.COMMIT_TYPE_REVERT,
+    feconf.COMMIT_TYPE_EDIT,
+    feconf.COMMIT_TYPE_DELETE,
+]
+
+
+class CollectionSnapshotMetadataDict(TypedDict):
+    """Dictionary representing the CollectionSnapshotMetadata object."""
+
+    collection_id: str
+    version: int
+    committer_id: str
+    commit_type: str
+    commit_message: Optional[str]
+    commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]]
+    commit_cmds_user_ids: List[str]
+    content_user_ids: List[str]
+    created_on: datetime.datetime
+    last_updated: datetime.datetime
+    deleted: bool
+
+
+class CollectionSnapshotMetadata:
+    """Domain object for collection snapshot metadata."""
+
+    # The list of supported commit types for a snapshot metadata model.
+    # Matches VersionedModel.COMMIT_TYPE_CHOICES.
+    SUPPORTED_COMMIT_TYPES: Final[List[str]] = SUPPORTED_COMMIT_TYPES
+
+    def __init__(
+        self,
+        collection_id: str,
+        version: int,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]],
+        commit_cmds_user_ids: List[str],
+        content_user_ids: List[str],
+        created_on: datetime.datetime,
+        last_updated: datetime.datetime,
+        deleted: bool,
+    ) -> None:
+        """Constructs a CollectionSnapshotMetadata domain object.
+
+        Args:
+            collection_id: str. The id of the collection.
+            version: int. The version of the collection.
+            committer_id: str. The user ID of the committer.
+            commit_type: str. The type of commit.
+            commit_message: str|None. The commit description message, or None.
+            commit_cmds: list(dict). A list of commands describing changes.
+            commit_cmds_user_ids: list(str). List of user IDs in commit_cmds.
+            content_user_ids: list(str). List of user IDs in the content.
+            created_on: datetime.datetime. The creation time of the snapshot.
+            last_updated: datetime.datetime. The last updated time of the
+                snapshot.
+            deleted: bool. Whether the snapshot model was deleted.
+        """
+        self.collection_id = collection_id
+        self.version = version
+        self.committer_id = committer_id
+        self.commit_type = commit_type
+        self.commit_message = commit_message
+        self.commit_cmds = commit_cmds
+        self.commit_cmds_user_ids = commit_cmds_user_ids
+        self.content_user_ids = content_user_ids
+        self.created_on = created_on
+        self.last_updated = last_updated
+        self.deleted = deleted
+
+    def to_dict(self) -> CollectionSnapshotMetadataDict:
+        """Returns a dict representing this CollectionSnapshotMetadata domain
+        object.
+
+        Returns:
+            CollectionSnapshotMetadataDict. A dict, mapping all fields of
+            CollectionSnapshotMetadata instance.
+        """
+        return {
+            'collection_id': self.collection_id,
+            'version': self.version,
+            'committer_id': self.committer_id,
+            'commit_type': self.commit_type,
+            'commit_message': self.commit_message,
+            'commit_cmds': self.commit_cmds,
+            'commit_cmds_user_ids': self.commit_cmds_user_ids,
+            'content_user_ids': self.content_user_ids,
+            'created_on': self.created_on,
+            'last_updated': self.last_updated,
+            'deleted': self.deleted,
+        }
+
+    @classmethod
+    def from_dict(
+        cls,
+        snapshot_metadata_dict: CollectionSnapshotMetadataDict,
+    ) -> CollectionSnapshotMetadata:
+        """Returns a CollectionSnapshotMetadata domain object from a dict.
+
+        Args:
+            snapshot_metadata_dict: CollectionSnapshotMetadataDict. The dict
+                representation of the CollectionSnapshotMetadata object.
+
+        Returns:
+            CollectionSnapshotMetadata. The corresponding
+            CollectionSnapshotMetadata domain object.
+        """
+        return cls(
+            snapshot_metadata_dict['collection_id'],
+            snapshot_metadata_dict['version'],
+            snapshot_metadata_dict['committer_id'],
+            snapshot_metadata_dict['commit_type'],
+            snapshot_metadata_dict['commit_message'],
+            snapshot_metadata_dict['commit_cmds'],
+            snapshot_metadata_dict['commit_cmds_user_ids'],
+            snapshot_metadata_dict['content_user_ids'],
+            snapshot_metadata_dict['created_on'],
+            snapshot_metadata_dict['last_updated'],
+            snapshot_metadata_dict['deleted'],
+        )
+
+    def validate(self) -> None:
+        """Validates various properties of the CollectionSnapshotMetadata.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                CollectionSnapshotMetadata are invalid.
+        """
+        if not isinstance(self.collection_id, str):
+            raise utils.ValidationError(
+                'Expected collection_id to be a string, received %s'
+                % self.collection_id
+            )
+        if not self.collection_id.isalnum():
+            raise utils.ValidationError(
+                'Expected collection_id to be a nonempty alphanumeric string, '
+                'received %s' % self.collection_id
+            )
+
+        # Here we check isinstance(..., bool) explicitly because bool is a
+        # subclass of int in Python, and we want to strictly reject bools.
+        if not isinstance(self.version, int) or isinstance(self.version, bool):
+            raise utils.ValidationError(
+                'Expected version to be an int, received %s' % self.version
+            )
+        if self.version <= 0:
+            raise utils.ValidationError(
+                'Expected version to be greater than 0, received %s'
+                % self.version
+            )
+
+        if not isinstance(self.committer_id, str):
+            raise utils.ValidationError(
+                'Expected committer_id to be a string, received %s'
+                % self.committer_id
+            )
+        if not utils.is_user_id_valid(
+            self.committer_id,
+            allow_system_user_id=True,
+            allow_pseudonymous_id=True,
+        ):
+            raise utils.ValidationError(
+                'Expected committer_id to be a valid user ID, received %s'
+                % self.committer_id
+            )
+
+        if not isinstance(self.commit_type, str):
+            raise utils.ValidationError(
+                'Expected commit_type to be a string, received %s'
+                % self.commit_type
+            )
+        if self.commit_type not in self.SUPPORTED_COMMIT_TYPES:
+            raise utils.ValidationError(
+                'Invalid commit_type: %s. Must be one of %s'
+                % (self.commit_type, self.SUPPORTED_COMMIT_TYPES)
+            )
+
+        if self.commit_message is not None and not isinstance(
+            self.commit_message, str
+        ):
+            raise utils.ValidationError(
+                'Expected commit_message to be a string or None, received %s'
+                % self.commit_message
+            )
+
+        if not isinstance(self.commit_cmds, list):
+            raise utils.ValidationError(
+                'Expected commit_cmds to be a list, received %s'
+                % self.commit_cmds
+            )
+        for commit_cmd in self.commit_cmds:
+            if not isinstance(commit_cmd, dict):
+                raise utils.ValidationError(
+                    'Expected commit_cmd to be a dict, received %s' % commit_cmd
+                )
+            try:
+                CollectionChange(commit_cmd)
+            except Exception as e:
+                raise utils.ValidationError(
+                    'Commit command %s is not valid: %s' % (commit_cmd, e)
+                ) from e
+
+        if not isinstance(self.commit_cmds_user_ids, list):
+            raise utils.ValidationError(
+                'Expected commit_cmds_user_ids to be a list, received %s'
+                % self.commit_cmds_user_ids
+            )
+        for user_id in self.commit_cmds_user_ids:
+            if not isinstance(user_id, str) or not utils.is_user_id_valid(
+                user_id
+            ):
+                raise utils.ValidationError(
+                    'Expected commit_cmds_user_ids to contain valid user IDs, '
+                    'received %s' % user_id
+                )
+
+        if not isinstance(self.content_user_ids, list):
+            raise utils.ValidationError(
+                'Expected content_user_ids to be a list, received %s'
+                % self.content_user_ids
+            )
+        for user_id in self.content_user_ids:
+            if not isinstance(user_id, str) or not utils.is_user_id_valid(
+                user_id
+            ):
+                raise utils.ValidationError(
+                    'Expected content_user_ids to contain valid user IDs, '
+                    'received %s' % user_id
+                )
+
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected created_on to be a datetime.datetime, received %s'
+                % self.created_on
+            )
+
+        if not isinstance(self.last_updated, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected last_updated to be a datetime.datetime, received %s'
+                % self.last_updated
+            )
+        if self.last_updated < self.created_on:
+            raise utils.ValidationError(
+                'Expected last_updated %s to be greater than or equal to '
+                'created_on %s' % (self.last_updated, self.created_on)
+            )
+
+        if not isinstance(self.deleted, bool):
+            raise utils.ValidationError(
+                'Expected deleted to be a bool, received %s' % self.deleted
+            )
