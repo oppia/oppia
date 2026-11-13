@@ -220,6 +220,7 @@ const explorationSummaryTileTitleSpanSelector =
   '.e2e-test-exp-summary-tile-title span span';
 const profileMenuLink = '.e2e-test-profile-link';
 const profileContainerSelector = '.e2e-test-profile-container';
+const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1436,6 +1437,18 @@ export class LoggedInUser extends BaseUser {
       );
       expect(bodyText).toEqual(body);
     }
+  }
+
+  /**
+   * Verifies that the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectResponseFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.expectElementToBeVisible(latestFeedbackMessageSelector);
+    await this.expectTextContentToBe(
+      latestFeedbackMessageSelector,
+      expectedFeedback
+    );
   }
 
   /**
