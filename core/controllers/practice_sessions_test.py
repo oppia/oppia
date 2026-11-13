@@ -1398,6 +1398,49 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Skill 1',
         )
 
+        # Both stories use module ID 1, so the story_id query param must select
+        # the module from the requested story.
+        json_response = self.get_json(
+            '%s/staging/%s/module/1?story_id=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                story_b_id,
+            )
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id2],
+            'Skill 2',
+        )
+
+        # Passing the first story explicitly continues to resolve its module.
+        json_response = self.get_json(
+            '%s/staging/%s/module/1?story_id=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                story_a_id,
+            )
+        )
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
+        )
+
+        # An unknown story_id must not fall back to another story's module.
+        json_response = self.get_json(
+            '%s/staging/%s/module/1?story_id=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                'nonexistent_story',
+            )
+        )
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
     def test_get_module_skills_module_not_found_in_any_story(self) -> None:
         story_id = 'story_id'
         exp_id = 'exp_1'

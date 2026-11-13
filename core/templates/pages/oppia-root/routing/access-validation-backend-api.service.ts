@@ -248,7 +248,8 @@ export class AccessValidationBackendApiService {
   validateAccessToEndOfModulePage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
-    moduleId: string
+    moduleId: string,
+    storyId?: string
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.END_OF_MODULE_PAGE_ACCESS_VALIDATOR,
@@ -258,7 +259,12 @@ export class AccessValidationBackendApiService {
         module_id: moduleId,
       }
     );
-    return this.http.get<void>(url).toPromise();
+    // Module IDs are only unique within a story, so the story must be sent
+    // explicitly when the URL identifies one.
+    const params = storyId
+      ? new HttpParams().set('story_id', storyId)
+      : new HttpParams();
+    return this.http.get<void>(url, {params}).toPromise();
   }
 
   validateAccessToMasteryChallengePage(

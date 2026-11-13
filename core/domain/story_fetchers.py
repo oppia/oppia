@@ -756,17 +756,26 @@ def get_all_nodes_for_topic(
 
 def get_all_modules_with_stories_for_topic(
     topic: topic_domain.Topic,
+    story_id: Optional[str] = None,
 ) -> List[Tuple[story_domain.Story, story_domain.Module]]:
-    """Returns modules paired with the first published story in the topic.
+    """Returns modules paired with a published story in the topic.
 
     Args:
         topic: Topic. The topic object.
+        story_id: str|None. If provided, only modules from this story are
+            returned. The story must be a published canonical story of the
+            topic. If None, modules from the first published story are
+            returned.
 
     Returns:
-        list(tuple(Story, Module)). Story-module pairs from the first
-        published story.
+        list(tuple(Story, Module)). Story-module pairs from the requested
+        story, or from the first published story when story_id is None.
     """
     story_ids = topic.get_canonical_story_ids(include_only_published=True)
+    if story_id is not None:
+        if story_id not in story_ids:
+            return []
+        story_ids = [story_id]
     stories = get_stories_by_ids(story_ids)
     for story in stories:
         if story is not None:

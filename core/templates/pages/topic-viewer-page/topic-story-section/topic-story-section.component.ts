@@ -49,6 +49,7 @@ import {
 
 const MODULE_MASTERED_QUERY_PARAM = 'module_mastered';
 const MODULE_ID_QUERY_PARAM = 'module_id';
+const STORY_ID_QUERY_PARAM = 'story_id';
 const MOBILE_SCREEN_BREAKPOINT = 480;
 const DEFAULT_FALLBACK_ACCENT_COLOR = '#00645c';
 const DEFAULT_PRACTICE_BG_COLOR = '#ecf7f6';
@@ -836,7 +837,8 @@ export class TopicStorySectionComponent
     return this.topicStorySectionBackendDataService.getEndOfModuleUrl(
       moduleId,
       this.classroomUrlFragment,
-      this.topicUrlFragment
+      this.topicUrlFragment,
+      this.storySummary.getId()
     );
   }
 
@@ -987,11 +989,23 @@ export class TopicStorySectionComponent
     const moduleIdValues = this.urlService.getQueryFieldValuesAsList(
       MODULE_ID_QUERY_PARAM
     );
+    const storyIdValues =
+      this.urlService.getQueryFieldValuesAsList(STORY_ID_QUERY_PARAM);
 
     if (
       moduleMasteredFlagValues.length === 0 ||
       moduleMasteredFlagValues[0] !== 'true' ||
       moduleIdValues.length === 0
+    ) {
+      return;
+    }
+
+    // The same module position exists in every story, so only show the modal
+    // in the story that the practice session belonged to. URLs created before
+    // story scoping do not include a story_id and keep the legacy behavior.
+    if (
+      storyIdValues.length > 0 &&
+      storyIdValues[0] !== this.storySummary.getId()
     ) {
       return;
     }

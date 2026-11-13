@@ -24,9 +24,12 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
+from core.platform import models
 from core.tests import test_utils
 
 FeatureStages = feature_flag_domain.FeatureStages
+
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 
 class FeatureNames(enum.Enum):
@@ -212,3 +215,54 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 )
             )
             self.assertIsNotNone(updated_feature_flag)
+
+    def test_legacy_storage_name_is_used_when_new_name_is_absent(
+        self,
+    ) -> None:
+        config_models.FeatureFlagConfigModel.create(
+            'legacy_feature_a', True, 40, ['user_group_1']
+        )
+        swap_legacy_names = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME',
+            {FeatureNames.FEATURE_A.value: 'legacy_feature_a'},
+        )
+
+        with swap_legacy_names:
+            feature_flag_config = (
+                registry.Registry.load_feature_flag_config_from_storage(
+                    FeatureNames.FEATURE_A.value
+                )
+            )
+
+        self.assertIsNotNone(feature_flag_config)
+        assert feature_flag_config is not None
+        self.assertTrue(feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(feature_flag_config.rollout_percentage, 40)
+        self.assertEqual(feature_flag_config.user_group_ids, ['user_group_1'])
+
+    def test_new_storage_name_wins_over_legacy_name(self) -> None:
+        config_models.FeatureFlagConfigModel.create(
+            'legacy_feature_a', True, 40, ['user_group_1']
+        )
+        config_models.FeatureFlagConfigModel.create(
+            FeatureNames.FEATURE_A.value, False, 10, ['user_group_2']
+        )
+        swap_legacy_names = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME',
+            {FeatureNames.FEATURE_A.value: 'legacy_feature_a'},
+        )
+
+        with swap_legacy_names:
+            feature_flag_config = (
+                registry.Registry.load_feature_flag_config_from_storage(
+                    FeatureNames.FEATURE_A.value
+                )
+            )
+
+        self.assertIsNotNone(feature_flag_config)
+        assert feature_flag_config is not None
+        self.assertFalse(feature_flag_config.force_enable_for_all_users)
+        self.assertEqual(feature_flag_config.rollout_percentage, 10)
+        self.assertEqual(feature_flag_config.user_group_ids, ['user_group_2'])

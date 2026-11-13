@@ -374,6 +374,15 @@ export class StoryContents {
         this._nodes[i].removeDestinationNodeId(nodeId);
       }
     }
+    // Keep module membership consistent with the remaining nodes. Otherwise a
+    // later story validation would reject a module that references the deleted
+    // node.
+    this._modules.forEach(module => {
+      const moduleNodeIds = module.getNodeIds();
+      if (moduleNodeIds.indexOf(nodeId) !== -1) {
+        module.setNodeIds(moduleNodeIds.filter(id => id !== nodeId));
+      }
+    });
     this._nodes.splice(this.getNodeIndex(nodeId), 1);
   }
 

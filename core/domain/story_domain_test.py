@@ -3120,6 +3120,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(len(self.story.story_contents.nodes), 1)
+        self.assertEqual(
+            self.story.story_contents.get_module('module_1').node_ids, []
+        )
 
     def test_create_module(self) -> None:
         module = story_domain.Module(

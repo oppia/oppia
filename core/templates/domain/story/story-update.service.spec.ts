@@ -525,6 +525,33 @@ describe('Story update service', () => {
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
   });
 
+  it('should move new chapter to last module when modules are disabled', () => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
+    _sampleStory
+      .getStoryContents()
+      .addModule(
+        ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
+      );
+
+    storyUpdateService.addStoryNode(_sampleStory, 'Title 3');
+
+    expect(
+      _sampleStory.getStoryContents().getModules()[0].getNodeIds()
+    ).toEqual(['node_1', 'node_2', 'node_3']);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'add_story_node',
+        node_id: 'node_3',
+        title: 'Title 3',
+      },
+      {
+        cmd: 'move_node_to_module',
+        node_id: 'node_3',
+        to_module_id: 'module_1',
+      },
+    ]);
+  });
+
   it('should create a proper backend change dict for adding a story node', () => {
     storyUpdateService.addStoryNode(_sampleStory, 'Title 2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([

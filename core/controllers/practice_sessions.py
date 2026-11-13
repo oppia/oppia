@@ -36,6 +36,7 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     """
 
     selected_subtopic_ids: Optional[List[int]]
+    story_id: Optional[str]
 
 
 class PracticeSessionsPageDataHandler(
@@ -64,6 +65,10 @@ class PracticeSessionsPageDataHandler(
                 'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'},
                 'default_value': None,
             },
+            'story_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -87,6 +92,10 @@ class PracticeSessionsPageDataHandler(
         )
         node_id = self.request.route_kwargs.get('node_id')
         module_id = self.request.route_kwargs.get('module_id')
+        # An empty story_id is equivalent to omitting it, which preserves
+        # compatibility with module URLs created before story-scoped modules
+        # were introduced.
+        story_id = self.normalized_request.get('story_id') or None
 
         selected_skill_ids: List[str] = []
         if selected_subtopic_ids is not None:
@@ -97,7 +106,7 @@ class PracticeSessionsPageDataHandler(
             selected_skill_ids = self._get_skill_ids_for_node(topic, node_id)
         elif module_id is not None:
             selected_skill_ids = self._get_skill_ids_for_module(
-                topic, module_id
+                topic, module_id, story_id
             )
         else:
             # Mastery challenge: collect all skills from all subtopics.
@@ -156,24 +165,31 @@ class PracticeSessionsPageDataHandler(
         return []
 
     def _get_story_and_module_for_module_id(
-        self, topic: topic_domain.Topic, module_id: str
+        self,
+        topic: topic_domain.Topic,
+        module_id: str,
+        story_id: Optional[str] = None,
     ) -> Optional[Tuple[story_domain.Story, story_domain.Module]]:
         """Returns the story-module pair matching the given module ID.
 
         The module_id parameter is a 1-based index that maps to the nth module
-        in the first published story of the topic (e.g., '1' maps to the first
-        module).
+        in the specified published story of the topic (e.g., '1' maps to the
+        first module). If story_id is None, the first published story is used
+        for backward compatibility.
 
         Args:
             topic: Topic. The topic object.
             module_id: str. The module ID (1-based index).
+            story_id: str|None. The ID of the story that the module belongs to.
 
         Returns:
             tuple(Story, Module) or None. The matching story-module pair, or
             None if no matching module is found.
         """
         modules_with_stories = (
-            story_fetchers.get_all_modules_with_stories_for_topic(topic)
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic, story_id
+            )
         )
         if module_id.isascii() and module_id.isdigit():
             module_index = int(module_id)
@@ -182,23 +198,28 @@ class PracticeSessionsPageDataHandler(
         return None
 
     def _get_skill_ids_for_module(
-        self, topic: topic_domain.Topic, module_id: str
+        self,
+        topic: topic_domain.Topic,
+        module_id: str,
+        story_id: Optional[str] = None,
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given module.
 
         The module_id parameter is a 1-based index that maps to the nth module
-        in the first published story of the topic (e.g., '1' maps to the first
-        module).
+        in the specified published story of the topic (e.g., '1' maps to the
+        first module). If story_id is None, the first published story is used
+        for backward compatibility.
 
         Args:
             topic: Topic. The topic object.
             module_id: str. The module ID (1-based index).
+            story_id: str|None. The ID of the story that the module belongs to.
 
         Returns:
             list(str). The skill IDs for all nodes in the module.
         """
         story_module = self._get_story_and_module_for_module_id(
-            topic, module_id
+            topic, module_id, story_id
         )
         if story_module is None:
             return []

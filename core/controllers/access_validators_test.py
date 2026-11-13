@@ -748,6 +748,117 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=200,
         )
 
+    def test_end_of_module_page_uses_story_id_to_select_module(self) -> None:
+        def create_story_with_module(
+            story_id: str, exp_id: str, skill_id: str
+        ) -> None:
+            self.save_new_valid_exploration(exp_id, self.admin_id)
+            self.publish_exploration(self.admin_id, exp_id)
+            self.save_new_story(story_id, self.admin_id, self.topic_id)
+            topic_services.add_canonical_story(
+                self.admin_id, self.topic_id, story_id
+            )
+            story_services.update_story(
+                self.admin_id,
+                story_id,
+                [
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_ADD_STORY_NODE,
+                            'node_id': 'node_1',
+                            'title': 'Chapter 1',
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                            ),
+                            'node_id': 'node_1',
+                            'old_value': None,
+                            'new_value': exp_id,
+                        }
+                    ),
+                ],
+                'Added node.',
+            )
+            topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+            story_services.update_story(
+                self.admin_id,
+                story_id,
+                [
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                            ),
+                            'node_id': 'node_1',
+                            # Here we use cast because the empty list's type
+                            # cannot be inferred, and List[str] is needed to
+                            # match AcceptableChangeDictTypes.
+                            'old_value': cast(List[str], []),
+                            'new_value': [skill_id],
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': story_domain.CMD_CREATE_MODULE,
+                            'module_id': 'module_1',
+                            'title': 'Module 1',
+                            'description': 'First module',
+                            'node_ids': ['node_1'],
+                        }
+                    ),
+                ],
+                'Added acquired skill IDs and module.',
+            )
+
+        create_story_with_module('story_a', 'exp_a', self.skill_id1)
+        create_story_with_module('story_b', 'exp_b', self.skill_id2)
+
+        end_of_module_url = (
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '1',
+            )
+        )
+
+        # Without a story_id, the first published story is used.
+        self.get_html_response(end_of_module_url, expected_status_int=200)
+        # Each story's module ID 1 must be accessible when it is selected.
+        self.get_html_response(
+            '%s?story_id=%s' % (end_of_module_url, 'story_a'),
+            expected_status_int=200,
+        )
+        self.get_html_response(
+            '%s?story_id=%s' % (end_of_module_url, 'story_b'),
+            expected_status_int=200,
+        )
+        # An unknown story must not fall back to another story's module.
+        self.get_html_response(
+            '%s?story_id=%s' % (end_of_module_url, 'nonexistent_story'),
+            expected_status_int=404,
+        )
+        # The module ID is scoped to the selected story, so an out-of-range
+        # position is invalid even though another story has that many modules.
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/test/module/%s'
+            '?story_id=%s'
+            % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                'math',
+                'public-topic-name',
+                '2',
+                'story_a',
+            ),
+            expected_status_int=404,
+        )
+
     def test_end_of_module_page_with_out_of_range_module_id(self) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/module/%s'

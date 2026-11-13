@@ -81,6 +81,28 @@ class _MigrationPlan(NamedTuple):
     result: result.Result[Tuple[str, str], Tuple[str, Exception]]
 
 
+def _put_then_delete_migrated_model(
+    plan: _MigrationPlan,
+) -> result.Result[Tuple[str, str], Tuple[str, Exception]]:
+    """Writes a migrated model before deleting its deprecated key.
+
+    The delete must only run after the put succeeds. Otherwise a failed write
+    would remove the only persisted copy of the feature flag configuration.
+
+    Args:
+        plan: _MigrationPlan. The plan containing the model to write and the
+            deprecated key to delete.
+
+    Returns:
+        Result. The result recorded for the plan.
+    """
+    if plan.model_to_put is not None:
+        datastore_services.put_multi([plan.model_to_put])
+    if plan.key_to_delete is not None:
+        datastore_services.delete_multi([plan.key_to_delete])
+    return plan.result
+
+
 # Here we use type Any because the commit command dicts may contain
 # arbitrary attribute values that are not declared as a TypedDict.
 def _rewrite_commit_cmd(commit_cmd: Dict[str, Any]) -> Dict[str, Any]:
@@ -206,21 +228,19 @@ class StoryModulesMigrationJobBase(base_jobs.JobBase):
                 ),
             )
 
-        latest_story = story_fetchers.get_story_from_model(story_model)
         try:
+            latest_story = story_fetchers.get_story_from_model(story_model)
             latest_story.validate()
-        except Exception:
+        except Exception as e:
+            error_message = 'Story %s failed non-strict validation: %s' % (
+                story_id,
+                e,
+            )
+            logging.exception(error_message)
             return _MigrationPlan(
                 model_to_put=None,
                 key_to_delete=None,
-                result=result.Err(
-                    (
-                        story_id,
-                        Exception(
-                            'Story %s failed non-strict validation' % story_id
-                        ),
-                    )
-                ),
+                result=result.Err((story_id, Exception(error_message))),
             )
 
         target_story_contents_schema_version = (
@@ -492,6 +512,8 @@ class StoryModulesMigrationJobBase(base_jobs.JobBase):
 
         models_to_put = (
             successful_migration_plans
+            | 'Filter plans that only put models'
+            >> beam.Filter(lambda plan: plan.key_to_delete is None)
             | 'Get models to put'
             >> beam.FlatMap(
                 lambda plan: (
@@ -500,16 +522,10 @@ class StoryModulesMigrationJobBase(base_jobs.JobBase):
             )
         )
 
-        keys_to_delete = (
+        plans_with_keys_to_delete = (
             successful_migration_plans
-            | 'Get keys to delete'
-            >> beam.FlatMap(
-                lambda plan: (
-                    [plan.key_to_delete]
-                    if plan.key_to_delete is not None
-                    else []
-                )
-            )
+            | 'Filter plans that delete deprecated keys'
+            >> beam.Filter(lambda plan: plan.key_to_delete is not None)
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
@@ -517,10 +533,13 @@ class StoryModulesMigrationJobBase(base_jobs.JobBase):
                 models_to_put
                 | 'Put migrated models into the datastore' >> ndb_io.PutModels()
             )
-            unused_delete_results = (
-                keys_to_delete
-                | 'Delete migrated models from the datastore'
-                >> ndb_io.DeleteModels()
+            # The feature flag model must be written before its deprecated key
+            # is deleted, so this branch handles both operations sequentially
+            # instead of running them as independent Beam branches.
+            unused_flag_update_results = (
+                plans_with_keys_to_delete
+                | 'Put then delete feature flag config models'
+                >> beam.Map(_put_then_delete_migrated_model)
             )
 
         return (

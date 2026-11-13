@@ -53,6 +53,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   private sessionType: PracticeSessionType = PracticeSessionType.Mastery;
   private nodeId: string = '';
   private moduleId: string = '';
+  private storyId: string = '';
 
   constructor(
     private urlService: UrlService,
@@ -98,8 +99,8 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             node_id: this.nodeId,
           }
         );
-      case PracticeSessionType.Module:
-        return this.urlInterpolationService.interpolateUrl(
+      case PracticeSessionType.Module: {
+        const moduleDataUrl = this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.MODULE_PRACTICE_DATA_URL,
           {
             classroom_url_fragment: classroomUrlFragment,
@@ -107,6 +108,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             module_id: this.moduleId,
           }
         );
+        return this.storyId
+          ? this.urlService.addField(moduleDataUrl, 'story_id', this.storyId)
+          : moduleDataUrl;
+      }
       case PracticeSessionType.Legacy:
         return this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL,
@@ -143,8 +148,8 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             node_id: this.nodeId,
           }
         );
-      case PracticeSessionType.Module:
-        return this.urlInterpolationService.interpolateUrl(
+      case PracticeSessionType.Module: {
+        const endOfModuleUrl = this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.END_OF_MODULE_URL,
           {
             classroom_url_fragment: classroomUrlFragment,
@@ -152,6 +157,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             module_id: this.moduleId,
           }
         );
+        return this.storyId
+          ? this.urlService.addField(endOfModuleUrl, 'story_id', this.storyId)
+          : endOfModuleUrl;
+      }
       case PracticeSessionType.Legacy:
         return this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
@@ -197,6 +206,15 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
         'module_id',
         this.moduleId
       );
+      // The topic viewer renders one section per story, so the story must be
+      // included to show the mastered modal only for this module's story.
+      if (this.storyId) {
+        topicViewerUrl = this.urlService.addField(
+          topicViewerUrl,
+          'story_id',
+          this.storyId
+        );
+      }
     }
 
     this.practiceSessionsBackendApiService
@@ -257,6 +275,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   private _determineSessionType(): void {
     const nodeId = this.urlService.getNodeIdFromPracticeUrl();
     const moduleId = this.urlService.getModuleIdFromUrl();
+    const storyId = this.urlService.getStoryIdFromPracticeUrl();
 
     if (nodeId) {
       this.sessionType = PracticeSessionType.Lesson;
@@ -267,6 +286,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     ) {
       this.sessionType = PracticeSessionType.Module;
       this.moduleId = moduleId;
+      this.storyId = storyId;
     } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {

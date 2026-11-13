@@ -50,7 +50,8 @@ class MockAccessValidationBackendApiService {
   validateAccessToEndOfModulePage(
     _classroomUrlFragment: string,
     _topicUrlFragment: string,
-    _moduleId: string
+    _moduleId: string,
+    _storyId?: string
   ) {
     return Promise.resolve();
   }
@@ -272,8 +273,40 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1', '');
     expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should pass story_id when validating an end-of-module page', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToEndOfModulePage'
+    ).and.returnValue(Promise.resolve());
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {story_id: 'story_1'};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      module_id: '1',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith(
+      'math',
+      'algebra',
+      '1',
+      'story_1'
+    );
   }));
 
   it('should allow access for mastery challenge when no params are present', fakeAsync(() => {

@@ -44,6 +44,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const selectedSubtopicIds = route.queryParams.selected_subtopic_ids || '';
+    const storyId = route.queryParams.story_id || '';
     const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
@@ -77,7 +78,8 @@ export class PracticeSessionAccessGuard implements CanActivate {
           this.accessValidationBackendApiService.validateAccessToEndOfModulePage(
             classroomUrlFragment,
             topicUrlFragment,
-            moduleId
+            moduleId,
+            storyId
           );
       } else if (selectedSubtopicIds) {
         validationPromise =

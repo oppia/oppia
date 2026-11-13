@@ -435,6 +435,13 @@ describe('TopicStorySectionBackendDataService', () => {
   it('should build an end of module url', () => {
     const url = service.getEndOfModuleUrl('1', 'math', 'topic');
     expect(url).toContain('/test/module/1');
+    expect(url).not.toContain('story_id');
+  });
+
+  it('should add the story id to an end of module url', () => {
+    const url = service.getEndOfModuleUrl('1', 'math', 'topic', 'story_1');
+    expect(url).toContain('/test/module/1');
+    expect(url).toContain('story_id=story_1');
   });
 
   it('should return # for end of module url when fragments are missing', () => {

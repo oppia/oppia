@@ -20,13 +20,14 @@ import copy
 from unittest import mock
 
 from core import feconf
-from core.domain import caching_services, story_domain
+from core.domain import caching_services, story_domain, story_fetchers
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import story_module_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Any, Dict, Final, Type
+import result
+from typing import Any, Dict, Final, Sequence, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -222,6 +223,61 @@ class MigrateStoryModulesJobTests(job_test_utils.JobTestBase):
         self.assertEqual(migrated_flag_config.rollout_percentage, 20)
         self.assertEqual(migrated_flag_config.user_group_ids, ['user_group_2'])
 
+    def test_put_then_delete_migrated_model_puts_before_deleting(self) -> None:
+        flag_model = config_models.FeatureFlagConfigModel.create(
+            self.OLD_FLAG_NAME, True, 50, []
+        )
+        plan = story_module_migration_jobs._MigrationPlan(  # pylint: disable=protected-access
+            model_to_put=flag_model,
+            key_to_delete=flag_model.key,
+            result=result.Ok((self.NEW_FLAG_NAME, 'SUCCESS')),
+        )
+        call_order = []
+
+        def record_put(_entities: Sequence[datastore_services.Model]) -> None:
+            call_order.append('put')
+
+        def record_delete(_keys: Sequence[datastore_services.Key]) -> None:
+            call_order.append('delete')
+
+        with mock.patch.object(
+            datastore_services, 'put_multi', side_effect=record_put
+        ), mock.patch.object(
+            datastore_services, 'delete_multi', side_effect=record_delete
+        ):
+            returned_result = story_module_migration_jobs._put_then_delete_migrated_model(  # pylint: disable=protected-access
+                plan
+            )
+
+        self.assertEqual(call_order, ['put', 'delete'])
+        self.assertTrue(returned_result.is_ok())
+
+    def test_put_then_delete_migrated_model_skips_delete_when_put_fails(
+        self,
+    ) -> None:
+        flag_model = config_models.FeatureFlagConfigModel.create(
+            self.OLD_FLAG_NAME, True, 50, []
+        )
+        plan = story_module_migration_jobs._MigrationPlan(  # pylint: disable=protected-access
+            model_to_put=flag_model,
+            key_to_delete=flag_model.key,
+            result=result.Ok((self.NEW_FLAG_NAME, 'SUCCESS')),
+        )
+
+        with mock.patch.object(
+            datastore_services,
+            'put_multi',
+            side_effect=Exception('put failed'),
+        ), mock.patch.object(
+            datastore_services, 'delete_multi'
+        ) as delete_multi_mock:
+            with self.assertRaisesRegex(Exception, 'put failed'):
+                story_module_migration_jobs._put_then_delete_migrated_model(  # pylint: disable=protected-access
+                    plan
+                )
+
+        delete_multi_mock.assert_not_called()
+
     def test_outdated_story_snapshot_is_migrated(self) -> None:
         self._put_story_storage_model(
             self.STORY_1_ID,
@@ -346,11 +402,40 @@ class MigrateStoryModulesJobTests(job_test_utils.JobTestBase):
                     stderr=(
                         'STORY MODULE MIGRATED ERROR: "(\'story_1_id\', '
                         'Exception(\'Story story_1_id failed non-strict '
-                        'validation\'))": 1'
+                        'validation: Expected description to be a string, '
+                        'received 123\'))": 1'
                     )
                 )
             ]
         )
+
+    def test_snapshot_is_not_migrated_when_story_cannot_be_loaded(self) -> None:
+        self._put_story_storage_model(
+            self.STORY_1_ID,
+            self.latest_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+        )
+        self._put_story_snapshot_model(self.STORY_1_ID, self.v7_contents, 7)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_STORY, None, [self.STORY_1_ID]
+        )
+
+        with mock.patch.object(
+            story_fetchers,
+            'get_story_from_model',
+            side_effect=Exception('failed to load story'),
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stderr=(
+                            'STORY MODULE MIGRATED ERROR: "(\'story_1_id\', '
+                            'Exception(\'Story story_1_id failed non-strict '
+                            'validation: failed to load story\'))": 1'
+                        )
+                    )
+                ]
+            )
 
     def test_snapshot_migration_failure_is_reported(self) -> None:
         self._put_story_storage_model(
@@ -722,7 +807,8 @@ class AuditStoryModulesMigrationJobTests(job_test_utils.JobTestBase):
                     stderr=(
                         'STORY MODULE AUDIT ERROR: "(\'story_4_id\', '
                         'Exception(\'Story story_4_id failed non-strict '
-                        'validation\'))": 1'
+                        'validation: Expected description to be a string, '
+                        'received 123\'))": 1'
                     )
                 ),
             ]

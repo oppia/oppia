@@ -476,7 +476,6 @@ interface StoryMoveNodeToModuleChange {
   cmd: 'move_node_to_module';
   node_id: string;
   to_module_id: string;
-  old_position_index: number;
 }
 
 interface StoryUpdateModulePropertyChange {

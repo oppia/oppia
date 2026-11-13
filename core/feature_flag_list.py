@@ -22,7 +22,7 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import List
+from typing import Dict, List
 
 
 class FeatureNames(enum.Enum):
@@ -128,6 +128,13 @@ class FeatureNames(enum.Enum):
 # testers. 'prod' feature has been fully tested so that it can be enabled in the
 # production environment.
 
+
+# Maps renamed feature flags to their legacy storage names. The flag settings
+# stored under the legacy name are used until the migration job renames the
+# persisted model, so that deploying the rename does not reset the flag.
+FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME: Dict[str, str] = {
+    FeatureNames.STORY_EDITOR_MODULES.value: 'story_editor_arcs',
+}
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.

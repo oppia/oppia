@@ -2503,14 +2503,17 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should build end of module url with fragments', () => {
+    component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
 
     const moduleUrl = component.getEndOfModuleUrl('1');
     expect(moduleUrl).toContain('fractions/test/module/1');
+    expect(moduleUrl).toContain('story_id=story_id_1');
   });
 
   it('should fallback end of module url when fragments are missing', () => {
+    component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
 
@@ -3092,6 +3095,9 @@ describe('TopicStorySectionComponent', () => {
       if (fieldName === 'module_id') {
         return ['1'];
       }
+      if (fieldName === 'story_id') {
+        return ['story_id_1'];
+      }
       return [];
     });
 
@@ -3106,6 +3112,55 @@ describe('TopicStorySectionComponent', () => {
       windowClass: 'oppia-module-mastered-modal',
     });
     expect(component.isModulePracticeCompleted(0)).toBe(true);
+  }));
+
+  it('should not show the mastered modal for a different story', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'First module',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'module_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'module_id') {
+        return ['1'];
+      }
+      if (fieldName === 'story_id') {
+        return ['another_story'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    tick();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
   it('should not show the mastered modal when module_id does not start with a digit', fakeAsync(() => {

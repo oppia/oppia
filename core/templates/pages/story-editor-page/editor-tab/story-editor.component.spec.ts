@@ -1098,6 +1098,26 @@ describe('Story Editor Component having three story nodes', () => {
     ]);
   });
 
+  it('should reconcile existing modules when modules are disabled', () => {
+    mockPlatformFeatureService.status.StoryEditorModules = {
+      isEnabled: false,
+    };
+
+    component.storyContents = story.getStoryContents();
+    component.storyContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_3'])
+    );
+
+    component._initEditor();
+
+    expect(component.storyContents.getModules().length).toBe(1);
+    expect(component.storyContents.getModules()[0].getNodeIds()).toEqual([
+      'node_3',
+      'node_1',
+      'node_2',
+    ]);
+  });
+
   it('should return true when node index is zero for isSameModule', () => {
     expect(component.isSameModule(0)).toBe(true);
   });

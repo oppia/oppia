@@ -672,6 +672,26 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate access to end of module page with story id', fakeAsync(() => {
+    avbas
+      .validateAccessToEndOfModulePage('classroom', 'topic', '1', 'story_1')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.url ===
+          '/access_validation_handler/can_access_practice_session_page/' +
+            'classroom/topic/test/module/1' &&
+        request.params.get('story_id') === 'story_1'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate access to mastery challenge page', fakeAsync(() => {
     avbas
       .validateAccessToMasteryChallengePage('classroom', 'topic')

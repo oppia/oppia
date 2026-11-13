@@ -281,6 +281,16 @@ export class UrlService {
   }
 
   /**
+   * This function returns the story ID from the module practice URL. The
+   * story_id query param scopes a module ID to a specific story, since module
+   * IDs are only unique within their story.
+   * @return {string} the story ID, or an empty string if it is absent.
+   */
+  getStoryIdFromPracticeUrl(): string {
+    return this.getUrlParams().story_id || '';
+  }
+
+  /**
    * This function is used to find the classroom URL fragment from the learner's
    * URL.
    * @return {string} the classroom URL fragment.

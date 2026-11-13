@@ -2625,6 +2625,12 @@ class Story:
                     if dest_id not in node.destination_node_ids:
                         node.destination_node_ids.append(dest_id)
                 node.destination_node_ids.remove(node_id)
+        # Keep module membership consistent with the remaining nodes. Otherwise
+        # story validation would reject a module that references the deleted
+        # node.
+        for module in self.story_contents.modules:
+            if node_id in module.node_ids:
+                module.node_ids.remove(node_id)
         del self.story_contents.nodes[node_index]
 
     def update_node_outline(self, node_id: str, new_outline: str) -> None:

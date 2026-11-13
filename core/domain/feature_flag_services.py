@@ -49,6 +49,9 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
     feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
+FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME = (
+    feature_flag_list.FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME
+)
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -163,35 +166,52 @@ def load_feature_flags_from_storage(
     feature_flag_name_to_feature_flag_dict: Dict[
         str, Optional[feature_flag_domain.FeatureFlag]
     ] = {}
+    names_to_fetch = list(feature_flag_names_list)
+    for feature_flag_name in feature_flag_names_list:
+        legacy_name = FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME.get(
+            feature_flag_name
+        )
+        if legacy_name is not None and legacy_name not in names_to_fetch:
+            names_to_fetch.append(legacy_name)
+
     feature_flag_config_models = config_models.FeatureFlagConfigModel.get_multi(
-        feature_flag_names_list
+        names_to_fetch
     )
+    feature_flag_config_models_by_id = {
+        model.id: model for model in feature_flag_config_models if model
+    }
 
-    for feature_flag_config_model in feature_flag_config_models:
-        if feature_flag_config_model:
-            feature_flag_spec = _get_feature_flag_spec(
-                feature_flag_config_model.id
+    for feature_flag_name in feature_flag_names_list:
+        feature_flag_config_model = feature_flag_config_models_by_id.get(
+            feature_flag_name
+        )
+        if feature_flag_config_model is None:
+            legacy_name = FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME.get(
+                feature_flag_name
             )
-            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-                feature_flag_config_model.force_enable_for_all_users,
-                feature_flag_config_model.rollout_percentage,
-                feature_flag_config_model.user_group_ids,
-                feature_flag_config_model.last_updated,
-            )
+            if legacy_name is not None:
+                feature_flag_config_model = (
+                    feature_flag_config_models_by_id.get(legacy_name)
+                )
 
-            feature_flag_name_to_feature_flag_dict[
-                feature_flag_config_model.id
-            ] = feature_flag_domain.FeatureFlag(
-                feature_flag_config_model.id,
+        if feature_flag_config_model is None:
+            feature_flag_name_to_feature_flag_dict[feature_flag_name] = None
+            continue
+
+        feature_flag_spec = _get_feature_flag_spec(feature_flag_name)
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            feature_flag_config_model.force_enable_for_all_users,
+            feature_flag_config_model.rollout_percentage,
+            feature_flag_config_model.user_group_ids,
+            feature_flag_config_model.last_updated,
+        )
+        feature_flag_name_to_feature_flag_dict[feature_flag_name] = (
+            feature_flag_domain.FeatureFlag(
+                feature_flag_name,
                 feature_flag_spec,
                 feature_flag_config,
             )
-
-        for feature_flag_name in feature_flag_names_list:
-            if feature_flag_name not in (
-                feature_flag_name_to_feature_flag_dict
-            ):
-                feature_flag_name_to_feature_flag_dict[feature_flag_name] = None
+        )
 
     return feature_flag_name_to_feature_flag_dict
 

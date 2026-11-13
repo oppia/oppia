@@ -339,6 +339,10 @@ class PracticeSessionAccessValidationPage(
                 },
                 'default_value': None,
             },
+            'story_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -350,6 +354,10 @@ class PracticeSessionAccessValidationPage(
         subtopics = self.normalized_request.get('selected_subtopic_ids')
         node_id = self.request.route_kwargs.get('node_id')
         module_id = self.request.route_kwargs.get('module_id')
+        # An empty story_id is equivalent to omitting it, which preserves
+        # compatibility with module URLs created before story-scoped modules
+        # were introduced.
+        story_id = self.normalized_request.get('story_id') or None
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         assert isinstance(topic_url_fragment, str)
@@ -361,7 +369,7 @@ class PracticeSessionAccessValidationPage(
             return
 
         if module_id is not None:
-            self._validate_module_id(topic, module_id)
+            self._validate_module_id(topic, module_id, story_id)
             return
 
         if subtopics is None:
@@ -402,18 +410,25 @@ class PracticeSessionAccessValidationPage(
         return story_fetchers.get_all_nodes_for_topic(topic)
 
     def _get_all_modules_for_topic(
-        self, topic: topic_domain.Topic
+        self,
+        topic: topic_domain.Topic,
+        story_id: Optional[str] = None,
     ) -> List[story_domain.Module]:
-        """Returns modules from the first published story in the topic.
+        """Returns modules from a published story in the topic.
 
         Args:
             topic: Topic. The topic object.
+            story_id: str|None. The ID of the story whose modules should be
+                returned. If None, modules from the first published story are
+                returned.
 
         Returns:
             list(Module). All modules in order.
         """
         stories_with_modules = (
-            story_fetchers.get_all_modules_with_stories_for_topic(topic)
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic, story_id
+            )
         )
         return [module for _, module in stories_with_modules]
 
@@ -440,22 +455,27 @@ class PracticeSessionAccessValidationPage(
             )
 
     def _validate_module_id(
-        self, topic: topic_domain.Topic, module_id: str
+        self,
+        topic: topic_domain.Topic,
+        module_id: str,
+        story_id: Optional[str] = None,
     ) -> None:
-        """Validates that the given module ID exists in the first story.
+        """Validates that the given module ID exists in the given story.
 
         The module_id parameter is a 1-based index that maps to the nth module
-        in the first published story of the topic (e.g., '1' maps to the first
-        module).
+        in the specified published story of the topic (e.g., '1' maps to the
+        first module). If story_id is None, the first published story is used
+        for backward compatibility.
 
         Args:
             topic: Topic. The topic object.
             module_id: str. The module ID (1-based index) to validate.
+            story_id: str|None. The ID of the story that the module belongs to.
 
         Raises:
             NotFoundException. The module ID was not found.
         """
-        all_modules = self._get_all_modules_for_topic(topic)
+        all_modules = self._get_all_modules_for_topic(topic, story_id)
         if (
             not module_id.isascii()
             or not module_id.isdigit()

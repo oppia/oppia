@@ -450,4 +450,15 @@ describe('Url Service', () => {
     mockLocation.pathname = '/learn/math/fractions/practice';
     expect(urlService.getModuleIdFromUrl()).toBe('');
   });
+
+  it('should correctly retrieve story id from practice url', () => {
+    mockLocation.search = '?story_id=story_1';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('story_1');
+
+    mockLocation.search = '?selected_subtopic_ids=%5B1%5D';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('');
+
+    mockLocation.search = '';
+    expect(urlService.getStoryIdFromPracticeUrl()).toBe('');
+  });
 });

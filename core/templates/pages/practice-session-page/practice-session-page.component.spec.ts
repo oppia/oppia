@@ -364,6 +364,37 @@ describe('Practice session page', () => {
     expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/module/1');
   }));
 
+  it('should include story id in module practice URLs when present', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = true;
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/module/1'
+    );
+    spyOn(urlService, 'getStoryIdFromPracticeUrl').and.returnValue('story_1');
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    // eslint-disable-next-line dot-notation
+    expect(component['_getDataUrl']()).toContain('story_id=story_1');
+    // eslint-disable-next-line dot-notation
+    expect(component['_getRetryUrl']()).toContain('story_id=story_1');
+
+    const dashboardActionButton =
+      component.questionPlayerConfig.resultActionButtons.find(
+        (button: {type: string}) => button.type === 'DASHBOARD'
+      );
+    expect(dashboardActionButton?.url).toContain('story_id=story_1');
+  }));
+
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/mastery-challenge'

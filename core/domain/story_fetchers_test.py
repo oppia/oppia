@@ -809,6 +809,30 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(first_story.id, self.story_id)
         self.assertEqual(first_module.id, 'module_1')
 
+        # Passing a story_id selects that story's modules even when another
+        # published story uses the same module id.
+        modules_with_stories = (
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic_fetchers.get_topic_by_id(self.TOPIC_ID), story_id_2
+            )
+        )
+        self.assertEqual(len(modules_with_stories), 1)
+        second_story, second_module = modules_with_stories[0]
+        self.assertEqual(second_story.id, story_id_2)
+        self.assertEqual(second_module.id, 'module_1')
+        self.assertEqual(
+            second_module.description, 'Same module id in second story'
+        )
+
+        # An unknown story id does not fall back to the first published story.
+        self.assertEqual(
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic_fetchers.get_topic_by_id(self.TOPIC_ID),
+                'nonexistent_story',
+            ),
+            [],
+        )
+
     def test_get_all_modules_with_stories_excludes_unpublished(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
         self.publish_exploration(self.user_id_admin, self.EXP_ID_1)

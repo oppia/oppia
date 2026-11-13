@@ -307,12 +307,13 @@ export class TopicStorySectionBackendDataService {
   getEndOfModuleUrl(
     moduleId: string,
     classroomUrlFragment: string,
-    topicUrlFragment: string
+    topicUrlFragment: string,
+    storyId?: string
   ): string {
     if (!classroomUrlFragment || !topicUrlFragment) {
       return '#';
     }
-    return this.urlInterpolationService.interpolateUrl(
+    const endOfModuleUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.END_OF_MODULE_URL,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -320,6 +321,12 @@ export class TopicStorySectionBackendDataService {
         module_id: moduleId,
       }
     );
+    // Module IDs are only unique within a story, so include the story when it
+    // is known. Older URLs without a story keep working for a single-story
+    // topic.
+    return storyId
+      ? this.urlService.addField(endOfModuleUrl, 'story_id', storyId)
+      : endOfModuleUrl;
   }
 
   getGeneralPracticeUrl(

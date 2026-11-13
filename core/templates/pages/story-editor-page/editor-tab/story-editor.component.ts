@@ -186,27 +186,28 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   private ensureModuleMembershipForNodes(): void {
-    if (
-      !this.isStoryEditorModulesFeatureFlagEnabled() ||
-      !this.storyContents ||
-      this.storyContents.getNodes().length === 0
-    ) {
+    if (!this.storyContents || this.storyContents.getNodes().length === 0) {
       return;
     }
 
     const nodeIds = this.storyContents.getNodes().map(node => node.getId());
     const modules = this.storyContents.getModules();
 
-    // Backfill a default module for stories that predate module data.
+    // Backfill a default module for stories that predate module data. This is
+    // gated by the feature flag because it adds a committable change when the
+    // editor is opened. Existing module data is still reconciled below even
+    // when the flag is off, so disabling the flag cannot produce an invalid
+    // story.
     if (modules.length === 0) {
-      this.storyContents.addModule(
-        ModuleModel.createNew(
-          'module_' + Date.now().toString(),
+      if (this.isStoryEditorModulesFeatureFlagEnabled()) {
+        this.storyUpdateService.createModule(
+          this.story,
+          'module_default',
           'All Chapters',
           '',
           nodeIds
-        )
-      );
+        );
+      }
       return;
     }
 

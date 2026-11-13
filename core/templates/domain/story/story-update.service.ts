@@ -66,7 +66,6 @@ interface Params {
   new_title?: string;
   module_ids_order?: string[];
   to_module_id?: string;
-  old_position_index?: number;
 }
 
 type Command = BackendChangeObject['cmd'];
@@ -471,9 +470,9 @@ export class StoryUpdateService {
       }
     );
 
-    if (this._platformFeatureService.status.StoryEditorModules?.isEnabled) {
-      const modules = story.getStoryContents().getModules();
-      if (modules.length === 0) {
+    const modules = story.getStoryContents().getModules();
+    if (modules.length === 0) {
+      if (this._platformFeatureService.status.StoryEditorModules?.isEnabled) {
         // Note: module IDs are opaque, so this does not need to match the
         // 'default_module' minted by admin.py, nor the 'arc_default' that
         // stories migrated from schema v6 still carry. Each is only ever
@@ -481,14 +480,18 @@ export class StoryUpdateService {
         this.createModule(story, 'module_default', 'All Chapters', '', [
           nextNodeId,
         ]);
-      } else {
-        this.moveNodeToModule(
-          story,
-          nextNodeId,
-          modules[modules.length - 1].getId()
-        );
       }
+      return;
     }
+
+    // Modules may already exist even when the feature flag is off, for example
+    // if it was disabled after module data was created. The new node still
+    // needs to belong to a module so that the story remains valid.
+    this.moveNodeToModule(
+      story,
+      nextNodeId,
+      modules[modules.length - 1].getId()
+    );
   }
 
   /**

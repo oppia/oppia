@@ -1106,6 +1106,22 @@ describe('Story contents object factory', () => {
     ).not.toContain('node_2');
   });
 
+  it('should remove node from every module when the node is deleted', () => {
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_1', 'Module 1', '', ['node_1', 'node_2'])
+    );
+    _sampleStoryContents.addModule(
+      ModuleModel.createNew('module_2', 'Module 2', '', ['node_2'])
+    );
+
+    _sampleStoryContents.deleteNode('node_2');
+
+    expect(_sampleStoryContents.getModules()[0].getNodeIds()).toEqual([
+      'node_1',
+    ]);
+    expect(_sampleStoryContents.getModules()[1].getNodeIds()).toEqual([]);
+  });
+
   it('should throw error when rearranging modules with wrong length', () => {
     _sampleStoryContents.addModule(
       ModuleModel.createNew('module_1', 'Module 1', 'Desc 1', [])
