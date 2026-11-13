@@ -173,6 +173,23 @@ describe('Question Editor Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should pass the sticky content option to the state editor', () => {
+    fixture.detectChanges();
+
+    const stateEditor = fixture.debugElement.children[0].children[0];
+    expect(stateEditor.properties.stateContentShouldStayVisibleOnScroll).toBe(
+      false
+    );
+
+    component.stateContentShouldStayVisibleOnScroll = true;
+    fixture.detectChanges();
+
+    expect(stateEditor.properties.stateContentShouldStayVisibleOnScroll).toBe(
+      true
+    );
+    expect(getComputedStyle(stateEditor.nativeElement).display).toBe('block');
+  });
+
   it('should set component properties on initialization', () => {
     expect(component.oppiaBlackImgUrl).toBeUndefined();
     expect(component.interactionIsShown).toBe(undefined);

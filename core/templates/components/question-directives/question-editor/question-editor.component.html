@@ -1,4 +1,6 @@
-<div class="oppia-editor-cards-container" *ngIf="stateEditorIsInitialized">
+<div class="oppia-editor-cards-container"
+     [class.oppia-sticky-question-editor]="stateContentShouldStayVisibleOnScroll"
+     *ngIf="stateEditorIsInitialized">
   <oppia-state-editor (onSaveStateContent)="saveStateContent($event)"
                       (onSaveInteractionData)="saveInteractionData($event)"
                       (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
@@ -8,6 +10,7 @@
                       (onSaveHints)="saveHints($event)"
                       (onSaveInapplicableSkillMisconceptionIds)="saveInapplicableSkillMisconceptionIds($event)"
                       [interactionIsShown]="interactionIsShown"
+                      [stateContentShouldStayVisibleOnScroll]="stateContentShouldStayVisibleOnScroll"
                       [stateContentPlaceholder]="getStateContentPlaceholder()"
                       [stateContentSaveButtonPlaceholder]="getStateContentSaveButtonPlaceholder()">
   </oppia-state-editor>
