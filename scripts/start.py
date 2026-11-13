@@ -110,32 +110,18 @@ def _alert_on_exit() -> Iterator[None]:
     try:
         yield
     finally:
-        print(
-            '\n\n'
-            # ANSI escape sequence for bright yellow text color.
-            '\033[93m'
-            # ANSI escape sequence for bold font.
-            '\033[1m'
-            'Servers are shutting down, please wait for them to end gracefully!'
-            # ANSI escape sequence for resetting formatting.
-            '\033[0m'
-            '\n\n'
+        common.log_to_terminal(
+            '\n\nServers are shutting down, please wait for them to end '
+            'gracefully!\n\n',
+            common.LogType.WARNING,
         )
 
 
 def _notify_about_successful_shutdown() -> None:
     """Notifies developers that the servers have shutdown gracefully."""
-    print(
-        '\n\n'
-        # ANSI escape sequence for bright green text color.
-        '\033[92m'
-        # ANSI escape sequence for bold font.
-        '\033[1m'
-        # The notification.
-        'Done! Thank you for waiting.'
-        # ANSI escape sequence for resetting formatting.
-        '\033[0m'
-        '\n\n'
+    common.log_to_terminal(
+        '\n\nDone! Thank you for waiting.\n\n',
+        common.LogType.SUCCESS,
     )
 
 
