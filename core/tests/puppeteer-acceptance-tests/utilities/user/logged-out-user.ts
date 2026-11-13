@@ -102,8 +102,6 @@ const navbarAboutTabImpactReportButton =
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
-const navbarGetInvolvedTabVolunteerButton =
-  'a.e2e-test-navbar-get-involved-menu-volunteer-button';
 const navbarGetInvolvedTabDonateButton =
   'a.e2e-test-navbar-get-involved-menu-donate-button';
 const navbarGetInvolvedTabContactUsButton =
@@ -164,8 +162,6 @@ const mobileSidebarExpandGetInvolvedMenuButton =
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
 const carouselSlideSelector = '[data-test="mat-card-content"]';
-const mobileSidebarGetInvolvedMenuVolunteerButton =
-  'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
 const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
@@ -218,20 +214,6 @@ const readBlogPostDesktopButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-desktop-button';
 const readBlogPostMobileButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-blog-post-mobile-button';
-const exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-top';
-const exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage =
-  '.e2e-test-volunteer-page-explore-volunteer-openings-button-at-the-bottom';
-const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
-const tabsPreviousButtonInVolunteerPage =
-  '.e2e-test-volunteer-page-tabs-prev-btn';
-const tabsNextButtonInVolunteerPage = '.e2e-test-volunteer-page-tabs-next-btn';
-const tabsFirstVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-first-expectations';
-const tabsSecondVolunteerExpectationsInVolunteerPage =
-  '.e2e-test-volunteer-page-second-expectations';
-// This is an external component's selector so it is not prefixed with "e2e-test".
-const tabsLabelsInVolunteerPage = '.mat-tab-label';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
 const languageDropdown = '.e2e-test-language-dropdown';
 const featuresSectionInAboutPage = '.e2e-test-about-page-features-section';
@@ -541,9 +523,6 @@ const ourNetworkSectionSelector = '.e2e-test-dp-our-network-section';
 const donationHeadingSelector = '.e2e-test-donate-heading';
 const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
 const ourImpactSectionSelector = '.e2e-test-dp-our-impact-section';
-
-// Volunteer Page.
-const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
 
 // Contact Us Page.
 const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
@@ -1430,35 +1409,6 @@ export class LoggedOutUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabSchoolAndOrganizationsButton,
         partnershipsUrl
-      );
-    }
-  }
-
-  /**
-   * Function to click the Volunteer button in the Get Involved Menu
-   * on navbar and check if it opens the Volunteer page.
-   */
-  async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavbarButtonSelector, {
-        visible: true,
-      });
-      await this.openMobileSidebar();
-      await this.clickOnElementWithSelector(
-        mobileSidebarExpandGetInvolvedMenuButton
-      );
-      await this.clickButtonToNavigateToNewPage(
-        mobileSidebarGetInvolvedMenuVolunteerButton,
-        volunteerUrl
-      );
-    } else {
-      await this.page.waitForSelector(navbarGetInvolvedTab, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarGetInvolvedTabVolunteerButton,
-        volunteerUrl
       );
     }
   }
@@ -2626,93 +2576,6 @@ export class LoggedOutUser extends BaseUser {
     await this.clickButtonToNavigateToNewPage(
       readMoreStoriesButtonInPartnershipsPage,
       blogUrl
-    );
-  }
-
-  /**
-   * Function to verify the Volunteer tabs functionality in the Volunteer page.
-   * It checks if the tabs can be toggled through tab-labels in desktop and arrows in mobile.
-   */
-  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
-    const tabsSection = await this.page.waitForSelector(
-      tabsSectionInVolunteerPage
-    );
-    if (!tabsSection) {
-      throw new Error('The tabs section is not visible in Volunteer page');
-    }
-
-    const tabLablels = await this.page.$$(tabsLabelsInVolunteerPage);
-    const expectedFirstTabHeading = 'Outreach volunteer expectations';
-    const expectedSecondTabHeading = 'Software volunteer expectations';
-
-    const firstTabHeading = await this.page.$eval(
-      tabsFirstVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!firstTabHeading?.includes(expectedFirstTabHeading)) {
-      throw new Error(
-        `Expected first tab heading to contain "${expectedFirstTabHeading}" , but got "${firstTabHeading}"`
-      );
-    }
-
-    // Toggle to the next tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await tabLablels[1].click();
-    } else {
-      await this.clickOnElementWithSelector(tabsNextButtonInVolunteerPage);
-    }
-
-    const secondTabHeading = await this.page.$eval(
-      tabsSecondVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!secondTabHeading?.includes(expectedSecondTabHeading)) {
-      throw new Error(
-        `Expected second tab heading to contain "${expectedSecondTabHeading}", but got "${secondTabHeading}"`
-      );
-    }
-
-    // Toggle to the previous tab.
-    if (!this.isViewportAtMobileWidth()) {
-      await tabLablels[0].click();
-    } else {
-      await this.clickOnElementWithSelector(tabsPreviousButtonInVolunteerPage);
-    }
-
-    const firstTabAgain = await this.page.$eval(
-      tabsFirstVolunteerExpectationsInVolunteerPage,
-      el => el.textContent
-    );
-    if (!firstTabAgain?.includes(expectedFirstTabHeading)) {
-      throw new Error(
-        `Expected first tab heading to contain "${expectedFirstTabHeading}" again, but got "${firstTabHeading}"`
-      );
-    }
-  }
-
-  /**
-   * Function to click the Explore Volunteer Openings button at the top of the
-   * Volunteer page and check if it opens the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
-      exploreVolunteerOpeningsButtonAtTheTopOfVolunteerPage,
-      'Explore Volunteer Openings at the top of the Volunteer page',
-      volunteerIdealistPageUrl,
-      'Oppia Idealist page'
-    );
-  }
-
-  /**
-   * Function to click the Explore Volunteer Openings button at the bottom of the
-   * Volunteer page and check if it opens the Oppia Idealist page.
-   */
-  async clickExploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
-      exploreVolunteerOpeningsButtonAtTheBottomOfVolunteerPage,
-      'Explore Volunteer Openings at the bottom of the Volunteer page',
-      volunteerIdealistPageUrl,
-      'Oppia Idealist page'
     );
   }
 
@@ -7228,18 +7091,6 @@ export class LoggedOutUser extends BaseUser {
       'Play Store Image',
       'https://play.google.com/store/apps/details?id=org.oppia.android',
       'Oppia - Apps on Google Play'
-    );
-  }
-
-  /**
-   * Ensures that the heading on the Volunteer page contains the specified text.
-   *
-   * @param heading - The expected heading text to be validated.
-   */
-  async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
-    await this.expectAnyElementWithSelectorToHaveTextContent(
-      volunteerPageHeadingSelector,
-      heading
     );
   }
 
