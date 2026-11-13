@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia profile page.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -35,6 +35,10 @@ import analyticsConstants from 'analytics-constants';
   selector: 'oppia-signup-page',
   templateUrl: './signup-page.component.html',
   styleUrls: ['./signup-page.component.css'],
+  // The license and terms links are injected via innerHTML from translation
+  // strings, so encapsulated styles cannot reach them to show visible focus.
+  // We need ViewEncapsulation.None because links are injected via innerHTML.
+  encapsulation: ViewEncapsulation.None,
 })
 export class SignupPageComponent {
   // These properties are initialized using Angular lifecycle hooks
