@@ -337,6 +337,29 @@ export class ChangeListService {
     return cloneDeep(this.explorationChangeList);
   }
 
+  /**
+   * Returns the name that a state has in the last saved version of the
+   * exploration, by undoing the unsaved renames in the change list, newest
+   * first. Returns null if the state was added in the unsaved changes, i.e.
+   * it is not in the last saved version under any name.
+   *
+   * @param {string} stateName - The current name of the state.
+   * @returns {string | null} The state's name in the last saved version, or
+   *   null if the state is not saved yet.
+   */
+  getSavedStateName(stateName: string): string | null {
+    let name = stateName;
+    for (let i = this.explorationChangeList.length - 1; i >= 0; i--) {
+      const change = this.explorationChangeList[i];
+      if (change.cmd === 'rename_state' && change.new_state_name === name) {
+        name = change.old_state_name;
+      } else if (change.cmd === 'add_state' && change.state_name === name) {
+        return null;
+      }
+    }
+    return name;
+  }
+
   isOnlyVoiceoverChangeListPresent(): boolean {
     return this.explorationChangeList.every(
       change => change.cmd === 'update_voiceovers'
