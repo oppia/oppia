@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
 import re
 
@@ -1201,6 +1202,63 @@ class LearnerGoals:
         topic_id: str. The id of the topic to be removed.
         """
         self.topic_ids_to_learn.remove(topic_id)
+
+    def validate(self) -> None:
+        """Validates the properties of the LearnerGoals.
+
+        MAX_CURRENT_GOALS_COUNT is not checked here. It is already enforced
+        when a topic is added to the goals, and checking it here could make
+        older entities fail validation.
+
+        Raises:
+            ValidationError. The id is not a valid user ID.
+            ValidationError. A topic ID list is not a list.
+            ValidationError. A topic ID is not a valid entity ID.
+            ValidationError. A topic ID list has duplicates.
+            ValidationError. A topic is both to learn and to master.
+        """
+        if not isinstance(self.id, str) or not utils.is_user_id_valid(self.id):
+            raise utils.ValidationError(
+                'Expected id to be a valid user ID, received %s' % self.id
+            )
+
+        topic_id_lists = [
+            ('topic_ids_to_learn', self.topic_ids_to_learn),
+            ('topic_ids_to_master', self.topic_ids_to_master),
+        ]
+        for field_name, topic_ids in topic_id_lists:
+            if not isinstance(topic_ids, list):
+                raise utils.ValidationError(
+                    'Expected %s to be a list, received %s'
+                    % (field_name, type(topic_ids).__name__)
+                )
+            for topic_id in topic_ids:
+                if not isinstance(topic_id, str) or not re.match(
+                    constants.ENTITY_ID_REGEX, topic_id
+                ):
+                    raise utils.ValidationError(
+                        'Expected each topic ID in %s to be a valid entity '
+                        'ID, received %s' % (field_name, topic_id)
+                    )
+            duplicates = sorted(
+                topic_id
+                for topic_id, count in collections.Counter(topic_ids).items()
+                if count > 1
+            )
+            if duplicates:
+                raise utils.ValidationError(
+                    'Expected %s to have no duplicates, received %s'
+                    % (field_name, duplicates)
+                )
+
+        topic_ids_in_both = set(self.topic_ids_to_learn) & set(
+            self.topic_ids_to_master
+        )
+        if topic_ids_in_both:
+            raise utils.ValidationError(
+                'Expected a topic to not be in both topic_ids_to_learn and '
+                'topic_ids_to_master, received %s' % sorted(topic_ids_in_both)
+            )
 
     def to_dict(self) -> LearnerGoalsDict:
         """Return dictionary representation of LearnerGoals.
