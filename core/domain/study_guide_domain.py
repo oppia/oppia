@@ -517,7 +517,7 @@ class StudyGuide:
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
             constants.DEFAULT_LANGUAGE_CODE,
-            0,
+            feconf.INITIAL_ENTITY_VERSION,
         )
 
     def get_subtopic_id_from_study_guide_id(self) -> int:
