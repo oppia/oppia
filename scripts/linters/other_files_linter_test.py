@@ -790,6 +790,76 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Lighthouse page coverage', result.name)
         self.assertFalse(result.failed)
 
+    def test_check_lighthouse_page_coverage_relative_page_module(self) -> None:
+        """A Lighthouse page_module that is already relative to
+        core/templates/ and has no .ts extension still covers its route.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about",'
+                    '    "page_module": "pages/about-page/about-page.module"'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertEqual('Lighthouse page coverage', result.name)
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_ignores_route_without_import(
+        self,
+    ) -> None:
+        """A route that does not lazy-load a page module is not reported as
+        missing Lighthouse coverage.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.NEW_PAGE.ROUTE,',
+                        '    component: NewPageComponent,',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return '{}'
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertEqual('Lighthouse page coverage', result.name)
+        self.assertFalse(result.failed)
+
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(
             FILE_CACHE

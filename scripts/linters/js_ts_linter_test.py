@@ -103,6 +103,27 @@ class JsTsLintTests(test_utils.LinterTestBase):
             with self.assertRaisesRegex(Exception, 'Some error'):
                 js_ts_linter.compile_all_ts_files()
 
+    def test_compile_all_ts_files_with_success(self) -> None:
+        popen_commands: List[str] = []
+
+        def mock_popen(  # pylint: disable=unused-argument
+            cmd: str, *args: str, **kwargs: str
+        ) -> MockProcess:
+            popen_commands.append(cmd)
+            return MockProcess(returncode=0, stdout=b'', stderr=b'')
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        with popen_swap:
+            js_ts_linter.compile_all_ts_files()
+
+        self.assertEqual(
+            popen_commands,
+            [
+                './node_modules/typescript/bin/tsc -p ./tsconfig-lint.json '
+                '-outDir %s' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH
+            ],
+        )
+
     def test_third_party_linter_with_stderr(self) -> None:
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
 
@@ -317,6 +338,37 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
         self.assertEqual(lint_task_report[0].name, 'ESLint')
         self.assertEqual(lint_task_report[0].trimmed_messages, [])
+
+    def test_eslint_integration_with_output_shorter_than_footer(self) -> None:
+        """Test that ESLint output with fewer lines than the summary footer
+        is trimmed without removing any lines.
+        """
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(
+                returncode=1,
+                stdout=b'10:5  error  Something bad  no-unused-vars',
+                stderr=b'',
+            )
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        self.assertTrue(lint_task_report[0].failed)
+        self.assertEqual(
+            lint_task_report[0].trimmed_messages,
+            ['10:5    Something bad  no-unused-vars\n'],
+        )
 
     def test_validate_eslint_failure(self) -> None:
         """A test that validates ESLint failure."""
