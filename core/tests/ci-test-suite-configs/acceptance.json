@@ -222,8 +222,8 @@
     },
     {
       "name": "logged-out-user/click-all-buttons-on-donation-thanks-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donation-thanks-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donation-thanks-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/check-all-user-flow-of-parent-teacher",
