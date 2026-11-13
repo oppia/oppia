@@ -90,24 +90,39 @@ interface FeaturedTranslationLanguagesBackendDict {
   featured_translation_languages: FeaturedTranslationLanguageBackendDict[];
 }
 
-interface TopicNamesBackendDict {
-  topic_names: string[];
+// A topic that can be selected in the contributor dashboard's topic filter.
+// The ID is what gets tracked and sent to the backend, since topic names can
+// change, and the name is only used for display purposes.
+export interface TranslatableTopic {
+  id: string;
+  name: string;
 }
 
-export interface TranslatableTopic {
-  name: string;
-  id: string;
+// A translatable topic annotated with how much of it has been translated
+// into a given language. The completeness is null when no language was
+// requested.
+export interface TranslatableTopicWithCompleteness extends TranslatableTopic {
   completeness: number | null;
 }
 
-interface TopicNamesPerClassroomDict {
+export interface TranslatableTopicsPerClassroom {
   classroom: string;
+  topics: TranslatableTopicWithCompleteness[];
+}
+
+interface TranslatableTopicsBackendDict {
   topics: TranslatableTopic[];
 }
 
-interface TopicNamesPerClassroomBackendDict {
-  topic_names_per_classroom: TopicNamesPerClassroomDict[];
+interface TranslatableTopicsPerClassroomBackendDict {
+  topics_per_classroom: TranslatableTopicsPerClassroom[];
 }
+
+// The option that represents "all topics" in the topic filter.
+export const ALL_TOPICS_OPTION: TranslatableTopic = {
+  id: ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL,
+  name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
+};
 
 interface PreferredTranslationLanguageBackendDict {
   preferred_translation_language_code: string | null;
@@ -164,13 +179,13 @@ export class ContributionOpportunitiesBackendApiService {
 
   async pinTranslationOpportunity(
     languageCode: string,
-    topicName: string,
+    topicId: string,
     explorationId: string
   ): Promise<void> {
     return this.http
       .put<void>(this.UPDATE_PINNED_OPPORTUNITY_HANDLER_URL, {
         language_code: languageCode,
-        topic_id: topicName,
+        topic_id: topicId,
         opportunity_id: explorationId,
       })
       .toPromise();
@@ -178,32 +193,34 @@ export class ContributionOpportunitiesBackendApiService {
 
   async unpinTranslationOpportunity(
     languageCode: string,
-    topicName: string
+    topicId: string
   ): Promise<void> {
     return this.http
       .put<void>(this.UPDATE_PINNED_OPPORTUNITY_HANDLER_URL, {
         language_code: languageCode,
-        topic_id: topicName,
+        topic_id: topicId,
       })
       .toPromise();
   }
 
   async fetchTranslationOpportunitiesAsync(
     languageCode: string,
-    topicName: string,
+    topicId: string,
     cursor: string,
     entityType?: string
   ): Promise<TranslationContributionOpportunities> {
+    const params: Record<string, string> = {
+      language_code: languageCode,
+      cursor: cursor,
+    };
+    if (this.shouldFilterByTopic(topicId)) {
+      params.topic_id = topicId;
+    }
+
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      const params: Record<string, string> = {
-        language_code: languageCode,
-        topic_name:
-          topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
-        cursor: cursor,
-      };
       if (this.shouldFilterByEntityType(entityType)) {
         params.entity_type = entityType as string;
       }
@@ -234,13 +251,6 @@ export class ContributionOpportunitiesBackendApiService {
           }
         );
     }
-
-    const params = {
-      language_code: languageCode,
-      topic_name:
-        topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
-      cursor: cursor,
-    };
 
     return this.http
       .get<TranslationContributionOpportunitiesBackendDict>(
@@ -282,15 +292,28 @@ export class ContributionOpportunitiesBackendApiService {
     );
   }
 
+  /**
+   * Returns whether the opportunity request should carry a topic_id
+   * parameter. An empty topic ID, or the "all" sentinel, both mean that
+   * opportunities from every topic are wanted, which the handlers express by
+   * the parameter being omitted.
+   */
+  private shouldFilterByTopic(topicId: string): boolean {
+    return (
+      topicId !== '' &&
+      topicId !== ContributorDashboardConstants.TOPIC_SENTINEL_ID_ALL
+    );
+  }
+
   async fetchReviewableTranslationOpportunitiesAsync(
-    topicName: string,
+    topicId: string,
     languageCode?: string,
     entityType?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: Record<string, string> = {};
 
-    if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
-      params.topic_name = topicName;
+    if (this.shouldFilterByTopic(topicId)) {
+      params.topic_id = topicId;
     }
 
     if (languageCode && languageCode !== '') {
@@ -373,46 +396,39 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchTranslatableTopicNamesAsync(): Promise<string[]> {
+  async fetchTranslatableTopicsAsync(): Promise<TranslatableTopic[]> {
     try {
       const response = await this.http
-        .get<TopicNamesBackendDict>('/gettranslatabletopicnames')
+        .get<TranslatableTopicsBackendDict>('/gettranslatabletopicnames')
         .toPromise();
 
-      return [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...response.topic_names];
+      return [ALL_TOPICS_OPTION, ...response.topics];
     } catch {
       return [];
     }
   }
 
-  async fetchTranslatableTopicNamesPerClassroomAsync(
+  async fetchTranslatableTopicsPerClassroomAsync(
     languageCode?: string
-  ): Promise<TopicNamesPerClassroomDict[]> {
+  ): Promise<TranslatableTopicsPerClassroom[]> {
     try {
       let params = new HttpParams();
       if (languageCode) {
         params = params.set('language_code', languageCode);
       }
       const response = await this.http
-        .get<TopicNamesPerClassroomBackendDict>(
+        .get<TranslatableTopicsPerClassroomBackendDict>(
           '/gettranslatabletopicnamesperclassroom',
           {params}
         )
         .toPromise();
 
-      const topicsPerClassroom = response.topic_names_per_classroom.map(
+      const topicsPerClassroom = response.topics_per_classroom.map(
         ({classroom, topics}) => ({
           classroom,
           topics:
             classroom === ''
-              ? [
-                  {
-                    name: AppConstants.TOPIC_SENTINEL_NAME_ALL,
-                    id: '',
-                    completeness: null,
-                  },
-                  ...topics,
-                ]
+              ? [{...ALL_TOPICS_OPTION, completeness: null}, ...topics]
               : topics,
         })
       );
@@ -461,13 +477,13 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchOpportunitiesCountAsync(
     opportunityType: string,
-    topicName: string,
+    topicId: string,
     languageCode: string = '',
     entityType?: string
   ): Promise<number> {
     const queryParams: Record<string, string> = {};
-    if (topicName) {
-      queryParams.topic_name = topicName;
+    if (this.shouldFilterByTopic(topicId)) {
+      queryParams.topic_id = topicId;
     }
     if (languageCode) {
       queryParams.language_code = languageCode;
