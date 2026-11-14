@@ -2008,7 +2008,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
         self.mock_testapp = webtest.TestApp(
@@ -2539,7 +2539,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
         self.mock_testapp = webtest.TestApp(
@@ -2683,7 +2683,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR,
+            feconf.ROLE_ID_WEB_RELEASE_COORDINATOR,
         )
 
         self.mock_testapp = webtest.TestApp(
