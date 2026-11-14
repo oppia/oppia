@@ -78,6 +78,8 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -128,6 +130,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   checkRevertExplorationValidUrl: string = '';
   explorationDownloadUrl: string = '';
   improvementsTabIsEnabled: boolean = false;
+  feedbackPromptModalHasBeenShown: boolean = false;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
@@ -171,6 +174,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
     private explorationWarningsService: ExplorationWarningsService,
+    private feedbackBackendApiService: FeedbackBackendApiService,
     private focusManagerService: FocusManagerService,
     private graphDataService: GraphDataService,
     private internetConnectivityService: InternetConnectivityService,
@@ -362,7 +366,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         (!currentStateName ||
           !explorationData.states.hasOwnProperty(currentStateName))
       ) {
-        if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
+        if (this.isNewCreatorFeedbackTabEnabled()) {
+          this.maybeShowFeedbackPromptModal();
+        } else if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
           this.routerService.navigateToFeedbackTab();
         }
       }
@@ -828,6 +834,58 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
   isImprovementsTabEnabled(): boolean {
     return this.improvementsTabIsEnabled;
+  }
+
+  isNewCreatorFeedbackTabEnabled(): boolean {
+    return this.platformFeatureService.status
+      .ExplorationEditorNewCreatorFeedbackTab.isEnabled;
+  }
+
+  maybeShowFeedbackPromptModal(): void {
+    if (!this.isModalOpenable || this.feedbackPromptModalHasBeenShown) {
+      return;
+    }
+
+    const explorationId = this.pageContextService.getExplorationId();
+    this.feedbackBackendApiService
+      .fetchLessonFeedbackStatusCountsAsync(explorationId)
+      .then(response => {
+        const openFeedbackCount = response.lesson_feedback_counts.open;
+
+        if (
+          openFeedbackCount === 0 ||
+          !this.isModalOpenable ||
+          this.feedbackPromptModalHasBeenShown
+        ) {
+          return;
+        }
+
+        this.feedbackPromptModalHasBeenShown = true;
+        this.isModalOpenable = false;
+
+        const modalRef = this.ngbModal.open(FeedbackPromptModalComponent, {
+          backdrop: 'static',
+          keyboard: false,
+          windowClass: 'oppia-confirm-or-cancel-modal',
+        });
+
+        if (modalRef.componentInstance) {
+          modalRef.componentInstance.openThreadsCount = openFeedbackCount;
+        }
+
+        modalRef.result.then(
+          () => {
+            this.routerService.navigateToFeedbackTab();
+            this.isModalOpenable = true;
+          },
+          () => {
+            this.isModalOpenable = true;
+          }
+        );
+      })
+      .catch(() => {
+        // Leave the modal closed if feedback status counts cannot be fetched.
+      });
   }
 
   ngOnDestroy(): void {
