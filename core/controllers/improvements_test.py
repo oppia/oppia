@@ -47,7 +47,9 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
     """Base class with helper methods related to building improvement tasks."""
 
     EXP_ID: Final = 'eid'
-    MOCK_DATE: Final = datetime.datetime(2020, 6, 22)
+    MOCK_DATE: Final = datetime.datetime(
+        2020, 6, 22, tzinfo=datetime.timezone.utc
+    )
 
     def setUp(self) -> None:
         super().setUp()

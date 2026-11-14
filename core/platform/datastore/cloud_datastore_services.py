@@ -19,12 +19,14 @@
 from __future__ import annotations
 
 import contextlib
+import datetime
 import logging
 
 from core import utils
 from core.platform import models
 
 from google.cloud import ndb
+from google.cloud.ndb import exceptions as ndb_exceptions
 from typing import (
     Any,
     ContextManager,
@@ -57,6 +59,66 @@ RedisCache = ndb.RedisCache
 BooleanProperty = ndb.BooleanProperty
 DateProperty = ndb.DateProperty
 DateTimeProperty = ndb.DateTimeProperty
+
+
+class AwareDateTimeProperty(ndb.DateTimeProperty):
+    """DateTimeProperty that exposes aware UTC datetimes to app code.
+
+    Datastore stores datetime values as naive UTC datetimes. This property
+    accepts naive or aware datetimes, normalizes them to UTC, stores them as
+    naive UTC values, and returns aware UTC datetimes when read.
+
+    This keeps the naive datetime representation restricted to the datastore
+    boundary while allowing application code to use timezone-aware UTC
+    datetimes consistently.
+    """
+
+    def _validate(self, value: datetime.datetime) -> datetime.datetime:
+        """Normalise input to an aware UTC datetime.
+
+        Args:
+            value: datetime.datetime. The value to check. Subclasses of
+                datetime.datetime are also accepted, since Datastore returns
+                values as DatetimeWithNanoseconds.
+
+        Returns:
+            datetime.datetime. An aware UTC datetime.
+
+        Raises:
+            ndb.exceptions.BadValueError. If value is not a datetime instance.
+        """
+        # NDB invokes this hook with whatever value the caller assigned or used
+        # in a query filter, so the check is kept at runtime to reject
+        # non-datetimes the same way ndb.DateTimeProperty._validate does.
+        if not isinstance(value, datetime.datetime):
+            raise ndb_exceptions.BadValueError(
+                'Expected datetime, got %r' % value
+            )
+        return utils.normalize_datetime_to_utc(value)
+
+    def _to_base_type(self, value: datetime.datetime) -> datetime.datetime:
+        """Strip tzinfo to produce the naive UTC datetime stored in Datastore.
+
+        Args:
+            value: datetime.datetime. An aware (or naive) UTC datetime.
+
+        Returns:
+            datetime.datetime. The equivalent naive UTC datetime.
+        """
+        return utils.normalize_datetime_to_utc(value).replace(tzinfo=None)
+
+    def _from_base_type(self, value: datetime.datetime) -> datetime.datetime:
+        """Converts Datastore datetime values to aware UTC datetimes.
+
+        Args:
+            value: datetime.datetime. The value read from Datastore.
+
+        Returns:
+            datetime.datetime. An aware UTC datetime.
+        """
+        return utils.normalize_datetime_to_utc(value)
+
+
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
 JsonProperty = ndb.JsonProperty

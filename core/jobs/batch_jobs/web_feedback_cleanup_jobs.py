@@ -35,7 +35,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
+from core import feconf, utils
 from core.domain import fs_services
 from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
@@ -99,10 +99,10 @@ class LessonFeedbackCleanupJob(base_jobs.JobBase):
             else CLOSED_LESSON_FEEDBACK_RETENTION_DAYS
         )
 
-        expired = datetime.datetime.now(datetime.timezone.utc).replace(
-            tzinfo=None
-        ) >= lesson_feedback_model.created_on + datetime.timedelta(
-            days=retention_days
+        expired = (
+            utils.get_current_utc_datetime()
+            >= lesson_feedback_model.created_on
+            + datetime.timedelta(days=retention_days)
         )
 
         return bool(expired)
@@ -219,10 +219,10 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
     ) -> bool:
         """Returns whether the platform feedback has exceeded its retention period."""
 
-        expired = datetime.datetime.now(datetime.timezone.utc).replace(
-            tzinfo=None
-        ) >= platform_feedback_model.created_on + datetime.timedelta(
-            days=PLATFORM_FEEDBACK_RETENTION_DAYS
+        expired = (
+            utils.get_current_utc_datetime()
+            >= platform_feedback_model.created_on
+            + datetime.timedelta(days=PLATFORM_FEEDBACK_RETENTION_DAYS)
         )
 
         return bool(expired)

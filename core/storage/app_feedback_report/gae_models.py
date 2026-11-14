@@ -128,7 +128,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The local datetime of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
-    submitted_on = datastore_services.DateTimeProperty(
+    submitted_on = datastore_services.AwareDateTimeProperty(
         required=True, indexed=True
     )
     # The nuber of hours offset from UTC of the user's local timezone.
@@ -573,7 +573,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets. If all reports assigned to this ticket have
     # been reassigned to a different ticket then this timestamp is None.
-    newest_report_timestamp = datastore_services.DateTimeProperty(
+    newest_report_timestamp = datastore_services.AwareDateTimeProperty(
         required=False, indexed=True
     )
     # A list of report IDs associated with this ticket.

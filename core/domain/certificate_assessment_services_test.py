@@ -2840,7 +2840,10 @@ class CertificateAssessmentAttemptServicesTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(attempt.version_data['certificate_id'], 'cert_abc123')
-        self.assertEqual(attempt.started_at, datetime.datetime(2026, 7, 18))
+        self.assertEqual(
+            attempt.started_at,
+            datetime.datetime(2026, 7, 18, tzinfo=datetime.timezone.utc),
+        )
         self.assertTrue(attempt.is_submitted)
 
     def test_get_certificate_attempt_raises_for_missing_attempt(self) -> None:
