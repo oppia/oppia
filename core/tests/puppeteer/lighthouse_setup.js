@@ -1546,17 +1546,18 @@ const shard4Setup = async function (browser, page) {
   await logStep('logging in', () => login(browser, page));
   // Shard 4 audits the topics-and-skills-dashboard (curriculum admin), the
   // topic/story/skill editors, the diagnostic test player page, and the
-  // practice, node-practice, mastery-challenge and end-of-arc-test pages.
+  // practice, node-practice, mastery-challenge and end-of-module-test pages.
   // The release coordinator role is still assigned because the per-URL feature
   // flag toggles in puppeteer-login-script.js need it.
   await logStep('assigning roles', () =>
     setRoles(browser, page, ['ADMIN', 'RELEASE_COORDINATOR'])
   );
 
-  // The story_editor_arcs flag is toggled per audited URL in
+  // The story_editor_modules flag is toggled per audited URL in
   // puppeteer-login-script.js, so that the legacy practice page (which needs
-  // it disabled) and the node-practice, mastery-challenge and end-of-arc-test
-  // pages (which need it enabled) can all be audited in this shard.
+  // it disabled) and the node-practice, mastery-challenge and
+  // end-of-module-test pages (which need it enabled) can all be audited in
+  // this shard.
   // The structures step seeds the staging topic (dummy-topic-one), its story
   // and subtopic. The staging topic backs the topic/story/practice/subtopic
   // pages, and its story nodes back the node-practice page.

@@ -839,6 +839,23 @@ describe('TopicStorySectionComponent', () => {
     expect(component.moduleGroups[0].hasPracticeQuestions).toBe(true);
   });
 
+  it('should keep visible module groups that are not in the module groups', async () => {
+    const ghostGroup = {
+      ...createModuleGroup('Ghost', [createLessonCard(1, 'not_started')]),
+      moduleId: 'ghost',
+    };
+    component.lessonCards = [];
+    component.moduleGroups = [];
+    component.visibleModuleGroups = [ghostGroup];
+
+    const availabilityLoader = component as unknown as {
+      loadPracticeQuestionAvailability: () => Promise<void>;
+    };
+    await availabilityLoader.loadPracticeQuestionAvailability();
+
+    expect(component.visibleModuleGroups[0]).toBe(ghostGroup);
+  });
+
   it('should keep practice disabled when the question check fails', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
@@ -1485,6 +1502,22 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
+  it('should proceed with skip confirmation when there is no module index', () => {
+    const pendingNavigation = component as unknown as {
+      pendingNavigationLessonNumber: number | null;
+      pendingNavigationModuleIndex: number | null;
+      pendingStartUrl: string;
+    };
+    pendingNavigation.pendingNavigationLessonNumber = 1;
+    pendingNavigation.pendingNavigationModuleIndex = -1;
+    pendingNavigation.pendingStartUrl = '';
+
+    component.onModuleSkipConfirmationProceed();
+
+    expect(component.activeLessonNumber).toBe(1);
+    expect(component.navigatedLessonNumber).toBe(1);
+  });
+
   it('should not show skip confirmation when all earlier modules are completed', fakeAsync(() => {
     localStorageService.getMasteredModules.and.returnValue(['1']);
 
@@ -1724,6 +1757,16 @@ describe('TopicStorySectionComponent', () => {
     expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
+  it('should navigate to a lesson that is not in any module group', () => {
+    component.visibleModuleGroups = [];
+
+    component.onLessonStartClick({lessonNumber: 42, startUrl: ''});
+
+    expect(component.activeLessonNumber).toBe(42);
+    expect(component.navigatedLessonNumber).toBe(42);
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
   it('should return Start label for a skipped module that was never started', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
@@ -1765,6 +1808,18 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(localStorageService.getSkippedModules).not.toHaveBeenCalled();
+  });
+
+  it('should not persist mastered modules when the story id is missing', () => {
+    (component.storySummary.getId as jasmine.Spy).and.returnValue('');
+    localStorageService.updateMasteredModules.calls.reset();
+
+    const persister = component as unknown as {
+      persistMasteredModules: () => void;
+    };
+    persister.persistMasteredModules();
+
+    expect(localStorageService.updateMasteredModules).not.toHaveBeenCalled();
   });
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -1882,6 +1937,12 @@ describe('TopicStorySectionComponent', () => {
     expect(component.shouldShowModuleEndTestCard(0)).toBe(true);
 
     component.visibleModuleGroups[0].lessonCards = [];
+    expect(component.shouldShowModuleEndTestCard(0)).toBe(false);
+  });
+
+  it('should not show an end test card for a module that does not exist', () => {
+    component.visibleModuleGroups = [];
+
     expect(component.shouldShowModuleEndTestCard(0)).toBe(false);
   });
 
