@@ -379,7 +379,9 @@
 }
 .oppia-top-navigation-bar .oppia-navbar-close-icon {
   color: #fff;
+  display: inline-block;
   font-size: 22px;
+  line-height: 1;
   margin-inline-end: 4px;
   margin-top: -5px;
 }

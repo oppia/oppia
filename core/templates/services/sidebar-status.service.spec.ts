@@ -57,6 +57,15 @@ describe('SidebarStatusService', () => {
     expect($window.nativeWindow.document.body.style.overflowY).toBe('auto');
   });
 
+  it('should not change scrolling if sidebar is already closed', () => {
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
+
+    sss.closeSidebar();
+
+    expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('hidden');
+  });
+
   it('should toggle the sidebar to open and then close', () => {
     sss.toggleSidebar();
     expect(sss.isSidebarShown()).toBe(true);

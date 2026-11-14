@@ -55,6 +55,9 @@ export class SidebarStatusService {
   }
 
   closeSidebar(): void {
+    if (!this.sidebarIsShown) {
+      return;
+    }
     this._closeSidebar();
     this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
   }
