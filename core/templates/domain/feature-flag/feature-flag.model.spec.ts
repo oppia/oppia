@@ -22,7 +22,7 @@ import {
 } from 'domain/feature-flag/feature-flag.model';
 
 describe('FeatureFlagModel', () => {
-  it('should create an instance from a backend dict.', () => {
+  it('should create an instance from a backend dict without developer notes.', () => {
     const feature = FeatureFlag.createFromBackendDict({
       name: 'feature name',
       description: 'This is a feature for test.',
@@ -40,5 +40,28 @@ describe('FeatureFlagModel', () => {
     expect(feature.rolloutPercentage).toEqual(0);
     expect(feature.userGroupIds).toEqual([]);
     expect(feature.lastUpdated).toEqual('September 4, 2023');
+    expect(feature.developerNotes).toBeNull();
+  });
+
+  it('should create an instance from a backend dict with developer notes.', () => {
+    const feature = FeatureFlag.createFromBackendDict({
+      name: 'feature name',
+      description: 'This is a feature for test.',
+      feature_stage: FeatureStage.DEV,
+      force_enable_for_all_users: true,
+      rollout_percentage: 0,
+      user_group_ids: [],
+      last_updated: 'September 4, 2023',
+      developer_notes: 'These are developer notes.',
+    });
+
+    expect(feature.name).toEqual('feature name');
+    expect(feature.description).toEqual('This is a feature for test.');
+    expect(feature.featureStage).toEqual('dev');
+    expect(feature.forceEnableForAllUsers).toBeTrue();
+    expect(feature.rolloutPercentage).toEqual(0);
+    expect(feature.userGroupIds).toEqual([]);
+    expect(feature.lastUpdated).toEqual('September 4, 2023');
+    expect(feature.developerNotes).toEqual('These are developer notes.');
   });
 });

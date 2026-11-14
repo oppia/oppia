@@ -64,19 +64,25 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         """Returns swap iterator for the registry variable."""
         return self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.FEATURE_A.value: (
-                    'a feature in dev stage',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in dev stage',
+                        FeatureStages.DEV,
+                    )
                 ),
                 FeatureNames.FEATURE_B.value: (
-                    'a feature in test stage',
-                    FeatureStages.TEST,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in test stage',
+                        FeatureStages.TEST,
+                    )
                 ),
                 FeatureNames.FEATURE_C.value: (
-                    'a feature in prod stage',
-                    FeatureStages.PROD,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'a feature in prod stage',
+                        FeatureStages.PROD,
+                    )
                 ),
             },
         )
@@ -119,15 +125,15 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
 
         swapped_value = {
-            FeatureNames.FEATURE_A.value: (
+            FeatureNames.FEATURE_A.value: feature_flag_domain.FeatureFlagSpec(
                 'a feature in dev stage',
                 FeatureStages.DEV,
             ),
-            FeatureNames.FEATURE_B.value: (
+            FeatureNames.FEATURE_B.value: feature_flag_domain.FeatureFlagSpec(
                 'a feature in test stage',
                 FeatureStages.TEST,
             ),
-            FeatureNames.FEATURE_C.value: (
+            FeatureNames.FEATURE_C.value: feature_flag_domain.FeatureFlagSpec(
                 'a feature in prod stage',
                 FeatureStages.PROD,
             ),
@@ -135,13 +141,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         self.swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             swapped_value,
         )
 
         self.swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             swapped_value,
         )
 
@@ -220,6 +226,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': None,
             },
             {
                 'name': FeatureNames.FEATURE_TWO.value,
@@ -229,6 +236,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': None,
             },
             {
                 'name': FeatureNames.FEATURE_THREE.value,
@@ -238,6 +246,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 'rollout_percentage': 0,
                 'user_group_ids': [],
                 'last_updated': None,
+                'developer_notes': 'feature flag three notes',
             },
         ]
         feature_flag_name_enums = [
@@ -254,19 +263,26 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            'FEATURE_FLAG_NAME_TO_SPEC',
             {
                 FeatureNames.FEATURE_ONE.value: (
-                    'feature flag one',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'feature flag one',
+                        FeatureStages.DEV,
+                    )
                 ),
                 FeatureNames.FEATURE_TWO.value: (
-                    'feature flag two',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'feature flag two',
+                        FeatureStages.DEV,
+                    )
                 ),
                 FeatureNames.FEATURE_THREE.value: (
-                    'feature flag three',
-                    FeatureStages.DEV,
+                    feature_flag_domain.FeatureFlagSpec(
+                        'feature flag three',
+                        FeatureStages.DEV,
+                        developer_notes='feature flag three notes',
+                    )
                 ),
             },
         )
