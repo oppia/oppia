@@ -39,6 +39,7 @@ from core.domain import (
     stats_domain,
     stats_services,
     translation_fetchers,
+    translation_services,
     user_services,
 )
 
@@ -193,12 +194,41 @@ class ExplorationHandler(
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_translation_tutorial
             )
-            # Here we use MyPy ignore because here we are defining a new
-            # 'exploration_is_linked_to_story' key on a well defined TypedDict
-            # dictionary.
-            exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
-                exp_services.get_story_id_linked_to_exploration(exploration_id)
-                is not None
+            story_id = exp_services.get_story_id_linked_to_exploration(
+                exploration_id
+            )
+            exploration_data['exploration_is_linked_to_story'] = (
+                story_id is not None
+            )
+
+            displayable_language_codes = []
+            if story_id is not None:
+                try:
+                    exploration = exp_fetchers.get_exploration_by_id(
+                        exploration_id, strict=False, version=version
+                    )
+                    if exploration is not None:
+                        displayable_language_codes = translation_services.get_displayable_translation_languages(
+                            feconf.TranslatableEntityType.EXPLORATION,
+                            exploration,
+                        )
+                except Exception:
+                    logging.exception(
+                        'Failed to fetch displayable translation languages for '
+                        'exploration %s' % exploration_id
+                    )
+                    displayable_language_codes = []
+
+            preferred_language_codes = (
+                user_settings.preferred_language_codes
+                if user_settings is not None
+                else []
+            )
+            exploration_data['displayable_language_codes'] = (
+                displayable_language_codes
+            )
+            exploration_data['preferred_language_codes'] = (
+                preferred_language_codes
             )
         except Exception as e:
             raise self.NotFoundException from e

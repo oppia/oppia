@@ -140,6 +140,9 @@ class UserExplorationDataDict(TypedDict):
     email_preferences: user_domain.UserExplorationPrefsDict
     next_content_id_index: int
     exploration_metadata: exp_domain.ExplorationMetadataDict
+    exploration_is_linked_to_story: bool
+    displayable_language_codes: List[str]
+    preferred_language_codes: List[str]
 
 
 class SnapshotsMetadataDict(TypedDict):
@@ -3307,6 +3310,9 @@ def get_user_exploration_data(
         'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed,
         'exploration_metadata': exploration.get_metadata().to_dict(),
+        'exploration_is_linked_to_story': False,
+        'displayable_language_codes': [],
+        'preferred_language_codes': [],
     }
 
     return editor_dict

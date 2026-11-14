@@ -238,4 +238,31 @@ describe('Entity translations service', () => {
       pt: entityTranslation,
     });
   });
+
+  it('should get displayable language codes for preview', () => {
+    const emptyEntityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: '1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_code: 'es',
+      translations: {},
+    });
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      fr: entityTranslation,
+      es: emptyEntityTranslation,
+    };
+    expect(
+      entityTranslationsService.getDisplayableLanguageCodesForPreview(
+        ['hi', 'fr'],
+        'en'
+      )
+    ).toEqual(['hi', 'fr']);
+    // Should filter out base language code.
+    expect(
+      entityTranslationsService.getDisplayableLanguageCodesForPreview(
+        ['en', 'hi'],
+        'en'
+      )
+    ).toEqual(['hi', 'fr']);
+  });
 });
