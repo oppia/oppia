@@ -24,26 +24,15 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
-    exp_fetchers,
     feature_flag_services,
     skill_services,
     story_domain,
     story_fetchers,
     topic_fetchers,
     topic_services,
-    translation_services,
-    voiceover_services,
 )
 
-from typing import Dict, List, Optional, Sequence, TypedDict, cast
-
-
-class StoryNodeResponseDict(story_domain.StoryNodeDict):
-    """TypedDict for the StoryNode dict enriched with voiceover metadata."""
-
-    available_text_language_codes: List[str]
-    available_voiceover_language_codes: List[str]
-    available_voiceover_language_accent_descriptions: Dict[str, str]
+from typing import Dict, List, Optional, Sequence, TypedDict
 
 
 class StoryResponseDict(TypedDict, total=False):
@@ -58,7 +47,7 @@ class StoryResponseDict(TypedDict, total=False):
     url_fragment: str
     story_is_published: bool
     completed_node_titles: List[str]
-    all_node_dicts: List[StoryNodeResponseDict]
+    all_node_dicts: List[story_domain.StoryNodeDict]
     arcs: List[story_domain.ArcDict]
 
 
@@ -84,9 +73,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
 
-        def _get_language_root_code(language_code: str) -> str:
-            return language_code.replace('_', '-').split('-')[0].lower()
-
         canonical_story_ids = topic.get_canonical_story_ids(
             include_only_published=True
         )
@@ -110,14 +96,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         canonical_story_dicts: List[StoryResponseDict] = []
         canonical_story_nodes: List[Sequence[story_domain.StoryNode]] = []
-        exploration_ids: set[str] = set()
-
-        def _collect_exploration_ids_from_nodes(
-            nodes: Sequence[story_domain.StoryNode],
-        ) -> None:
-            for node in nodes:
-                if node.exploration_id:  # pragma: no cover
-                    exploration_ids.add(node.exploration_id)
 
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
@@ -128,7 +106,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 for node in all_nodes
                 if node.status != constants.STORY_NODE_STATUS_DRAFT
             ]
-            _collect_exploration_ids_from_nodes(filtered_nodes)
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['pending_nodes']
@@ -163,7 +140,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['all_nodes']
-            _collect_exploration_ids_from_nodes(all_nodes)
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['pending_nodes']
@@ -192,140 +168,18 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 ]
             additional_story_dicts.append(additional_story_dict)
 
-        exploration_id_to_available_text_languages: Dict[str, List[str]] = {}
-        exploration_id_to_available_voiceover_languages: Dict[
-            str, List[str]
-        ] = {}
-
-        if exploration_ids:
-            explorations_by_id = exp_fetchers.get_multiple_explorations_by_id(
-                list(exploration_ids), strict=False
-            )
-
-            language_accent_mapping = (
-                voiceover_services.get_all_language_accent_codes_for_voiceovers()
-            )
-
-            for exploration_id, exploration in explorations_by_id.items():
-                displayable_language_codes = (
-                    translation_services.get_displayable_translation_languages(
-                        feconf.TranslatableEntityType.EXPLORATION,
-                        exploration,
-                    )
-                )
-
-                if (
-                    exploration.language_code
-                    and exploration.language_code
-                    not in displayable_language_codes
-                ):
-                    displayable_language_codes.insert(
-                        0, exploration.language_code
-                    )
-
-                unique_displayable_language_codes = list(
-                    dict.fromkeys(displayable_language_codes)
-                )
-
-                exploration_id_to_available_text_languages[exploration_id] = (
-                    unique_displayable_language_codes
-                )
-                displayable_language_roots = {
-                    _get_language_root_code(language_code)
-                    for language_code in unique_displayable_language_codes
-                }
-
-                voiceover_language_codes = []
-                entity_voiceovers_for_exp = voiceover_services.get_entity_voiceovers_for_given_exploration(
-                    exploration_id,
-                    feconf.TranslatableEntityType.EXPLORATION.value,
-                    exploration.version,
-                )
-
-                for entity_voiceovers in entity_voiceovers_for_exp:
-                    if not entity_voiceovers.voiceovers_mapping:
-                        continue
-
-                    accent_code = entity_voiceovers.language_accent_code
-                    accent_root_code = _get_language_root_code(accent_code)
-
-                    if accent_root_code in displayable_language_roots:
-                        voiceover_language_codes.append(accent_code)
-                        continue
-
-                    for language_code in unique_displayable_language_codes:
-                        if accent_code in language_accent_mapping.get(
-                            language_code, {}
-                        ):
-                            voiceover_language_codes.append(accent_code)
-                            break
-
-                voiceover_language_codes = list(
-                    dict.fromkeys(voiceover_language_codes)
-                )
-
-                exploration_id_to_available_voiceover_languages[
-                    exploration_id
-                ] = voiceover_language_codes
-
-        language_accent_codes_to_descriptions = (
-            voiceover_services.get_language_accent_codes_to_descriptions()
-        )
-
-        def _create_node_dict(
-            node: story_domain.StoryNode,
-        ) -> StoryNodeResponseDict:
-            available_text_language_codes: List[str] = []
-            available_voiceover_language_codes: List[str] = []
-
-            if node.exploration_id:  # pragma: no cover
-                available_text_language_codes = (
-                    exploration_id_to_available_text_languages.get(
-                        node.exploration_id, []
-                    )
-                )
-                available_voiceover_language_codes = (
-                    exploration_id_to_available_voiceover_languages.get(
-                        node.exploration_id, []
-                    )
-                )
-
-            # Here we use cast because the dict returned from node.to_dict()
-            # has a different type than StoryNodeResponseDict and we need to
-            # override the type for the caller.
-            return cast(
-                StoryNodeResponseDict,
-                {
-                    **node.to_dict(),
-                    'available_text_language_codes': (
-                        available_text_language_codes
-                    ),
-                    'available_voiceover_language_codes': (
-                        available_voiceover_language_codes
-                    ),
-                    'available_voiceover_language_accent_descriptions': {
-                        accent_code: (
-                            language_accent_codes_to_descriptions.get(
-                                accent_code, accent_code
-                            )
-                        )
-                        for accent_code in available_voiceover_language_codes
-                    },
-                },
-            )
-
         for canonical_story_dict, canonical_nodes in zip(
             canonical_story_dicts, canonical_story_nodes
         ):
             canonical_story_dict['all_node_dicts'] = [
-                _create_node_dict(node) for node in canonical_nodes
+                node.to_dict() for node in canonical_nodes
             ]
 
         for additional_story_dict, additional_nodes in zip(
             additional_story_dicts, additional_story_nodes
         ):
             additional_story_dict['all_node_dicts'] = [
-                _create_node_dict(node) for node in additional_nodes
+                node.to_dict() for node in additional_nodes
             ]
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
