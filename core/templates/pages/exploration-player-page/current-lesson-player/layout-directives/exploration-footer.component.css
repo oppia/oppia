@@ -299,11 +299,11 @@
   }
 
   .hint-box-add-ons::after {
-    margin-left: 141px;
+    margin-inline-start: 141px;
   }
 
   .hint-box-add-ons::before {
-    margin-left: 139px;
+    margin-inline-start: 139px;
   }
 
   .hint-box {
@@ -390,31 +390,27 @@
   position: absolute;
 }
 
-[dir="rtl"] .hint-container {
-  transform: scaleX(-1);
-}
-
 .btn-close {
   bottom: 10px;
   font-size: 22px;
-  margin-left: 10px;
+  margin-inline-start: 10px;
   position: relative;
 }
 
 .hint-box-add-ons {
-  left: -5.5px;
+  inset-inline-start: -5.5px;
 }
 
 .hint-box-add-ons .btn-close {
-  left: 0;
+  inset-inline-start: 0;
 }
 
 .hint-box-add-ons::after {
-  margin-left: 163px;
+  margin-inline-start: 163px;
 }
 
 .hint-box-add-ons::before {
-  margin-left: 161px;
+  margin-inline-start: 161px;
 }
 
 .hint-box {
@@ -429,7 +425,7 @@
   display: flex;
   font-size: 17px;
   height: 40px;
-  margin-right: 10px;
+  margin-inline-end: 10px;
   min-width: 350px;
   padding: 20px 10px 20px 10px;
   position: relative;
@@ -443,7 +439,7 @@
 .hint-box::before {
   border: solid transparent;
   content: " ";
-  left: 50%;
+  inset-inline-start: 50%;
   position: absolute;
   top: 100%;
 }

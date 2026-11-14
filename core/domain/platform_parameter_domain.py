@@ -338,7 +338,8 @@ class PlatformParameterFilter:
             # Ruling out the possibility of None for mypy type checking.
             assert context.app_version is not None
             matched = self._match_version_flavor(op, value, context.app_version)
-        elif self._type == 'app_version':
+        else:
+            assert self._type == 'app_version'
             matched = self._match_version_expression(
                 op, value, context.app_version
             )
@@ -378,7 +379,8 @@ class PlatformParameterFilter:
                         'Invalid app version flavor \'%s\', must be one of'
                         ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVORS)
                     )
-        elif self._type == 'app_version':
+        else:
+            assert self._type == 'app_version'
             for _, version in self._conditions:
                 if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
                     raise utils.ValidationError(

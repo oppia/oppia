@@ -16,8 +16,6 @@
  * @fileoverview Tests for technical feedback dashboard flag guard.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {
@@ -31,6 +29,7 @@ import {TechnicalFeedbackDashboardPageComponentAuthGuard} from './technical-feed
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import {Location} from '@angular/common';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockPlatformFeatureService {
   get status() {
@@ -87,7 +86,7 @@ describe('TechnicalFeedbackDashboardPageComponentAuthGuard', () => {
   it('should redirect to 404 when flag is disabled', done => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       TechnicalFeedbackDashboardEnabled: {isEnabled: false},
-    });
+    } as FeatureStatusChecker);
 
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
     const replaceStateSpy = spyOn(location, 'replaceState');
