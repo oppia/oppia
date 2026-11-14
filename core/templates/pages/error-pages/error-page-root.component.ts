@@ -58,10 +58,7 @@ export class ErrorPageRootComponent extends BaseRootComponent {
       this.statusCode = bodyTag[0].getAttribute('errorCode');
     }
 
-    if (
-      !this.validStatusCodes.includes(String(this.statusCode)) ||
-      this.activatedRoute.snapshot.url.length > 0
-    ) {
+    if (!this.validStatusCodes.includes(String(this.statusCode))) {
       this.statusCode = '404';
     }
 
