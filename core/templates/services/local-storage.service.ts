@@ -546,14 +546,15 @@ export class LocalStorageService {
   }
 
   /**
-   * Save the given mastered module arc IDs for a story to localStorage.
+   * Save the given mastered module IDs for a story to localStorage.
    * @param storyId The id of the story the mastered modules belong to.
-   * @param masteredArcIds The arc IDs of the mastered modules.
+   * @param masteredModuleIds The IDs of the modules the learner has
+   *     mastered.
    */
-  updateMasteredModules(storyId: string, masteredArcIds: string[]): void {
+  updateMasteredModules(storyId: string, masteredModuleIds: string[]): void {
     if (this.isStorageAvailable()) {
       const masteredModulesDict = this.parseMasteredModulesDict();
-      masteredModulesDict[storyId] = masteredArcIds;
+      masteredModulesDict[storyId] = masteredModuleIds;
       (this.storage as Storage).setItem(
         this.MASTERED_MODULES_KEY,
         JSON.stringify(masteredModulesDict)
@@ -562,10 +563,10 @@ export class LocalStorageService {
   }
 
   /**
-   * Retrieve the mastered module arc IDs for a story from localStorage.
+   * Retrieve the mastered module IDs for a story from localStorage.
    * @param storyId The id of the story the mastered modules belong to.
-   * @returns The arc IDs of the mastered modules, or an empty array if none
-   *   are stored.
+   * @returns The IDs of the modules the learner has mastered, or an empty
+   *     array if none are stored.
    */
   getMasteredModules(storyId: string): string[] {
     if (this.isStorageAvailable()) {

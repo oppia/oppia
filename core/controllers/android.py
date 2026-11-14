@@ -467,10 +467,10 @@ class AndroidActivityHandler(
                 )
 
             for activity_data, entity in zip(activities_data, fetched_entities):
-                if (
-                    activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION
-                    and isinstance(entity, story_domain.Story)
-                ):
+                if activity_type in (
+                    constants.ACTIVITY_TYPE_STORY,
+                    constants.ACTIVITY_TYPE_STORY_MIGRATION,
+                ) and isinstance(entity, story_domain.Story):
                     response_dict: ActivityDataResponseDict = {
                         'id': activity_data['id'],
                         'version': activity_data.get('version'),

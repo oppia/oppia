@@ -275,7 +275,7 @@ describe('TopicStorySectionComponent', () => {
   const createStorySummarySpy = (
     nodeTitles: string[],
     nodes: jasmine.SpyObj<StoryNode>[],
-    arcs: object[] = []
+    modules: object[] = []
   ): jasmine.SpyObj<StorySummary> => {
     const storySummarySpy = jasmine.createSpyObj('StorySummary', [
       'getTitle',
@@ -284,7 +284,7 @@ describe('TopicStorySectionComponent', () => {
       'getAllNodes',
       'getId',
       'getUrlFragment',
-      'getArcs',
+      'getModules',
       'isNodeCompleted',
       'getCompletedNodeTitles',
       'getVisitedChapterTitles',
@@ -296,7 +296,7 @@ describe('TopicStorySectionComponent', () => {
     storySummarySpy.getAllNodes.and.returnValue(nodes);
     storySummarySpy.getId.and.returnValue('story_id_1');
     storySummarySpy.getUrlFragment.and.returnValue('story-url-fragment');
-    storySummarySpy.getArcs.and.returnValue(arcs);
+    storySummarySpy.getModules.and.returnValue(modules);
     storySummarySpy.isNodeCompleted.and.returnValue(false);
     storySummarySpy.getCompletedNodeTitles.and.returnValue([]);
     storySummarySpy.getVisitedChapterTitles.and.returnValue([]);
@@ -384,7 +384,7 @@ describe('TopicStorySectionComponent', () => {
     iconBg: '',
     headerBackgroundColor: '',
     headerBorderColor: '',
-    arcId: '1',
+    moduleId: '1',
     hasPracticeQuestions: false,
   });
 
@@ -412,7 +412,7 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should build module groups when story has arcs', () => {
+  it('should build module groups when story has modules', () => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -429,15 +429,15 @@ describe('TopicStorySectionComponent', () => {
       null
     );
 
-    const arcs = [
+    const modules = [
       {
-        id: 'arc_1',
+        id: 'module_1',
         title: 'Module 1',
         description: 'First module',
         node_ids: ['node_1'],
       },
       {
-        id: 'arc_2',
+        id: 'module_2',
         title: 'Module 2',
         description: 'Second module',
         node_ids: ['node_2'],
@@ -447,7 +447,7 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = createStorySummarySpy(
       ['Node title 1', 'Node title 2'],
       [storyNodeSpy1, storyNodeSpy2],
-      arcs
+      modules
     );
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
@@ -456,13 +456,13 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.moduleGroups.length).toBe(2);
     expect(component.moduleGroups[0].moduleTitle).toBe('Module 1');
-    expect(component.moduleGroups[0].arcId).toBe('1');
+    expect(component.moduleGroups[0].moduleId).toBe('1');
     expect(component.moduleGroups[0].lessonCards.length).toBe(1);
     expect(component.moduleGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
     expect(component.moduleGroups[1].moduleTitle).toBe('Module 2');
-    expect(component.moduleGroups[1].arcId).toBe('2');
+    expect(component.moduleGroups[1].moduleId).toBe('2');
     expect(component.moduleGroups[1].lessonCards.length).toBe(1);
     expect(component.moduleGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
@@ -728,7 +728,7 @@ describe('TopicStorySectionComponent', () => {
     ).toHaveBeenCalledTimes(1);
   });
 
-  it('should construct practice card url when arcs and fragments are present', () => {
+  it('should construct practice card url when modules and fragments are present', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -745,7 +745,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -763,10 +763,10 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.isPracticeCardVisible).toBe(true);
-    expect(component.practiceCard.practiceUrl).toContain('test/arc/1');
+    expect(component.practiceCard.practiceUrl).toContain('test/module/1');
   });
 
-  it('should use positional arc id in practice card url for non-numeric arc ids', () => {
+  it('should use positional module id in practice card url for non-numeric module ids', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -783,7 +783,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'default_arc',
+          id: 'default_module',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -800,9 +800,9 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.isPracticeCardVisible).toBe(true);
-    expect(component.practiceCard.practiceUrl).toContain('add/test/arc/1');
+    expect(component.practiceCard.practiceUrl).toContain('add/test/module/1');
     expect(component.practiceCard.practiceUrl).not.toContain(
-      'add/test/arc/arc'
+      'add/test/module/module'
     );
   });
 
@@ -823,7 +823,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -837,6 +837,23 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.lessonCards[0].hasPracticeQuestions).toBe(true);
     expect(component.moduleGroups[0].hasPracticeQuestions).toBe(true);
+  });
+
+  it('should keep visible module groups that are not in the module groups', async () => {
+    const ghostGroup = {
+      ...createModuleGroup('Ghost', [createLessonCard(1, 'not_started')]),
+      moduleId: 'ghost',
+    };
+    component.lessonCards = [];
+    component.moduleGroups = [];
+    component.visibleModuleGroups = [ghostGroup];
+
+    const availabilityLoader = component as unknown as {
+      loadPracticeQuestionAvailability: () => Promise<void>;
+    };
+    await availabilityLoader.loadPracticeQuestionAvailability();
+
+    expect(component.visibleModuleGroups[0]).toBe(ghostGroup);
   });
 
   it('should keep practice disabled when the question check fails', async () => {
@@ -856,7 +873,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -972,7 +989,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModuleExpanded(0)).toBe(false);
   });
 
-  it('should ignore arc node ids not present in all nodes', () => {
+  it('should ignore module node ids not present in all nodes', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node title 1',
       'Node description 1',
@@ -981,9 +998,9 @@ describe('TopicStorySectionComponent', () => {
       null
     );
 
-    const arcs = [
+    const modules = [
       {
-        id: 'arc_1',
+        id: 'module_1',
         title: 'Module 1',
         description: 'First module',
         node_ids: ['missing_node_id'],
@@ -993,7 +1010,7 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
       [storyNodeSpy],
-      arcs
+      modules
     );
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
@@ -1055,7 +1072,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2'],
@@ -1155,7 +1172,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].isNewLabelVisible).toBe(true);
   });
 
-  it('should return empty module groups when arcs are empty', async () => {
+  it('should return empty module groups when modules are empty', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
       'Desc',
@@ -1270,7 +1287,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2'],
@@ -1315,13 +1332,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -1366,13 +1383,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -1411,13 +1428,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -1485,6 +1502,22 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
+  it('should proceed with skip confirmation when there is no module index', () => {
+    const pendingNavigation = component as unknown as {
+      pendingNavigationLessonNumber: number | null;
+      pendingNavigationModuleIndex: number | null;
+      pendingStartUrl: string;
+    };
+    pendingNavigation.pendingNavigationLessonNumber = 1;
+    pendingNavigation.pendingNavigationModuleIndex = -1;
+    pendingNavigation.pendingStartUrl = '';
+
+    component.onModuleSkipConfirmationProceed();
+
+    expect(component.activeLessonNumber).toBe(1);
+    expect(component.navigatedLessonNumber).toBe(1);
+  });
+
   it('should not show skip confirmation when all earlier modules are completed', fakeAsync(() => {
     localStorageService.getMasteredModules.and.returnValue(['1']);
 
@@ -1509,13 +1542,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -1545,7 +1578,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should only scroll and not open the arc skip modal when a lesson circle is clicked in the navbar', fakeAsync(() => {
+  it('should only scroll and not open the module skip modal when a lesson circle is clicked in the navbar', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(1024);
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -1567,13 +1600,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -1585,13 +1618,13 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.activePracticeArcId = 'arc_2';
+    component.activePracticeModuleId = 'module_2';
     component.onNavigationLessonSelected({lessonNumber: 2, moduleIndex: 1});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.activePracticeArcId).toBe('');
+    expect(component.activePracticeModuleId).toBe('');
 
     tick(300);
   }));
@@ -1724,6 +1757,16 @@ describe('TopicStorySectionComponent', () => {
     expect(component.getModuleSkipConfirmationMessage()).toBe('');
   });
 
+  it('should navigate to a lesson that is not in any module group', () => {
+    component.visibleModuleGroups = [];
+
+    component.onLessonStartClick({lessonNumber: 42, startUrl: ''});
+
+    expect(component.activeLessonNumber).toBe(42);
+    expect(component.navigatedLessonNumber).toBe(42);
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
   it('should return Start label for a skipped module that was never started', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
@@ -1765,6 +1808,18 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(localStorageService.getSkippedModules).not.toHaveBeenCalled();
+  });
+
+  it('should not persist mastered modules when the story id is missing', () => {
+    (component.storySummary.getId as jasmine.Spy).and.returnValue('');
+    localStorageService.updateMasteredModules.calls.reset();
+
+    const persister = component as unknown as {
+      persistMasteredModules: () => void;
+    };
+    persister.persistMasteredModules();
+
+    expect(localStorageService.updateMasteredModules).not.toHaveBeenCalled();
   });
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -1842,8 +1897,8 @@ describe('TopicStorySectionComponent', () => {
       nodeIds.push(`node_${i}`);
     }
 
-    const arcs = nodeIds.map((nodeId, i) => ({
-      id: `arc_${i}`,
+    const modules = nodeIds.map((nodeId, i) => ({
+      id: `module_${i}`,
       title: `Module ${i}`,
       description: `Module ${i} desc`,
       node_ids: [nodeId],
@@ -1852,7 +1907,7 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = createStorySummarySpy(
       nodeIds.map((_, i) => `Node ${i}`),
       storyNodeSpies,
-      arcs
+      modules
     );
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
@@ -1875,13 +1930,19 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModuleExpanded(0)).toBe(false);
   });
 
-  it('should show an module end test card when the module has lessons', () => {
+  it('should show a module end test card when the module has lessons', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'not_started')]),
     ];
     expect(component.shouldShowModuleEndTestCard(0)).toBe(true);
 
     component.visibleModuleGroups[0].lessonCards = [];
+    expect(component.shouldShowModuleEndTestCard(0)).toBe(false);
+  });
+
+  it('should not show an end test card for a module that does not exist', () => {
+    component.visibleModuleGroups = [];
+
     expect(component.shouldShowModuleEndTestCard(0)).toBe(false);
   });
 
@@ -1929,7 +1990,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isStoryCompleted()).toBe(false);
   });
 
-  it('should not report an module as completed before its test is completed', () => {
+  it('should not report a module as completed before its test is completed', () => {
     const baseLesson = {
       lessonTitle: 'Lesson',
       lessonDescription: '',
@@ -1957,7 +2018,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        arcId: '1',
+        moduleId: '1',
         hasPracticeQuestions: false,
       },
       {
@@ -1971,7 +2032,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        arcId: '2',
+        moduleId: '2',
         hasPracticeQuestions: false,
       },
       {
@@ -1989,7 +2050,7 @@ describe('TopicStorySectionComponent', () => {
         iconBg: '',
         headerBackgroundColor: '',
         headerBorderColor: '',
-        arcId: '3',
+        moduleId: '3',
         hasPracticeQuestions: false,
       },
     ];
@@ -2000,7 +2061,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModuleCompleted(99)).toBe(false);
   });
 
-  it('should collapse an module only when its lessons and test are completed', () => {
+  it('should collapse a module only when its lessons and test are completed', () => {
     localStorageService.getMasteredModules.and.returnValue(['1']);
     const storyNodeSpy = createStoryNodeSpy(
       'Completed Node',
@@ -2014,7 +2075,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2032,7 +2093,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModuleExpanded(0)).toBe(false);
   });
 
-  it('should expand an module when only its lessons are completed', () => {
+  it('should expand a module when only its lessons are completed', () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Completed Node',
       'Desc',
@@ -2045,7 +2106,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2084,13 +2145,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -2119,7 +2180,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.areAllLessonsCompleted(1)).toBeFalsy();
   });
 
-  it('should handle buildModuleGroups when arcs is null', async () => {
+  it('should handle buildModuleGroups when modules is null', async () => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node',
       'Desc',
@@ -2129,7 +2190,7 @@ describe('TopicStorySectionComponent', () => {
     );
 
     const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
-    storySummary.getArcs.and.returnValue(null);
+    storySummary.getModules.and.returnValue(null);
 
     component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
@@ -2279,7 +2340,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2321,7 +2382,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2373,13 +2434,13 @@ describe('TopicStorySectionComponent', () => {
       [publishedNodeSpy, draftNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -2397,7 +2458,7 @@ describe('TopicStorySectionComponent', () => {
         accentColor: '#27a844',
         showPractice: true,
         isPracticeCompleted: false,
-        arcId: '1',
+        moduleId: '1',
       },
     ]);
   });
@@ -2502,20 +2563,23 @@ describe('TopicStorySectionComponent', () => {
     expect(practiceUrl).toBe('#');
   });
 
-  it('should build end of arc url with fragments', () => {
+  it('should build end of module url with fragments', () => {
+    component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
 
-    const arcUrl = component.getEndOfArcUrl('1');
-    expect(arcUrl).toContain('fractions/test/arc/1');
+    const moduleUrl = component.getEndOfModuleUrl('1');
+    expect(moduleUrl).toContain('fractions/test/module/1');
+    expect(moduleUrl).toContain('story_id=story_id_1');
   });
 
-  it('should fallback end of arc url when fragments are missing', () => {
+  it('should fallback end of module url when fragments are missing', () => {
+    component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
 
-    const arcUrl = component.getEndOfArcUrl('1');
-    expect(arcUrl).toBe('#');
+    const moduleUrl = component.getEndOfModuleUrl('1');
+    expect(moduleUrl).toBe('#');
   });
 
   it('should return false from isNewChapterLabelVisible when service throws', () => {
@@ -2581,7 +2645,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
   });
 
-  it('should show module mastered modal when returning from completed arc test', fakeAsync(() => {
+  it('should show module mastered modal when returning from completed module test', fakeAsync(() => {
     const createNode = (nodeId: string, title: string) => {
       const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
         'getTitle',
@@ -2620,13 +2684,13 @@ describe('TopicStorySectionComponent', () => {
       [node1, node2, node3, node4],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_4'],
@@ -2637,10 +2701,10 @@ describe('TopicStorySectionComponent', () => {
       (title: string) => title !== 'Node 4'
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -2665,7 +2729,7 @@ describe('TopicStorySectionComponent', () => {
     );
   }));
 
-  it('should handle malformed arc_id query values when showing mastered modal', fakeAsync(() => {
+  it('should handle malformed module_id query values when showing mastered modal', fakeAsync(() => {
     const createNode = (nodeId: string, title: string) => {
       const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
         'getTitle',
@@ -2703,7 +2767,7 @@ describe('TopicStorySectionComponent', () => {
       [node1, node2, node3],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
@@ -2714,10 +2778,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1/story'];
       }
       return [];
@@ -2766,7 +2830,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2787,7 +2851,7 @@ describe('TopicStorySectionComponent', () => {
     component.activeLessonNumber = 1;
     component.onNavigationPracticeSelected('1');
 
-    expect(component.activePracticeArcId).toBe('1');
+    expect(component.activePracticeModuleId).toBe('1');
     expect(component.activeLessonNumber).toBeNull();
     tick(300);
   }));
@@ -2795,7 +2859,7 @@ describe('TopicStorySectionComponent', () => {
   it('should handle onNavigationPracticeSelected when element is not found', fakeAsync(() => {
     component.onNavigationPracticeSelected('999');
 
-    expect(component.activePracticeArcId).toBe('999');
+    expect(component.activePracticeModuleId).toBe('999');
     tick(300);
   }));
 
@@ -2817,12 +2881,12 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.masteredModuleIndex).toBeNull();
     expect(component.isModuleExpanded(0)).toBe(false);
-    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+    expect(Reflect.get(component, 'hasHandledModuleMasteredQueryParams')).toBe(
       true
     );
   });
 
-  it('should call onModuleSkipConfirmationCancel when arc skip modal is rejected', fakeAsync(() => {
+  it('should call onModuleSkipConfirmationCancel when module skip modal is rejected', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -2843,13 +2907,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -2898,7 +2962,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2909,10 +2973,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -2935,7 +2999,7 @@ describe('TopicStorySectionComponent', () => {
       windowClass: 'oppia-module-mastered-modal',
     });
     expect(component.masteredModuleIndex).toBeNull();
-    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+    expect(Reflect.get(component, 'hasHandledModuleMasteredQueryParams')).toBe(
       true
     );
   }));
@@ -2955,7 +3019,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -2966,10 +3030,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3058,7 +3122,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModulePracticeCompleted(0)).toBe(false);
   });
 
-  it('should report practice completion for a mastered module arc', fakeAsync(() => {
+  it('should report practice completion for a mastered module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3075,7 +3139,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3086,11 +3150,14 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
+      }
+      if (fieldName === 'story_id') {
+        return ['story_id_1'];
       }
       return [];
     });
@@ -3108,7 +3175,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModulePracticeCompleted(0)).toBe(true);
   }));
 
-  it('should not show the mastered modal when arc_id does not start with a digit', fakeAsync(() => {
+  it('should not show the mastered modal for a different story', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3125,7 +3192,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3136,10 +3203,59 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
+        return ['1'];
+      }
+      if (fieldName === 'story_id') {
+        return ['another_story'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    tick();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  }));
+
+  it('should not show the mastered modal when module_id does not start with a digit', fakeAsync(() => {
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'module_1',
+          title: 'Module 1',
+          description: 'First module',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'module_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'module_id') {
         return ['abc'];
       }
       return [];
@@ -3154,7 +3270,7 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should not show the mastered modal when arc_id is empty', fakeAsync(() => {
+  it('should not show the mastered modal when module_id is empty', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3171,7 +3287,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3182,10 +3298,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return [''];
       }
       return [];
@@ -3200,7 +3316,7 @@ describe('TopicStorySectionComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   }));
 
-  it('should not show the mastered modal when arc_id does not match any module', fakeAsync(() => {
+  it('should not show the mastered modal when module_id does not match any module', fakeAsync(() => {
     const storyNodeSpy = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3217,7 +3333,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3228,10 +3344,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['5'];
       }
       return [];
@@ -3285,13 +3401,13 @@ describe('TopicStorySectionComponent', () => {
       [node1, node2, node3, node4],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2', 'node_3'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_4'],
@@ -3302,10 +3418,10 @@ describe('TopicStorySectionComponent', () => {
       (title: string) => title !== 'Node 4'
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3376,13 +3492,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -3401,7 +3517,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.isModulePracticeCompleted(1)).toBe(false);
   });
 
-  it('should persist mastered modules when returning from arc test', fakeAsync(() => {
+  it('should persist mastered modules when returning from module test', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3424,13 +3540,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -3441,10 +3557,10 @@ describe('TopicStorySectionComponent', () => {
       (title: string) => title === 'Node 1'
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3495,19 +3611,19 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2, storyNodeSpy3],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
         },
         {
-          id: 'arc_3',
+          id: 'module_3',
           title: 'Module 3',
           description: 'Third module',
           node_ids: ['node_3'],
@@ -3538,7 +3654,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3552,7 +3668,7 @@ describe('TopicStorySectionComponent', () => {
       component.storySummary as jasmine.SpyObj<StorySummary>
     ).isNodeCompleted.and.returnValue(true);
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      return fieldName === 'arc_mastered' ? ['true'] : ['1'];
+      return fieldName === 'module_mastered' ? ['true'] : ['1'];
     });
     localStorageService.getMasteredModules.calls.reset();
     localStorageService.updateMasteredModules.calls.reset();
@@ -3563,7 +3679,7 @@ describe('TopicStorySectionComponent', () => {
     expect(localStorageService.updateMasteredModules).not.toHaveBeenCalled();
   });
 
-  it('should open arc skip confirmation as bottom sheet on mobile', fakeAsync(() => {
+  it('should open module skip confirmation as bottom sheet on mobile', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(300);
     const mockBottomSheetRef = {
       afterDismissed: () => ({subscribe: jasmine.createSpy('subscribe')}),
@@ -3590,13 +3706,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -3640,7 +3756,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3651,10 +3767,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3704,13 +3820,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -3767,13 +3883,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -3820,7 +3936,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3831,10 +3947,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3877,7 +3993,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3888,10 +4004,10 @@ describe('TopicStorySectionComponent', () => {
       true
     );
     urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
-      if (fieldName === 'arc_mastered') {
+      if (fieldName === 'module_mastered') {
         return ['true'];
       }
-      if (fieldName === 'arc_id') {
+      if (fieldName === 'module_id') {
         return ['1'];
       }
       return [];
@@ -3928,7 +4044,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1', 'node_2'],
@@ -3951,7 +4067,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should expand module group when lesson belongs to an module', fakeAsync(() => {
+  it('should expand module group when lesson belongs to a module', fakeAsync(() => {
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
       'Desc 1',
@@ -3965,7 +4081,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -3989,7 +4105,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should open arc skip confirmation modal when lesson is in a later module and earlier ones are incomplete', fakeAsync(() => {
+  it('should open module skip confirmation modal when lesson is in a later module and earlier ones are incomplete', fakeAsync(() => {
     windowDimensionsService.getWidth.and.returnValue(1024);
     const storyNodeSpy1 = createStoryNodeSpy(
       'Node 1',
@@ -4011,13 +4127,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -4051,7 +4167,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4063,31 +4179,31 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    component.activePracticeArcId = 'arc_1';
+    component.activePracticeModuleId = 'module_1';
     component.onLessonStartClick({
       lessonNumber: 1,
       startUrl: '',
     });
 
     expect(component.activeLessonNumber).toBe(1);
-    expect(component.activePracticeArcId).toBe('');
+    expect(component.activePracticeModuleId).toBe('');
 
     tick(300);
   }));
 
-  it('should not confirm arc skip nor show a modal when all earlier modules are completed', () => {
+  it('should not confirm module skip nor show a modal when all earlier modules are completed', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
       createModuleGroup('Module 2', [createLessonCard(2, 'completed')]),
     ];
 
-    component.activePracticeArcId = 'arc_2';
+    component.activePracticeModuleId = 'module_2';
     component.onLessonStartClick({lessonNumber: 2, startUrl: ''});
 
     expect(ngbModal.open).not.toHaveBeenCalled();
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.activePracticeArcId).toBe('');
+    expect(component.activePracticeModuleId).toBe('');
   });
 
   it('should open the modal from navigation even when mastery is unlocked', () => {
@@ -4227,7 +4343,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4259,7 +4375,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4314,13 +4430,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -4362,13 +4478,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -4409,13 +4525,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -4458,13 +4574,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -4515,7 +4631,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4555,7 +4671,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.masteredModuleIndex).toBeNull();
   });
 
-  it('should set hasHandledArcMasteredQueryParams to true', () => {
+  it('should set hasHandledModuleMasteredQueryParams to true', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
@@ -4563,7 +4679,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onModuleMasteredContinue();
 
-    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+    expect(Reflect.get(component, 'hasHandledModuleMasteredQueryParams')).toBe(
       true
     );
   });
@@ -4647,7 +4763,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4712,7 +4828,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4789,7 +4905,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.masteredModuleIndex).toBeNull();
   });
 
-  it('should set hasHandledArcMasteredQueryParams to true', () => {
+  it('should set hasHandledModuleMasteredQueryParams to true', () => {
     component.visibleModuleGroups = [
       createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
     ];
@@ -4797,7 +4913,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.onModuleMasteredContinue();
 
-    expect(Reflect.get(component, 'hasHandledArcMasteredQueryParams')).toBe(
+    expect(Reflect.get(component, 'hasHandledModuleMasteredQueryParams')).toBe(
       true
     );
   });
@@ -4830,7 +4946,7 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
@@ -4875,13 +4991,13 @@ describe('TopicStorySectionComponent', () => {
       [storyNodeSpy1, storyNodeSpy2],
       [
         {
-          id: 'arc_1',
+          id: 'module_1',
           title: 'Module 1',
           description: 'First module',
           node_ids: ['node_1'],
         },
         {
-          id: 'arc_2',
+          id: 'module_2',
           title: 'Module 2',
           description: 'Second module',
           node_ids: ['node_2'],
@@ -5076,7 +5192,7 @@ describe('TopicStorySectionComponent', () => {
       createModuleGroup('Module 1', [createLessonCard(1, 'completed')]),
       createModuleGroup('Module 2', [createLessonCard(2, 'not_started')]),
     ];
-    Reflect.set(component, 'completedModulePracticeArcIds', new Set(['1']));
+    Reflect.set(component, 'completedPracticeModuleIds', new Set(['1']));
 
     (
       Reflect.get(component, 'markSkippedModulesBefore') as (

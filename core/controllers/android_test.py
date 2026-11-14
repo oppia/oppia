@@ -372,8 +372,28 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200,
                 ),
-                [{'id': 'story_id', 'version': 1, 'payload': story.to_dict()}],
+                [
+                    {
+                        'id': 'story_id',
+                        'version': 1,
+                        'payload': story.to_dict_for_android(),
+                    }
+                ],
             )
+
+    def test_get_story_payload_does_not_include_modules(self) -> None:
+        """Story payloads for Android must not expose the modules field."""
+        self.save_new_story('story_id', 'user_id', 'Title')
+        with self.secrets_swap:
+            response = self.get_json(
+                '/android_data?activity_type=story&'
+                'activities_data=[{"id": "story_id", "version": 1}]',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200,
+            )
+        story_contents = response[0]['payload']['story_contents']
+        self.assertNotIn('modules', story_contents)
+        self.assertNotIn('arcs', story_contents)
 
     def test_get_story_migration_returns_correct_json(self) -> None:
         story = self.save_new_story('story_id', 'user_id', 'Title')
@@ -992,7 +1012,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     {
                         'id': 'story_id',
                         'version': 1,
-                        'payload': story.to_dict(),
+                        'payload': story.to_dict_for_android(),
                     },
                     {'id': 'nonexistent_story', 'version': 1, 'payload': None},
                 ],

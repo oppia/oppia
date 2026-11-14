@@ -85,7 +85,7 @@ const SIGNUP_PATH = '/signup';
 // shard. The release coordinator role (assigned in the shard setup) is what
 // authorises the per-URL toggle below.
 const NEW_LESSON_PLAYER_FLAG = 'new_lesson_player';
-const STORY_EDITOR_ARCS_FLAG = 'story_editor_arcs';
+const STORY_EDITOR_MODULES_FLAG = 'story_editor_modules';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -211,13 +211,13 @@ const getRequiredFeatureFlagStates = function (url) {
     states[NEW_LESSON_PLAYER_FLAG] = false;
   }
   if (pathname.endsWith('/practice/session')) {
-    states[STORY_EDITOR_ARCS_FLAG] = false;
+    states[STORY_EDITOR_MODULES_FLAG] = false;
   } else if (
     /\/practice\/[^/]+$/.test(pathname) ||
     pathname.endsWith('/mastery-challenge') ||
-    pathname.indexOf('/test/arc/') !== -1
+    pathname.indexOf('/test/module/') !== -1
   ) {
-    states[STORY_EDITOR_ARCS_FLAG] = true;
+    states[STORY_EDITOR_MODULES_FLAG] = true;
   }
   return states;
 };

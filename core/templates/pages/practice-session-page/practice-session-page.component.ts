@@ -31,7 +31,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 enum PracticeSessionType {
   Lesson = 'lesson',
-  Arc = 'arc',
+  Module = 'module',
   Mastery = 'mastery',
   Legacy = 'legacy',
 }
@@ -52,7 +52,8 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   loadingMessage: string = 'Loading';
   private sessionType: PracticeSessionType = PracticeSessionType.Mastery;
   private nodeId: string = '';
-  private arcId: string = '';
+  private moduleId: string = '';
+  private storyId: string = '';
 
   constructor(
     private urlService: UrlService,
@@ -98,15 +99,19 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             node_id: this.nodeId,
           }
         );
-      case PracticeSessionType.Arc:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.ARC_PRACTICE_DATA_URL,
+      case PracticeSessionType.Module: {
+        const moduleDataUrl = this.urlInterpolationService.interpolateUrl(
+          PracticeSessionPageConstants.MODULE_PRACTICE_DATA_URL,
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
-            arc_id: this.arcId,
+            module_id: this.moduleId,
           }
         );
+        return this.storyId
+          ? this.urlService.addField(moduleDataUrl, 'story_id', this.storyId)
+          : moduleDataUrl;
+      }
       case PracticeSessionType.Legacy:
         return this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL,
@@ -143,15 +148,19 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             node_id: this.nodeId,
           }
         );
-      case PracticeSessionType.Arc:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.END_OF_ARC_URL,
+      case PracticeSessionType.Module: {
+        const endOfModuleUrl = this.urlInterpolationService.interpolateUrl(
+          PracticeSessionPageConstants.END_OF_MODULE_URL,
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
-            arc_id: this.arcId,
+            module_id: this.moduleId,
           }
         );
+        return this.storyId
+          ? this.urlService.addField(endOfModuleUrl, 'story_id', this.storyId)
+          : endOfModuleUrl;
+      }
       case PracticeSessionType.Legacy:
         return this.urlInterpolationService.interpolateUrl(
           PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
@@ -186,17 +195,26 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       }
     );
 
-    if (this.sessionType === PracticeSessionType.Arc && this.arcId) {
+    if (this.sessionType === PracticeSessionType.Module && this.moduleId) {
       topicViewerUrl = this.urlService.addField(
         topicViewerUrl,
-        'arc_mastered',
+        'module_mastered',
         'true'
       );
       topicViewerUrl = this.urlService.addField(
         topicViewerUrl,
-        'arc_id',
-        this.arcId
+        'module_id',
+        this.moduleId
       );
+      // The topic viewer renders one section per story, so the story must be
+      // included to show the mastered modal only for this module's story.
+      if (this.storyId) {
+        topicViewerUrl = this.urlService.addField(
+          topicViewerUrl,
+          'story_id',
+          this.storyId
+        );
+      }
     }
 
     this.practiceSessionsBackendApiService
@@ -246,7 +264,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     );
 
     this.topicName = this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    if (!this.platformFeatureService.status.StoryEditorArcs.isEnabled) {
+    if (!this.platformFeatureService.status.StoryEditorModules.isEnabled) {
       this.stringifiedSubtopicIds =
         this.urlService.getSelectedSubtopicsFromUrl();
     }
@@ -256,17 +274,19 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
 
   private _determineSessionType(): void {
     const nodeId = this.urlService.getNodeIdFromPracticeUrl();
-    const arcId = this.urlService.getArcIdFromUrl();
+    const moduleId = this.urlService.getModuleIdFromUrl();
+    const storyId = this.urlService.getStoryIdFromPracticeUrl();
 
     if (nodeId) {
       this.sessionType = PracticeSessionType.Lesson;
       this.nodeId = nodeId;
     } else if (
-      arcId &&
-      this.platformFeatureService.status.StoryEditorArcs.isEnabled
+      moduleId &&
+      this.platformFeatureService.status.StoryEditorModules.isEnabled
     ) {
-      this.sessionType = PracticeSessionType.Arc;
-      this.arcId = arcId;
+      this.sessionType = PracticeSessionType.Module;
+      this.moduleId = moduleId;
+      this.storyId = storyId;
     } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {

@@ -47,10 +47,11 @@ class MockAccessValidationBackendApiService {
     return Promise.resolve();
   }
 
-  validateAccessToEndOfArcPage(
+  validateAccessToEndOfModulePage(
     _classroomUrlFragment: string,
     _topicUrlFragment: string,
-    _arcId: string
+    _moduleId: string,
+    _storyId?: string
   ) {
     return Promise.resolve();
   }
@@ -71,7 +72,7 @@ class MockRouter {
 
 class MockPlatformFeatureService {
   status = {
-    StoryEditorArcs: {
+    StoryEditorModules: {
       isEnabled: true,
     },
   };
@@ -246,10 +247,10 @@ describe('PracticeSessionAccessGuard', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
-  it('should allow access for end-of-arc when arc_id is present', fakeAsync(() => {
+  it('should allow access for end-of-module when module_id is present', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
-      'validateAccessToEndOfArcPage'
+      'validateAccessToEndOfModulePage'
     ).and.returnValue(Promise.resolve());
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
@@ -260,7 +261,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      arc_id: '1',
+      module_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -272,8 +273,40 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1', '');
     expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should pass story_id when validating an end-of-module page', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToEndOfModulePage'
+    ).and.returnValue(Promise.resolve());
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {story_id: 'story_1'};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      module_id: '1',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith(
+      'math',
+      'algebra',
+      '1',
+      'story_1'
+    );
   }));
 
   it('should allow access for mastery challenge when no params are present', fakeAsync(() => {
@@ -305,8 +338,8 @@ describe('PracticeSessionAccessGuard', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
-  it('should redirect to 404 when StoryEditorArcs flag is disabled and node_id is present', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+  it('should redirect to 404 when StoryEditorModules flag is disabled and node_id is present', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     const routeSnapshot = new ActivatedRouteSnapshot();
@@ -331,8 +364,8 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
-  it('should redirect to 404 when StoryEditorArcs flag is disabled and arc_id is present', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+  it('should redirect to 404 when StoryEditorModules flag is disabled and module_id is present', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     const routeSnapshot = new ActivatedRouteSnapshot();
@@ -340,12 +373,12 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      arc_id: '1',
+      module_id: '1',
     };
 
     guard
       .canActivate(routeSnapshot, {
-        url: '/learn/math/algebra/test/arc/1',
+        url: '/learn/math/algebra/test/module/1',
       } as RouterStateSnapshot)
       .then(canActivate => {
         expect(canActivate).toBeFalsy();
@@ -357,8 +390,8 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
-  it('should redirect to 404 when StoryEditorArcs flag is disabled and no params present (mastery)', fakeAsync(() => {
-    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+  it('should redirect to 404 when StoryEditorModules flag is disabled and no params present (mastery)', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorModules.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     const routeSnapshot = new ActivatedRouteSnapshot();

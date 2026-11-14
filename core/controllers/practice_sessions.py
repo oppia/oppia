@@ -36,6 +36,7 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     """
 
     selected_subtopic_ids: Optional[List[int]]
+    story_id: Optional[str]
 
 
 class PracticeSessionsPageDataHandler(
@@ -53,7 +54,7 @@ class PracticeSessionsPageDataHandler(
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
-        'arc_id': {
+        'module_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
         },
@@ -62,6 +63,10 @@ class PracticeSessionsPageDataHandler(
         'GET': {
             'selected_subtopic_ids': {
                 'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'},
+                'default_value': None,
+            },
+            'story_id': {
+                'schema': {'type': 'basestring'},
                 'default_value': None,
             },
         }
@@ -86,7 +91,11 @@ class PracticeSessionsPageDataHandler(
             'selected_subtopic_ids'
         )
         node_id = self.request.route_kwargs.get('node_id')
-        arc_id = self.request.route_kwargs.get('arc_id')
+        module_id = self.request.route_kwargs.get('module_id')
+        # An empty story_id is equivalent to omitting it, which preserves
+        # compatibility with module URLs created before story-scoped modules
+        # were introduced.
+        story_id = self.normalized_request.get('story_id') or None
 
         selected_skill_ids: List[str] = []
         if selected_subtopic_ids is not None:
@@ -95,8 +104,10 @@ class PracticeSessionsPageDataHandler(
                     selected_skill_ids.extend(subtopic.skill_ids)
         elif node_id is not None:
             selected_skill_ids = self._get_skill_ids_for_node(topic, node_id)
-        elif arc_id is not None:
-            selected_skill_ids = self._get_skill_ids_for_arc(topic, arc_id)
+        elif module_id is not None:
+            selected_skill_ids = self._get_skill_ids_for_module(
+                topic, module_id, story_id
+            )
         else:
             # Mastery challenge: collect all skills from all subtopics.
             for subtopic in topic.subtopics:
@@ -153,50 +164,64 @@ class PracticeSessionsPageDataHandler(
                 return node.acquired_skill_ids
         return []
 
-    def _get_story_and_arc_for_arc_id(
-        self, topic: topic_domain.Topic, arc_id: str
-    ) -> Optional[Tuple[story_domain.Story, story_domain.Arc]]:
-        """Returns the story-arc pair matching the given arc ID.
+    def _get_story_and_module_for_module_id(
+        self,
+        topic: topic_domain.Topic,
+        module_id: str,
+        story_id: Optional[str] = None,
+    ) -> Optional[Tuple[story_domain.Story, story_domain.Module]]:
+        """Returns the story-module pair matching the given module ID.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc in
-        the first published story of the topic (e.g., '1' maps to the first
-        arc).
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the specified published story of the topic (e.g., '1' maps to the
+        first module). If story_id is None, the first published story is used
+        for backward compatibility.
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID (1-based index).
+            module_id: str. The module ID (1-based index).
+            story_id: str|None. The ID of the story that the module belongs to.
 
         Returns:
-            tuple(Story, Arc) or None. The matching story-arc pair, or None
-            if no matching arc is found.
+            tuple(Story, Module) or None. The matching story-module pair, or
+            None if no matching module is found.
         """
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic
+        modules_with_stories = (
+            story_fetchers.get_all_modules_with_stories_for_topic(
+                topic, story_id
+            )
         )
-        if arc_id.isascii() and arc_id.isdigit():
-            arc_index = int(arc_id)
-            if 1 <= arc_index <= len(arcs_with_stories):
-                return arcs_with_stories[arc_index - 1]
+        if module_id.isascii() and module_id.isdigit():
+            module_index = int(module_id)
+            if 1 <= module_index <= len(modules_with_stories):
+                return modules_with_stories[module_index - 1]
         return None
 
-    def _get_skill_ids_for_arc(
-        self, topic: topic_domain.Topic, arc_id: str
+    def _get_skill_ids_for_module(
+        self,
+        topic: topic_domain.Topic,
+        module_id: str,
+        story_id: Optional[str] = None,
     ) -> List[str]:
-        """Returns skill IDs associated with all nodes in a given arc.
+        """Returns skill IDs associated with all nodes in a given module.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc in
-        the first published story of the topic (e.g., '1' maps to the first
-        arc).
+        The module_id parameter is a 1-based index that maps to the nth module
+        in the specified published story of the topic (e.g., '1' maps to the
+        first module). If story_id is None, the first published story is used
+        for backward compatibility.
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID (1-based index).
+            module_id: str. The module ID (1-based index).
+            story_id: str|None. The ID of the story that the module belongs to.
 
         Returns:
-            list(str). The skill IDs for all nodes in the arc.
+            list(str). The skill IDs for all nodes in the module.
         """
-        story_arc = self._get_story_and_arc_for_arc_id(topic, arc_id)
-        if story_arc is None:
+        story_module = self._get_story_and_module_for_module_id(
+            topic, module_id, story_id
+        )
+        if story_module is None:
             return []
-        story, arc = story_arc
-        return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
+        story, module = story_module
+        return story.get_acquired_skill_ids_for_node_ids(module.node_ids)

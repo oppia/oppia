@@ -85,7 +85,7 @@ describe('ModuleNavigationComponent', () => {
         accentColor: '#000',
         showPractice: false,
         isPracticeCompleted: false,
-        arcId: '1',
+        moduleId: '1',
       },
     ];
 
@@ -125,7 +125,7 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      arcId: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(true);
@@ -140,7 +140,7 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      arcId: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
@@ -152,23 +152,23 @@ describe('ModuleNavigationComponent', () => {
       accentColor: '#000',
       showPractice: true,
       isPracticeCompleted: false,
-      arcId: '1',
+      moduleId: '1',
     };
 
     expect(component.isLastLessonCompleted(moduleGroup)).toBe(false);
   });
 
-  it('should mark matching practice arc as active when one is provided', () => {
-    component.activePracticeArcId = 'arc-2';
+  it('should mark matching practice module as active when one is provided', () => {
+    component.activePracticeModuleId = 'module-2';
 
-    expect(component.isActivePractice('arc-2')).toBe(true);
-    expect(component.isActivePractice('arc-1')).toBe(false);
+    expect(component.isActivePractice('module-2')).toBe(true);
+    expect(component.isActivePractice('module-1')).toBe(false);
   });
 
   it('should report no active practice when none is provided', () => {
-    component.activePracticeArcId = '';
+    component.activePracticeModuleId = '';
 
-    expect(component.isActivePractice('arc-1')).toBe(false);
+    expect(component.isActivePractice('module-1')).toBe(false);
   });
 
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {
@@ -267,7 +267,7 @@ describe('ModuleNavigationComponent', () => {
             accentColor: '#000',
             showPractice: true,
             isPracticeCompleted: false,
-            arcId: '1',
+            moduleId: '1',
           },
         ],
         false

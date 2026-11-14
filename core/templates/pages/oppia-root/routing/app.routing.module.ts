@@ -151,7 +151,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NODE_PRACTICE_SESSION
       .ROUTE,
-    data: {requiredFeatureFlags: [FeatureNames.StoryEditorArcs]},
+    data: {requiredFeatureFlags: [FeatureNames.StoryEditorModules]},
     loadChildren: () =>
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
@@ -159,8 +159,8 @@ const routes: Route[] = [
     canActivate: [PracticeSessionAccessGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
-    data: {requiredFeatureFlags: [FeatureNames.StoryEditorArcs]},
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_MODULE_TEST.ROUTE,
+    data: {requiredFeatureFlags: [FeatureNames.StoryEditorModules]},
     loadChildren: () =>
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
@@ -169,7 +169,7 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MASTERY_CHALLENGE.ROUTE,
-    data: {requiredFeatureFlags: [FeatureNames.StoryEditorArcs]},
+    data: {requiredFeatureFlags: [FeatureNames.StoryEditorModules]},
     loadChildren: () =>
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule

@@ -34,6 +34,9 @@ FeatureNames = feature_flag_list.FeatureNames
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
     feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
+FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME = (
+    feature_flag_list.FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME
+)
 
 
 class Registry:
@@ -124,6 +127,14 @@ class Registry:
         feature_flag_config_model = config_models.FeatureFlagConfigModel.get(
             name, strict=False
         )
+        if feature_flag_config_model is None:
+            legacy_name = FEATURE_FLAG_NAME_TO_LEGACY_STORAGE_NAME.get(name)
+            if legacy_name is not None:
+                feature_flag_config_model = (
+                    config_models.FeatureFlagConfigModel.get(
+                        legacy_name, strict=False
+                    )
+                )
 
         if feature_flag_config_model is not None:
             return feature_flag_domain.FeatureFlagConfig(
