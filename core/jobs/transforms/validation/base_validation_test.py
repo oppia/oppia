@@ -69,6 +69,22 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
+    def test_process_reports_nothing_for_recently_deleted_model(self) -> None:
+        recently_deleted_model = base_models.BaseModel(
+            id='123',
+            deleted=True,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([recently_deleted_model])
+            | beam.ParDo(base_validation.ValidateDeletedModel())
+        )
+
+        self.assert_pcoll_empty(output)
+
 
 class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
@@ -135,6 +151,19 @@ class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
+    def test_validate_model_id_reports_nothing_for_valid_id(self) -> None:
+        valid_id_model = base_models.BaseModel(
+            id='valid_id-123', created_on=self.YEAR_AGO, last_updated=self.NOW
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([valid_id_model])
+            | beam.ParDo(base_validation.ValidateBaseModelId())
+        )
+
+        self.assert_pcoll_empty(output)
+
 
 class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
 
@@ -164,6 +193,28 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
+
+    def test_validate_post_commit_status_reports_nothing_when_valid(
+        self,
+    ) -> None:
+        valid_commit_status = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='public',
+            post_commit_is_private=False,
+            commit_cmds=[],
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_status])
+            | beam.ParDo(base_validation.ValidatePostCommitStatus())
+        )
+
+        self.assert_pcoll_empty(output)
 
 
 class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
@@ -225,6 +276,28 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
+
+    def test_validate_post_commit_is_private_reports_nothing_when_consistent(
+        self,
+    ) -> None:
+        valid_commit_status = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='private',
+            post_commit_is_private=True,
+            commit_cmds=[],
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_status])
+            | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
+        )
+
+        self.assert_pcoll_empty(output)
 
 
 class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
@@ -587,6 +660,25 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
+
+    def test_validate_commit_type_reports_nothing_for_valid_type(self) -> None:
+        valid_commit_type_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[],
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_type_model])
+            | beam.ParDo(base_validation.ValidateCommitType())
+        )
+
+        self.assert_pcoll_empty(output)
 
 
 class MockValidateCommitCmdsSchema(
