@@ -807,6 +807,10 @@
 /core/controllers/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
 /core/domain/html_translation_services*.py @oppia/contributor-experience-team
+/core/domain/job_domain.py @oppia/lace-backend-reviewers
+/core/domain/job_services.py @oppia/lace-backend-reviewers
+/core/domain/job_domain_test.py @oppia/lace-backend-reviewers
+/core/domain/job_services_test.py @oppia/lace-backend-reviewers
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers
