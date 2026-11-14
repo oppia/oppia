@@ -2665,7 +2665,6 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
-    await this.dismissFeedbackPromptModalIfPresent();
     // Ensure the editor is fully loaded before attempting to navigate.
     await this.waitForPageToFullyLoad();
 
@@ -2919,17 +2918,7 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
-    let goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
-    if (!goToFeedbackButton) {
-      try {
-        goToFeedbackButton = await this.page.waitForSelector(
-          goToFeedbackButtonSelector,
-          {visible: true, timeout: 2500}
-        );
-      } catch {
-        goToFeedbackButton = null;
-      }
-    }
+    const goToFeedbackButton = await this.page.$(goToFeedbackButtonSelector);
     if (goToFeedbackButton) {
       await this.clickOnElementWithSelector(goToFeedbackButtonSelector);
       await this.waitForNetworkIdle();
@@ -2948,6 +2937,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
+
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
@@ -4874,7 +4864,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
-    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
@@ -5004,7 +4993,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
-    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -8255,7 +8243,6 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the stats tab of the exploration editor.
    */
   async navigateToStatsTab(): Promise<void> {
-    await this.dismissFeedbackPromptModalIfPresent();
     if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
       if (!mobileNavbarElement) {

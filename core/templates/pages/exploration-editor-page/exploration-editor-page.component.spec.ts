@@ -80,6 +80,8 @@ import {LanguageCodeToEntityTranslations} from '../../services/entity-translatio
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {FeedbackStatusCountsBackendResponse} from 'domain/feedback/feedback.model';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -107,6 +109,9 @@ class MockPlatformFeatureService {
     ShowVoiceoverTabForNonCuratedExplorations: {
       isEnabled: false,
     },
+    ExplorationEditorNewCreatorFeedbackTab: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -128,6 +133,7 @@ describe('Exploration editor page component', () => {
   let rs: RouterService;
   let autosaveInfoModalsService: AutosaveInfoModalsService;
   let sas: SiteAnalyticsService;
+  let feedbackBackendApiService: FeedbackBackendApiService;
   let sers: StateEditorRefreshService;
   let sts: StateTutorialFirstTimeService;
   let stfts: StateTutorialFirstTimeService;
@@ -368,6 +374,7 @@ describe('Exploration editor page component', () => {
     rs = TestBed.inject(RouterService);
     sas = TestBed.inject(SiteAnalyticsService);
     sers = TestBed.inject(StateEditorRefreshService);
+    feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
     sts = TestBed.inject(StateTutorialFirstTimeService);
     stfts = TestBed.inject(StateTutorialFirstTimeService);
     tds = TestBed.inject(ThreadDataBackendApiService);
@@ -1176,7 +1183,29 @@ describe('Exploration editor page component', () => {
     });
 
     it('should open feedback prompt modal and navigate to feedback tab when confirmed', fakeAsync(() => {
-      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      const mockFeedbackStatusCounts: FeedbackStatusCountsBackendResponse = {
+        lesson_feedback_counts: {
+          open: 2,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 2,
+        },
+        platform_report_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+      };
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(mockFeedbackStatusCounts));
       spyOn(rs, 'navigateToFeedbackTab');
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
@@ -1199,7 +1228,29 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should not navigate to feedback tab when feedback prompt modal is dismissed', fakeAsync(() => {
-      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      const mockFeedbackStatusCounts: FeedbackStatusCountsBackendResponse = {
+        lesson_feedback_counts: {
+          open: 2,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 2,
+        },
+        platform_report_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+      };
+
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(mockFeedbackStatusCounts));
       spyOn(rs, 'navigateToFeedbackTab');
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
@@ -1221,38 +1272,121 @@ describe('Exploration editor page component', () => {
       expect(component.feedbackPromptModalHasBeenShown).toBe(true);
     }));
 
-    it('should not open feedback prompt modal if openThreadsCount is 0', () => {
-      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
-      spyOn(ngbModal, 'open');
+    it('should not open feedback prompt modal if open feedback count is 0', fakeAsync(() => {
+      const mockFeedbackStatusCounts: FeedbackStatusCountsBackendResponse = {
+        lesson_feedback_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+        platform_report_counts: {
+          open: 0,
+          fixed: 0,
+          compliment: 0,
+          not_actionable: 0,
+          transferred_to_github: 0,
+          total: 0,
+        },
+      };
 
-      expect(ngbModal.open).not.toHaveBeenCalled();
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.resolve(mockFeedbackStatusCounts));
+      spyOn(ngbModal, 'open');
 
       component.feedbackPromptModalHasBeenShown = false;
       component.isModalOpenable = true;
 
       component.maybeShowFeedbackPromptModal();
+      tick();
 
       expect(ngbModal.open).not.toHaveBeenCalled();
-    });
+    }));
 
     it('should not open feedback prompt modal if already shown or modal is not openable', () => {
-      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      spyOn(feedbackBackendApiService, 'fetchLessonFeedbackStatusCountsAsync');
       spyOn(ngbModal, 'open');
-
-      expect(ngbModal.open).not.toHaveBeenCalled();
 
       // Case 1: Modal is not openable.
       component.feedbackPromptModalHasBeenShown = false;
       component.isModalOpenable = false;
       component.maybeShowFeedbackPromptModal();
       expect(ngbModal.open).not.toHaveBeenCalled();
+      expect(
+        feedbackBackendApiService.fetchLessonFeedbackStatusCountsAsync
+      ).not.toHaveBeenCalled();
 
-      // Case 2: Modal was already shown (e.g. after draft save).
+      // Case 2: Modal was already shown.
       component.feedbackPromptModalHasBeenShown = true;
       component.isModalOpenable = true;
       component.maybeShowFeedbackPromptModal();
       expect(ngbModal.open).not.toHaveBeenCalled();
+      expect(
+        feedbackBackendApiService.fetchLessonFeedbackStatusCountsAsync
+      ).not.toHaveBeenCalled();
     });
+
+    it('should handle error when fetching feedback status counts fails', fakeAsync(() => {
+      spyOn(
+        feedbackBackendApiService,
+        'fetchLessonFeedbackStatusCountsAsync'
+      ).and.returnValue(Promise.reject(new Error('Network error')));
+      spyOn(ngbModal, 'open');
+
+      component.feedbackPromptModalHasBeenShown = false;
+      component.isModalOpenable = true;
+
+      component.maybeShowFeedbackPromptModal();
+      tick();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+      expect(component.feedbackPromptModalHasBeenShown).toBe(false);
+    }));
+
+    it('should correctly check if new creator feedback tab is enabled', () => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      expect(component.isNewCreatorFeedbackTabEnabled()).toBe(true);
+
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        false;
+      expect(component.isNewCreatorFeedbackTabEnabled()).toBe(false);
+    });
+
+    it('should call maybeShowFeedbackPromptModal in initExplorationPage when new creator feedback tab is enabled', fakeAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        true;
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
+      spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
+      spyOn(component, 'maybeShowFeedbackPromptModal');
+
+      component.initExplorationPage();
+      tick();
+
+      expect(component.maybeShowFeedbackPromptModal).toHaveBeenCalled();
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should navigate to feedback tab in initExplorationPage when new creator feedback tab is disabled and there are open threads', fakeAsync(() => {
+      mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+        false;
+      isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
+      spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      spyOn(rs, 'navigateToFeedbackTab');
+
+      component.initExplorationPage();
+      tick();
+
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      flush();
+      discardPeriodicTasks();
+    }));
 
     it('should get exploration url', () => {
       expect(component.getExplorationUrl(explorationId)).toBe('/explore/exp1');
