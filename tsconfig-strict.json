@@ -74,6 +74,9 @@
       "tests/*": [
         "core/templates/tests/*"
       ],
+      "third-party-imports/*": [
+        "core/templates/third-party-imports/*"
+      ],
       "utility/*": [
         "core/templates/utility/*"
       ]

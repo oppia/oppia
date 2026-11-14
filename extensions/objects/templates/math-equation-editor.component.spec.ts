@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the math equation editor.
  */
 
-// @ts-nocheck
-
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {
   GuppyInitializationService,
