@@ -2165,7 +2165,7 @@ describe('Conversation flow service', () => {
     it('should not recommend a coming soon chapter as the next lesson', fakeAsync(() => {
       setUpStoryMode('Ready To Publish', true);
       conversationFlowService.setRecommendedExplorationSummaries([]);
-
+      // eslint-disable-next-line dot-notation
       conversationFlowService['_handleStoryModeTerminalCard']();
       tick();
 
@@ -2180,7 +2180,7 @@ describe('Conversation flow service', () => {
 
     it('should recommend a published chapter as the next lesson', fakeAsync(() => {
       setUpStoryMode('Published', true);
-
+      // eslint-disable-next-line dot-notation
       conversationFlowService['_handleStoryModeTerminalCard']();
       tick();
 
@@ -2194,7 +2194,7 @@ describe('Conversation flow service', () => {
 
     it('should keep recommending a ready to publish chapter when the serial chapter learner view is disabled', fakeAsync(() => {
       setUpStoryMode('Ready To Publish', false);
-
+      // eslint-disable-next-line dot-notation
       conversationFlowService['_handleStoryModeTerminalCard']();
       tick();
 

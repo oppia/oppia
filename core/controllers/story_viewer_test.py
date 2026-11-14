@@ -1037,6 +1037,12 @@ class ComingSoonChapterExplorationAccessTests(BaseStoryViewerControllerTests):
     """
 
     def _get_exploration_init_data(self, expected_status_int: int) -> None:
+        """Requests the initial data of the exploration of the third chapter
+        and checks the response status.
+
+        Args:
+            expected_status_int: int. The expected HTTP status code.
+        """
         self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID_7),
             expected_status_int=expected_status_int,
