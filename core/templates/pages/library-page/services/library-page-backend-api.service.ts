@@ -26,15 +26,9 @@ import {TranslatableExplorationMetadataField} from 'domain/summary/learner-explo
 import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-interface LibraryGroupDataBackendDict {
-  activity_list: ActivityDict[];
-  header_i18n_id: string;
-  preferred_language_codes: string[];
-}
-
-// 'activity_list' mixes exploration and collection summaries. Each summary
-// type only carries some of the fields below: exploration summaries have
-// 'last_updated_msec', 'ratings' and 'translated_metadata_fields', while
+// 'activity_summary_dicts' mixes exploration and collection summaries. Each
+// summary type only carries some of the fields below: exploration summaries
+// have 'last_updated_msec', 'ratings' and 'translated_metadata_fields', while
 // collection summaries have 'node_count'. The template reads each of them only
 // inside the branch matching 'activity_type', so they are kept non-optional
 // here.
@@ -80,19 +74,12 @@ export interface CreatorDashboardData {
   collections_list: CollectionSummaryBackendDict[];
 }
 
-export interface LibraryGroupData {
-  activity_list: ActivityDict[];
-  header_i18n_id: string;
-  preferred_language_codes: string[];
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class LibraryPageBackendApiService {
   LIBRARY_INDEX_HANDLER: string = '/libraryindexhandler';
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
-  LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
   constructor(
     private http: HttpClient,
@@ -119,19 +106,6 @@ export class LibraryPageBackendApiService {
   async fetchCreatorDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this.http
       .get<CreatorDashboardDataBackendDict>(this.CREATOR_DASHBOARD_HANDLER)
-      .toPromise();
-  }
-
-  async fetchLibraryGroupDataAsync(
-    groupName: string
-  ): Promise<LibraryGroupData> {
-    return this.http
-      .get<LibraryGroupDataBackendDict>(this.LIBRARY_GROUP_HANDLER, {
-        params: {
-          group_name: groupName,
-          ...this.getDisplayLanguageParams(),
-        },
-      })
       .toPromise();
   }
 }

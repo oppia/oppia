@@ -121,6 +121,37 @@ describe('Release coordinator navbar component', () => {
     );
   });
 
+  it('should render release coordinator tabs as focusable buttons', () => {
+    fixture.detectChanges();
+
+    const tabButtons = fixture.nativeElement.querySelectorAll(
+      '.oppia-navbar-tabs-release-coordinator button.oppia-navbar-tab'
+    ) as NodeListOf<HTMLButtonElement>;
+    expect(tabButtons.length).toBe(6);
+
+    tabButtons.forEach(tabButton => {
+      expect(tabButton.type).toBe('button');
+      expect(tabButton.hasAttribute('href')).toBe(false);
+      expect(tabButton.tabIndex).toBe(0);
+    });
+
+    const activeTabChangeSpy = component.activeTabChange.emit as jasmine.Spy;
+    tabButtons[1].click();
+    fixture.detectChanges();
+
+    expect(activeTabChangeSpy).toHaveBeenCalledWith(
+      ReleaseCoordinatorPageConstants.TAB_ID_FEATURES
+    );
+    expect(component.activeTab).toBe(
+      ReleaseCoordinatorPageConstants.TAB_ID_FEATURES
+    );
+    expect(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-navbar-tabs-release-coordinator button.active'
+      ).length
+    ).toBe(2);
+  });
+
   it('should set profileDropdownIsActive to true', () => {
     expect(component.profileDropdownIsActive).toBe(false);
 
