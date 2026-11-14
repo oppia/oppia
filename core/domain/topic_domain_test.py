@@ -58,6 +58,26 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
+    def test_topic_name_and_description_are_translatable(self) -> None:
+        contents = (
+            self.topic.get_translatable_contents_collection().content_id_to_translatable_content
+        )
+        self.assertEqual(self.topic.get_content_count(), 2)
+        self.assertEqual(
+            contents[feconf.TOPIC_NAME_CONTENT_ID].content_value, 'Name'
+        )
+        self.assertEqual(
+            contents[feconf.TOPIC_DESCRIPTION_CONTENT_ID].content_value,
+            'description',
+        )
+
+    def test_empty_topic_description_is_not_translatable(self) -> None:
+        self.topic.description = ''
+        self.assertEqual(
+            self.topic.get_translatable_content_ids(),
+            [feconf.TOPIC_NAME_CONTENT_ID],
+        )
+
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(

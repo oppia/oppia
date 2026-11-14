@@ -107,6 +107,9 @@ class FeatureNames(enum.Enum):
     )
     STORY_EDITOR_ARCS = 'story_editor_arcs'
     ENABLE_DROPDOWN_PAGINATION = 'enable_dropdown_pagination'
+    ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES = (
+        'enable_topic_metadata_translation_opportunities'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -131,6 +134,7 @@ class FeatureNames(enum.Enum):
 DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.ENABLE_DROPDOWN_PAGINATION,
+    FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -375,6 +379,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables dropdown-based page navigation on the '
             'Contributor Dashboard, replacing the simple Previous/Next '
             'pagination buttons with a page selector dropdown.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.ENABLE_TOPIC_METADATA_TRANSLATION_OPPORTUNITIES.value: (
+        (
+            'This flag enables topic name and description translation '
+            'opportunities on the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
