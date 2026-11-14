@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for VoiceoverCardComponent.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -47,6 +45,7 @@ import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverCardComponent} from './voiceover-card.component';
 import {FormatTimePipe} from 'filters/format-timer.pipe';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 import {AppConstants} from 'app.constants';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -193,7 +192,7 @@ describe('Voiceover card component', () => {
     spyOn(
       adminBackendApiService,
       'getAdminConfigForAutomaticVoiceoversAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(Promise.resolve(false));
 
     component.manualVoiceoverTotalDuration = 10;
     component.manualVoiceoverProgress = 0;
@@ -245,7 +244,7 @@ describe('Voiceover card component', () => {
       duration_secs: 12.0,
     };
 
-    let changeDicts = [
+    let changeDicts: ExplorationChange[] = [
       {
         cmd: 'update_voiceovers',
         language_accent_code: 'en-US',
