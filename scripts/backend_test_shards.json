@@ -42,6 +42,8 @@
         "core.controllers.general_feedback_test",
         "extensions.issues.base_test",
         "core.feature_flag_list_test",
+        "core.android_feature_flag_list_test",
+        "core.domain.android_feature_flag_registry_test",
         "core.controllers.skill_mastery_test",
         "core.controllers.improvements_test",
         "core.controllers.topics_and_skills_dashboard_test",
@@ -435,6 +437,7 @@
         "core.controllers.certificate_assessment_test",
         "core.domain.certificate_assessment_services_test",
         "core.jobs.batch_jobs.classroom_migration_jobs_test",
-        "core.jobs.batch_jobs.legacy_feedback_migration_jobs_test"
+        "core.jobs.batch_jobs.legacy_feedback_migration_jobs_test",
+        "core.domain.android_feature_flag_domain_test"
     ]
 }

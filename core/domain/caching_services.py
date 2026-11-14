@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 
 from core.domain import (
+    android_feature_flag_domain,
     caching_domain,
     collection_domain,
     exp_domain,
@@ -54,6 +55,7 @@ if MYPY:  # pragma: no cover
 
     AllowedCacheableObjectTypes = Union[
         AllowedDefaultTypes,
+        android_feature_flag_domain.AndroidFeatureFlagConfig,
         collection_domain.Collection,
         exp_domain.Exploration,
         skill_domain.Skill,
@@ -102,6 +104,9 @@ CACHE_NAMESPACE_TOPIC: Final = 'topic'
 # The value for each key in this namespace should be a serialized representation
 # of a Platform Parameter. This namespace does not support sub-namespaces.
 CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
+# The value for each key in this namespace should be a serialized
+# representation of an Android feature-flag configuration.
+CACHE_NAMESPACE_ANDROID_FEATURE_FLAG: Final = 'android_feature_flag'
 # The sub-namespace is not necessary for the default namespace. The namespace
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
@@ -117,6 +122,9 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
+    android_feature_flag: Callable[
+        [str], android_feature_flag_domain.AndroidFeatureFlagConfig
+    ]
     default: Callable[[str], str]
 
 
@@ -129,6 +137,9 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
+    android_feature_flag: Callable[
+        [android_feature_flag_domain.AndroidFeatureFlagConfig], str
+    ]
     default: Callable[[str], str]
 
 
@@ -141,6 +152,7 @@ NamespaceType = Literal[
     'story',
     'topic',
     'platform',
+    'android_feature_flag',
     'default',
 ]
 
@@ -154,6 +166,9 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize
     ),
+    CACHE_NAMESPACE_ANDROID_FEATURE_FLAG: (
+        android_feature_flag_domain.AndroidFeatureFlagConfig.deserialize
+    ),
     CACHE_NAMESPACE_DEFAULT: json.loads,
 }
 
@@ -165,6 +180,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
+    CACHE_NAMESPACE_ANDROID_FEATURE_FLAG: lambda x: x.serialize(),
     CACHE_NAMESPACE_DEFAULT: json.dumps,
 }
 
@@ -255,6 +271,14 @@ def get_multi(
 
 @overload
 def get_multi(
+    namespace: Literal['android_feature_flag'],
+    sub_namespace: str | None,
+    obj_ids: List[str],
+) -> Dict[str, android_feature_flag_domain.AndroidFeatureFlagConfig]: ...
+
+
+@overload
+def get_multi(
     namespace: Literal['default'], sub_namespace: str | None, obj_ids: List[str]
 ) -> Dict[str, AllowedDefaultTypes]: ...
 
@@ -282,8 +306,10 @@ def get_multi(
         ValueError. The namespace does not exist or is not recognized.
 
     Returns:
-        dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
-        decoded (id, value) pairs retrieved from the platform caching service.
+        dict(str, Exploration|Skill|Story|Topic|Collection|
+        PlatformParameter|AndroidFeatureFlagConfig|str). Dictionary of
+        decoded (id, value) pairs retrieved from the platform caching
+        service.
     """
 
     result_dict: Dict[str, AllowedCacheableObjectTypes] = {}
@@ -354,6 +380,16 @@ def set_multi(
 
 @overload
 def set_multi(
+    namespace: Literal['android_feature_flag'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[
+        str, android_feature_flag_domain.AndroidFeatureFlagConfig
+    ],
+) -> bool: ...
+
+
+@overload
+def set_multi(
     namespace: Literal['default'],
     sub_namespace: str | None,
     id_value_mapping: Mapping[str, AllowedDefaultTypes],
@@ -379,7 +415,7 @@ def set_multi(
             the sub-namespace is either None or the stringified version number
             of the objects. If the sub-namespace is not required, pass in None.
         id_value_mapping:
-            dict(str, Exploration|Skill|Story|Topic|Collection|str). A dict of
+            dict(str, Exploration|Skill|Story|Topic|Collection|AndroidFeatureFlagConfig|str). A dict of
             {id, value} pairs to set to the cache.
 
     Raises:
