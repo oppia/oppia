@@ -18,10 +18,15 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.domain import role_services
+import datetime
+from unittest import mock
+
+from core import feconf, utils
+from core.domain import role_domain, role_services
 from core.storage.audit import gae_models
 from core.tests import test_utils
+
+from typing import Dict
 
 
 class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
@@ -73,16 +78,103 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
     def test_log_role_query(self) -> None:
         self.assertEqual(
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
-                'TEST_USER'
+                'uid_%s' % ('a' * 32)
             ),
             False,
         )
         role_services.log_role_query(
-            'TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST'
+            'uid_%s' % ('a' * 32), feconf.ROLE_ACTION_ADD, role='GUEST'
         )
         self.assertEqual(
             gae_models.RoleQueryAuditModel.has_reference_to_user_id(
-                'TEST_USER'
+                'uid_%s' % ('a' * 32)
             ),
             True,
         )
+
+    def test_log_role_query_rejects_malformed_user_id(self) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, 'user_id'):
+            role_services.log_role_query(
+                'TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST'
+            )
+        self.assertEqual(gae_models.RoleQueryAuditModel.query().count(), 0)
+
+    def test_log_role_query_preserves_storage_fields(self) -> None:
+        user_id = 'uid_%s' % ('a' * 32)
+        now = datetime.datetime(2026, 10, 29)
+        with self.swap(utils, 'get_current_utc_datetime', lambda: now):
+            with mock.patch(
+                'core.domain.role_services.time.time', return_value=1234.9
+            ):
+                with mock.patch(
+                    'core.domain.role_services.random.randint', return_value=42
+                ):
+                    role_services.log_role_query(
+                        user_id,
+                        feconf.ROLE_ACTION_VIEW_BY_USERNAME,
+                        role='',
+                        username=' nonexistent/query ',
+                    )
+        audit = gae_models.RoleQueryAuditModel.get(
+            '%s.1234.%s.42' % (user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME)
+        )
+        self.assertEqual(audit.user_id, user_id)
+        self.assertEqual(audit.intent, feconf.ROLE_ACTION_VIEW_BY_USERNAME)
+        self.assertEqual(audit.role, '')
+        self.assertEqual(audit.username, ' nonexistent/query ')
+        self.assertEqual(audit.created_on, now)
+        self.assertEqual(audit.last_updated, now)
+        self.assertFalse(audit.deleted)
+        role_services.log_role_query(user_id, feconf.ROLE_ACTION_REMOVE)
+        self.assertEqual(gae_models.RoleQueryAuditModel.query().count(), 2)
+
+    def test_log_role_query_rejects_invalid_payloads(self) -> None:
+        user_id = 'uid_%s' % ('a' * 32)
+        for field, value in (
+            ('intent', 'unknown'),
+            ('role', 1),
+            ('username', False),
+        ):
+            with self.subTest(field=field):
+                with mock.patch(
+                    'core.domain.role_services.time.time'
+                ) as timestamp:
+                    with mock.patch(
+                        'core.domain.role_services.random.randint'
+                    ) as random_id:
+                        with self.assertRaisesRegex(
+                            utils.ValidationError, field
+                        ):
+                            # Here we use object because payload values have
+                            # deliberately invalid, unrelated types.
+                            payload: Dict[str, object] = {
+                                'user_id': user_id,
+                                'intent': feconf.ROLE_ACTION_ADD,
+                            }
+                            payload[field] = value
+                            # Here we use MyPy ignore because this call tests
+                            # deliberately invalid argument types.
+                            role_services.log_role_query(**payload)  # type: ignore[arg-type]
+                        timestamp.assert_not_called()
+                        random_id.assert_not_called()
+                self.assertEqual(
+                    gae_models.RoleQueryAuditModel.query().count(), 0
+                )
+
+    def test_log_role_query_validates_domain_before_saving(self) -> None:
+        with mock.patch.object(
+            role_domain.RoleQueryAudit,
+            'validate',
+            side_effect=utils.ValidationError('Invalid audit'),
+        ):
+            with mock.patch.object(
+                role_services, '_save_role_query_audit'
+            ) as save:
+                with self.assertRaisesRegex(
+                    utils.ValidationError, 'Invalid audit'
+                ):
+                    role_services.log_role_query(
+                        'uid_%s' % ('a' * 32), feconf.ROLE_ACTION_ADD
+                    )
+                save.assert_not_called()
+        self.assertEqual(gae_models.RoleQueryAuditModel.query().count(), 0)
