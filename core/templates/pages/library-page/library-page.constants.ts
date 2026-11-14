@@ -18,17 +18,14 @@
 
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
-// LIBRARY_PAGE_MODES.GROUP should have the same value as
-// LIBRARY_PAGE_MODE_GROUP in feconf.py.
+// LIBRARY_PAGE_MODES.INDEX should have the same value as
+// LIBRARY_PAGE_MODE_INDEX in feconf.py.
 export const LibraryPageConstants = {
   LIBRARY_PAGE_MODES: {
-    GROUP: 'group',
     INDEX: 'index',
   },
 
   LIBRARY_PATHS_TO_MODES: {
     '/community-library': 'index',
-    '/community-library/top-rated': 'group',
-    '/community-library/recently-published': 'group',
   },
 } as const;
