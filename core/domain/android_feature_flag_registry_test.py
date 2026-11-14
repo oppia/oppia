@@ -19,9 +19,8 @@
 from __future__ import annotations
 
 from core import android_feature_flag_list, utils
-from core.domain import android_feature_flag_domain
+from core.domain import android_feature_flag_domain, caching_services
 from core.domain import android_feature_flag_registry as registry
-from core.domain import caching_services
 from core.platform import models
 from core.tests import test_utils
 
