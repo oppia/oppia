@@ -794,8 +794,9 @@ class BuildTests(test_utils.GenericTestBase):
         with ensure_files_exist_swap, clean_swap:
             with modify_constants_swap, generate_python_package_swap:
                 with (
-                    build_using_ng_not_expected_swap
-                ), sync_angular_css_hashes_not_expected_swap:
+                    build_using_ng_not_expected_swap,
+                    sync_angular_css_hashes_not_expected_swap,
+                ):
                     build.main(args=['--prod_env', '--skip_ng_build'])
 
     def test_build_with_watcher(self) -> None:
@@ -911,8 +912,7 @@ class BuildTests(test_utils.GenericTestBase):
             try:
                 with self.assertRaisesRegex(
                     RuntimeError,
-                    'build does not exist. '
-                    'Angular CLI build may have failed.',
+                    'build does not exist. Angular CLI build may have failed.',
                 ):
                     build.sync_angular_css_hashes()
             finally:

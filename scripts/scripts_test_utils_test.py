@@ -27,7 +27,6 @@ import psutil
 
 
 class PopenStubTests(test_utils.TestBase):
-
     def test_default_attributes(self) -> None:
         popen = scripts_test_utils.PopenStub()
 

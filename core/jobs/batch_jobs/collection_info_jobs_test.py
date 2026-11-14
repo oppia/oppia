@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 
 
 class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[collection_info_jobs.GetCollectionOwnersEmailsJob] = (
         collection_info_jobs.GetCollectionOwnersEmailsJob
     )
@@ -151,7 +150,6 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
 
 class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[collection_info_jobs.MatchEntityTypeCollectionJob] = (
         collection_info_jobs.MatchEntityTypeCollectionJob
     )

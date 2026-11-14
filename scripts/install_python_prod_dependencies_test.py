@@ -138,7 +138,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_run = self.swap(subprocess, 'run', mock_run)
 
         class MockErrorProcess:
-
             def __init__(self) -> None:
                 self.returncode = 1
 

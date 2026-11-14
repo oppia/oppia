@@ -40,14 +40,12 @@ if MYPY:  # pragma: no cover
 
 
 class MockDomainObject(base_models.BaseModel):
-
     def validate(self, strict: bool = True) -> None:
         """Mock validate function."""
         pass
 
 
 class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
-
     def test_process_reports_error_for_old_deleted_model(self) -> None:
         expired_model = base_models.BaseModel(
             id='123',
@@ -71,7 +69,6 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
-
     def test_process_reports_model_timestamp_relationship_error(self) -> None:
         invalid_timestamp = base_models.BaseModel(
             id='123', created_on=self.NOW, last_updated=self.YEAR_AGO
@@ -114,7 +111,6 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_model_id(self) -> None:
         invalid_id_model = base_models.BaseModel(
             id='123@?!*', created_on=self.YEAR_AGO, last_updated=self.NOW
@@ -137,7 +133,6 @@ class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_post_commit_is_invalid(self) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -167,7 +162,6 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_post_commit_is_private_when_status_is_public(
         self,
     ) -> None:
@@ -228,7 +222,6 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_post_commit_is_public_when_status_is_public(self) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -408,7 +401,6 @@ class MockValidateExplorationModelDomainObjectInstances(
 
 
 class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
-
     def test_validation_type_for_domain_object(self) -> None:
         model = base_models.BaseModel(
             id='mock-123',
@@ -561,7 +553,6 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_commit_type(self) -> None:
         invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -592,7 +583,6 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 class MockValidateCommitCmdsSchema(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
-
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with super class's process() method, because in
     # in super class's process() method we are returning CommitCmdsValidateError
@@ -613,7 +603,6 @@ class MockValidateCommitCmdsSchema(
 class MockValidateCommitCmdsSchemaChangeDomain(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
-
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with super class's `_get_change_domain_class()` method, because
     # in super class's method we are returning Type[BaseChange] and here for
@@ -628,7 +617,6 @@ class MockValidateCommitCmdsSchemaChangeDomain(
 class MockValidateWrongSchema(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
-
     def _get_change_domain_class(
         self, _: base_models.BaseModel
     ) -> Type[change_domain.BaseChange]:
@@ -637,7 +625,6 @@ class MockValidateWrongSchema(
 
 
 class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_none_commit(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',

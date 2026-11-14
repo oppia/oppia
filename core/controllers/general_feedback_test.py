@@ -590,12 +590,15 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
         )
         create_platform_report_mock = mock.Mock(return_value=report)
         csrf_token = self.get_new_csrf_token()
-        with self.swap_to_always_return(
-            captcha_services, 'verify_turnstile_token', True
-        ), self.swap(
-            general_feedback_services,
-            'create_platform_report',
-            create_platform_report_mock,
+        with (
+            self.swap_to_always_return(
+                captcha_services, 'verify_turnstile_token', True
+            ),
+            self.swap(
+                general_feedback_services,
+                'create_platform_report',
+                create_platform_report_mock,
+            ),
         ):
             response = self.post_json(
                 feconf.PLATFORM_FEEDBACK_URL,
@@ -727,12 +730,15 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             self._get_lesson_metadata(),
         )
         csrf_token = self.get_new_csrf_token()
-        with self.swap_to_always_return(
-            captcha_services, 'verify_turnstile_token', True
-        ), self.swap(
-            general_feedback_services,
-            'create_platform_report',
-            mock.Mock(return_value=report),
+        with (
+            self.swap_to_always_return(
+                captcha_services, 'verify_turnstile_token', True
+            ),
+            self.swap(
+                general_feedback_services,
+                'create_platform_report',
+                mock.Mock(return_value=report),
+            ),
         ):
             response = self.post_json(
                 feconf.PLATFORM_FEEDBACK_URL,

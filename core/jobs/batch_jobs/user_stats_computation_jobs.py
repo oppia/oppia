@@ -61,8 +61,7 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
             # (model.id, (user_settings_models,)).
             | 'Group models with same ID' >> beam.GroupBy(lambda m: m.id)
             # Discards model.id from the PCollection.
-            | 'Get rid of key'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key' >> beam.Values()  # pylint: disable=no-value-for-parameter
             # Only keep groupings that indicate that
             # the UserStatsModel is missing.
             | 'Filter pairs of models'

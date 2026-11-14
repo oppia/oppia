@@ -151,9 +151,7 @@ class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
         self.assertIn('certificate_id', response)
         self.assertTrue(response['certificate_id'])
 
-        stored_offerings = (
-            certificate_assessment_services.get_certificate_assessment_offerings()
-        )
+        stored_offerings = certificate_assessment_services.get_certificate_assessment_offerings()
         self.assertEqual(len(stored_offerings), 1)
         self.assertEqual(
             stored_offerings[0].certificate_id, response['certificate_id']
@@ -433,9 +431,7 @@ class ValidateCertificateAssessmentOfferingHandlerUnitTests(
         self.assertIn('validation_message', response)
 
     def test_create_empty_validation_payload(self) -> None:
-        empty_payload = (
-            certificate_assessment.create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
-        )
+        empty_payload = certificate_assessment.create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
         self.assertEqual(
             empty_payload,
             {
@@ -455,14 +451,17 @@ class ValidateCertificateAssessmentOfferingHandlerUnitTests(
             'validation_errors': [],
             'validation_message': 'Valid.',
         }
-        with mock.patch.object(
-            certificate_assessment_services,
-            'validate_certificate_assessment_offering',
-            return_value=validation_result,
-        ) as validate_mock, mock.patch.object(
-            certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
-            'render_json',
-        ) as render_json_mock:
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'validate_certificate_assessment_offering',
+                return_value=validation_result,
+            ) as validate_mock,
+            mock.patch.object(
+                certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+                'render_json',
+            ) as render_json_mock,
+        ):
             handler.post()
 
         validate_mock.assert_called_once_with(topic_ids=[], total_questions=0)
@@ -856,23 +855,26 @@ class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         )
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {'certificate_id': 'cert_1'}
-        with mock.patch.object(
-            certificate_assessment_services,
-            'start_certificate_assessment_attempt',
-            return_value=(
-                mock.Mock(attempt_id='attempt_1'),
-                [
-                    {
-                        'question_id': 'q1',
-                        'question_version': 1,
-                        'question_state_data': {'content': 'state'},
-                    }
-                ],
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'start_certificate_assessment_attempt',
+                return_value=(
+                    mock.Mock(attempt_id='attempt_1'),
+                    [
+                        {
+                            'question_id': 'q1',
+                            'question_version': 1,
+                            'question_state_data': {'content': 'state'},
+                        }
+                    ],
+                ),
             ),
-        ), mock.patch.object(
-            certificate_assessment.StartCertificateAssessmentHandler,
-            'render_json',
-        ) as render_json_mock:
+            mock.patch.object(
+                certificate_assessment.StartCertificateAssessmentHandler,
+                'render_json',
+            ) as render_json_mock,
+        ):
             handler.post()
 
         render_json_mock.assert_called_once_with(
@@ -958,21 +960,25 @@ class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         )
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {'certificate_id': 'cert_1'}
-        with mock.patch.object(
-            certificate_assessment_services,
-            'start_certificate_assessment_attempt',
-            side_effect=(
-                certificate_assessment_services.CertificateAssessmentAttemptCooldownException(
-                    6
-                )
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'start_certificate_assessment_attempt',
+                side_effect=(
+                    certificate_assessment_services.CertificateAssessmentAttemptCooldownException(
+                        6
+                    )
+                ),
             ),
-        ), mock.patch.object(
-            certificate_assessment.StartCertificateAssessmentHandler,
-            'error',
-        ) as error_mock, mock.patch.object(
-            certificate_assessment.StartCertificateAssessmentHandler,
-            'render_json',
-        ) as render_json_mock:
+            mock.patch.object(
+                certificate_assessment.StartCertificateAssessmentHandler,
+                'error',
+            ) as error_mock,
+            mock.patch.object(
+                certificate_assessment.StartCertificateAssessmentHandler,
+                'render_json',
+            ) as render_json_mock,
+        ):
             handler.post()
 
         error_mock.assert_called_once_with(429)
@@ -1005,21 +1011,25 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
                 }
             ]
         }
-        with mock.patch.object(
-            certificate_assessment_services,
-            'get_certificate_assessment_attempt',
-            return_value=mock.Mock(
-                learner_id='user_id_1',
-                is_submitted=False,
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'get_certificate_assessment_attempt',
+                return_value=mock.Mock(
+                    learner_id='user_id_1',
+                    is_submitted=False,
+                ),
             ),
-        ), mock.patch.object(
-            certificate_assessment_services,
-            'submit_certificate_assessment_attempt',
-            return_value=mock.Mock(attempt_id='attempt_1'),
-        ), mock.patch.object(
-            certificate_assessment.SubmitCertificateAssessmentHandler,
-            'render_json',
-        ) as render_json_mock:
+            mock.patch.object(
+                certificate_assessment_services,
+                'submit_certificate_assessment_attempt',
+                return_value=mock.Mock(attempt_id='attempt_1'),
+            ),
+            mock.patch.object(
+                certificate_assessment.SubmitCertificateAssessmentHandler,
+                'render_json',
+            ) as render_json_mock,
+        ):
             handler.post('attempt_1')
 
         render_json_mock.assert_called_once_with(
@@ -1043,14 +1053,17 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             ]
         }
         attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)
-        with mock.patch.object(
-            certificate_assessment_services,
-            'get_certificate_assessment_attempt',
-            return_value=attempt,
-        ), mock.patch.object(
-            certificate_assessment_services,
-            'submit_certificate_assessment_attempt',
-            side_effect=utils.ValidationError('invalid attempt'),
+        with (
+            mock.patch.object(
+                certificate_assessment_services,
+                'get_certificate_assessment_attempt',
+                return_value=attempt,
+            ),
+            mock.patch.object(
+                certificate_assessment_services,
+                'submit_certificate_assessment_attempt',
+                side_effect=utils.ValidationError('invalid attempt'),
+            ),
         ):
             with self.assertRaisesRegex(
                 handler.InvalidInputException, 'invalid attempt'

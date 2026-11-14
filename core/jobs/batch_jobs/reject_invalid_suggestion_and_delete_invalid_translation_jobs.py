@@ -112,10 +112,8 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
             suggestion_dicts
             | 'Report the suggestions to be rejected'
             >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {result}'
                 )
             )
         )
@@ -181,10 +179,8 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJob(
             suggestion_dicts
             | 'Report the suggestions to be rejected'
             >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {result}'
                 )
             )
         )
@@ -237,10 +233,8 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             >> (beam.Filter(lambda x: x > 0))
             | 'Report total deleted translations count'
             >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'DELETED TRANSLATIONS COUNT SUCCESS: {result}'
-                    )
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f'DELETED TRANSLATIONS COUNT SUCCESS: {result}'
                 )
             )
         )
@@ -272,10 +266,8 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             invalid_translation_dicts
             | 'Report translations to be deleted'
             >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {result}'
                 )
             )
         )
@@ -293,8 +285,7 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             | 'Filter model with latest entity version'
             >> beam.ParDo(GetLatestModel())
             # PCollection<entity_translation_model>.
-            | 'Get list of latest entity translation model'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get list of latest entity translation model' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         updated_exp_opportunity_models = (
@@ -343,10 +334,8 @@ class AuditDeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             invalid_translation_dicts
             | 'Report translations to be deleted'
             >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {result}'
                 )
             )
         )

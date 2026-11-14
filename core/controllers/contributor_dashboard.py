@@ -242,9 +242,7 @@ class ContributionOpportunitiesHandler(
                         search_query.lower() in skill_description.lower()
                         or search_query.lower() in topic_name.lower()
                     ):
-                        client_side_skill_opportunity_dict: (
-                            ClientSideSkillOpportunityDict
-                        ) = {
+                        client_side_skill_opportunity_dict: ClientSideSkillOpportunityDict = {
                             'id': skill_opportunity_dict['id'],
                             'skill_description': skill_description,
                             'question_count': skill_opportunity_dict[
@@ -767,11 +765,7 @@ class TranslatableContentsHandlerV2(
                 translatable_contents_collection = (
                     state.get_translatable_contents_collection()
                 )
-                for (
-                    content_id
-                ) in (
-                    translatable_contents_collection.content_id_to_translatable_content
-                ):
+                for content_id in translatable_contents_collection.content_id_to_translatable_content:
                     content_id_to_grouping_key[content_id] = state_name
 
         translatable_contents = []
@@ -1315,11 +1309,9 @@ class UserContributionRightsDataHandler(
                     else False
                 ),
                 'can_suggest_questions': (
-                    (
-                        contribution_rights.can_submit_questions
-                        if contribution_rights
-                        else False
-                    )
+                    contribution_rights.can_submit_questions
+                    if contribution_rights
+                    else False
                 ),
             }
         )

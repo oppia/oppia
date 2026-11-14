@@ -62,7 +62,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         opportunity_management_jobs.DeleteSkillOpportunityModelJob
     ] = opportunity_management_jobs.DeleteSkillOpportunityModelJob
@@ -104,7 +103,6 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
 
 class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         opportunity_management_jobs.GenerateSkillOpportunityModelJob
     ] = opportunity_management_jobs.GenerateSkillOpportunityModelJob
@@ -331,20 +329,18 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             '_count_unique_question_ids',
             lambda _: -1,
         ):
-
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr='ERROR: \"Expected question_count to be '
-                        'a non-negative integer, received -1\": 2',
+                        stderr='ERROR: "Expected question_count to be '
+                        'a non-negative integer, received -1": 2',
                     )
                 ]
             )
 
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob
     ] = opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob
@@ -404,7 +400,6 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 class GenerateExplorationOpportunitySummariesJobTests(
     job_test_utils.JobTestBase
 ):
-
     JOB_CLASS: Type[
         opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob
     ] = opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob

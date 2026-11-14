@@ -57,7 +57,6 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
 class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
     test_utils.GenericTestBase
 ):
-
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
     EXP_ID_2: Final = 'EXP_ID_2'
@@ -548,7 +547,6 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
 
 
 class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
     EXP_ID_2: Final = 'EXP_ID_2'
@@ -688,7 +686,6 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 class LearnerDashboardCollectionsProgressHandlerTests(
     test_utils.GenericTestBase
 ):
-
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
     EXP_ID_2: Final = 'EXP_ID_2'
@@ -794,7 +791,6 @@ class LearnerDashboardCollectionsProgressHandlerTests(
 class LearnerDashboardExplorationsProgressHandlerTests(
     test_utils.GenericTestBase
 ):
-
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
     EXP_ID_2: Final = 'EXP_ID_2'

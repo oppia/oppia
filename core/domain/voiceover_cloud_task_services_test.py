@@ -90,9 +90,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
 
         retrieved_language_accent_to_content_status_map = voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
             exploration_id
-        )[
-            'language_accent_to_content_status_map'
-        ]
+        )['language_accent_to_content_status_map']
 
         self.assertEqual(
             retrieved_language_accent_to_content_status_map,

@@ -223,9 +223,7 @@ class CertificateAssessmentOfferingHandler(
     @acl_decorators.can_access_certificate_dashboard
     def get(self) -> None:
         """Returns all certificate assessment offerings."""
-        certificate_offerings = (
-            certificate_assessment_services.get_certificate_assessment_offerings()
-        )
+        certificate_offerings = certificate_assessment_services.get_certificate_assessment_offerings()
         self.render_json(
             {
                 'certificate_offerings': [
@@ -321,9 +319,7 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentOfferingNotFoundException as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json(
             {
@@ -362,9 +358,7 @@ class CertificateAssessmentOfferingByIdHandler(
                 demonstrates=demonstrates,
                 async_status=self.normalized_payload['async_status'],
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentOfferingNotFoundException as e:
             raise self.NotFoundException(str(e)) from e
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
@@ -383,9 +377,7 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_assessment_services.delete_certificate_assessment_offering(
                 certificate_id
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentOfferingNotFoundException as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})
 
@@ -443,9 +435,7 @@ class StartCertificateAssessmentHandler(
                     self.normalized_payload['certificate_id'], self.user_id
                 )
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentAttemptCooldownException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentAttemptCooldownException as e:
             # Surface a structured error so the frontend can translate it via
             # its translate pipes, instead of a hardcoded English string.
             self.error(429)
@@ -460,9 +450,7 @@ class StartCertificateAssessmentHandler(
             return
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
-        except (
-            certificate_assessment_services.CertificateAssessmentAttemptNotReadyException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentAttemptNotReadyException as e:
             raise self.InvalidInputException(str(e)) from e
         self.render_json(
             {
@@ -545,9 +533,7 @@ class CertificateAssessmentResultHandler(
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 attempt.version_data['certificate_id']
             )
-        except (
-            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
-        ) as e:
+        except certificate_assessment_services.CertificateAssessmentOfferingNotFoundException as e:
             raise self.NotFoundException(str(e)) from e
         topics = topic_fetchers.get_topics_by_ids(
             list(attempt.attempt_data.keys())

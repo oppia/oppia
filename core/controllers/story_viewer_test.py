@@ -35,7 +35,6 @@ from core.tests import test_utils
 
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
-
     def _record_completion(
         self, user_id: str, STORY_ID: str, node_id: str
     ) -> None:
@@ -205,7 +204,6 @@ class StoryPageTests(BaseStoryViewerControllerTests):
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
-
     def test_can_not_access_story_viewer_page_with_unpublished_story(
         self,
     ) -> None:
@@ -344,7 +342,6 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
-
     def test_cannot_access_story_progress_handler_if_user_is_not_logged_in(
         self,
     ) -> None:
@@ -810,7 +807,8 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
         def _mock_none_function(
-            _: str, strict: bool = True  # pylint: disable=unused-argument
+            _: str,
+            strict: bool = True,  # pylint: disable=unused-argument
         ) -> None:
             """Mocks None."""
             return None

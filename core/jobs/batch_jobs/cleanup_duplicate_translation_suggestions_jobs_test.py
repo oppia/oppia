@@ -34,10 +34,7 @@ if MYPY:  # pragma: no cover
 
 
 class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
-
-    JOB_CLASS = (
-        cleanup_duplicate_translation_suggestions_jobs.AuditDuplicateTranslationSuggestionsJob
-    )
+    JOB_CLASS = cleanup_duplicate_translation_suggestions_jobs.AuditDuplicateTranslationSuggestionsJob
 
     def test_empty_datastore_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()
@@ -130,10 +127,7 @@ class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
 class CleanupDuplicateTranslationSuggestionsJobTests(
     job_test_utils.JobTestBase
 ):
-
-    JOB_CLASS = (
-        cleanup_duplicate_translation_suggestions_jobs.CleanupDuplicateTranslationSuggestionsJob
-    )
+    JOB_CLASS = cleanup_duplicate_translation_suggestions_jobs.CleanupDuplicateTranslationSuggestionsJob
 
     def test_empty_datastore_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()

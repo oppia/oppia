@@ -288,8 +288,7 @@ class EditableSkillDataHandler(
 
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(
-                'Please delete all questions associated with this skill '
-                'first.'
+                'Please delete all questions associated with this skill first.'
             )
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)

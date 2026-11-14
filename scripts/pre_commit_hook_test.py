@@ -125,8 +125,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
         with (
-            islink_swap
-        ), exists_swap, subprocess_swap, self.print_swap, symlink_swap:
+            islink_swap,
+            exists_swap,
+            subprocess_swap,
+            self.print_swap,
+            symlink_swap,
+        ):
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
@@ -332,10 +336,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'Changes to %s made for deployment cannot be committed.'
-            % (pre_commit_hook.FECONF_FILEPATH),
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Changes to %s made for deployment cannot be committed.'
+                % (pre_commit_hook.FECONF_FILEPATH),
+            ),
         ):
             pre_commit_hook.check_changes_in_config()
 
@@ -356,10 +363,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'Changes to %s made for deployment cannot be committed.'
-            % (pre_commit_hook.CONSTANTS_FILEPATH),
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Changes to %s made for deployment cannot be committed.'
+                % (pre_commit_hook.CONSTANTS_FILEPATH),
+            ),
         ):
             pre_commit_hook.check_changes_in_config()
 
@@ -386,8 +396,10 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             mock_check_changes_in_config,
         )
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, self.print_swap, self.assertRaisesRegex(
-                SystemExit, '1'
+            with (
+                check_config_swap,
+                self.print_swap,
+                self.assertRaisesRegex(SystemExit, '1'),
             ):
                 pre_commit_hook.main(args=[])
         self.assertTrue(

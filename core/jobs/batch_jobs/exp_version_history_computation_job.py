@@ -126,11 +126,9 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 snapshot_dict = snapshot_model.content
                 exp_id = snapshot_model.get_unversioned_instance_id()
                 model_class = exp_models.ExplorationModel
-                reconstituted_model = (
-                    model_class(  # pylint: disable=protected-access
-                        id=exp_id
-                    )._reconstitute(snapshot_dict)
-                )
+                reconstituted_model = model_class(  # pylint: disable=protected-access
+                    id=exp_id
+                )._reconstitute(snapshot_dict)
                 reconstituted_model.created_on = snapshot_model.created_on
                 reconstituted_model.last_updated = snapshot_model.last_updated
                 return reconstituted_model
@@ -402,8 +400,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 }
             )
             | 'Group by key' >> beam.CoGroupByKey()
-            | 'Get rid of exploration id'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of exploration id' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Get formatted model groups'
             >> beam.Map(self.convert_to_formatted_model_group)
             | 'Filter valid model groups'
@@ -949,11 +946,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 snapshot_dict = snapshot_model.content
                 exp_id = snapshot_model.get_unversioned_instance_id()
                 model_class = exp_models.ExplorationModel
-                reconstituted_model = (
-                    model_class(  # pylint: disable=protected-access
-                        id=exp_id
-                    )._reconstitute(snapshot_dict)
-                )
+                reconstituted_model = model_class(  # pylint: disable=protected-access
+                    id=exp_id
+                )._reconstitute(snapshot_dict)
                 reconstituted_model.created_on = snapshot_model.created_on
                 reconstituted_model.last_updated = snapshot_model.last_updated
                 return reconstituted_model
@@ -1028,8 +1023,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         valid_model_groups = (
             model_groups
-            | 'Get rid of exploration id'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of exploration id' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Get formatted model groups'
             >> beam.Map(self.convert_to_formatted_model_group)
             | 'Filter valid model groups'

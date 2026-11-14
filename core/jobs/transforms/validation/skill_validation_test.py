@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_change_domain_implemented(self) -> None:
         valid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
             id='123',
@@ -297,7 +296,6 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_skill_model(self) -> None:
         valid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
             id='skill_id123',

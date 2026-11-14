@@ -354,9 +354,8 @@ class StudyGuide:
         for section in self.sections:
             section_dict = section.to_dict()
             heading_html = (
-                '<p><strong>'
-                f'{section_dict['heading']['unicode_str']}'
-                '</strong></p>'
+                '<p><strong>%s</strong></p>'
+                % section_dict['heading']['unicode_str']
             )
             concatenated_html_parts.append(heading_html)
             concatenated_html_parts.append(section_dict['content']['html'])

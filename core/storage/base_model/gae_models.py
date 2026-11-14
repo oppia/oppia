@@ -1435,9 +1435,7 @@ class VersionedModel(BaseModel):
         # states_schema_version value from the latest exploration version.
         snapshot_id = model.get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
-        new_model._reconstitute_from_snapshot_id(
-            snapshot_id
-        )  # pylint: disable=protected-access
+        new_model._reconstitute_from_snapshot_id(snapshot_id)  # pylint: disable=protected-access
         new_model.version = current_version
 
         models_to_put = new_model.compute_models_to_commit(
@@ -1650,9 +1648,7 @@ class VersionedModel(BaseModel):
             if snapshot_model is None:
                 raise ValueError('At least one version number is invalid.')
             snapshot_dict = snapshot_model.content
-            reconstituted_model = cls(
-                id=entity_id
-            )._reconstitute(  # pylint: disable=protected-access
+            reconstituted_model = cls(id=entity_id)._reconstitute(  # pylint: disable=protected-access
                 snapshot_dict
             )
             reconstituted_model.created_on = snapshot_model.created_on

@@ -62,7 +62,6 @@ class CheckerTestBase(unittest.TestCase):
 
 
 class HangingIndentCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -245,7 +244,6 @@ class HangingIndentCheckerTests(CheckerTestBase):
 
 
 class DocstringParameterCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -1988,7 +1986,6 @@ class DocstringParameterCheckerTests(CheckerTestBase):
 
 
 class ImportOnlyModulesCheckerTests(CheckerTestBase):
-
     def test_finds_import_from(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2078,7 +2075,6 @@ class ImportOnlyModulesCheckerTests(CheckerTestBase):
 
 
 class BackslashContinuationCheckerTests(CheckerTestBase):
-
     def test_finds_backslash_continuation(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2115,7 +2111,6 @@ class BackslashContinuationCheckerTests(CheckerTestBase):
 
 
 class FunctionArgsOrderCheckerTests(CheckerTestBase):
-
     def test_finds_function_def(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2164,7 +2159,6 @@ class FunctionArgsOrderCheckerTests(CheckerTestBase):
 
 
 class RestrictedImportCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -2464,7 +2458,6 @@ class RestrictedImportCheckerTests(CheckerTestBase):
 
 
 class SingleCharAndNewlineAtEOFCheckerTests(CheckerTestBase):
-
     def test_checks_single_char_and_newline_eof(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2520,7 +2513,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(CheckerTestBase):
 
 
 class TypeIgnoreCommentCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3017,7 +3009,6 @@ class TypeIgnoreCommentCheckerTests(CheckerTestBase):
 
 
 class ExceptionalTypesCommentCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3535,7 +3526,6 @@ class ExceptionalTypesCommentCheckerTests(CheckerTestBase):
 
 
 class SingleLineCommentCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3831,7 +3821,6 @@ class SingleLineCommentCheckerTests(CheckerTestBase):
 
 
 class BlankLineBelowFileOverviewCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4051,7 +4040,6 @@ class BlankLineBelowFileOverviewCheckerTests(CheckerTestBase):
 
 
 class SingleLinePragmaCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4206,7 +4194,6 @@ class SingleLinePragmaCheckerTests(CheckerTestBase):
 
 
 class SingleSpaceAfterKeyWordCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4345,7 +4332,6 @@ class SingleSpaceAfterKeyWordCheckerTests(CheckerTestBase):
 
 
 class InequalityWithNoneCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4586,7 +4572,6 @@ class DisallowedFunctionsCheckerTests(CheckerTestBase):
 
 
 class NonTestFilesFunctionNameCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4658,7 +4643,6 @@ class NonTestFilesFunctionNameCheckerTests(CheckerTestBase):
 
 
 class DisallowHandlerWithoutSchemaTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4860,7 +4844,6 @@ class DisallowHandlerWithoutSchemaTests(CheckerTestBase):
 
 
 class DisallowedImportsCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -5016,7 +4999,6 @@ class PreventStringConcatenationCheckerTests(CheckerTestBase):
 
 
 class QuoteConventionCheckerTests(CheckerTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -5161,11 +5143,7 @@ class QuoteConventionCheckerTests(CheckerTestBase):
         # A triple-quoted string that is not the first statement is a plain
         # triple-quoted string, not a docstring.
         self._assert_messages(
-            (
-                'def foo():\n'
-                '    x = 1\n'
-                '    return \'\'\'not a docstring\'\'\'\n'
-            ),
+            ('def foo():\n    x = 1\n    return \'\'\'not a docstring\'\'\'\n'),
             testutils.MessageTest(
                 msg_id='invalid-triple-quote', line=3, args=('\'\'\'',)
             ),

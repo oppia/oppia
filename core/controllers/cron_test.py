@@ -79,7 +79,6 @@ if MYPY:  # pragma: no cover
 
 
 class CronJobTests(test_utils.GenericTestBase):
-
     NINE_WEEKS: Final = datetime.timedelta(weeks=9)
     FOURTEEN_WEEKS: Final = datetime.timedelta(weeks=14)
 
@@ -285,7 +284,6 @@ class CronJobTests(test_utils.GenericTestBase):
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     test_utils.GenericTestBase
 ):
-
     target_id = 'exp1'
     language_code = 'en'
     default_translation_html = '<p>Sample translation</p>'
@@ -547,7 +545,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
 
 class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
-
     target_id = 'exp1'
     language_code = 'en'
     default_translation_html = '<p>Sample translation</p>'
@@ -629,8 +626,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont'
-                    'ributor_dashboard_suggestions'
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions'
                 )
 
             mock_send.assert_not_called()
@@ -700,8 +696,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr'
-                    'ibutor_dashboard_suggestions'
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions'
                 )
 
             mock_send.assert_not_called()
@@ -732,8 +727,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont'
-                    'ributor_dashboard_suggestions'
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions'
                 )
             mock_send.assert_called_once_with(
                 {'en': [self.reviewer_id]}, {'en': [mock.ANY]}
@@ -770,8 +764,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
             )
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr'
-                    'ibutor_dashboard_suggestions'
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions'
                 )
             mock_send.assert_called_once_with({'en': []}, mock.ANY)
             self.logout()
@@ -799,8 +792,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr'
-                    'ibutor_dashboard_suggestions'
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions'
                 )
 
             mock_send.assert_called_once_with(
@@ -812,7 +804,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     test_utils.GenericTestBase
 ):
-
     target_id = 'exp1'
     skill_id = 'skill_123456'
     language_code = 'en'
@@ -1224,7 +1215,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 class CronMailChapterPublicationsNotificationsHandlerTests(
     test_utils.GenericTestBase
 ):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

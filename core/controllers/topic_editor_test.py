@@ -39,7 +39,6 @@ from typing import List
 
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -152,7 +151,6 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
-
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
@@ -670,7 +668,6 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
-
     def test_get_can_not_access_handler_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -754,7 +751,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
-
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
@@ -928,7 +924,6 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 class TopicEditorTests(
     BaseTopicEditorControllerTests, test_utils.EmailTestBase
 ):
-
     @test_utils.set_platform_parameters(
         [
             (
@@ -1541,7 +1536,6 @@ class TopicEditorTests(
 class TopicPublishSendMailHandlerTests(
     BaseTopicEditorControllerTests, test_utils.EmailTestBase
 ):
-
     @test_utils.set_platform_parameters(
         [
             (
@@ -1575,7 +1569,6 @@ class TopicPublishSendMailHandlerTests(
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
-
     def test_get_topic_rights(self) -> None:
         """Test the get topic rights functionality."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -1629,7 +1622,6 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
 
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
-
     def test_get_can_not_access_handler_with_invalid_publish_status(
         self,
     ) -> None:

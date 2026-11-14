@@ -316,9 +316,7 @@ def create_suggestion(
         elif target_type == feconf.ENTITY_TYPE_SKILL:
             skill = skill_fetchers.get_skill_by_id(target_id, strict=False)
             if skill is not None:
-                translatable_contents = (
-                    skill.get_translatable_contents_collection().content_id_to_translatable_content
-                )
+                translatable_contents = skill.get_translatable_contents_collection().content_id_to_translatable_content
                 if content_id in translatable_contents:
                     content_value = translatable_contents[
                         content_id
@@ -1554,9 +1552,9 @@ def get_reviewable_question_suggestions_by_offset(
     return question_suggestions, next_offset
 
 
-def get_question_suggestions_waiting_longest_for_review() -> (
-    List[suggestion_registry.SuggestionAddQuestion]
-):
+def get_question_suggestions_waiting_longest_for_review() -> List[
+    suggestion_registry.SuggestionAddQuestion
+]:
     """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
     of question suggestions, sorted in descending order by review wait time.
 
@@ -1564,9 +1562,7 @@ def get_question_suggestions_waiting_longest_for_review() -> (
         list(Suggestion). A list of question suggestions, sorted in descending
         order based on how long the suggestions have been waiting for review.
     """
-    question_suggestion_models = (
-        suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
-    )
+    question_suggestion_models = suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
 
     question_suggestion = []
     for suggestion_model in question_suggestion_models:
@@ -1696,9 +1692,7 @@ def get_question_suggestions_in_review_count_by_skill_ids(
     if not skill_ids:
         return {}
     counts: Dict[str, int] = collections.defaultdict(int)
-    for (
-        model
-    ) in suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
+    for model in suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_skill_ids(
         skill_ids
     ):
         counts[model.target_id] += 1
@@ -1921,11 +1915,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(
                     )
 
         if user_contribution_rights.can_review_translation_for_language_codes:
-            for (
-                language_code
-            ) in (
-                user_contribution_rights.can_review_translation_for_language_codes
-            ):
+            for language_code in user_contribution_rights.can_review_translation_for_language_codes:
                 # Get a list of the translation suggestions in the language code
                 # from the datastore if we haven't already gotten them.
                 if language_code not in (
@@ -2088,9 +2078,9 @@ def get_submitted_suggestions_by_offset(
     return suggestions, next_offset
 
 
-def get_info_about_suggestions_waiting_too_long_for_review() -> (
-    List[suggestion_registry.ReviewableSuggestionEmailInfo]
-):
+def get_info_about_suggestions_waiting_too_long_for_review() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
     """Gets the information about the suggestions that have been waiting longer
     than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
     for a review on the Contributor Dashboard. There can be information about at
@@ -2119,9 +2109,9 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> (
     ]
 
 
-def get_new_suggestions_for_reviewer_notifications() -> (
-    List[suggestion_registry.ReviewableSuggestionEmailInfo]
-):
+def get_new_suggestions_for_reviewer_notifications() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
     """Retrieves and organizes new suggestions for reviewer email notifications.
 
     Returns:
@@ -2668,11 +2658,11 @@ def update_translation_suggestion(
             f'{count} {name}' for name, _, count in discrepancy_components
         ]
 
-        original_summary_text = (
-            f'Components in original text: {', '.join(original_summary)}.'
+        original_summary_text = 'Components in original text: %s.' % ', '.join(
+            original_summary
         )
-        updated_summary_text = (
-            f'Components in translated text: {', '.join(updated_summary)}.'
+        updated_summary_text = 'Components in translated text: %s.' % ', '.join(
+            updated_summary
         )
 
         # Get truncated versions of both original and translated
@@ -3134,9 +3124,9 @@ def _update_question_review_stats_models(
     stats_ids = stats_dict.keys()
 
     stats_models = get_question_review_stats_models(list(stats_ids))
-    stats_models_to_update: List[suggestion_models.QuestionReviewStatsModel] = (
-        []
-    )
+    stats_models_to_update: List[
+        suggestion_models.QuestionReviewStatsModel
+    ] = []
     for stats_model in stats_models:
         stat = stats_dict[stats_model.id]
         stats_model.reviewed_questions_count = stat.reviewed_questions_count
@@ -3170,9 +3160,11 @@ def _update_translation_submitter_total_stats_model(
         Exception. Contributor user ID is None.
     """
 
-    stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(  # pylint: disable=line-too-long
-        translation_submitter_total_stats.language_code,
-        translation_submitter_total_stats.contributor_id,
+    stats_model = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(  # pylint: disable=line-too-long
+            translation_submitter_total_stats.language_code,
+            translation_submitter_total_stats.contributor_id,
+        )
     )
 
     # We assert here because we are calling this method only when the model
@@ -3201,9 +3193,7 @@ def _update_translation_submitter_total_stats_model(
     stats_model.accepted_translations_count = (
         translation_submitter_total_stats.accepted_translations_count
     )
-    stats_model.accepted_translations_without_reviewer_edits_count = (
-        translation_submitter_total_stats.accepted_translations_without_reviewer_edits_count
-    )
+    stats_model.accepted_translations_without_reviewer_edits_count = translation_submitter_total_stats.accepted_translations_without_reviewer_edits_count
     stats_model.accepted_translation_word_count = (
         translation_submitter_total_stats.accepted_translation_word_count
     )
@@ -3240,9 +3230,11 @@ def _update_translation_reviewer_total_stats_models(
             TranslationReviewerTotalContributionStats domain object.
     """
 
-    stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(  # pylint: disable=line-too-long
-        translation_reviewer_total_stat.language_code,
-        translation_reviewer_total_stat.contributor_id,
+    stats_model = (
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.get(  # pylint: disable=line-too-long
+            translation_reviewer_total_stat.language_code,
+            translation_reviewer_total_stat.contributor_id,
+        )
     )
 
     # We assert here because we are calling this method only when the model
@@ -3258,9 +3250,7 @@ def _update_translation_reviewer_total_stats_models(
     stats_model.accepted_translations_count = (
         translation_reviewer_total_stat.accepted_translations_count
     )
-    stats_model.accepted_translations_with_reviewer_edits_count = (
-        translation_reviewer_total_stat.accepted_translations_with_reviewer_edits_count
-    )
+    stats_model.accepted_translations_with_reviewer_edits_count = translation_reviewer_total_stat.accepted_translations_with_reviewer_edits_count
     stats_model.accepted_translation_word_count = (
         translation_reviewer_total_stat.accepted_translation_word_count
     )
@@ -3292,8 +3282,10 @@ def _update_question_submitter_total_stats_models(
         question_submitter_total_stats: QuestionSubmitterTotalContributionStats.
             A QuestionSubmitterTotalContributionStats domain object.
     """
-    stats_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get(  # pylint: disable=line-too-long
-        question_submitter_total_stats.contributor_id
+    stats_model = (
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel.get(  # pylint: disable=line-too-long
+            question_submitter_total_stats.contributor_id
+        )
     )
     stats_model.topic_ids_with_question_submissions = (
         question_submitter_total_stats.topic_ids_with_question_submissions
@@ -3313,9 +3305,7 @@ def _update_question_submitter_total_stats_models(
     stats_model.accepted_questions_count = (
         question_submitter_total_stats.accepted_questions_count
     )
-    stats_model.accepted_questions_without_reviewer_edits_count = (
-        question_submitter_total_stats.accepted_questions_without_reviewer_edits_count
-    )
+    stats_model.accepted_questions_without_reviewer_edits_count = question_submitter_total_stats.accepted_questions_without_reviewer_edits_count
     stats_model.rejected_questions_count = (
         question_submitter_total_stats.rejected_questions_count
     )
@@ -3344,8 +3334,10 @@ def _update_question_reviewer_total_stats_models(
         question_reviewer_total_stats: QuestionReviewerTotalContributionStats.
             A QuestionreviewerTotalContributionStats domain object.
     """
-    stats_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get(  # pylint: disable=line-too-long
-        question_reviewer_total_stats.contributor_id
+    stats_model = (
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.get(  # pylint: disable=line-too-long
+            question_reviewer_total_stats.contributor_id
+        )
     )
     stats_model.topic_ids_with_question_reviews = (
         question_reviewer_total_stats.topic_ids_with_question_reviews
@@ -3356,9 +3348,7 @@ def _update_question_reviewer_total_stats_models(
     stats_model.accepted_questions_count = (
         question_reviewer_total_stats.accepted_questions_count
     )
-    stats_model.accepted_questions_with_reviewer_edits_count = (
-        question_reviewer_total_stats.accepted_questions_with_reviewer_edits_count
-    )
+    stats_model.accepted_questions_with_reviewer_edits_count = question_reviewer_total_stats.accepted_questions_with_reviewer_edits_count
     stats_model.rejected_questions_count = (
         question_reviewer_total_stats.rejected_questions_count
     )
@@ -4252,9 +4242,7 @@ def increment_translation_contribution_stats_at_review(
             content_word_count
         )
     if suggestion_is_accepted and not edited_by_reviewer:
-        translation_contribution_stat.accepted_translations_without_reviewer_edits_count += (
-            1  # pylint: disable=line-too-long
-        )
+        translation_contribution_stat.accepted_translations_without_reviewer_edits_count += 1  # pylint: disable=line-too-long
 
 
 def increment_translation_review_stats(
@@ -4396,9 +4384,7 @@ def increment_translation_submitter_total_stats_at_review(
         )
 
     if suggestion_is_accepted and not edited_by_reviewer:
-        translation_submitter_total_stat.accepted_translations_without_reviewer_edits_count += (
-            1  # pylint: disable=line-too-long
-        )
+        translation_submitter_total_stat.accepted_translations_without_reviewer_edits_count += 1  # pylint: disable=line-too-long
         (translation_submitter_total_stat.recent_review_outcomes).pop()
         translation_submitter_total_stat.recent_review_outcomes.append(
             suggestion_models.REVIEW_OUTCOME_ACCEPTED
@@ -4512,9 +4498,7 @@ def increment_question_submitter_total_stats_at_review(
         )
 
     if suggestion_is_accepted and not edited_by_reviewer:
-        question_submitter_total_stat.accepted_questions_without_reviewer_edits_count += (
-            1  # pylint: disable=line-too-long
-        )
+        question_submitter_total_stat.accepted_questions_without_reviewer_edits_count += 1  # pylint: disable=line-too-long
         (question_submitter_total_stat.recent_review_outcomes).pop()
         (question_submitter_total_stat.recent_review_outcomes).append(
             suggestion_models.REVIEW_OUTCOME_ACCEPTED

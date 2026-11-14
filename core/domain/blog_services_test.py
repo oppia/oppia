@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class BlogServicesUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
@@ -814,7 +813,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
 
 class BlogAuthorDetailsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         auth_id = 'someUser'

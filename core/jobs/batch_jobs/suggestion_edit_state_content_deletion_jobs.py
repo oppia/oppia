@@ -43,7 +43,9 @@ if MYPY:  # pragma: no cover
 class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all edit state content suggestion models."""
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[suggestion_models.GeneralSuggestionModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -57,10 +59,8 @@ class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: i
             >> (
                 beam.Filter(
                     lambda model: (
-                        (
-                            model.suggestion_type
-                            == (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-                        )
+                        model.suggestion_type
+                        == (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
                     )
                 )
             )

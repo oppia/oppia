@@ -25,7 +25,6 @@ from core.tests import test_utils
 
 
 class JobRunResultTests(test_utils.TestBase):
-
     def test_usage(self) -> None:
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         self.assertEqual(run_result.stdout, 'abc')

@@ -133,8 +133,7 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             >> beam.Filter(lambda model: model.published_on is not None)
             | 'Key by author_id from summaries'
             >> beam.Map(lambda model: (model.author_id, None))
-            | 'Deduplicate author_id pairs'
-            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
+            | 'Deduplicate author_id pairs' >> beam.Distinct()  # pylint: disable=no-value-for-parameter
         )
 
         existing_author_detail_pairs = (

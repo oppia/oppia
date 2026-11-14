@@ -380,7 +380,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     content_id,
                     content_html,
                 ) in content_ids_to_content_values.items():
-
                     try:
                         voiceover_filename = voiceover_regeneration_services.generate_new_voiceover_filename(
                             content_id, language_accent_code

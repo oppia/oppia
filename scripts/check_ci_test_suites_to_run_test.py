@@ -898,9 +898,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         )
 
     def test_check_ci_test_suites_to_run_with_output_all_suites(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     check_ci_test_suites_to_run.main(
                         [
                             '--github_base_ref',
@@ -916,9 +926,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     )
 
     def test_check_ci_test_suites_to_run_with_python_file(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -940,9 +960,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_file_not_in_root_file_mapping(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -964,9 +994,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_no_tests_corresponding_to_changed_files(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1005,9 +1045,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_run_all_tests_root_file(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1029,9 +1079,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_partial_root_file_changes(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1096,9 +1156,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_test_module(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1147,9 +1217,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_lighthouse_modules(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1201,9 +1281,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_lighthouse_desktop_module(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1255,9 +1345,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_lighthouse_base_module(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -1325,9 +1425,19 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         with open(acceptance_config_file_path, 'w+', encoding='utf-8') as f:
             f.write(json.dumps(acceptance_config))
 
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap, self.lighthouse_shards_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with (
+            self.root_files_mapping_file_path_swap,
+            self.lighthouse_pages_config_file_path_swap,
+            self.lighthouse_shards_config_file_path_swap,
+        ):  # pylint: disable=line-too-long
+            with (
+                self.ci_test_suite_configs_directory_swap,
+                self.test_modules_mapping_directory_swap,
+            ):  # pylint: disable=line-too-long
+                with (
+                    self.root_files_config_file_path_swap,
+                    self.generate_root_files_mapping_swap,
+                ):  # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',

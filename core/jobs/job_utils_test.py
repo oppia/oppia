@@ -56,7 +56,6 @@ class CoreModel(base_models.BaseModel):
 
 
 class ResolveProjectIdTests(test_utils.TestBase):
-
     def test_pipeline_with_valid_options_returns_project_id(self) -> None:
         with self.swap_to_always_return(
             app_identity_services, 'get_application_id', 'LOL'
@@ -70,7 +69,6 @@ class ResolveProjectIdTests(test_utils.TestBase):
 
 
 class CloneTests(test_utils.TestBase):
-
     def test_clone_model(self) -> None:
         model = base_models.BaseModel(id='123', deleted=True)
         clone = job_utils.clone_model(model)
@@ -122,7 +120,6 @@ class CloneTests(test_utils.TestBase):
 
 
 class GetModelClassTests(test_utils.TestBase):
-
     def test_get_from_existing_model(self) -> None:
         self.assertIs(
             job_utils.get_model_class('BaseModel'), base_models.BaseModel
@@ -134,7 +131,6 @@ class GetModelClassTests(test_utils.TestBase):
 
 
 class GetModelKindTests(test_utils.TestBase):
-
     def test_get_from_datastore_model(self) -> None:
         model = base_models.BaseModel()
 
@@ -154,7 +150,6 @@ class GetModelKindTests(test_utils.TestBase):
 
 
 class GetModelPropertyTests(test_utils.TestBase):
-
     def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
@@ -179,7 +174,6 @@ class GetModelPropertyTests(test_utils.TestBase):
 
 
 class GetModelIdTests(test_utils.TestBase):
-
     def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
@@ -194,7 +188,6 @@ class GetModelIdTests(test_utils.TestBase):
 
 
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.oppia_project_id = 'dev-project-id'
@@ -304,7 +297,6 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
 
 class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
-
     def test_query_everything(self) -> None:
         query = datastore_services.query_everything()
 

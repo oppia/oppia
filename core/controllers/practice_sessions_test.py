@@ -34,7 +34,6 @@ from typing import List, cast
 
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -109,7 +108,6 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
-
     def test_get_returns_all_subtopic_skills_when_no_params(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s'

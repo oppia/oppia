@@ -82,9 +82,7 @@ class ModelProperty:
                 '%r is not a property of %s' % (property_obj, self._model_kind)
             )
         else:
-            property_name = (
-                property_obj._name
-            )  # pylint: disable=protected-access
+            property_name = property_obj._name  # pylint: disable=protected-access
 
         self._property_name = property_name
 

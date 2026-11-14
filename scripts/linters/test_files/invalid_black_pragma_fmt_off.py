@@ -14,13 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file containing a prohibited Black directive ("# fmt: off"),
+"""Python file containing a prohibited formatter directive ("# fmt: off"),
 used by scripts/linters/python_linter_test.
 """
 
+
 # fmt: off
 class FakeClass:
-    """This is a fake docstring for prohibited Black pragma purposes."""
+    """This is a fake docstring for prohibited formatter pragma purposes."""
 
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg

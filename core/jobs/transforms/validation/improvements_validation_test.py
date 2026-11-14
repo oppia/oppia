@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
-
     def test_model_with_invalid_composite_entity(self) -> None:
         model = improvements_models.ExplorationStatsTaskEntryModel(
             id='123',

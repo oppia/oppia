@@ -39,9 +39,7 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
-    ] = (
-        audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
-    )
+    ] = audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
 
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'

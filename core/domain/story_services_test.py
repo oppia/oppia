@@ -1627,7 +1627,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         # test wrong inputs that we can normally catch by typing.
         with logging_swap, assert_raises_regexp_context_manager:
             story_services.update_story(
-                self.USER_ID, self.STORY_ID, [{}], 'Updated story node.'  # type: ignore[list-item]
+                self.USER_ID,
+                self.STORY_ID,
+                [{}],
+                'Updated story node.',  # type: ignore[list-item]
             )
 
         self.assertEqual(
@@ -1709,7 +1712,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected a commit message but received none.'
         ):
             story_services.update_story(
-                self.USER_ID, self.STORY_ID, change_list, None  # type: ignore[arg-type]
+                self.USER_ID,
+                self.STORY_ID,
+                change_list,
+                None,  # type: ignore[arg-type]
             )
 
     def test_update_story_acquired_skill_ids(self) -> None:
@@ -2925,7 +2931,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                             # causes MyPy to throw an incompatible argument type error.
                             # Thus to avoid error, we used ignore.
                             param_domain.ParamChange(
-                                'param1', 'Copier', {}  # type: ignore[arg-type]
+                                'param1',
+                                'Copier',
+                                {},  # type: ignore[arg-type]
                             ).to_dict()
                         ],
                     }
@@ -3974,7 +3982,6 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
 
 
 class StoryContentsMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_story_contents_to_latest_schema(self) -> None:
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()

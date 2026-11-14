@@ -254,9 +254,12 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             lambda: [{'id': 'azure', 'display_name': 'Azure Translator'}],
         )
 
-        with self.feature_flag_swap, (
-            domain_swap
-        ), is_enabled_swap, providers_swap:
+        with (
+            self.feature_flag_swap,
+            domain_swap,
+            is_enabled_swap,
+            providers_swap,
+        ):
             response = self.get_json('/translation-provider-mapping')
 
         self.assertEqual(response['provider_mapping'], {'hi': 'azure'})
@@ -294,8 +297,8 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         domain_swap = self.swap(
             machine_translation_services,
             'update_machine_translation_policy',
-            lambda language_to_provider_mapping=None, automatic_translation_is_enabled=None: mock_update_mapping(
-                language_to_provider_mapping
+            lambda language_to_provider_mapping=None, automatic_translation_is_enabled=None: (
+                mock_update_mapping(language_to_provider_mapping)
             ),
         )
 

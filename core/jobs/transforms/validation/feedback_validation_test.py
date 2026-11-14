@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
-
     def test_model_with_invalid_entity_type_raises_error(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
             id='123',
@@ -72,7 +71,6 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_feedback_analytics_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(

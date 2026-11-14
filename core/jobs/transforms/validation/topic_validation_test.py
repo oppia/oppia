@@ -40,7 +40,6 @@ if MYPY:  # pragma: no cover
 class ValidateCanonicalNameMatchesNameInLowercaseTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_process_for_not_matching_canonical_name(self) -> None:
         model_with_different_name = topic_models.TopicModel(
             id='123',
@@ -94,7 +93,6 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
 
 
 class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_change_domain_implemented(self) -> None:
         valid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
@@ -374,7 +372,6 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 class ValidateTopicRightsSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             topic_models.TopicRightsSnapshotMetadataModel(
@@ -549,7 +546,6 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
 
 
 class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_rights_model(self) -> None:
         valid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='rights_id123',
@@ -619,7 +615,6 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_topic_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(

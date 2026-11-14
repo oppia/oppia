@@ -26,20 +26,18 @@ from scripts import check_tests_are_captured_in_ci
 
 from typing import List
 
-ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = (
-    [  # pylint: disable=line-too-long
-        {
-            'name': 'test/acceptance_suite1',
-            'module': 'acceptance/specs/test/acceptance_suite1.spec.ts',
-            'framework': 'puppeteer',
-        },
-        {
-            'name': 'test2/acceptance_suite2',
-            'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts',
-            'framework': 'puppeteer',
-        },
-    ]
-)
+ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = [  # pylint: disable=line-too-long
+    {
+        'name': 'test/acceptance_suite1',
+        'module': 'acceptance/specs/test/acceptance_suite1.spec.ts',
+        'framework': 'puppeteer',
+    },
+    {
+        'name': 'test2/acceptance_suite2',
+        'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts',
+        'framework': 'puppeteer',
+    },
+]
 
 
 class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
@@ -130,9 +128,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
     def test_get_acceptance_test_suites_from_ci_config_file(self) -> None:
         with self.acceptance_ci_test_suite_config_file_path_swap:
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_ci_config_file()
-            )
+            acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_ci_config_file()
             self.assertEqual(acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_acceptance_test_suites_from_acceptance_directory(self) -> None:
@@ -146,9 +142,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             self.playwright_acceptance_test_specs_directory_swap,
             os_getcwd_swap,
         ):
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-            )
+            acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
             self.assertEqual(acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_acceptance_test_suites_from_acceptance_directory_with_exclusion(
@@ -170,9 +164,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             os_getcwd_swap,
         ):
             with acceptance_test_suites_that_are_not_run_in_ci_swap:
-                acceptance_test_suites = (
-                    check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-                )
+                acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
                 self.assertEqual(
                     acceptance_test_suites, ACCEPTANCE_TEST_SUITES[:1]
                 )
@@ -196,9 +188,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             self.playwright_acceptance_test_specs_directory_swap,
             os_getcwd_swap,
         ):
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-            )
+            acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
             playwright_suites = [
                 s
                 for s in acceptance_test_suites
@@ -216,14 +206,14 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             )
 
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
-        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES[:1]
 
-        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
         get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
@@ -253,14 +243,14 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                     check_tests_are_captured_in_ci.main()
 
     def test_check_tests_are_captured_in_ci_with_no_error(self) -> None:
-        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
-        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
         get_acceptance_test_suites_from_ci_config_file_swap = self.swap(

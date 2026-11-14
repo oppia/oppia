@@ -57,7 +57,6 @@ class MockNumbersModel(datastore_services.Model):
 
 
 class BaseEventHandlerTests(test_utils.GenericTestBase):
-
     def test_handle_event_raises_not_implemented_error(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -71,7 +70,6 @@ class BaseEventHandlerTests(test_utils.GenericTestBase):
 
 
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
-
     def test_record_exploration_actual_start_events(self) -> None:
         all_models = (
             stats_models.ExplorationActualStartEventLogEntryModel.get_all()
@@ -98,7 +96,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
 
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
-
     def test_record_solution_hit_events(self) -> None:
         all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
@@ -122,7 +119,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
 
 class StartExplorationEventHandlerTests(test_utils.GenericTestBase):
-
     def test_recording_exploration_start_events(self) -> None:
 
         all_models = stats_models.StartExplorationEventLogEntryModel.get_all()
@@ -149,7 +145,6 @@ class StartExplorationEventHandlerTests(test_utils.GenericTestBase):
 
 
 class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
-
     def test_recording_exploration_leave_events(self) -> None:
 
         all_models = (
@@ -189,7 +184,6 @@ class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
 
 
 class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
-
     def test_recording_exploration_leave_events(self) -> None:
 
         all_models = (
@@ -229,7 +223,6 @@ class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
 
 
 class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
-
     def test_recording_exploration_rating_events(self) -> None:
 
         all_models = stats_models.RateExplorationEventLogEntryModel.get_all()
@@ -253,7 +246,6 @@ class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
-
     def test_record_state_hit_events(self) -> None:
         all_models = stats_models.StateHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
@@ -283,7 +275,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
 
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
-
     def test_record_state_complete_events(self) -> None:
         all_models = stats_models.StateCompleteEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
@@ -307,20 +298,15 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
 
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
-
     def test_record_leave_for_refresher_exploration_events(self) -> None:
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
+        all_models = stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
 
         event_services.LeaveForRefresherExpEventHandler.record(
             'exp_id', 'refresher_exp_id', 1, 'state_name', 'session_id', 2.0
         )
 
-        all_models = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
-        )
+        all_models = stats_models.LeaveForRefresherExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -336,7 +322,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
-
     def test_new_feedback_thread_creation_events(self) -> None:
 
         exp_id = 'exp_id'
@@ -355,7 +340,6 @@ class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
-
     def test_recording_reopening_feedback_thread_events(self) -> None:
 
         exp_id = 'exp_id'
@@ -485,7 +469,6 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
 
 
 class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
-
     def test_answer_submission(self) -> None:
         all_models = stats_models.AnswerSubmittedEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 0)
@@ -546,7 +529,6 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
 
 
 class EventHandlerNameTests(test_utils.GenericTestBase):
-
     def test_event_handler_names(self) -> None:
         """This function checks for duplicate event handlers."""
 
@@ -597,7 +579,6 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
 
 
 class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

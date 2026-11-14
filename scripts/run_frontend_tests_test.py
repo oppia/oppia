@@ -687,26 +687,29 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_file_spec(_file_path: str) -> None:
             return None
 
-        with self.swap(
-            git_changes_utils,
-            'get_local_git_repository_remote_name',
-            mock_get_remote_name,
-        ), self.swap(git_changes_utils, 'get_refs', mock_get_refs), self.swap(
-            git_changes_utils, 'get_changed_files', mock_get_changed_files
-        ), self.swap(
-            git_changes_utils,
-            'get_staged_acmrt_files',
-            mock_get_staged_acmrt_files,
-        ), self.swap(
-            run_frontend_tests, 'get_file_spec', mock_get_file_spec
-        ), self.swap_success_Popen, self.print_swap, self.swap(
-            build, 'main', lambda args: None
-        ), self.swap(
-            install_third_party_libs, 'main', lambda: None
-        ), self.swap_check_frontend_coverage, self.assertRaisesRegex(
-            SystemExit, '0'
+        with (
+            self.swap(
+                git_changes_utils,
+                'get_local_git_repository_remote_name',
+                mock_get_remote_name,
+            ),
+            self.swap(git_changes_utils, 'get_refs', mock_get_refs),
+            self.swap(
+                git_changes_utils, 'get_changed_files', mock_get_changed_files
+            ),
+            self.swap(
+                git_changes_utils,
+                'get_staged_acmrt_files',
+                mock_get_staged_acmrt_files,
+            ),
+            self.swap(run_frontend_tests, 'get_file_spec', mock_get_file_spec),
+            self.swap_success_Popen,
+            self.print_swap,
+            self.swap(build, 'main', lambda args: None),
+            self.swap(install_third_party_libs, 'main', lambda: None),
+            self.swap_check_frontend_coverage,
+            self.assertRaisesRegex(SystemExit, '0'),
         ):
-
             run_frontend_tests.main(
                 args=['--run_on_changed_files_in_branch', '--allow_no_spec']
             )
@@ -748,8 +751,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def wait(self) -> None:  # pylint: disable=missing-docstring
                 return None
 
-        def mock_popen(
-            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        def mock_popen(  # pylint: disable=unused-argument
+            cmd: list[str],
+            stdout: int,
         ) -> MockTask:
             return MockTask()
 
@@ -794,8 +798,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def wait(self) -> None:  # pylint: disable=missing-docstring
                 return None
 
-        def mock_popen(
-            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        def mock_popen(  # pylint: disable=unused-argument
+            cmd: list[str],
+            stdout: int,
         ) -> MockTask:
             return MockTask()
 

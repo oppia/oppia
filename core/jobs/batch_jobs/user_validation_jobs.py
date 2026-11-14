@@ -56,10 +56,10 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
             user_usernames_and_bios
             | 'Get users with null bio or bio with length greater than 2000'
             >> beam.Filter(
-                lambda user_username_and_bio: not isinstance(
-                    user_username_and_bio[1], str
+                lambda user_username_and_bio: (
+                    not isinstance(user_username_and_bio[1], str)
+                    or len(user_username_and_bio[1]) > 2000
                 )
-                or len(user_username_and_bio[1]) > 2000
             )
         )
 
@@ -87,9 +87,11 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
             users_with_invalid_bios
             | 'Report info on each invalid user bio'
             >> beam.Map(
-                lambda user_username_and_bio: job_run_result.JobRunResult.as_stderr(
-                    'The username of user is "%s" and their bio is "%s"'
-                    % (user_username_and_bio[0], user_username_and_bio[1])
+                lambda user_username_and_bio: (
+                    job_run_result.JobRunResult.as_stderr(
+                        'The username of user is "%s" and their bio is "%s"'
+                        % (user_username_and_bio[0], user_username_and_bio[1])
+                    )
                 )
             )
         )

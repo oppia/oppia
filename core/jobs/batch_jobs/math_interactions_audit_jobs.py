@@ -71,8 +71,10 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
             | 'Filtering out states without math interactions'
             >> (
                 beam.Filter(
-                    lambda tup: tup[2]['interaction']['id']
-                    in feconf.MATH_INTERACTION_IDS
+                    lambda tup: (
+                        tup[2]['interaction']['id']
+                        in feconf.MATH_INTERACTION_IDS
+                    )
                 )
             )
         )

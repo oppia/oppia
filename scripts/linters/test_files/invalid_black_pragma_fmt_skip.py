@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file containing a prohibited Black directive ("# fmt: skip"),
+"""Python file containing a prohibited formatter directive ("# fmt: skip"),
 used by scripts/linters/python_linter_test.
 """
 
 
 class FakeClass:
-    """This is a fake docstring for prohibited Black pragma purposes.""" # fmt: skip
+    """This is a fake docstring for prohibited formatter pragma purposes."""  # fmt: skip
 
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg

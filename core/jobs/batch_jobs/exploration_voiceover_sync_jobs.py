@@ -110,9 +110,9 @@ def update_entity_voiceovers_model(
                 'auto': None,
             }
         else:
-            entity_voiceovers_model.voiceovers_mapping[content_id][
-                'manual'
-            ] = manual_voiceover
+            entity_voiceovers_model.voiceovers_mapping[content_id]['manual'] = (
+                manual_voiceover
+            )
 
     return entity_voiceovers_model
 

@@ -25,7 +25,6 @@ from . import models
 
 
 class BaseVisualizationTests(test_utils.GenericTestBase):
-
     def test_get_class_name_correctly(self) -> None:
         self.assertEqual(
             models.BaseVisualization('AnswerFrequencies', {}, True).id,
@@ -62,5 +61,7 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(utils.ValidationError, error_message):
             models.BaseVisualization(
-                'AnswerFrequencies', {}, 'false'  # type: ignore[arg-type]
+                'AnswerFrequencies',
+                {},
+                'false',  # type: ignore[arg-type]
             ).validate()

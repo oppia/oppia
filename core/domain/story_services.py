@@ -498,9 +498,9 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
                 rename_arc_cmd = cast(story_domain.RenameArcCmd, change)
-                story.story_contents.get_arc(rename_arc_cmd.arc_id).title = (
-                    rename_arc_cmd.new_title
-                )
+                story.story_contents.get_arc(
+                    rename_arc_cmd.arc_id
+                ).title = rename_arc_cmd.new_title
             elif change.cmd == story_domain.CMD_REARRANGE_ARCS:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
@@ -1184,9 +1184,9 @@ def record_completed_node_in_story_context(
         progress_model.put()
 
 
-def get_chapter_notifications_stories_list() -> (
-    List[story_domain.StoryPublicationTimeliness]
-):
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness
+]:
     """Returns a list of stories with behind-schedule or upcoming chapters.
 
     Returns:

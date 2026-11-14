@@ -426,15 +426,25 @@ class BackfillTranslationOpportunityModelJobBase(base_jobs.JobBase):
             )
 
             yield job_run_result.JobRunResult.as_stdout(
-                f'Audit Summary:\n'
-                f'- Matches: {totals.get('match', 0)}\n'
-                f'- Missing in Datastore: {totals.get('missing', 0)}\n'
-                f'- Discrepancies: {totals.get('discrepancy', 0)}\n'
-                f'- Orphaned in Datastore: {totals.get('orphaned', 0)}\n'
-                f'- Total Content Count (Existing): {totals.get('exist_content_count', 0)}\n'
-                f'- Total Content Count (Computed): {totals.get('comp_content_count', 0)}\n'
-                f'- Total Translation Counts (Existing): {exist_translation_totals_str}\n'
-                f'- Total Translation Counts (Computed): {comp_translation_totals_str}'
+                'Audit Summary:\n'
+                '- Matches: %s\n'
+                '- Missing in Datastore: %s\n'
+                '- Discrepancies: %s\n'
+                '- Orphaned in Datastore: %s\n'
+                '- Total Content Count (Existing): %s\n'
+                '- Total Content Count (Computed): %s\n'
+                '- Total Translation Counts (Existing): %s\n'
+                '- Total Translation Counts (Computed): %s'
+                % (
+                    totals.get('match', 0),
+                    totals.get('missing', 0),
+                    totals.get('discrepancy', 0),
+                    totals.get('orphaned', 0),
+                    totals.get('exist_content_count', 0),
+                    totals.get('comp_content_count', 0),
+                    exist_translation_totals_str,
+                    comp_translation_totals_str,
+                )
             )
 
             for detail in error_details:
@@ -512,8 +522,7 @@ class BackfillExplorationTranslationOpportunityModelJob(
             >> beam.Map(topic_fetchers.get_topic_from_model)
             | 'Extract published story IDs'
             >> beam.FlatMap(get_published_story_ids)
-            | 'Distinct story IDs'
-            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
+            | 'Distinct story IDs' >> beam.Distinct()  # pylint: disable=no-value-for-parameter
         )
 
         story_topic_ids_pcoll = (
@@ -552,8 +561,10 @@ class BackfillExplorationTranslationOpportunityModelJob(
             )
             | 'Filter exploration translations'
             >> beam.Filter(
-                lambda model: model.entity_type
-                == feconf.TranslatableEntityType.EXPLORATION.value
+                lambda model: (
+                    model.entity_type
+                    == feconf.TranslatableEntityType.EXPLORATION.value
+                )
             )
             | 'Map translation to exp_id'
             >> beam.Map(lambda model: (model.entity_id, model))
@@ -637,8 +648,10 @@ class BackfillSkillOpportunityModelJob(
             )
             | 'Filter skill translations'
             >> beam.Filter(
-                lambda model: model.entity_type
-                == feconf.TranslatableEntityType.SKILL.value
+                lambda model: (
+                    model.entity_type
+                    == feconf.TranslatableEntityType.SKILL.value
+                )
             )
             | 'Map translation to skill_id'
             >> beam.Map(lambda model: (model.entity_id, model))

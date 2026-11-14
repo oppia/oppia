@@ -112,8 +112,7 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             >> beam.Filter(
                 # Keep only skills that don't exist (False) or have a
                 # superseding skill.
-                lambda result: not result[1]
-                or result[2] is not None
+                lambda result: not result[1] or result[2] is not None
             )
             | 'Create collection of hanging prerequisites'
             >> beam.Map(

@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class JobOptionsTests(test_utils.TestBase):
-
     def test_default_values(self) -> None:
         options = job_options.JobOptions()
 

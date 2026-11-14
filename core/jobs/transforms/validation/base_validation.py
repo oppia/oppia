@@ -249,7 +249,9 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
 class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on and last_updated timestamps are valid."""
 
-    def process(self, entity: base_models.BaseModel) -> Iterator[
+    def process(
+        self, entity: base_models.BaseModel
+    ) -> Iterator[
         Union[
             base_validation_errors.InconsistentTimestampsError,
             base_validation_errors.ModelMutatedDuringJobError,
@@ -291,7 +293,8 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelDomainObjectInstances(
-    beam.DoFn, Generic[ModelInstanceType]  # type: ignore[misc]
+    beam.DoFn,
+    Generic[ModelInstanceType],  # type: ignore[misc]
 ):
     """DoFn to check whether the model instance passes the validation of the
     domain object for model.
@@ -402,7 +405,9 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             'class. It should be implemented in the derived class.'
         )
 
-    def process(self, entity: ModelInstanceType) -> Iterator[
+    def process(
+        self, entity: ModelInstanceType
+    ) -> Iterator[
         Union[
             base_validation_errors.CommitCmdsNoneError,
             base_validation_errors.CommitCmdsValidateError,

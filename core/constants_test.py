@@ -24,7 +24,6 @@ from core.tests import test_utils
 
 
 class ConstantsTests(test_utils.GenericTestBase):
-
     def test_constants_file_is_existing(self) -> None:
         """Test if the constants file is existing."""
         self.assertTrue(os.path.isfile(os.path.join('assets', 'constants.ts')))

@@ -56,13 +56,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 expected to raise an Exception when normalized.
         """
         for item in mappings:
-            assert (
-                object_class.normalize(item[0]) == item[1]
-            ), 'Expected %s when normalizing %s as a %s, got %s' % (
-                item[1],
-                item[0],
-                object_class.__name__,
-                object_class.normalize(item[0]),
+            assert object_class.normalize(item[0]) == item[1], (
+                'Expected %s when normalizing %s as a %s, got %s'
+                % (
+                    item[1],
+                    item[0],
+                    object_class.__name__,
+                    object_class.normalize(item[0]),
+                )
             )
 
         for item, error_msg in invalid_items_with_error_messages:
@@ -1066,7 +1067,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
 
 class SchemaValidityTests(test_utils.GenericTestBase):
-
     def test_schemas_used_to_define_objects_are_valid(self) -> None:
         count = 0
         for name, member in inspect.getmembers(objects):
@@ -1102,7 +1102,6 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
-
     def test_default_values_for_objects_are_valid(self) -> None:
         for _, member in inspect.getmembers(objects):
             if not inspect.isclass(member):
@@ -1176,7 +1175,6 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
 
 
 class NormalizedRectangleTests(test_utils.GenericTestBase):
-
     def test_normalize(self) -> None:
         normalized_rectangle = objects.NormalizedRectangle2D()
         self.assertEqual(
@@ -1194,7 +1192,6 @@ class NormalizedRectangleTests(test_utils.GenericTestBase):
 
 
 class CodeStringTests(test_utils.GenericTestBase):
-
     def test_normalize(self) -> None:
         code_string = objects.CodeString()
         self.assertEqual(code_string.normalize(code_string.default_value), '')
@@ -1206,7 +1203,6 @@ class CodeStringTests(test_utils.GenericTestBase):
 
 
 class BaseTranslatableObjectTests(test_utils.GenericTestBase):
-
     def test_translatable_objects_naming(self) -> None:
         for name, member in inspect.getmembers(objects):
             if not inspect.isclass(member):
@@ -1266,7 +1262,6 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 
 
 class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
-
     def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 5'
@@ -1311,7 +1306,6 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
 
 class TranslatableHtmlTests(test_utils.GenericTestBase):
-
     def test_normalization(self) -> None:
         with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize(
@@ -1383,7 +1377,6 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
 
 
 class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
-
     def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'
@@ -1450,7 +1443,6 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 
 
 class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
-
     def test_normalization(self) -> None:
         with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'
@@ -1513,7 +1505,6 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
 
 
 class JsonEncodedInStringTests(test_utils.GenericTestBase):
-
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.

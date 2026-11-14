@@ -1541,8 +1541,7 @@ class Collection:
 
             if not self.nodes:
                 raise utils.ValidationError(
-                    'Expected to have at least 1 exploration in the '
-                    'collection.'
+                    'Expected to have at least 1 exploration in the collection.'
                 )
 
 
@@ -1682,7 +1681,6 @@ class CollectionSummary:
             )
 
         for tag in self.tags:
-
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 

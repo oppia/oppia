@@ -156,12 +156,12 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
         'excluded_dirs': (),
     },
     'fmt: off': {
-        'message': 'Use of "fmt: off" is prohibited. All code must be formatted by Black.',
+        'message': 'Use of "fmt: off" is prohibited. All code must be formatted by Ruff.',
         'excluded_files': (),
         'excluded_dirs': (),
     },
     'fmt: skip': {
-        'message': 'Use of "fmt: skip" is prohibited. All code must be formatted by Black.',
+        'message': 'Use of "fmt: skip" is prohibited. All code must be formatted by Ruff.',
         'excluded_files': (),
         'excluded_dirs': (),
     },
@@ -661,9 +661,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
         error_messages = []
         files_to_lint = self.all_filepaths
         failed = False
-        excluded_files = (
-            warranted_angular_security_bypasses.EXCLUDED_BYPASS_SECURITY_TRUST_FILES
-        )
+        excluded_files = warranted_angular_security_bypasses.EXCLUDED_BYPASS_SECURITY_TRUST_FILES
         allowed_files = ''
         for filepath in files_to_lint:
             for excluded_file in excluded_files:

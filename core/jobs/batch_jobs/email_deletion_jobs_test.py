@@ -38,7 +38,6 @@ email_models, feedback_models, user_models = models.Registry.import_models(
 
 
 class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob] = (
         email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
     )

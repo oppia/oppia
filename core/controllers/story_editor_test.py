@@ -31,7 +31,6 @@ from typing import List
 
 
 class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -63,7 +62,6 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
 
 class StoryPublicationTests(BaseStoryEditorControllerTests):
-
     def test_put_can_not_publish_story_with_invalid_story_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -262,7 +260,6 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
 
 class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
-
     def test_validation_error_messages(self) -> None:
         # Check that admins can publish a story.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -303,7 +300,6 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
-
     def test_get_story_data_when_story_reference_is_not_first(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 

@@ -337,7 +337,8 @@ def get_learner_collection_dict_by_id(
     # difference in types, MyPy throws an error. Thus, to avoid the error,
     # we used ignore here.
     collection_dict['nodes'] = [
-        node.to_dict() for node in collection.nodes  # type: ignore[misc]
+        node.to_dict()
+        for node in collection.nodes  # type: ignore[misc]
     ]
 
     collection_dict['playthrough_dict'] = {
@@ -612,9 +613,9 @@ def get_displayable_exp_summary_dicts(
     )
     view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 
-    entity_translations_map: Dict[str, translation_domain.EntityTranslation] = (
-        {}
-    )
+    entity_translations_map: Dict[
+        str, translation_domain.EntityTranslation
+    ] = {}
     if (
         display_in_language_code
         and display_in_language_code != constants.DEFAULT_LANGUAGE_CODE
@@ -773,9 +774,9 @@ def _get_displayable_collection_summary_dicts(
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    displayable_collection_summaries: List[DisplayableCollectionSummaryDict] = (
-        []
-    )
+    displayable_collection_summaries: List[
+        DisplayableCollectionSummaryDict
+    ] = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
             rights_domain.ACTIVITY_STATUS_PRIVATE
@@ -871,9 +872,7 @@ def get_library_groups(
             collection_models.CollectionSummaryModel
         ] = collection_query.order(
             -collection_models.CollectionSummaryModel.collection_model_last_updated
-        ).fetch(
-            8
-        )
+        ).fetch(8)
         collection_summaries = [
             collection_services.get_collection_summary_from_model(m)
             for m in collection_models_result
@@ -984,7 +983,6 @@ def check_activity_id_validity(
     private_collection_ids = []
 
     for activities_info in activity_summaries_by_type:
-
         # If the activity is an Exploration.
         if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
             for index, summary in enumerate(activities_info['summaries']):

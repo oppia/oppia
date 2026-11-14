@@ -562,9 +562,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         collection_summary_model = collection_models.CollectionSummaryModel.get(
             collection.id
         )
-        collection_summary_model.deleted = (
-            True  # pylint: disable=singleton-comparison
-        )
+        collection_summary_model.deleted = True  # pylint: disable=singleton-comparison
         collection_summary_model.update_timestamps()
         collection_summary_model.put()
 

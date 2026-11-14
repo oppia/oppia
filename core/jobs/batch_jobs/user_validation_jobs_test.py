@@ -33,7 +33,6 @@ if MYPY:
 
 
 class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[user_validation_jobs.GetUsersWithInvalidBioJob] = (
         user_validation_jobs.GetUsersWithInvalidBioJob
     )

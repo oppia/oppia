@@ -119,7 +119,9 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (topic_id, topic_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -194,8 +196,7 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
                 'topic_changes': topic_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_topic_objects_list = (
@@ -219,7 +220,7 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
             topic_objects_list
             | 'Remove migrated jobs'
             >> beam.Filter(
-                lambda x: (len(x['topic_changes']) == 0 and len(x['topic']) > 0)
+                lambda x: len(x['topic_changes']) == 0 and len(x['topic']) > 0
             )
             | 'Transform previously migrated topics into job run results'
             >> (
