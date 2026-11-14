@@ -75,10 +75,6 @@ describe('Logged-In Learner', function () {
       'serial_chapter_launch_learner_view'
     );
 
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
-
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
