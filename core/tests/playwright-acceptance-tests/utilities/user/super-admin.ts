@@ -22,6 +22,9 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const adminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
+const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const actionStatusMessageSelector = '.e2e-test-status-message';
 
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
@@ -243,6 +246,60 @@ export class SuperAdmin extends LoggedInUser {
         numberOfLanguages: initalNumberOfLanguages + 1,
       }
     );
+  }
+
+  /**
+   * Function to check if the application is running in production mode.
+   */
+  async isInProdMode(): Promise<boolean> {
+    return process.env.PROD_ENV === 'true';
+  }
+
+  /**
+   * Navigates to the admin page activities tab.
+   */
+  async navigateToAdminPageActivitiesTab(): Promise<void> {
+    await this.goto(adminPageActivitiesTab);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Expects action status message to contain the given text.
+   * @param {string} statusMessage - The expected status message.
+   */
+  async expectActionStatusMessageToBe(statusMessage: string): Promise<void> {
+    await this.expectElementToBeVisible(actionStatusMessageSelector);
+    await this.expectTextContentToContain(
+      actionStatusMessageSelector,
+      statusMessage
+    );
+  }
+
+  /**
+   * Generates a single dummy blog post from the admin activities tab.
+   */
+  async generateDummyBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(generateBlogPostButton);
+    const responsePromise = this.page.waitForResponse(
+      response =>
+        response.url().includes('/adminhandler') && response.status() === 200
+    );
+    await this.clickOnElementWithSelector(generateBlogPostButton);
+    await responsePromise;
+    await this.expectActionStatusMessageToBe(
+      'Dummy Blog Post generated successfully.'
+    );
+  }
+
+  /**
+   * Generates N dummy blog posts from the admin activities tab.
+   * @param {number} numBlogs - The number of blog posts to generate.
+   */
+  async generateDummyBlogPosts(numBlogs: number): Promise<void> {
+    await this.navigateToAdminPageActivitiesTab();
+    for (let i = 0; i < numBlogs; i++) {
+      await this.generateDummyBlogPost();
+    }
   }
 }
 
