@@ -1,19 +1,9 @@
-/* stylelint-disable-next-line no-descending-specificity */
-.oppia-active-opportunities-tab a {
-  color: #00645d;
-  text-decoration: none;
-}
-/* stylelint-disable-next-line no-descending-specificity */
-.oppia-active-opportunities-tab a:hover {
-  color: #00645d;
-}
-
 .oppia-tabs-container {
   padding-top: 5px;
   text-align: center;
 }
-.oppia-tabs-container a:focus-visible {
-  border: 3px dotted black;
+.oppia-tabs-container button:focus-visible {
+  outline: 3px dotted black;
 }
 .oppia-language-container {
   display: flex;
@@ -196,7 +186,16 @@ button.oppia-autofocus:focus {
   width: -o-calc(100% / 3);
   width: calc(100% / 3);
 }
+.oppia-opportunities-tabs-button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 0;
+}
 .oppia-opportunities-tabs-text {
+  /* Keep the label inline so wrapped text retains the previous link layout. */
   color: #4a4a4a;
   font-size: 18px;
   font-weight: bold;
@@ -226,6 +225,13 @@ button.oppia-autofocus:focus {
 .oppia-opportunities-tabs-text:hover {
   color: #00645d;
   text-decoration: none;
+}
+.oppia-active-opportunities-tab .oppia-opportunities-tabs-text {
+  color: #00645d;
+  text-decoration: none;
+}
+.oppia-active-opportunities-tab .oppia-opportunities-tabs-text:hover {
+  color: #00645d;
 }
 .oppia-review-item-detail-container {
   background-color: #00645d;
