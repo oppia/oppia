@@ -1803,12 +1803,27 @@ class TranslatableEntityType(enum.Enum):
     CLASSROOM = 'classroom'
 
 
-class TranslatedContentDict(TypedDict):
-    """Dictionary representing TranslatedContent object."""
+class _TranslatedContentDictRequired(TypedDict):
+    """Required fields for the TranslatedContent dictionary."""
 
     content_value: ContentValueType
     needs_update: bool
     content_format: str
+
+
+class TranslatedContentDict(_TranslatedContentDictRequired, total=False):
+    """Dictionary representing TranslatedContent object.
+
+    The optional 'data_source' field records whether the translation was
+    produced by an AI auto-generation feature ('auto') or submitted manually
+    by a human contributor ('manual').  Rows stored before this field was
+    introduced default to 'manual' when read back.
+    """
+
+    # Indicates whether this translation was produced automatically ('auto')
+    # or by a human contributor ('manual'). Absent values should be treated
+    # as 'manual' for backward compatibility.
+    data_source: str
 
 
 class VoiceoverRegenerationState(enum.Enum):

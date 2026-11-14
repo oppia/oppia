@@ -219,6 +219,12 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   margin-bottom: 50px;
 }
 
+.dashboard-content-primary.e2e-test-translation-configuration-content {
+  display: block;
+  max-width: 960px;
+  width: 100%;
+}
+
 .dashboard-content-mobile {
   border: 0;
   border-radius: 0;

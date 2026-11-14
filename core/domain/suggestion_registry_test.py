@@ -2161,6 +2161,48 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
         self.assertEqual(len(translations[0].translations), 1)
+        translation_content = translations[0].translations['content']
+        self.assertEqual(translation_content.data_source, 'manual')
+
+    def test_accept_suggestion_with_auto_generated_adds_translation(
+        self,
+    ) -> None:
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+
+        # Modify the change command to simulate an auto-generated suggestion
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['was_auto_generated'] = True
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        suggestion.accept('Accepted auto translation')
+
+        translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
+            )
+        )
+        self.assertEqual(len(translations), 1)
+        self.assertEqual(translations[0].language_code, 'hi')
+        self.assertEqual(len(translations[0].translations), 1)
+
+        translation_content = translations[0].translations['content']
+        self.assertEqual(translation_content.data_source, 'auto')
 
     def test_accept_suggestion_saves_to_current_exploration_version(
         self,

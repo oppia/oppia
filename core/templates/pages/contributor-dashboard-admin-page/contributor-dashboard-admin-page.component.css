@@ -4,6 +4,10 @@
   padding-top: 16px;
 }
 
+.oppia-auto-translation-config-follows {
+  margin-bottom: 0;
+}
+
 .oppia-status-message-container {
   background-color: #fff;
   border: 1px solid #00376d;

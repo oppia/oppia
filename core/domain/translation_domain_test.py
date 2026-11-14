@@ -670,10 +670,12 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
             'My name is Nikhil.',
             translation_domain.TranslatableContentFormat.HTML,
             False,
+            data_source='auto',
         )
 
         self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
+        self.assertEqual(translated_content.data_source, 'auto')
 
     def test_to_dict_method_of_translated_content_class(self) -> None:
         translated_content = translation_domain.TranslatedContent(
@@ -685,9 +687,46 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
             'content_value': 'My name is Nikhil.',
             'content_format': 'html',
             'needs_update': False,
+            'data_source': 'manual',
         }
 
         self.assertEqual(translated_content.to_dict(), translated_content_dict)
+
+    def test_auto_generated_translated_content_to_dict(self) -> None:
+        translated_content = translation_domain.TranslatedContent(
+            'In Hindi',
+            feconf.TranslatableContentFormat.HTML,
+            False,
+            data_source='auto',
+        )
+        self.assertEqual(
+            translated_content.to_dict(),
+            {
+                'content_value': 'In Hindi',
+                'content_format': feconf.TranslatableContentFormat.HTML.value,
+                'needs_update': False,
+                'data_source': 'auto',
+            },
+        )
+
+    def test_from_dict_without_data_source_defaults_to_manual(self) -> None:
+        translated_content_dict: feconf.TranslatedContentDict = {
+            'content_value': 'In Hindi',
+            'content_format': feconf.TranslatableContentFormat.HTML.value,
+            'needs_update': False,
+        }
+
+        translated_content = translation_domain.TranslatedContent.from_dict(
+            translated_content_dict
+        )
+
+        self.assertEqual(translated_content.content_value, 'In Hindi')
+        self.assertEqual(
+            translated_content.content_format,
+            feconf.TranslatableContentFormat.HTML,
+        )
+        self.assertEqual(translated_content.needs_update, False)
+        self.assertEqual(translated_content.data_source, 'manual')
 
 
 class MachineTranslationTests(test_utils.GenericTestBase):
