@@ -109,14 +109,7 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """
     common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
-    # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
-    # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
-    # doesn't yet know about the filter parameter added in 3.12.
-    # TODO(#15913): Remove this ignore pragma and comment once MyPy is
-    # upgraded.
-    tar.extractall(  # type: ignore[call-arg]
-        path=common.OPPIA_TOOLS_DIR, filter='data'
-    )
+    tar.extractall(path=common.OPPIA_TOOLS_DIR, filter='data')
     tar.close()
     rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
     os.remove(filename)
@@ -258,12 +251,7 @@ def install_gcloud_sdk() -> None:
 
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
-        # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
-        # Python 3.12 and its bundled typeshed stub for TarFile.extractall()
-        # doesn't yet know about the filter parameter added in 3.12.
-        # TODO(#15913): Remove this ignore pragma and comment once MyPy is
-        # upgraded.
-        tar.extractall(  # type: ignore[call-arg]
+        tar.extractall(
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'
             ),
@@ -367,15 +355,7 @@ def download_and_untar_files(
         with contextlib.closing(
             tarfile.open(name=TMP_UNZIP_PATH, mode='r:gz')
         ) as tfile:
-            # Here we use MyPy ignore because the pinned mypy==1.0.1 predates
-            # Python 3.12 and its bundled typeshed stub for
-            # TarFile.extractall() doesn't yet know about the filter
-            # parameter added in 3.12.
-            # TODO(#15913): Remove this ignore pragma and comment once MyPy
-            # is upgraded.
-            tfile.extractall(  # type: ignore[call-arg]
-                target_parent_dir, filter='data'
-            )
+            tfile.extractall(target_parent_dir, filter='data')
         os.remove(TMP_UNZIP_PATH)
 
         # Rename the target directory.

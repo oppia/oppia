@@ -40,7 +40,7 @@ from urllib import request as urlrequest
 from core.tests import test_utils
 
 import yaml
-from typing import Generator, List, Literal, NoReturn, Tuple
+from typing import Generator, List, Literal, NoReturn, TextIO, Tuple
 
 from . import common
 
@@ -795,16 +795,16 @@ class CommonTests(test_utils.GenericTestBase):
     def test_print_each_string_after_two_new_lines(self) -> None:
         @contextlib.contextmanager
         def _redirect_stdout(
-            new_target: io.TextIOWrapper,
-        ) -> Generator[io.TextIOWrapper, None, None]:
+            new_target: TextIO,
+        ) -> Generator[TextIO, None, None]:
             """Redirect stdout to the new target.
 
             Args:
-                new_target: TextIOWrapper. The new target to which stdout is
+                new_target: TextIO. The new target to which stdout is
                     redirected.
 
             Yields:
-                TextIOWrapper. The new target.
+                TextIO. The new target.
             """
             old_target = sys.stdout
             sys.stdout = new_target

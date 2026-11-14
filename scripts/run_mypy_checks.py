@@ -64,6 +64,8 @@ NOT_FULLY_COVERED_FILES_FOR_UNREACHABLE_CODE: Final = [
     'core/domain/user_services_test.py',
     'core/domain/takeout_service_test.py',
     'core/domain/event_services_test.py',
+    'core/domain/draft_upgrade_services.py',
+    'core/domain/suggestion_services_test.py',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')

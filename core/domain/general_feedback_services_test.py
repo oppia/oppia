@@ -382,7 +382,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_stores_session_info_when_opted_in(
         self,
     ) -> None:
-        session_info = {
+        # Here we use object because session_info contains values of various types.
+        session_info: Dict[str, object] = {
             'console_logs': [
                 {
                     'error_message': 'Console error.',
