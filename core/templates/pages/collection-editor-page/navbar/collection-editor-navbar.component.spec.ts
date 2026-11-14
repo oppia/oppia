@@ -240,6 +240,63 @@ describe('Collection editor navbar component', () => {
     expect(componentInstance.playerButtonHovering).toBeTrue();
   });
 
+  it('should render collection tabs as accessible buttons without fragments', () => {
+    spyOn(urlService, 'getCollectionIdFromEditorUrl').and.returnValue(
+      collectionId
+    );
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      mockCollection
+    );
+    spyOn(collectionEditorStateService, 'getCollectionRights').and.returnValue(
+      mockPrivateCollectionRights
+    );
+    spyOn(collectionEditorStateService, 'isLoadingCollection').and.returnValue(
+      false
+    );
+    spyOn(collectionEditorStateService, 'isSavingCollection').and.returnValue(
+      false
+    );
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'edit'
+    );
+    componentInstance.validationIssues = [];
+    fixture.detectChanges();
+
+    const editorTab = fixture.nativeElement.querySelector(
+      '.e2e-test-main-tab'
+    ) as HTMLButtonElement;
+    const settingsTab = fixture.nativeElement.querySelector(
+      '.e2e-test-settings-tab'
+    ) as HTMLButtonElement;
+
+    [editorTab, settingsTab].forEach(tab => {
+      expect(tab.tagName).toBe('BUTTON');
+      expect(tab.type).toBe('button');
+      expect(tab.hasAttribute('href')).toBe(false);
+      expect(tab.tabIndex).toBe(0);
+      expect(tab.getAttribute('aria-label')).toBeTruthy();
+    });
+
+    const navigateToEditTabSpy = spyOn(
+      collectionEditorRoutingService,
+      'navigateToEditTab'
+    );
+    const navigateToSettingsTabSpy = spyOn(
+      collectionEditorRoutingService,
+      'navigateToSettingsTab'
+    );
+    const initialHash = window.location.hash;
+
+    editorTab.click();
+    settingsTab.click();
+
+    expect(navigateToEditTabSpy).toHaveBeenCalled();
+    expect(navigateToSettingsTabSpy).toHaveBeenCalled();
+    expect(window.location.hash).toBe(initialHash);
+    expect(window.location.hash).not.toBe('#');
+  });
+
   it('should test getters', () => {
     componentInstance.validationIssues = [];
     componentInstance.collectionRights = {
