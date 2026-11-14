@@ -31,11 +31,19 @@ const NUM_OF_DUMMY_BLOGS = 30;
 test.describe.configure({mode: 'serial'});
 
 test.describe('Logged-out User', function () {
+  test.skip(
+    () => process.env.PROD_ENV === 'true',
+    'Skipping in production mode as generating dummy blog posts is only available in dev mode.'
+  );
+
   let loggedOutUser: LoggedOutUser;
   let superAdmin: SuperAdmin;
   let blogPostEditor: BlogPostEditor & LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
+    if (process.env.PROD_ENV === 'true') {
+      return;
+    }
     loggedOutUser = await UserFactory.createLoggedOutUser(browser);
     superAdmin = await UserFactory.createNewSuperAdmin(browser);
     blogPostEditor = await UserFactory.createNewUser(
@@ -71,6 +79,9 @@ test.describe('Logged-out User', function () {
   });
 
   test.beforeEach(async function () {
+    if (process.env.PROD_ENV === 'true') {
+      return;
+    }
     await loggedOutUser.navigateToBlogPage();
   });
 
