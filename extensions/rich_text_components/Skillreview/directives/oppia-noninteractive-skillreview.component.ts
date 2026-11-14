@@ -42,6 +42,7 @@ import {
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {EntityContext} from 'domain/utilities/entity-context.model';
 import {PageContextService} from 'services/page-context.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -59,8 +60,6 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   @Input() textWithValue!: string;
   skillId!: string;
   linkText!: string;
-  entityId!: string;
-  entityType?: string;
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -104,12 +103,30 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
   }
 
+  // Restore exactly the custom entity context that existed before the
+  // concept card was opened. If there was none, remove it so that the entity
+  // context is derived from the URL again; otherwise it would stay pinned to
+  // the current entity (e.g. the previously opened question) after navigating
+  // elsewhere.
+  private _restoreCustomEntityContext(
+    previousCustomEntityContext: EntityContext | null
+  ): void {
+    if (previousCustomEntityContext) {
+      this.pageContextService.setCustomEntityContext(
+        previousCustomEntityContext.getType(),
+        previousCustomEntityContext.getId()
+      );
+    } else {
+      this.pageContextService.removeCustomEntityContext();
+    }
+  }
+
   openConceptCard(event: MouseEvent): void {
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
-    this.entityId = this.pageContextService.getEntityId();
-    this.entityType = this.pageContextService.getEntityType();
+    const previousCustomEntityContext =
+      this.pageContextService.getCustomEntityContext();
 
     this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL,
@@ -122,18 +139,11 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then(
-      () => {},
+      () => {
+        this._restoreCustomEntityContext(previousCustomEntityContext);
+      },
       res => {
-        this.pageContextService.removeCustomEntityContext();
-        // Restore the entity context to that of the state before the concept card
-        // editor was initialized. This prevents change of context issues in
-        // calling components once the editor is closed.
-        if (this.entityId && this.entityType) {
-          this.pageContextService.setCustomEntityContext(
-            this.entityType,
-            this.entityId
-          );
-        }
+        this._restoreCustomEntityContext(previousCustomEntityContext);
         const allowedDismissActions = [
           'cancel',
           'escape key press',
