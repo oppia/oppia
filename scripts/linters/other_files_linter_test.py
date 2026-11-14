@@ -24,8 +24,9 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
+from scripts import concurrent_task_utils
 
-from typing import Final, List, Tuple
+from typing import Dict, Final, List, Tuple
 
 from . import other_files_linter, run_lint_checks
 
@@ -36,6 +37,7 @@ FILE_CACHE: Final = NAME_SPACE.files
 LINTER_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'scripts', 'linters', 'test_files'
 )
+CORE_TEMPLATES_DIR: Final = os.path.join(os.getcwd(), 'core', 'templates')
 
 
 class CustomLintChecksManagerTests(test_utils.LinterTestBase):
@@ -591,7 +593,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         )
 
     def test_check_lighthouse_page_coverage_all_covered(self) -> None:
-        """All routes are either in LH or in the exclusion list."""
+        """All routes have a Lighthouse page whose URL audits them."""
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
@@ -617,7 +619,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 return (
                     '{'
                     '  "splash": {'
-                    '    "url": "http://localhost:8181/",'
+                    # A URL with no path segment still resolves to root.
+                    '    "url": "http://localhost:8181",'
                     '    "page_module": '
                     '"core/templates/pages/splash-page/splash-page.module.ts"'
                     '  },'
@@ -625,6 +628,15 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '    "url": "http://localhost:8181/android",'
                     '    "page_module": '
                     '"core/templates/pages/android-page/android-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "SPLASH": {"ROUTE": ""},'
+                    '    "ANDROID": {"ROUTE": "android"}'
                     '  }'
                     '}'
                 )
@@ -639,7 +651,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertFalse(result.failed)
 
     def test_check_lighthouse_page_coverage_new_route_fails(self) -> None:
-        """A new route without LH coverage or exclusion fails the check."""
+        """A route without a matching Lighthouse page URL fails the check."""
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
@@ -662,7 +674,24 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     ]
                 )
             if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
-                return '{}'
+                return (
+                    '{'
+                    '  "splash": {'
+                    '    "url": "http://localhost:8181/",'
+                    '    "page_module": '
+                    '"core/templates/pages/splash-page/splash-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "SPLASH": {"ROUTE": ""},'
+                    '    "NEW_PAGE": {"ROUTE": "new-page"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -674,14 +703,20 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertTrue(
             any('NEW_PAGE' in msg for msg in result.trimmed_messages)
         )
+        self.assertFalse(
+            any('SPLASH' in msg for msg in result.trimmed_messages)
+        )
 
     def test_check_lighthouse_page_coverage_with_lh_entry(self) -> None:
-        """A new route that has a corresponding LH entry passes."""
+        """A route with a matching Lighthouse page URL passes, and non-route
+        objects in the routing module are ignored.
+        """
 
         def mock_read(path: str) -> str:
             if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
                 return '\n'.join(
                     [
+                        'const notARoute = {foo: \'bar\'};',
                         'const routes: Route[] = [',
                         '  {',
                         '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
@@ -699,6 +734,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '    "url": "http://localhost:8181/about",'
                     '    "page_module": '
                     '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about"}'
                     '  }'
                     '}'
                 )
@@ -737,6 +780,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '    "url": "http://localhost:8181/admin",'
                     '    "page_module": '
                     '"core/templates/pages/admin-page/admin-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ADMIN": {"ROUTE": "admin"}'
                     '  }'
                     '}'
                 )
@@ -780,6 +831,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  }'
                     '}'
                 )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about"}'
+                    '  }'
+                    '}'
+                )
             raise AssertionError('Unexpected file path: %s' % path)
 
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
@@ -789,6 +848,1031 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             ).check_lighthouse_page_coverage()
         self.assertEqual('Lighthouse page coverage', result.name)
         self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_skips_routes_without_standalone_page(
+        self,
+    ) -> None:
+        """Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE are skipped."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.LOGIN.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/login-page/login-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return '{}'
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "ROUTES_WITH_NO_STANDALONE_PAGE": ["LOGIN", "LOGOUT"],'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "LOGIN": {"ROUTE": "login"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertEqual('Lighthouse page coverage', result.name)
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_shared_module_fails(self) -> None:
+        """A route that only shares a module with an audited route is still
+        reported as uncovered, because coverage is matched on the URL.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.EXPLORATION_PLAYER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/exploration-player-page/'
+                        'current-lesson-player/exploration-player-page.module\')',
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.EXPLORATION_PLAYER_EMBED.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/exploration-player-page/'
+                        'current-lesson-player/exploration-player-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "exploration-player": {'
+                    '    "url": '
+                    '"http://localhost:8181/explore/{{exploration_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/exploration-player-page/'
+                    'current-lesson-player/exploration-player-page.module.ts"'
+                    '  },'
+                    '  "lesson-player-embed": {'
+                    '    "url": '
+                    '"http://localhost:8181/embed/lesson/{{exploration_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/exploration-player-page/'
+                    'current-lesson-player/exploration-player-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "EXPLORATION_PLAYER": '
+                    '{"ROUTE": "explore/:exploration_id"},'
+                    '    "EXPLORATION_PLAYER_EMBED": '
+                    '{"ROUTE": "embed/exploration/:exploration_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'EXPLORATION_PLAYER_EMBED' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+        self.assertFalse(
+            any(
+                '\n  EXPLORATION_PLAYER\n' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+
+    def test_check_lighthouse_page_coverage_route_param_matches_value(
+        self,
+    ) -> None:
+        """A router parameter matches the concrete sample value in the URL."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.COLLECTION_PLAYER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/collection-player-page/'
+                        'collection-player-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "collection-player": {'
+                    '    "url": "http://localhost:8181/collection/0",'
+                    '    "page_module": '
+                    '"core/templates/pages/collection-player-page/'
+                    'collection-player-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "COLLECTION_PLAYER": '
+                    '{"ROUTE": "collection/:collection_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_child_route_prefix(self) -> None:
+        """A route is covered when a page URL extends it with child-route
+        segments, such as the topic-viewer's /story path.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.TOPIC_VIEWER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/topic-viewer-page/'
+                        'topic-viewer-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "topic-viewer": {'
+                    '    "url": '
+                    '"http://localhost:8181/learn/staging/dummy-topic-one/story",'
+                    '    "page_module": '
+                    '"core/templates/pages/topic-viewer-page/'
+                    'topic-viewer-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "TOPIC_VIEWER": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_page_placeholder(self) -> None:
+        """A Lighthouse placeholder in the page URL matches a literal route
+        segment.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about/{{some_id}}",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about/extra"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_missing_route_path_fails(
+        self,
+    ) -> None:
+        """A route whose path cannot be resolved is reported as uncovered."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return '{}'
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(any('ABOUT' in msg for msg in result.trimmed_messages))
+
+    def test_check_lighthouse_page_coverage_shorter_page_url_fails(
+        self,
+    ) -> None:
+        """A route with more segments than the page URL is uncovered."""
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.ABOUT.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/about-page/about-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "about": {'
+                    '    "url": "http://localhost:8181/about",'
+                    '    "page_module": '
+                    '"core/templates/pages/about-page/about-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "ABOUT": {"ROUTE": "about/extra"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+
+    def test_check_lighthouse_page_coverage_literal_route_does_not_cover_param(
+        self,
+    ) -> None:
+        """A page auditing a literal route is not credited with a sibling
+        parameterised route whose only match there is that literal.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.PRACTICE_SESSION.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/practice-session-page/\'',
+                        'practice-session-page.module\')',
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.NODE_PRACTICE_SESSION.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/practice-session-page/\'',
+                        'practice-session-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "practice-session": {'
+                    '    "url": "http://localhost:8181/learn/staging/'
+                    'dummy-topic-one/practice/session",'
+                    '    "page_module": '
+                    '"core/templates/pages/practice-session-page/'
+                    'practice-session-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "PRACTICE_SESSION": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment/'
+                    'practice/session"},'
+                    '    "NODE_PRACTICE_SESSION": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment/'
+                    'practice/:node_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'NODE_PRACTICE_SESSION' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+        self.assertFalse(
+            any(
+                '\n  PRACTICE_SESSION\n' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+
+    def test_check_lighthouse_page_coverage_param_route_own_page(self) -> None:
+        """A parameterised route is covered when a page URL reaches it with a
+        concrete sample value rather than a sibling literal.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.PRACTICE_SESSION.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/practice-session-page/\'',
+                        'practice-session-page.module\')',
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.NODE_PRACTICE_SESSION.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/practice-session-page/\'',
+                        'practice-session-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "practice-session": {'
+                    '    "url": "http://localhost:8181/learn/staging/'
+                    'dummy-topic-one/practice/session",'
+                    '    "page_module": '
+                    '"core/templates/pages/practice-session-page/'
+                    'practice-session-page.module.ts"'
+                    '  },'
+                    '  "node-practice-session": {'
+                    '    "url": "http://localhost:8181/learn/staging/'
+                    'dummy-topic-one/practice/1",'
+                    '    "page_module": '
+                    '"core/templates/pages/practice-session-page/'
+                    'practice-session-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "PRACTICE_SESSION": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment/'
+                    'practice/session"},'
+                    '    "NODE_PRACTICE_SESSION": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment/'
+                    'practice/:node_id"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertFalse(result.failed)
+
+    def test_check_lighthouse_page_coverage_longer_route_is_more_specific(
+        self,
+    ) -> None:
+        """A page URL extending a parent route is credited to the longer child
+        route, not to the parent it also leads with.
+        """
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return '\n'.join(
+                    [
+                        'const routes: Route[] = [',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.TOPIC_VIEWER.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/topic-viewer-page/\'',
+                        'topic-viewer-page.module\')',
+                        '  },',
+                        '  {',
+                        '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                        '.MASTERY_CHALLENGE.ROUTE,',
+                        '    loadChildren: () =>',
+                        '      import(\'pages/topic-viewer-page/\'',
+                        'topic-viewer-page.module\')',
+                        '  },',
+                        '];',
+                    ]
+                )
+            if path == other_files_linter.LIGHTHOUSE_PAGES_JSON_FILEPATH:
+                return (
+                    '{'
+                    '  "mastery-challenge": {'
+                    '    "url": "http://localhost:8181/learn/staging/'
+                    'dummy-topic-one/mastery-challenge",'
+                    '    "page_module": '
+                    '"core/templates/pages/topic-viewer-page/'
+                    'topic-viewer-page.module.ts"'
+                    '  }'
+                    '}'
+                )
+            if path == other_files_linter.ASSETS_CONSTANTS_FILEPATH:
+                return (
+                    '{'
+                    '  "PAGES_REGISTERED_WITH_FRONTEND": {'
+                    '    "TOPIC_VIEWER": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment"},'
+                    '    "MASTERY_CHALLENGE": {"ROUTE": '
+                    '"learn/:classroom_url_fragment/:topic_url_fragment/'
+                    'mastery-challenge"}'
+                    '  }'
+                    '}'
+                )
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_lighthouse_page_coverage()
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any('\n  TOPIC_VIEWER\n' in msg for msg in result.trimmed_messages)
+        )
+        self.assertFalse(
+            any(
+                '\n  MASTERY_CHALLENGE\n' in msg
+                for msg in result.trimmed_messages
+            )
+        )
+
+    def _run_route_feature_flag_check(
+        self, files: Dict[str, str]
+    ) -> concurrent_task_utils.TaskResult:
+        """Runs the route feature flag check against mocked file contents.
+
+        Args:
+            files: dict(str, str). Maps file paths to their mocked contents.
+
+        Returns:
+            TaskResult. The result of the lint check.
+        """
+
+        def mock_read(path: str) -> str:
+            if path in files:
+                return files[path]
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            return other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_route_feature_flags_match_guards()
+
+    def _get_practice_route_routing_content(self) -> str:
+        """Returns routing content with a flag-declaring practice route.
+
+        Returns:
+            str. The mocked app.routing.module.ts content.
+        """
+        return '\n'.join(
+            [
+                'import {PracticeSessionAccessGuard} from '
+                '\'pages/practice-session-page/'
+                'practice-session-page-auth.guard\';',
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.NODE_PRACTICE_SESSION.ROUTE,',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.StoryEditorArcs]},',
+                '    loadChildren: () =>',
+                '      import(\'pages/practice-session-page/'
+                'practice-session-page.module\').then(',
+                '        m => m.PracticeSessionPageModule',
+                '      ),',
+                '    canActivate: [PracticeSessionAccessGuard],',
+                '  },',
+                '];',
+            ]
+        )
+
+    def _get_certificate_route_routing_content(self) -> str:
+        """Returns routing content with a flag-declaring certificate route.
+
+        Returns:
+            str. The mocked app.routing.module.ts content.
+        """
+        return '\n'.join(
+            [
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.CERTIFICATE_OFFERING_AVAILABLE.ROUTE,',
+                '    pathMatch: \'full\',',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.EnableCertificateAssessment]},',
+                '    loadChildren: () =>',
+                '      import(',
+                '        \'pages/certificate-offering-available-page/'
+                'certificate-offering-available-page.module\'',
+                '      ).then(m => m.CertificateOfferingAvailablePageModule),',
+                '  },',
+                '];',
+            ]
+        )
+
+    def test_check_route_feature_flags_match_guards_top_level_match(
+        self,
+    ) -> None:
+        """A top-level guard that checks the declared flag passes."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: (
+                'platformFeatureService.status.StoryEditorArcs.isEnabled'
+            ),
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_top_level_mismatch(
+        self,
+    ) -> None:
+        """A top-level guard that checks a different flag fails."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: (
+                'platformFeatureService.status.NewLessonPlayer.isEnabled'
+            ),
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'NODE_PRACTICE_SESSION' in message
+                and 'StoryEditorArcs' in message
+                and 'NewLessonPlayer' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_module_routing_match(
+        self,
+    ) -> None:
+        """A guard in a lazy module's routing module is checked."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page.module.ts',
+        )
+        routing_module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-routing.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_certificate_route_routing_content()
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageRoutingModule} '
+                    'from \'./certificate-offering-available-page-routing'
+                    '.module\';',
+                ]
+            ),
+            routing_module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageAuthGuard} '
+                    'from \'./certificate-offering-available-page-auth'
+                    '.guard\';',
+                    'const routes = [',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateOfferingAvailablePageAuthGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.'
+                'EnableCertificateAssessment\n'
+                '        .isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_module_routing_mismatch(
+        self,
+    ) -> None:
+        """A lazy module guard that checks a different flag fails."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page.module.ts',
+        )
+        routing_module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-routing.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-offering-available-page',
+            'certificate-offering-available-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_certificate_route_routing_content()
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageRoutingModule} '
+                    'from \'./certificate-offering-available-page-routing'
+                    '.module\';',
+                ]
+            ),
+            routing_module_path: '\n'.join(
+                [
+                    'import {CertificateOfferingAvailablePageAuthGuard} '
+                    'from \'./certificate-offering-available-page-auth'
+                    '.guard\';',
+                    'const routes = [',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateOfferingAvailablePageAuthGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.NewLessonPlayer.isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'CERTIFICATE_OFFERING_AVAILABLE' in message
+                and 'EnableCertificateAssessment' in message
+                and 'NewLessonPlayer' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_inline_module_route(
+        self,
+    ) -> None:
+        """A guard in an inline lazy-module route is checked."""
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-assessment-player-page',
+            'certificate-assessment-player-page.module.ts',
+        )
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'certificate-assessment-player-page',
+            'certificate-assessment-player-page-auth.guard.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,',
+                    '    data: {requiredFeatureFlags: '
+                    '[FeatureNames.EnableCertificateAssessment]},',
+                    '    loadChildren: () =>',
+                    '      import(\'pages/certificate-assessment-player-page/'
+                    'certificate-assessment-player-page.module\').then(',
+                    '        m => m.CertificateAssessmentPlayerPageModule',
+                    '      ),',
+                    '  },',
+                    '];',
+                ]
+            ),
+            module_path: '\n'.join(
+                [
+                    'import {CertificateAssessmentPlayerPageAuthGuard} from '
+                    '\'./certificate-assessment-player-page-auth.guard\';',
+                    'RouterModule.forChild([',
+                    '  {',
+                    '    path: \'\',',
+                    '    canActivate: '
+                    '[CertificateAssessmentPlayerPageAuthGuard],',
+                    '  },',
+                    ']);',
+                ]
+            ),
+            guard_path: (
+                'platformFeatureService.status.'
+                'EnableCertificateAssessment\n'
+                '        .isEnabled'
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_ignores_undeclared(
+        self,
+    ) -> None:
+        """A route without requiredFeatureFlags is ignored."""
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'import {PracticeSessionAccessGuard} from '
+                    '\'pages/practice-session-page/'
+                    'practice-session-page-auth.guard\';',
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.PRACTICE_SESSION.ROUTE,',
+                    '    canActivate: [PracticeSessionAccessGuard],',
+                    '    loadChildren: () =>',
+                    '      import(\'pages/practice-session-page/'
+                    'practice-session-page.module\').then(',
+                    '        m => m.PracticeSessionPageModule',
+                    '      ),',
+                    '  },',
+                    '];',
+                ]
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_unresolved_guard(
+        self,
+    ) -> None:
+        """A guard that cannot be resolved fails the check."""
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: '\n'.join(
+                [
+                    'const routes: Route[] = [',
+                    '  {',
+                    '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                    '.NODE_PRACTICE_SESSION.ROUTE,',
+                    '    data: {requiredFeatureFlags: '
+                    '[FeatureNames.StoryEditorArcs]},',
+                    '    canActivate: [UnknownGuard],',
+                    '  },',
+                    '];',
+                ]
+            ),
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'UnknownGuard' in message and 'could not be resolved' in message
+                for message in result.trimmed_messages
+            )
+        )
+
+    def test_check_route_feature_flags_match_guards_guard_has_no_flags(
+        self,
+    ) -> None:
+        """A guard that checks no flags does not fail the check."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        module_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page.module.ts',
+        )
+        files = {
+            other_files_linter.APP_ROUTING_MODULE_FILEPATH: (
+                self._get_practice_route_routing_content()
+            ),
+            guard_path: 'return true;',
+            module_path: 'const routes = [];',
+        }
+
+        result = self._run_route_feature_flag_check(files)
+
+        self.assertFalse(result.failed)
+
+    def test_check_route_feature_flags_match_guards_unreadable_guard(
+        self,
+    ) -> None:
+        """A guard whose source cannot be read fails the check."""
+        guard_path = os.path.join(
+            CORE_TEMPLATES_DIR,
+            'pages',
+            'practice-session-page',
+            'practice-session-page-auth.guard.ts',
+        )
+        routing_content = '\n'.join(
+            [
+                'import {PracticeSessionAccessGuard} from '
+                '\'pages/practice-session-page/'
+                'practice-session-page-auth.guard\';',
+                'const routes: Route[] = [',
+                '  {',
+                '    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND'
+                '.NODE_PRACTICE_SESSION.ROUTE,',
+                '    data: {requiredFeatureFlags: '
+                '[FeatureNames.StoryEditorArcs]},',
+                '    canActivate: [PracticeSessionAccessGuard],',
+                '  },',
+                '];',
+            ]
+        )
+
+        def mock_read(path: str) -> str:
+            if path == other_files_linter.APP_ROUTING_MODULE_FILEPATH:
+                return routing_content
+            if path == guard_path:
+                raise OSError('guard source missing')
+            raise AssertionError('Unexpected file path: %s' % path)
+
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        with read_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_route_feature_flags_match_guards()
+
+        self.assertTrue(result.failed)
+        self.assertTrue(
+            any(
+                'PracticeSessionAccessGuard' in message
+                and 'could not be read' in message
+                for message in result.trimmed_messages
+            )
+        )
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(
