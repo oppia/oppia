@@ -121,6 +121,16 @@ class LcovStanzaRelevantLines:
             )
         self.covered_lines = int(match.group(1))
 
+        self.uncovered_lines = sorted(
+            {
+                int(line_number)
+                for line_number, hit_count in re.findall(
+                    r'^DA:(\d+),(\d+)(?:,[^\r\n]*)?\r?$', stanza, re.MULTILINE
+                )
+                if int(hit_count) == 0
+            }
+        )
+
 
 def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     """Get all stanzas from a lcov file. The lcov file gather all the frontend
@@ -129,6 +139,7 @@ def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     SF: file path
     FNF: total functions
     FNH: functions covered
+    DA: line number, execution count, optional checksum
     LF: total lines
     LH: lines covered
     BRF: total branches
@@ -228,6 +239,10 @@ def check_coverage_changes(files_to_check: Optional[List[str]] = None) -> None:
                     '\033[1m{}\033[0m seems to be not completely tested.'
                     ' Make sure it\'s fully covered.\n'.format(file_path)
                 )
+                if stanza.uncovered_lines:
+                    errors += 'Uncovered lines: {}\n'.format(
+                        ', '.join(str(line) for line in stanza.uncovered_lines)
+                    )
         else:
             if total_lines == covered_lines:
                 errors += (
