@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the ItemSelectionInput interaction.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractiveItemSelectionInputComponent} from './oppia-interactive-item-selection-input.component';
@@ -185,40 +183,16 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         let dummyMouseEvent = new MouseEvent('Mouse');
         spyOn(currentInteractionService, 'updateCurrentAnswer');
         spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
+        const selectedButton = document.createElement('button');
+        selectedButton.classList.add('selected');
         spyOn(document, 'querySelector')
           .withArgs('button.multiple-choice-option.selected')
-          .and.returnValue({
-            // This throws "Type '{ add: () => void; remove: () => void; }'
-            // is missing the following properties from type 'DOMTokenList':
-            // length, value, contains, item, and 4 more". We need to suppress
-            // this error because typescript expects more
-            // properties than just one add and remove.
-            // We need only add and remove for testing purposes.
-            classList: {
-              add: () => {
-                return;
-              },
-              remove: () => {
-                return;
-              },
-              contains: (text: string) => {
-                return true;
-              },
-            },
-          });
-        spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-          classList: {
-            add: () => {
-              return;
-            },
-            remove: () => {
-              return;
-            },
-            contains: (text: string) => {
-              return true;
-            },
-          },
-        } as unknown as EventTarget);
+          .and.returnValue(selectedButton);
+        const currentTargetButton = document.createElement('button');
+        currentTargetButton.classList.add('selected');
+        spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+          currentTargetButton
+        );
         spyOn(currentInteractionService, 'onSubmit').and.callThrough();
         spyOn(component, 'submitAnswer').and.callThrough();
         component.ngOnInit();
@@ -265,40 +239,16 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         let dummyMouseEvent = new MouseEvent('Mouse');
         spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
         spyOn(currentInteractionService, 'updateCurrentAnswer');
+        const selectedButton = document.createElement('button');
+        selectedButton.classList.add('selected');
         spyOn(document, 'querySelector')
           .withArgs('button.multiple-choice-option.selected')
-          .and.returnValue({
-            // This throws "Type '{ add: () => void; remove: () => void; }'
-            // is missing the following properties from type 'DOMTokenList':
-            // length, value, contains, item, and 4 more". We need to suppress
-            // this error because typescript expects more
-            // properties than just one add and remove.
-            // We need only add and remove for testing purposes.
-            classList: {
-              add: () => {
-                return;
-              },
-              remove: () => {
-                return;
-              },
-              contains: (text: string) => {
-                return true;
-              },
-            },
-          });
-        spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-          classList: {
-            add: () => {
-              return;
-            },
-            remove: () => {
-              return;
-            },
-            contains: (text: string) => {
-              return true;
-            },
-          },
-        } as unknown as EventTarget);
+          .and.returnValue(selectedButton);
+        const currentTargetButton = document.createElement('button');
+        currentTargetButton.classList.add('selected');
+        spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+          currentTargetButton
+        );
         spyOn(currentInteractionService, 'onSubmit').and.callThrough();
         spyOn(component, 'submitAnswer').and.callThrough();
         component.ngOnInit();
