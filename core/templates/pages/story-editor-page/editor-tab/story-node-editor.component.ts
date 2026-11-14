@@ -395,7 +395,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   // The input field stays open when the new ID is rejected, so that the user
   // can fix it. Otherwise, the exploration is shown as a link again (or the
   // empty input field is kept, if the exploration was removed).
-  updateExplorationId(explorationId: string): void {
+  updateExplorationId(explorationId: string | null): void {
     if (this.storyEditorStateService.isStoryPublished()) {
       if (explorationId === '' || explorationId === null) {
         this.alertsService.addInfoMessage(
@@ -418,6 +418,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
             );
             this.currentExplorationId = explorationId;
             this.explorationIdEditorIsShown = false;
+            this.restoreExplorationIdFocus();
           } else {
             this.invalidExpErrorIsShown = true;
           }
@@ -439,6 +440,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       );
       this.currentExplorationId = explorationId;
       this.explorationIdEditorIsShown = explorationId === null;
+      this.restoreExplorationIdFocus();
       if (explorationId === null) {
         this.explorationId = null;
       }
@@ -651,6 +653,18 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.expIdCanBeSaved = true;
     this.invalidExpErrorIsShown = false;
     this.explorationIdEditorIsShown = !this.currentExplorationId;
+    this.restoreExplorationIdFocus();
+  }
+
+  // The button that was used (Save, Cancel or delete) is removed from the DOM
+  // afterwards, so the focus is moved to the edit button, or to the input
+  // field if it is still shown, instead of falling back to the document.
+  restoreExplorationIdFocus(): void {
+    this.focusManagerService.setFocus(
+      this.explorationIdEditorIsShown
+        ? 'storyNodeExplorationId'
+        : 'storyNodeExplorationIdEditButton'
+    );
   }
 
   updateLocalEditableOutline($event: SchemaDefaultValue): void {

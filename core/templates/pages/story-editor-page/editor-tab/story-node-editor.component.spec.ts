@@ -432,6 +432,7 @@ describe('Story node editor component', () => {
       component.explorationId = 'invalid id';
       component.expIdCanBeSaved = false;
       component.invalidExpErrorIsShown = true;
+      const setFocusSpy = spyOn(focusManagerService, 'setFocus');
 
       component.cancelExplorationIdEdit();
       fixture.detectChanges();
@@ -441,6 +442,10 @@ describe('Story node editor component', () => {
       expect(component.invalidExpErrorIsShown).toBe(false);
       expect(component.explorationIdEditorIsShown).toBe(false);
       expect(query('.e2e-test-exploration-id-link')).not.toBeNull();
+      // The Cancel button is removed, so the focus moves to the edit button.
+      expect(setFocusSpy).toHaveBeenCalledWith(
+        'storyNodeExplorationIdEditButton'
+      );
     });
 
     it('should save the exploration ID when the form is submitted', () => {
@@ -577,11 +582,13 @@ describe('Story node editor component', () => {
     it('should keep the input field when the edit is cancelled and no exploration is linked', () => {
       renderChapterWithExploration(null);
       component.explorationId = 'exp_2';
+      const setFocusSpy = spyOn(focusManagerService, 'setFocus');
 
       component.cancelExplorationIdEdit();
 
       expect(component.explorationId).toBeNull();
       expect(component.explorationIdEditorIsShown).toBe(true);
+      expect(setFocusSpy).toHaveBeenCalledWith('storyNodeExplorationId');
     });
   });
 
@@ -1087,6 +1094,7 @@ describe('Story node editor component', () => {
         storyUpdateService,
         'setStoryNodeExplorationId'
       );
+      const setFocusSpy = spyOn(focusManagerService, 'setFocus');
       component.explorationIdEditorIsShown = true;
 
       component.updateExplorationId('exp10');
@@ -1096,6 +1104,9 @@ describe('Story node editor component', () => {
       expect(storyUpdateSpy).toHaveBeenCalled();
       expect(component.currentExplorationId).toEqual('exp10');
       expect(component.explorationIdEditorIsShown).toBe(false);
+      expect(setFocusSpy).toHaveBeenCalledWith(
+        'storyNodeExplorationIdEditButton'
+      );
     })
   );
 
@@ -1135,7 +1146,7 @@ describe('Story node editor component', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
     component.explorationIdEditorIsShown = true;
 
-    component.updateExplorationId(null as unknown as string);
+    component.updateExplorationId(null);
     expect(storyUpdateSpy).not.toHaveBeenCalled();
     expect(alertsSpy).toHaveBeenCalled();
     expect(component.explorationIdEditorIsShown).toBe(true);
@@ -1144,6 +1155,7 @@ describe('Story node editor component', () => {
   it('should set node exploration id and show it as a link if story is not published', () => {
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+    const setFocusSpy = spyOn(focusManagerService, 'setFocus');
     component.explorationIdEditorIsShown = true;
 
     component.updateExplorationId('exp10');
@@ -1151,29 +1163,26 @@ describe('Story node editor component', () => {
     expect(storyUpdateSpy).toHaveBeenCalledWith(story, 'node1', 'exp10');
     expect(component.currentExplorationId).toEqual('exp10');
     expect(component.explorationIdEditorIsShown).toBe(false);
+    expect(setFocusSpy).toHaveBeenCalledWith(
+      'storyNodeExplorationIdEditButton'
+    );
   });
 
-  it(
-    'should call StoryUpdateService to set node exploration id and set ' +
-      'invalid exp error if story is published and exp id is invalid',
-    () => {
-      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
-      Promise.resolve(false);
+  it('should remove the exploration and show the empty input field if story is not published', () => {
+    spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+    const setFocusSpy = spyOn(focusManagerService, 'setFocus');
+    component.explorationId = 'exp10';
+    component.explorationIdEditorIsShown = false;
 
-      let storyUpdateSpy = spyOn(
-        storyUpdateService,
-        'setStoryNodeExplorationId'
-      );
-      component.explorationId = 'exp10';
-      component.explorationIdEditorIsShown = false;
+    component.updateExplorationId(null);
 
-      component.updateExplorationId(null as unknown as string);
-      expect(storyUpdateSpy).toHaveBeenCalled();
-      // The exploration was removed, so the empty input field is shown.
-      expect(component.explorationId).toBeNull();
-      expect(component.explorationIdEditorIsShown).toBe(true);
-    }
-  );
+    expect(storyUpdateSpy).toHaveBeenCalledWith(story, 'node1', null);
+    expect(component.explorationId).toBeNull();
+    expect(component.explorationIdEditorIsShown).toBe(true);
+    // The delete button is removed, so the focus moves to the input field.
+    expect(setFocusSpy).toHaveBeenCalledWith('storyNodeExplorationId');
+  });
 
   it(
     'should show alert message if we try to update ' +
