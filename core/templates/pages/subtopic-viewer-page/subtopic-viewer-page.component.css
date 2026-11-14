@@ -151,28 +151,28 @@
   padding: 15px 25px;
 }
 
-.card {
+.new-subtopic-viewer-container .card {
   background-color: #fff;
   border: none !important;
   margin-bottom: 12px;
   overflow: hidden;
 }
 
-.card-highlighted {
+.new-subtopic-viewer-container .card-highlighted {
   border: 3px solid #f5a623 !important;
 }
 
-.card-header {
+.new-subtopic-viewer-container .card-header {
   background-color: #003b36;
   margin: 0;
   padding: 0;
 }
 
-.card-highlighted .card-header {
+.new-subtopic-viewer-container .card-highlighted .card-header {
   background-color: #00645c;
 }
 
-.card-header-button {
+.new-subtopic-viewer-container .card-header-button {
   align-items: center;
   background: none;
   border: none;
@@ -186,12 +186,12 @@
   width: 100%;
 }
 
-.card-header-button:focus-visible {
+.new-subtopic-viewer-container .card-header-button:focus-visible {
   outline: 2px solid #fff;
   outline-offset: -4px;
 }
 
-.card-title {
+.new-subtopic-viewer-container .card-title {
   color: #fff;
   font-family: Roboto, Arial, sans-serif;
   font-size: 18px;
@@ -199,16 +199,16 @@
   margin: 0;
 }
 
-.card-chevron {
+.new-subtopic-viewer-container .card-chevron {
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 
-.card-chevron-expanded {
+.new-subtopic-viewer-container .card-chevron-expanded {
   transform: rotate(180deg);
 }
 
-.card-content {
+.new-subtopic-viewer-container .card-content {
   border: none !important;
   padding: 18px 6px;
 }
@@ -339,15 +339,15 @@
     padding: 30px;
   }
 
-  .card-header-button {
+  .new-subtopic-viewer-container .card-header-button {
     padding: 15px 15px;
   }
 
-  .card-title {
+  .new-subtopic-viewer-container .card-title {
     font-size: 18px;
   }
 
-  .card-content {
+  .new-subtopic-viewer-container .card-content {
     padding: 15px;
   }
 
