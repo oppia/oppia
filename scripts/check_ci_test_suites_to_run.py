@@ -20,11 +20,13 @@ import argparse
 import collections
 import json
 import os
+import re
 import subprocess
 
+from core import feature_flag_list
 from scripts import generate_root_files_mapping
 
-from typing import Final, List, Optional, Sequence, Set, TypedDict
+from typing import Dict, Final, List, Optional, Sequence, Set, TypedDict
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -118,6 +120,39 @@ LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join(
 LIGHTHOUSE_SHARDS_CONFIG_FILE_PATH: Final = os.path.join(
     'core', 'tests', 'lighthouse-shards.json'
 )
+# The routing module lazy-imports each page module and is the single source of
+# truth for the feature flags a route requires (data.requiredFeatureFlags), so
+# the CI check reads it directly to detect pages gated by DEV-stage flags.
+APP_ROUTING_MODULE_FILEPATH: Final = os.path.join(
+    'core',
+    'templates',
+    'pages',
+    'oppia-root',
+    'routing',
+    'app.routing.module.ts',
+)
+# ROUTES_WITH_NO_STANDALONE_PAGE is defined in assets/constants.ts, which is
+# the single source of truth for the route keys that have no standalone page.
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join('assets', 'constants.ts')
+# Maps the PascalCase FeatureNames members used in app.routing.module.ts to
+# their snake_case values, which are the identifiers the backend uses for the
+# feature flags (see core/feature_flag_list.py).
+FEATURE_NAMES_MODEL_FILEPATH: Final = os.path.join(
+    'core',
+    'templates',
+    'domain',
+    'feature-flag',
+    'feature-status-summary.model.ts',
+)
+MODULE_IMPORT_REGEX: Final = r"""import\(\s*'(pages/[^']+)'\s*\)"""
+FEATURE_NAMES_MEMBERS_REGEX: Final = r"""(\w+)\s*=\s*'([^']+)'"""
+ROUTE_KEY_REGEX: Final = (
+    r'PAGES_REGISTERED_WITH_FRONTEND(?:\s*\n\s*\.?|\.)([A-Z][A-Z_0-9]+)\s*\.ROUTE'
+)
+ROUTES_WITH_NO_STANDALONE_PAGE_REGEX: Final = (
+    r'"ROUTES_WITH_NO_STANDALONE_PAGE"\s*:\s*\[([^\]]*)\]'
+)
+QUOTED_STRING_REGEX: Final = r'"([^"]+)"'
 CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'ci-test-suite-configs'
 )
@@ -357,6 +392,8 @@ def get_lighthouse_test_suites(
         page['name'] for page in get_lighthouse_pages_from_config()
     }
     _validate_shard_page_membership(shards_config, configured_pages)
+    _validate_shard_pages_are_not_dev_feature_gated(shards_config)
+    _validate_shard_pages_without_standalone_pages(shards_config)
     for shard_name in sorted(shards_config, key=int):
         pages_in_shard = [
             page for page in shards_config[shard_name] if page in pages_to_run
@@ -380,9 +417,11 @@ def _validate_shard_page_membership(
     """Raises if the shard config does not cover every configured page.
 
     Every page in ``lighthouse-pages.json`` must be listed in exactly one
-    shard in ``lighthouse-shards.json``. This catches a page that was added to
-    the pages config but forgotten in a shard (leaving it unrun), or a page
-    that was accidentally listed in two shards.
+    shard in ``lighthouse-shards.json``, except for pages that are gated by a
+    DEV-stage feature flag: those pages cannot be audited by Lighthouse yet and
+    are the only pages that may be omitted from the shards. This catches a page
+    that was added to the pages config but forgotten in a shard (leaving it
+    unrun), or a page that was accidentally listed in two shards.
 
     Args:
         shards_config: dict(str, list(str)). The explicit shard-to-pages
@@ -391,8 +430,9 @@ def _validate_shard_page_membership(
             pages.
 
     Raises:
-        ValueError. A configured page is missing from or duplicated across the
-            shard config, or a shard lists an unknown page.
+        ValueError. A configured page that is not gated by a DEV-stage feature
+            flag is missing from or duplicated across the shard config, or a
+            shard lists an unknown page.
     """
     listed_pages: List[str] = []
     for shard_name in sorted(shards_config, key=int):
@@ -404,11 +444,18 @@ def _validate_shard_page_membership(
                 )
             listed_pages.append(page)
 
-    missing_pages = sorted(configured_pages - set(listed_pages))
+    page_name_to_dev_feature_flags = _get_page_name_to_dev_feature_flags()
+    missing_pages = sorted(
+        page
+        for page in configured_pages - set(listed_pages)
+        if not page_name_to_dev_feature_flags.get(page, [])
+    )
     if missing_pages:
         raise ValueError(
             'Pages %s are present in lighthouse-pages.json but are missing '
-            'from lighthouse-shards.json.' % ', '.join(missing_pages)
+            'from lighthouse-shards.json. Pages gated by DEV-stage feature '
+            'flags are the only pages that may be omitted from the shards.'
+            % ', '.join(missing_pages)
         )
 
     duplicate_pages = sorted(
@@ -420,6 +467,304 @@ def _validate_shard_page_membership(
         raise ValueError(
             'Pages %s are listed in more than one shard in '
             'lighthouse-shards.json.' % ', '.join(duplicate_pages)
+        )
+
+
+def _normalize_module_path(module_path: str) -> str:
+    """Normalizes a page module path to the routing module import format.
+
+    ``lighthouse-pages.json`` stores full paths (for example
+    core/templates/pages/x-page/x-page.module.ts) while app.routing.module.ts
+    lazy imports module files without the core/templates/ prefix or the .ts
+    extension. Stripping both makes the two representations comparable.
+
+    Args:
+        module_path: str. The page module path to normalize.
+
+    Returns:
+        str. The normalized module path.
+    """
+    return os.path.normpath(
+        module_path.replace('core/templates/', '', 1).removesuffix('.ts')
+    )
+
+
+def _extract_route_objects(content: str) -> List[str]:
+    """Returns each top-level (outermost) balanced curly-brace group.
+
+    Route objects in app.routing.module.ts are object literals that follow a
+    ``PAGES_REGISTERED_WITH_FRONTEND.<KEY>.ROUTE`` path. Scanning for balanced
+    braces keeps each route object's lazy import together with its data block
+    even when the object contains nested object literals (such as a data
+    block) or a block-bodied loadChildren.
+
+    Args:
+        content: str. The normalized routing module source.
+
+    Returns:
+        list(str). The text of each outermost balanced {...} group, in
+        source order.
+    """
+    route_objects: List[str] = []
+    start_index = -1
+    depth = 0
+    for index, char in enumerate(content):
+        if char == '{':
+            if depth == 0:
+                start_index = index
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0 and start_index != -1:
+                route_objects.append(content[start_index : index + 1])
+                start_index = -1
+    return route_objects
+
+
+def _get_normalized_routing_content() -> str:
+    """Reads app.routing.module.ts and normalizes it for regex matching.
+
+    Single-line comments are removed and string-concatenated import paths are
+    joined so that the module import and route key regexes can match them
+    reliably.
+
+    Returns:
+        str. The normalized routing module source.
+    """
+    with open(APP_ROUTING_MODULE_FILEPATH, 'r', encoding='utf-8') as f:
+        routing_content = f.read()
+    normalized_content = re.sub(r'//[^\n]*', '', routing_content)
+    normalized_content = re.sub(
+        r"'([^']+)'\s*\+\s*\n?\s*'([^']+)'",  # pylint: disable=invalid-string-quote
+        r"'\1\2'",  # pylint: disable=invalid-string-quote
+        normalized_content,
+    )
+    return normalized_content
+
+
+def _get_assets_constants_content() -> str:
+    """Reads assets/constants.ts.
+
+    ROUTES_WITH_NO_STANDALONE_PAGE is defined here, so the CI check reads the
+    file directly to find the route keys that have no standalone page.
+
+    Returns:
+        str. The contents of assets/constants.ts.
+    """
+    with open(ASSETS_CONSTANTS_FILEPATH, 'r', encoding='utf-8') as f:
+        return f.read()
+
+
+def _get_routes_without_standalone_pages(constants_content: str) -> Set[str]:
+    """Gets the route keys that have no standalone Lighthouse page.
+
+    The ROUTES_WITH_NO_STANDALONE_PAGE constant lists the keys of routes that
+    are pure redirect handlers (for example login and logout).
+
+    Args:
+        constants_content: str. The contents of assets/constants.ts, where
+            ROUTES_WITH_NO_STANDALONE_PAGE is defined.
+
+    Returns:
+        set(str). The route keys listed in ROUTES_WITH_NO_STANDALONE_PAGE,
+        or an empty set if the constant is not present.
+    """
+    array_match = re.search(
+        ROUTES_WITH_NO_STANDALONE_PAGE_REGEX, constants_content
+    )
+    if not array_match:
+        return set()
+    return set(re.findall(QUOTED_STRING_REGEX, array_match.group(1)))
+
+
+def _get_feature_names_members_to_values() -> Dict[str, str]:
+    """Gets the FeatureNames enum members and their snake_case values.
+
+    The routing module refers to the flags a route requires by the PascalCase
+    FeatureNames members (for example FeatureNames.EnableCertificateAssessment),
+    while the backend identifies a flag by the snake_case value that member is
+    assigned in feature-status-summary.model.ts. Resolving the value from the
+    enum keeps this check in sync with the single source of truth instead of
+    maintaining a second member-to-value mapping.
+
+    Returns:
+        dict(str, str). Maps each FeatureNames member to its snake_case value.
+    """
+    with open(FEATURE_NAMES_MODEL_FILEPATH, 'r', encoding='utf-8') as f:
+        content = f.read()
+    feature_names_block = content.split('export enum FeatureNames {', 1)[1]
+    feature_names_block = feature_names_block.split('}', 1)[0]
+    members_to_values = dict(
+        re.findall(FEATURE_NAMES_MEMBERS_REGEX, feature_names_block)
+    )
+    return members_to_values
+
+
+def _get_modules_without_standalone_pages() -> Set[str]:
+    """Maps routes with no standalone page to the modules they lazy-import.
+
+    ROUTES_WITH_NO_STANDALONE_PAGE keeps the keys of routes that are pure
+    redirect handlers (for example login and logout). Pages that audit those
+    modules have no stable page to measure and must be kept out of the
+    Lighthouse shards.
+
+    Returns:
+        set(str). The module import paths of the routes listed in
+        ROUTES_WITH_NO_STANDALONE_PAGE.
+    """
+    normalized_content = _get_normalized_routing_content()
+    key_to_modules: Dict[str, List[str]] = {}
+    for route_object in _extract_route_objects(normalized_content):
+        key_match = re.search(ROUTE_KEY_REGEX, route_object)
+        if key_match:
+            key_to_modules[key_match.group(1)] = re.findall(
+                MODULE_IMPORT_REGEX, route_object
+            )
+    modules_without_standalone_pages: Set[str] = set()
+    constants_content = _get_assets_constants_content()
+    for route_key in _get_routes_without_standalone_pages(constants_content):
+        modules_without_standalone_pages.update(
+            key_to_modules.get(route_key, [])
+        )
+    return modules_without_standalone_pages
+
+
+def _validate_shard_pages_without_standalone_pages(
+    shards_config: dict[str, List[str]],
+) -> None:
+    """Raises if a shard lists a page whose route has no standalone page.
+
+    Routes listed in ROUTES_WITH_NO_STANDALONE_PAGE in assets/constants.ts
+    (for example login and logout) are pure redirect handlers that lead to no
+    page worth auditing, so the modules they lazy-import must not appear as
+    page_module entries in any Lighthouse shard.
+
+    Args:
+        shards_config: dict(str, list(str)). The explicit shard-to-pages
+            mapping.
+
+    Raises:
+        ValueError. A page listed in a shard corresponds to a route with no
+            standalone page.
+    """
+    modules_without_standalone_pages = _get_modules_without_standalone_pages()
+    page_name_to_module = {
+        page['name']: _normalize_module_path(page['page_module'])
+        for page in get_lighthouse_pages_from_config()
+    }
+    offending_pages: List[str] = []
+    for shard_name in sorted(shards_config, key=int):
+        for page_name in shards_config[shard_name]:
+            if (
+                page_name_to_module.get(page_name)
+                in modules_without_standalone_pages
+            ):
+                offending_pages.append(
+                    '%s (shard %s)' % (page_name, shard_name)
+                )
+    if offending_pages:
+        raise ValueError(
+            'Pages that correspond to routes without a standalone page cannot '
+            'be audited by Lighthouse and must not be listed in '
+            'lighthouse-shards.json:\n\n  %s'
+            % '\n'.join(sorted(offending_pages))
+        )
+
+
+def _get_module_to_dev_feature_flags() -> Dict[str, Set[str]]:
+    """Maps each routed module to the DEV-stage feature flags it requires.
+
+    Reads the ``data.requiredFeatureFlags`` blocks in app.routing.module.ts,
+    which is the single source of truth for the feature flags each route
+    requires. Only flags that are still in the DEV stage are returned, because
+    a page whose route requires a DEV-stage flag cannot be audited by
+    Lighthouse: the audit server only allows TEST- and PROD-stage flags to be
+    enabled.
+
+    Returns:
+        dict(str, set(str)). Maps each routed module import path to the set of
+        snake_case values of the DEV-stage flags its routes require.
+    """
+    normalized_content = _get_normalized_routing_content()
+    members_to_values = _get_feature_names_members_to_values()
+    dev_feature_values = {
+        feature.value for feature in feature_flag_list.DEV_FEATURES_LIST
+    }
+    modules_to_dev_feature_flags: Dict[str, Set[str]] = {}
+    for route_object in _extract_route_objects(normalized_content):
+        import_matches = re.findall(MODULE_IMPORT_REGEX, route_object)
+        if not import_matches:
+            continue
+        required_flag_members: List[str] = []
+        for flags_block in re.findall(
+            r'requiredFeatureFlags\s*:\s*\[([^\]]*)\]', route_object
+        ):
+            required_flag_members.extend(
+                re.findall(r'FeatureNames\.(\w+)', flags_block)
+            )
+        required_dev_feature_flags: Set[str] = set()
+        for member in required_flag_members:
+            feature_value = members_to_values.get(member)
+            if feature_value in dev_feature_values:
+                required_dev_feature_flags.add(feature_value)
+        for module in import_matches:
+            modules_to_dev_feature_flags.setdefault(module, set()).update(
+                required_dev_feature_flags
+            )
+    return modules_to_dev_feature_flags
+
+
+def _get_page_name_to_dev_feature_flags() -> Dict[str, List[str]]:
+    """Maps each configured Lighthouse page to the DEV-stage flags it requires.
+
+    Returns:
+        dict(str, list(str)). Maps each Lighthouse page name to the sorted
+        snake_case values of the DEV-stage flags gating the module it audits.
+    """
+    modules_to_dev_feature_flags = _get_module_to_dev_feature_flags()
+    page_name_to_dev_feature_flags: Dict[str, List[str]] = {}
+    for page in get_lighthouse_pages_from_config():
+        normalized_module = _normalize_module_path(page['page_module'])
+        page_name_to_dev_feature_flags[page['name']] = sorted(
+            modules_to_dev_feature_flags.get(normalized_module, set())
+        )
+    return page_name_to_dev_feature_flags
+
+
+def _validate_shard_pages_are_not_dev_feature_gated(
+    shards_config: dict[str, List[str]],
+) -> None:
+    """Raises if a shard lists a page gated by a DEV-stage feature flag.
+
+    Lighthouse audits run on a server where only TEST- and PROD-stage feature
+    flags can be enabled, so a page whose route requires a DEV-stage flag
+    cannot be audited. Such pages must be omitted from every shard until the
+    flag they depend on reaches a later stage.
+
+    Args:
+        shards_config: dict(str, list(str)). The explicit shard-to-pages
+            mapping.
+
+    Raises:
+        ValueError. A page listed in a shard requires a DEV-stage feature flag.
+    """
+    page_name_to_dev_feature_flags = _get_page_name_to_dev_feature_flags()
+    offending_pages: List[str] = []
+    for shard_name in sorted(shards_config, key=int):
+        for page_name in shards_config[shard_name]:
+            dev_feature_flags = page_name_to_dev_feature_flags.get(
+                page_name, []
+            )
+            if dev_feature_flags:
+                offending_pages.append(
+                    '%s (shard %s: gated by %s)'
+                    % (page_name, shard_name, ', '.join(dev_feature_flags))
+                )
+    if offending_pages:
+        raise ValueError(
+            'Pages gated by DEV-stage feature flags cannot be audited by '
+            'Lighthouse and must not be listed in lighthouse-shards.json:'
+            '\n\n  %s' % '\n'.join(sorted(offending_pages))
         )
 
 
