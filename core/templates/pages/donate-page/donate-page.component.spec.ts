@@ -121,10 +121,10 @@ describe('Donate page', () => {
     });
   });
 
-  it('should set the learner carousel interval to 8 seconds', () => {
+  it('should set the learner carousel interval to 5 seconds', () => {
     fixture.detectChanges();
 
-    expect(component.learnerCarousel.interval).toBe(8000);
+    expect(component.learnerCarousel.interval).toBe(5000);
   });
 
   it('should move the correct testimonials carousel to the previous slide', () => {
