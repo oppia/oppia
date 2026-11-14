@@ -755,7 +755,20 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 0,
             )
         )
-        self.assertEqual(len(questions), 5)
+        self.assertEqual(
+            len(questions), 3 * feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+        )
+        skill_ids_by_description = {
+            summary.description: summary.id for summary in skill_summaries
+        }
+        self.assertEqual(
+            [node.acquired_skill_ids for node in story.story_contents.nodes],
+            [
+                [skill_ids_by_description['Dummy Skill 1']],
+                [skill_ids_by_description['Dummy Skill 2']],
+                [skill_ids_by_description['Dummy Skill 3']],
+            ],
+        )
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
@@ -818,7 +831,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 0,
             )
         )
-        self.assertEqual(len(questions), 5)
+        self.assertEqual(
+            len(questions), 3 * feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+        )
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
