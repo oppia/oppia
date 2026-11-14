@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for FeedbackModalComponent.
  */
 
-// @ts-nocheck
-
 import {
   Component,
   EventEmitter,
@@ -79,10 +77,12 @@ class MockImageReceiverComponent {
 
 class MockWindowRef {
   nativeWindow: {
-    location: {
-      href: string;
-      reload: jasmine.Spy;
-    };
+    location:
+      | {
+          href: string;
+          reload: jasmine.Spy;
+        }
+      | string;
     navigator: {userAgent: string};
     innerWidth: number;
     innerHeight: number;
@@ -644,7 +644,10 @@ describe('FeedbackModalComponent', () => {
     component.signIn();
     flushMicrotasks();
 
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    expect(typeof windowRef.nativeWindow.location).not.toBe('string');
+    if (typeof windowRef.nativeWindow.location !== 'string') {
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    }
   }));
 
   it('should select typo category and disable technical logs checkbox', () => {

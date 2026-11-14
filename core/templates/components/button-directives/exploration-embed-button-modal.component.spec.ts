@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -93,20 +91,19 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   }));
 
   it('should select the embed url', fakeAsync(() => {
-    const removeAllRanges = jasmine.createSpy('removeAllRanges');
-    const addRange = jasmine.createSpy('addRange');
-    spyOn(window, 'getSelection').and.returnValue({
-      removeAllRanges: removeAllRanges,
-      addRange: addRange,
-    });
+    const selectionSpy = jasmine.createSpyObj<Selection>('Selection', [
+      'removeAllRanges',
+      'addRange',
+    ]);
+    spyOn(window, 'getSelection').and.returnValue(selectionSpy);
 
     let embedUrlDiv = fixture.debugElement.query(
       By.css('.oppia-embed-modal-code')
     );
     embedUrlDiv.nativeElement.click();
     fixture.detectChanges();
-    expect(addRange).toHaveBeenCalled();
-    expect(removeAllRanges).toHaveBeenCalled();
+    expect(selectionSpy.addRange).toHaveBeenCalled();
+    expect(selectionSpy.removeAllRanges).toHaveBeenCalled();
   }));
 
   it('should throw Error if codeDiv is null', () => {

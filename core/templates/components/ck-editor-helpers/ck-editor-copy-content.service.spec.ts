@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
-// @ts-nocheck
-
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -40,22 +38,44 @@ const generateContent = (html: string): HTMLElement => {
   return container.content.firstChild.firstChild as HTMLElement;
 };
 
+interface ImageWidgetStartupData {
+  alt: string;
+  caption: string;
+  filepath: string;
+  isCopied: boolean;
+}
+
+interface MathWidgetStartupData {
+  math_content: {
+    raw_latex: string;
+    svg_filename: string;
+  };
+  isCopied: boolean;
+}
+
+type WidgetStartupData = ImageWidgetStartupData | MathWidgetStartupData;
+
+interface ExecCommandData {
+  startupData: WidgetStartupData;
+}
+
 describe('Ck editor copy content service', () => {
   let loggerService = new LoggerService();
   let htmlEscaperService = new HtmlEscaperService(loggerService);
 
   let service: CkEditorCopyContentService;
   let ckEditorStub: CKEDITOR.editor;
-  let insertHtmlSpy: jasmine.Spy<
-    (html: string, mode?: string, range?: CKEDITOR.dom.range) => void
+  let insertHtmlSpy: jasmine.Spy<(html: string) => void>;
+  let execCommandSpy: jasmine.Spy<
+    (commandName: string, data?: ExecCommandData) => boolean
   >;
-  let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
       insertHtml: (html: string) => {},
-      execCommand: (commandName: string): boolean => true,
+      execCommand: (commandName: string, data?: ExecCommandData): boolean =>
+        true,
     } as CKEDITOR.editor;
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');

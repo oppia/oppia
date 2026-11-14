@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the checkpoint celebration modal component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -26,12 +24,16 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing';
-import {EventEmitter} from '@angular/core';
+import {EventEmitter, ElementRef} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {CheckpointCelebrationModalComponent} from './checkpoint-celebration-modal.component';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  ReadOnlyExplorationBackendApiService,
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendDict,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -77,7 +79,7 @@ class MockCheckpointCelebrationUtilityService {
   }
 }
 
-const dummyExplorationBackendDict = {
+const dummyExplorationBackendDict: ReadOnlyExplorationBackendDict = {
   init_state_name: 'Introduction',
   param_changes: [],
   param_specs: {},
@@ -116,6 +118,7 @@ const dummyExplorationBackendDict = {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: true,
+      inapplicable_skill_misconception_ids: [],
     },
     'End State': {
       classifier_model_id: null,
@@ -140,6 +143,7 @@ const dummyExplorationBackendDict = {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: [],
     },
   },
   title: 'Dummy Title',
@@ -164,7 +168,7 @@ const dummyExplorationMetadata = {
   edits_allowed: true,
 };
 
-const dummyExplorationBackendResponse = {
+const dummyExplorationBackendResponse: FetchExplorationBackendResponse = {
   can_edit: true,
   exploration: dummyExplorationBackendDict,
   exploration_metadata: dummyExplorationMetadata,
@@ -642,22 +646,11 @@ describe('Checkpoint celebration modal component', function () {
   }));
 
   it('should reset timer', () => {
-    component.checkpointTimerTemplateRef = {
-      nativeElement: {
-        // This throws "Type
-        // '{ strokeDasharray: string; strokeDashoffset: string; }' is missing
-        // the following properties from type 'CSSStyleDeclaration':
-        // accentColor, alignContent, alignItems, alignSelf, and 457 more.".
-        // We need to suppress this error because only these values are
-        // needed for testing and providing a value for every single property is
-        // unnecessary.
-        // @ts-expect-error
-        style: {
-          strokeDashoffset: '',
-          transitionDuration: '',
-        },
-      },
-    };
+    const svgPolyline = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'polyline'
+    );
+    component.checkpointTimerTemplateRef = new ElementRef(svgPolyline);
     const rtlSpy = spyOn(
       i18nLanguageCodeService,
       'isLanguageRTL'
@@ -673,24 +666,18 @@ describe('Checkpoint celebration modal component', function () {
     component.resetTimer();
 
     expect(rtlSpy).toHaveBeenCalled();
-    expect(component.checkpointTimer).toEqual({
-      style: {
-        strokeDashoffset: '10',
-        transitionDuration: '12.14s',
-      },
-    });
+    expect(component.checkpointTimer).toBe(svgPolyline);
+    expect(svgPolyline.style.strokeDashoffset).toBe('10');
+    expect(svgPolyline.style.transitionDuration).toBe('12.14s');
 
     rtlSpy.and.returnValue(true);
 
     component.resetTimer();
 
     expect(rtlSpy).toHaveBeenCalledTimes(2);
-    expect(component.checkpointTimer).toEqual({
-      style: {
-        strokeDashoffset: '-10',
-        transitionDuration: '12.14s',
-      },
-    });
+    expect(component.checkpointTimer).toBe(svgPolyline);
+    expect(svgPolyline.style.strokeDashoffset).toBe('-10');
+    expect(svgPolyline.style.transitionDuration).toBe('12.14s');
   });
 
   it('should open lesson info modal', () => {
