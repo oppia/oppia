@@ -108,10 +108,31 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.admin_email_address = 'testadmin@example.com'
 
-        self.original_parameter_registry = (
-            platform_parameter_registry.Registry.parameter_registry.copy()
+        updated_specs = dict(
+            platform_parameter_list.PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
         )
-        platform_parameter_registry.Registry.parameter_registry.clear()
+        updated_specs.update(
+            {
+                'test_param_1': (
+                    'Param for test.',
+                    platform_parameter_domain.DataTypes.BOOL,
+                    False,
+                ),
+            }
+        )
+        self.swap_platform_parameter_specs = self.swap(
+            platform_parameter_registry,
+            'PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT',
+            updated_specs,
+        )
+        self.swap_platform_parameter_specs_list = self.swap(
+            platform_parameter_list,
+            'PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT',
+            updated_specs,
+        )
+        self.swap_platform_parameter_specs.__enter__()
+        self.swap_platform_parameter_specs_list.__enter__()
+
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
             None,
@@ -125,10 +146,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
 
     def tearDown(self) -> None:
+        self.swap_platform_parameter_specs_list.__exit__(None, None, None)
+        self.swap_platform_parameter_specs.__exit__(None, None, None)
         super().tearDown()
-        platform_parameter_registry.Registry.parameter_registry = (
-            self.original_parameter_registry
-        )
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -1728,7 +1748,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             response_dict['platform_params_dicts'], [param.to_dict()]
         )
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
         self.logout()
 
     def test_get_handler_includes_all_stories(self) -> None:
@@ -1813,7 +1832,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
         self.assertEqual(rule_dicts, new_rule_dicts)
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
         self.logout()
 
     @test_utils.set_platform_parameters(
@@ -1830,7 +1848,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -1867,7 +1884,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             rules = response_dict['platform_params_dicts'][0]['rules']
             self.assertEqual(rules, new_rule_dicts)
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
         self.logout()
 
     @test_utils.set_platform_parameters(
@@ -1922,7 +1938,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -2072,31 +2087,36 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        # Here we use MyPy ignore because we are assigning a None value
-        # where instance of 'PlatformParameter' is expected, and this is
-        # done to Replace the stored instance with None in order to
-        # trigger the unexpected exception during update.
-        platform_parameter_registry.Registry.parameter_registry[
-            param.name
-        ] = None  # type: ignore[assignment]
-        response = self.post_json(
-            '/adminhandler',
-            {
-                'action': 'update_platform_parameter_rules',
-                'platform_param_name': param.name,
-                'new_rules': new_rule_dicts,
-                'commit_message': 'test update param',
-                'default_value': {'value': False},
-            },
-            csrf_token=csrf_token,
-            expected_status_int=500,
-        )
-        self.assertEqual(
-            response['error'],
-            '\'NoneType\' object has no attribute \'serialize\'',
-        )
+        def mock_update_platform_parameter(
+            unused_name: str,
+            unused_committer_id: str,
+            unused_commit_message: str,
+            unused_new_rules: list[
+                platform_parameter_domain.PlatformParameterRule
+            ],
+            unused_default_value: platform_parameter_domain.PlatformDataTypes,
+        ) -> None:
+            raise Exception('Unexpected error')
 
-        platform_parameter_registry.Registry.parameter_registry.pop(param.name)
+        with self.swap(
+            platform_parameter_registry.Registry,
+            'update_platform_parameter',
+            mock_update_platform_parameter,
+        ):
+            response = self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': param.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update param',
+                    'default_value': {'value': False},
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500,
+            )
+            self.assertEqual(response['error'], 'Unexpected error')
+
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
