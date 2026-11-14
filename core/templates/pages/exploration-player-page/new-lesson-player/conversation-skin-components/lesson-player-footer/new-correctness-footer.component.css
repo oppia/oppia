@@ -57,7 +57,7 @@
   flex-shrink: 0;
   height: 26px;
   justify-content: center;
-  margin-right: 10px;
+  margin-inline-end: 10px;
   width: 26px;
 }
 
