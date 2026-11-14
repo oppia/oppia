@@ -40,7 +40,7 @@
     <button type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
             (click)="save()"
-            [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
+            [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty() || isSaving">
             Done
     </button>
   </div>

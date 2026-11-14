@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -1415,6 +1416,11 @@ class ImageUploadHandler(
         filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):
+            if bool(
+                re.match(constants.MATH_SVG_FILENAME_REGEX, filename)
+            ):
+                self.render_json({'filename': filename})
+                return
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename

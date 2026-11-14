@@ -130,6 +130,7 @@ export class RteHelperModalComponent {
   @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
   @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
+  isSaving: boolean = false;
   errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
@@ -289,6 +290,7 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
+    this.isSaving = false;
     const dismissValue = this.componentIsNewlyCreated ? true : false;
     if (this.rteHelperBottomSheetRef) {
       this.rteHelperBottomSheetRef.dismiss(dismissValue);
@@ -299,6 +301,7 @@ export class RteHelperModalComponent {
   }
 
   delete(): void {
+    this.isSaving = false;
     if (this.rteHelperBottomSheetRef) {
       this.rteHelperBottomSheetRef.dismiss(true);
     } else {
@@ -308,6 +311,7 @@ export class RteHelperModalComponent {
   }
 
   private dismissWithCancel(): void {
+    this.isSaving = false;
     if (this.rteHelperBottomSheetRef) {
       this.rteHelperBottomSheetRef.dismiss('cancel');
     } else {
@@ -558,6 +562,10 @@ export class RteHelperModalComponent {
   }
 
   save(): void {
+    if (this.isSaving) {
+      return;
+    }
+    this.isSaving = true;
     for (let index in this.customizationArgsForm.value) {
       this.tmpCustomizationArgs[Number(index)].value =
         this.customizationArgsForm.value[index];
@@ -594,6 +602,32 @@ export class RteHelperModalComponent {
         this.dismissWithCancel();
         return;
       }
+
+      const existingMathContent = this.attrsCustomizationArgsDict?.[
+        'math_content'
+      ] as {raw_latex?: string; svg_filename?: string} | undefined;
+      // If the math expression is unchanged and an svg_filename already exists,
+      // there is no need to re-upload the same SVG file to the backend.
+      if (
+        existingMathContent &&
+        existingMathContent.svg_filename &&
+        existingMathContent.raw_latex === rawLatex
+      ) {
+        const mathContentDict = {
+          raw_latex: rawLatex,
+          svg_filename: existingMathContent.svg_filename,
+        };
+        const caName = tmpCustomizationArgs[0].name;
+        customizationArgsDict[caName] = mathContentDict;
+        this.isSaving = false;
+        if (this.rteHelperBottomSheetRef) {
+          this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
+        } else {
+          this.ngbActiveModal.close(customizationArgsDict);
+        }
+        return;
+      }
+
       if (!svgFile) {
         this.alertsService.addWarning('SVG file is missing.');
         this.dismissWithCancel();
@@ -643,6 +677,7 @@ export class RteHelperModalComponent {
         };
         const caName = tmpCustomizationArgs[0].name;
         customizationArgsDict[caName] = mathContentDict;
+        this.isSaving = false;
         if (this.rteHelperBottomSheetRef) {
           this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
         } else {
@@ -674,6 +709,7 @@ export class RteHelperModalComponent {
             };
             const caName = tmpCustomizationArgs[0].name;
             customizationArgsDict[caName] = mathContentDict;
+            this.isSaving = false;
             if (this.rteHelperBottomSheetRef) {
               this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
             } else {
@@ -704,6 +740,7 @@ export class RteHelperModalComponent {
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
       }
+      this.isSaving = false;
       if (this.rteHelperBottomSheetRef) {
         this.rteHelperBottomSheetRef.dismiss(customizationArgsDict);
       } else {

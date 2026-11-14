@@ -295,6 +295,49 @@ describe('RteHelperModalComponent', () => {
       });
     }));
 
+    it('should not re-upload math SVG if raw_latex is unchanged and svg_filename exists', fakeAsync(() => {
+      component.attrsCustomizationArgsDict = {
+        math_content: {
+          raw_latex: 'x^2',
+          svg_filename: 'mathImage_existing.svg',
+        },
+      } as unknown as CustomizationArgsForRteType;
+      spyOn(assetsBackendApiService, 'saveMathExpressionImage');
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'Svg Data',
+        svg_filename: 'mathImage_existing.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+
+      component.save();
+      flush();
+
+      expect(
+        assetsBackendApiService.saveMathExpressionImage
+      ).not.toHaveBeenCalled();
+      expect(activeModal.close).toHaveBeenCalledWith({
+        math_content: {
+          raw_latex: 'x^2',
+          svg_filename: 'mathImage_existing.svg',
+        },
+      });
+    }));
+
+    it('should ignore subsequent save calls while saving is in progress', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.isSaving = true;
+      spyOn(mockExternalRteSaveEventEmitter, 'emit');
+
+      component.save();
+
+      expect(mockExternalRteSaveEventEmitter.emit).not.toHaveBeenCalled();
+    }));
+
     it('should handle being unable to communicate to server and show error while saving', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
