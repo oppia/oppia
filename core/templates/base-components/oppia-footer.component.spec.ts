@@ -16,8 +16,6 @@
  * @fileoverview Tests for the Oppia Footer Component.
  */
 
-// @ts-nocheck
-
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -76,7 +74,7 @@ describe('OppiaFooterComponent', () => {
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let ngbModal: MockNgbModal;
+  let ngbModal: NgbModal;
   let siteAnalyticsService: SiteAnalyticsService;
   let platformFeatureService: MockPlatformFeatureService;
 

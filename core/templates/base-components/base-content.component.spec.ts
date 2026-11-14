@@ -16,11 +16,14 @@
  * @fileoverview Tests for the Base Transclusion Component.
  */
 
-// @ts-nocheck
-
 import {DOCUMENT} from '@angular/common';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
 import {NavigationEnd, Router} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {LimitToPipe} from 'filters/limit-to.pipe';
@@ -69,7 +72,6 @@ describe('Base Content Component', () => {
   let sidebarStatusService: SidebarStatusService;
   let cookieService: CookieService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let oldDate = Date;
 
   class MockUrlService {
     isIframed(): boolean {
@@ -283,24 +285,20 @@ describe('Base Content Component', () => {
     expect(componentInstance.hasAcknowledgedCookies()).toBe(true);
   });
 
-  it('should be able to acknowledge cookies', () => {
-    spyOn(window, 'Date')
-      .withArgs()
-      .and.returnValue(new oldDate(NOW_MILLIS))
-      .withArgs(ONE_YEAR_FROM_NOW_MILLIS)
-      .and.callThrough();
+  it('should be able to acknowledge cookies', fakeAsync(() => {
+    jasmine.clock().mockDate(new Date(NOW_MILLIS));
     spyOn(cookieService, 'put');
     componentInstance.acknowledgeCookies();
     expect(cookieService.put).toHaveBeenCalledWith(
       'OPPIA_COOKIES_ACKNOWLEDGED',
       String(NOW_MILLIS),
       {
-        expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS),
+        expires: new Date(ONE_YEAR_FROM_NOW_MILLIS),
         secure: true,
         sameSite: 'none',
       }
     );
-  });
+  }));
 
   it('should initialize isRtl and update it when language direction changes', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValues(

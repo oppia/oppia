@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -33,6 +31,7 @@ import {UserService} from 'services/user.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CreateActivityButtonComponent} from './create-activity-button.component';
 import {PrimaryButtonComponent} from './primary-button.component';
+import {UserInfo} from 'domain/user/user-info.model';
 
 /**
  * @fileoverview Unit tests for CreateActivityButtonComponent.
@@ -80,63 +79,31 @@ describe('CreateActivityButtonComponent', () => {
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
 
-  let userInfoForCollectionCreator = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => false,
-    isTranslationCoordinator: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () => 'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true,
-    isVoiceoverAdmin: () => false,
-  };
+  let userInfoForCollectionCreator = new UserInfo(
+    ['USER_ROLE'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.org',
+    true
+  );
 
-  let userInfoForNonCollectionCreator = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => false,
-    isTranslationCoordinator: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    canCreateCollections: () => false,
-    getPreferredSiteLanguageCode: () => 'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true,
-    isVoiceoverAdmin: () => false,
-  };
+  let userInfoForNonCollectionCreator = new UserInfo(
+    ['USER_ROLE'],
+    true,
+    false,
+    false,
+    false,
+    false,
+    'en',
+    'username1',
+    'tester@example.org',
+    true
+  );
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
