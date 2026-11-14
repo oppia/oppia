@@ -18,7 +18,13 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
 import {
   ReadOnlyTopicBackendDict,
   ReadOnlyTopic,
@@ -123,7 +129,7 @@ describe('Lesson player navbar breadcrumb component', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should fetch topic and classroom data when linked to a topic', async () => {
+    it('should fetch topic and classroom data when linked to a topic', fakeAsync(() => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
@@ -133,7 +139,7 @@ describe('Lesson player navbar breadcrumb component', () => {
       ).and.returnValue('classroom1');
 
       componentInstance.ngOnInit();
-      await fixture.whenStable();
+      flushMicrotasks();
 
       expect(componentInstance.isLinkedToTopic).toBe(true);
       expect(
@@ -145,9 +151,9 @@ describe('Lesson player navbar breadcrumb component', () => {
       ).toHaveBeenCalledWith('classroom1');
       expect(capitalizePipe.transform).toHaveBeenCalledWith('math classroom');
       expect(componentInstance.classroomName).toBe('Math Classroom');
-    });
+    }));
 
-    it('should keep the breadcrumb hidden when the topic fetch fails', async () => {
+    it('should keep the breadcrumb hidden when the topic fetch fails', fakeAsync(() => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
@@ -161,14 +167,14 @@ describe('Lesson player navbar breadcrumb component', () => {
       spyOn(loggerService, 'error');
 
       componentInstance.ngOnInit();
-      await fixture.whenStable();
+      flushMicrotasks();
 
       expect(loggerService.error).toHaveBeenCalledTimes(1);
       expect(componentInstance.topicName).toBe('');
       expect(componentInstance.shouldShowBreadcrumb()).toBe(false);
-    });
+    }));
 
-    it('should keep the breadcrumb hidden when the classroom fetch fails', async () => {
+    it('should keep the breadcrumb hidden when the classroom fetch fails', fakeAsync(() => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic1'
       );
@@ -182,12 +188,12 @@ describe('Lesson player navbar breadcrumb component', () => {
       spyOn(loggerService, 'error');
 
       componentInstance.ngOnInit();
-      await fixture.whenStable();
+      flushMicrotasks();
 
       expect(loggerService.error).toHaveBeenCalledTimes(1);
       expect(componentInstance.classroomName).toBe('');
       expect(componentInstance.shouldShowBreadcrumb()).toBe(false);
-    });
+    }));
   });
 
   describe('computeIsLinkedToTopic (via ngOnInit)', () => {
@@ -211,7 +217,9 @@ describe('Lesson player navbar breadcrumb component', () => {
       spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.throwError(
         'Test error'
       );
+
       componentInstance.ngOnInit();
+
       expect(componentInstance.isLinkedToTopic).toBe(false);
       expect(
         topicViewerBackendApiService.fetchTopicDataAsync
