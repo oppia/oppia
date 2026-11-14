@@ -224,6 +224,7 @@ describe('Image Uploader Modal', () => {
   );
 
   it('should remove invalid tags and attributes', fakeAsync(() => {
+    const svgSanitizerService = TestBed.inject(SvgSanitizerService);
     componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
     componentInstance.ngOnInit();
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
@@ -238,8 +239,12 @@ describe('Image Uploader Modal', () => {
     expect(componentInstance.invalidTagsAndAttributes.attrs).toContain(
       'path:data-name'
     );
-    expect(componentInstance.uploadedImage).not.toContain('circel');
-    expect(componentInstance.uploadedImage).not.toContain('data-name');
+    const decodedUploadedImage =
+      svgSanitizerService.convertBase64ToUnicodeString(
+        (componentInstance.uploadedImage as string).split(',')[1]
+      );
+    expect(decodedUploadedImage).not.toContain('circel');
+    expect(decodedUploadedImage).not.toContain('data-name');
     expect(componentInstance.invalidImageWarningIsShown).toBe(false);
   }));
 
