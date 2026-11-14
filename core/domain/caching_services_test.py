@@ -23,6 +23,7 @@ import json
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    android_feature_flag_domain,
     caching_domain,
     caching_services,
     collection_domain,
@@ -925,4 +926,30 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_parameter.to_dict(),
             platform_parameters[platform_parameter_id].to_dict(),
+        )
+
+    def test_android_feature_flag_config_is_set_and_get_correctly(
+        self,
+    ) -> None:
+        feature_flag_id = 'android_feature_flag'
+        feature_flag = android_feature_flag_domain.AndroidFeatureFlagConfig(
+            android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+            '1.0',
+            '2.0',
+            50,
+        )
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_ANDROID_FEATURE_FLAG,
+            None,
+            {feature_flag_id: feature_flag},
+        )
+        cached_flags = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_ANDROID_FEATURE_FLAG,
+            None,
+            [feature_flag_id],
+        )
+
+        self.assertEqual(
+            cached_flags[feature_flag_id].to_dict(), feature_flag.to_dict()
         )
