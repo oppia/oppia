@@ -46,6 +46,8 @@ export class PageContextService {
   static imageSaveDestination: string =
     AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
   static imageContextNewImageFilenames: string[] = [];
+  static imageContextTargetEntityType: string =
+    AppConstants.ENTITY_TYPE.EXPLORATION;
 
   // Page Context is null initially when no shared service exist.
   pageContext: string | null = null;
@@ -231,9 +233,19 @@ export class PageContextService {
     return PageContextService.imageContextNewImageFilenames;
   }
 
+  setImageContextTargetEntityType(entityType: string): void {
+    PageContextService.imageContextTargetEntityType = entityType;
+  }
+
+  getImageContextTargetEntityType(): string {
+    return PageContextService.imageContextTargetEntityType;
+  }
+
   removeCustomEntityContext(): void {
     PageContextService.customEntityContext = null;
     PageContextService.imageContextNewImageFilenames = [];
+    PageContextService.imageContextTargetEntityType =
+      AppConstants.ENTITY_TYPE.EXPLORATION;
   }
 
   getEntityId(): string {

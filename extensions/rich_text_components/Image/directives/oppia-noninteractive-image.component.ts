@@ -172,16 +172,18 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         } else {
           let entityType = this.pageContextService.getEntityType();
           // For translation suggestions, target-content images live in the
-          // exploration namespace (read live), while images the translator
-          // added live in the suggestion namespace. Resolve target images
-          // from the exploration namespace so editor updates are reflected.
+          // target entity's namespace (exploration or skill), while images
+          // the translator added live in the suggestion namespace. Resolve
+          // target images from the target entity's namespace so editor
+          // updates are reflected.
           const newImageFilenames =
             this.pageContextService.getImageContextNewImageFilenames();
           if (
             entityType === AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS &&
             !newImageFilenames.includes(this.filepath)
           ) {
-            entityType = AppConstants.ENTITY_TYPE.EXPLORATION;
+            entityType =
+              this.pageContextService.getImageContextTargetEntityType();
           }
           if (entityType) {
             this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(

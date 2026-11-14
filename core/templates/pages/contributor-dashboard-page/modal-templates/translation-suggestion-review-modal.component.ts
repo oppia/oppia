@@ -299,6 +299,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.pageContextService.setImageContextNewImageFilenames(
       this.activeSuggestion.new_image_filenames || []
     );
+    this.pageContextService.setImageContextTargetEntityType(
+      this.activeSuggestion.target_type
+    );
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
