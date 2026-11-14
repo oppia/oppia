@@ -11,12 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// @ts-nocheck
 
 /**
  * @fileoverview Unit tests for UrlService.
  */
 
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
@@ -268,7 +268,7 @@ describe('Url Service', () => {
   it('should correctly retrieve selected subtopics from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
@@ -277,7 +277,7 @@ describe('Url Service', () => {
   it('should throw error for invalid practice session url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(() => {
       urlService.getSelectedSubtopicsFromUrl();
@@ -432,7 +432,7 @@ describe('Url Service', () => {
   it('should correctly retrieve node id from practice url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/learn/math/fractions/practice/1';
     expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
 
@@ -443,7 +443,7 @@ describe('Url Service', () => {
   it('should correctly retrieve arc id from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/learn/math/fractions/test/arc/1';
     expect(urlService.getArcIdFromUrl()).toBe('1');
 

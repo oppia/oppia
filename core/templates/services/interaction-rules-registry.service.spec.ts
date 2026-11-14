@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for interaction rules registry service.
  */
 
-// @ts-nocheck
-
 import {TestBed} from '@angular/core/testing';
 
 import {
@@ -165,7 +163,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for AlgebraicExpressionInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'AlgebraicExpressionInput'
       )
@@ -173,19 +171,19 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for CodeRepl', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId('CodeRepl')
     ).toBe(codeReplRulesService);
   });
 
   it('should return the correct rules service for Continue', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId('Continue')
     ).toBe(continueRulesService);
   });
 
   it('should return the correct rules service for DragAndDropSortInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'DragAndDropSortInput'
       )
@@ -193,7 +191,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for EndExploration', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'EndExploration'
       )
@@ -201,7 +199,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for FractionInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'FractionInput'
       )
@@ -209,7 +207,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for GraphInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'GraphInput'
       )
@@ -217,7 +215,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for ImageClickInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'ImageClickInput'
       )
@@ -225,7 +223,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for InteractiveMap', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'InteractiveMap'
       )
@@ -233,7 +231,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for ItemSelectionInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'ItemSelectionInput'
       )
@@ -241,7 +239,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for MathEquationInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'MathEquationInput'
       )
@@ -249,7 +247,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for MultipleChoiceInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'MultipleChoiceInput'
       )
@@ -257,7 +255,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for MusicNotesInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'MusicNotesInput'
       )
@@ -265,7 +263,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for NumberWithUnits', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'NumberWithUnits'
       )
@@ -273,7 +271,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for NumericExpressionInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'NumericExpressionInput'
       )
@@ -281,7 +279,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for NumericInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'NumericInput'
       )
@@ -289,7 +287,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for PencilCodeEditor', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'PencilCodeEditor'
       )
@@ -297,7 +295,7 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for RatioExpressionInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'RatioExpressionInput'
       )
@@ -305,13 +303,13 @@ describe('Interaction Rules Registry Service', () => {
   });
 
   it('should return the correct rules service for SetInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId('SetInput')
     ).toBe(setInputRulesService);
   });
 
   it('should return the correct rules service for TextInput', () => {
-    expect(
+    expect<object>(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
         'TextInput'
       )
