@@ -54,26 +54,27 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         updated_specs = dict(
-            platform_parameter_list
-            .PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
+            platform_parameter_list.PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
         )
-        updated_specs.update({
-            'param_a': (
-                'Parameter named a',
-                platform_parameter_domain.DataTypes.STRING,
-                '',
-            ),
-            'param_b': (
-                'Parameter named b',
-                platform_parameter_domain.DataTypes.BOOL,
-                False,
-            ),
-            'param_c': (
-                'Parameter named c',
-                platform_parameter_domain.DataTypes.NUMBER,
-                0,
-            ),
-        })
+        updated_specs.update(
+            {
+                'param_a': (
+                    'Parameter named a',
+                    platform_parameter_domain.DataTypes.STRING,
+                    '',
+                ),
+                'param_b': (
+                    'Parameter named b',
+                    platform_parameter_domain.DataTypes.BOOL,
+                    False,
+                ),
+                'param_c': (
+                    'Parameter named c',
+                    platform_parameter_domain.DataTypes.NUMBER,
+                    0,
+                ),
+            }
+        )
 
         self.swap_platform_parameter_specs = self.swap(
             registry,

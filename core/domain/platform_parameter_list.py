@@ -30,9 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models,) = models.Registry.import_models(
-    [models.Names.SUGGESTION]
-)
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ParamName(enum.Enum):
@@ -193,8 +191,7 @@ PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT: Dict[
         10,
     ),
     (
-        ParamName
-        .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
+        ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
     ): (
         'The bounce-rate a state must exceed to create a new improvements '
         'task.',
@@ -202,8 +199,7 @@ PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT: Dict[
         0.20,
     ),
     (
-        ParamName
-        .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value
+        ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value
     ): (
         'The bounce-rate a state must fall under to discard its '
         'improvement task.',

@@ -32,14 +32,11 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
-(config_models,) = models.Registry.import_models(
-    [models.Names.CONFIG]
-)
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 ParamName = platform_parameter_list.ParamName
 PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT = (
-    platform_parameter_list
-    .PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
+    platform_parameter_list.PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
 )
 
 
@@ -87,9 +84,8 @@ class Registry:
                 for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT
             ]
             raise Exception(
-                'Unsupported data type \'%s\', must be one of %s.' % (
-                    data_type.value, allowed_data_types
-                )
+                'Unsupported data type \'%s\', must be one of %s.'
+                % (data_type.value, allowed_data_types)
             )
 
         param_dict: platform_parameter_domain.PlatformParameterDict = {
@@ -275,15 +271,17 @@ class Registry:
         Returns:
             PlatformParameter|None. The loaded instance, None if it's not found
             in storage.
+
+        Raises:
+            Exception. The platform parameter is not found in the registry.
         """
         parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False
         )
 
         if parameter_model:
-            param_spec = (
-                PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT
-                .get(name)
+            param_spec = PLATFORM_PARAMETER_NAME_TO_DESCRIPTION_DATA_TYPE_AND_DEFAULT.get(
+                name
             )
             if param_spec is None:
                 raise Exception('Platform parameter not found: %s.' % name)
