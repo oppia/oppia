@@ -24,6 +24,7 @@ from core.domain import (
     feature_flag_services,
     machine_translation_services,
     translation_services,
+    user_services,
 )
 
 from typing import Any, Dict
@@ -51,6 +52,7 @@ class MachineTranslationGenerateHandler(
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
+        assert self.user_id is not None
 
         if not feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
@@ -63,14 +65,18 @@ class MachineTranslationGenerateHandler(
                 'Automatic translation is currently disabled by the site admin.'
             )
 
-        # TODO(#24714): In Milestone 2, implement strict role-based access control
-        # to verify the user holds the new "translation submitter" role before
-        # allowing them to trigger paid Azure API calls.
-
         assert self.normalized_payload is not None
         source_text = self.normalized_payload['source_text']
         source_language_code = self.normalized_payload['source_language_code']
         target_language_code = self.normalized_payload['target_language_code']
+
+        if not user_services.can_submit_translation_suggestions(
+            self.user_id, language_code=target_language_code
+        ):
+            raise self.UnauthorizedUserException(
+                'You do not have permission to submit translations '
+                'for this language.'
+            )
 
         try:
             translation_result = (

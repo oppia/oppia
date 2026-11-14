@@ -103,6 +103,15 @@ NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'description': 'questions',
         'rights_message': 'submit question suggestions',
     },
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION: {
+        'task': 'submit',
+        'category': 'translations',
+        'to_submit': 'translation suggestions',
+        'description_template': '%s language translations',
+        'rights_message_template': (
+            'submit translation suggestions in the %s language'
+        ),
+    },
 }
 
 REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -125,6 +134,15 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'category': 'question',
         'role_description': 'question submitter role',
         'rights_message': 'submit question suggestions',
+    },
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION: {
+        'category': 'translation',
+        'role_description_template': (
+            'translation submitter role in the %s language'
+        ),
+        'rights_message_template': (
+            'submit translation suggestions in the %s language'
+        ),
     },
 }
 
@@ -3016,6 +3034,7 @@ def send_email_to_new_cd_user(
 
     if category in [
         constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
     ]:
         if language_code is None:
             raise Exception(
@@ -3061,7 +3080,10 @@ def send_email_to_new_cd_user(
             to_review,
         )
 
-    elif category in [constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION]:
+    elif category in [
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+    ]:
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
@@ -3127,7 +3149,10 @@ def send_email_to_removed_cd_user(
         raise Exception('Invalid category: %s' % category)
 
     category_data = REMOVED_CD_USER_EMAIL_DATA[category]
-    if category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
+    if category in [
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+    ]:
         email_subject = 'You have been unassigned as a %s submitter' % (
             category_data['category']
         )
@@ -3136,7 +3161,10 @@ def send_email_to_removed_cd_user(
             category_data['category']
         )
 
-    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
+    if category in [
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+    ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'

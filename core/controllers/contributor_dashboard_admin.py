@@ -147,6 +147,22 @@ class ContributionRightsHandler(
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code
             )
+        elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION:
+            if language_code is None:
+                raise Exception(
+                    'The language_code cannot be None if the submit category is'
+                    ' \'translation\''
+                )
+            if user_services.can_submit_translation_suggestions(
+                user_id, language_code=language_code
+            ):
+                raise self.InvalidInputException(
+                    'User %s already has rights to submit translation in '
+                    'language code %s' % (username, language_code)
+                )
+            user_services.allow_user_to_submit_translation_in_language(
+                user_id, language_code
+            )
         elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
             if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
@@ -175,6 +191,7 @@ class ContributionRightsHandler(
 
         assert category in (
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
             constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         )
@@ -225,6 +242,22 @@ class ContributionRightsHandler(
             user_services.remove_translation_review_rights_in_language(
                 user_id, language_code
             )
+        elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION:
+            if language_code is None:
+                raise Exception(
+                    'The language_code cannot be None if the submit category is'
+                    ' \'translation\''
+                )
+            if not user_services.can_submit_translation_suggestions(
+                user_id, language_code=language_code
+            ):
+                raise self.InvalidInputException(
+                    '%s does not have rights to submit translation in '
+                    'language %s.' % (username, language_code)
+                )
+            user_services.remove_translation_submit_rights_in_language(
+                user_id, language_code
+            )
         elif category == (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION):
             if not user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
@@ -251,6 +284,7 @@ class ContributionRightsHandler(
 
         assert category in (
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
             constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         )
@@ -353,7 +387,10 @@ class ContributionRightsDataHandler(
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes
-                )
+                ),
+                'can_submit_translation_for_language_codes': (
+                    user_rights.can_submit_translation_for_language_codes
+                ),
             }
         if (
             feconf.ROLE_ID_QUESTION_ADMIN in self.roles

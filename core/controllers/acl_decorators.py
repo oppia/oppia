@@ -1300,7 +1300,10 @@ def can_manage_contributors_role(
                 self.user.actions
             ):
                 return handler(self, category, **kwargs)
-        elif category == (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
+        elif category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
+        ]:
             if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
                 self.user.actions
             ):

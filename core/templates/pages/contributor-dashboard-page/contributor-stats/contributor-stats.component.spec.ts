@@ -41,6 +41,7 @@ import {CertificateDownloadModalComponent} from '../modal-templates/certificate-
 describe('Contributor stats component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
   const userContributionRights = {
+    can_submit_translation_for_language_codes: [],
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true,
