@@ -18,6 +18,13 @@
 
 // @ts-nocheck
 
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {ExplorationRecommendationsService} from './exploration-recommendations.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -2086,4 +2093,114 @@ describe('Conversation flow service', () => {
     expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalled();
     expect(cardAnimationService.scrollToBottom).toHaveBeenCalled();
   }));
+
+  describe('story mode next chapter recommendation', () => {
+    const createNode = (
+      id: string,
+      status: string,
+      destinationNodeIds: string[]
+    ): ReadOnlyStoryNode =>
+      new ReadOnlyStoryNode(
+        id,
+        '',
+        '',
+        [],
+        destinationNodeIds,
+        [],
+        '',
+        false,
+        '',
+        {id: 'exp_' + id} as LearnerExplorationSummary,
+        false,
+        'bg_color',
+        'filename',
+        status
+      );
+
+    const setUpStoryMode = (
+      nextChapterStatus: string,
+      serialChapterLearnerViewEnabled: boolean
+    ): void => {
+      const platformFeatureService = TestBed.inject(PlatformFeatureService);
+      const storyViewerBackendApiService = TestBed.inject(
+        StoryViewerBackendApiService
+      );
+      const explorationRecommendationsService = TestBed.inject(
+        ExplorationRecommendationsService
+      );
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        SerialChapterLaunchLearnerView: {
+          isEnabled: serialChapterLearnerViewEnabled,
+        },
+      } as unknown as FeatureStatusChecker);
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        topic_url_fragment: 'topic',
+        classroom_url_fragment: 'classroom',
+        story_url_fragment: 'story',
+        node_id: 'node_1',
+      });
+      spyOn(
+        storyViewerBackendApiService,
+        'fetchStoryDataAsync'
+      ).and.returnValue(
+        Promise.resolve(
+          new StoryPlaythrough(
+            'story_id',
+            [
+              createNode('node_1', 'Published', ['node_2']),
+              createNode('node_2', nextChapterStatus, []),
+            ],
+            '',
+            '',
+            '',
+            ''
+          )
+        )
+      );
+      spyOn(explorationRecommendationsService, 'setRecommendedStoryNodeId');
+      conversationFlowService.isLoggedIn = false;
+      spyOn(userService, 'setReturnUrl');
+    };
+
+    it('should not recommend a coming soon chapter as the next lesson', fakeAsync(() => {
+      setUpStoryMode('Ready To Publish', true);
+      conversationFlowService.setRecommendedExplorationSummaries([]);
+
+      conversationFlowService['_handleStoryModeTerminalCard']();
+      tick();
+
+      expect(
+        conversationFlowService.getRecommendedExplorationSummaries()
+      ).toEqual([]);
+      expect(
+        TestBed.inject(ExplorationRecommendationsService)
+          .setRecommendedStoryNodeId
+      ).not.toHaveBeenCalled();
+    }));
+
+    it('should recommend a published chapter as the next lesson', fakeAsync(() => {
+      setUpStoryMode('Published', true);
+
+      conversationFlowService['_handleStoryModeTerminalCard']();
+      tick();
+
+      expect(
+        conversationFlowService.getRecommendedExplorationSummaries().length
+      ).toBe(1);
+      expect(
+        conversationFlowService.getRecommendedExplorationSummaries()[0].id
+      ).toBe('exp_node_2');
+    }));
+
+    it('should keep recommending a ready to publish chapter when the serial chapter learner view is disabled', fakeAsync(() => {
+      setUpStoryMode('Ready To Publish', false);
+
+      conversationFlowService['_handleStoryModeTerminalCard']();
+      tick();
+
+      expect(
+        conversationFlowService.getRecommendedExplorationSummaries().length
+      ).toBe(1);
+    }));
+  });
 });

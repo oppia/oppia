@@ -18,6 +18,8 @@
 
 // @ts-nocheck
 
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   EventEmitter,
@@ -83,6 +85,7 @@ describe('New Ratings and recommendations component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
+  let platformFeatureService: PlatformFeatureService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
   let bottomSheet: MatBottomSheet;
@@ -177,6 +180,7 @@ describe('New Ratings and recommendations component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     bottomSheet = TestBed.inject(MatBottomSheet);
@@ -402,6 +406,133 @@ describe('New Ratings and recommendations component', () => {
       expect(componentInstance.storyViewerUrl).toBe(undefined);
     })
   );
+
+  describe('when the next chapter is marked as ready to publish', () => {
+    let readOnlyStoryNode1: ReadOnlyStoryNode;
+    let readOnlyStoryNode2: ReadOnlyStoryNode;
+
+    const createNode = (id: string, status: string): ReadOnlyStoryNode =>
+      new ReadOnlyStoryNode(
+        id,
+        '',
+        '',
+        [],
+        [],
+        [],
+        '',
+        false,
+        '',
+        {} as LearnerExplorationSummary,
+        false,
+        'bg_color',
+        'filename',
+        status
+      );
+
+    const initializeComponent = (
+      serialChapterLearnerViewEnabled: boolean
+    ): void => {
+      readOnlyStoryNode1 = createNode('node_1', 'Published');
+      readOnlyStoryNode2 = createNode('node_2', 'Ready To Publish');
+
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        SerialChapterLaunchLearnerView: {
+          isEnabled: serialChapterLearnerViewEnabled,
+        },
+      } as unknown as FeatureStatusChecker);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        true
+      );
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        story_url_fragment: 'story_url_fragment',
+        topic_url_fragment: 'topic_url_fragment',
+        classroom_url_fragment: 'classroom_url_fragment',
+        node_id: 'node_1',
+      });
+      spyOn(
+        storyViewerBackendApiService,
+        'fetchStoryDataAsync'
+      ).and.returnValue(
+        Promise.resolve(
+          new StoryPlaythrough(
+            'story_id',
+            [readOnlyStoryNode1, readOnlyStoryNode2],
+            '',
+            '',
+            '',
+            ''
+          )
+        )
+      );
+      spyOn(
+        topicViewerBackendApiService,
+        'fetchTopicDataAsync'
+      ).and.returnValue(
+        Promise.resolve(
+          new ReadOnlyTopic(
+            'topic_name',
+            'topic_Id',
+            'description',
+            [],
+            [],
+            [],
+            [],
+            {},
+            {},
+            true,
+            'metatag',
+            'page_title_fragment',
+            null
+          )
+        )
+      );
+    };
+
+    it('should not offer the coming soon chapter as the next chapter when the serial chapter learner view is enabled', fakeAsync(() => {
+      initializeComponent(true);
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.storyId).toBe('story_id');
+      expect(componentInstance.nextStoryNode).toBeNull();
+      expect(componentInstance.nextStoryNodeIconUrl).toBeUndefined();
+    }));
+
+    it('should keep offering the next chapter when the serial chapter learner view is disabled', fakeAsync(() => {
+      initializeComponent(false);
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
+      expect(componentInstance.nextStoryNodeIconUrl).toBeDefined();
+    }));
+
+    it('should offer a published next chapter when the serial chapter learner view is enabled', fakeAsync(() => {
+      initializeComponent(true);
+      readOnlyStoryNode2 = createNode('node_2', 'Published');
+      (
+        storyViewerBackendApiService.fetchStoryDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve(
+          new StoryPlaythrough(
+            'story_id',
+            [readOnlyStoryNode1, readOnlyStoryNode2],
+            '',
+            '',
+            '',
+            ''
+          )
+        )
+      );
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
+    }));
+  });
 
   it('should obtain next chapter thumbnail url', () => {
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and.returnValue(

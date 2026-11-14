@@ -31,23 +31,27 @@ from core.domain import (
     certificate_assessment_services,
     classroom_config_services,
     email_manager,
+    exp_services,
     feature_flag_services,
     feedback_services,
     platform_parameter_list,
     platform_parameter_services,
     question_services,
+    rights_domain,
     rights_manager,
     role_services,
     skill_domain,
     skill_fetchers,
     story_domain,
     story_fetchers,
+    story_services,
     study_guide_services,
     subtopic_page_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
     topic_services,
+    user_domain,
     user_services,
 )
 
@@ -211,6 +215,48 @@ def does_classroom_exist(
     return test_does_classroom_exist
 
 
+def _is_exploration_hidden_from_learner(
+    user: user_domain.UserActionsInfo,
+    user_id: Optional[str],
+    exploration_id: str,
+    exploration_rights: rights_domain.ActivityRights,
+) -> bool:
+    """Checks whether the exploration belongs to a story chapter that learners
+    cannot access yet (e.g. a chapter marked as 'Coming soon'), and the user is
+    not someone who is allowed to see such chapters.
+
+    Args:
+        user: UserActionsInfo. The user trying to access the exploration.
+        user_id: str|None. The ID of the user, or None if logged out.
+        exploration_id: str. The ID of the exploration.
+        exploration_rights: ActivityRights. The rights of the exploration.
+
+    Returns:
+        bool. True if the exploration must be hidden from this user.
+    """
+    story_id = exp_services.get_story_id_linked_to_exploration(exploration_id)
+    if story_id is None:
+        return False
+    story = story_fetchers.get_story_by_id(story_id, strict=False)
+    if story is None:
+        return False
+    node = None
+    for story_node in story.story_contents.nodes:
+        if story_node.exploration_id == exploration_id:
+            node = story_node
+            break
+    if node is None:
+        return False
+    if story_services.is_story_node_accessible_to_learner(node, user_id):
+        return False
+    # Curriculum admins, topic managers and people who can edit the exploration
+    # still need to be able to play it, e.g. to test the chapter before launch.
+    return not (
+        role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user.actions
+        or rights_manager.check_can_edit_activity(user, exploration_rights)
+    )
+
+
 def can_play_exploration(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -254,6 +300,8 @@ def can_play_exploration(
 
         if rights_manager.check_can_access_activity(
             self.user, exploration_rights
+        ) and not _is_exploration_hidden_from_learner(
+            self.user, self.user_id, exploration_id, exploration_rights
         ):
             return handler(self, exploration_id, **kwargs)
         else:
@@ -310,6 +358,8 @@ def can_play_exploration_as_logged_in_user(
 
         if rights_manager.check_can_access_activity(
             self.user, exploration_rights
+        ) and not _is_exploration_hidden_from_learner(
+            self.user, self.user_id, exploration_id, exploration_rights
         ):
             return handler(self, exploration_id, **kwargs)
         else:

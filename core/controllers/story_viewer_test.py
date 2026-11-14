@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     learner_goals_services,
@@ -44,6 +44,30 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             user_id, STORY_ID, node_id
         )
 
+    def _set_node_status(self, node_id: str, new_status: str) -> None:
+        """Updates the status of the given node of the story."""
+        story_services.update_story(
+            self.admin_id,
+            self.STORY_ID,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'node_id': node_id,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_STATUS
+                        ),
+                        'old_value': None,
+                        'new_value': new_status,
+                    }
+                )
+            ],
+            'Update node status.',
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
     def setUp(self) -> None:
         """Completes the sign up process for the various users."""
         super().setUp()
@@ -488,6 +512,56 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             response.headers['location'],
         )
 
+    def test_redirect_to_story_page_when_next_node_is_coming_soon(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_1, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.get_html_response(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_2,
+            ),
+            expected_status_int=302,
+        )
+
+        self.assertEqual(
+            'http://localhost/learn/staging/topic/story/title-one',
+            response.headers['location'],
+        )
+
+    def test_redirect_to_ready_to_publish_next_node_when_learner_view_is_off(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_1, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.get_html_response(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_2,
+            ),
+            expected_status_int=302,
+        )
+
+        self.assertEqual(
+            'http://localhost/explore/1?classroom_url_fragment=staging'
+            '&topic_url_fragment=topic&story_url_fragment=title-one'
+            '&node_id=node_1',
+            response.headers['location'],
+        )
+
     def test_redirect_to_next_node(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
@@ -508,6 +582,83 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
     def test_post_succeeds_when_story_and_node_exist(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.post_json(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_1,
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+
+        self.assertEqual(json_response['summaries'][0]['id'], self.EXP_ID_7)
+        self.assertEqual(json_response['next_node_id'], self.NODE_ID_3)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_post_does_not_return_exploration_of_coming_soon_next_chapter(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.post_json(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_1,
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+
+        # The next chapter is still the learner's pending chapter, so the story
+        # is not treated as completed, but its exploration is not exposed.
+        self.assertEqual(json_response['summaries'], [])
+        self.assertEqual(json_response['next_node_id'], self.NODE_ID_3)
+        self.assertNotIn(
+            self.STORY_ID,
+            learner_progress_services.get_all_completed_story_ids(
+                self.viewer_id
+            ),
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_post_returns_exploration_of_published_next_chapter(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_PUBLISHED
+        )
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.post_json(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_1,
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+
+        self.assertEqual(json_response['summaries'][0]['id'], self.EXP_ID_7)
+        self.assertEqual(json_response['next_node_id'], self.NODE_ID_3)
+
+    def test_post_returns_ready_to_publish_chapter_when_learner_view_off(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
         csrf_token = self.get_new_csrf_token()
         json_response = self.post_json(
             '%s/staging/topic/%s/%s'
@@ -877,3 +1028,69 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             ),
             0,
         )
+
+
+class ComingSoonChapterExplorationAccessTests(BaseStoryViewerControllerTests):
+    """Tests that explorations of chapters which are not yet available to
+    learners cannot be played by learners, even if they know the exploration
+    ID.
+    """
+
+    def _get_exploration_init_data(self, expected_status_int: int) -> None:
+        self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID_7),
+            expected_status_int=expected_status_int,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_learner_cannot_play_exploration_of_coming_soon_chapter(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+
+        self._get_exploration_init_data(404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_learner_cannot_play_exploration_of_draft_chapter(self) -> None:
+        self._set_node_status(self.NODE_ID_3, constants.STORY_NODE_STATUS_DRAFT)
+
+        self._get_exploration_init_data(404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_learner_can_play_exploration_of_published_chapter(self) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_PUBLISHED
+        )
+
+        self._get_exploration_init_data(200)
+
+    def test_learner_can_play_ready_to_publish_chapter_when_flag_is_off(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+
+        self._get_exploration_init_data(200)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
+    def test_exploration_owner_can_play_exploration_of_coming_soon_chapter(
+        self,
+    ) -> None:
+        self._set_node_status(
+            self.NODE_ID_3, constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        )
+        self.logout()
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self._get_exploration_init_data(200)

@@ -955,6 +955,25 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates directly to the exploration URL and checks that the page
+   * displays an 'Error 404' message. This is used to verify that explorations
+   * of chapters which are not yet available to learners (e.g. "Coming soon"
+   * chapters) cannot be opened by knowing their ID.
+   * @param {string} explorationId - The ID of the exploration to open.
+   */
+  async expectExplorationLinkReturns404(explorationId: string): Promise<void> {
+    await this.goto(`${baseUrl}/explore/${explorationId}`, false);
+    const isError404Present = await this.isTextPresentOnPage('Error 404');
+    if (!isError404Present) {
+      throw new Error(
+        `Expected "Error 404" for exploration ${explorationId}, ` +
+          'but it was not shown.'
+      );
+    }
+    showMessage('The exploration link returns 404 as expected.');
+  }
+
+  /**
    * Navigates to the exploration page and starts playing the exploration.
    * @param {string} explorationId - The ID of the exploration to play.
    */
@@ -3682,6 +3701,43 @@ export class LoggedInUser extends BaseUser {
     }
 
     throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
+  }
+
+  /**
+   * Verifies that none of the given "next chapter" controls are shown on the
+   * end card of the chapter that was just completed. This is used to check
+   * that chapters marked as "Coming soon" cannot be reached from the end card.
+   * @param {string[]} selectors - Selectors of the next chapter controls.
+   */
+  async expectNextChapterNotAccessibleFromEndCard(
+    selectors: string[]
+  ): Promise<void> {
+    // Wait for the end card to be rendered before asserting absence, so that
+    // the check is not trivially satisfied while the page is still loading.
+    await this.page.waitForSelector(
+      '.post-chapter-recommendations-container, ' +
+        '.new-post-chapter-recommendation-cards-container',
+      {visible: true}
+    );
+    // The next chapter is resolved asynchronously after the end card is
+    // rendered, so give it time to show up if it is going to.
+    await this.page.waitForTimeout(1000);
+    for (const selector of selectors) {
+      await this.expectElementToBeVisible(selector, false);
+    }
+    showMessage('Next chapter is not accessible from the end card.');
+  }
+
+  /**
+   * Verifies that at least one of the given "next chapter" controls is shown
+   * on the end card.
+   * @param {string[]} selectors - Selectors of the next chapter controls.
+   */
+  async expectNextChapterAccessibleFromEndCard(
+    selectors: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(selectors.join(','), {visible: true});
+    showMessage('Next chapter is accessible from the end card.');
   }
 
   /**
