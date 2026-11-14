@@ -1396,7 +1396,7 @@ class Question(translation_domain.BaseTranslatableObject):
             content_ids for equality.
 
             Args:
-                new_type: RuleInputMigrationType. The type to migrate to.
+                new_type: _RuleInputMigrationType. The type to migrate to.
                 value: *. The value to migrate.
                 choices: list(dict). The list of subtitled html dicts to extract
                     content ids from.
