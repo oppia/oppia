@@ -32,9 +32,6 @@ from core.domain import (
     general_feedback_domain,
     html_cleaner,
     platform_parameter_domain,
-)
-from core.domain import platform_parameter_list as param_list
-from core.domain import (
     platform_parameter_registry,
     question_domain,
     rights_domain,
@@ -47,6 +44,7 @@ from core.domain import (
     translation_domain,
     user_services,
 )
+from core.domain import platform_parameter_list as param_list
 from core.platform import models
 from core.tests import test_utils
 
