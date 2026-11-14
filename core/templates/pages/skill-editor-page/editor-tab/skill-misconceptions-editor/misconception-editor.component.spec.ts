@@ -218,4 +218,52 @@ describe('Misconception Editor Component', () => {
     expect(updatesSpy).toHaveBeenCalledWith(sampleSkill, 1, true, false);
     expect(component.onMisconceptionChange.emit).toHaveBeenCalled();
   });
+
+  it('should update misconception notes for a changed string value', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionNotes('newNotes');
+
+    expect(component.container.misconceptionNotes).toBe('newNotes');
+  });
+
+  it('should not update misconception notes for a non-string value', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionNotes(['non-string value']);
+
+    expect(component.container.misconceptionNotes).toBe('notes');
+  });
+
+  it('should not update misconception notes when the value is unchanged', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionNotes('notes');
+
+    expect(component.container.misconceptionNotes).toBe('notes');
+  });
+
+  it('should update misconception feedback for a changed string value', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionFeedback('newFeedback');
+
+    expect(component.container.misconceptionFeedback).toBe('newFeedback');
+  });
+
+  it('should not update misconception feedback for a non-string value', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionFeedback(['non-string value']);
+
+    expect(component.container.misconceptionFeedback).toBe('feedback');
+  });
+
+  it('should not update misconception feedback when the value is unchanged', () => {
+    component.ngOnInit();
+
+    component.updateMisconceptionFeedback('feedback');
+
+    expect(component.container.misconceptionFeedback).toBe('feedback');
+  });
 });

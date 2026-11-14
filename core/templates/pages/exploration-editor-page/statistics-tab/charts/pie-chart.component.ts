@@ -46,8 +46,11 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('pieChart') pieChart!: ElementRef;
 
-  // A read-only array representing the table of chart data.
-  @Input() data!: string[];
+  // A read-only array representing the table of chart data. Each row is either
+  // a header row (all values are strings, e.g. ['Type', 'Number']) or a data
+  // row (the label in column 0 is a string and the value in column 1 is a
+  // number), which is why the row type is a string-or-number union.
+  @Input() data!: (string | number)[][];
   // A read-only object containing several chart options. This object
   // should have the following keys: pieHole, pieSliceTextStyleColor,
   // chartAreaWidth, colors, height, legendPosition, width.

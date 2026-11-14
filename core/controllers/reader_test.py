@@ -170,252 +170,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
-    """Test the handler for retrieving exploration pre-tests."""
-
-    def setUp(self) -> None:
-        """Before each individual test, initialize data."""
-        super().setUp()
-
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, 'user', description='Description')
-
-    def test_get_exploration_pretests(self) -> None:
-        story_id = story_services.get_new_story_id()
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id,
-            'user',
-            name='Topic',
-            description='A new topic',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            next_subtopic_id=0,
-        )
-        self.save_new_story(story_id, 'user', topic_id)
-        topic_services.add_canonical_story('user', topic_id, story_id)
-
-        changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_1',
-                    'title': 'Title 1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                    ),
-                    'node_id': 'node_1',
-                    'old_value': None,
-                    'new_value': 'exp_1',
-                }
-            ),
-        ]
-        story_services.update_story('user', story_id, changelist, 'Added node.')
-
-        exp_id = '15'
-        exp_id_2 = '1'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('15')
-        exp_services.delete_demo('1')
-        exp_services.load_demo('1')
-        old_value_list: List[str] = []
-        change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
-                    ),
-                    'old_value': old_value_list,
-                    'new_value': [self.skill_id],
-                    'node_id': 'node_1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                    ),
-                    'old_value': 'exp_1',
-                    'new_value': exp_id,
-                    'node_id': 'node_1',
-                }
-            ),
-        ]
-        story_services.update_story(
-            'user', story_id, change_list, 'Updated Node 1.'
-        )
-        question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
-            question_id,
-            'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index,
-        )
-        question_id_2 = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
-            question_id_2,
-            'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index,
-        )
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id, self.skill_id, 0.3
-        )
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id_2, self.skill_id, 0.5
-        )
-        # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
-            json_response_1 = self.get_json(
-                '%s/%s?story_url_fragment=title'
-                % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id)
-            )
-        self.assertTrue(
-            json_response_1['pretest_question_dicts'][0]['id']
-            in [question_id, question_id_2]
-        )
-
-        self.get_json(
-            '%s/%s?story_url_fragment=title'
-            % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
-            expected_status_int=400,
-        )
-
-        self.get_json(
-            '%s/%s?story_url_fragment=invalid-story'
-            % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
-            expected_status_int=400,
-        )
-
-    def test_cannot_perform_exploration_pretests_without_prerequisite_skill_ids(
-        self,
-    ) -> None:
-        story_id = story_services.get_new_story_id()
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id,
-            'user',
-            name='Topic',
-            description='A new topic',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            next_subtopic_id=0,
-        )
-        self.save_new_story(story_id, 'user', topic_id)
-        topic_services.add_canonical_story('user', topic_id, story_id)
-
-        changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_1',
-                    'title': 'Title 1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                    ),
-                    'node_id': 'node_1',
-                    'old_value': None,
-                    'new_value': 'exp_1',
-                }
-            ),
-        ]
-        story_services.update_story('user', story_id, changelist, 'Added node.')
-
-        exp_id = '15'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('15')
-        old_value_list: List[str] = []
-        change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
-                    ),
-                    'old_value': old_value_list,
-                    'new_value': [self.skill_id],
-                    'node_id': 'node_1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                    ),
-                    'old_value': 'exp_1',
-                    'new_value': exp_id,
-                    'node_id': 'node_1',
-                }
-            ),
-        ]
-        story_services.update_story(
-            'user', story_id, change_list, 'Updated Node 1.'
-        )
-        question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
-            question_id,
-            'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index,
-        )
-        question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(
-            question_id_2,
-            'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index,
-        )
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id, self.skill_id, 0.3
-        )
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id_2, self.skill_id, 0.5
-        )
-        # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
-            with self.swap_to_always_return(
-                story_domain.Story,
-                'get_prerequisite_skill_ids_for_exp_id',
-                None,
-            ):
-                json_response = self.get_json(
-                    '%s/%s?story_url_fragment=title'
-                    % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id),
-                    expected_status_int=500,
-                )
-        self.assertEqual(
-            json_response['error'],
-            'No prerequisite skill_ids found for the exploration '
-            'with exploration_id: 15',
-        )
-
-
 class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
@@ -1841,7 +1595,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
-        def _mock_none_function(_: str) -> None:
+        def _mock_none_function(
+            _: str, strict: bool = True  # pylint: disable=unused-argument
+        ) -> None:
             """Mocks None."""
             return None
 
@@ -2082,7 +1838,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         setattr(story, 'corresponding_topic_id', None)
 
-        with self.swap(story_fetchers, 'get_story_by_id', lambda _: story):
+        with self.swap(
+            story_fetchers,
+            'get_story_by_id',
+            lambda _, strict=True: story,  # pylint: disable=unused-argument
+        ):
             payload = {
                 'client_time_spent_in_secs': 0,
                 'params': {},
@@ -2827,7 +2587,9 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        state_hit_event_log_entry_model = all_models.get()
+        state_hit_event_log_entry_model: Optional[
+            stats_models.StateHitEventLogEntryModel
+        ] = all_models.get()
         assert state_hit_event_log_entry_model is not None
         model = state_hit_event_log_entry_model
 
@@ -2934,7 +2696,9 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateCompleteEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        state_complete_event_log_entry_model = all_models.get()
+        state_complete_event_log_entry_model: Optional[
+            stats_models.StateCompleteEventLogEntryModel
+        ] = all_models.get()
         assert state_complete_event_log_entry_model is not None
         model = state_complete_event_log_entry_model
 
@@ -3011,7 +2775,9 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        exp_event_log_model = all_models.get()
+        exp_event_log_model: Optional[
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+        ] = all_models.get()
         assert exp_event_log_model is not None
         model = exp_event_log_model
 
@@ -3159,7 +2925,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StartExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        event_log_entry_model = all_models.get()
+        event_log_entry_model: Optional[
+            stats_models.StartExplorationEventLogEntryModel
+        ] = all_models.get()
         assert event_log_entry_model is not None
         model = event_log_entry_model
 
@@ -3235,7 +3003,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        event_log_entry_model = all_models.get()
+        event_log_entry_model: Optional[
+            stats_models.ExplorationActualStartEventLogEntryModel
+        ] = all_models.get()
         assert event_log_entry_model is not None
         model = event_log_entry_model
 
@@ -3306,7 +3076,9 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        event_log_entry_model = all_models.get()
+        event_log_entry_model: Optional[
+            stats_models.SolutionHitEventLogEntryModel
+        ] = all_models.get()
         assert event_log_entry_model is not None
         model = event_log_entry_model
 

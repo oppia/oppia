@@ -663,6 +663,20 @@ describe('Site Analytics Service', () => {
       );
     });
 
+    it('should register download contributor certificate event', () => {
+      const contributionType = 'Translation';
+      sas.registerDownloadContributorCertificateEvent(contributionType);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'contributor_dashboard_download_certificate',
+        {
+          contribution_type: contributionType,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
     it('should register active lesson usage', () => {
       sas.registerLessonActiveUse();
 

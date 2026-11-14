@@ -30,13 +30,13 @@
               </oppia-exploration-objective-editor>
             </div>
 
-            <div [ngClass]="{'has-error': !explorationCategoryService.displayed}" class="oppia-settings-input-group">
+            <div [ngClass]="{'has-error': !categoryDisplayed}" class="oppia-settings-input-group">
               <div>
                 <div *ngIf="hasPageLoaded">
                   <p>
                     <mat-form-field class="e2e-test-exploration-category" appearance="fill">
                       <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type new)</mat-label>
-                      <mat-select [(value)]="explorationCategoryService.displayed"
+                      <mat-select [(value)]="categoryDisplayed"
                                   (valueChange)="updateCategoryListWithUserData()"
                                   class="e2e-test-exploration-category-dropdown">
                         <mat-option class="e2e-test-exploration-new-category-add">
@@ -60,8 +60,8 @@
               <div>
                 <mat-form-field appearance="fill">
                   <mat-label for="explorationLanguageCode" class="d-block">Language</mat-label>
-                  <mat-select class="e2e-test-exploration-language-select" [(value)]="explorationLanguageCodeService.displayed" name="language">
-                    <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()"
+                  <mat-select class="e2e-test-exploration-language-select" [(value)]="languageCodeDisplayed" name="language">
+                    <mat-option *ngFor="let value of getSupportedContentLanguages()"
                                 [value]="value.code"
                                 (click)="saveExplorationLanguageCode()"
                                 class="e2e-test-exploration-language-selector-choice">
@@ -83,7 +83,7 @@
                 <div *ngIf="stateNames && stateNames.length > 0">
                   <mat-form-field  id="explorationInitStateName" appearance="fill">
                     <mat-label for="explorationInitStateName" class="d-block">Name of first card</mat-label>
-                    <mat-select class="e2e-test-initial-state-select" [(value)]="explorationInitStateNameService.displayed" name="language">
+                    <mat-select class="e2e-test-initial-state-select" [(value)]="initStateNameDisplayed" name="language">
                       <mat-option *ngFor="let stateNames of stateNames"
                                   [value]="stateNames"
                                   (click)="saveExplorationInitStateName()"
@@ -152,7 +152,7 @@
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <span id="explorationTitle" type="text">
-                {{ explorationTitleService.displayed }}
+                {{ explorationTitle }}
               </span>
             </div>
           </div>
@@ -165,7 +165,7 @@
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <span id="explorationObjective" type="text">
-                {{explorationObjectiveService.displayed}}
+                {{ explorationObjective }}
               </span>
             </div>
           </div>
@@ -178,7 +178,7 @@
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <span id="explorationCategory" type="text">
-                {{explorationCategoryService.displayed}}
+                {{ categoryDisplayed }}
               </span>
             </div>
           </div>
@@ -188,7 +188,7 @@
               <label for="explorationLanguageCode">Language</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              {{explorationLanguageCodeService.getCurrentLanguageDescription()}}
+              {{ getCurrentLanguageDescription() }}
             </div>
           </div>
 
@@ -197,7 +197,7 @@
               <label for="explorationInitStateName">First State</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              {{ explorationInitStateNameService.displayed }}
+              {{ initStateNameDisplayed }}
             </div>
           </div>
         </div>
@@ -424,14 +424,14 @@
             <form>
               <div>
                 <label class="form-label">Add new voice artist: </label>
-                <input id="newVoicAartistUsername"
+                <input id="newVoiceArtistUsername"
                        class="form-control e2e-test-new-voice-artist-username"
-                       [(ngModel)]="newVoicAartistUsername"
+                       [(ngModel)]="newVoiceArtistUsername"
                        [ngModelOptions]="{standalone: true}"
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <button (click)="editVoiceArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button type="button" (click)="editVoiceArtist(newVoiceArtistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">
@@ -471,7 +471,7 @@
 
         <p *ngIf="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
           <em tabindex="0">Link to share:</em>
-          <input class="form-control" type="text" value="{{getExplorePageUrl(explorationId)}}" readonly="readonly" onClick="this.select();">
+          <input class="form-control" type="text" value="{{getExplorePageUrl()}}" readonly="readonly" aria-label="Link to share" onClick="this.select();">
         </p>
 
         <br>
@@ -523,10 +523,10 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" aria-label="feedback email" type="checkbox" class="visually-hidden" (click)="unmuteFeedbackNotifications()">
-              <input span *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" (click)="unmuteFeedbackNotifications()">
-              <input *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="visually-hidden" checked (click)="muteFeedbackNotifications()">
-              <input span *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked (click)="muteFeedbackNotifications()">
+              <input *ngIf="areFeedbackNotificationsMuted()" aria-label="feedback email" type="checkbox" class="visually-hidden" (click)="unmuteFeedbackNotifications()">
+              <input span *ngIf="areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" (click)="unmuteFeedbackNotifications()">
+              <input *ngIf="!areFeedbackNotificationsMuted()" type="checkbox" class="visually-hidden" checked (click)="muteFeedbackNotifications()">
+              <input span *ngIf="!areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked (click)="muteFeedbackNotifications()">
               <label class="oppia-on-off-switch-label e2e-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -534,10 +534,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text  d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text  d-block secondary-info-text" *ngIf="!areFeedbackNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new feedback for this exploration.
         </span>
-        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="areFeedbackNotificationsMuted()" tabindex="0">
           You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
         </span>
       </div>
@@ -549,10 +549,10 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" aria-label="Suggestion emails" (click)="unmuteSuggestionNotifications()">
-              <input span *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" (click)="unmuteSuggestionNotifications()">
-              <input *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" checked aria-label="Suggestion emails" (click)="muteSuggestionNotifications()">
-              <input span *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked (click)="muteSuggestionNotifications()">
+              <input *ngIf="areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" aria-label="Suggestion emails" (click)="unmuteSuggestionNotifications()">
+              <input span *ngIf="areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" (click)="unmuteSuggestionNotifications()">
+              <input *ngIf="!areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" checked aria-label="Suggestion emails" (click)="muteSuggestionNotifications()">
+              <input span *ngIf="!areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked (click)="muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -560,10 +560,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="!areSuggestionNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new suggestions for this exploration.
         </span>
-        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="areSuggestionNotificationsMuted()" tabindex="0">
           You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
         </span>
       </div>
@@ -655,11 +655,11 @@
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div [hidden]="!(explorationParamSpecsService.savedMemento && explorationParamSpecsService.savedMemento.getParamDict())">
+        <div [hidden]="!hasParamDict()">
           <em>No parameters used.</em>
         </div>
-        <ol *ngIf="explorationParamSpecsService.savedMemento">
-          <li *ngFor="let item of explorationParamSpecsService.savedMemento.getParamDict() | keyvalue">
+        <ol *ngIf="hasSavedParamSpecs()">
+          <li *ngFor="let item of getParamDict() | keyvalue">
             <b>{{item.key}}</b> ({{item.value.getType().getName()}})
           </li>
         </ol>

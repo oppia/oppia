@@ -46,7 +46,10 @@ export class ImageReceiverComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() allowedImageFormats!: string[];
+  // This is readonly because callers such as the profile picture modal declare
+  // their copy as 'readonly string[]', and the component itself only ever reads
+  // the list.
+  @Input() allowedImageFormats!: readonly string[];
   @Input() maxImageSizeInKB!: number;
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;

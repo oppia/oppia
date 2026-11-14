@@ -24,6 +24,7 @@ import {
   waitForAsync,
   TestBed,
   fakeAsync,
+  tick,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -40,6 +41,11 @@ import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Subject, of, throwError} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -139,6 +145,7 @@ describe('create new subtopic modal', function () {
     htmlLengthService = new MockHtmlLengthService();
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         CreateNewSubtopicModalComponent,
         UrlFragmentEditorComponent,
@@ -257,6 +264,22 @@ describe('create new subtopic modal', function () {
   it('should update sectionContentHtml when localContentValueChange is called', () => {
     component.localContentValueChange('section content');
     expect(component.sectionContentHtml).toBe('section content');
+  });
+
+  it('should reset htmlData to empty string for a non-string value', () => {
+    component.htmlData = 'old data';
+
+    component.localValueChange(null);
+
+    expect(component.htmlData).toBe('');
+  });
+
+  it('should reset section content to empty string for a non-string value', () => {
+    component.sectionContentHtml = 'old content';
+
+    component.localContentValueChange(null);
+
+    expect(component.sectionContentHtml).toBe('');
   });
 
   it(
@@ -565,5 +588,136 @@ describe('create new subtopic modal', function () {
       123,
       '#FF0000'
     );
+  });
+
+  describe('thumbnail image uploader', () => {
+    let assetsBackendApiService: AssetsBackendApiService;
+    let alertsService: AlertsService;
+    let pageContextService: PageContextService;
+    let imageData;
+
+    beforeEach(() => {
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      alertsService = TestBed.inject(AlertsService);
+      pageContextService = TestBed.inject(PageContextService);
+      spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('topicId');
+      imageData = {
+        filename: 'img_new.svg',
+        bg_color: '#FFFFFF',
+        image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
+      };
+    });
+
+    it('should initialize the image uploader parameters', () => {
+      expect(component.imageUploaderParameters).toEqual({
+        disabled: false,
+        maxImageSizeInKB: 100,
+        imageName: 'Thumbnail',
+        orientation: 'landscape',
+        bgColor: AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic[0],
+        allowedBgColors: [...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic],
+        allowedImageFormats: ['svg'],
+        aspectRatio: '4:3',
+        previewTitle: '',
+        previewDescriptionBgColor: '#BE563C',
+      });
+    });
+
+    it('should update the preview title when the subtopic title changes', () => {
+      component.updatePreviewTitle('Fractions');
+
+      expect(component.imageUploaderParameters.previewTitle).toBe('Fractions');
+    });
+
+    it('should upload the thumbnail and store its filename and bg color', fakeAsync(() => {
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      ).and.returnValue(of({filename: 'img_new.svg'}));
+
+      component.onImageSave(imageData);
+      tick();
+
+      expect(postThumbnailFileSpy).toHaveBeenCalledWith(
+        imageData.image_data,
+        'img_new.svg',
+        'topic',
+        'topicId'
+      );
+      expect(component.editableThumbnailFilename).toBe('img_new.svg');
+      expect(component.editableThumbnailBgColor).toBe('#FFFFFF');
+    }));
+
+    it('should show a warning and not store the thumbnail if the upload fails', fakeAsync(() => {
+      spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+        throwError('Upload failed')
+      );
+      const addWarningSpy = spyOn(alertsService, 'addWarning');
+
+      component.onImageSave(imageData);
+      tick();
+
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Could not upload the thumbnail.'
+      );
+      expect(component.editableThumbnailFilename).toBe('');
+    }));
+
+    it('should clear the stored thumbnail filename while the new thumbnail is being uploaded', () => {
+      component.editableThumbnailFilename = 'img_old.svg';
+      spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+        new Subject()
+      );
+
+      component.onImageSave(imageData);
+
+      expect(component.editableThumbnailFilename).toBe('');
+    });
+
+    it('should not keep the previous thumbnail if replacing it fails', fakeAsync(() => {
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+      postThumbnailFileSpy.and.returnValue(of({filename: 'img_new.svg'}));
+      component.onImageSave(imageData);
+      tick();
+      expect(component.editableThumbnailFilename).toBe('img_new.svg');
+
+      postThumbnailFileSpy.and.returnValue(throwError('Upload failed'));
+      const addWarningSpy = spyOn(alertsService, 'addWarning');
+      component.onImageSave({...imageData, filename: 'img_replacement.svg'});
+      tick();
+
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Could not upload the thumbnail.'
+      );
+      expect(component.editableThumbnailFilename).toBe('');
+    }));
+
+    it('should not upload the thumbnail if the entity type is missing', () => {
+      pageContextService.getEntityType.and.returnValue(undefined);
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+
+      component.onImageSave(imageData);
+
+      expect(postThumbnailFileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not upload the thumbnail if the entity id is missing', () => {
+      pageContextService.getEntityId.and.returnValue('');
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+
+      component.onImageSave(imageData);
+
+      expect(postThumbnailFileSpy).not.toHaveBeenCalled();
+    });
   });
 });

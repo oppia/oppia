@@ -110,12 +110,6 @@ FRONTEND_TEMPLATES_DIR = (
     if constants.DEV_MODE
     else os.path.join('build')
 )
-# To know more about AOT visit https://angular.io/guide/glossary#aot
-FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular')
-    if constants.DEV_MODE
-    else os.path.join('build')
-)
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
 )
@@ -272,14 +266,6 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE = 8
 # The maximum number of results to retrieve in a datastore query
 # for recently published explorations in /library page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE = 8
-
-# The maximum number of results to retrieve in a datastore query
-# for top rated published explorations in /library/top_rated page.
-NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
-
-# The maximum number of results to retrieve in a datastore query
-# for recently published explorations in /library/recently_published page.
-RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
@@ -585,7 +571,7 @@ CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
     '{service_account_id}@{app_id}.iam.gserviceaccount.com'
 )
 
-OPPIA_VERSION = '3.5.3'
+OPPIA_VERSION = '3.5.4'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -655,9 +641,6 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 # To prevent recording scores for users until details like whether to score
 # users for only curated lessons is confirmed.
 ENABLE_RECORDING_OF_SCORES = False
-
-# No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -968,7 +951,6 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
     '/learneranswerinfohandler/learner_answer_details'
 )
-EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
@@ -1010,12 +992,10 @@ LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
-LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
-LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 LESSON_URL_PREFIX = '/lesson'
+LESSON_URL_EMBED_PREFIX = '/embed/lesson'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
@@ -1048,8 +1028,6 @@ DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
 EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
-REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
-REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
 OPPORTUNITIES_COUNT_URL = '/opportunitiescounthandler/<opportunity_type>'
@@ -1257,20 +1235,6 @@ PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
-# The i18n id for the header of the "Top Rated Explorations" category in the
-# library index page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
-    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS'
-)
-# The i18n id for the header of the "Recently Published" category in the
-# library index page.
-LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
-
-# The group name that appears at the end of the url for the recently published
-# page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
-# The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5

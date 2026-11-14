@@ -70,7 +70,7 @@ interface GraphButton {
 
 interface GraphOption {
   text: string;
-  option: string;
+  option: 'isDirected' | 'isWeighted' | 'isLabeled';
 }
 
 @Component({

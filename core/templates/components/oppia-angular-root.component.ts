@@ -81,7 +81,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-backend-api.service';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
-import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
 import 'third-party-imports/ckeditor.import';
@@ -196,7 +195,6 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
   // The 'unknown' type is used here because the rteHelperService can be of any type.
   static rteHelperService: RteHelperService | unknown;
   static ratingComputationService: RatingComputationService;
-  static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   // The 'unknown' type is used here because the value can be of any type.
   static ajsValueProvider: (key: string, value: unknown) => void;
@@ -212,7 +210,6 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
     private pageTitleService: PageTitleService,
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
-    private reviewTestBackendApiService: ReviewTestBackendApiService,
     private rteHelperService: RteHelperService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -257,8 +254,6 @@ export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
       this.profilePageBackendApiService;
     OppiaAngularRootComponent.ratingComputationService =
       this.ratingComputationService;
-    OppiaAngularRootComponent.reviewTestBackendApiService =
-      this.reviewTestBackendApiService;
     OppiaAngularRootComponent.storyViewerBackendApiService =
       this.storyViewerBackendApiService;
     OppiaAngularRootComponent.injector = this.injector;

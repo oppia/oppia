@@ -16,8 +16,6 @@
  * @fileoverview Tests for Story update service.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
@@ -584,7 +582,9 @@ describe('Story update service', () => {
       'node_2',
       'node_3',
     ]);
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
+    const committableChangeList: object[] =
+      undoRedoService.getCommittableChangeList();
+    expect(committableChangeList).toEqual([
       {
         cmd: 'add_story_node',
         node_id: 'node_3',
@@ -1524,7 +1524,9 @@ describe('Story update service', () => {
         'Adventure 1',
         'New Title'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      const committableChangeList: object[] =
+        undoRedoService.getCommittableChangeList();
+      expect(committableChangeList).toEqual([
         {
           cmd: 'create_arc',
           arc_id: 'arc_1',
@@ -1704,7 +1706,9 @@ describe('Story update service', () => {
         []
       );
       storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_2');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      const committableChangeList: object[] =
+        undoRedoService.getCommittableChangeList();
+      expect(committableChangeList).toEqual([
         {
           cmd: 'create_arc',
           arc_id: 'arc_1',

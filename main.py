@@ -65,7 +65,6 @@ from core.controllers import (
     recent_commits,
     release_coordinator,
     resources,
-    review_tests,
     skill_editor,
     skill_mastery,
     story_editor,
@@ -577,17 +576,6 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
-        review_tests.ReviewTestsPageDataHandler,
-    ),
-    get_redirect_route(
-        r'%s/can_access_review_tests_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/<story_url_fragment>'
-        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.ReviewTestsPageAccessValidationHandler,
-    ),
-    get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler,
     ),
@@ -792,9 +780,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_GROUP_DATA_URL, library.LibraryGroupIndexHandler
-    ),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
@@ -859,10 +844,6 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
-        reader.PretestHandler,
     ),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
@@ -1443,10 +1424,6 @@ URLS = [
         learner_group.LearnerStoriesChaptersProgressHandler,
     ),
     get_redirect_route(
-        '/learner_groups_feature_status_handler',
-        learner_group.LearnerGroupsFeatureStatusHandler,
-    ),
-    get_redirect_route(
         r'/android_platform_parameters',
         android.AndroidPlatformParametersHandler,
     ),
@@ -1529,9 +1506,24 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend(
     (
+        # Error pages for the status codes the frontend error page supports
+        # (see ErrorPageRootComponent.validStatusCodes) are rendered by the
+        # frontend from the status code in the route, so the backend serves the
+        # oppia root page with a 200 status instead of returning a 404 status
+        # for a known error URL. Any other status code falls through to the
+        # catch-all 404 handler below, so an undefined error URL still returns a
+        # 404 instead of a misleading 200.
+        get_redirect_route(
+            r'/error/<status_code:(400|401|404|500)>',
+            oppia_root.OppiaRootPage,
+        ),
         get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
         get_redirect_route(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+            oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
             r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
@@ -1615,6 +1607,36 @@ URLS.extend(
         ),
         get_redirect_route(
             r'%s/<exploration_id>' % feconf.LESSON_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'%s/<exploration_id>' % feconf.LESSON_URL_EMBED_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/edit-certificate-assessment-offering/<certificate_offering_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment/<certificate_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/certificate-assessment-result/<attempt_id>',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/edit-learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learner-group/<learner_group_id>', oppia_root.OppiaRootPage
+        ),
+        get_redirect_route(
+            r'/learn/<classroom_url_fragment>/certificate-offering-available',
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'/technical-feedback-dashboard/<team>/<report_id>',
             oppia_root.OppiaRootPage,
         ),
     )

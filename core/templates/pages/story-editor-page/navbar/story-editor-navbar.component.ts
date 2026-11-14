@@ -487,7 +487,13 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.storyEditorNavigationService.onChangeActiveTab.subscribe(tab => {
         this.currentTab = tab;
-        if (tab === 'chapter_editor') {
+        // When the page is opened directly on a chapter URL, this event is
+        // emitted before the story has loaded. In that case the node data is
+        // fetched later by _validateStory(), once the story is initialized.
+        if (
+          tab === 'chapter_editor' &&
+          this.storyEditorStateService.hasLoadedStory()
+        ) {
           this.getStoryNodeData();
         }
       })

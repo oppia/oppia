@@ -60,6 +60,13 @@ export class HeadroomDirective implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.headroom.destroy();
+    try {
+      this.headroom.destroy();
+    } catch {
+      // Headroom.js initializes scrollTracker inside a 100ms setTimeout.
+      // If the directive is destroyed before 100ms (e.g. during fast route
+      // transitions), headroom.destroy() throws a TypeError because
+      // scrollTracker is undefined.
+    }
   }
 }

@@ -115,9 +115,6 @@ export class AccessValidationBackendApiService {
   EXPLORATION_PLAYER_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_exploration_player_page/<exploration_id>';
 
-  REVIEW_TESTS_PAGE_ACCESS_VALIDATOR =
-    '/access_validation_handler/can_access_review_tests_page/<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>'; // eslint-disable-line max-len
-
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -163,22 +160,6 @@ export class AccessValidationBackendApiService {
     const params = version ? new HttpParams().set('v', version) : undefined;
 
     return this.http.get<void>(url, {params}).toPromise();
-  }
-
-  validateAccessToReviewTestPage(
-    classroomUrlFragment: string,
-    topicUrlFragment: string,
-    storyUrlFragment: string
-  ): Promise<void> {
-    const url = this.urlInterpolationService.interpolateUrl(
-      this.REVIEW_TESTS_PAGE_ACCESS_VALIDATOR,
-      {
-        classroom_url_fragment: classroomUrlFragment,
-        topic_url_fragment: topicUrlFragment,
-        story_url_fragment: storyUrlFragment,
-      }
-    );
-    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToSubtopicViewerPage(

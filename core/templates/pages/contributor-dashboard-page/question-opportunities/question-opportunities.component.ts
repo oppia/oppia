@@ -37,6 +37,9 @@ interface Opportunity {
   subheading: string;
   progressPercentage: string;
   actionButtonTitle: string;
+  inReviewCount: number;
+  totalCount: number;
+  translationsCount: number;
 }
 
 interface GetSkillOpportunitiesResponse {
@@ -56,6 +59,7 @@ interface GetPresentableOpportunitiesResponse {
 export class QuestionOpportunitiesComponent implements OnInit {
   userIsLoggedIn: boolean = false;
   allOpportunities: Record<string, Opportunity> = {};
+  opportunityType: string = AppConstants.OPPORTUNITY_TYPE_SKILL;
 
   constructor(
     private alertsService: AlertsService,
@@ -88,6 +92,9 @@ export class QuestionOpportunitiesComponent implements OnInit {
         subheading: subheading,
         progressPercentage: progressPercentage,
         actionButtonTitle: 'Suggest Question',
+        inReviewCount: opportunity.getQuestionsInReviewCount(),
+        totalCount: maxQuestionsPerSkill,
+        translationsCount: opportunity.getQuestionCount(),
       };
 
       this.allOpportunities[opportunityDict.id] = opportunityDict;

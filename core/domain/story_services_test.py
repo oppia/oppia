@@ -3871,63 +3871,6 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3],
         )
 
-    def test_get_latest_completed_node_ids(self) -> None:
-        self.assertIsNone(
-            self._get_progress_model(self.owner_id, self.STORY_1_ID)
-        )
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.owner_id, self.STORY_1_ID
-            ),
-            [],
-        )
-
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.owner_id, self.STORY_1_ID
-            ),
-            [self.NODE_ID_1],
-        )
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.owner_id, self.STORY_1_ID
-            ),
-            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
-        )
-
-    def test_get_latest_completed_node_ids_different_completion_order(
-        self,
-    ) -> None:
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.owner_id, self.STORY_1_ID
-            ),
-            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
-        )
-
-    def test_get_latest_completed_node_ids_multiple_completions(self) -> None:
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
-
-        self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(
-                self.owner_id, self.STORY_1_ID
-            ),
-            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
-        )
-
     def test_get_completed_nodes_in_story(self) -> None:
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)

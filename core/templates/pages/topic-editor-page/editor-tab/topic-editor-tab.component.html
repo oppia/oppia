@@ -54,7 +54,7 @@
             <div class="topic-url-fragment e2e-test-topic-url-fragment-field">
               <url-fragment-editor-component label="Topic URL Fragment"
                                              placeholder="Enter the URL fragment for the topic."
-                                             maxLength="{{MAX_CHARS_IN_TOPIC_URL_FRAGMENT}}"
+                                             [maxLength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
                                              fragmentType="topic"
                                              [generatedUrlPrefix]="generatedUrlPrefix"
                                              [fragmentIsDuplicate]="topicUrlFragmentExists"
@@ -472,7 +472,7 @@
       <div *ngIf="storiesListIsShown" class="oppia-mobile-collapsible-card-content stories-list-container">
         <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
                 (click)="createCanonicalStory()"
-                [oppiaFocusOn]="addStoryBtn"
+                [oppiaFocusOn]="'addStoryBtn'"
                 *ngIf="topicRights.canEditTopic()">
           + ADD STORY
         </button>

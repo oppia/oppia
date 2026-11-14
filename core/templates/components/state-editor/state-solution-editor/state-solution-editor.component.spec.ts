@@ -302,6 +302,7 @@ describe('State Solution Editor Component', () => {
         false
       );
       spyOn(solutionValidityService, 'updateValidity').and.stub();
+      spyOn(component.onSaveNextContentIdIndex, 'emit');
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(
         true,
         false
@@ -328,6 +329,7 @@ describe('State Solution Editor Component', () => {
         'The current solution does not lead to another card.',
         4000
       );
+      expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
     })
   );
 

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core import feature_flag_list, feconf
+from core import feconf
 from core.constants import constants
 from core.domain import (
     learner_group_fetchers,
@@ -1540,35 +1540,6 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-
-class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
-    """Unit test for LearnerGroupsFeatureStatusHandler."""
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
-    def test_get_request_returns_true_when_learner_groups_featuer_flag_enabled(
-        self,
-    ) -> None:
-        response = self.get_json('/learner_groups_feature_status_handler')
-        self.assertEqual(
-            response,
-            {
-                'feature_is_enabled': True,
-            },
-        )
-
-    def test_get_request_returns_false_when_learner_groups_featuer_flag_disable(
-        self,
-    ) -> None:
-        response = self.get_json('/learner_groups_feature_status_handler')
-        self.assertEqual(
-            response,
-            {
-                'feature_is_enabled': False,
-            },
-        )
 
 
 class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):

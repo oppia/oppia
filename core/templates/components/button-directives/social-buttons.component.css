@@ -22,6 +22,11 @@
 .oppia-footer-social a:focus {
   text-decoration: none;
 }
+.oppia-footer-social-icons div:focus-within {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 .oppia-footer-social a > img {
   width: 30px;
 }
