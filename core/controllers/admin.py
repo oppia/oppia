@@ -159,6 +159,9 @@ ARABIC_BLOG_POST_CONTENT = """
     </ul>
 """
 
+MAX_DUMMY_EXPLORATIONS_PER_REQ = 50
+
+
 SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
     {
         'id': '%s',
@@ -523,6 +526,7 @@ class AdminHandler(
             Exception. The num_dummy_translation_opportunities_to_generate
                 must be provided when the action is
                 generate_dummy_translation_opportunities.
+            InvalidInputException. Generate count must be greater than 0.
             InvalidInputException. Generate count cannot be less than publish
                 count.
             InvalidInputException. The number of classrooms to generate must
@@ -592,9 +596,20 @@ class AdminHandler(
                         ' when the action is generate_dummy_explorations.'
                     )
 
+                if num_dummy_exps_to_generate <= 0:
+                    raise self.InvalidInputException(
+                        'Generate count must be greater than 0'
+                    )
+
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count'
+                    )
+
+                if num_dummy_exps_to_generate > MAX_DUMMY_EXPLORATIONS_PER_REQ:
+                    raise self.InvalidInputException(
+                        f'Cannot generate more than {MAX_DUMMY_EXPLORATIONS_PER_REQ} dummy '
+                        f'explorations in a single request. Requested: {num_dummy_exps_to_generate}.'
                     )
 
                 self._generate_dummy_explorations(
