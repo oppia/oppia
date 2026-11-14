@@ -20,20 +20,19 @@ from __future__ import annotations
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Callable, Dict, Iterator, List
+from typing import Callable, Iterable, Iterator, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import base_models
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
-
-datastore_services = models.Registry.import_datastore_services()
 
 ERROR_TRUNCATION_LIMIT = 10
 
@@ -68,15 +67,19 @@ This class must implement the following methods:
 class BaseValidationJob(base_jobs.JobBase):
     """Base class for all validation jobs."""
 
-    def run(self) -> beam.PCollection[Dict[str, List[str]]]:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the validation job.
 
         Returns:
-            PCollection. A PCollection of dictionaries, where keys are error
-            types and values are lists of truncated model IDs.
+            PCollection. A PCollection of JobRunResults: one with the number of
+            models that were validated, and one per error type. Each error
+            result has the error type, the total number of errors of that
+            type, and up to ERROR_TRUNCATION_LIMIT of the error messages.
         """
         all_models = self.pipeline | 'Get all models' >> (
-            ndb_io.GetModels(datastore_services.query_everything())
+            ndb_io.GetModels(
+                self.get_model_class().get_all(include_deleted=False)
+            )
         )
 
         default_validation_fns = [
@@ -101,20 +104,43 @@ class BaseValidationJob(base_jobs.JobBase):
         # representative sample of each error type is visible in the initial
         # set of logs, even if the total number of errors for a particular
         # type exceeds the truncation limit.
-        return (
+        error_results = (
             results
             | 'Group Errors by Type'
             >> beam.GroupBy(lambda error: type(error).__name__)
-            | 'Extract Error Messages'
-            >> beam.Map(
-                lambda group: {
-                    group[0]: sorted([error.stderr for error in group[1]])[
-                        :ERROR_TRUNCATION_LIMIT
-                    ]
-                }
+            | 'Extract Error Messages' >> beam.MapTuple(summarize_errors)
+        )
+        # The number of validated models shows that the job ran on the
+        # expected data, even when it finds no errors.
+        validated_models_count = (
+            all_models
+            | 'Count Validated Models'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'VALIDATED MODELS'
             )
         )
+        return (
+            validated_models_count,
+            error_results,
+        ) | 'Combine Results' >> beam.Flatten()
 
+    def get_model_class(self) -> Type[base_models.BaseModel]:
+        """Provides the class of the models to be validated. Only models of
+        this class are fetched by the job. Should be implemented in the
+        inherited classes.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError(
+            'Missing implementation for get_model_class in derived class.'
+        )
+
+    # TODO(#25777): Explore if we can update the validation functions to
+    # accept subclasses of base_models.BaseModel as parameters. This would
+    # allow subclasses to use specific model types in their signatures and
+    # avoid type assertions.
     def get_validation_fns(
         self,
     ) -> List[
@@ -164,6 +190,32 @@ class BaseValidationJob(base_jobs.JobBase):
             'Missing implementation for get_validate_domain_object_fn '
             'in derived class.'
         )
+
+
+def summarize_errors(
+    error_type: str, errors: Iterable[job_run_result.JobRunResult]
+) -> job_run_result.JobRunResult:
+    """Summarizes all the errors of one type as a single JobRunResult.
+
+    Args:
+        error_type: str. The name of the error class.
+        errors: iterable(JobRunResult). All the errors of that type.
+
+    Returns:
+        JobRunResult. A result with the error type, the total number of errors
+        and up to ERROR_TRUNCATION_LIMIT of the error messages, sorted.
+    """
+    # The errors are copied to a list because the iterable which Beam passes
+    # after a GroupBy does not support len().
+    error_messages = sorted(error.stderr for error in errors)
+    return job_run_result.JobRunResult.as_stderr(
+        '%s (%d total):\n%s'
+        % (
+            error_type,
+            len(error_messages),
+            '\n'.join(error_messages[:ERROR_TRUNCATION_LIMIT]),
+        )
+    )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
