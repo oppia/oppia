@@ -46,6 +46,7 @@ export class InteractiveNumericInput implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() requireNonnegativeInputWithValue: string = '';
+  @Input() allowExponentialNotationWithValue: string = '';
   @Input() lastAnswer!: NumericInputAnswer | null;
   @Input() savedSolution!: NumericInputAnswer;
   @Input() labelForFocusTarget!: string;
@@ -58,6 +59,7 @@ export class InteractiveNumericInput implements OnInit {
   NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
   errorMessageI18nKey: string = '';
   requireNonnegativeInput: boolean = false;
+  allowExponentialNotation: boolean = false;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -107,6 +109,7 @@ export class InteractiveNumericInput implements OnInit {
   private getAttributesObject() {
     return {
       requireNonnegativeInputWithValue: this.requireNonnegativeInputWithValue,
+      allowExponentialNotationWithValue: this.allowExponentialNotationWithValue,
     };
   }
 
@@ -137,12 +140,14 @@ export class InteractiveNumericInput implements OnInit {
   }
 
   ngOnInit(): void {
-    const {requireNonnegativeInput} =
+    const {requireNonnegativeInput, allowExponentialNotation} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'NumericInput',
         this.getAttributesObject()
       ) as NumericInputCustomizationArgs;
     this.requireNonnegativeInput = requireNonnegativeInput.value;
+    this.allowExponentialNotation = allowExponentialNotation.value;
+    this.answer = this.savedSolution !== undefined ? this.savedSolution : '';
     this.answer =
       this.lastAnswer !== null && this.lastAnswer !== undefined
         ? this.lastAnswer
@@ -154,6 +159,7 @@ export class InteractiveNumericInput implements OnInit {
       type: 'float',
       ui_config: {
         checkRequireNonnegativeInput: this.requireNonnegativeInput,
+        checkAllowExponentialNotation: this.allowExponentialNotation,
       },
     };
 
