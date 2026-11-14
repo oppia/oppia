@@ -161,19 +161,14 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         .fetchApplyDraftExplorationAsync(explorationId)
         .then(returnDict => {
           const explorationLanguageCode = returnDict.language_code;
-          let displayableLanguageCodes = [
-            ...(returnDict.displayable_language_codes || []),
-            ...Object.keys(
-              this.entityTranslationsService
-                .languageCodeToLatestEntityTranslations
-            ),
-          ].filter(languageCode => languageCode !== explorationLanguageCode);
-          displayableLanguageCodes = Array.from(
-            new Set(displayableLanguageCodes)
-          );
+          const displayableLanguageCodes =
+            this.entityTranslationsService.getDisplayableLanguageCodesForPreview(
+              returnDict.displayable_language_codes || [],
+              explorationLanguageCode
+            );
           this.explorationEngineService.init(
             returnDict,
-            returnDict.version,
+            0,
             null,
             returnDict.auto_tts_enabled,
             returnDict.preferred_language_codes || [],

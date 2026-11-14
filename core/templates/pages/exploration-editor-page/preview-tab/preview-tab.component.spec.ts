@@ -377,6 +377,19 @@ describe('Preview Tab Component', () => {
         entity_type: 'exploration',
         entity_version: 1,
         language_code: 'hi',
+        translations: {
+          content_id_1: {
+            content_value: 'नमस्ते',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+      }),
+      fr: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'fr',
         translations: {},
       }),
       en: EntityTranslation.createFromBackendDict({
@@ -415,7 +428,7 @@ describe('Preview Tab Component', () => {
 
     expect(explorationEngineService.init).toHaveBeenCalledWith(
       explorationWithLanguages,
-      2,
+      0,
       null,
       false,
       ['es'],

@@ -173,6 +173,19 @@ describe('ExplorationInitializationService', () => {
         entity_type: 'exploration',
         entity_version: 1,
         language_code: 'hi',
+        translations: {
+          content_id_1: {
+            content_value: 'नमस्ते',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+      }),
+      fr: EntityTranslation.createFromBackendDict({
+        entity_id: 'exp123',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'fr',
         translations: {},
       }),
       en: EntityTranslation.createFromBackendDict({
@@ -197,7 +210,7 @@ describe('ExplorationInitializationService', () => {
     );
     expect(explorationEngineService.init).toHaveBeenCalledWith(
       mockExplorationData,
-      1,
+      0,
       null,
       false,
       ['es'],

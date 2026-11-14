@@ -85,17 +85,15 @@ export class ExplorationInitializationService {
         featuresData
       );
       const explorationLanguageCode = explorationData.language_code;
-      let displayableLanguageCodes = [
-        ...(explorationData.displayable_language_codes || []),
-        ...Object.keys(
-          this.entityTranslationsService.languageCodeToLatestEntityTranslations
-        ),
-      ].filter(languageCode => languageCode !== explorationLanguageCode);
-      displayableLanguageCodes = Array.from(new Set(displayableLanguageCodes));
+      const displayableLanguageCodes =
+        this.entityTranslationsService.getDisplayableLanguageCodesForPreview(
+          explorationData.displayable_language_codes || [],
+          explorationLanguageCode
+        );
 
       this.explorationEngineService.init(
         explorationData,
-        explorationData.version,
+        0,
         null,
         explorationData.auto_tts_enabled,
         explorationData.preferred_language_codes || [],
