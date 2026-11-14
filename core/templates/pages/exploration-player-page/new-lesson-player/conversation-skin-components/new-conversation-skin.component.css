@@ -4,13 +4,24 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 /* All classes below should start with .conversation-skin */
 .new-conversation-skin-correctness-footer-container {
-  bottom: 40px;
+  bottom: 0;
+  height: 0;
   left: 0;
   padding: 0;
   pointer-events: none;
-  position: absolute;
-  width: 100%;
+  position: fixed;
+  /* Same width as the navigation footer, so that the pop-up is centred on the
+     lesson card instead of on the whole viewport. */
+  width: calc(100vw - 83px);
   z-index: 16;
+}
+
+.new-conversation-skin-correctness-footer-container.expanded-sidebar {
+  width: calc(100vw - 243px);
+}
+
+.new-conversation-skin-correctness-footer-container.question-player-footer {
+  width: 100%;
 }
 
 .new-supplemental-card-parent-container {
@@ -124,6 +135,11 @@ oppia-card-navigation-control {
 }
 
 @media(max-width: 767px) {
+  .new-conversation-skin-correctness-footer-container,
+  .new-conversation-skin-correctness-footer-container.expanded-sidebar {
+    width: 100vw;
+  }
+
   oppia-card-navigation-control {
     left: 0;
     width: 100vw;

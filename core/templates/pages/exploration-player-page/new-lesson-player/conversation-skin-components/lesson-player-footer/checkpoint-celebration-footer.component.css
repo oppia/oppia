@@ -42,7 +42,7 @@
   left: 50%;
   padding-left: 30px;
   padding-right: 30px;
-  position: fixed;
+  position: absolute;
   transform: translateX(-50%);
 }
 .tick-symbol {

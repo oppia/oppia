@@ -14,14 +14,12 @@
 
 /**
  * @fileoverview Component for the interaction controls (skip, continue,
- * submit buttons) in the new conversation skin. This was split out of
- * CardNavigationControlComponent so that the interaction buttons can be
- * rendered inside the tutor card, while card-to-card navigation and the
- * progress tracker remain in the fixed footer bar.
+ * submit buttons) in the new conversation skin.
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {
   InteractionSpecsConstants,
@@ -47,6 +45,7 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
 import {PlayerPositionService} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 
 @Component({
   selector: 'oppia-card-interaction-controls',
@@ -101,9 +100,11 @@ export class CardInteractionControlsComponent {
     private explorationModeService: ExplorationModeService,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
+    private currentInteractionService: CurrentInteractionService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
@@ -190,6 +191,22 @@ export class CardInteractionControlsComponent {
       }
       throw e;
     }
+  }
+
+  isSubmitButtonDisabled(): boolean {
+    // When returning to the current card after navigating through previous
+    // cards, the interaction service can still hold the state of a different
+    // card, which used to leave the Submit button falsely disabled. A learner's
+    // answer is always on the last card, so only check the state there.
+    const currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    if (!this.playerTranscriptService.isLastCard(currentIndex)) {
+      return false;
+    }
+    return (
+      this.currentInteractionService.isSubmitButtonDisabled() ||
+      this.displayedCard.showNoResponseError() ||
+      this.displayedCard.showInvalidResponseError()
+    );
   }
 
   shouldContinueButtonBeShown(): boolean {

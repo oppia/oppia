@@ -32,6 +32,7 @@ import {FatigueDetectionService} from '../services/fatigue-detection.service';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
+import {TranslateModule} from '@ngx-translate/core';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
@@ -44,6 +45,7 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 import {ConversationFlowService} from '../services/conversation-flow.service';
+import {LessonPlayerNavbarBreadcrumbComponent} from './header-components/lesson-player-navbar-breadcrumb.component';
 
 @NgModule({
   imports: [
@@ -59,6 +61,7 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
     ToastrModule,
     MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),
+    TranslateModule,
   ],
   declarations: [
     NewLessonPlayerPageComponent,
@@ -70,6 +73,7 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
     CustomizableThankYouModalComponent,
     LessonFeedbackModalComponent,
     NewProgressReminderModalComponent,
+    LessonPlayerNavbarBreadcrumbComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -81,6 +85,7 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
     LessonFeedbackModalComponent,
     NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewProgressReminderModalComponent,
+    LessonPlayerNavbarBreadcrumbComponent,
   ],
   providers: [
     HintAndSolutionModalService,
