@@ -20,12 +20,16 @@
 import {Injectable} from '@angular/core';
 
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SidebarStatusService {
-  constructor(private wds: WindowDimensionsService) {}
+  constructor(
+    private wds: WindowDimensionsService,
+    private windowRef: WindowRef
+  ) {}
 
   private sidebarIsShown: boolean = false;
   private hamburgerIconClicked: boolean = false;
@@ -51,7 +55,11 @@ export class SidebarStatusService {
   }
 
   closeSidebar(): void {
+    if (!this.sidebarIsShown) {
+      return;
+    }
     this._closeSidebar();
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
   }
 
   toggleHamburgerIconStatus(event: Event): void {
@@ -77,7 +85,7 @@ export class SidebarStatusService {
 
   onDocumentClick(): void {
     if (this.hamburgerIconClicked) {
-      this.sidebarIsShown = false;
+      this.closeSidebar();
       this.hamburgerIconClicked = false;
     }
   }

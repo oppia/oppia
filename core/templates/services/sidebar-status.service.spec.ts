@@ -47,10 +47,23 @@ describe('SidebarStatusService', () => {
     expect(sss.isSidebarShown()).toBe(true);
   });
 
-  it('should close the sidebar when its open', () => {
+  it('should close the sidebar and restore body scrolling', () => {
     sss.openSidebar();
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
+
     sss.closeSidebar();
+
     expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('auto');
+  });
+
+  it('should not change scrolling if sidebar is already closed', () => {
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
+
+    sss.closeSidebar();
+
+    expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('hidden');
   });
 
   it('should toggle the sidebar to open and then close', () => {
@@ -74,8 +87,10 @@ describe('SidebarStatusService', () => {
     sss.toggleHamburgerIconStatus(clickEvent);
     expect(sss.isHamburgerIconclicked()).toBe(true);
     sss.openSidebar();
+    $window.nativeWindow.document.body.style.overflowY = 'hidden';
     sss.onDocumentClick();
     expect(sss.isSidebarShown()).toBe(false);
+    expect($window.nativeWindow.document.body.style.overflowY).toBe('auto');
     expect(sss.isHamburgerIconclicked()).toBe(false);
   });
 });
