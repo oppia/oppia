@@ -235,6 +235,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
             'StudyGuideCommitLogEntryModel',
             # Config models.
             'PlatformParameterSnapshotMetadataModel',
+            'AndroidPlatformParameterConfigSnapshotMetadataModel',
             # Certificate assessment offering models.
             'CertificateAssessmentOfferingSnapshotMetadataModel',
             'CertificateAssessmentOfferingCommitLogEntryModel',
