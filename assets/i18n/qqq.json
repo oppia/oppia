@@ -524,6 +524,7 @@
   "I18N_END_CHAPTER_PRACTICE_SESSION_TEXT": "Text displayed under the recommendation card which leads the learner onto the practice tab",
   "I18N_END_CHAPTER_STUDY_GUIDE_TEXT": "Text displayed under the recommendation card which leads the learner onto the study tab",
   "I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE": "Message displayed to the learner at the end of an exploration telling them what other lessons/practice session they could try.",
+  "I18N_ERROR_GO_BACK_TO_CLASSROOMS": "Text of the link shown on the 404 error page that takes the learner back to the classrooms page.",
   "I18N_ERROR_HEADER_400": "Text displayed as title when a 400 type error occurred.",
   "I18N_ERROR_HEADER_401": "Text displayed as title when a 401 type error occurred because the user has no permissions to access the page.",
   "I18N_ERROR_HEADER_404": "Text displayed as title when a 404 type error occurred because the page was not found.",

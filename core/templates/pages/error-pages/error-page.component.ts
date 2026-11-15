@@ -18,6 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
+import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -33,6 +34,8 @@ export class ErrorPageComponent implements OnInit {
   @Input() statusCode!: string;
 
   customErrorMessage: string | null = null;
+  classroomsPageUrl: string =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

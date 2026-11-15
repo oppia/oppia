@@ -72,6 +72,34 @@ describe('ErrorPageComponent', () => {
     );
   });
 
+  it('should set the classrooms page url', () => {
+    expect(component.classroomsPageUrl).toBe('/learn');
+  });
+
+  it('should show the "Go back to Classrooms" link on the 404 page', () => {
+    component.statusCode = '404';
+    fixture.detectChanges();
+
+    const link: HTMLAnchorElement | null = fixture.nativeElement.querySelector(
+      '.e2e-test-go-back-to-classrooms-link'
+    );
+    expect(link).not.toBeNull();
+    expect(link?.getAttribute('href')).toBe('/learn');
+  });
+
+  it('should not show the "Go back to Classrooms" link for non-404 errors', () => {
+    for (const statusCode of ['400', '401', '500']) {
+      component.statusCode = statusCode;
+      fixture.detectChanges();
+
+      expect(
+        fixture.nativeElement.querySelector(
+          '.e2e-test-go-back-to-classrooms-link'
+        )
+      ).toBeNull();
+    }
+  });
+
   it('should extract custom error message from sessionStorage', fakeAsync(() => {
     component.statusCode = '401';
     windowRef.nativeWindow.sessionStorage.setItem(

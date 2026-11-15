@@ -111,6 +111,16 @@ describe('Error page', () => {
     );
   });
 
+  it('should show the "Go back to Classrooms" link', () => {
+    expect(component.classroomsPageUrl).toBe('/learn');
+
+    const link: HTMLAnchorElement | null = fixture.nativeElement.querySelector(
+      '.e2e-test-go-back-to-classrooms-link'
+    );
+    expect(link).not.toBeNull();
+    expect(link?.getAttribute('href')).toBe('/learn');
+  });
+
   it('should unsubscribe on component destruction', () => {
     component.directiveSubscriptions.add(
       translateService.onLangChange.subscribe(() => {

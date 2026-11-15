@@ -20,6 +20,7 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
+import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
 
@@ -30,6 +31,9 @@ import {PageTitleService} from 'services/page-title.service';
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  classroomsPageUrl: string =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService,
