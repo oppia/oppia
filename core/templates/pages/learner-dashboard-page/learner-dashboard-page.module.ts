@@ -27,7 +27,6 @@ import {ClassroomButtonComponent} from './classroom-button/classroom-button.comp
 import {ContentToggleButtonComponent} from './content-toggle-button/content-toggle-button.component';
 import {GoalListComponent} from './goal-list/goal-list.component';
 import {SkillCardModule} from './skill-card/skill-card.module';
-import {LearnerTopicGoalsSummaryTileComponent} from 'components/summary-tile/learner-topic-goals-summary-tile.component';
 import {GoalsTabComponent} from './goals-tab.component';
 import {ProgressTabComponent} from './progress-tab.component';
 import {LearnerTopicSummaryTileComponent} from 'components/summary-tile/learner-topic-summary-tile.component';
@@ -87,7 +86,6 @@ import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a
     GoalListComponent,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
-    LearnerTopicGoalsSummaryTileComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
@@ -108,7 +106,6 @@ import {AddAFollowUpNoteModalComponent} from './add-a-follow-up-note-modal/add-a
     ContentToggleButtonComponent,
     GoalListComponent,
     LearnerDashboardPageComponent,
-    LearnerTopicGoalsSummaryTileComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
