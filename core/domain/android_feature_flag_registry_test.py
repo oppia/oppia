@@ -204,5 +204,8 @@ class AndroidFeatureFlagRegistryTests(test_utils.GenericTestBase):
     def test_get_all_feature_flag_names_returns_registered_names(self) -> None:
         self.assertEqual(
             registry.Registry.get_all_feature_flag_names(),
-            [FEATURE_FLAG_NAME],
+            [
+                feature.value
+                for feature in android_feature_flag_list.AndroidFeatureFlagNames
+            ],
         )
