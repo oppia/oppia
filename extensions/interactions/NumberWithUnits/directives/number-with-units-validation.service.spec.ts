@@ -326,13 +326,8 @@ describe('NumberWithUnitsValidationService', () => {
     );
 
     spyOn(NumberWithUnits, 'fromDict').and.returnValue(dummyNumberWithUnits);
-    // This throws "Type null is not assignable to type
-    // 'string'." We need to suppress this error
-    // because of the need to test validations. This
-    // function is not used in the validations.
-    // @ts-ignore
     spyOn(dummyNumberWithUnits, 'toMathjsCompatibleString').and.returnValue(
-      null
+      'invalid'
     );
 
     answerGroups[0].rules = [
@@ -347,9 +342,7 @@ describe('NumberWithUnitsValidationService', () => {
         goodDefaultOutcome
       );
     }).toThrowError(
-      'Unexpected type of argument in function unit ' +
-        '(expected: number or Complex or BigNumber or Fraction or Unit or ' +
-        'string or Array or Matrix or boolean, actual: null, index: 0)\n' +
+      'Unit "invalid" not found.\n' +
         'laterInput: {"type":"real","real":2.02,"fraction":{"isNegative":false,' +
         '"wholeNumber":0,"numerator":0,"denominator":1},"units":[{"unit":"m",' +
         '"exponent":1},{"unit":"s","exponent":-2}]}\n' +

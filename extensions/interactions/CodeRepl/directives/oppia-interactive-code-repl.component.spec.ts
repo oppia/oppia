@@ -272,7 +272,7 @@ describe('InteractiveCodeReplComponent', () => {
 
   it('should display error when code fails', fakeAsync(() => {
     spyOn(Sk, 'importMainWithBody').and.returnValue({});
-    (spyOn(Sk.misceval, 'asyncToPromise') as jasmine.Spy).and.callFake(() => {
+    spyOn(Sk.misceval, 'asyncToPromise').and.callFake(() => {
       return Promise.reject('Error');
     });
     spyOn(component, 'sendResponse').and.callThrough();

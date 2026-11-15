@@ -662,10 +662,9 @@ describe('InteractiveImageClickInput', () => {
   it('should update dot position and styles', () => {
     const imageElement = document.createElement('img');
     imageElement.classList.add('oppia-image-click-img');
-    spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
-      left: 100,
-      top: 200,
-    } as DOMRect);
+    spyOn(imageElement, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(100, 200, 0, 0)
+    );
     spyOn(window, 'getComputedStyle').and.returnValue({
       marginLeft: '10px',
       marginTop: '20px',
@@ -673,12 +672,9 @@ describe('InteractiveImageClickInput', () => {
 
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-select-image-region-cursor');
-    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210,
-    } as DOMRect);
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(200, 100, 10, 10)
+    );
 
     const event = new MouseEvent('mousemove', {
       clientX: 100,

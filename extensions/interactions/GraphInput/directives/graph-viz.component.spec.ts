@@ -905,25 +905,16 @@ describe('GraphVizComponent', () => {
       container.querySelectorAll('.graph-button')
     );
 
-    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210,
-    } as DOMRect);
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(200, 100, 10, 10)
+    );
 
-    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
-      top: 90,
-      bottom: 135,
-      left: 190,
-      right: 275,
-    } as DOMRect);
-    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
-      top: 50,
-      bottom: 80,
-      left: 150,
-      right: 220,
-    } as DOMRect);
+    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue(
+      new DOMRect(190, 90, 85, 45)
+    );
+    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue(
+      new DOMRect(150, 50, 70, 30)
+    );
 
     spyOn(buttonElements[0], 'dispatchEvent');
 
@@ -955,25 +946,16 @@ describe('GraphVizComponent', () => {
       container.querySelectorAll('.graph-button')
     );
 
-    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210,
-    } as DOMRect);
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue(
+      new DOMRect(200, 100, 10, 10)
+    );
 
-    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
-      top: 50,
-      bottom: 80,
-      left: 150,
-      right: 220,
-    } as DOMRect);
-    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
-      top: 120,
-      bottom: 150,
-      left: 220,
-      right: 290,
-    } as DOMRect);
+    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue(
+      new DOMRect(150, 50, 70, 30)
+    );
+    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue(
+      new DOMRect(220, 120, 70, 30)
+    );
 
     const result = component.isButtonOnTopOfDot();
 

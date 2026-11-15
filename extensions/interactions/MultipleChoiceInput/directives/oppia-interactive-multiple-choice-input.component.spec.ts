@@ -51,12 +51,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
           value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
         },
         choices: {
-          value: (
-            JSON.parse(attributes.choicesWithValue) as {
-              html: string;
-              contentId: string;
-            }[]
-          ).map(dict => SubtitledHtml.createDefault(dict.html, dict.contentId)),
+          value: JSON.parse(attributes.choicesWithValue).map(
+            (dict: {html: string; contentId: string}) =>
+              SubtitledHtml.createDefault(dict.html, dict.contentId)
+          ),
         },
       };
     }
