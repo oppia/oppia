@@ -4,7 +4,7 @@
 
 For adding type definitions for a js library, the first step is to find the source code of the library.
 
-Try to find the file that imports the js script of the library. For example **PencilCodeEmbed** is imported by the [pencilcode.html](https://github.com/oppia/oppia/blob/develop/extensions/interactions/pencilcode.html) file.
+Try to find the file that imports the js script of the library. For example **PencilCodeEmbed** is imported by the [oppia-interactive-pencil-code-editor.component.ts](https://github.com/oppia/oppia/blob/develop/extensions/interactions/PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component.ts) file.
 
 ### Create a file for the type definitions
 
