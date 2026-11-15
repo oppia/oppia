@@ -47,7 +47,7 @@ SHARDS_SPEC_PATH: Final = os.path.join(
     os.getcwd(), 'scripts', 'backend_test_shards.json'
 )
 SHARDS_WIKI_LINK: Final = (
-    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors'
+    'https://github.com/oppia/oppia/wiki/Backend-tests#common-errors'
 )
 _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'

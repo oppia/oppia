@@ -487,20 +487,11 @@ def verify_pip_is_installed() -> None:
         )
 
         if common.is_mac_os():
-            print(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-                'OS%29'
-            )
+            print('https://github.com/oppia/oppia/wiki/Installing-Oppia')
         elif common.is_linux_os():
-            print(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-                '%29'
-            )
+            print('https://github.com/oppia/oppia/wiki/Installing-Oppia')
         else:
-            print(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29'
-            )
+            print('https://github.com/oppia/oppia/wiki/Installing-Oppia')
         raise ImportError('Error importing pip: %s' % e) from e
 
 

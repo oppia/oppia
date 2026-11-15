@@ -270,8 +270,8 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                         'scripts/check_frontend_test_coverage.py, please '
                         'make sure you\'ve followed the unit tests rules '
                         'correctly on: '
-                        'https://github.com/oppia/oppia/wiki/Frontend-unit'
-                        '-tests-guide#rules'
+                        'https://github.com/oppia/oppia/wiki/Frontend'
+                        '-tests#good-practices'
                     ],
                 )
 

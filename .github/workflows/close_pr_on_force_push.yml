@@ -45,7 +45,7 @@ jobs:
             const wasForcePushed = result.repository.pullRequest.timelineItems.nodes.length > 0;
 
             if (wasForcePushed) {
-              const comment = `Hi @${pr.user.login}, this PR's branch appears to have been force-pushed or rebased, which rewrites commit history. Per our [contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change), force-pushing to a PR branch is not allowed, so this PR is being closed. Please open a new PR from a fresh branch instead of force-pushing. Thanks!`;
+              const comment = `Hi @${pr.user.login}, this PR's branch appears to have been force-pushed or rebased, which rewrites commit history. Per our [contribution guidelines](https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-3-push-changes-to-your-github-fork), force-pushing to a PR branch is not allowed, so this PR is being closed. Please open a new PR from a fresh branch instead of force-pushing. Thanks!`;
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
