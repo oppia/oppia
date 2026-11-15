@@ -328,7 +328,9 @@ class BaseChange:
         # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
-    def __getattr__(self, name: str) -> str:
+    # Here we use type Any because dynamic properties on change objects
+    # can hold various types (int, str, dict, etc.) depending on the command.
+    def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         # Here we use cast because in method to_dict(), we are calling
@@ -340,7 +342,8 @@ class BaseChange:
         # Thus to avoid the error, we used cast here. We have not used assert
         # here because that will be written after `self.__dict__[name]` and
         # never be executed, which causes backend coverage to throw error.
+        # Here we use type Any because dynamic properties can be of any type.
         try:
-            return cast(str, self.__dict__[name])
+            return cast(Any, self.__dict__[name])
         except KeyError as e:
             raise AttributeError(name) from e

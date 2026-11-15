@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for unicode string editor.
  */
 
-// @ts-nocheck
-
 import {EventEmitter, SimpleChanges} from '@angular/core';
 import {ExternalSaveService} from 'services/external-save.service';
 import {FormsModule} from '@angular/forms';
