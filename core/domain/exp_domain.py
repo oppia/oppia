@@ -32,9 +32,9 @@ import string
 
 from core import feconf, schema_utils, utils, web_feature_flag_list
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
     interaction_registry,
     param_domain,

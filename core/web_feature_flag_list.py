@@ -42,7 +42,6 @@ class WebFeatureNames(enum.Enum):
     )
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
-    SHOW_TRANSLATION_SIZE = 'show_translation_size'
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -130,7 +129,6 @@ class WebFeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    WebFeatureNames.SHOW_TRANSLATION_SIZE,
     WebFeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     WebFeatureNames.ENABLE_DROPDOWN_PAGINATION,
 ]
@@ -214,13 +212,6 @@ WEB_FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag is to show redesigned learner dashboard.',
             web_feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    WebFeatureNames.SHOW_TRANSLATION_SIZE.value: (
-        (
-            'This flag is to show translation size on translation cards in '
-            'contributor dashboard.',
-            web_feature_flag_domain.ServerMode.DEV,
         )
     ),
     WebFeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (

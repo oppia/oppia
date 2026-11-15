@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Skill Editor Navbar Component.
  */
 
-// @ts-nocheck
-
 import {
   ComponentFixture,
   fakeAsync,
@@ -253,7 +251,7 @@ describe('Skill Editor Navbar Component', () => {
     const runSpy = jasmine.createSpy('runSpy');
     const modalRef = {
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
     component.confirmBeforeLeavingQuestions(runSpy);
@@ -273,12 +271,8 @@ describe('Skill Editor Navbar Component', () => {
     var runFn = jasmine.createSpy('runFn');
 
     spyOn(ngbModal, 'open').and.returnValue({
-      result: {
-        then: function (confirmCb: () => void, cancelCb: () => void) {
-          cancelCb();
-        },
-      },
-    });
+      result: Promise.reject(),
+    } as NgbModalRef);
 
     component.confirmBeforeLeavingQuestions(runFn);
     tick();

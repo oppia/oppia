@@ -32,12 +32,12 @@ from core import (
     web_feature_flag_list,
 )
 from core.constants import constants
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
-from core.domain import rules_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     customization_args_util,
+    html_cleaner,  # pylint: disable=invalid-import-from
     interaction_registry,
     param_domain,
+    rules_registry,  # pylint: disable=invalid-import-from
     translation_domain,
     web_feature_flag_services,
 )
