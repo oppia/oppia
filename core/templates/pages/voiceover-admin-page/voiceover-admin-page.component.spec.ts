@@ -16,8 +16,6 @@
  * @fileoverview Tests for the voiceover admin component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -115,6 +113,7 @@ describe('Voiceover Admin Page component ', () => {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      autoGeneratableLanguageAccentCodes: [],
     };
     spyOn(
       voiceoverBackendApiService,
@@ -301,9 +300,7 @@ describe('Voiceover Admin Page component ', () => {
       'hi-IN': true,
     };
 
-    spyOn(component, 'saveUpdatedLanguageAccentSupport').and.returnValue(
-      Promise.resolve()
-    );
+    spyOn(component, 'saveUpdatedLanguageAccentSupport');
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
       result: Promise.resolve(),
@@ -352,9 +349,7 @@ describe('Voiceover Admin Page component ', () => {
       'en-IN': false,
     };
 
-    spyOn(component, 'saveUpdatedLanguageAccentSupport').and.returnValue(
-      Promise.resolve()
-    );
+    spyOn(component, 'saveUpdatedLanguageAccentSupport');
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
       result: Promise.reject(),
