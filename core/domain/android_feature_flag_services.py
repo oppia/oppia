@@ -31,9 +31,9 @@ import packaging.version
 from typing import Dict, List, Optional
 
 DEFAULT_MIN_APP_VERSION = '0.0'
-GA_APP_VERSION_FLAVOR = android_platform_parameter_domain.ANDROID_PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS[
-    3
-]
+GA_APP_VERSION_FLAVOR = (
+    android_platform_parameter_domain.ALLOWED_APP_VERSION_FLAVORS[3]
+)
 AndroidFeatureFlagConfig = android_feature_flag_domain.AndroidFeatureFlagConfig
 AndroidFeatureFlagState = android_feature_flag_domain.AndroidFeatureFlagState
 

@@ -295,6 +295,7 @@ class AndroidFeatureFlagServicesTests(test_utils.GenericTestBase):
         updated_flag = android_feature_flag_registry.Registry.load_feature_flag_from_storage(
             FEATURE_FLAG_NAME
         )
+        assert updated_flag is not None
         self.assertEqual(updated_flag.min_app_version, '1.0')
         self.assertEqual(updated_flag.max_app_version, '4.0')
         self.assertEqual(updated_flag.rollout_percentage, 60)

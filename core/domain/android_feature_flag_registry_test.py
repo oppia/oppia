@@ -115,8 +115,10 @@ class AndroidFeatureFlagRegistryTests(test_utils.GenericTestBase):
                 [FEATURE_FLAG_NAME, secondary_name]
             )
 
-        self.assertEqual(flags[FEATURE_FLAG_NAME].min_app_version, '0.32')
-        self.assertEqual(flags[FEATURE_FLAG_NAME].rollout_percentage, 25)
+        stored_flag = flags[FEATURE_FLAG_NAME]
+        assert stored_flag is not None
+        self.assertEqual(stored_flag.min_app_version, '0.32')
+        self.assertEqual(stored_flag.rollout_percentage, 25)
         self.assertIsNone(flags[secondary_name])
 
     def test_load_unregistered_flag_raises_exception(self) -> None:
@@ -140,6 +142,7 @@ class AndroidFeatureFlagRegistryTests(test_utils.GenericTestBase):
             FEATURE_FLAG_NAME
         )
         self.assertIsNotNone(stored_flag)
+        assert stored_flag is not None
         self.assertEqual(stored_flag.min_app_version, '1.5')
         self.assertEqual(stored_flag.rollout_percentage, 60)
         self.assertEqual(
@@ -161,6 +164,7 @@ class AndroidFeatureFlagRegistryTests(test_utils.GenericTestBase):
         stored_flag = registry.Registry.load_feature_flag_from_storage(
             FEATURE_FLAG_NAME
         )
+        assert stored_flag is not None
         self.assertEqual(stored_flag.min_app_version, '2.0')
         self.assertEqual(stored_flag.max_app_version, '3.0')
         self.assertEqual(stored_flag.rollout_percentage, 75)

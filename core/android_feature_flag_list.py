@@ -53,7 +53,7 @@ class AndroidFeatureFlagNames(enum.Enum):
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
-DEV_FEATURES_LIST = []
+DEV_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
 
 # Names of features in alpha stage, the corresponding feature flag instances must
 # be in alpha stage otherwise it will cause a test error in the backend test.
