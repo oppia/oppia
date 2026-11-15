@@ -512,6 +512,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             response.headers['location'],
         )
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW]
+    )
     def test_redirect_to_story_page_when_next_node_is_coming_soon(
         self,
     ) -> None:
