@@ -849,3 +849,8 @@ indexes:
   - name: learner_id
   - name: created_on
     direction: desc
+
+- kind: BlogPostSummaryModel
+  properties:
+  - name: tags
+  - name: published_on
