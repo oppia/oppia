@@ -1369,8 +1369,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'EarlyQuit',
             {},
             [],
-            None,
-            True,  # type: ignore[arg-type]
+            None,  # type: ignore[arg-type]
+            True,
         )
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(

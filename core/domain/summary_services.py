@@ -337,8 +337,8 @@ def get_learner_collection_dict_by_id(
     # difference in types, MyPy throws an error. Thus, to avoid the error,
     # we used ignore here.
     collection_dict['nodes'] = [
-        node.to_dict()
-        for node in collection.nodes  # type: ignore[misc]
+        node.to_dict()  # type: ignore[misc]
+        for node in collection.nodes
     ]
 
     collection_dict['playthrough_dict'] = {

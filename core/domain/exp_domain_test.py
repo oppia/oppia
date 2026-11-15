@@ -19919,8 +19919,8 @@ class OldVersionExploration(translation_domain.BaseTranslatableObject):
         # that assign with SerializableExplorationDict to put in cache for
         # testing purpose.
         exploration_dict: exp_domain.SerializableExplorationDict = (
-            self.to_dict()
-        )  # type: ignore[assignment]
+            self.to_dict()  # type: ignore[assignment]
+        )
         exploration_dict['version'] = self.version
         return json.dumps(exploration_dict)
 

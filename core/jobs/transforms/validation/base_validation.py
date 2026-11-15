@@ -293,8 +293,8 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelDomainObjectInstances(
-    beam.DoFn,
-    Generic[ModelInstanceType],  # type: ignore[misc]
+    beam.DoFn,  # type: ignore[misc]
+    Generic[ModelInstanceType],
 ):
     """DoFn to check whether the model instance passes the validation of the
     domain object for model.

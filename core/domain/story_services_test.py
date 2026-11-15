@@ -1629,8 +1629,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
-                [{}],
-                'Updated story node.',  # type: ignore[list-item]
+                [{}],  # type: ignore[list-item]
+                'Updated story node.',
             )
 
         self.assertEqual(

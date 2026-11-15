@@ -1468,9 +1468,9 @@ class TestBase(unittest.TestCase):
             # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
-                new_function_with_checks.call_num > 0,
+                new_function_with_checks.call_num > 0,  # type: ignore[attr-defined]
                 called,
-                msg=msg,  # type: ignore[attr-defined]
+                msg=msg,
             )
             pretty_unused_args: List[str] = []
 

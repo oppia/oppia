@@ -25,6 +25,8 @@ import re
 from core.domain import visualization_registry
 from core.tests import test_utils
 
+from typing import Dict, Union
+
 
 class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the visualization registry."""
@@ -75,16 +77,19 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         ):
             sorted_tiles_instance.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_visualization_class_with_invalid_addressed_info_is_supported_value(
         self,
     ) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles'
         )
-        option_names = {'header': 'Pretty Tiles!', 'use_percentages': True}
+        option_names: Dict[str, Union[str, bool]] = {
+            'header': 'Pretty Tiles!',
+            'use_percentages': True,
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies',
             option_names,

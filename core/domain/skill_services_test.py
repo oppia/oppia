@@ -147,8 +147,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
                 self.SKILL_ID,
-                invalid_skill_change_list,
-                self.user_id_a,  # type: ignore[arg-type]
+                invalid_skill_change_list,  # type: ignore[arg-type]
+                self.user_id_a,
             )
 
     def test_compute_summary(self) -> None:

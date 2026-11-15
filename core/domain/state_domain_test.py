@@ -3047,8 +3047,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
 
             exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict',
-                10,  # type: ignore[arg-type]
+                'invalid_state_dict',  # type: ignore[arg-type]
+                10,
             )
 
         self.assertEqual(len(captured_logs), 1)

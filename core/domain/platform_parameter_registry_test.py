@@ -21,7 +21,7 @@ from __future__ import annotations
 import enum
 
 from core import feconf, utils
-from core.domain import caching_services
+from core.domain import caching_services, platform_parameter_list
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
@@ -95,9 +95,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         # names for our tests and create_platform_parameter only accepts
         # platform parameter name of type platform_parameter_list.ParamName.
         return registry.Registry.create_platform_parameter(
-            ParamName.PARAMETER_A,
+            ParamName.PARAMETER_A,  # type: ignore[arg-type]
             'test',
-            data_types,  # type: ignore[arg-type]
+            data_types,
         )
 
     def test_create_platform_parameter(self) -> None:
@@ -118,7 +118,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             registry.Registry.create_platform_parameter(
-                ParamName.PARAMETER_A,
+                platform_parameter_list.ParamName.DUMMY_PARAMETER,
                 'test',
                 DataType.INVALID,  # type: ignore[arg-type]
             )

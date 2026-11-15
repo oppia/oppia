@@ -401,8 +401,8 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             collection_services.update_collection(
                 self.owner_id,
                 'collection_id',
-                None,
-                'commit message',  # type: ignore[arg-type]
+                None,  # type: ignore[arg-type]
+                'commit message',
             )
 
     def test_save_collection_with_mismatch_of_versions_raises_error(

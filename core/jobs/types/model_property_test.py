@@ -102,8 +102,8 @@ class ModelPropertyTests(test_utils.TestBase):
             # datastore_services.Model. Thus to silence mypy error, we added an
             # ignore here.
             model_property.ModelProperty(
-                SubclassOfNdbModel,
-                SubclassOfNdbModel.value,  # type: ignore[arg-type]
+                SubclassOfNdbModel,  # type: ignore[arg-type]
+                SubclassOfNdbModel.value,
             )
 
     def test_init_raises_type_error_when_property_is_not_an_ndb_property(
