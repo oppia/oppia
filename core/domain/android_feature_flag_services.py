@@ -108,6 +108,17 @@ def get_evaluated_android_feature_flags(
     Returns:
         list(dict(str, bool)). A list of feature-name-to-enabled-value mappings
         for the flags applicable to the given app version and installation.
+        List of dictionaries of the form:
+        {
+            “name”: str Feature flag name.
+            “enabled”: bool. Whether feature is enabled.
+        }
+
+    Note: Omitted flags (version mismatch) are NOT included.
+    This differs from returning {“enabled”: false} which explicitly disables.
+
+    Raises:
+        Exception. If app_version_name format is invalid.
     """
     app_version, flavor = _parse_app_version_name(app_version_name)
     parsed_app_version = packaging.version.Version(app_version)
@@ -185,7 +196,7 @@ def update_android_feature_flag(
             feature_flag_name
         )
     )
-    if current_flag.state != AndroidFeatureFlagState.LIVE:
+    if current_flag.state == AndroidFeatureFlagState.FINAL:
         raise utils.ValidationError(
             'Android feature flag %s is FINAL and cannot be updated.'
             % feature_flag_name
@@ -198,7 +209,11 @@ def update_android_feature_flag(
     )
     updated_flag = AndroidFeatureFlagConfig(
         current_flag.state,
-        updated_min_app_version,
+        (
+            min_app_version
+            if min_app_version is not None
+            else current_flag.min_app_version
+        ),
         (
             max_app_version
             if max_app_version is not None
