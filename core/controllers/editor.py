@@ -202,7 +202,7 @@ class ExplorationHandler(
             )
 
             displayable_language_codes = []
-            if story_id is not None:
+            if story_id is not None and version is None and apply_draft:
                 try:
                     exploration = exp_fetchers.get_exploration_by_id(
                         exploration_id, strict=False, version=version
@@ -308,10 +308,7 @@ class ExplorationHandler(
         exploration_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id
         )
-        # Here we use MyPy ignore because here we are defining a new
-        # 'exploration_is_linked_to_story' key on a well defined TypedDict
-        # dictionary.
-        exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
+        exploration_data['exploration_is_linked_to_story'] = (
             exp_services.get_story_id_linked_to_exploration(exploration_id)
             is not None
         )

@@ -3620,6 +3620,40 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             self.assertEqual(response['displayable_language_codes'], ['hi'])
             self.assertEqual(response['preferred_language_codes'], ['hi', 'es'])
 
+    def test_exploration_loaded_with_translation_languages_fetch_failure(
+        self,
+    ) -> None:
+        with self.swap_to_always_return(
+            exp_services,
+            'get_story_id_linked_to_exploration',
+            value='story_id',
+        ), self.swap_to_always_raise(
+            translation_services,
+            'get_displayable_translation_languages',
+            error=Exception('Translation fetch failure'),
+        ):
+            response = self.get_json(
+                '/createhandler/data/%s' % self.EXP_ID2,
+                params={'apply_draft': True},
+            )
+            self.assertEqual(response['displayable_language_codes'], [])
+
+    def test_exploration_loaded_when_exploration_is_none(self) -> None:
+        with self.swap_to_always_return(
+            exp_services,
+            'get_story_id_linked_to_exploration',
+            value='story_id',
+        ), self.swap_to_always_return(
+            exp_fetchers,
+            'get_exploration_by_id',
+            value=None,
+        ):
+            response = self.get_json(
+                '/createhandler/data/%s' % self.EXP_ID2,
+                params={'apply_draft': True},
+            )
+            self.assertEqual(response['displayable_language_codes'], [])
+
     def test_exploration_loaded_without_draft_when_draft_version_invalid(
         self,
     ) -> None:
