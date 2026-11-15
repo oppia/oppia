@@ -28,9 +28,25 @@ from typing import Dict, List
 class AndroidFeatureFlagNames(enum.Enum):
     """Enum of Android feature flags."""
 
+    DOWNLOADS_SUPPORT = 'android_enable_downloads_support'
+    EXTRA_TOPIC_TABS_UI = 'android_enable_extra_topic_tabs_ui'
+    LEARNER_STUDY_ANALYTICS = 'android_enable_learner_study_analytics'
     FAST_LANGUAGE_SWITCHING_IN_LESSON = (
         'android_enable_fast_language_switching_in_lesson'
     )
+    LOGGING_LEARNER_STUDY_IDS = 'android_enable_logging_learner_study_ids'
+    EDIT_ACCOUNTS_OPTIONS_UI = 'android_enable_edit_accounts_options_ui'
+    ENABLE_PERFORMANCE_METRICS_COLLECTION = (
+        'android_enable_performance_metrics_collection'
+    )
+    SPOTLIGHT_UI = 'android_enable_spotlight_ui'
+    INTERACTION_CONFIG_CHANGE_STATE_RETENTION = (
+        'android_enable_interaction_config_change_state_retention'
+    )
+    APP_AND_OS_DEPRECATION = 'android_enable_app_and_os_deprecation'
+    ENABLE_NPS_SURVEY = 'android_enable_nps_survey'
+    ENABLE_ONBOARDING_FLOW_V2 = 'android_enable_onboarding_flow_v2'
+    ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -71,8 +87,56 @@ GA_FEATURES_LIST: List[AndroidFeatureFlagNames] = []
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
     str, tuple[str, android_feature_flag_domain.AndroidFeatureFlagState]
 ] = {
+    AndroidFeatureFlagNames.DOWNLOADS_SUPPORT.value: (
+        'Enables manually downloading topics.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.EXTRA_TOPIC_TABS_UI.value: (
+        'Enables the practice and info topic tabs.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.LEARNER_STUDY_ANALYTICS.value: (
+        'Enables learner study analytics.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
     AndroidFeatureFlagNames.FAST_LANGUAGE_SWITCHING_IN_LESSON.value: (
         'Enables fast language switching in lesson.',
         android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
-    )
+    ),
+    AndroidFeatureFlagNames.LOGGING_LEARNER_STUDY_IDS.value: (
+        'Enables logging learner study IDs with outgoing events.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.EDIT_ACCOUNTS_OPTIONS_UI.value: (
+        'Enables the edit account options UI.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.ENABLE_PERFORMANCE_METRICS_COLLECTION.value: (
+        'Enables performance metrics collection.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.SPOTLIGHT_UI.value: (
+        'Enables the spotlight UI.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.INTERACTION_CONFIG_CHANGE_STATE_RETENTION.value: (
+        'Enables retaining interaction state across configuration changes.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.APP_AND_OS_DEPRECATION.value: (
+        'Enables app and OS deprecation.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.ENABLE_NPS_SURVEY.value: (
+        'Enables the NPS survey.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.ENABLE_ONBOARDING_FLOW_V2.value: (
+        'Enables the new onboarding flow.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
+    AndroidFeatureFlagNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
+        'Enables multiple classrooms.',
+        android_feature_flag_domain.AndroidFeatureFlagState.LIVE,
+    ),
 }

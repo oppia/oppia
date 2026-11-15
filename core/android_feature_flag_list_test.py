@@ -92,6 +92,30 @@ class AndroidFeatureFlagListTest(test_utils.GenericTestBase):
             'Android feature flags: %s.' % sorted(unknown_features),
         )
 
+    def test_android_feature_names_match_kotlin_feature_flags(self) -> None:
+        expected_feature_names = {
+            'android_enable_downloads_support',
+            'android_enable_extra_topic_tabs_ui',
+            'android_enable_learner_study_analytics',
+            'android_enable_fast_language_switching_in_lesson',
+            'android_enable_logging_learner_study_ids',
+            'android_enable_edit_accounts_options_ui',
+            'android_enable_performance_metrics_collection',
+            'android_enable_spotlight_ui',
+            'android_enable_interaction_config_change_state_retention',
+            'android_enable_app_and_os_deprecation',
+            'android_enable_nps_survey',
+            'android_enable_onboarding_flow_v2',
+            'enable_multiple_classrooms',
+        }
+        actual_feature_names = {
+            feature.value
+            for feature in android_feature_flag_list.AndroidFeatureFlagNames
+        }
+
+        self.assertEqual(len(actual_feature_names), 13)
+        self.assertEqual(actual_feature_names, expected_feature_names)
+
     def test_all_feature_flags_have_descriptions_and_valid_states(self) -> None:
         invalid_feature_names: List[str] = []
         for feature_name, (
