@@ -50,6 +50,7 @@ import {Voiceover} from 'domain/exploration/voiceover.model';
 type PortalTree = (TemplatePortal<object> | PortalTree)[];
 type TemplatePortalName =
   | 'pTagPortal'
+  | 'divTagPortal'
   | 'h1TagPortal'
   | 'spanTagPortal'
   | 'olTagPortal'
@@ -79,6 +80,7 @@ type TemplatePortalName =
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
   @ViewChild('p') pTagPortal!: TemplateRef<object>;
+  @ViewChild('div') divTagPortal!: TemplateRef<object>;
   @ViewChild('h1') h1TagPortal!: TemplateRef<object>;
   @ViewChild('span') spanTagPortal!: TemplateRef<object>;
   @ViewChild('ol') olTagPortal!: TemplateRef<object>;
@@ -253,7 +255,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       });
 
       if (node.nodeName === 'DIV') {
-        let wrapper = document.createElement('div');
+        const wrapper = node.cloneNode() as HTMLElement;
         updatedChildNodes.forEach(child => {
           wrapper.appendChild(child);
         });
@@ -746,6 +748,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   ): TemplatePortal<object> | undefined {
     const templatePortals: Record<TemplatePortalName, TemplateRef<object>> = {
       pTagPortal: this.pTagPortal,
+      divTagPortal: this.divTagPortal,
       h1TagPortal: this.h1TagPortal,
       spanTagPortal: this.spanTagPortal,
       olTagPortal: this.olTagPortal,
