@@ -17,21 +17,12 @@
  */
 
 import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
-import {
-  trigger,
-  state,
-  style,
-  transition,
-  animate,
-  group,
-} from '@angular/animations';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
-import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {
   LearnerDashboardBackendApiService,
   SubtopicMasterySummaryBackendDict,
@@ -41,8 +32,6 @@ import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learne
 import {AlertsService} from 'services/alerts.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {StorySummary} from 'domain/story/story-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -51,9 +40,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 
 interface LearnerDashboardExplorationsData {
-  completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
-  subscriptionList: ProfileSummary[];
 }
 
 @Component({
@@ -61,77 +48,10 @@ interface LearnerDashboardExplorationsData {
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: ['./learner-dashboard-page.component.css'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
-    trigger('slideInOut', [
-      state(
-        'true',
-        style({
-          'max-height': '500px',
-          opacity: '1',
-          visibility: 'visible',
-        })
-      ),
-      state(
-        'false',
-        style({
-          'max-height': '0px',
-          opacity: '0',
-          visibility: 'hidden',
-        })
-      ),
-      transition('true => false', [
-        group([
-          animate(
-            '500ms ease-in-out',
-            style({
-              opacity: '0',
-            })
-          ),
-          animate(
-            '500ms ease-in-out',
-            style({
-              'max-height': '0px',
-            })
-          ),
-          animate(
-            '500ms ease-in-out',
-            style({
-              visibility: 'hidden',
-            })
-          ),
-        ]),
-      ]),
-      transition('false => true', [
-        group([
-          animate(
-            '500ms ease-in-out',
-            style({
-              visibility: 'visible',
-            })
-          ),
-          animate(
-            '500ms ease-in-out',
-            style({
-              'max-height': '500px',
-            })
-          ),
-          animate(
-            '500ms ease-in-out',
-            style({
-              opacity: '1',
-            })
-          ),
-        ]),
-      ]),
-    ]),
-  ],
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   LEARNER_DASHBOARD_SECTION_I18N_IDS =
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS;
-
-  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS =
-    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS;
 
   username: string = '';
 
@@ -139,9 +59,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
-  completedExplorationsList!: LearnerExplorationSummary[];
-  completedCollectionsList!: CollectionSummary[];
-  completedStoriesList!: StorySummary[];
   learntTopicsList!: LearnerTopicSummary[];
   partiallyLearntTopicsList!: LearnerTopicSummary[];
   incompleteExplorationsList!: LearnerExplorationSummary[];
@@ -149,10 +66,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   topicsToLearn!: LearnerTopicSummary[];
   allTopics!: LearnerTopicSummary[];
   untrackedTopics!: Record<string, LearnerTopicSummary[]>;
-  subscriptionsList!: ProfileSummary[];
 
-  completedToIncompleteCollections!: string[];
-  learntToPartiallyLearntTopics!: string[];
   activeSection!: string;
 
   profilePicturePngDataUrl!: string;
@@ -169,7 +83,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
-    private focusManagerService: FocusManagerService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
@@ -198,21 +111,12 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   filterExplorationsData(responseData: LearnerDashboardExplorationsData): void {
     this.populateCuratedExplorationIds();
 
-    this.completedExplorationsList = (
-      responseData.completedExplorationsList || []
-    ).filter(
-      (exp: LearnerExplorationSummary) =>
-        !this.curatedExplorationIds.has(exp.id)
-    );
-
     this.incompleteExplorationsList = (
       responseData.incompleteExplorationsList || []
     ).filter(
       (exp: LearnerExplorationSummary) =>
         !this.curatedExplorationIds.has(exp.id)
     );
-
-    this.subscriptionsList = responseData.subscriptionList;
   }
 
   ngOnInit(): void {
@@ -241,14 +145,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync();
     dashboardTopicAndStoriesDataPromise.then(
       responseData => {
-        this.completedStoriesList = responseData.completedStoriesList;
         this.learntTopicsList = responseData.learntTopicsList;
         this.partiallyLearntTopicsList = responseData.partiallyLearntTopicsList;
         this.topicsToLearn = responseData.topicsToLearnList;
         this.untrackedTopics = responseData.untrackedTopics;
         this.allTopics = responseData.allTopicsList;
-        this.learntToPartiallyLearntTopics =
-          responseData.learntToPartiallyLearntTopics;
         this.activeSection =
           LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
         if (this.urlService.getUrlParams().active_tab === 'learner-groups') {
@@ -286,10 +187,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
     dashboardCollectionsDataPromise.then(
       responseData => {
-        this.completedCollectionsList = responseData.completedCollectionsList;
         this.incompleteCollectionsList = responseData.incompleteCollectionsList;
-        this.completedToIncompleteCollections =
-          responseData.completedToIncompleteCollections;
       },
       errorResponseStatus => {
         if (
@@ -330,9 +228,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       .then(() => {
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
-          // So that focus is applied after the loading screen has dissapeared.
           this.communityLessonsDataLoaded = true;
-          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
         }, 0);
       })
       .catch(errorResponse => {
@@ -363,10 +259,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
   setActiveSection(newActiveSectionName: string): void {
     if (
       newActiveSectionName ===
@@ -385,65 +277,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       return;
     }
     this.activeSection = newActiveSectionName;
-    if (
-      this.activeSection ===
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
-        .COMMUNITY_LESSONS
-    ) {
-      this.loaderService.showLoadingScreen('Loading');
-      let dashboardCollectionsDataPromise =
-        this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
-      dashboardCollectionsDataPromise.then(
-        responseData => {
-          this.completedCollectionsList = responseData.completedCollectionsList;
-          this.incompleteCollectionsList =
-            responseData.incompleteCollectionsList;
-          this.completedToIncompleteCollections =
-            responseData.completedToIncompleteCollections;
-        },
-        errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-          ) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard collections data'
-            );
-          }
-        }
-      );
-
-      let dashboardExplorationsDataPromise =
-        this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-      dashboardExplorationsDataPromise.then(
-        responseData => {
-          this.filterExplorationsData(responseData);
-        },
-        errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-          ) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard explorations data'
-            );
-          }
-        }
-      );
-      Promise.all([
-        dashboardCollectionsDataPromise,
-        dashboardExplorationsDataPromise,
-      ])
-        .then(() => {
-          setTimeout(() => {
-            this.loaderService.hideLoadingScreen();
-            this.communityLessonsDataLoaded = true;
-            // So that focus is applied after the loading screen has dissapeared.
-            this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-          }, 0);
-        })
-        .catch(errorResponse => {
-          // This is placed here in order to satisfy Unit tests.
-        });
-    }
   }
 
   isCertificateAssessmentEnabled(): boolean {

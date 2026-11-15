@@ -53,11 +53,6 @@ test.describe('Logged-In Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Enable redesigned learner dashboard.
-
-    // Reload page to get latest changes.
-    await loggedInLearner.reloadPage();
-
     // Create explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
@@ -105,7 +100,7 @@ test.describe('Logged-In Learner', function () {
   test('should be able add a goal', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
-    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
+    await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
       false
     );
     await loggedInLearner.navigateToProgressSection();

@@ -40,8 +40,6 @@ test.describe('Logged In Learner', function () {
   test.beforeAll(async function ({browser}) {
     test.setTimeout(600000);
     loggedInUser = await UserFactory.createUserForSignup(browser);
-    // Create release coordinator to enable redesigned learner dashboard.
-
     // Create curriculum admin to create topic, story, and chapter.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',

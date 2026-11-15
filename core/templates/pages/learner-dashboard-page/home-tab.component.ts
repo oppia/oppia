@@ -17,21 +17,10 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewEncapsulation,
-} from '@angular/core';
+import {Component, Input, ViewEncapsulation} from '@angular/core';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
-import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {Subscription} from 'rxjs';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
 
@@ -42,7 +31,6 @@ import {LoaderService} from 'services/loader.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class HomeTabComponent {
-  @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -52,24 +40,11 @@ export class HomeTabComponent {
   @Input() goalTopics!: LearnerTopicSummary[];
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
-  @Input() username!: string;
-  @Input() totalLessonsInPlaylists!: (
-    | LearnerExplorationSummary
-    | CollectionSummary
-  )[];
   currentGoalsLength!: number;
-  classroomUrlFragment!: string;
   goalTopicsLength!: number;
-  width!: number;
-  CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
-  widthConst: number = 233;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
-  windowIsNarrow: boolean = false;
-  directiveSubscriptions = new Subscription();
   currentGoalIds: Set<string> = new Set();
   storySummariesWithAvailableNodes: Set<string> = new Set();
-  communityLibraryUrl =
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
   hasMultipleUnfinishedPublished: boolean = false;
   totalLessonCards: number = 0;
   loadedLessonCards: number = 0;
@@ -78,9 +53,6 @@ export class HomeTabComponent {
 
   constructor(
     private loaderService: LoaderService,
-    private windowDimensionService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService,
     private platformFeatureService: PlatformFeatureService
   ) {}
 
@@ -91,7 +63,6 @@ export class HomeTabComponent {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.width = this.widthConst * this.currentGoals.length;
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
@@ -155,13 +126,6 @@ export class HomeTabComponent {
       this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
     }
 
-    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.directiveSubscriptions.add(
-      this.windowDimensionService.getResizeEvent().subscribe(() => {
-        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      })
-    );
-
     if (this.totalLessonCards === 0) {
       this.allCardsLoaded = true;
       this.loadingMessage = '';
@@ -186,29 +150,8 @@ export class HomeTabComponent {
     }
   }
 
-  getTimeOfDay(): string {
-    let time = new Date().getHours();
-
-    if (time <= 12) {
-      return 'I18N_LEARNER_DASHBOARD_MORNING_GREETING';
-    } else if (time <= 18) {
-      return 'I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING';
-    }
-    return 'I18N_LEARNER_DASHBOARD_EVENING_GREETING';
-  }
-
   isNonemptyObject(object: Object): boolean {
     return Object.keys(object).length !== 0;
-  }
-
-  getClassroomLink(classroomUrlFragment: string): string {
-    this.classroomUrlFragment = classroomUrlFragment;
-    return this.urlInterpolationService.interpolateUrl(
-      this.CLASSROOM_LINK_URL_TEMPLATE,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-      }
-    );
   }
 
   isGoalLimitReached(): boolean {
@@ -218,49 +161,6 @@ export class HomeTabComponent {
       return true;
     }
     return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
-  }
-
-  getWidth(length: number): number {
-    /**
-     * If there are 3 or more topics for each untrackedTopic, the total
-     * width of the section will be 662px in mobile view to enable scrolling.
-     */
-    if (length >= 3) {
-      return 662;
-    }
-    /**
-     * If there less than 3 topics for each untrackedTopic, the total
-     * width of the section will be calculated by multiplying the addition of
-     * number of topics and one classroom card with 164px in mobile view to
-     * enable scrolling.
-     */
-    return (length + 1) * 164;
-  }
-
-  changeActiveSection(): void {
-    this.setActiveSection.emit(
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
-    );
-  }
-
-  registerClassroomInProgressLessonEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this.siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent(
-      classroomName,
-      topicName
-    );
-  }
-
-  registerNewClassroomLessonEvent(
-    classroomName: string,
-    topicName: string
-  ): void {
-    this.siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent(
-      classroomName,
-      topicName
-    );
   }
 
   getTotalInProgressLessons(): number {

@@ -208,12 +208,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
-        (
-            'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
         (
             'This flag is to show new contributor admin dashboard.',

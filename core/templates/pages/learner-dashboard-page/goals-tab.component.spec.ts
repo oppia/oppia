@@ -18,12 +18,7 @@
 
 // @ts-nocheck
 
-import {
-  waitForAsync,
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -32,9 +27,8 @@ import {LearnerDashboardIdsBackendApiService} from 'domain/learner_dashboard/lea
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {GoalsTabComponent} from './goals-tab.component';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   MatDialog,
   MatDialogConfig,
@@ -49,8 +43,6 @@ describe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
-  let windowDimensionsService: WindowDimensionsService;
-  let mockResizeEmitter: EventEmitter<void>;
   let matDialogSpy: jasmine.SpyObj<MatDialog>;
   let matDialogRefSpy: jasmine.SpyObj<MatDialogRef<AddGoalsModalComponent>>;
   let allTopics: {[key: string]: string} = {
@@ -61,7 +53,6 @@ describe('Goals tab Component', () => {
   let sampleTopic: LearnerTopicSummary;
 
   beforeEach(waitForAsync(() => {
-    mockResizeEmitter = new EventEmitter();
     matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', [
       'close',
@@ -82,13 +73,6 @@ describe('Goals tab Component', () => {
       providers: [
         LearnerDashboardActivityBackendApiService,
         LearnerDashboardIdsBackendApiService,
-        {
-          provide: WindowDimensionsService,
-          useValue: {
-            isWindowNarrow: () => true,
-            getResizeEvent: () => mockResizeEmitter,
-          },
-        },
         {provide: MatDialog, useValue: matDialogSpy},
         {provide: MatDialogRef, useValue: matDialogRefSpy},
         {
@@ -110,7 +94,6 @@ describe('Goals tab Component', () => {
     learnerDashboardActivityBackendApiService = TestBed.inject(
       LearnerDashboardActivityBackendApiService
     );
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -276,35 +259,11 @@ describe('Goals tab Component', () => {
         learnerTopicSummaryBackendDict3
       ),
     ];
-    component.partiallyLearntTopicsList = [
-      LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict1
-      ),
-    ];
-    component.untrackedTopics = {};
-    component.learntToPartiallyLearntTopics = [];
 
     sampleTopic = LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1
     );
     fixture.detectChanges();
-  });
-
-  it('should intialize the component and set values', fakeAsync(() => {
-    component.ngOnInit();
-    fixture.detectChanges();
-
-    expect(component.MAX_CURRENT_GOALS_LENGTH).toEqual(5);
-    expect(component.windowIsNarrow).toBeTrue();
-  }));
-
-  it('should check whether window is narrow on resizing the screen', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.windowIsNarrow).toBeTrue();
-
-    mockResizeEmitter.emit();
-
-    expect(component.windowIsNarrow).toBeFalse();
   });
 
   it('should open add-goals-modal when add goal button is clicked', () => {
@@ -400,6 +359,31 @@ describe('Goals tab Component', () => {
     expect(component.checkedTopics).toEqual(new Set(['sample_topic_2']));
   });
 
+  it('should not change goals if add-goals-modal is dismissed', async () => {
+    component.checkedTopics = new Set(['sample_topic_id', 'sample_topic_2']);
+    const initialGoals = [...component.currentGoals];
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
+    matDialogRefSpy.afterClosed.and.returnValue(of(undefined));
+    const addToLearnerGoalsSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'addToLearnerGoals'
+    );
+    const removeActivityModalAsyncSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'removeActivityModalAsync'
+    );
+
+    component.openModal();
+    await fixture.whenStable();
+
+    expect(addToLearnerGoalsSpy).not.toHaveBeenCalled();
+    expect(removeActivityModalAsyncSpy).not.toHaveBeenCalled();
+    expect(component.currentGoals).toEqual(initialGoals);
+    expect(component.checkedTopics).toEqual(
+      new Set(['sample_topic_id', 'sample_topic_2'])
+    );
+  });
+
   it('should remove goal based on topicId and topicName', async () => {
     component.checkedTopics = new Set(['sample_topic_id', 'sample_topic_2']);
     const removeActivityModalAsyncSpy = spyOn(
@@ -414,5 +398,22 @@ describe('Goals tab Component', () => {
     expect(removeActivityModalAsyncSpy).toHaveBeenCalled();
     expect(component.checkedTopics).toEqual(new Set(['sample_topic_id']));
     expect(component.currentGoals).toEqual([sampleTopic]);
+  });
+
+  it('should not remove any goal if topicId is not in current goals', async () => {
+    component.checkedTopics = new Set(['sample_topic_id', 'sample_topic_2']);
+    const initialGoals = [...component.currentGoals];
+    const removeActivityModalAsyncSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'removeActivityModalAsync'
+    ).and.returnValue(Promise.resolve(true));
+
+    await component.removeGoal('unknown_topic_id', 'Unknown Topic');
+
+    expect(removeActivityModalAsyncSpy).toHaveBeenCalled();
+    expect(component.currentGoals).toEqual(initialGoals);
+    expect(component.checkedTopics).toEqual(
+      new Set(['sample_topic_id', 'sample_topic_2'])
+    );
   });
 });

@@ -21,8 +21,6 @@ import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
-import {Subscription} from 'rxjs';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 
@@ -34,7 +32,6 @@ import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.componen
 })
 export class GoalsTabComponent implements OnInit {
   constructor(
-    private windowDimensionService: WindowDimensionsService,
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private dialog: MatDialog
   ) {}
@@ -45,23 +42,10 @@ export class GoalsTabComponent implements OnInit {
   @Input() currentGoals!: LearnerTopicSummary[];
   @Input() editGoals!: LearnerTopicSummary[];
   @Input() completedGoals!: LearnerTopicSummary[];
-  @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
-  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
-  @Input() learntToPartiallyLearntTopics!: string[];
-  MAX_CURRENT_GOALS_LENGTH!: number;
   checkedTopics: Set<string> = new Set();
   completedTopics: Set<string> = new Set();
-  topicToIndexMapping = {
-    CURRENT: 0,
-    COMPLETED: 1,
-    NEITHER: 2,
-  };
-
-  windowIsNarrow: boolean = false;
-  directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     let topic: LearnerTopicSummary;
 
     for (topic of this.currentGoals) {
@@ -70,12 +54,6 @@ export class GoalsTabComponent implements OnInit {
     for (topic of this.completedGoals) {
       this.completedTopics.add(topic.id);
     }
-    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.directiveSubscriptions.add(
-      this.windowDimensionService.getResizeEvent().subscribe(() => {
-        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      })
-    );
   }
 
   // TODO(#18384): Change how current goals is being modified with event emitter, currently directly modfiying parent input (original implementation).

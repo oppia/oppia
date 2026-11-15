@@ -53,11 +53,6 @@ test.describe('Logged-In Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Enable redesigned learner dashboard.
-
-    // Reload the page to ensure redesigned learner dashboard is shown.
-    await loggedInLearner.reloadPage();
-
     // Create explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
