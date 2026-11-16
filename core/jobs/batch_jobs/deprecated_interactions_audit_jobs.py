@@ -25,7 +25,6 @@ from core.platform import models
 
 import apache_beam as beam
 from typing import (
-    Any,
     Dict,
     Final,
     Iterable,
@@ -61,6 +60,20 @@ class ExpDetailsDict(TypedDict):
     exp_id: str
     title: str
     interactions: List[str]
+
+
+class GroupedExpAndRightsDict(TypedDict):
+    """Dictionary representing joined exploration details and rights."""
+
+    exp_details: List[ExpDetailsDict]
+    rights: List[exp_models.ExplorationRightsModel]
+
+
+class GroupedUserDataDict(TypedDict):
+    """Dictionary representing joined user data and exploration details."""
+
+    exp_details_list: List[List[ExpDetailsDict]]
+    user_settings: List[user_models.UserSettingsModel]
 
 
 class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
@@ -164,7 +177,9 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
     def _extract_exp_details(
         model: exp_models.ExplorationModel,
     ) -> Tuple[str, ExpDetailsDict]:
-        """Extracts the exploration ID and summary of deprecated interactions."""
+        """Extracts the exploration ID and summary of deprecated
+        interactions.
+        """
         deprecated_interactions: Set[str] = set()
         for state in model.states.values():
             if isinstance(state, dict):
@@ -187,7 +202,7 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
     @staticmethod
     def _map_exp_to_users(
         unused_exp_id: str,
-        grouped_exp_and_rights: Dict[str, List[Any]],
+        grouped_exp_and_rights: GroupedExpAndRightsDict,
     ) -> Iterable[Tuple[Optional[str], ExpDetailsDict]]:
         """Maps an affected exploration to its owner and editor user IDs.
         If no owner or editor exists, yields (None, exp_details).
@@ -210,7 +225,7 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
     @staticmethod
     def _format_user_audit_result(
         user_id: str,
-        grouped_user_data: Dict[str, List[Any]],
+        grouped_user_data: GroupedUserDataDict,
     ) -> job_run_result.JobRunResult:
         """Formats the audit output for a user and their affected
         explorations.

@@ -25,7 +25,7 @@ from core.jobs.batch_jobs import deprecated_interactions_audit_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Any, Dict, Final, List, Type
+from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -51,7 +51,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
         self,
         exp_id: str,
         title: str,
-        states: Dict[str, Any],
+        states: Dict[str, state_domain.StateDict],
     ) -> exp_models.ExplorationModel:
         """Helper method to create an ExplorationModel."""
         return self.create_model(
@@ -313,7 +313,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult.as_stdout(
                     f'Unowned Exploration: ID: {self.EXP_1_ID}, '
-                    "Title: 'Title 1', Interactions: ['MusicNotesInput']"
+                    'Title: \'Title 1\', Interactions: [\'MusicNotesInput\']'
                 )
             ]
         )
@@ -352,7 +352,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
                     f'User: user1, Email: user1@example.com, '
                     f'User ID: {self.USER_1_ID}, Affected Explorations: '
                     f"[('{self.EXP_1_ID}', 'Multi Interaction Exp', "
-                    "['CodeRepl', 'PencilCodeEditor'])]"
+                    '[\'CodeRepl\', \'PencilCodeEditor\'])]'
                 )
             ]
         )
