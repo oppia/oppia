@@ -688,14 +688,33 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                     webapp2.Request, 'get', error=ValueError('uh-oh')
                 )
             )
-            self.get_custom_response(
-                '/community-library',
-                expected_content_type='text/plain',
-                params=None,
-                expected_status_int=500,
+            response = self.testapp.get(
+                '/community-library', expect_errors=True
             )
 
-        self.assertRegex(logs[0], 'uh-oh: request GET /')
+        self.assertEqual(response.status_int, 400)
+        self.assertRegex(logs[0], 'uh-oh: request GET /community-library')
+
+    def test_multipart_request_with_invalid_body_returns_400(self) -> None:
+        # A multipart request with an empty boundary and a byte that is not
+        # UTF-8 (0xac) in its body. Formatting the whole request for the log
+        # used to fail with a UnicodeDecodeError and return a 500.
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL,
+                params=b'x' * 1281 + b'\xac',
+                headers={'Content-Type': 'multipart/form-data; boundary='},
+                expect_errors=True,
+            )
+
+        self.assertEqual(response.status_int, 400)
+        self.assertEqual(
+            logs,
+            [
+                "Invalid boundary in multipart form: b'': request POST %s"
+                % feconf.SIGNUP_DATA_URL
+            ],
+        )
 
 
 class MissingHandlerArgsTests(test_utils.GenericTestBase):
