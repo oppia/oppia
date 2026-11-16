@@ -77,6 +77,35 @@ export class DiagnosticTestPlayerEngineService {
     this._initialCopyOfTopicTrackerModel = cloneDeep(
       diagnosticTestTopicTrackerModel
     );
+    this._testNextTopic(
+      question => {
+        successCallback(this.createCard(question), this._focusLabel);
+      },
+      () => {
+        // No topic had any questions to show, so the test is finished
+        // without a single question.
+        this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit(
+          this.getRecommendedTopicIds()
+        );
+      }
+    );
+  }
+
+  /**
+   * Selects the next topic to test and fetches its questions. A topic can
+   * come back with no questions at all: its diagnostic test skills may be
+   * shared with a topic that was already tested, so all their questions are
+   * excluded as already shown. Such a topic is skipped (neither passed nor
+   * failed) and the next pending topic is tried.
+   *
+   * @param onQuestion - Called with the first question of the topic that is
+   *     now being tested.
+   * @param onTestFinished - Called if no pending topic is left to test.
+   */
+  private _testNextTopic(
+    onQuestion: (question: Question) => void,
+    onTestFinished: () => void
+  ): void {
     this._currentTopicId =
       this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest();
 
@@ -86,22 +115,31 @@ export class DiagnosticTestPlayerEngineService {
         this._encounteredQuestionIds
       )
       .then(
-        response => {
-          this._diagnosticTestCurrentTopicStatusModel =
-            new DiagnosticTestCurrentTopicStatusModel(response);
+        skillIdToQuestionsDict => {
+          if (Object.keys(skillIdToQuestionsDict).length === 0) {
+            this._diagnosticTestTopicTrackerModel.recordTopicSkipped(
+              this._currentTopicId
+            );
+            if (this.isDiagnosticTestFinished()) {
+              onTestFinished();
+              return;
+            }
+            this._testNextTopic(onQuestion, onTestFinished);
+            return;
+          }
 
-          // The diagnostic test current topic status model is initialized in the
-          // above step, so there will always be at least one skill ID in the
-          // pending list. Hence accessing the first element from the pending list
-          // in the below line is safe.
+          this._diagnosticTestCurrentTopicStatusModel =
+            new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict);
+          // The response has at least one skill (checked above), so the
+          // pending list of the new model is not empty and accessing its
+          // first element is safe.
           this._currentSkillId =
             this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0];
           this._currentQuestion =
             this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
               this._currentSkillId
             );
-          const stateCard = this.createCard(this._currentQuestion);
-          successCallback(stateCard, this._focusLabel);
+          onQuestion(this._currentQuestion);
         },
         () => {
           this.alertsService.addWarning('Failed to load the questions.');
@@ -132,39 +170,10 @@ export class DiagnosticTestPlayerEngineService {
 
       if (this.isDiagnosticTestFinished()) {
         errorCallback();
+        return;
       }
 
-      this._currentTopicId =
-        this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest();
-
-      this.questionBackendApiService
-        .fetchDiagnosticTestQuestionsAsync(
-          this._currentTopicId,
-          this._encounteredQuestionIds
-        )
-        .then(
-          skillIdToQuestionsModel => {
-            this._diagnosticTestCurrentTopicStatusModel =
-              new DiagnosticTestCurrentTopicStatusModel(
-                skillIdToQuestionsModel
-              );
-            // The diagnostic test current topic status model is initialized in
-            // the above step, so there will always be at least one skill ID in
-            // the pending list. Hence accessing the first element from the
-            // pending list in the below line is safe.
-            this._currentSkillId =
-              this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0];
-
-            this._currentQuestion =
-              this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-                this._currentSkillId
-              );
-            return successCallback(this._currentQuestion);
-          },
-          () => {
-            this.alertsService.addWarning('Failed to load the questions.');
-          }
-        );
+      this._testNextTopic(successCallback, errorCallback);
     } else {
       if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
         // The topic completion is checked in the above step, so there will
