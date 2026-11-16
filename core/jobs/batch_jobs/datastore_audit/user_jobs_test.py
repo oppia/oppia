@@ -18,19 +18,19 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain, exp_services
+from core.domain import exp_domain, exp_services, user_domain_errors
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import user_jobs
+from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import (
     base_validation_errors,
-    job_run_result,
     model_property,
     user_validation_errors,
 )
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final, List, Optional
+from typing import Dict, Final, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -51,9 +51,6 @@ class ExpUserLastPlaythroughModelValidationJobTests(
     LEARNER_EMAIL: Final = 'learner@example.com'
     LEARNER_USERNAME: Final = 'learner'
     RENAMED_STATE_NAME: Final = 'Renamed state'
-    VALIDATED_MODELS_RESULT: Final = job_run_result.JobRunResult.as_stdout(
-        'VALIDATED MODELS SUCCESS: 1'
-    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -87,6 +84,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
         self,
         model_id: Optional[str] = None,
         user_id: Optional[str] = None,
+        exploration_id: str = EXP_ID,
         last_played_exp_version: Optional[int] = 2,
         last_played_state_name: Optional[str] = RENAMED_STATE_NAME,
     ) -> user_models.ExpUserLastPlaythroughModel:
@@ -96,18 +94,19 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             model_id: str|None. The ID of the model. Defaults to the ID built
                 from the user ID and the exploration ID.
             user_id: str|None. The ID of the user. Defaults to the learner.
+            exploration_id: str. The ID of the exploration.
             last_played_exp_version: int|None. The last played version.
             last_played_state_name: str|None. The last played state name.
 
         Returns:
             ExpUserLastPlaythroughModel. The created model.
         """
-        user_id = user_id or self.learner_id
+        user_id = self.learner_id if user_id is None else user_id
         return self.create_model(
             user_models.ExpUserLastPlaythroughModel,
-            id=model_id or '%s.%s' % (user_id, self.EXP_ID),
+            id=model_id or '%s.%s' % (user_id, exploration_id),
             user_id=user_id,
-            exploration_id=self.EXP_ID,
+            exploration_id=exploration_id,
             last_played_exp_version=last_played_exp_version,
             last_played_state_name=last_played_state_name,
         )
@@ -130,25 +129,24 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             exploration_ids=exploration_ids,
         )
 
-    def _get_job_result(
+    def _get_job_output(
         self, *errors: base_validation_errors.BaseValidationError
-    ) -> job_run_result.JobRunResult:
-        """Returns the job result that summarizes errors of a single type.
+    ) -> Dict[str, List[str]]:
+        """Returns the job output for errors of a single type, in the format
+        of BaseValidationJob.
 
         Args:
             *errors: BaseValidationError. The errors, all of the same type.
 
         Returns:
-            JobRunResult. The expected job result.
+            dict(str, list(str)). The error type mapped to its sorted, truncated
+            error messages.
         """
-        return job_run_result.JobRunResult.as_stderr(
-            '%s (%d total):\n%s'
-            % (
-                errors[0].__class__.__name__,
-                len(errors),
-                '\n'.join(sorted(error.stderr for error in errors)),
-            )
-        )
+        return {
+            errors[0].__class__.__name__: sorted(
+                error.stderr for error in errors
+            )[: base_validation_jobs.ERROR_TRUNCATION_LIMIT]
+        }
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -163,7 +161,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             ]
         )
 
-        self.assert_job_output_is([self.VALIDATED_MODELS_RESULT])
+        self.assert_job_output_is([])
 
     def test_valid_model_with_state_renamed_after_it_was_played(self) -> None:
         # The state is still called by its old name in version 1, which is
@@ -180,7 +178,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
             ]
         )
 
-        self.assert_job_output_is([self.VALIDATED_MODELS_RESULT])
+        self.assert_job_output_is([])
 
     def test_invalid_domain_object(self) -> None:
         model = self._create_playthrough_model(last_played_exp_version=0)
@@ -197,8 +195,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
         # domain validation error is reported.
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     base_validation_errors.ModelDomainObjectValidateError(
                         model,
                         'Expected last_played_exp_version to be an integer '
@@ -223,12 +220,139 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     base_validation_errors.ModelDomainObjectValidateError(
                         model,
                         'Expected last_played_exp_version to be an integer '
                         '>= 1, received None',
+                    )
+                ),
+            ]
+        )
+
+    def _assert_missing_state_name_is_reported(
+        self, state_name: Optional[str]
+    ) -> None:
+        """Checks the job output for a model that has a valid version and a
+        missing state name.
+
+        Args:
+            state_name: str|None. The missing state name (None or empty).
+        """
+        model = self._create_playthrough_model(
+            last_played_exp_version=2, last_played_state_name=state_name
+        )
+        self.put_multi(
+            [
+                model,
+                self._create_incomplete_activities_model(
+                    self.learner_id, [self.EXP_ID]
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                self._get_job_output(
+                    base_validation_errors.ModelDomainObjectValidateError(
+                        model,
+                        str(
+                            user_domain_errors.InvalidLastPlayedStateNameError(
+                                state_name
+                            )
+                        ),
+                    )
+                ),
+                self._get_job_output(
+                    user_validation_errors.LastPlayedStateNotInExplorationError(
+                        model
+                    )
+                ),
+            ]
+        )
+
+    def test_model_with_valid_version_and_none_state_name(self) -> None:
+        self._assert_missing_state_name_is_reported(None)
+
+    def test_model_with_valid_version_and_empty_state_name(self) -> None:
+        self._assert_missing_state_name_is_reported('')
+
+    def test_model_with_empty_user_id(self) -> None:
+        # The model requires a user_id, so None cannot be stored, but an
+        # empty string can. The job reports it instead of looking it up.
+        model = self._create_playthrough_model(user_id='')
+        self.put_multi([model])
+
+        self.assert_job_output_is(
+            [
+                self._get_job_output(
+                    base_validation_errors.ModelDomainObjectValidateError(
+                        model,
+                        str(
+                            user_domain_errors.InvalidLastPlaythroughUserIdError(
+                                ''
+                            )
+                        ),
+                    )
+                ),
+                self._get_job_output(
+                    base_validation_errors.ModelRelationshipError(
+                        model_property.ModelProperty(
+                            user_models.ExpUserLastPlaythroughModel,
+                            user_models.ExpUserLastPlaythroughModel.user_id,
+                        ),
+                        model,
+                        'UserSettingsModel',
+                        '',
+                    )
+                ),
+                self._get_job_output(
+                    user_validation_errors.ExplorationNotMarkedIncompleteError(
+                        model
+                    )
+                ),
+            ]
+        )
+
+    def test_model_with_empty_exploration_id(self) -> None:
+        # The model requires an exploration_id, so None cannot be stored, but
+        # an empty string can. The job reports it instead of looking it up.
+        model = self._create_playthrough_model(exploration_id='')
+        self.put_multi(
+            [
+                model,
+                self._create_incomplete_activities_model(
+                    self.learner_id, [self.EXP_ID]
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                self._get_job_output(
+                    base_validation_errors.ModelDomainObjectValidateError(
+                        model,
+                        str(
+                            user_domain_errors.InvalidLastPlaythroughExplorationIdError(
+                                ''
+                            )
+                        ),
+                    )
+                ),
+                self._get_job_output(
+                    base_validation_errors.ModelRelationshipError(
+                        model_property.ModelProperty(
+                            user_models.ExpUserLastPlaythroughModel,
+                            user_models.ExpUserLastPlaythroughModel.exploration_id,
+                        ),
+                        model,
+                        'ExplorationModel',
+                        '',
+                    )
+                ),
+                self._get_job_output(
+                    user_validation_errors.ExplorationNotMarkedIncompleteError(
+                        model
                     )
                 ),
             ]
@@ -249,8 +373,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.InvalidExpUserLastPlaythroughIdError(
                         model
                     )
@@ -272,8 +395,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
                             user_models.ExpUserLastPlaythroughModel,
@@ -301,8 +423,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
                             user_models.ExpUserLastPlaythroughModel,
@@ -331,8 +452,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.LastPlayedExpVersionTooHighError(
                         model, 2
                     )
@@ -359,8 +479,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.LastPlayedExpVersionNotFoundError(
                         model
                     )
@@ -386,8 +505,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.LastPlayedStateNotInExplorationError(
                         model
                     )
@@ -401,8 +519,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
                     )
@@ -423,8 +540,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
                     )
@@ -441,8 +557,7 @@ class ExpUserLastPlaythroughModelValidationJobTests(
 
         self.assert_job_output_is(
             [
-                self.VALIDATED_MODELS_RESULT,
-                self._get_job_result(
+                self._get_job_output(
                     base_validation_errors.ModelRelationshipError(
                         model_property.ModelProperty(
                             user_models.ExpUserLastPlaythroughModel,
@@ -453,12 +568,12 @@ class ExpUserLastPlaythroughModelValidationJobTests(
                         user_id,
                     )
                 ),
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.LastPlayedExpVersionTooHighError(
                         model, 2
                     )
                 ),
-                self._get_job_result(
+                self._get_job_output(
                     user_validation_errors.ExplorationNotMarkedIncompleteError(
                         model
                     )

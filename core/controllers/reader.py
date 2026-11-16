@@ -1409,10 +1409,11 @@ class ExplorationMaybeLeaveHandler(
                 'schema': {
                     'type': 'basestring',
                     'validators': [
+                        {'id': 'is_nonempty'},
                         {
                             'id': 'has_length_at_most',
                             'max_value': constants.MAX_STATE_NAME_LENGTH,
-                        }
+                        },
                     ],
                 }
             },

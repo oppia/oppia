@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation jobs for user models."""
+"""Validation job for ExpUserLastPlaythroughModel."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from core.jobs.types import (
 )
 from core.platform import models
 
-from typing import Callable, Iterator, List, Type
+from typing import Callable, Iterator, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -51,11 +51,6 @@ class ExpUserLastPlaythroughModelValidationJob(
     base_validation_jobs.BaseValidationJob
 ):
     """Validates ExpUserLastPlaythroughModel instances."""
-
-    def get_model_class(
-        self,
-    ) -> Type[user_models.ExpUserLastPlaythroughModel]:
-        return user_models.ExpUserLastPlaythroughModel
 
     def get_validation_fns(
         self,
@@ -87,7 +82,8 @@ class ExpUserLastPlaythroughModelValidationJob(
         Yields:
             ModelDomainObjectValidateError. The domain validation error.
         """
-        assert isinstance(model, user_models.ExpUserLastPlaythroughModel)
+        if not isinstance(model, user_models.ExpUserLastPlaythroughModel):
+            return
         domain_object = user_domain.ExpUserLastPlaythrough(
             model.user_id,
             model.exploration_id,
@@ -116,7 +112,8 @@ class ExpUserLastPlaythroughModelValidationJob(
             InvalidExpUserLastPlaythroughIdError. The error for a mismatched
             ID.
         """
-        assert isinstance(model, user_models.ExpUserLastPlaythroughModel)
+        if not isinstance(model, user_models.ExpUserLastPlaythroughModel):
+            return
         if model.id != '%s.%s' % (model.user_id, model.exploration_id):
             yield user_validation_errors.InvalidExpUserLastPlaythroughIdError(
                 model
@@ -133,11 +130,17 @@ class ExpUserLastPlaythroughModelValidationJob(
         Yields:
             ModelRelationshipError. The error for a missing user.
         """
-        assert isinstance(model, user_models.ExpUserLastPlaythroughModel)
-        with datastore_services.get_ndb_context():
-            user_settings_model = user_models.UserSettingsModel.get(
-                model.user_id, strict=False
-            )
+        if not isinstance(model, user_models.ExpUserLastPlaythroughModel):
+            return
+
+        # An empty ID cannot be looked up in the datastore, so it is
+        # reported as a missing user without a lookup.
+        user_settings_model = None
+        if model.user_id:
+            with datastore_services.get_ndb_context():
+                user_settings_model = user_models.UserSettingsModel.get(
+                    model.user_id, strict=False
+                )
         if user_settings_model is None:
             yield base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
@@ -167,11 +170,17 @@ class ExpUserLastPlaythroughModelValidationJob(
             JobRunResult. The error for a missing exploration, an invalid
             version or an invalid state name.
         """
-        assert isinstance(model, user_models.ExpUserLastPlaythroughModel)
-        with datastore_services.get_ndb_context():
-            exploration_model = exp_models.ExplorationModel.get(
-                model.exploration_id, strict=False
-            )
+        if not isinstance(model, user_models.ExpUserLastPlaythroughModel):
+            return
+
+        # An empty ID cannot be looked up in the datastore, so it is
+        # reported as a missing exploration without a lookup.
+        exploration_model = None
+        if model.exploration_id:
+            with datastore_services.get_ndb_context():
+                exploration_model = exp_models.ExplorationModel.get(
+                    model.exploration_id, strict=False
+                )
         if exploration_model is None:
             yield base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
@@ -230,13 +239,19 @@ class ExpUserLastPlaythroughModelValidationJob(
             ExplorationNotMarkedIncompleteError. The error for an exploration
             that is not marked as incomplete.
         """
-        assert isinstance(model, user_models.ExpUserLastPlaythroughModel)
-        with datastore_services.get_ndb_context():
-            incomplete_activities_model = (
-                user_models.IncompleteActivitiesModel.get(
-                    model.user_id, strict=False
+        if not isinstance(model, user_models.ExpUserLastPlaythroughModel):
+            return
+
+        # An empty user ID cannot be looked up in the datastore, and no
+        # incomplete activities can belong to it.
+        incomplete_activities_model = None
+        if model.user_id:
+            with datastore_services.get_ndb_context():
+                incomplete_activities_model = (
+                    user_models.IncompleteActivitiesModel.get(
+                        model.user_id, strict=False
+                    )
                 )
-            )
         if (
             incomplete_activities_model is None
             or model.exploration_id

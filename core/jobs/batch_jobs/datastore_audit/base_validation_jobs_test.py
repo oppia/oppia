@@ -29,44 +29,13 @@ from typing import Callable, Iterator, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, user_models
+    from mypy_imports import base_models
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.USER]
-)
-
-
-class MissingGetModelClassJob(base_validation_jobs.BaseValidationJob):
-    """Child validation job with missing get_model_class."""
-
-    def get_validation_fns(
-        self,
-    ) -> List[
-        Callable[[base_models.BaseModel], Iterator[job_run_result.JobRunResult]]
-    ]:
-        return []
-
-    def validate_domain_object(
-        self, unused_model: base_models.BaseModel
-    ) -> Iterator[job_run_result.JobRunResult]:
-        """Mock domain validate function."""
-        # The yield from () statement is used to ensure that the function
-        # returns an empty iterator every time it's called.
-        yield from ()
-
-    def get_validate_domain_object_fn(
-        self,
-    ) -> Callable[
-        [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
-    ]:
-        return self.validate_domain_object
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing get_validation_fns."""
-
-    def get_model_class(self) -> Type[base_models.BaseModel]:
-        return base_models.BaseModel
 
     def validate_domain_object(
         self, unused_model: base_models.BaseModel
@@ -96,9 +65,6 @@ class MissingGetValidateDomainObjectFnJob(
     base_validation_jobs.BaseValidationJob
 ):
     """Child validation job with missing get_validate_domain_object_fn."""
-
-    def get_model_class(self) -> Type[base_models.BaseModel]:
-        return base_models.BaseModel
 
     def validate_mock_error(
         self, unused_model: base_models.BaseModel
@@ -134,9 +100,6 @@ class MockDomainObjectValidationError(
 
 class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with a mock validation function."""
-
-    def get_model_class(self) -> Type[base_models.BaseModel]:
-        return base_models.BaseModel
 
     def get_validation_fns(
         self,
@@ -197,17 +160,13 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    'VALIDATED MODELS SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'InconsistentTimestampsError (1 total):\n%s'
-                    % (
+                {
+                    'InconsistentTimestampsError': [
                         base_validation_errors.InconsistentTimestampsError(
                             model
                         ).stderr
-                    )
-                ),
+                    ],
+                }
             ]
         )
 
@@ -220,71 +179,22 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    'VALIDATED MODELS SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'BaseValidationError (1 total):\n%s'
-                    % (
+                {
+                    'BaseValidationError': [
                         base_validation_errors.BaseValidationError(
                             'Mock validation error message', model
                         ).stderr
-                    )
-                ),
+                    ]
+                }
             ]
         )
-
-    def test_run_only_validates_models_of_the_model_class(self) -> None:
-        model = self.create_model(
-            base_models.BaseModel, id='model_with_mock_error'
-        )
-        other_model = self.create_model(
-            user_models.CompletedActivitiesModel,
-            id='other_model_with_mock_error',
-        )
-
-        self.put_multi([model, other_model])
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'VALIDATED MODELS SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'BaseValidationError (1 total):\n%s'
-                    % (
-                        base_validation_errors.BaseValidationError(
-                            'Mock validation error message', model
-                        ).stderr
-                    )
-                ),
-            ]
-        )
-
-    def test_run_does_not_validate_deleted_models(self) -> None:
-        model = self.create_model(
-            base_models.BaseModel, id='model_with_mock_error', deleted=True
-        )
-
-        self.put_multi([model])
-
-        self.assert_job_output_is([])
 
     def test_run_with_valid_model(self) -> None:
         model = self.create_model(base_models.BaseModel, id='valid_model')
 
         self.put_multi([model])
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'VALIDATED MODELS SUCCESS: 1'
-                )
-            ]
-        )
-
-    def test_run_with_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([])
 
     def test_truncation_of_messages(self) -> None:
         model1 = self.create_model(
@@ -302,31 +212,18 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
         with self.swap(base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2):
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult.as_stdout(
-                        'VALIDATED MODELS SUCCESS: 3'
-                    ),
-                    job_run_result.JobRunResult.as_stderr(
-                        'BaseValidationError (3 total):\n%s\n%s'
-                        % (
+                    {
+                        'BaseValidationError': [
                             base_validation_errors.BaseValidationError(
                                 'Mock validation error message', model1
                             ).stderr,
                             base_validation_errors.BaseValidationError(
                                 'Mock validation error message', model2
                             ).stderr,
-                        )
-                    ),
+                        ]
+                    }
                 ]
             )
-
-    def test_get_model_class_not_implemented(self) -> None:
-        self.job = MissingGetModelClassJob(self.pipeline)
-
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Missing implementation for get_model_class in derived class.',
-        ):
-            self.run_job()
 
     def test_get_validation_fns_not_implemented(self) -> None:
         self.job = MissingGetValidationFnsJob(self.pipeline)
