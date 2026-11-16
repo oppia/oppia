@@ -238,19 +238,17 @@ def _is_exploration_hidden_from_learner(
     if story_id is None:
         return False
     story = story_fetchers.get_story_by_id(story_id, strict=False)
-    if story is None:
+    story_nodes = story.story_contents.nodes if story is not None else []
+    unavailable_nodes = [
+        node
+        for node in story_nodes
+        if node.exploration_id == exploration_id
+        and not story_services.is_story_node_accessible_to_learner(
+            node, user_id
+        )
+    ]
+    if not unavailable_nodes:
         return False
-    node = None
-    for story_node in story.story_contents.nodes:
-        if story_node.exploration_id == exploration_id:
-            node = story_node
-            break
-    if node is None:
-        return False
-    if story_services.is_story_node_accessible_to_learner(node, user_id):
-        return False
-    # Curriculum admins, topic managers and people who can edit the exploration
-    # still need to be able to play it, e.g. to test the chapter before launch.
     return not (
         role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user.actions
         or rights_manager.check_can_edit_activity(user, exploration_rights)

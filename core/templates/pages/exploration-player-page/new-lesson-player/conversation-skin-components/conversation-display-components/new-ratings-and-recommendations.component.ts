@@ -188,9 +188,9 @@ export class NewRatingsAndRecommendationsComponent
 
   isChapterDisplayedAsComingSoon(node: ReadOnlyStoryNode): boolean {
     return (
+      node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH &&
       this.platformFeatureService.status.SerialChapterLaunchLearnerView
-        .isEnabled &&
-      node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        .isEnabled
     );
   }
 
