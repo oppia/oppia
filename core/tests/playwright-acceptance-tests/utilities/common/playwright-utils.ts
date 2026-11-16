@@ -974,7 +974,10 @@ export class BaseUser {
     useSelector: boolean = false,
     timeout: number = 60000,
     waitUntil:
-      'load' | 'domcontentloaded' | 'networkidle' | 'commit' = 'networkidle'
+      | 'load'
+      | 'domcontentloaded'
+      | 'networkidle'
+      | 'commit' = 'networkidle'
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation({
       waitUntil,
