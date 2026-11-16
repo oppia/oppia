@@ -18,6 +18,7 @@
 
 import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
+import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 
@@ -42,21 +43,6 @@ const languageAccentDropdownSelector =
 
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
-const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
-const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
-const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
-const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
-const settingsContainerSelector =
-  '.oppia-editor-card.oppia-settings-card-container';
-const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
-const navigationDropdownInMobileVisibleSelector =
-  '.oppia-exploration-editor-tabs-dropdown.show';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -64,70 +50,8 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarDropdown);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
-        await this.expectElementToBeVisible(mobileOptionsButtonSelector, true);
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      await this.expectElementToBeVisible(mobileNavbarDropdown, true);
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.clickOnElementWithSelector(mobileSettingsBarSelector);
-
-      // Close dropdown if it doesn't automatically close.
-      const isVisible = await this.isElementVisible(
-        navigationDropdownInMobileVisibleSelector
-      );
-      if (isVisible) {
-        // We are using page.click as this button might be overlapped by the
-        // dropdown. Thus, it will fail with onClick.
-        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
-        await this.page.click(mobileNavbarDropdown);
-        try {
-          await this.expectElementToBeVisible(
-            navigationDropdownInMobileVisibleSelector,
-            false,
-            this.page,
-            10000
-          );
-        } catch (error) {
-          await this.page.click(mobileNavbarDropdown);
-          await this.expectElementToBeVisible(
-            navigationDropdownInMobileVisibleSelector,
-            false
-          );
-        }
-        // Ensure layout fully stabilized.
-        await this.waitForPageToFullyLoad();
-      }
-
-      // Open all available dropdowns because they are closed by default.
-      const dropdowns = [
-        basicSettingsDropdown,
-        advanceSettingsDropdown,
-        rolesSettingsDropdown,
-        voiceArtistSettingsDropdown,
-        permissionSettingsDropdown,
-        feedbackSettingsDropdown,
-      ];
-
-      for (const dropdown of dropdowns) {
-        const element = this.page.locator(dropdown);
-        // Some sections may not be available to certain roles.
-        if (await element.isVisible().catch(() => false)) {
-          await this.clickOnElementWithSelector(dropdown);
-        }
-      }
-    } else {
-      await this.expectElementToBeVisible(settingsTabSelector, true);
-      await this.clickOnElementWithSelector(settingsTabSelector);
-    }
-
-    await this.expectElementToBeVisible(settingsContainerSelector, true);
-    showMessage('Settings tab is opened successfully.');
+    const explorationEditorUtils = new ExplorationEditorUtils(this);
+    await explorationEditorUtils.navigateToSettingsTab();
   }
 
   /**
@@ -201,7 +125,6 @@ export class VoiceoverAdmin extends BaseUser {
    * as an invalid username, where the caller asserts the resulting error.
    * @param voiceArtist - The username to submit.
    */
-
   async submitVoiceoverArtistUsername(voiceArtist: string): Promise<void> {
     if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
       await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
