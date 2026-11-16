@@ -88,8 +88,9 @@
 .oppia-learner-dash-goals-add-text {
   color: #00645c;
 }
-.oppia-learner-dash-button--add-goals:hover
-  .oppia-learner-dash-goals-add-circle {
+/* Kept on one line: stylelint rejects the wrapped form Prettier produces. */
+/* prettier-ignore */
+.oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-circle {
   background-color: #429488;
 }
 .oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-text {
