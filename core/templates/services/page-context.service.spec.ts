@@ -56,6 +56,46 @@ describe('PageContext service', () => {
   let windowRef: MockWindowRef;
   let blogPostPageService: BlogPostPageService;
 
+  describe('image context for translation suggestions', () => {
+    beforeEach(() => {
+      ecs = TestBed.inject(PageContextService);
+      ecs.removeCustomEntityContext();
+    });
+
+    it(
+      'should set and get the target entity type used for resolving' +
+        ' target-content images',
+      () => {
+        ecs.setImageContextTargetEntityType('skill');
+
+        expect(ecs.getImageContextTargetEntityType()).toBe('skill');
+      }
+    );
+
+    it('should set and get the new image filenames added in the suggestion', () => {
+      ecs.setImageContextNewImageFilenames(['img1.png', 'img2.png']);
+
+      expect(ecs.getImageContextNewImageFilenames()).toEqual([
+        'img1.png',
+        'img2.png',
+      ]);
+    });
+
+    it(
+      'should reset the image context when the custom entity context is' +
+        ' removed',
+      () => {
+        ecs.setImageContextTargetEntityType('skill');
+        ecs.setImageContextNewImageFilenames(['img1.png']);
+
+        ecs.removeCustomEntityContext();
+
+        expect(ecs.getImageContextTargetEntityType()).toBe('exploration');
+        expect(ecs.getImageContextNewImageFilenames()).toEqual([]);
+      }
+    );
+  });
+
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
       ecs = TestBed.inject(PageContextService);
