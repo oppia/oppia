@@ -16,14 +16,20 @@
  * @fileoverview Unit tests for the CheckpointProgressService.
  */
 
-// @ts-nocheck
-
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateModule} from '@ngx-translate/core';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {Exploration} from 'domain/exploration/exploration.model';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
+import {StateObjectsDict, States} from 'domain/exploration/states.model';
+import {State} from 'domain/state/state.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 describe('CheckpointProgressService', () => {
   let checkpointProgressService: CheckpointProgressService;
@@ -43,16 +49,55 @@ describe('CheckpointProgressService', () => {
     explorationEngineService = TestBed.inject(ExplorationEngineService);
   });
 
+  // Returns a state with the given name and checkpoint flag.
+  const createState = (
+    name: string | null,
+    cardIsCheckpoint: boolean
+  ): State => {
+    const state = State.createDefaultState(name, 'content', 'default_outcome');
+    state.cardIsCheckpoint = cardIsCheckpoint;
+    return state;
+  };
+
+  // Returns a card for the state with the given name.
+  const createCard = (stateName: string): StateCard =>
+    StateCard.createNewCard(
+      stateName,
+      '',
+      '',
+      createState(stateName, false).interaction,
+      'content'
+    );
+
+  // Returns an exploration that contains the given states.
+  const createExploration = (states: State[]): Exploration => {
+    const stateObjects: StateObjectsDict = {};
+    for (const state of states) {
+      stateObjects[state.name ?? 'state_without_name'] = state;
+    }
+    return new Exploration(
+      'Introduction',
+      ParamChanges.createFromBackendList([]),
+      ParamSpecs.createFromBackendDict({}),
+      new States(stateObjects),
+      'Exploration',
+      0,
+      'en',
+      TestBed.inject(LoggerService),
+      TestBed.inject(UrlInterpolationService)
+    );
+  };
+
   it('should be created', () => {
     expect(checkpointProgressService).toBeTruthy();
   });
 
   it('should get most recently reached checkpoint index correctly', () => {
     const mockCards = [
-      {getStateName: () => 'Introduction'},
-      {getStateName: () => 'Checkpoint1'},
-      {getStateName: () => 'MiddleState'},
-      {getStateName: () => 'Checkpoint2'},
+      createCard('Introduction'),
+      createCard('Checkpoint1'),
+      createCard('MiddleState'),
+      createCard('Checkpoint2'),
     ];
 
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(4);
@@ -62,7 +107,7 @@ describe('CheckpointProgressService', () => {
     spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
       (stateName: string) => {
         const checkpointStates = ['Checkpoint1', 'Checkpoint2'];
-        return {cardIsCheckpoint: checkpointStates.includes(stateName)};
+        return createState(stateName, checkpointStates.includes(stateName));
       }
     );
 
@@ -79,17 +124,15 @@ describe('CheckpointProgressService', () => {
 
   it('should return correct checkpoint count when checkpoints exist', () => {
     const mockStates = [
-      {name: 'Introduction', cardIsCheckpoint: false},
-      {name: 'Checkpoint1', cardIsCheckpoint: true},
-      {name: 'MiddleState', cardIsCheckpoint: false},
-      {name: 'Checkpoint2', cardIsCheckpoint: true},
+      createState('Introduction', false),
+      createState('Checkpoint1', true),
+      createState('MiddleState', false),
+      createState('Checkpoint2', true),
     ];
 
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const count = checkpointProgressService.fetchCheckpointCount();
     expect(count).toBe(2);
@@ -97,15 +140,13 @@ describe('CheckpointProgressService', () => {
 
   it('should return zero when no checkpoints exist', () => {
     const mockStates = [
-      {name: 'Introduction', cardIsCheckpoint: false},
-      {name: 'MiddleState', cardIsCheckpoint: false},
+      createState('Introduction', false),
+      createState('MiddleState', false),
     ];
 
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const count = checkpointProgressService.fetchCheckpointCount();
     expect(count).toBe(0);
@@ -113,16 +154,14 @@ describe('CheckpointProgressService', () => {
 
   it('should count all states with cardIsCheckpoint true', () => {
     const mockStates = [
-      {name: 'Checkpoint1', cardIsCheckpoint: true},
-      {name: 'Checkpoint2', cardIsCheckpoint: true},
-      {name: 'Checkpoint3', cardIsCheckpoint: true},
+      createState('Checkpoint1', true),
+      createState('Checkpoint2', true),
+      createState('Checkpoint3', true),
     ];
 
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const count = checkpointProgressService.fetchCheckpointCount();
     expect(count).toBe(3);
@@ -136,20 +175,18 @@ describe('CheckpointProgressService', () => {
       Checkpoint2: 3,
     };
     const mockStates = [
-      {name: 'Introduction', cardIsCheckpoint: false},
-      {name: 'Checkpoint1', cardIsCheckpoint: true},
-      {name: 'MiddleState', cardIsCheckpoint: false},
-      {name: 'Checkpoint2', cardIsCheckpoint: true},
+      createState('Introduction', false),
+      createState('Checkpoint1', true),
+      createState('MiddleState', false),
+      createState('Checkpoint2', true),
     ];
 
     spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
       mockDepthGraph
     );
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const checkpointIndexes = checkpointProgressService.getCheckpointStates();
 
@@ -165,18 +202,16 @@ describe('CheckpointProgressService', () => {
       MiddleState: 1,
     };
     const mockStates = [
-      {name: 'Introduction', cardIsCheckpoint: false},
-      {name: 'MiddleState', cardIsCheckpoint: false},
+      createState('Introduction', false),
+      createState('MiddleState', false),
     ];
 
     spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
       mockDepthGraph
     );
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const checkpointIndexes = checkpointProgressService.getCheckpointStates();
 
@@ -189,19 +224,17 @@ describe('CheckpointProgressService', () => {
       Checkpoint2: 3,
     };
     const mockStates = [
-      {name: null, cardIsCheckpoint: true},
-      {name: 'Checkpoint1', cardIsCheckpoint: true},
-      {name: 'Checkpoint2', cardIsCheckpoint: true},
+      createState(null, true),
+      createState('Checkpoint1', true),
+      createState('Checkpoint2', true),
     ];
 
     spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
       mockDepthGraph
     );
-    spyOn(explorationEngineService, 'getExploration').and.returnValue({
-      states: {
-        getStates: () => mockStates,
-      },
-    });
+    spyOn(explorationEngineService, 'getExploration').and.returnValue(
+      createExploration(mockStates)
+    );
 
     const checkpointIndexes = checkpointProgressService.getCheckpointStates();
 
@@ -209,18 +242,15 @@ describe('CheckpointProgressService', () => {
   });
 
   it('should get most recently reached checkpoint index with no checkpoints', () => {
-    const mockCards = [
-      {getStateName: () => 'Introduction'},
-      {getStateName: () => 'MiddleState'},
-    ];
+    const mockCards = [createCard('Introduction'), createCard('MiddleState')];
 
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(2);
     spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {
       return mockCards[index];
     });
-    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue({
-      cardIsCheckpoint: false,
-    });
+    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+      createState('Introduction', false)
+    );
 
     const checkpointIndex =
       checkpointProgressService.getMostRecentlyReachedCheckpointIndex();

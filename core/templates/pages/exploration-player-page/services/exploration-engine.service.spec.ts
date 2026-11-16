@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the exploration engine service.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
@@ -42,8 +40,10 @@ import {
 import {StateCard} from 'domain/state_card/state-card.model';
 import {State} from 'domain/state/state.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {UrlService} from 'services/contextual/url.service';
 import {
   AnswerClassificationService,
@@ -58,8 +58,12 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
-import {ComputeGraphService} from 'services/compute-graph.service';
-import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {ComputeGraphService, GraphData} from 'services/compute-graph.service';
+import {
+  NodeData,
+  NodeDataDict,
+  StateGraphLayoutService,
+} from 'components/graph-services/graph-layout.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -83,12 +87,14 @@ describe('Exploration engine service ', () => {
   let explorationEngineService: ExplorationEngineService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
+  let loggerService: LoggerService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let computeGraphService: ComputeGraphService;
   let stateGraphLayoutService: StateGraphLayoutService;
   let statsReportingService: StatsReportingService;
+  let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let textInputService: jasmine.SpyObj<InteractionRulesService>;
   let translateService: TranslateService;
@@ -409,11 +415,13 @@ describe('Exploration engine service ', () => {
     );
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
+    loggerService = TestBed.inject(LoggerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
     statsReportingService = TestBed.inject(StatsReportingService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     textInputService = jasmine.createSpyObj('InteractionRulesService', ['']);
@@ -428,18 +436,14 @@ describe('Exploration engine service ', () => {
       'explorationId'
     );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(2);
-    spyOn(contentTranslationLanguageService, 'init').and.returnValue(null);
-    spyOn(imagePreloaderService, 'init').and.returnValue(null);
-    spyOn(imagePreloaderService, 'kickOffImagePreloader').and.returnValue(null);
-    spyOn(audioPreloaderService, 'init').and.returnValue(null);
-    spyOn(audioPreloaderService, 'kickOffAudioPreloader').and.returnValue(null);
-    spyOn(statsReportingService, 'recordExplorationStarted').and.returnValue(
-      null
-    );
-    spyOn(statsReportingService, 'recordAnswerSubmitted').and.returnValue(null);
-    spyOn(statsReportingService, 'recordAnswerSubmitAction').and.returnValue(
-      null
-    );
+    spyOn(contentTranslationLanguageService, 'init');
+    spyOn(imagePreloaderService, 'init');
+    spyOn(imagePreloaderService, 'kickOffImagePreloader');
+    spyOn(audioPreloaderService, 'init');
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader');
+    spyOn(statsReportingService, 'recordExplorationStarted');
+    spyOn(statsReportingService, 'recordAnswerSubmitted');
+    spyOn(statsReportingService, 'recordAnswerSubmitAction');
     spyOn(expressionInterpolationService, 'processHtml').and.callFake(
       (html: string, envs: Record<string, string>[]) => html
     );
@@ -464,10 +468,7 @@ describe('Exploration engine service ', () => {
         contentTranslationLanguageService,
         'getCurrentContentLanguageCode'
       ).and.returnValue('en');
-      spyOn(
-        contentTranslationManagerService,
-        'displayTranslations'
-      ).and.returnValue(null);
+      spyOn(contentTranslationManagerService, 'displayTranslations');
 
       explorationEngineService.init(
         explorationDict,
@@ -572,13 +573,15 @@ describe('Exploration engine service ', () => {
   });
 
   it("should throw an error if initial state name is null when calling 'init'", () => {
-    const mockExploration = {
-      getInitialState: () => ({name: null}),
-    };
-
-    spyOn(Exploration, 'createFromBackendDict').and.returnValue(
-      mockExploration
+    const exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
     );
+    // State names are null for states that have not been saved yet.
+    exploration.getInitialState().name = null;
+
+    spyOn(Exploration, 'createFromBackendDict').and.returnValue(exploration);
 
     expect(() => {
       explorationEngineService.init(
@@ -633,30 +636,65 @@ describe('Exploration engine service ', () => {
   });
 
   describe('extractDepthGraph and getMaxStateDepth', () => {
-    let mockGraphData;
-    let mockComputedNodes;
+    let mockGraphData: GraphData;
+    let mockComputedNodes: NodeDataDict;
+
+    // Only id and depth are read by extractDepthGraph, so the other layout
+    // fields are left at default values.
+    const createNodeData = (id: string, depth: number): NodeData => ({
+      depth: depth,
+      offset: 0,
+      reachable: true,
+      y0: 0,
+      x0: 0,
+      yLabel: 0,
+      xLabel: 0,
+      height: 0,
+      width: 0,
+      id: id,
+      label: id,
+      reachableFromEnd: true,
+      style: '',
+      secondaryLabel: '',
+      nodeClass: '',
+      canDelete: false,
+    });
 
     beforeEach(() => {
       mockGraphData = {
-        nodes: [{id: 'Start'}, {id: 'Mid'}, {id: 'End'}],
+        nodes: {Start: 'Start', Mid: 'Mid', End: 'End'},
         links: [
-          {source: 'Start', target: 'Mid'},
-          {source: 'Mid', target: 'End'},
+          {
+            source: 'Start',
+            target: 'Mid',
+            linkProperty: null,
+            connectsDestIfStuck: false,
+          },
+          {
+            source: 'Mid',
+            target: 'End',
+            linkProperty: null,
+            connectsDestIfStuck: false,
+          },
         ],
         initStateId: 'Start',
         finalStateIds: ['End'],
       };
-      mockComputedNodes = [
-        {id: 'Start', depth: 0},
-        {id: 'Mid', depth: 1},
-        {id: 'End', depth: 2},
-      ];
+      mockComputedNodes = {
+        Start: createNodeData('Start', 0),
+        Mid: createNodeData('Mid', 1),
+        End: createNodeData('End', 2),
+      };
       spyOn(explorationEngineService, 'getInitialStateName').and.returnValue(
         'Start'
       );
-      spyOn(explorationEngineService, 'getExploration').and.returnValue({
-        states: explorationDict.states,
-      });
+      spyOn(explorationEngineService, 'getExploration').and.returnValue(
+        Exploration.createFromBackendDict(
+          explorationDict,
+          loggerService,
+          urlInterpolationService
+        )
+      );
       spyOn(computeGraphService, 'compute').and.returnValue(mockGraphData);
       spyOn(stateGraphLayoutService, 'computeLayout').and.returnValue(
         mockComputedNodes
@@ -847,15 +885,15 @@ describe('Exploration engine service ', () => {
       );
       tick();
 
-      spyOn(explorationEngineService.exploration, 'getState').and.returnValue({
-        interaction: {
-          id: null,
-        },
-        content: {
-          content_id: '123',
-          html: '<p>Missing contentId</p>',
-        },
-      });
+      const stateWithoutInteractionId = State.createDefaultState(
+        'Start',
+        'content',
+        'default_outcome'
+      );
+      stateWithoutInteractionId.interaction.id = null;
+      spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+        stateWithoutInteractionId
+      );
 
       spyOn(alertsService, 'addWarning');
 
@@ -958,19 +996,23 @@ describe('Exploration engine service ', () => {
       );
       tick();
 
-      spyOn(explorationEngineService.exploration, 'getState').and.returnValue({
-        content: {contentId: null, html: '<p>Missing contentId</p>'},
-        interaction: {id: 'TextInput', customizationArgs: {}},
-        paramChanges: [],
-      });
+      const stateWithoutContentId = State.createDefaultState(
+        'Start',
+        'content',
+        'default_outcome'
+      );
+      stateWithoutContentId.content.contentId = null;
+      stateWithoutContentId.content.html = '<p>Missing contentId</p>';
+      stateWithoutContentId.interaction.id = 'TextInput';
+      stateWithoutContentId.interaction.customizationArgs = {};
+      spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+        stateWithoutContentId
+      );
 
       spyOn(
         explorationEngineService.exploration,
         'getInteraction'
-      ).and.returnValue({
-        id: 'TextInput',
-        customizationArgs: {},
-      });
+      ).and.returnValue(stateWithoutContentId.interaction);
 
       expect(() => {
         explorationEngineService.submitAnswer(
@@ -1058,20 +1100,29 @@ describe('Exploration engine service ', () => {
       );
       tick();
 
+      const stuckState = State.createDefaultState(
+        'StuckState',
+        'feedback_1',
+        'default_outcome'
+      );
+      stuckState.content.html = 'Stuck content';
+      stuckState.interaction.id = 'TextInput';
+      stuckState.interaction.customizationArgs = {};
+      const startState = State.createDefaultState(
+        'Start',
+        'feedback_1',
+        'default_outcome'
+      );
+      startState.content.html = 'Start content';
+      startState.interaction.id = 'TextInput';
+      startState.interaction.customizationArgs = {};
+
       spyOn(explorationEngineService.exploration, 'getState').and.callFake(
         (stateName: string) => {
           if (stateName === 'StuckState') {
-            return {
-              content: {contentId: 'feedback_1', html: 'Stuck content'},
-              interaction: {id: 'TextInput', customizationArgs: {}},
-              paramChanges: [],
-            };
+            return stuckState;
           }
-          return {
-            content: {content_id: 'feedback_1', html: 'Start content'},
-            interaction: {id: 'TextInput', customizationArgs: {}},
-            paramChanges: [],
-          };
+          return startState;
         }
       );
 
@@ -1082,7 +1133,7 @@ describe('Exploration engine service ', () => {
         if (stateName === 'StuckState') {
           return null;
         }
-        return {id: 'TextInput', customizationArgs: {}};
+        return startState.interaction;
       });
 
       spyOn(alertsService, 'addWarning');
@@ -1191,7 +1242,17 @@ describe('Exploration engine service ', () => {
         'addWarning'
       ).and.callThrough();
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
-      spyOn(explorationEngineService, 'makeParams').and.returnValue(null);
+      // Simulates makeParams returning null. submitAnswer has a null check
+      // for this that shows the "Parameters should not be empty." warning,
+      // and this test checks that warning. The return type is
+      // ExplorationParams because the real makeParams throws when a
+      // parameter can't be evaluated instead of returning null, so the spy
+      // is typed as a plain jasmine.Spy to allow a null return value.
+      const makeParamsSpy: jasmine.Spy = spyOn(
+        explorationEngineService,
+        'makeParams'
+      );
+      makeParamsSpy.and.returnValue(null);
 
       explorationEngineService.init(
         explorationDict,
@@ -1232,7 +1293,17 @@ describe('Exploration engine service ', () => {
         answerClassificationService,
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
-      spyOn(explorationEngineService, 'makeQuestion').and.returnValue(null);
+      // Simulates makeQuestion returning null. submitAnswer has a null check
+      // for this that shows the "Question content should not be empty."
+      // warning, and this test checks that warning. The return type is
+      // string because the real makeQuestion returns the result of
+      // processHtml, which is always a string, so the spy is typed as a
+      // plain jasmine.Spy to allow a null return value.
+      const makeQuestionSpy: jasmine.Spy = spyOn(
+        explorationEngineService,
+        'makeQuestion'
+      );
+      makeQuestionSpy.and.returnValue(null);
       let alertsServiceSpy = spyOn(
         alertsService,
         'addWarning'
@@ -1854,12 +1925,14 @@ describe('Exploration engine service ', () => {
   });
 
   it("should throw an error if contentId is null when calling 'getStateCardByName'", () => {
-    const mockState = {
-      content: {
-        html: '<p>Sample content</p>',
-        contentId: null,
-      },
-    };
+    const mockState = State.createDefaultState(
+      'SomeState',
+      'content',
+      'default_outcome'
+    );
+    mockState.content.html = '<p>Sample content</p>';
+    mockState.content.contentId = null;
+    mockState.interaction.id = 'TextInput';
 
     explorationEngineService.init(
       explorationDict,
@@ -1876,9 +1949,7 @@ describe('Exploration engine service ', () => {
     spyOn(
       explorationEngineService.exploration,
       'getInteraction'
-    ).and.returnValue({
-      id: 'TextInput',
-    });
+    ).and.returnValue(mockState.interaction);
     spyOn(
       explorationEngineService.exploration,
       'getInteractionId'
@@ -2179,18 +2250,27 @@ describe('Exploration engine service ', () => {
     tick();
 
     let midLookupCount = 0;
-    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
-      (stateName: string) => {
-        if (stateName === 'Mid' && midLookupCount++ === 0) {
-          return null;
-        }
-        return State.createDefaultState(
-          stateName,
-          'content_id',
-          'default_outcome'
-        );
-      }
+    // Simulates the destination state being missing on its first lookup.
+    // submitAnswer checks for this and keeps the old params instead of
+    // calling makeParams, and this test checks that branch. The return type
+    // is State because Exploration.getState reads from a map keyed by state
+    // name, and TypeScript treats such lookups as always finding a value,
+    // although an unknown name gives undefined at runtime. So the spy is
+    // typed as a plain jasmine.Spy to allow a null return value.
+    const getStateSpy: jasmine.Spy = spyOn(
+      explorationEngineService.exploration,
+      'getState'
     );
+    getStateSpy.and.callFake((stateName: string) => {
+      if (stateName === 'Mid' && midLookupCount++ === 0) {
+        return null;
+      }
+      return State.createDefaultState(
+        stateName,
+        'content_id',
+        'default_outcome'
+      );
+    });
     spyOn(explorationEngineService, 'makeQuestion').and.returnValue('Question');
     const makeParamsSpy = spyOn(
       explorationEngineService,
@@ -2362,33 +2442,43 @@ describe('Exploration engine service ', () => {
     };
 
     let stuckStateLookupCount = 0;
-    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
-      (stateName: string) => {
-        if (stateName === 'StuckState') {
-          if (stuckStateLookupCount++ === 0) {
-            return null;
-          }
-          const state = State.createDefaultState(
-            'StuckState',
-            'stuck_content_id',
-            'default_outcome'
-          );
-          state.content.html = 'Stuck';
-          state.interaction.id = 'TextInput';
-          state.interaction.customizationArgs = validCustomizationArgs;
-          return state;
+    // Simulates the stuck state being missing on its first lookup.
+    // _getNextCardIfReallyStuck checks for this and keeps the old params
+    // instead of calling makeParams, and this test checks that branch. The
+    // return type is State because Exploration.getState reads from a map
+    // keyed by state name, and TypeScript treats such lookups as always
+    // finding a value, although an unknown name gives undefined at runtime.
+    // So the spy is typed as a plain jasmine.Spy to allow a null return
+    // value.
+    const getStateSpy: jasmine.Spy = spyOn(
+      explorationEngineService.exploration,
+      'getState'
+    );
+    getStateSpy.and.callFake((stateName: string) => {
+      if (stateName === 'StuckState') {
+        if (stuckStateLookupCount++ === 0) {
+          return null;
         }
         const state = State.createDefaultState(
-          'Start',
-          'content_id',
+          'StuckState',
+          'stuck_content_id',
           'default_outcome'
         );
-        state.content.html = '';
+        state.content.html = 'Stuck';
         state.interaction.id = 'TextInput';
         state.interaction.customizationArgs = validCustomizationArgs;
         return state;
       }
-    );
+      const state = State.createDefaultState(
+        'Start',
+        'content_id',
+        'default_outcome'
+      );
+      state.content.html = '';
+      state.interaction.id = 'TextInput';
+      state.interaction.customizationArgs = validCustomizationArgs;
+      return state;
+    });
     spyOn(explorationEngineService, 'makeQuestion').and.callFake(
       (newState: State | null) => {
         if (newState === null) {
