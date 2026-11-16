@@ -17,6 +17,7 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -42,11 +43,27 @@ export class RuleTypeSelector implements OnInit {
 
   constructor(
     private stateInteractionIdService: StateInteractionIdService,
-    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe
+    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe,
+    private stateCustomizationArgsService: StateCustomizationArgsService
   ) {}
 
   selectedRule($event: Event): void {
     this.onSelectionChange.emit(this.localValue);
+  }
+
+  isRuleTypeDisabled(ruleType: string): boolean {
+    if (
+      this.stateInteractionIdService.savedMemento !== 'DragAndDropSortInput' ||
+      ruleType !== 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+    ) {
+      return false;
+    }
+
+    const customizationArgs = this.stateCustomizationArgsService.savedMemento;
+    return (
+      'allowMultipleItemsInSamePosition' in customizationArgs &&
+      customizationArgs.allowMultipleItemsInSamePosition.value === false
+    );
   }
 
   ngOnInit(): void {
