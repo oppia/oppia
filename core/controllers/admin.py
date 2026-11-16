@@ -39,12 +39,7 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     opportunity_services,
-)
-from core.domain import platform_parameter_domain as parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services as parameter_services
-from core.domain import (
+    platform_parameter_list,
     question_domain,
     question_services,
     recommendations_services,
@@ -71,6 +66,9 @@ from core.domain import (
     voiceover_services,
     wipeout_service,
 )
+from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services as parameter_services
 
 from typing import Callable, Dict, List, Optional, TypedDict, Union, cast
 
@@ -222,6 +220,15 @@ class ClassroomPageDataDict(TypedDict):
     topic_ids: List[str]
     topic_list_intro: str
     url_fragment: str
+
+
+class DummyStoryNodeDict(TypedDict):
+    """Dict representation of a story node generated as dummy data."""
+
+    exp_id: str
+    title: str
+    description: str
+    acquired_skill_ids: List[str]
 
 
 class AdminHandlerNormalizePayloadDict(TypedDict):
@@ -1039,7 +1046,7 @@ class AdminHandler(
 
     def _load_dummy_new_structures_data(self) -> None:
         """Loads the database with two topics (one of which is empty), a story
-        and three skills in the topic (two of them in a subtopic) and a question
+        and three skills in the topic (two of them in a subtopic) and questions
         attached to each skill.
 
         Raises:
@@ -1059,12 +1066,6 @@ class AdminHandler(
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
 
-            question_id_1 = question_services.get_new_question_id()
-            question_id_2 = question_services.get_new_question_id()
-            question_id_3 = question_services.get_new_question_id()
-            question_id_4 = question_services.get_new_question_id()
-            question_id_5 = question_services.get_new_question_id()
-
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
             )
@@ -1075,42 +1076,26 @@ class AdminHandler(
                 skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>'
             )
 
-            question_1 = self._create_dummy_question(
-                question_id_1, 'Question 1', [skill_id_1]
-            )
-            question_2 = self._create_dummy_question(
-                question_id_2, 'Question 2', [skill_id_2]
-            )
-            question_3 = self._create_dummy_question(
-                question_id_3, 'Question 3', [skill_id_3]
-            )
-            question_4 = self._create_dummy_question(
-                question_id_4, 'Question 4', [skill_id_1]
-            )
-            question_5 = self._create_dummy_question(
-                question_id_5, 'Question 5', [skill_id_1]
-            )
-            question_services.add_question(self.user_id, question_1)
-            question_services.add_question(self.user_id, question_2)
-            question_services.add_question(self.user_id, question_3)
-            question_services.add_question(self.user_id, question_4)
-            question_services.add_question(self.user_id, question_5)
-
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_1, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_4, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_2, skill_id_2, 0.5
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_3, skill_id_3, 0.7
-            )
+            # A story cannot be published unless every skill acquired by one of
+            # its nodes has at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+            # questions, so create that many questions for each skill.
+            for skill_index, skill_id in enumerate(
+                (skill_id_1, skill_id_2, skill_id_3)
+            ):
+                for question_index in range(
+                    feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+                ):
+                    question_id = question_services.get_new_question_id()
+                    question = self._create_dummy_question(
+                        question_id,
+                        'Question %d for skill %d'
+                        % (question_index + 1, skill_index + 1),
+                        [skill_id],
+                    )
+                    question_services.add_question(self.user_id, question)
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_id, skill_id, 0.5
+                    )
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1,
@@ -1195,29 +1180,36 @@ class AdminHandler(
                 '#F8BF74',
             )
 
-            story_node_dicts = [
+            story_node_dicts: List[DummyStoryNodeDict] = [
                 {
                     'exp_id': '6',
                     'title': 'What are the place values?',
                     'description': 'Jaime learns the place value of each digit '
                     'in a big number.',
+                    'acquired_skill_ids': [skill_id_1],
                 },
                 {
                     'exp_id': '25',
                     'title': 'Finding the value of a number',
                     'description': 'Jaime understands the value of his '
                     'arcade score.',
+                    'acquired_skill_ids': [skill_id_2],
                 },
                 {
                     'exp_id': '13',
                     'title': 'Comparing Numbers',
                     'description': 'Jaime learns if a number is smaller or '
                     'greater than another number.',
+                    'acquired_skill_ids': [skill_id_3],
                 },
             ]
 
             def generate_dummy_story_nodes(
-                node_id: int, exp_id: str, title: str, description: str
+                node_id: int,
+                exp_id: str,
+                title: str,
+                description: str,
+                acquired_skill_ids: List[str],
             ) -> None:
                 """Generates and connects sequential story nodes.
 
@@ -1226,6 +1218,8 @@ class AdminHandler(
                     exp_id: str. The exploration id.
                     title: str. The title of the story node.
                     description: str. The description of the story node.
+                    acquired_skill_ids: list(str). The skill ids acquired by
+                        the story node.
                 """
                 assert self.user_id is not None
                 story.add_node(
@@ -1236,6 +1230,10 @@ class AdminHandler(
                 )
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id
+                )
+                story.update_node_acquired_skill_ids(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    acquired_skill_ids,
                 )
 
                 if node_id != len(story_node_dicts):
