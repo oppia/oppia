@@ -1304,6 +1304,11 @@ class UserContributionRightsDataHandler(
                     if contribution_rights
                     else []
                 ),
+                'can_submit_translation_for_language_codes': (
+                    contribution_rights.can_submit_translation_for_language_codes
+                    if contribution_rights
+                    else []
+                ),
                 'can_review_voiceover_for_language_codes': (
                     contribution_rights.can_review_voiceover_for_language_codes
                     if contribution_rights

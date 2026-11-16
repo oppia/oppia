@@ -425,7 +425,11 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         );
         modalRef.componentInstance.username = username;
         modalRef.componentInstance.assignedLanguageIds =
-          response.can_review_translation_for_language_codes;
+          this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER
+            ? response.can_submit_translation_for_language_codes || []
+            : response.can_review_translation_for_language_codes;
+        modalRef.componentInstance.isSubmitter =
+          this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER;
         let languageIdToName: Record<string, string> = {};
         AppConstants.SUPPORTED_AUDIO_LANGUAGES.forEach(
           language => (languageIdToName[language.id] = language.description)

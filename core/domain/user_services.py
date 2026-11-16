@@ -741,6 +741,9 @@ def _create_user_contribution_rights_from_model(
             ),
             user_contribution_rights_model.can_review_questions,
             user_contribution_rights_model.can_submit_questions,
+            can_submit_translation_for_language_codes=(
+                user_contribution_rights_model.can_submit_translation_for_language_codes
+            ),
         )
     else:
         return user_domain.UserContributionRights('', [], [], False, False)
@@ -857,6 +860,9 @@ def _save_user_contribution_rights(
         id=user_contribution_rights.id,
         can_review_translation_for_language_codes=(
             user_contribution_rights.can_review_translation_for_language_codes
+        ),
+        can_submit_translation_for_language_codes=(
+            user_contribution_rights.can_submit_translation_for_language_codes
         ),
         can_review_voiceover_for_language_codes=(
             user_contribution_rights.can_review_voiceover_for_language_codes
@@ -2595,6 +2601,34 @@ def can_submit_question_suggestions(user_id: str) -> bool:
     return user_contribution_rights.can_submit_questions
 
 
+def can_submit_translation_suggestions(
+    user_id: str, language_code: Optional[str] = None
+) -> bool:
+    """Returns whether the user can submit translations in a language."""
+    rights = get_user_contribution_rights(user_id)
+    if language_code is None:
+        return bool(rights.can_submit_translation_for_language_codes)
+    return language_code in rights.can_submit_translation_for_language_codes
+
+
+def allow_user_to_submit_translation_in_language(
+    user_id: str, language_code: str
+) -> None:
+    rights = get_user_contribution_rights(user_id)
+    if language_code not in rights.can_submit_translation_for_language_codes:
+        rights.can_submit_translation_for_language_codes.append(language_code)
+    rights.can_submit_translation_for_language_codes.sort()
+    _save_user_contribution_rights(rights)
+
+
+def remove_translation_submit_rights_in_language(
+    user_id: str, language_code: str
+) -> None:
+    rights = get_user_contribution_rights(user_id)
+    rights.can_submit_translation_for_language_codes.remove(language_code)
+    _update_user_contribution_rights(rights)
+
+
 def allow_user_to_review_translation_in_language(
     user_id: str, language_code: str
 ) -> None:
@@ -2748,6 +2782,7 @@ def remove_contribution_reviewer(user_id: str) -> None:
         # update community contribution stats function.
         user_contribution_rights.can_review_questions = False
         user_contribution_rights.can_review_translation_for_language_codes = []
+        user_contribution_rights.can_submit_translation_for_language_codes = []
         _update_reviewer_counts_in_community_contribution_stats(
             user_contribution_rights
         )
@@ -2789,6 +2824,15 @@ def get_contributor_usernames(
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
         user_ids = user_models.UserContributionRightsModel.get_translation_reviewer_user_ids(
+            language_code
+        )
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION:
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\'.'
+            )
+        user_ids = user_models.UserContributionRightsModel.get_translation_submitter_user_ids(
             language_code
         )
     elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:

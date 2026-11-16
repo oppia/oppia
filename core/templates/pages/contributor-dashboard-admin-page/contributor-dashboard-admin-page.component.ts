@@ -74,6 +74,7 @@ interface TranslationContributionStat {
 interface ContributionReviewersResult {
   usernames?: string[];
   REVIEW_TRANSLATION?: string[];
+  SUBMIT_TRANSLATION?: string[];
   REVIEW_QUESTION?: boolean;
   SUBMIT_QUESTION?: boolean;
 }
@@ -218,6 +219,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         translationCategories = {
           REVIEW_TRANSLATION:
             AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+          SUBMIT_TRANSLATION:
+            AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION,
         };
       }
       if (userInfo.isQuestionAdmin() || userInfo.isQuestionCoordinator()) {
@@ -266,7 +269,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
   isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
     return (
-      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION ||
+      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION
     );
   }
 
@@ -338,6 +342,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
               this.contributionReviewersResult = {
                 REVIEW_TRANSLATION: this.getLanguageDescriptions(
                   contributionRights.can_review_translation_for_language_codes
+                ),
+                SUBMIT_TRANSLATION: this.getLanguageDescriptions(
+                  contributionRights.can_submit_translation_for_language_codes
                 ),
               };
             }

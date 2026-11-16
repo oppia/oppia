@@ -205,6 +205,16 @@ class SuggestionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            language_code = self.normalized_payload['change_cmd'].get(
+                'language_code'
+            )
+            if not user_services.can_submit_translation_suggestions(
+                self.user_id, language_code
+            ):
+                raise self.UnauthorizedUserException(
+                    'You do not have permission to submit translations in this language.'
+                )
         if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.'

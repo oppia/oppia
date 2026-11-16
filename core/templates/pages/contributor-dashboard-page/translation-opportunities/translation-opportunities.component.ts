@@ -61,6 +61,7 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   opportunityType = 'translation';
   languageSelected = false;
   userIsReviewer = false;
+  userIsSubmitter = false;
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
@@ -182,6 +183,10 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
             userContributionRights.can_review_translation_for_language_codes.includes(
               activeLanguageCode
             );
+          this.userIsSubmitter =
+            userContributionRights.can_submit_translation_for_language_codes?.includes(
+              activeLanguageCode
+            ) ?? false;
         }
         this.languageSelected = true;
       }
@@ -212,6 +217,9 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    if (!this.userIsSubmitter) {
+      return {opportunitiesDicts: [], more: false};
+    }
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
@@ -222,6 +230,9 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
   }
 
   async loadOpportunitiesCountAsync(): Promise<number> {
+    if (!this.userIsSubmitter) {
+      return 0;
+    }
     return this.contributionOpportunitiesService.getTranslationOpportunitiesCountAsync(
       this.translationLanguageService.getActiveLanguageCode(),
       this.translationTopicService.getActiveTopicName(),
@@ -233,6 +244,9 @@ export class TranslationOpportunitiesComponent implements OnInit, OnChanges {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    if (!this.userIsSubmitter) {
+      return {opportunitiesDicts: [], more: false};
+    }
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),

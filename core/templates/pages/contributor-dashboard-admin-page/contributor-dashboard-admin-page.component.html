@@ -79,6 +79,8 @@
             <tr>
               <td *ngIf="CD_USER_RIGHTS_CATEGORIES.REVIEW_TRANSLATION"><strong>Review Translations in languages</strong>
               </td>
+              <td *ngIf="CD_USER_RIGHTS_CATEGORIES.SUBMIT_TRANSLATION"><strong>Submit Translations in languages</strong>
+              </td>
               <td *ngIf="CD_USER_RIGHTS_CATEGORIES.REVIEW_QUESTION"><strong>Review Questions</strong></td>
               <td *ngIf="CD_USER_RIGHTS_CATEGORIES.SUBMIT_QUESTION"><strong>Submit Questions</strong></td>
             </tr>
@@ -90,6 +92,12 @@
                 <ng-container *ngFor="let language of contributionReviewersResult.REVIEW_TRANSLATION; let last = last">
                   <span class="e2e-test-translation-reviewer-language">{{ language }}</span>
                   <span *ngIf="!last">, </span>
+                </ng-container>
+              </td>
+              <td *ngIf="CD_USER_RIGHTS_CATEGORIES.SUBMIT_TRANSLATION">
+                <span *ngIf="!contributionReviewersResult.SUBMIT_TRANSLATION || contributionReviewersResult.SUBMIT_TRANSLATION.length === 0"><i>None</i></span>
+                <ng-container *ngFor="let language of contributionReviewersResult.SUBMIT_TRANSLATION; let last = last">
+                  <span>{{ language }}</span><span *ngIf="!last">, </span>
                 </ng-container>
               </td>
               <td *ngIf="CD_USER_RIGHTS_CATEGORIES.REVIEW_QUESTION">

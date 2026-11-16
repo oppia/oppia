@@ -35,6 +35,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   @Input() assignedLanguageIds: string[] = [];
   @Input() languageIdToName!: {[languageId: string]: string};
   @Input() username!: string;
+  @Input() isSubmitter: boolean = false;
   // Set to null when there is no language left in the list of languages to be
   // updated. If this value is null, it also means that the 'Add' button
   // should be disabled.
@@ -64,7 +65,9 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.selectedLanguageId = null;
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        this.isSubmitter
+          ? constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION
+          : constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         this.username,
         this.languageIdInUpdate
       )
@@ -92,7 +95,9 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.languageIdInUpdate = languageIdToRemove;
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        this.isSubmitter
+          ? constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_TRANSLATION
+          : constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         this.username,
         languageIdToRemove
       )
