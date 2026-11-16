@@ -35,6 +35,7 @@
 # (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
 /core/controllers/ @oppia/lace-backend-reviewers
 /core/domain/ @oppia/lace-backend-reviewers
+/core/storage/ @oppia/lace-backend-reviewers
 /core/templates/components/ @oppia/lace-frontend-reviewers
 /core/templates/domain/ @oppia/lace-frontend-reviewers
 /core/templates/pages/ @oppia/lace-frontend-reviewers
@@ -689,7 +690,6 @@
 
 # Certificate Offering Pages.
 /core/domain/certificate_assessment*.py @oppia/contributor-experience-team
-/core/storage/certificate_assessment @oppia/contributor-experience-team
 /core/templates/pages/certificate-assessment-creator-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/create-certificate-offering-page/ @oppia/contributor-experience-team
 /core/templates/pages/edit-certificate-offering-page/ @oppia/contributor-experience-team
@@ -754,13 +754,47 @@
 /core/templates/services/auth-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 
+# Storage models.
+# Each storage directory is owned by the team that owns the corresponding
+# domain layer. Storage that is shared across the platform (base models, auth,
+# user data, audit logs, config and email) is owned by core reviewers in the
+# "Critical files" section at the bottom of this file.
+/core/storage/activity/ @oppia/lace-backend-reviewers
+/core/storage/app_feedback_report/ @oppia/web-android-compatibility-reviewers
+/core/storage/beam_job/ @oppia/lace-backend-reviewers
+/core/storage/blog/ @oppia/lace-backend-reviewers
+/core/storage/blog_statistics/ @oppia/lace-backend-reviewers
+/core/storage/certificate_assessment/ @oppia/contributor-experience-team
+/core/storage/classroom/ @oppia/lace-backend-reviewers
+/core/storage/cloud_task/ @oppia/lace-backend-reviewers
+/core/storage/collection/ @oppia/lace-backend-reviewers
+/core/storage/exploration/ @oppia/lace-backend-reviewers
+/core/storage/feedback/ @oppia/contributor-experience-team
+/core/storage/general_feedback/ @oppia/lace-backend-reviewers
+/core/storage/improvements/ @oppia/lace-backend-reviewers
+/core/storage/job/ @oppia/lace-backend-reviewers
+/core/storage/learner_group/ @oppia/lace-backend-reviewers
+/core/storage/opportunity/ @oppia/contributor-experience-team
+/core/storage/question/ @oppia/lace-backend-reviewers
+/core/storage/recommendations/ @oppia/lace-backend-reviewers
+/core/storage/skill/ @oppia/lace-backend-reviewers
+/core/storage/statistics/ @oppia/lace-backend-reviewers
+/core/storage/story/ @oppia/lace-backend-reviewers
+/core/storage/subtopic/ @oppia/lace-backend-reviewers
+/core/storage/suggestion/ @oppia/contributor-experience-team
+/core/storage/topic/ @oppia/lace-backend-reviewers
+/core/storage/translation/ @oppia/contributor-experience-team
+/core/storage/voiceover/ @oppia/lace-backend-reviewers
+
+
 # Feature Flags and Platform Parameters
 /core/controllers/feature_flag*.py @oppia/core-reviewers
 /core/domain/platform_parameter*.py @oppia/core-reviewers
 /core/domain/feature_flag*.py @oppia/core-reviewers
-/core/feature_flag*.py @oppia/core-reviewers
+/core/feature_flag_list*.py @oppia/lace-backend-reviewers
 /core/templates/domain/platform-parameter/ @oppia/core-reviewers
 /core/templates/domain/feature-flag/ @oppia/core-reviewers
+/core/templates/domain/feature-flag/feature-status-summary.model*.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
 /core/templates/services/platform-feature*.ts @oppia/core-reviewers
 
@@ -809,7 +843,14 @@
 /core/domain/html_translation_services*.py @oppia/contributor-experience-team
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
-/core/storage/ @oppia/core-reviewers
+/core/storage/__init__.py @oppia/core-reviewers
+/core/storage/storage_models_test.py @oppia/core-reviewers
+/core/storage/audit/ @oppia/core-reviewers
+/core/storage/auth/ @oppia/core-reviewers
+/core/storage/base_model/ @oppia/core-reviewers
+/core/storage/config/ @oppia/core-reviewers
+/core/storage/email/ @oppia/core-reviewers
+/core/storage/user/ @oppia/core-reviewers
 /core/domain/user*.py @oppia/core-reviewers
 /LICENSE @oppia/core-reviewers
 /NOTICE @oppia/core-reviewers

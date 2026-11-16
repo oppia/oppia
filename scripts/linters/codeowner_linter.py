@@ -36,7 +36,6 @@ CODEOWNER_FILEPATH: Final = '.github/CODEOWNERS'
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
 CODEOWNER_IMPORTANT_PATHS: Final = [
-    '/core/storage/',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',
@@ -62,6 +61,14 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/domain/html_translation_services*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
+    '/core/storage/__init__.py',
+    '/core/storage/storage_models_test.py',
+    '/core/storage/audit/',
+    '/core/storage/auth/',
+    '/core/storage/base_model/',
+    '/core/storage/config/',
+    '/core/storage/email/',
+    '/core/storage/user/',
     '/core/domain/user*.py',
     '/LICENSE',
     '/NOTICE',
