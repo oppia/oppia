@@ -202,8 +202,14 @@ export class ExplorationEditorUtils {
       return;
     }
 
-    // Skip if the section is already expanded.
-    if (await this.userInstance.isElementVisible(sectionContentSelector)) {
+    // Skip if the section is already expanded. The visibility is checked
+    // immediately instead of with isElementVisible(), which waits up to its
+    // timeout for the content to appear: a collapsed section never satisfies
+    // that wait, so every expansion would stall for the full timeout.
+    const isSectionExpanded = await this.userInstance.page.isVisible(
+      sectionContentSelector
+    );
+    if (isSectionExpanded) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
           'Reason: Section is already expanded on desktop.'

@@ -28,9 +28,7 @@ const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistUsernameInputBox = 'input#newVoiceArtistUsername';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
-
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
-
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
 
