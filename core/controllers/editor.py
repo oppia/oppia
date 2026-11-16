@@ -1416,9 +1416,7 @@ class ImageUploadHandler(
         filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):
-            if bool(
-                re.match(constants.MATH_SVG_FILENAME_REGEX, filename)
-            ):
+            if bool(re.match(constants.MATH_SVG_FILENAME_REGEX, filename)):
                 self.render_json({'filename': filename})
                 return
             raise self.InvalidInputException(

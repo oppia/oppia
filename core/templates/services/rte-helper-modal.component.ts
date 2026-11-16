@@ -603,9 +603,10 @@ export class RteHelperModalComponent {
         return;
       }
 
-      const existingMathContent = this.attrsCustomizationArgsDict?.[
-        'math_content'
-      ] as {raw_latex?: string; svg_filename?: string} | undefined;
+      const existingMathContent = this.attrsCustomizationArgsDict
+        ?.math_content as
+        | {raw_latex?: string; svg_filename?: string}
+        | undefined;
       // If the math expression is unchanged and an svg_filename already exists,
       // there is no need to re-upload the same SVG file to the backend.
       if (
