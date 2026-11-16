@@ -6,27 +6,23 @@ correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: "Text Input state name with unicode \u0105\u0142"
 language_code: en
-next_content_id_index: 111
 objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
-schema_version: 62
+schema_version: 47
 states:
   Algebraic Expression Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_0
+      content_id: content
       html: <p>Algebraic Expression Input. Provide the formula for calculating the
         area of a circle with radius = r.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Code Editor
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_2
+            content_id: feedback_1
             html: <p>That is exactly how you find the area of a circle! Good job!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -42,19 +38,12 @@ states:
       customization_args:
         customOskLetters:
           value:
-          - "r"
-          - "π"
-        allowedVariables:
-          value:
           - r
           - "\u03C0"
-        useFractionForDivision:
-          value: true
       default_outcome:
         dest: Algebraic Expression Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_1
+          content_id: default_outcome
           html: <p>That is not how the area of a circle is calculated. Try again.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -62,40 +51,36 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_3
+          content_id: hint_1
           html: <p>The area of a circle is related to a constant called "pi".</p>
       id: AlgebraicExpressionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        hint_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        hint_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Code Editor:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_4
+      content_id: content
       html: <p>Code Editor. Write a program which prints 'Hello Oppia' to me.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Pencil Code Editor
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_6
+            content_id: feedback_1
             html: <p>Hello! Let's move onto another interaction.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -119,9 +104,8 @@ states:
           value: ''
       default_outcome:
         dest: Code Editor
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_5
+          content_id: default_outcome
           html: <p>I'm looking for a particular 'Hello Oppia' message. Don't you want
             to say hello?</p>
         labelled_as_correct: false
@@ -131,40 +115,36 @@ states:
       hints: []
       id: CodeRepl
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_4: {}
-        default_outcome_5: {}
-        feedback_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_4: {}
-        default_outcome_5: {}
-        feedback_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Continue:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_7
+      content_id: content
       html: <p>Continue. Please press the continue button.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText_9
+            content_id: ca_buttonText_0
             unicode_str: Continue
       default_outcome:
         dest: Graph Theory
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_8
+          content_id: default_outcome
           html: <p>Moving onward!</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -173,34 +153,30 @@ states:
       hints: []
       id: Continue
       solution: null
-    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_9: {}
-        content_7: {}
-        default_outcome_8: {}
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_buttonText_9: {}
-        content_7: {}
-        default_outcome_8: {}
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
   Drag And Drop Sort:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_10
+      content_id: content
       html: <p>Sort the following fractions in ascending order.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Set Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_12
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -209,8 +185,8 @@ states:
         rule_specs:
         - inputs:
             x:
-            - - ca_choices_14
-            - - ca_choices_13
+            - - ca_choices_3
+            - - ca_choices_2
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
@@ -220,15 +196,14 @@ states:
           value: false
         choices:
           value:
-          - content_id: ca_choices_13
+          - content_id: ca_choices_2
             html: <p>Choice 1</p>
-          - content_id: ca_choices_14
+          - content_id: ca_choices_3
             html: <p>Choice 2</p>
       default_outcome:
         dest: Drag And Drop Sort
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_11
+          content_id: default_outcome
           html: <p>No, that's not right.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -237,31 +212,28 @@ states:
       hints: []
       id: DragAndDropSortInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_13: {}
-        ca_choices_14: {}
-        content_10: {}
-        default_outcome_11: {}
-        feedback_12: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_13: {}
-        ca_choices_14: {}
-        content_10: {}
-        default_outcome_11: {}
-        feedback_12: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   End Exploration:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_15
+      content_id: content
       html: <p>Congratulations, you have finished!</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -272,30 +244,26 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_15: {}
+        content: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_15: {}
+        content: {}
   Fraction Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_16
+      content_id: content
       html: <p>Write 20/50 as a fraction in simplest terms.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Number With Units
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_18
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -319,15 +287,14 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: ca_customPlaceholder_19
+            content_id: ca_customPlaceholder_2
             unicode_str: ''
         requireSimplestForm:
           value: true
       default_outcome:
         dest: Fraction Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_17
+          content_id: default_outcome
           html: <p>No, that's not right. The answer is 2/5.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -336,36 +303,32 @@ states:
       hints: []
       id: FractionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_customPlaceholder_19: {}
-        content_16: {}
-        default_outcome_17: {}
-        feedback_18: {}
+        ca_customPlaceholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_customPlaceholder_19: {}
-        content_16: {}
-        default_outcome_17: {}
-        feedback_18: {}
+        ca_customPlaceholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Graph Theory:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_20
+      content_id: content
       html: <p>Graph Theory. Please create a pentagon.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Number Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_22
+            content_id: feedback_1
             html: <p>Penta-penta-pentagon!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -414,9 +377,8 @@ states:
         training_data: []
       - outcome:
           dest: Graph Theory
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_23
+            content_id: feedback_2
             html: <p>That's a triangle. Your shape needs more sides.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -453,9 +415,8 @@ states:
         training_data: []
       - outcome:
           dest: Graph Theory
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_24
+            content_id: feedback_3
             html: <p>Your shape is missing one side!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -539,9 +500,8 @@ states:
               y: 168.0
       default_outcome:
         dest: Graph Theory
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_21
+          content_id: default_outcome
           html: <p>That's not quite a pentagon. Please try again!</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -549,44 +509,40 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_25
+          content_id: hint_1
           html: <p>dsf</p>
       id: GraphInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_20: {}
-        default_outcome_21: {}
-        feedback_22: {}
-        feedback_23: {}
-        feedback_24: {}
-        hint_25: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_20: {}
-        default_outcome_21: {}
-        feedback_22: {}
-        feedback_23: {}
-        feedback_24: {}
-        hint_25: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
   Image Region:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_26
+      content_id: content
       html: <p>Image Region. Please click on the constructor in the Python code shown.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Image Region
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_28
+            content_id: feedback_1
             html: <p>That's the class definition. Try again.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -600,9 +556,8 @@ states:
         training_data: []
       - outcome:
           dest: Image Region
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_29
+            content_id: feedback_2
             html: <p>That's the class's docstring. Try again.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -616,9 +571,8 @@ states:
         training_data: []
       - outcome:
           dest: Image Region
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_30
+            content_id: feedback_3
             html: <p>That's a function, which is close to what you're looking for.
               Try again!</p>
           labelled_as_correct: false
@@ -633,9 +587,8 @@ states:
         training_data: []
       - outcome:
           dest: Image Region
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_31
+            content_id: feedback_4
             html: <p>That's a classmethod. It does execute code, but it doesn't construct
               anything. Try again!</p>
           labelled_as_correct: false
@@ -650,9 +603,8 @@ states:
         training_data: []
       - outcome:
           dest: Continue
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_32
+            content_id: feedback_5
             html: <p>You found it! This is the code responsible for constructing a
               new class object.</p>
           labelled_as_correct: false
@@ -715,9 +667,8 @@ states:
                 regionType: Rectangle
       default_outcome:
         dest: Image Region
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_27
+          content_id: default_outcome
           html: "<p>Constructors <em>initialize</em>\_an object, or <em>init</em>\_\
             it.Constructors are also functions themselves.</p>"
         labelled_as_correct: false
@@ -726,48 +677,44 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_33
+          content_id: hint_1
           html: <p>sdf</p>
       id: ImageClickInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_26: {}
-        default_outcome_27: {}
-        feedback_28: {}
-        feedback_29: {}
-        feedback_30: {}
-        feedback_31: {}
-        feedback_32: {}
-        hint_33: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_26: {}
-        default_outcome_27: {}
-        feedback_28: {}
-        feedback_29: {}
-        feedback_30: {}
-        feedback_31: {}
-        feedback_32: {}
-        hint_33: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        hint_1: {}
   Item Selection Multi:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_34
+      content_id: content
       html: <p>Item selection. Please select the good options.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Image Region
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_36
+            content_id: feedback_1
             html: <p>That's right!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -776,16 +723,15 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_41
-            - ca_choices_43
+            - ca_choices_5
+            - ca_choices_7
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_37
+            content_id: feedback_2
             html: <p>That's not a good option!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -794,15 +740,14 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_42
+            - ca_choices_6
           rule_type: ContainsAtLeastOneOf
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_38
+            content_id: feedback_3
             html: <p>That's not all of the good options!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -816,9 +761,8 @@ states:
         training_data: []
       - outcome:
           dest: Item Selection Multi
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_39
+            content_id: feedback_4
             html: <p>That's good! No bad options, but make sure to choose all good
               options!</p>
           labelled_as_correct: false
@@ -828,8 +772,8 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_41
-            - ca_choices_43
+            - ca_choices_5
+            - ca_choices_7
           rule_type: IsProperSubsetOf
         tagged_skill_misconception_id: null
         training_data: []
@@ -837,11 +781,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_41
+          - content_id: ca_choices_5
             html: <p>Good option A.</p>
-          - content_id: ca_choices_42
+          - content_id: ca_choices_6
             html: <p>Bad option B.</p>
-          - content_id: ca_choices_43
+          - content_id: ca_choices_7
             html: <p>Good option C.</p>
         maxAllowableSelectionCount:
           value: 2
@@ -849,9 +793,8 @@ states:
           value: 2
       default_outcome:
         dest: Item Selection Multi
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_35
+          content_id: default_outcome
           html: <p>The two good options actually have the word 'good' in them.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -859,52 +802,48 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_40
+          content_id: hint_1
           html: <p>sdf</p>
       id: ItemSelectionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_41: {}
-        ca_choices_42: {}
-        ca_choices_43: {}
-        content_34: {}
-        default_outcome_35: {}
-        feedback_36: {}
-        feedback_37: {}
-        feedback_38: {}
-        feedback_39: {}
-        hint_40: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_41: {}
-        ca_choices_42: {}
-        ca_choices_43: {}
-        content_34: {}
-        default_outcome_35: {}
-        feedback_36: {}
-        feedback_37: {}
-        feedback_38: {}
-        feedback_39: {}
-        hint_40: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        hint_1: {}
   Item Selection Single:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_44
+      content_id: content
       html: <p>Item Selection with one choice. Select "Choice 2" below.<br></p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Item Selection Single
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_46
+            content_id: feedback_1
             html: <p>No, you want the one below this one.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -913,15 +852,14 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_49
+            - ca_choices_4
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_47
+            content_id: feedback_2
             html: <p>Yes, good choice!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -930,15 +868,14 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_50
+            - ca_choices_5
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Single
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_48
+            content_id: feedback_3
             html: <p>No, you want the choice above this one.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -947,7 +884,7 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_51
+            - ca_choices_6
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -955,11 +892,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_49
+          - content_id: ca_choices_4
             html: <p>Choice 1</p>
-          - content_id: ca_choices_50
+          - content_id: ca_choices_5
             html: <p>Choice 2</p>
-          - content_id: ca_choices_51
+          - content_id: ca_choices_6
             html: <p>Choice 3</p>
         maxAllowableSelectionCount:
           value: 1
@@ -967,9 +904,8 @@ states:
           value: 1
       default_outcome:
         dest: Item Selection Single
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_45
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -978,45 +914,41 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_49: {}
-        ca_choices_50: {}
-        ca_choices_51: {}
-        content_44: {}
-        default_outcome_45: {}
-        feedback_46: {}
-        feedback_47: {}
-        feedback_48: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_49: {}
-        ca_choices_50: {}
-        ca_choices_51: {}
-        content_44: {}
-        default_outcome_45: {}
-        feedback_46: {}
-        feedback_47: {}
-        feedback_48: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
   Math Equation Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_52
+      content_id: content
       html: <p>Math Equation Input. Write the equation of a straight line in the slope-intercept
         form. Consider the slope to be 'm' and the y-intercept to be 'c'</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Numeric Expression Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_54
+            content_id: feedback_1
             html: <p>That is the slope-intercept form of a straight line! Good job!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1033,23 +965,14 @@ states:
       customization_args:
         customOskLetters:
           value:
-          - "c"
-          - "m"
-          - "x"
-          - "y"
-        allowedVariables:
-          value:
           - c
           - m
           - x
           - y
-        useFractionForDivision:
-          value: true
       default_outcome:
         dest: Math Equation Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_53
+          content_id: default_outcome
           html: <p>That is not the slope-intercept form of a straight line. Try again.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1057,40 +980,36 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_55
+          content_id: hint_1
           html: <p>The slope-intercept form of a straight-line is 'y=m*x+c'.</p>
       id: MathEquationInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_52: {}
-        default_outcome_53: {}
-        feedback_54: {}
-        hint_55: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_52: {}
-        default_outcome_53: {}
-        feedback_54: {}
-        hint_55: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Multiple Choice:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_56
+      content_id: content
       html: <p>Multiple Choice. Select "Second choice" below.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Item Selection Single
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_58
+            content_id: feedback_1
             html: <p>Nice choice!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1104,9 +1023,8 @@ states:
         training_data: []
       - outcome:
           dest: Drag And Drop Sort
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_59
+            content_id: feedback_2
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1120,9 +1038,8 @@ states:
         training_data: []
       - outcome:
           dest: Multiple Choice
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_60
+            content_id: feedback_3
             html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1138,19 +1055,18 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_62
+          - content_id: ca_choices_4
             html: <p>First choice</p>
-          - content_id: ca_choices_63
+          - content_id: ca_choices_5
             html: <p>Second choice</p>
-          - content_id: ca_choices_64
+          - content_id: ca_choices_6
             html: <p>Third choice</p>
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
         dest: Multiple Choice
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_57
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1158,51 +1074,47 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_61
+          content_id: hint_1
           html: <p>sfd</p>
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_62: {}
-        ca_choices_63: {}
-        ca_choices_64: {}
-        content_56: {}
-        default_outcome_57: {}
-        feedback_58: {}
-        feedback_59: {}
-        feedback_60: {}
-        hint_61: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_62: {}
-        ca_choices_63: {}
-        ca_choices_64: {}
-        content_56: {}
-        default_outcome_57: {}
-        feedback_58: {}
-        feedback_59: {}
-        feedback_60: {}
-        hint_61: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
   Music Notes Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_65
+      content_id: content
       html: <p>Music Notes Input. One C note is given. Can you find the next C in
         the scale?</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: World Map
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_67
+            content_id: feedback_1
             html: <p>You found the next C! Excellent.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1230,9 +1142,8 @@ states:
           value: []
       default_outcome:
         dest: Music Notes Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_66
+          content_id: default_outcome
           html: <p>That's not the next C. Try again?</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1240,41 +1151,37 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_68
+          content_id: hint_1
           html: '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes
             on the C major scale.</p>'
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_65: {}
-        default_outcome_66: {}
-        feedback_67: {}
-        hint_68: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_65: {}
-        default_outcome_66: {}
-        feedback_67: {}
-        hint_68: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Number Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_69
+      content_id: content
       html: <p>Number Input. Enter a two or higher digit number.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Number Line Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_71
+            content_id: feedback_1
             html: <p>That number has more than one digit. Right!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1287,14 +1194,11 @@ states:
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args:
-        requireNonnegativeInput:
-          value: false
+      customization_args: {}
       default_outcome:
         dest: Number Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_70
+          content_id: default_outcome
           html: <p>That's only one digit! Try again.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1303,34 +1207,30 @@ states:
       hints: []
       id: NumericInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_69: {}
-        default_outcome_70: {}
-        feedback_71: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_69: {}
-        default_outcome_70: {}
-        feedback_71: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Number Line Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_108
+      content_id: content
       html: <p>Select 2 on the number line.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Fraction Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_110
+            content_id: feedback_1
             html: <p>Correct! The selected point is 2.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1352,9 +1252,8 @@ states:
           value: -2
       default_outcome:
         dest: Number Line Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_109
+          content_id: default_outcome
           html: <p>Try selecting the mark labeled 2.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1363,23 +1262,30 @@ states:
       hints: []
       id: NumberLineInput
       solution: null
-    linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Number With Units:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_72
+      content_id: content
       html: <p>Write 2 km/s in terms of m/s.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Ratio Expression Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_74
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1407,9 +1313,8 @@ states:
       customization_args: {}
       default_outcome:
         dest: Number With Units
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_73
+          content_id: default_outcome
           html: <p>No, that's not right. The answer is 2000 m/s.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1418,34 +1323,30 @@ states:
       hints: []
       id: NumberWithUnits
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_72: {}
-        default_outcome_73: {}
-        feedback_74: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_72: {}
-        default_outcome_73: {}
-        feedback_74: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Numeric Expression Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_75
+      content_id: content
       html: <p>Numeric Expression Input. Break down 1234.56 into component place values.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Algebraic Expression Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_77
+            content_id: feedback_1
             html: <p>That is perfect!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1461,15 +1362,12 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_79
+            content_id: ca_placeholder_0
             unicode_str: Type an expression here, using only numbers.
-        useFractionForDivision:
-          value: true
       default_outcome:
         dest: Numeric Expression Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_76
+          content_id: default_outcome
           html: <p>That is not the correct expansion of 1234.56. Try again.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1477,45 +1375,41 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_78
+          content_id: hint_1
           html: <p>The final numeric expression that you get should be equivalent
             to the original number. Also, don't forget to breakdown the decimal place
             values as well!</p>
       id: NumericExpressionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_79: {}
-        content_75: {}
-        default_outcome_76: {}
-        feedback_77: {}
-        hint_78: {}
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_placeholder_79: {}
-        content_75: {}
-        default_outcome_76: {}
-        feedback_77: {}
-        hint_78: {}
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
   Pencil Code Editor:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_80
+      content_id: content
       html: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
         message to me.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Music Notes Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_82
+            content_id: feedback_1
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1529,9 +1423,8 @@ states:
         training_data: []
       - outcome:
           dest: Music Notes Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_83
+            content_id: feedback_2
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1549,9 +1442,8 @@ states:
           value: '# Write a goodbye to me, below.'
       default_outcome:
         dest: Pencil Code Editor
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_81
+          content_id: default_outcome
           html: <p>Where are your manners? You should say goodbye to me. We've explored
             so much, together!</p>
         labelled_as_correct: false
@@ -1561,36 +1453,32 @@ states:
       hints: []
       id: PencilCodeEditor
       solution: null
-    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_80: {}
-        default_outcome_81: {}
-        feedback_82: {}
-        feedback_83: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_80: {}
-        default_outcome_81: {}
-        feedback_82: {}
-        feedback_83: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
   Ratio Expression Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_84
+      content_id: content
       html: <p>Write the equivalent ratio for half.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Set Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_86
+            content_id: feedback_1
             html: <p>Yes, well done!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1610,13 +1498,12 @@ states:
           value: 0
         placeholder:
           value:
-            content_id: ca_placeholder_87
+            content_id: ca_placeholder_2
             unicode_str: ''
       default_outcome:
         dest: Ratio Expression Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_85
+          content_id: default_outcome
           html: <p>No, that's not right. The answer is 1:2 (or equivalent).</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1625,37 +1512,33 @@ states:
       hints: []
       id: RatioExpressionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_87: {}
-        content_84: {}
-        default_outcome_85: {}
-        feedback_86: {}
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_placeholder_87: {}
-        content_84: {}
-        default_outcome_85: {}
-        feedback_86: {}
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Set Input:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_88
+      content_id: content
       html: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
         looking for any of three popular ones.</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Math Equation Input
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_90
+            content_id: feedback_1
             html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
               hard to use in rhyming devices.</p>
           labelled_as_correct: false
@@ -1665,7 +1548,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_91
+              contentId: rule_input_5
               unicodeStrSet:
               - orange
               - purple
@@ -1677,13 +1560,12 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText_95
+            content_id: ca_buttonText_4
             unicode_str: Add item
       default_outcome:
         dest: Set Input
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_89
+          content_id: default_outcome
           html: <p>Not quite.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1691,55 +1573,51 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_92
+          content_id: hint_1
           html: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
       - hint_content:
-          content_id: hint_93
+          content_id: hint_2
           html: <p>A third one is both a color and a fruit. This fruit is of particular
             importance to the state of Florida.<br></p>
       - hint_content:
-          content_id: hint_94
+          content_id: hint_3
           html: <p>Try orange. :) There are still two others, however!<br></p>
       id: SetInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_95: {}
-        content_88: {}
-        default_outcome_89: {}
-        feedback_90: {}
-        hint_92: {}
-        hint_93: {}
-        hint_94: {}
-        rule_input_91: {}
+        ca_buttonText_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        hint_2: {}
+        hint_3: {}
+        rule_input_5: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_buttonText_95: {}
-        content_88: {}
-        default_outcome_89: {}
-        feedback_90: {}
-        hint_92: {}
-        hint_93: {}
-        hint_94: {}
-        rule_input_91: {}
+        ca_buttonText_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        hint_2: {}
+        hint_3: {}
+        rule_input_5: {}
   "Text Input state name with unicode \u0105\u0142":
-    card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content_96
+      content_id: content
       html: <p>Text input. Please add a word containing "ate".</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: Multiple Choice
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_98
+            content_id: feedback_1
             html: <p>Omnomnom.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1748,7 +1626,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_99
+              contentId: rule_input_3
               normalizedStrSet:
               - ate
           rule_type: Contains
@@ -1756,19 +1634,16 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        catchMisspellings:
-          value: false
         placeholder:
           value:
-            content_id: ca_placeholder_101
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: "Text Input state name with unicode \u0105\u0142"
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_97
+          content_id: default_outcome
           html: <p>The answer needs to contain "ate".</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1776,45 +1651,41 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_100
+          content_id: hint_1
           html: <p>Hint 1</p>
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_101: {}
-        content_96: {}
-        default_outcome_97: {}
-        feedback_98: {}
-        hint_100: {}
-        rule_input_99: {}
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_placeholder_101: {}
-        content_96: {}
-        default_outcome_97: {}
-        feedback_98: {}
-        hint_100: {}
-        rule_input_99: {}
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
   World Map:
-    card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_102
+      content_id: content
       html: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
         States?</p>
-    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
           dest: End Exploration
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_104
+            content_id: feedback_1
             html: <p>That's Washington, D.C., the capital of the United States.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1831,9 +1702,8 @@ states:
         training_data: []
       - outcome:
           dest: End Exploration
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_105
+            content_id: feedback_2
             html: <p>Ottawa, the capital of Canada!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1850,9 +1720,8 @@ states:
         training_data: []
       - outcome:
           dest: End Exploration
-          dest_if_really_stuck: null
           feedback:
-            content_id: feedback_106
+            content_id: feedback_3
             html: <p>Mexico City, Mexico. The capital of Mexico.</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -1877,9 +1746,8 @@ states:
           value: 3.0
       default_outcome:
         dest: World Map
-        dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_103
+          content_id: default_outcome
           html: <p>Not quite. Try again!</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1887,32 +1755,30 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint_107
+          content_id: hint_1
           html: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
             special markings on a map.</p>'
       id: InteractiveMap
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_102: {}
-        default_outcome_103: {}
-        feedback_104: {}
-        feedback_105: {}
-        feedback_106: {}
-        hint_107: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content_102: {}
-        default_outcome_103: {}
-        feedback_104: {}
-        feedback_105: {}
-        feedback_106: {}
-        hint_107: {}
-states_schema_version: 57
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        hint_1: {}
+states_schema_version: 42
 tags: []
 title: Test of all interactions
-version: 0

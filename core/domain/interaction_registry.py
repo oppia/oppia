@@ -137,14 +137,15 @@ class Registry:
         cls, state_schema_version: int, can_fetch_latest_specs: bool = False
     ) -> Dict[str, base.BaseInteractionDict]:
         """Returns a dict containing the full specs of each interaction for the
-        given state schema version, if available else return all specs or an
-        error depending on can_fetch_latest_specs.
+        given state schema version. When can_fetch_latest_specs is True,
+        interactions absent from the legacy specs use their latest specs.
 
         Args:
             state_schema_version: int. The state schema version to retrieve
                 interaction specs for.
-            can_fetch_latest_specs: boolean. Whether to fetch the latest specs
-                if the legacy specs file is not found.
+            can_fetch_latest_specs: boolean. Whether to use the latest specs
+                for interactions missing from the legacy specs, or when the
+                legacy specs file is not found.
 
         Returns:
             dict. The interaction specs for the given state schema
@@ -179,9 +180,6 @@ class Registry:
                 cls._state_schema_version_to_interaction_specs[
                     state_schema_version
                 ] = specs_from_json
-                return cls._state_schema_version_to_interaction_specs[
-                    state_schema_version
-                ]
             elif can_fetch_latest_specs:
                 return cls.get_all_specs()
             else:
@@ -190,6 +188,11 @@ class Registry:
                     % state_schema_version
                 )
 
-        return cls._state_schema_version_to_interaction_specs[
+        legacy_specs = cls._state_schema_version_to_interaction_specs[
             state_schema_version
         ]
+        if can_fetch_latest_specs:
+            # Explorations using older schemas may contain interactions added
+            # after their legacy specs were recorded.
+            return {**cls.get_all_specs(), **legacy_specs}
+        return legacy_specs
