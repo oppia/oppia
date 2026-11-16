@@ -25,7 +25,6 @@ from core.platform import models
 
 import apache_beam as beam
 from typing import (
-    Dict,
     Final,
     Iterable,
     List,
