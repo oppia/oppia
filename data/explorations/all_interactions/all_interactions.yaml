@@ -2,8 +2,9 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Test
+correctness_feedback_enabled: false
 edits_allowed: true
-init_state_name: Text Input state name with unicode ął
+init_state_name: "Text Input state name with unicode \u0105\u0142"
 language_code: en
 next_content_id_index: 111
 objective: Dummy exploration for testing all interactions
@@ -39,10 +40,14 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        customOskLetters:
+          value:
+          - "r"
+          - "π"
         allowedVariables:
           value:
           - r
-          - π
+          - "\u03C0"
         useFractionForDivision:
           value: true
       default_outcome:
@@ -62,8 +67,21 @@ states:
       id: AlgebraicExpressionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        hint_3: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        hint_3: {}
   Code Editor:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -114,8 +132,19 @@ states:
       id: CodeRepl
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_4: {}
+        default_outcome_5: {}
+        feedback_6: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_4: {}
+        default_outcome_5: {}
+        feedback_6: {}
   Continue:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -145,8 +174,19 @@ states:
       id: Continue
       solution: null
     linked_skill_id: null
+    next_content_id_index: 1
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_9: {}
+        content_7: {}
+        default_outcome_8: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_9: {}
+        content_7: {}
+        default_outcome_8: {}
   Drag And Drop Sort:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -198,8 +238,23 @@ states:
       id: DragAndDropSortInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        content_10: {}
+        default_outcome_11: {}
+        feedback_12: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13: {}
+        ca_choices_14: {}
+        content_10: {}
+        default_outcome_11: {}
+        feedback_12: {}
   End Exploration:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -218,8 +273,15 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_15: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_15: {}
   Fraction Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -275,8 +337,21 @@ states:
       id: FractionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_19: {}
+        content_16: {}
+        default_outcome_17: {}
+        feedback_18: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_19: {}
+        content_16: {}
+        default_outcome_17: {}
+        feedback_18: {}
   Graph Theory:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -479,8 +554,25 @@ states:
       id: GraphInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_20: {}
+        default_outcome_21: {}
+        feedback_22: {}
+        feedback_23: {}
+        feedback_24: {}
+        hint_25: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_20: {}
+        default_outcome_21: {}
+        feedback_22: {}
+        feedback_23: {}
+        feedback_24: {}
+        hint_25: {}
   Image Region:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -626,8 +718,8 @@ states:
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome_27
-          html: <p>Constructors <em>initialize</em> an object, or <em>init</em> it.Constructors
-            are also functions themselves.</p>
+          html: "<p>Constructors <em>initialize</em>\_an object, or <em>init</em>\_\
+            it.Constructors are also functions themselves.</p>"
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -639,8 +731,29 @@ states:
       id: ImageClickInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 6
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_26: {}
+        default_outcome_27: {}
+        feedback_28: {}
+        feedback_29: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        hint_33: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_26: {}
+        default_outcome_27: {}
+        feedback_28: {}
+        feedback_29: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        hint_33: {}
   Item Selection Multi:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -751,8 +864,33 @@ states:
       id: ItemSelectionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 8
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_41: {}
+        ca_choices_42: {}
+        ca_choices_43: {}
+        content_34: {}
+        default_outcome_35: {}
+        feedback_36: {}
+        feedback_37: {}
+        feedback_38: {}
+        feedback_39: {}
+        hint_40: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_41: {}
+        ca_choices_42: {}
+        ca_choices_43: {}
+        content_34: {}
+        default_outcome_35: {}
+        feedback_36: {}
+        feedback_37: {}
+        feedback_38: {}
+        feedback_39: {}
+        hint_40: {}
   Item Selection Single:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -841,8 +979,29 @@ states:
       id: ItemSelectionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 7
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_49: {}
+        ca_choices_50: {}
+        ca_choices_51: {}
+        content_44: {}
+        default_outcome_45: {}
+        feedback_46: {}
+        feedback_47: {}
+        feedback_48: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_49: {}
+        ca_choices_50: {}
+        ca_choices_51: {}
+        content_44: {}
+        default_outcome_45: {}
+        feedback_46: {}
+        feedback_47: {}
+        feedback_48: {}
   Math Equation Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -872,6 +1031,12 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        customOskLetters:
+          value:
+          - "c"
+          - "m"
+          - "x"
+          - "y"
         allowedVariables:
           value:
           - c
@@ -897,8 +1062,21 @@ states:
       id: MathEquationInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_52: {}
+        default_outcome_53: {}
+        feedback_54: {}
+        hint_55: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_52: {}
+        default_outcome_53: {}
+        feedback_54: {}
+        hint_55: {}
   Multiple Choice:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -985,8 +1163,31 @@ states:
       id: MultipleChoiceInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 7
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_62: {}
+        ca_choices_63: {}
+        ca_choices_64: {}
+        content_56: {}
+        default_outcome_57: {}
+        feedback_58: {}
+        feedback_59: {}
+        feedback_60: {}
+        hint_61: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_62: {}
+        ca_choices_63: {}
+        ca_choices_64: {}
+        content_56: {}
+        default_outcome_57: {}
+        feedback_58: {}
+        feedback_59: {}
+        feedback_60: {}
+        hint_61: {}
   Music Notes Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1045,8 +1246,21 @@ states:
       id: MusicNotesInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_65: {}
+        default_outcome_66: {}
+        feedback_67: {}
+        hint_68: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_65: {}
+        default_outcome_66: {}
+        feedback_67: {}
+        hint_68: {}
   Number Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1090,8 +1304,19 @@ states:
       id: NumericInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_69: {}
+        default_outcome_70: {}
+        feedback_71: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_69: {}
+        default_outcome_70: {}
+        feedback_71: {}
   Number Line Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1194,8 +1419,19 @@ states:
       id: NumberWithUnits
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_72: {}
+        default_outcome_73: {}
+        feedback_74: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_72: {}
+        default_outcome_73: {}
+        feedback_74: {}
   Numeric Expression Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1248,8 +1484,23 @@ states:
       id: NumericExpressionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_79: {}
+        content_75: {}
+        default_outcome_76: {}
+        feedback_77: {}
+        hint_78: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_79: {}
+        content_75: {}
+        default_outcome_76: {}
+        feedback_77: {}
+        hint_78: {}
   Pencil Code Editor:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1311,8 +1562,21 @@ states:
       id: PencilCodeEditor
       solution: null
     linked_skill_id: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_80: {}
+        default_outcome_81: {}
+        feedback_82: {}
+        feedback_83: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_80: {}
+        default_outcome_81: {}
+        feedback_82: {}
+        feedback_83: {}
   Ratio Expression Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1362,8 +1626,21 @@ states:
       id: RatioExpressionInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_87: {}
+        content_84: {}
+        default_outcome_85: {}
+        feedback_86: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_87: {}
+        content_84: {}
+        default_outcome_85: {}
+        feedback_86: {}
   Set Input:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1426,9 +1703,30 @@ states:
       id: SetInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 6
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_95: {}
+        content_88: {}
+        default_outcome_89: {}
+        feedback_90: {}
+        hint_92: {}
+        hint_93: {}
+        hint_94: {}
+        rule_input_91: {}
     solicit_answer_details: false
-  Text Input state name with unicode ął:
+    written_translations:
+      translations_mapping:
+        ca_buttonText_95: {}
+        content_88: {}
+        default_outcome_89: {}
+        feedback_90: {}
+        hint_92: {}
+        hint_93: {}
+        hint_94: {}
+        rule_input_91: {}
+  "Text Input state name with unicode \u0105\u0142":
     card_is_checkpoint: true
     classifier_model_id: null
     content:
@@ -1467,7 +1765,7 @@ states:
         rows:
           value: 1
       default_outcome:
-        dest: Text Input state name with unicode ął
+        dest: "Text Input state name with unicode \u0105\u0142"
         dest_if_really_stuck: null
         feedback:
           content_id: default_outcome_97
@@ -1483,8 +1781,25 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_101: {}
+        content_96: {}
+        default_outcome_97: {}
+        feedback_98: {}
+        hint_100: {}
+        rule_input_99: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_101: {}
+        content_96: {}
+        default_outcome_97: {}
+        feedback_98: {}
+        hint_100: {}
+        rule_input_99: {}
   World Map:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -1578,8 +1893,25 @@ states:
       id: InteractiveMap
       solution: null
     linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_102: {}
+        default_outcome_103: {}
+        feedback_104: {}
+        feedback_105: {}
+        feedback_106: {}
+        hint_107: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content_102: {}
+        default_outcome_103: {}
+        feedback_104: {}
+        feedback_105: {}
+        feedback_106: {}
+        hint_107: {}
 states_schema_version: 57
 tags: []
 title: Test of all interactions
