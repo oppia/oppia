@@ -25,7 +25,7 @@ const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 const imageToUploadInQuestion = testConstants.data.profilePicture;
 
-const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
+const submitQuestionTab = 'button.e2e-test-submitQuestionTab';
 const opportunityHeadingTitleSelector =
   '.e2e-test-opportunity-list-item-heading';
 const opportunityListItem = '.e2e-test-opportunity-list-item';
