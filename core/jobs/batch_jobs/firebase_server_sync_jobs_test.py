@@ -120,6 +120,20 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.firebase_sdk_stub.assert_is_user('aid_a')
 
+    def test_user_with_mixed_case_email_is_left_unchanged(self) -> None:
+        # NOTE: Firebase stores emails in lowercase.
+        self.create_oppia_user(
+            user_id='uid_a', firebase_auth_id='aid_a', email='A@a.com'
+        )
+        self.firebase_sdk_stub.create_user(
+            uid='aid_a', email='a@a.com', disabled=False
+        )
+
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult.as_stdout('OK: 1')]
+        )
+        self.firebase_sdk_stub.assert_is_user('aid_a')
+
     def test_user_missing_from_firebase_is_created(self) -> None:
         self.create_oppia_user(
             user_id='uid_b', firebase_auth_id='aid_b', email='b@b.com'
@@ -212,6 +226,28 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.create_oppia_user(
             user_id='uid_y', firebase_auth_id='aid_y', email=duplicate_email
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'OPPIA_USER_COLLISION: Oppia users '
+                        '(user_ids=[\'uid_x\', \'uid_y\']) are sharing the'
+                        ' same email'
+                    )
+                ),
+            ]
+        )
+        self.firebase_sdk_stub.assert_is_not_user('aid_x')
+        self.firebase_sdk_stub.assert_is_not_user('aid_y')
+
+    def test_oppia_email_collision_up_to_case_aborts_writes(self) -> None:
+        self.create_oppia_user(
+            user_id='uid_x', firebase_auth_id='aid_x', email='dup@dup.com'
+        )
+        self.create_oppia_user(
+            user_id='uid_y', firebase_auth_id='aid_y', email='DUP@dup.com'
         )
 
         self.assert_job_output_is(
