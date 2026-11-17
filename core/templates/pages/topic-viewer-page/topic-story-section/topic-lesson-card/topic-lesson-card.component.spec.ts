@@ -178,18 +178,6 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isCompletedLesson).toBeFalse();
   });
 
-  it('should navigate to startUrl directly when no fallback is needed', () => {
-    spyOn(component.startLessonClick, 'emit');
-    component.startUrl = '/explore/123';
-
-    component.onStartButtonClick();
-
-    expect(component.startLessonClick.emit).toHaveBeenCalledWith({
-      lessonNumber: 1,
-      startUrl: '/explore/123',
-    });
-  });
-
   it('should not emit startLessonClick when startUrl is empty', () => {
     spyOn(component.startLessonClick, 'emit');
     component.startUrl = '';

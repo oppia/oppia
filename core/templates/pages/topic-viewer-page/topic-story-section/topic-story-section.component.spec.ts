@@ -25,7 +25,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
-import {EventEmitter} from '@angular/core';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
@@ -63,7 +62,6 @@ describe('TopicStorySectionComponent', () => {
   let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
   let i18nLanguageCodeService: {
     isCurrentLanguageRTL: jasmine.Spy;
-    onI18nLanguageCodeChange: EventEmitter<string>;
   };
   let chapterLabelVisibilityService: jasmine.SpyObj<ChapterLabelVisibilityService>;
   let questionBackendApiService: jasmine.SpyObj<QuestionBackendApiService>;
@@ -112,8 +110,6 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
       'isCurrentLanguageRTL',
     ]);
-    i18nLanguageCodeService.onI18nLanguageCodeChange =
-      new EventEmitter<string>();
     chapterLabelVisibilityService = jasmine.createSpyObj(
       'ChapterLabelVisibilityService',
       ['isNewChapterLabelVisible']
