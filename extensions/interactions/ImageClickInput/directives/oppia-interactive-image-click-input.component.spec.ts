@@ -665,10 +665,13 @@ describe('InteractiveImageClickInput', () => {
     spyOn(imageElement, 'getBoundingClientRect').and.returnValue(
       new DOMRect(100, 200, 0, 0)
     );
-    spyOn(window, 'getComputedStyle').and.returnValue({
-      marginLeft: '10px',
-      marginTop: '20px',
-    } as CSSStyleDeclaration);
+    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
+      'CSSStyleDeclaration',
+      ['marginLeft', 'marginTop']
+    );
+    styleMock.marginLeft = '10px';
+    styleMock.marginTop = '20px';
+    spyOn(window, 'getComputedStyle').and.returnValue(styleMock);
 
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-select-image-region-cursor');

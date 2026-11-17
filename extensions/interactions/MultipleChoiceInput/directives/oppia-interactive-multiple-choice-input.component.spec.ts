@@ -201,8 +201,8 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     const buttons = fixture.nativeElement.querySelectorAll(
       'button.multiple-choice-option'
     );
-    expect(buttons[2].classList.contains('selected')).toBe(true);
-    expect(buttons[0].classList.contains('selected')).toBe(false);
+    expect(buttons[2].classList.contains('selected')).toBeTrue();
+    expect(buttons[0].classList.contains('selected')).toBeFalse();
   });
 
   it(

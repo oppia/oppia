@@ -189,7 +189,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           .withArgs('button.multiple-choice-option.selected')
           .and.returnValue(selectedButton);
         const currentTargetButton = document.createElement('button');
-        currentTargetButton.classList.add('selected');
         spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
           currentTargetButton
         );
@@ -201,6 +200,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         };
 
         component.submitMultipleChoiceAnswer(dummyMouseEvent, 0);
+        expect(currentTargetButton.classList.contains('selected')).toBe(true);
 
         expect(component.userSelections).toEqual({
           'choice 1': true,
@@ -245,7 +245,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           .withArgs('button.multiple-choice-option.selected')
           .and.returnValue(selectedButton);
         const currentTargetButton = document.createElement('button');
-        currentTargetButton.classList.add('selected');
         spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
           currentTargetButton
         );
@@ -257,6 +256,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         };
 
         component.submitMultipleChoiceAnswer(dummyMouseEvent, 0);
+        expect(currentTargetButton.classList.contains('selected')).toBe(true);
 
         expect(component.userSelections).toEqual({
           'choice 1': true,
