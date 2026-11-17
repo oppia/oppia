@@ -17,10 +17,11 @@
  */
 
 import {ElementHandle} from 'puppeteer';
-import {BaseUser} from '../common/puppeteer-utils';
 import {RTEEditor} from '../common/rte-editor';
 import isElementClickable from '../../functions/is-element-clickable';
 import {showMessage} from '../common/show-message';
+import testConstants from '../common/test-constants';
+import {CONTENT_TYPE_FILTER, Contributor} from './contributor';
 
 // Common Selectors.
 const selectedSkillSelector = '.e2e-test-rte-skill-selected';
@@ -80,7 +81,7 @@ const skipLinkProbeTimeoutMsecs = 2000;
 const translateButtonClickAttempts = 3;
 const translateModalTimeoutMsecs = 10000;
 
-export class TranslationSubmitter extends BaseUser {
+export class TranslationSubmitter extends Contributor {
   /**
    * Clicks on the given pagination button.
    * @param button - The button to click on.
@@ -793,6 +794,128 @@ export class TranslationSubmitter extends BaseUser {
 
   async clickOnAutoTranslateButton(): Promise<void> {
     await this.clickOnElementWithSelector(autoTranslateButtonSelector);
+  }
+
+  /**
+   * Navigates to the contributor dashboard.
+   */
+  async navigateToContributorDashboard(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboard);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the "Translate Text" tab of the Contributor Dashboard
+   * and applies the target language, topic, and optional content type filters.
+   * @param language - Target translation language.
+   * @param topicName - Topic name to filter by.
+   * @param contentType - Optional content type filter option.
+   */
+  async navigateToTranslateTextTab(
+    language: string,
+    topicName: string,
+    contentType?: CONTENT_TYPE_FILTER
+  ): Promise<void> {
+    if (!this.page.url().includes('/contributor-dashboard')) {
+      await this.navigateToContributorDashboard();
+    }
+    await this.switchToTabInContributionDashboard('Translate Text');
+    await this.selectLanguageFilter(language);
+    await this.selectSubjectInTranslateTextTab(topicName);
+    if (contentType) {
+      await this.selectContentTypeFilter(contentType);
+    }
+  }
+
+  /**
+   * Submits translations for a lesson's metadata items (title, objective, optional tag).
+   * @param language - Target translation language.
+   * @param topicName - Topic the lesson belongs to.
+   * @param chapterName - Chapter title.
+   * @param lessonSubheading - Opportunity subheading.
+   * @param metadata - The translated title, objective, and optional tag.
+   */
+  async submitLessonMetadataTranslations(
+    language: string,
+    topicName: string,
+    chapterName: string,
+    lessonSubheading: string,
+    metadata: {
+      title: string;
+      objective: string;
+      tag?: string;
+    }
+  ): Promise<void> {
+    await this.navigateToTranslateTextTab(
+      language,
+      topicName,
+      CONTENT_TYPE_FILTER.LESSONS
+    );
+    await this.clickOnTranslateButtonInTranslateTextTab(
+      chapterName,
+      lessonSubheading
+    );
+
+    await this.skipToTranslationItemOfContentType('title', 15);
+    await this.typeTextInTranslationInput(metadata.title);
+    await this.saveTranslationAndMoveToNextItem();
+
+    await this.skipToTranslationItemOfContentType('objective', 15);
+    await this.typeTextInTranslationInput(metadata.objective);
+
+    if (metadata.tag) {
+      await this.saveTranslationAndMoveToNextItem(
+        'Submitted translation for review.'
+      );
+      await this.skipToTranslationItemOfContentType('tag', 15);
+      await this.typeTextInTranslationInput(metadata.tag);
+    }
+
+    await this.saveTranslationAndCloseModal(
+      'Submitted translation for review.'
+    );
+  }
+
+  /**
+   * Submits translations for a skill's translatable items.
+   * @param language - Target translation language.
+   * @param topicName - Topic the skill belongs to.
+   * @param skillName - Skill description.
+   * @param skillSubheading - Opportunity subheading.
+   * @param items - Items to translate.
+   */
+  async submitSkillTranslations(
+    language: string,
+    topicName: string,
+    skillName: string,
+    skillSubheading: string,
+    items: {
+      type: string;
+      text: string;
+      html: boolean;
+    }[]
+  ): Promise<void> {
+    await this.navigateToTranslateTextTab(
+      language,
+      topicName,
+      CONTENT_TYPE_FILTER.SKILLS
+    );
+
+    for (const item of items) {
+      await this.clickOnTranslateButtonInTranslateTextTab(
+        skillName,
+        skillSubheading
+      );
+      await this.skipToTranslationItemOfContentType(item.type, 15);
+      if (item.html) {
+        await this.typeTextForRTE(item.text);
+      } else {
+        await this.typeTextInTranslationInput(item.text);
+      }
+      await this.saveTranslationAndCloseModal(
+        'Submitted translation for review.'
+      );
+    }
   }
 }
 

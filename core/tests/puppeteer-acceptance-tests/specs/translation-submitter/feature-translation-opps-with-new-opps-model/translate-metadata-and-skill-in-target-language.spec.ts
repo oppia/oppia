@@ -32,10 +32,7 @@ import {
   CONTENT_TYPE_FILTER,
 } from '../../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 import {TopicManager} from '../../../utilities/user/topic-manager';
@@ -119,48 +116,24 @@ describe('Translation Submitter', function () {
       'enable_translation_opps_with_new_opp_models'
     );
 
-    // A skill only gets a translation opportunity while it is assigned to a
-    // topic, so the skill is created through the topic that owns it.
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      TOPIC_NAME,
-      SUBTOPIC_NAME,
-      SKILL_NAME
-    );
-    await curriculumAdm.openSkillEditor(SKILL_NAME);
-    await curriculumAdm.updateReviewMaterial(SKILL_EXPLANATION);
-    await curriculumAdm.addMisconception(
-      'Unit fraction numerator',
-      'Learners may confuse the numerator and denominator.',
-      MISCONCEPTION_FEEDBACK
-    );
-    await curriculumAdm.publishUpdatedSkill('Add translatable skill content.');
-
-    await curriculumAdm.navigateToCreatorDashboardPage();
-    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.updateCardContent(
-      'A birthday cake is cut into equal pieces.'
-    );
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await curriculumAdm.saveExplorationDraft();
-
-    // The tag gives the lesson a tag metadata item to translate, alongside the
-    // title and objective items.
-    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      EXPLORATION_TITLE,
-      EXPLORATION_OBJECTIVE,
-      EXPLORATION_CATEGORY,
-      EXPLORATION_TAG
-    );
-
-    await curriculumAdm.createAndPublishStoryWithChapter(
-      'The Picnic Problem',
-      'the-picnic-problem',
-      CHAPTER_NAME,
-      explorationId,
-      TOPIC_NAME
-    );
+    await curriculumAdm.setUpCuratedLessonWithSkill({
+      topicName: TOPIC_NAME,
+      subtopicName: SUBTOPIC_NAME,
+      skillName: SKILL_NAME,
+      skillExplanation: SKILL_EXPLANATION,
+      misconception: {
+        name: 'Unit fraction numerator',
+        notes: 'Learners may confuse the numerator and denominator.',
+        feedback: MISCONCEPTION_FEEDBACK,
+      },
+      explorationTitle: EXPLORATION_TITLE,
+      explorationObjective: EXPLORATION_OBJECTIVE,
+      explorationCategory: EXPLORATION_CATEGORY,
+      explorationTag: EXPLORATION_TAG,
+      storyTitle: 'The Picnic Problem',
+      storyUrlFragment: 'the-picnic-problem',
+      chapterTitle: CHAPTER_NAME,
+    });
   }, 2100000);
 
   it('should filter opportunities by entity type', async function () {

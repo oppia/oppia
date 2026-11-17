@@ -28,10 +28,7 @@ import {
   CONTENT_TYPE_FILTER,
 } from '../../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 import {TopicManager} from '../../../utilities/user/topic-manager';
@@ -53,8 +50,6 @@ const EXPLORATION_OBJECTIVE = 'Learn dividing a birthday cake into equal parts';
 const LESSON_SUBHEADING = `Exploration - ${TOPIC_NAME}`;
 const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 
-const CONTENT_TYPE_TITLE = 'title';
-const CONTENT_TYPE_OBJECTIVE = 'objective';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
@@ -65,8 +60,6 @@ const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर हिस्सों में बाँटना सीखें';
 const HINDI_SKILL_DESCRIPTION = 'इकाई भिन्न';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
-
-const MAX_ITEMS_TO_SKIP = 15;
 
 describe('Translation Reviewer: filter opportunities by entity type', function () {
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
@@ -100,89 +93,46 @@ describe('Translation Reviewer: filter opportunities by entity type', function (
       'enable_translation_opps_with_new_opp_models'
     );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      TOPIC_NAME,
-      SUBTOPIC_NAME,
-      SKILL_NAME
-    );
-
-    await curriculumAdm.navigateToCreatorDashboardPage();
-    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.updateCardContent(
-      'A birthday cake is cut into equal pieces.'
-    );
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await curriculumAdm.saveExplorationDraft();
-    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      EXPLORATION_TITLE,
-      EXPLORATION_OBJECTIVE,
-      'Mathematics'
-    );
-
-    await curriculumAdm.createAndPublishStoryWithChapter(
-      'The Picnic Problem',
-      'the-picnic-problem',
-      CHAPTER_NAME,
-      explorationId,
-      TOPIC_NAME
-    );
+    await curriculumAdm.setUpCuratedLessonWithSkill({
+      topicName: TOPIC_NAME,
+      subtopicName: SUBTOPIC_NAME,
+      skillName: SKILL_NAME,
+      explorationTitle: EXPLORATION_TITLE,
+      explorationObjective: EXPLORATION_OBJECTIVE,
+      storyTitle: 'The Picnic Problem',
+      storyUrlFragment: 'the-picnic-problem',
+      chapterTitle: CHAPTER_NAME,
+    });
 
     // Submit the metadata and skill translations that this spec reviews.
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectLanguageFilter(TRANSLATION_LANGUAGE);
-    await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
-
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    await translationSubmitter.submitLessonMetadataTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
       CHAPTER_NAME,
-      LESSON_SUBHEADING
+      LESSON_SUBHEADING,
+      {
+        title: HINDI_TITLE,
+        objective: HINDI_OBJECTIVE,
+      }
     );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_TITLE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_OBJECTIVE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
-    await translationSubmitter.saveTranslationAndMoveToNextItem(
-      'Submitted translation for review.'
-    );
-    await translationSubmitter.closeTranslateTextModal();
 
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.SKILLS
-    );
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    await translationSubmitter.submitSkillTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
       SKILL_NAME,
-      SKILL_SUBHEADING
-    );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_SKILL_DESCRIPTION,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(
-      HINDI_SKILL_DESCRIPTION
-    );
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_SKILL_EXPLANATION,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextForRTE(HINDI_SKILL_EXPLANATION);
-    await translationSubmitter.clickOnElementWithText('Save and close');
-    await translationSubmitter.expectToastMessage(
-      'Submitted translation for review.'
+      SKILL_SUBHEADING,
+      [
+        {
+          type: CONTENT_TYPE_SKILL_DESCRIPTION,
+          text: HINDI_SKILL_DESCRIPTION,
+          html: false,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_EXPLANATION,
+          text: HINDI_SKILL_EXPLANATION,
+          html: true,
+        },
+      ]
     );
   }, 2100000);
 

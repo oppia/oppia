@@ -30,10 +30,7 @@ import {
   CONTENT_TYPE_FILTER,
 } from '../../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
@@ -58,17 +55,12 @@ const EXPLORATION_CARD_CONTENT = 'A birthday cake is cut into equal pieces.';
 const LESSON_SUBHEADING = `Exploration - ${TOPIC_NAME}`;
 const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 
-const CONTENT_TYPE_TITLE = 'title';
-const CONTENT_TYPE_OBJECTIVE = 'objective';
-const CONTENT_TYPE_TAG = 'tag';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 
 const HINDI_TITLE = 'पाई काटना';
 const HINDI_OBJECTIVE = 'केक को बराबर बाँटना सीखें';
 const HINDI_TAG = 'भिन्नों';
 const HINDI_SKILL_EXPLANATION = 'इकाई भिन्न की समीक्षा';
-
-const MAX_ITEMS_TO_SKIP = 15;
 
 // The lesson contributes a title, objective and tag, and the skill contributes an
 // explanation, so no list here holds more than a handful of suggestions. The
@@ -112,97 +104,46 @@ describe('Logged-out User', function () {
       'enable_translation_opps_with_new_opp_models'
     );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      TOPIC_NAME,
-      SUBTOPIC_NAME,
-      SKILL_NAME
-    );
-    await curriculumAdm.openSkillEditor(SKILL_NAME);
-    await curriculumAdm.updateReviewMaterial(
-      'Review material for unit fractions.'
-    );
-    await curriculumAdm.publishUpdatedSkill('Set concept-card explanation.');
-
-    // The concept card link is what makes the skill's explanation reachable
-    // from inside the lesson. It is added to the card content here because the
-    // skill it points at has to exist first.
-    await curriculumAdm.navigateToCreatorDashboardPage();
-    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.updateCardContentWithConceptCard(
-      EXPLORATION_CARD_CONTENT
-    );
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await curriculumAdm.saveExplorationDraft();
-    explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      EXPLORATION_TITLE,
-      EXPLORATION_OBJECTIVE,
-      'Mathematics',
-      'fractions'
-    );
-
-    await curriculumAdm.createAndPublishStoryWithChapter(
-      'The Picnic Problem',
-      'the-picnic-problem',
-      CHAPTER_NAME,
-      explorationId,
-      TOPIC_NAME
-    );
+    explorationId = await curriculumAdm.setUpCuratedLessonWithSkill({
+      topicName: TOPIC_NAME,
+      subtopicName: SUBTOPIC_NAME,
+      skillName: SKILL_NAME,
+      skillExplanation: 'Review material for unit fractions.',
+      explorationTitle: EXPLORATION_TITLE,
+      explorationObjective: EXPLORATION_OBJECTIVE,
+      explorationTag: 'fractions',
+      explorationCardContent: EXPLORATION_CARD_CONTENT,
+      linkConceptCard: true,
+      storyTitle: 'The Picnic Problem',
+      storyUrlFragment: 'the-picnic-problem',
+      chapterTitle: CHAPTER_NAME,
+    });
 
     // Submit the three metadata items and the skill explanation from LO.4.
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectLanguageFilter(TRANSLATION_LANGUAGE);
-    await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
-
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    await translationSubmitter.submitLessonMetadataTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
       CHAPTER_NAME,
-      LESSON_SUBHEADING
-    );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_TITLE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_OBJECTIVE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
-    await translationSubmitter.saveTranslationAndMoveToNextItem(
-      'Submitted translation for review.'
-    );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_TAG,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_TAG);
-    await translationSubmitter.saveTranslationAndCloseModal(
-      'Submitted translation for review.'
+      LESSON_SUBHEADING,
+      {
+        title: HINDI_TITLE,
+        objective: HINDI_OBJECTIVE,
+        tag: HINDI_TAG,
+      }
     );
 
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.SKILLS
-    );
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    await translationSubmitter.submitSkillTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
       SKILL_NAME,
-      SKILL_SUBHEADING
-    );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_SKILL_EXPLANATION,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextForRTE(HINDI_SKILL_EXPLANATION);
-    await translationSubmitter.clickOnElementWithText('Save and close');
-    await translationSubmitter.expectToastMessage(
-      'Submitted translation for review.'
+      SKILL_SUBHEADING,
+      [
+        {
+          type: CONTENT_TYPE_SKILL_EXPLANATION,
+          text: HINDI_SKILL_EXPLANATION,
+          html: true,
+        },
+      ]
     );
 
     // Only accepted translations are displayed to the learner.

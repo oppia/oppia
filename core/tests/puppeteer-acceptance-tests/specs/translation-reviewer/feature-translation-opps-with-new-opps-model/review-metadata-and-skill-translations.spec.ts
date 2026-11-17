@@ -31,10 +31,7 @@ import {
   CONTENT_TYPE_FILTER,
 } from '../../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 import {TopicManager} from '../../../utilities/user/topic-manager';
@@ -56,8 +53,6 @@ const EXPLORATION_OBJECTIVE = 'Learn dividing a birthday cake into equal parts';
 const LESSON_SUBHEADING = `Exploration - ${TOPIC_NAME}`;
 const SKILL_SUBHEADING = `Skill - ${TOPIC_NAME}`;
 
-const CONTENT_TYPE_TITLE = 'title';
-const CONTENT_TYPE_OBJECTIVE = 'objective';
 const CONTENT_TYPE_SKILL_DESCRIPTION = 'skill description';
 const CONTENT_TYPE_SKILL_EXPLANATION = 'skill explanation';
 const CONTENT_TYPE_MISCONCEPTION_FEEDBACK = 'misconception feedback';
@@ -78,72 +73,11 @@ const ACCEPT_AND_REVIEW_NEXT_LABEL = 'Accept and review next';
 const ACCEPT_LABEL = 'Accept';
 const REJECT_AND_REVIEW_NEXT_LABEL = 'Reject and review next';
 
-const MAX_ITEMS_TO_SKIP = 15;
-
 describe('Translation Reviewer: review translations', function () {
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
-
-  /** Adds the three translatable fields to a skill without creating duplicates. */
-  const prepareSkill = async (skillName: string): Promise<void> => {
-    await curriculumAdm.openSkillEditor(skillName);
-    await curriculumAdm.updateReviewMaterial(SKILL_EXPLANATION);
-    await curriculumAdm.addMisconception(
-      'Unit fraction numerator',
-      'Learners may confuse the numerator and denominator.',
-      MISCONCEPTION_FEEDBACK
-    );
-    await curriculumAdm.publishUpdatedSkill('Add translatable skill content.');
-  };
-
-  /** Submits feedback first so the review queue is explanation, description, feedback. */
-  const submitSkillTranslations = async (skillName: string): Promise<void> => {
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectLanguageFilter(TRANSLATION_LANGUAGE);
-    await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.SKILLS
-    );
-    for (const item of [
-      {
-        type: CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
-        text: HINDI_MISCONCEPTION_FEEDBACK,
-        html: true,
-      },
-      {
-        type: CONTENT_TYPE_SKILL_DESCRIPTION,
-        text: HINDI_SKILL_DESCRIPTION,
-        html: false,
-      },
-      {
-        type: CONTENT_TYPE_SKILL_EXPLANATION,
-        text: HINDI_SKILL_EXPLANATION,
-        html: true,
-      },
-    ]) {
-      await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-        skillName,
-        SKILL_SUBHEADING
-      );
-      await translationSubmitter.skipToTranslationItemOfContentType(
-        item.type,
-        MAX_ITEMS_TO_SKIP
-      );
-      if (item.html) {
-        await translationSubmitter.typeTextForRTE(item.text);
-      } else {
-        await translationSubmitter.typeTextInTranslationInput(item.text);
-      }
-      await translationSubmitter.saveTranslationAndCloseModal(
-        'Submitted translation for review.'
-      );
-    }
-  };
 
   beforeAll(async function () {
     translationReviewer = await UserFactory.createNewUser(
@@ -171,67 +105,58 @@ describe('Translation Reviewer: review translations', function () {
       'enable_translation_opps_with_new_opp_models'
     );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      TOPIC_NAME,
-      SUBTOPIC_NAME,
-      SKILL_NAME
-    );
-    await prepareSkill(SKILL_NAME);
-
-    await curriculumAdm.navigateToCreatorDashboardPage();
-    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.updateCardContent(
-      'A birthday cake is cut into equal pieces.'
-    );
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await curriculumAdm.saveExplorationDraft();
-    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      EXPLORATION_TITLE,
-      EXPLORATION_OBJECTIVE,
-      'Mathematics'
-    );
-
-    await curriculumAdm.createAndPublishStoryWithChapter(
-      'The Picnic Problem',
-      'the-picnic-problem',
-      CHAPTER_NAME,
-      explorationId,
-      TOPIC_NAME
-    );
+    await curriculumAdm.setUpCuratedLessonWithSkill({
+      topicName: TOPIC_NAME,
+      subtopicName: SUBTOPIC_NAME,
+      skillName: SKILL_NAME,
+      skillExplanation: SKILL_EXPLANATION,
+      misconception: {
+        name: 'Unit fraction numerator',
+        notes: 'Learners may confuse the numerator and denominator.',
+        feedback: MISCONCEPTION_FEEDBACK,
+      },
+      explorationTitle: EXPLORATION_TITLE,
+      explorationObjective: EXPLORATION_OBJECTIVE,
+      storyTitle: 'The Picnic Problem',
+      storyUrlFragment: 'the-picnic-problem',
+      chapterTitle: CHAPTER_NAME,
+    });
 
     // Submit the metadata and skill translations that this spec reviews.
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectLanguageFilter(TRANSLATION_LANGUAGE);
-    await translationSubmitter.selectSubjectInTranslateTextTab(TOPIC_NAME);
-
-    await translationSubmitter.selectContentTypeFilter(
-      CONTENT_TYPE_FILTER.LESSONS
-    );
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    await translationSubmitter.submitLessonMetadataTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
       CHAPTER_NAME,
-      LESSON_SUBHEADING
-    );
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_TITLE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_TITLE);
-    await translationSubmitter.saveTranslationAndMoveToNextItem();
-    await translationSubmitter.skipToTranslationItemOfContentType(
-      CONTENT_TYPE_OBJECTIVE,
-      MAX_ITEMS_TO_SKIP
-    );
-    await translationSubmitter.typeTextInTranslationInput(HINDI_OBJECTIVE);
-    await translationSubmitter.saveTranslationAndCloseModal(
-      'Submitted translation for review.'
+      LESSON_SUBHEADING,
+      {
+        title: HINDI_TITLE,
+        objective: HINDI_OBJECTIVE,
+      }
     );
 
-    await submitSkillTranslations(SKILL_NAME);
+    await translationSubmitter.submitSkillTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
+      SKILL_NAME,
+      SKILL_SUBHEADING,
+      [
+        {
+          type: CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
+          text: HINDI_MISCONCEPTION_FEEDBACK,
+          html: true,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_DESCRIPTION,
+          text: HINDI_SKILL_DESCRIPTION,
+          html: false,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_EXPLANATION,
+          text: HINDI_SKILL_EXPLANATION,
+          html: true,
+        },
+      ]
+    );
   }, 2100000);
 
   it('should review exploration metadata translations', async function () {
@@ -419,9 +344,39 @@ describe('Translation Reviewer: review translations', function () {
   });
 
   it('should reject pending translations when their skill is deleted', async function () {
-    await curriculumAdm.createSkillForTopic(DELETION_SKILL_NAME, TOPIC_NAME);
-    await prepareSkill(DELETION_SKILL_NAME);
-    await submitSkillTranslations(DELETION_SKILL_NAME);
+    await curriculumAdm.createAndConfigureSkillForTopic(
+      DELETION_SKILL_NAME,
+      TOPIC_NAME,
+      SKILL_EXPLANATION,
+      {
+        name: 'Unit fraction numerator',
+        notes: 'Learners may confuse the numerator and denominator.',
+        feedback: MISCONCEPTION_FEEDBACK,
+      }
+    );
+    await translationSubmitter.submitSkillTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
+      DELETION_SKILL_NAME,
+      SKILL_SUBHEADING,
+      [
+        {
+          type: CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
+          text: HINDI_MISCONCEPTION_FEEDBACK,
+          html: true,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_DESCRIPTION,
+          text: HINDI_SKILL_DESCRIPTION,
+          html: false,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_EXPLANATION,
+          text: HINDI_SKILL_EXPLANATION,
+          html: true,
+        },
+      ]
+    );
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
@@ -460,11 +415,16 @@ describe('Translation Reviewer: review translations', function () {
   }, 900000);
 
   it('should preserve translations when their skill is unassigned and reassigned', async function () {
-    await curriculumAdm.createSkillForTopic(
+    await curriculumAdm.createAndConfigureSkillForTopic(
       REASSIGNMENT_SKILL_NAME,
-      TOPIC_NAME
+      TOPIC_NAME,
+      SKILL_EXPLANATION,
+      {
+        name: 'Unit fraction numerator',
+        notes: 'Learners may confuse the numerator and denominator.',
+        feedback: MISCONCEPTION_FEEDBACK,
+      }
     );
-    await prepareSkill(REASSIGNMENT_SKILL_NAME);
     const skillEditorPath = new URL(
       curriculumAdm.getCurrentUrlWithoutParameters()
     ).pathname;
@@ -473,7 +433,29 @@ describe('Translation Reviewer: review translations', function () {
       SUBTOPIC_NAME,
       TOPIC_NAME
     );
-    await submitSkillTranslations(REASSIGNMENT_SKILL_NAME);
+    await translationSubmitter.submitSkillTranslations(
+      TRANSLATION_LANGUAGE,
+      TOPIC_NAME,
+      REASSIGNMENT_SKILL_NAME,
+      SKILL_SUBHEADING,
+      [
+        {
+          type: CONTENT_TYPE_MISCONCEPTION_FEEDBACK,
+          text: HINDI_MISCONCEPTION_FEEDBACK,
+          html: true,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_DESCRIPTION,
+          text: HINDI_SKILL_DESCRIPTION,
+          html: false,
+        },
+        {
+          type: CONTENT_TYPE_SKILL_EXPLANATION,
+          text: HINDI_SKILL_EXPLANATION,
+          html: true,
+        },
+      ]
+    );
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.selectLanguageFilter(TRANSLATION_LANGUAGE);
     await translationReviewer.filterContentByTopic(TOPIC_NAME);
