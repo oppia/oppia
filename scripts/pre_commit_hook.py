@@ -204,7 +204,7 @@ def check_changes_in_config() -> None:
 
 
 def run_formatters() -> None:
-    """Runs prettier and black formatters."""
+    """Runs prettier, black, and ruff formatters and linters."""
     subprocess.run([NPX_CMD, 'lint-staged'], check=True)
 
 
@@ -240,9 +240,8 @@ def main(args: Optional[List[str]] = None) -> None:
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
-    print('Running the code formatters: Prettier and Black')
+    print('Running the code formatters: Prettier, Black, and Ruff')
     run_formatters()
-
     return
 
 
