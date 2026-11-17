@@ -153,7 +153,7 @@
   color: #555;
   font: normal normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
   line-height: 0;
-  margin: 4px 2px !important;
+  margin: 4px 2px;
 }
 
 .tag-heading {
