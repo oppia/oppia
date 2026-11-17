@@ -434,15 +434,6 @@ class BaseHandler(
                 self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
-        if self.payload_parse_error is not None:
-            self.handle_exception(
-                self.InvalidInputException(
-                    'The request payload could not be parsed.'
-                ),
-                self.app.debug,
-            )
-            return
-
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 # If user opens a new tab during signup process, the user_id
@@ -479,6 +470,10 @@ class BaseHandler(
 
         schema_validation_succeeded = True
         try:
+            if self.payload_parse_error is not None:
+                raise self.InvalidInputException(
+                    'The request payload could not be parsed.'
+                )
             self.validate_and_normalize_args()
 
         # TODO(#13155): Remove NotImplementedError once all the handlers
