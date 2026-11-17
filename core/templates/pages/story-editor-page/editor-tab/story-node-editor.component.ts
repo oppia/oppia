@@ -442,7 +442,11 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.explorationIdEditorIsShown = explorationId === null;
       this.restoreExplorationIdFocus();
       if (explorationId === null) {
+        // Like Cancel, clear the validation state of the discarded draft, so
+        // that the empty input field doesn't show a stale error.
         this.explorationId = null;
+        this.expIdCanBeSaved = true;
+        this.invalidExpErrorIsShown = false;
       }
     }
   }

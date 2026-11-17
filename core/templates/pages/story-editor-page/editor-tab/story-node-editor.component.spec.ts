@@ -568,6 +568,27 @@ describe('Story node editor component', () => {
       expect(updateExplorationIdSpy).toHaveBeenCalledWith(null);
     });
 
+    it('should clear the validation state of an invalid draft when the exploration is removed', () => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+      spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+      renderChapterWithExploration('exp_1');
+      component.openExplorationIdEditor();
+      component.explorationId = 'invalid id!';
+      component.expIdCanBeSaved = false;
+      component.invalidExpErrorIsShown = true;
+      fixture.detectChanges();
+      expect(query('.story-node-exploration .error-message')).not.toBeNull();
+
+      query('.e2e-test-delete-exploration-id-button')?.click();
+      fixture.detectChanges();
+
+      expect(component.explorationId).toBeNull();
+      expect(component.expIdCanBeSaved).toBe(true);
+      expect(component.invalidExpErrorIsShown).toBe(false);
+      expect(component.explorationIdEditorIsShown).toBe(true);
+      expect(query('.story-node-exploration .error-message')).toBeNull();
+    });
+
     it('should not show the delete button while editing if the story is published', () => {
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
       renderChapterWithExploration('exp_1');
