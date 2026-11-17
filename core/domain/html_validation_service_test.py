@@ -1355,13 +1355,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml), False
         )
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        invalid_xml = False  # type: ignore[assignment]
-        self.assertEqual(
-            html_validation_service.is_parsable_as_xml(invalid_xml), False
-        )
         valid_xml = b'<svg><path d="0" /></svg>'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(valid_xml), True
