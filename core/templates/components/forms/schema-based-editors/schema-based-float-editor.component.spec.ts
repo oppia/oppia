@@ -112,6 +112,41 @@ describe('Schema based float editor component', function () {
     expect(component.onChange).toEqual(mockFunction);
   }));
 
+  it('should display the localized value written by the model', () => {
+    const localizedValue = '1,25';
+    spyOn(numberConversionService, 'convertToLocalizedNumber').and.returnValue(
+      localizedValue
+    );
+    const onChangeSpy = jasmine.createSpy('onChange');
+    component.registerOnChange(onChangeSpy);
+
+    component.writeValue(1.25);
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector(
+      '#float-input'
+    ) as HTMLInputElement;
+    expect(component.localValue).toBe(1.25);
+    expect(component.localStringValue).toBe(localizedValue);
+    expect(input.value).toBe(localizedValue);
+    expect(
+      numberConversionService.convertToLocalizedNumber
+    ).toHaveBeenCalledWith(1.25);
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should clear empty model values and preserve the default value', () => {
+    component.writeValue(null);
+
+    expect(component.localValue).toBeNull();
+    expect(component.localStringValue).toBe('');
+
+    component.writeValue(undefined);
+
+    expect(component.localValue).toBe(0.0);
+    expect(component.localStringValue).toBe('');
+  });
+
   it('should call input focus when user selects the input field', () => {
     spyOn(component.inputFocus, 'emit');
 
