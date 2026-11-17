@@ -20,8 +20,7 @@
 /*rtl:end:remove*/
 
 .oppia-svg-star-image {
-  filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg)
-    brightness(91%) contrast(89%);
+  filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
   float: right;
   margin-right: 24px;
   width: 30px;
@@ -88,8 +87,6 @@
 .oppia-learner-dash-goals-add-text {
   color: #00645c;
 }
-/* Kept on one line: stylelint rejects the wrapped form Prettier produces. */
-/* prettier-ignore */
 .oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-circle {
   background-color: #429488;
 }
