@@ -682,6 +682,7 @@ describe('Settings Tab Component', () => {
       'owner',
       'editor',
     ]);
+    expect(component.getAssignableRoles()).toBe(component.getAssignableRoles());
   });
 
   it('should open a modal when removeRole is called', fakeAsync(() => {

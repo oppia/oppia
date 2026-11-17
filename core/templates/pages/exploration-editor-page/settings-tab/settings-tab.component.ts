@@ -134,6 +134,12 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     },
   ];
 
+  // Anyone can play a public exploration, so the playtester (viewer) role is
+  // only offered while the exploration is private.
+  PUBLIC_ROLES = this.ROLES.filter(
+    role => role.value !== AppConstants.ROLE_VIEWER
+  );
+
   CATEGORY_LIST_FOR_SELECT2!: {
     id: string;
     text: string;
@@ -500,15 +506,12 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   // Methods for rights management.
   /**
-   * Returns the roles that can be given to a new member. Anyone can play a
-   * public exploration, so the playtester (viewer) role is only offered while
-   * the exploration is private.
+   * Returns the roles that can be given to a new member.
    */
   getAssignableRoles(): {name: string; value: string}[] {
-    if (this.explorationRightsService.isPrivate()) {
-      return this.ROLES;
-    }
-    return this.ROLES.filter(role => role.value !== 'viewer');
+    return this.explorationRightsService.isPrivate()
+      ? this.ROLES
+      : this.PUBLIC_ROLES;
   }
 
   openEditRolesForm(): void {
