@@ -105,10 +105,6 @@ class MockPlatformFeatureService {
 }
 
 class MockInsertScriptService {
-  // The real service appends an external PencilCode script during ngOnInit.
-  // Loading it in unit tests can surface a cross-origin "Script error." that
-  // gets attributed to an unrelated spec (see #26940), so stub the service
-  // instead of patching document.body.appendChild.
   loadScript(): boolean {
     return true;
   }

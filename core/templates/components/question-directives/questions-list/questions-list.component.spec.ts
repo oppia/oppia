@@ -80,14 +80,6 @@ class MockUrlInterpolationService {
 }
 
 class MockWindowRef {
-  // This mock mirrors the real window so that services injected into this
-  // spec (for example WindowDimensionsService, which reads
-  // window.document.documentElement, and ImageLocalStorageService, which
-  // clears window.sessionStorage) keep behaving exactly as they do in
-  // production. Only `location` is replaced: QuestionsListComponent writes
-  // window.location.hash when the question editor is opened, and tests share
-  // a single browser page, so leaving that write to the real window would
-  // leak '#/questions#<id>' into every spec that runs afterwards.
   nativeWindow = {
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,

@@ -75,9 +75,6 @@ describe('Image Uploader Modal', () => {
     }
   }
 
-  // The mocks extend the real APIs so that they remain complete,
-  // type-checked implementations instead of partial objects hidden behind
-  // casts.
   class MockFileReader extends FileReader {
     get result(): string | ArrayBuffer | null {
       return mockedFileReadResult;
