@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
@@ -31,6 +29,7 @@ import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 
 const skillContentsDict = {
   explanation: {
@@ -142,7 +141,7 @@ class FakeSkillBackendApiService {
             ],
           },
           assignedSkillTopicData: {
-            topicName: ['tester'],
+            topicName: 'tester',
           },
         });
       } else {
@@ -151,7 +150,12 @@ class FakeSkillBackendApiService {
     });
   }
 
-  async updateSkillAsync() {
+  async updateSkillAsync(
+    skillId: string,
+    skillVersion: number,
+    commitMessage: string,
+    changeList: BackendChangeObject[]
+  ) {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.skillObject);
@@ -285,7 +289,7 @@ describe('Skill editor state service', () => {
     expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
 
     expect(skillEditorStateService.getAssignedSkillTopicData()).toEqual({
-      topicName: ['tester'],
+      topicName: 'tester',
     });
   }));
 

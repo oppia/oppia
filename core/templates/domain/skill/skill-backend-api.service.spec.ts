@@ -159,9 +159,12 @@ describe('Skill backend API service', () => {
         jasmine.any(SkillSummary)
       );
       expect(response.groupedSkillSummaries.topic[0].languageCode).toBe('en');
-      expect(response.groupedSkillSummaries.topic[0]).not.toBe(
-        skillSummaryBackendDict
-      );
+      expect(
+        Object.is(
+          response.groupedSkillSummaries.topic[0],
+          skillSummaryBackendDict
+        )
+      ).toBe(false);
       expect(groupedSkillSummaries.topic[0]).toBe(skillSummaryBackendDict);
       expect(Object.keys(response.groupedSkillSummaries)).toEqual([
         'topic',
