@@ -55,6 +55,7 @@ export class SidebarStatusService {
   }
 
   closeSidebar(): void {
+    this.hamburgerIconClicked = false;
     if (!this.sidebarIsShown) {
       return;
     }
