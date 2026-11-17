@@ -136,10 +136,6 @@ describe('Exploration Summary Backend Api Service', () => {
       },
     ];
 
-    const expectedResults = sampleResults.map(summary =>
-      LearnerExplorationSummary.createFromBackendDict(summary)
-    );
-
     const requestUrl =
       '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' +
@@ -157,7 +153,13 @@ describe('Exploration Summary Backend Api Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(expectedResults);
+    const results = successHandler.calls.mostRecent()
+      .args[0] as LearnerExplorationSummary[];
+    expect(results.length).toBe(1);
+    expect(results[0] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[0].title).toBe('Title 1');
+    expect(results[0].communityOwned).toBeFalse();
+    expect(results[0].humanReadableContributorsSummary).toEqual({});
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -214,10 +216,6 @@ describe('Exploration Summary Backend Api Service', () => {
       },
     ];
 
-    const expectedResults = sampleResults.map(summary =>
-      LearnerExplorationSummary.createFromBackendDict(summary)
-    );
-
     const requestUrl =
       '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' +
@@ -235,7 +233,15 @@ describe('Exploration Summary Backend Api Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(expectedResults);
+    const results = successHandler.calls.mostRecent()
+      .args[0] as LearnerExplorationSummary[];
+    expect(results.length).toBe(2);
+    expect(results[0] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[0].title).toBe('Title 1');
+    expect(results[0].communityOwned).toBeFalse();
+    expect(results[1] instanceof LearnerExplorationSummary).toBeTrue();
+    expect(results[1].title).toBe('Title 2');
+    expect(results[1].communityOwned).toBeFalse();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

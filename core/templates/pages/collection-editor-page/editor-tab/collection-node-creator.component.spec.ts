@@ -137,6 +137,8 @@ describe('Collection node creator component', () => {
           thumbnail_bg_color: '',
           thumbnail_icon_url: '',
           title: '',
+          visited_checkpoints_count: 2,
+          total_checkpoints_count: 5,
         }),
       ])
     );
@@ -147,7 +149,18 @@ describe('Collection node creator component', () => {
     ).and.returnValue(false);
     componentInstance.addExplorationToCollection(expId);
     tick();
-    expect(collectionLinearizerService.appendCollectionNode).toHaveBeenCalled();
+    expect(
+      collectionLinearizerService.appendCollectionNode
+    ).toHaveBeenCalledWith(
+      componentInstance.collection,
+      expId,
+      jasmine.objectContaining({
+        community_owned: true,
+        id: expId,
+        visited_checkpoints_count: 2,
+        total_checkpoints_count: 5,
+      })
+    );
   }));
 
   it(
