@@ -6741,11 +6741,8 @@ export class ExplorationEditor extends BaseUser {
 
       try {
         const selectedDestinationText = await this.page.$eval(
-          destinationSelectorDropdown,
-          (select: Element) => {
-            const selectEl = select as HTMLSelectElement;
-            return selectEl.selectedOptions[0]?.textContent?.trim() || '';
-          }
+          `${destinationSelectorDropdown} option:checked`,
+          option => option.textContent?.trim() || ''
         );
         const currentCardName = await this.page.$eval(
           currentCardNameContainerSelector,
