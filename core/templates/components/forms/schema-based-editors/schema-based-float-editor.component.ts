@@ -93,8 +93,12 @@ export class SchemaBasedFloatEditorComponent
   ) {}
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: number): void {
-    this.localValue = value;
+  writeValue(value: number | null | undefined): void {
+    this.localValue = value === undefined ? 0.0 : value;
+    this.localStringValue =
+      value === null || value === undefined
+        ? ''
+        : this.numberConversionService.convertToLocalizedNumber(value);
   }
 
   // Implemented as a part of ControlValueAccessor interface.
