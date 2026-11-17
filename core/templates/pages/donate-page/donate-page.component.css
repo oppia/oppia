@@ -453,9 +453,8 @@
 }
 
 .donate-learner-carousel-indicators {
-  bottom: 18px;
+  bottom: 14px;
   display: flex;
-  gap: 8px;
   justify-content: center;
   left: 0;
   position: absolute;
@@ -463,12 +462,14 @@
 }
 
 .donate-learner-carousel-indicator {
+  background-clip: content-box;
   background-color: #808080;
   border: 0;
   border-radius: 50%;
+  box-sizing: content-box;
   cursor: pointer;
   height: 12px;
-  padding: 0;
+  padding: 6px;
   width: 12px;
 }
 
