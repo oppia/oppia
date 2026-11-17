@@ -23,7 +23,7 @@ import {Contributor} from './contributor';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 
-const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
+const submitQuestionTab = '.e2e-test-submitQuestionTab';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDifficultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';

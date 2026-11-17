@@ -44,10 +44,6 @@ import {
 } from '../user/practice-question-submitter';
 import {Contributor, ContributorFactory} from '../user/contributor';
 import {
-  ContributorAdmin,
-  ContributorAdminFactory,
-} from '../user/contributor-admin';
-import {
   PracticeQuestionReviewer,
   PracticeQuestionReviewerFactory,
 } from '../user/practice-question-reviewer';
@@ -102,7 +98,6 @@ type BasicRolesUser = LoggedOutUser &
   TopicManager &
   CurriculumAdmin &
   Contributor &
-  ContributorAdmin &
   PracticeQuestionReviewer;
 
 /**
@@ -274,7 +269,6 @@ export class UserFactory {
       QuestionSubmitterFactory(page),
       CurriculumAdminFactory(page),
       ContributorFactory(page),
-      ContributorAdminFactory(page),
       PracticeQuestionReviewerFactory(page),
       TopicManagerFactory(page),
     ]);
