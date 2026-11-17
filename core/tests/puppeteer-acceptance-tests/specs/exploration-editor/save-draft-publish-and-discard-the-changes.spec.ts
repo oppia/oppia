@@ -84,3 +84,5 @@ describe('Exploration Creator', function () {
     await UserFactory.closeAllBrowsers();
   });
 });
+
+// Temporary comment-only trigger for issue #23128 regular Full-stack CI reproduction.
