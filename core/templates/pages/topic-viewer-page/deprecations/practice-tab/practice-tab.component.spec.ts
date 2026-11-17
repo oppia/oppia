@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
-// @ts-nocheck
-
 import {
   TestBed,
   waitForAsync,
@@ -37,7 +35,10 @@ import {QuestionBackendApiService} from 'domain/question/question-backend-api.se
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 
 class MockWindowRef {
@@ -162,7 +163,7 @@ describe('Practice tab component', function () {
 
       expect(
         i18nLanguageCodeService.getTopicTranslationKey
-      ).toHaveBeenCalledWith('topic_id_1', 'TITLE');
+      ).toHaveBeenCalledWith('topic_id_1', TranslationKeyType.TITLE);
       expect(component.topicNameTranslationKey).toEqual(
         'dummy_topic_translation_key'
       );

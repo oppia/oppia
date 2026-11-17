@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EntityCreationService.
  */
 
-// @ts-nocheck
-
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
@@ -138,7 +136,7 @@ describe('Entity creation service', () => {
 
     entityCreationService.createSubtopic();
 
-    expect(routingSpy).not.toHaveBeenCalledWith('1');
+    expect(routingSpy).not.toHaveBeenCalledWith(1);
   });
 
   it('should call CreateNewSkillModalService to navigate to skill editor', () => {

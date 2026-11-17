@@ -17,8 +17,6 @@
  * select difficulty modal component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -51,18 +49,9 @@ class MockActiveModal {
   }
 }
 
-class MockReaderObject {
-  result = null;
-  onload: () => string;
-  constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
-  }
-
-  readAsDataURL(file: string) {
-    this.onload();
-    return 'The file is loaded';
+class MockReaderObject extends FileReader {
+  readAsDataURL(): void {
+    this.dispatchEvent(new ProgressEvent('load'));
   }
 }
 
