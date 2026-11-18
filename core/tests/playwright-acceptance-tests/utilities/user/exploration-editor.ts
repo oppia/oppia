@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {expect, Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -1812,15 +1812,11 @@ export class ExplorationEditor extends BaseUser {
     feedback: string,
     views: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(explorationDashboardCardSelector);
-    const cards = await this.page.$$(explorationDashboardCardSelector);
-    if (!cards[index]) {
-      throw new Error(`Exploration card at index ${index} not found.`);
-    }
-    const card = cards[index];
-    await this.expectTextContentToBe(gridRatingSelector, rating, card);
-    await this.expectTextContentToBe(gridFeedbackSelector, feedback, card);
-    await this.expectTextContentToBe(gridViewsSelector, views, card);
+    const card = this.page.locator(explorationDashboardCardSelector).nth(index);
+    await expect(card).toBeVisible();
+    await expect(card.locator(gridRatingSelector)).toHaveText(rating);
+    await expect(card.locator(gridFeedbackSelector)).toHaveText(feedback);
+    await expect(card.locator(gridViewsSelector)).toHaveText(views);
   }
 
   /**
@@ -1862,15 +1858,11 @@ export class ExplorationEditor extends BaseUser {
     feedback: string,
     views: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(explorationListItemSelector);
-    const rows = await this.page.$$(explorationListItemSelector);
-    if (!rows[index]) {
-      throw new Error(`Exploration row at index ${index} not found.`);
-    }
-    const row = rows[index];
-    await this.expectTextContentToBe(listRatingSelector, rating, row);
-    await this.expectTextContentToBe(listFeedbackSelector, feedback, row);
-    await this.expectTextContentToBe(listViewsSelector, views, row);
+    const row = this.page.locator(explorationListItemSelector).nth(index);
+    await expect(row).toBeVisible();
+    await expect(row.locator(listRatingSelector)).toHaveText(rating);
+    await expect(row.locator(listFeedbackSelector)).toHaveText(feedback);
+    await expect(row.locator(listViewsSelector)).toHaveText(views);
   }
 
   /**
