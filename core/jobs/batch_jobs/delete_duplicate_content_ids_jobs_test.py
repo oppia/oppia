@@ -358,7 +358,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Fixed exploration exp_id (version 1) - regenerated content '
+                    'Fixed exploration exp_id (version 2) - regenerated content '
                     'IDs: [\'content_5 -> content_2 in State2\']'
                 )
             ]
