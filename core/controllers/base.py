@@ -403,7 +403,24 @@ class BaseHandler(
             not self._is_requested_path_currently_accessible_to_user()
             and request_split.path != '/maintenance'
         ):
-            self.redirect('/maintenance')
+            method = (
+                'GET' if self.request.method == 'HEAD' else self.request.method
+            )
+            return_type = getattr(
+                self,
+                '%s_HANDLER_ERROR_RETURN_TYPE' % method,
+                feconf.HANDLER_TYPE_JSON,
+            )
+            if return_type == feconf.HANDLER_TYPE_JSON:
+                self.error(503)
+                self.render_json(
+                    {
+                        'error': 'The site is currently under maintenance.',
+                        'status_code': 503,
+                    }
+                )
+            else:
+                self.redirect('/maintenance')
             return
 
         if self.user_is_scheduled_for_deletion:

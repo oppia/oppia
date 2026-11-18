@@ -778,7 +778,41 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         )
 
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
+        self.assertEqual(response.location, 'http://localhost/maintenance')
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_maintenance_page_is_available(self) -> None:
+        response = self.get_html_response('/maintenance')
+
+        self.assertEqual(response.status_int, 200)
+
+    def test_json_get_response_has_service_unavailable_status(self) -> None:
+        response = self.get_json(
+            '/url_handler?current_url=/', expected_status_int=503
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'error': 'The site is currently under maintenance.',
+                'status_code': 503,
+            },
+        )
+
+    def test_json_post_response_has_service_unavailable_status(self) -> None:
+        response = self.post_json('/url_handler', {}, expected_status_int=503)
+
+        self.assertEqual(response['status_code'], 503)
+
+    def test_html_head_response_redirects_to_maintenance_page(self) -> None:
+        response = self.testapp.head('/community-library', status=302)
+
+        self.assertEqual(response.location, 'http://localhost/maintenance')
+
+    def test_json_head_response_has_service_unavailable_status(self) -> None:
+        response = self.testapp.head('/url_handler?current_url=/', status=503)
+
+        self.assertEqual(response.content_type, 'application/json')
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(
         self,
@@ -885,9 +919,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        self.get_html_response(
-            '/url_handler?current_url=/', expected_status_int=302
-        )
+        self.get_json('/url_handler?current_url=/', expected_status_int=503)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
