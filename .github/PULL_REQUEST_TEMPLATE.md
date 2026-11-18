@@ -31,11 +31,12 @@ If this PR involves any of the following changes, it can cause release regressio
 - Apache Beam jobs or data migration scripts that modify production server data.
 - Database model modifications, schema changes, or data backfills.
 - Database indexes (e.g., index.yaml) or third-party service changes (e.g., Elasticsearch, Redis, etc.)
+- Any changes to datastore queries, since this may require new indexes to be built.
 - Core infrastructure, cron job adjustments, or third-party API changes.
 
 Because the develop branch must always be releasable, these changes must be thoroughly tested on the Oppia backup server prior to merging. Please follow [these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production) and link your testing/job request doc below.
 
-If your PR does NOT affect production data, schemas, indexes, or infrastructure, please delete this entire section.
+If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this entire section.
 -->
 
 - [ ] **Backup Server Testing Completed:** [Link to your testing doc / job request spreadsheet]
