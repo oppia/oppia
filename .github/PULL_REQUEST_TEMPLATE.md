@@ -36,7 +36,7 @@ If this PR involves any of the following changes, it can cause release regressio
 
 Because the develop branch must always be releasable, these changes must be thoroughly tested on the Oppia backup server prior to merging. Please follow [these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production) and link your testing/job request doc in the text for the first checkbox below. Ask the server admin to tick the boxes once they have confirmed that the changes are safe.
 
-If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this entire section (including the heading and the checkboxes below).
+If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this "Testing & Production Impact Doc" section fully (including the heading and the checkboxes below).
 -->
 
 (To be filled in by a server admin)
