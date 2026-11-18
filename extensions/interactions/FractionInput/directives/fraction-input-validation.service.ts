@@ -142,27 +142,39 @@ export class FractionInputValidationService {
       ) {
         return false;
       }
-      // An earlier IsEquivalentToAndInSimplestForm rule only matches its own
-      // fraction written in simplest form (e.g. 1/2 but not 2/4, and 1 1/2
-      // but not 3/2), so a later IsEquivalentTo rule, or a later
-      // IsExactlyEqualTo rule for any other representation, can still match.
-      // This only holds if learners are allowed to submit answers not in
-      // simplest form.
-      if (
-        earlierRule.type === 'IsEquivalentToAndInSimplestForm' &&
-        !shouldBeInSimplestForm
-      ) {
-        if (laterRule.type === 'IsEquivalentTo') {
-          return false;
-        }
+      // An earlier IsEquivalentToAndInSimplestForm rule only matches answers
+      // written exactly as its fraction's simplest form (e.g. 1/2 but not 2/4,
+      // and 1 1/2 but not 3/2, even though 3/2 is also in simplest form), so
+      // later rules matching other representations of the value can still
+      // be reached.
+      if (earlierRule.type === 'IsEquivalentToAndInSimplestForm') {
+        const earlierSimplestForm = Fraction.fromDict(
+          earlierRule.inputs.f as FractionAnswer
+        ).convertToSimplestForm();
         if (laterRule.type === 'IsExactlyEqualTo') {
           return isEqual(
             this.normalizeFractionToDict(laterRule.inputs.f as FractionAnswer),
-            Fraction.fromDict(earlierRule.inputs.f as FractionAnswer)
-              .convertToSimplestForm()
-              .toDict()
+            earlierSimplestForm.toDict()
           );
         }
+        if (laterRule.type === 'IsEquivalentToAndInSimplestForm') {
+          return isEqual(
+            Fraction.fromDict(laterRule.inputs.f as FractionAnswer)
+              .convertToSimplestForm()
+              .toDict(),
+            earlierSimplestForm.toDict()
+          );
+        }
+        // The only other rule type with a single-value range is
+        // IsEquivalentTo. Only a value below 1 has a single simplest form
+        // representation (any other value can be written as both a mixed
+        // number and an improper fraction), so that later rule is only
+        // unreachable if that is the only form learners can submit.
+        return (
+          shouldBeInSimplestForm &&
+          !earlierSimplestForm.hasNonzeroIntegerPart() &&
+          !earlierSimplestForm.isImproperFraction()
+        );
       }
       return true;
     };
