@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the story editor component.
  */
 
-// @ts-nocheck
-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -753,13 +751,11 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should call windowref to open a tab', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      open: jasmine.createSpy('open', () => {}),
-    });
+    const openSpy = spyOn(windowRef.nativeWindow, 'open');
 
     component.returnToTopicEditorPage();
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalled();
+    expect(openSpy).toHaveBeenCalled();
   });
 
   it('should fetch story when story is initialized', () => {
