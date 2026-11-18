@@ -20,7 +20,8 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
 import {ExplorationEditorModal} from '../common/exploration-editor';
-import {ExplorationEditor, INTERACTION_TYPES} from './exploration-editor';
+import {INTERACTION_TYPES} from './exploration-editor';
+import {LoggedInUser} from './logged-in-user';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
 
@@ -3330,11 +3331,11 @@ export class CurriculumAdmin extends TopicManager {
     cardContent: string = 'A birthday cake is cut into equal pieces.',
     linkConceptCard: boolean = false
   ): Promise<string> {
-    const editor = new ExplorationEditor();
+    const editor = new LoggedInUser();
     editor.page = this.page;
-    editor.browser = this.browser;
+    editor.browserObject = this.browserObject;
     await editor.navigateToCreatorDashboardPage();
-    await editor.navigateToExplorationEditorFromCreatorDashboard();
+    await editor.navigateToExplorationEditorPageFromCreatorDashboard();
     await editor.dismissWelcomeModal();
     if (linkConceptCard) {
       await editor.updateCardContentWithConceptCard(cardContent);
