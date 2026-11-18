@@ -62,6 +62,114 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
     REVIEWED_QUESTIONS_COUNT = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
 
+    def test_create_question_reviewer_total_stats_if_absent(self) -> None:
+        user_id = 'uid_new_question_reviewer'
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+
+        contribution_stats_services.create_question_reviewer_total_stats_if_absent(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        stats_model = model_class.get_by_id(user_id)
+        assert stats_model is not None
+        today = utils.get_current_utc_date()
+        self.assertEqual(stats_model.contributor_id, user_id)
+        self.assertEqual(stats_model.topic_ids_with_question_reviews, [])
+        self.assertEqual(stats_model.reviewed_questions_count, 0)
+        self.assertEqual(stats_model.accepted_questions_count, 0)
+        self.assertEqual(
+            stats_model.accepted_questions_with_reviewer_edits_count, 0
+        )
+        self.assertEqual(stats_model.rejected_questions_count, 0)
+        self.assertEqual(stats_model.first_contribution_date, today)
+        self.assertEqual(stats_model.last_contribution_date, today)
+
+    def test_create_question_reviewer_total_stats_keeps_existing_model(
+        self,
+    ) -> None:
+        user_id = 'uid_existing_question_reviewer'
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id=user_id,
+            topic_ids_with_question_reviews=['topic_1'],
+            reviewed_questions_count=3,
+            accepted_questions_count=2,
+            accepted_questions_with_reviewer_edits_count=1,
+            rejected_questions_count=1,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE,
+        )
+
+        contribution_stats_services.create_question_reviewer_total_stats_if_absent(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        stats_model = model_class.get_by_id(user_id)
+        assert stats_model is not None
+        self.assertEqual(stats_model.reviewed_questions_count, 3)
+        self.assertEqual(
+            stats_model.first_contribution_date, self.FIRST_CONTRIBUTION_DATE
+        )
+
+    def test_delete_question_reviewer_total_stats_if_empty(self) -> None:
+        user_id = 'uid_empty_question_reviewer'
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        contribution_stats_services.create_question_reviewer_total_stats_if_absent(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        contribution_stats_services.delete_question_reviewer_total_stats_if_empty(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        self.assertIsNone(model_class.get_by_id(user_id))
+
+    def test_delete_question_reviewer_total_stats_keeps_reviewed_model(
+        self,
+    ) -> None:
+        user_id = 'uid_active_question_reviewer'
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+        model_class.create(
+            contributor_id=user_id,
+            topic_ids_with_question_reviews=['topic_1'],
+            reviewed_questions_count=2,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=0,
+            rejected_questions_count=1,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE,
+        )
+
+        contribution_stats_services.delete_question_reviewer_total_stats_if_empty(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        stats_model = model_class.get_by_id(user_id)
+        assert stats_model is not None
+        self.assertEqual(stats_model.reviewed_questions_count, 2)
+
+    def test_delete_question_reviewer_total_stats_without_model(
+        self,
+    ) -> None:
+        user_id = 'uid_missing_question_reviewer'
+        model_class = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+        )
+
+        contribution_stats_services.delete_question_reviewer_total_stats_if_empty(  # pylint: disable=line-too-long
+            user_id
+        )
+
+        self.assertIsNone(model_class.get_by_id(user_id))
+
     def setUp(self) -> None:
 
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-// @ts-nocheck
-
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
@@ -36,7 +34,10 @@ describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
-  const sampleDataResults = {
+  const sampleDataResults: {
+    questionDict: QuestionBackendDict;
+    associated_skill_dicts: SkillBackendDict[];
+  } = {
     questionDict: {
       id: '0',
       question_state_data: {
