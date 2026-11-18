@@ -531,6 +531,48 @@ describe('Contributor stats component', () => {
     }));
   });
 
+  it('should refresh the table and emit rightsUpdated after question rights are updated', fakeAsync(() => {
+    spyOn(
+      contributorDashboardAdminBackendApiService,
+      'contributionReviewerRightsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        can_submit_questions: false,
+        can_review_questions: false,
+        can_review_translation_for_language_codes: [],
+        can_review_voiceover_for_language_codes: [],
+      })
+    );
+    const updateRightsSpy = spyOn(
+      contributorDashboardAdminBackendApiService,
+      'updateQuestionRightsAsync'
+    ).and.returnValue(Promise.resolve());
+    const refreshPaginationSpy = spyOn(component, 'refreshPagination');
+    const rightsUpdatedSpy = spyOn(component.rightsUpdated, 'emit');
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve({
+          isQuestionSubmitter: false,
+          isQuestionReviewer: true,
+        }),
+      } as NgbModalRef;
+    });
+
+    component.openCdAdminQuestionRoleEditorModal('user1');
+    tick();
+
+    expect(updateRightsSpy).toHaveBeenCalledWith(
+      'user1',
+      false,
+      true,
+      false,
+      false
+    );
+    expect(refreshPaginationSpy).toHaveBeenCalled();
+    expect(rightsUpdatedSpy).toHaveBeenCalled();
+  }));
+
   it(
     'should open question role editor modal and return changed value of' +
       ' translation submitter',
@@ -624,6 +666,62 @@ describe('Contributor stats component', () => {
       expect(removeRightsSpy).toHaveBeenCalled();
     })
   );
+
+  it('should show N/A as last reviewed for question reviewers with no reviews', () => {
+    const reviewerStats = new QuestionReviewerStats(
+      'user1',
+      [],
+      0,
+      0,
+      0,
+      0,
+      'Oct 2026',
+      0
+    );
+
+    expect(component.getLastContributedText(reviewerStats)).toBe('N/A');
+  });
+
+  it('should show how long ago a question reviewer last reviewed', () => {
+    const reviewedToday = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      0
+    );
+    const reviewedOneDayAgo = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      1
+    );
+    const reviewedFiveDaysAgo = new QuestionReviewerStats(
+      'user1',
+      ['topic1'],
+      2,
+      1,
+      0,
+      1,
+      'Oct 2026',
+      5
+    );
+
+    expect(component.getLastContributedText(reviewedToday)).toBe('Today');
+    expect(component.getLastContributedText(reviewedOneDayAgo)).toBe(
+      '1 day ago'
+    );
+    expect(component.getLastContributedText(reviewedFiveDaysAgo)).toBe(
+      '5 days ago'
+    );
+  });
 
   it(
     'should open question role editor modal and return true changed' +

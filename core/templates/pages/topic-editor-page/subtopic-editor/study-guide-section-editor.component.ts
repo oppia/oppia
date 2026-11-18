@@ -24,6 +24,7 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {AppConstants} from 'app.constants';
 
 interface HtmlFormSchema {
@@ -93,16 +94,20 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     return this.STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA;
   }
 
-  updateLocalHeading($event: string): void {
-    if (this.container.sectionHeadingPlaintext !== $event) {
-      this.container.sectionHeadingPlaintext = $event;
+  updateLocalHeading($event: SchemaDefaultValue): void {
+    // The schema editor may emit non-string values (e.g. null) in some edge
+    // cases, so non-string values are reset to the empty string.
+    const heading = typeof $event === 'string' ? $event : '';
+    if (this.container.sectionHeadingPlaintext !== heading) {
+      this.container.sectionHeadingPlaintext = heading;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  updateLocalContent($event: string): void {
-    if (this.container.sectionContentHtml !== $event) {
-      this.container.sectionContentHtml = $event;
+  updateLocalContent($event: SchemaDefaultValue): void {
+    const content = typeof $event === 'string' ? $event : '';
+    if (this.container.sectionContentHtml !== content) {
+      this.container.sectionContentHtml = content;
       this.changeDetectorRef.detectChanges();
     }
   }

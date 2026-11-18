@@ -14,8 +14,8 @@
                [style.fill]="'black'">
       </polygon>
       <text *ngIf="graph.isWeighted"
-            [attr.x]="getEdgeCentre(idx).x"
-            [attr.y]="getEdgeCentre(idx).y - 12"
+            [attr.x]="getEdgeCenter(idx).x"
+            [attr.y]="getEdgeCenter(idx).y - 12"
             class="unselectable-text">
         {{edge.weight}}
       </text>

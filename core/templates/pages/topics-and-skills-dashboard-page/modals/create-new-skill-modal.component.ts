@@ -31,6 +31,15 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ValidatorsService} from 'services/validators.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+
+// The schema for the concept-card explanation rich-text editor. The 'html'
+// type is fixed by the object literal below, so it is captured in this
+// interface to keep the schema assignable to the schema-based-editor input.
+interface SkillConceptCardSchema {
+  type: 'html';
+  ui_config: object;
+}
 
 @Component({
   selector: 'oppia-create-new-skill-modal',
@@ -50,7 +59,7 @@ export class CreateNewSkillModalComponent {
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA = {
+  HTML_SCHEMA: SkillConceptCardSchema = {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
@@ -80,9 +89,12 @@ export class CreateNewSkillModalComponent {
     this.pageContextService.setImageSaveDestinationToLocalStorage();
   }
 
-  updateExplanation($event: string): void {
-    if ($event !== this.bindableDict.displayedConceptCardExplanation) {
-      this.bindableDict.displayedConceptCardExplanation = $event;
+  updateExplanation($event: SchemaDefaultValue): void {
+    // The schema editor may emit non-string values (e.g. null) in some edge
+    // cases, so non-string values are reset to the empty string.
+    const explanation = typeof $event === 'string' ? $event : '';
+    if (explanation !== this.bindableDict.displayedConceptCardExplanation) {
+      this.bindableDict.displayedConceptCardExplanation = explanation;
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -91,7 +103,7 @@ export class CreateNewSkillModalComponent {
     this.conceptCardExplanationEditorIsShown = true;
   }
 
-  getHtmlSchema(): {type: string} {
+  getHtmlSchema(): SkillConceptCardSchema {
     return this.HTML_SCHEMA;
   }
 

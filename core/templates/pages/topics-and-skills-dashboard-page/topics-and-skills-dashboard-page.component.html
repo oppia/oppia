@@ -189,8 +189,8 @@
                                                 [choices]="statusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
-                                                [(selection)]="filterObject.status"
-                                                (selectionChange)="applyFilters()">
+                                                [selection]="filterObject.status"
+                                                (selectionChange)="onStatusFilterChanged($event)">
                   </oppia-filtered-choices-field>
                 </div>
                 <div *ngIf="activeTab === TAB_NAME_SKILLS">
@@ -198,8 +198,8 @@
                                                 [choices]="skillStatusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
-                                                [(selection)]="filterObject.status"
-                                                (selectionChange)="applyFilters()">
+                                                [selection]="filterObject.status"
+                                                (selectionChange)="onStatusFilterChanged($event)">
                   </oppia-filtered-choices-field>
                 </div>
               </div>
@@ -231,8 +231,8 @@
                                                 placeholder="Sort Options"
                                                 [isSearchable]="false"
                                                 searchLabel="Search"
-                                                [(selection)]="filterObject.sort"
-                                                (selectionChange)="applyFilters()">
+                                                [selection]="filterObject.sort"
+                                                (selectionChange)="onSortFilterChanged($event)">
                   </oppia-filtered-choices-field>
                 </div>
               </div>

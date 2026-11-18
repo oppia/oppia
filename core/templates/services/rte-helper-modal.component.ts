@@ -60,12 +60,15 @@ type ConvertStringLiteralsToString<T> = T extends string
 // each component in ComponentSpecsType.
 // It uses mapped types to iterate over each key K in ComponentSpecsType, and
 // then indexes into the object using [number] to represent any index in the
-// array.
+// array. The spec elements are collected into a single array (instead of a
+// union of per-component arrays) so that *ngFor over the specs infers the
+// union of spec element types; iterating over a union of arrays would infer a
+// single component's spec type and break the template type checks.
 export type CustomizationArgsSpecsType = {
-  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number][];
-  // Finally, use [keyof ComponentSpecsType] to create a union of all the array
-  // types.
-}[keyof ComponentSpecsType];
+  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number];
+  // Finally, use [keyof ComponentSpecsType] to create a union of all the spec
+  // element types.
+}[keyof ComponentSpecsType][];
 // CustomizationArgsForRteType maps the customization_arg_specs array to an
 // object with keys as 'name' and values as the 'default_value'.
 // It uses mapped types and Extract to achieve this.
@@ -302,6 +305,14 @@ export class RteHelperModalComponent {
       this.ngbActiveModal.dismiss(true);
     }
     this.customizationArgsFormSubscription.unsubscribe();
+  }
+
+  private dismissWithCancel(): void {
+    if (this.rteHelperBottomSheetRef) {
+      this.rteHelperBottomSheetRef.dismiss('cancel');
+    } else {
+      this.ngbActiveModal.dismiss('cancel');
+    }
   }
 
   onCustomizationArgsFormChange(value: {
@@ -580,16 +591,12 @@ export class RteHelperModalComponent {
           'The rawLatex or svgFileName for a Math expression should not ' +
             'be empty.'
         );
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       if (!svgFile) {
         this.alertsService.addWarning('SVG file is missing.');
-        this.ngbActiveModal.dismiss('cancel');
+        this.dismissWithCancel();
         return;
       }
       const resampledFile =
@@ -597,7 +604,7 @@ export class RteHelperModalComponent {
 
       if (!resampledFile) {
         this.alertsService.addWarning('Failed to process SVG file.');
-        this.ngbActiveModal.dismiss('cancel');
+        this.dismissWithCancel();
         return;
       }
 
@@ -620,11 +627,7 @@ export class RteHelperModalComponent {
             "and '+ z^2'",
           5000
         );
-        if (this.rteHelperBottomSheetRef) {
-          this.rteHelperBottomSheetRef.dismiss('cancel');
-        } else {
-          this.ngbActiveModal.dismiss('cancel');
-        }
+        this.dismissWithCancel();
         return;
       }
       if (
@@ -653,7 +656,7 @@ export class RteHelperModalComponent {
         this.alertsService.addWarning(
           'Error: Could not retrieve entity type or entity ID.'
         );
-        this.ngbActiveModal.dismiss('cancel');
+        this.dismissWithCancel();
         return;
       }
       this.assetsBackendApiService
@@ -681,11 +684,7 @@ export class RteHelperModalComponent {
             this.alertsService.addWarning(
               errorResponse.error || 'Error communicating with server.'
             );
-            if (this.rteHelperBottomSheetRef) {
-              this.rteHelperBottomSheetRef.dismiss('cancel');
-            } else {
-              this.ngbActiveModal.dismiss('cancel');
-            }
+            this.dismissWithCancel();
           }
         );
     } else {
