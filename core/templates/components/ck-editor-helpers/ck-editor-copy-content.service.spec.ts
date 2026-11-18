@@ -65,7 +65,7 @@ describe('Ck editor copy content service', () => {
 
   let service: CkEditorCopyContentService;
   let ckEditorStub: CKEDITOR.editor;
-  let insertHtmlSpy: jasmine.Spy<(html: string) => void>;
+  let insertHtmlSpy: jasmine.Spy<CKEDITOR.editor['insertHtml']>;
   let execCommandSpy: jasmine.Spy<
     (commandName: string, data?: ExecCommandData) => boolean
   >;
@@ -73,7 +73,7 @@ describe('Ck editor copy content service', () => {
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
-      insertHtml: (html: string) => {},
+      insertHtml: (...args: Parameters<CKEDITOR.editor['insertHtml']>) => {},
       execCommand: (commandName: string, data?: ExecCommandData): boolean =>
         true,
     } as CKEDITOR.editor;

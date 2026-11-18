@@ -77,6 +77,9 @@ class MockImageReceiverComponent {
 
 class MockWindowRef {
   nativeWindow: {
+    // When signIn() redirects with a login URL, production assigns the URL
+    // string directly to nativeWindow.location. When loginUrl is empty, it
+    // calls location.reload() on the mock object.
     location:
       | {
           href: string;
