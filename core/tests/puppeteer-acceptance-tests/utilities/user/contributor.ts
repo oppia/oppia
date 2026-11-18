@@ -601,17 +601,17 @@ export class Contributor extends ExplorationEditor {
       throw new Error(`Tab ${tabName} not found.`);
     }
 
-    // The tab is a list item and its click handler sits on the link inside it,
-    // so the link is what has to be clicked.
-    const tabLink = await tabElement.$('a');
+    // The tab is a list item and its click handler sits on the button or link
+    // inside it, so the button or link is what has to be clicked.
+    const tabLink = (await tabElement.$('button, a')) ?? tabElement;
     if (!tabLink) {
-      throw new Error(`Tab ${tabName} has no link to click.`);
+      throw new Error(`Tab ${tabName} has no clickable element.`);
     }
 
-    // The click is dispatched on the link rather than made natively because
-    // Puppeteer re-centres a target before dispatching a mouse event, which at
-    // mobile width parks the tab under the sticky navigation bar and delivers
-    // the click to the bar instead.
+    // The click is dispatched on the link or button rather than made natively
+    // because Puppeteer re-centres a target before dispatching a mouse event,
+    // which at mobile width parks the tab under the sticky navigation bar and
+    // delivers the click to the bar instead.
     await this.waitForElementToStabilize(tabLink);
     await tabLink.evaluate(el => (el as HTMLElement).click());
 
