@@ -46,6 +46,7 @@ import {StateInteractionIdService} from '../state-editor-properties-services/sta
 import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolicitAnswerDetailsService} from '../state-editor-properties-services/state-solicit-answer-details.service';
+import {EditabilityService} from 'services/editability.service';
 import {StateResponsesComponent} from './state-responses.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
@@ -1577,5 +1578,36 @@ describe('State Responses Component', () => {
     expect(component.getUnaddressedMisconceptionNames()).toEqual([
       'Misconception 2',
     ]);
+  });
+
+  it('should expose editability from the editability service', () => {
+    const editabilityService = TestBed.inject(EditabilityService);
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    spyOn(editabilityService, 'isEditableOutsideTutorialMode').and.returnValue(
+      false
+    );
+
+    expect(component.isEditable).toBe(true);
+    expect(component.isEditableOutsideTutorialMode).toBe(false);
+  });
+
+  it('should get and set the solicit answer details displayed value', () => {
+    stateSolicitAnswerDetailsService.displayed = true;
+
+    expect(component.solicitAnswerDetailsDisplayed).toBe(true);
+
+    component.solicitAnswerDetailsDisplayed = false;
+
+    expect(stateSolicitAnswerDetailsService.displayed).toBe(false);
+  });
+
+  it('should set and reset the active edit option', () => {
+    component.setActiveEditOption('skill1-misconception1');
+
+    expect(component.activeEditOption).toBe('skill1-misconception1');
+
+    component.setActiveEditOption(null);
+
+    expect(component.activeEditOption).toBeNull();
   });
 });

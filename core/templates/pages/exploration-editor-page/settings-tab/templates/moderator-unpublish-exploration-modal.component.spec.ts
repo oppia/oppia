@@ -19,6 +19,7 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {Schema} from 'services/schema-default-value.service';
 import {ModeratorUnpublishExplorationModalComponent} from './moderator-unpublish-exploration-modal.component';
 
 class MockActiveModal {
@@ -72,11 +73,16 @@ describe('Moderator Unpublish Exploration Modal', function () {
       ui_config: {
         rows: 20,
       },
-    });
+    } as Schema);
 
     let newValue = 'update this value in emailbody';
     component.updateValue(newValue);
     expect(component.emailBody).toBe(newValue);
+  });
+
+  it('should set email body to empty string when value is null', () => {
+    component.updateValue(null);
+    expect(component.emailBody).toBe('');
   });
 
   it('should close modal when "Unpublish Exploration" button is clicked', () => {

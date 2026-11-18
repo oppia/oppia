@@ -106,7 +106,6 @@ describe('Lesson Creator', function () {
     );
 
     await learner1.navigateToCommunityLibraryPage();
-    await learner1.searchForLessonInSearchBar(EXPLORATION_TITLE);
     await learner1.playLessonFromSearchResults(EXPLORATION_TITLE);
 
     await learner1.submitAnswer('3');
@@ -121,7 +120,6 @@ describe('Lesson Creator', function () {
     await learner1.rateExploration(3, 'Nice!', false);
 
     await learner2.navigateToCommunityLibraryPage();
-    await learner2.searchForLessonInSearchBar(EXPLORATION_TITLE);
     await learner2.playLessonFromSearchResults(EXPLORATION_TITLE);
   }, 600000);
 

@@ -39,18 +39,12 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     opportunity_services,
-)
-from core.domain import platform_parameter_domain as parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services as parameter_services
-from core.domain import (
+    platform_parameter_list,
     question_domain,
     question_services,
     recommendations_services,
     rights_manager,
     role_services,
-    search_services,
     skill_domain,
     skill_fetchers,
     skill_services,
@@ -72,6 +66,9 @@ from core.domain import (
     voiceover_services,
     wipeout_service,
 )
+from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services as parameter_services
 
 from typing import Callable, Dict, List, Optional, TypedDict, Union, cast
 
@@ -225,6 +222,15 @@ class ClassroomPageDataDict(TypedDict):
     url_fragment: str
 
 
+class DummyStoryNodeDict(TypedDict):
+    """Dict representation of a story node generated as dummy data."""
+
+    exp_id: str
+    title: str
+    description: str
+    acquired_skill_ids: List[str]
+
+
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
@@ -319,7 +325,6 @@ class AdminHandler(
                         'reload_collection',
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
-                        'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -335,9 +340,6 @@ class AdminHandler(
                         'rollback_exploration_to_safe_state',
                     ],
                 },
-                # TODO(#13331): Remove default_value when it is confirmed that,
-                # for clearing the search indices of exploration & collection
-                # 'action' field must be provided in the payload.
                 'default_value': None,
             },
             'exploration_id': {
@@ -623,10 +625,6 @@ class AdminHandler(
                         ' action is generate_dummy_blog_post.'
                     )
                 self._load_dummy_blog_post(blog_post_title)
-            elif action == 'clear_search_index':
-                search_services.clear_collection_search_index()
-                search_services.clear_exploration_search_index()
-                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
@@ -1048,7 +1046,7 @@ class AdminHandler(
 
     def _load_dummy_new_structures_data(self) -> None:
         """Loads the database with two topics (one of which is empty), a story
-        and three skills in the topic (two of them in a subtopic) and a question
+        and three skills in the topic (two of them in a subtopic) and questions
         attached to each skill.
 
         Raises:
@@ -1068,12 +1066,6 @@ class AdminHandler(
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
 
-            question_id_1 = question_services.get_new_question_id()
-            question_id_2 = question_services.get_new_question_id()
-            question_id_3 = question_services.get_new_question_id()
-            question_id_4 = question_services.get_new_question_id()
-            question_id_5 = question_services.get_new_question_id()
-
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
             )
@@ -1084,42 +1076,26 @@ class AdminHandler(
                 skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>'
             )
 
-            question_1 = self._create_dummy_question(
-                question_id_1, 'Question 1', [skill_id_1]
-            )
-            question_2 = self._create_dummy_question(
-                question_id_2, 'Question 2', [skill_id_2]
-            )
-            question_3 = self._create_dummy_question(
-                question_id_3, 'Question 3', [skill_id_3]
-            )
-            question_4 = self._create_dummy_question(
-                question_id_4, 'Question 4', [skill_id_1]
-            )
-            question_5 = self._create_dummy_question(
-                question_id_5, 'Question 5', [skill_id_1]
-            )
-            question_services.add_question(self.user_id, question_1)
-            question_services.add_question(self.user_id, question_2)
-            question_services.add_question(self.user_id, question_3)
-            question_services.add_question(self.user_id, question_4)
-            question_services.add_question(self.user_id, question_5)
-
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_1, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_4, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_1, 0.3
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_2, skill_id_2, 0.5
-            )
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_3, skill_id_3, 0.7
-            )
+            # A story cannot be published unless every skill acquired by one of
+            # its nodes has at least MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+            # questions, so create that many questions for each skill.
+            for skill_index, skill_id in enumerate(
+                (skill_id_1, skill_id_2, skill_id_3)
+            ):
+                for question_index in range(
+                    feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH
+                ):
+                    question_id = question_services.get_new_question_id()
+                    question = self._create_dummy_question(
+                        question_id,
+                        'Question %d for skill %d'
+                        % (question_index + 1, skill_index + 1),
+                        [skill_id],
+                    )
+                    question_services.add_question(self.user_id, question)
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_id, skill_id, 0.5
+                    )
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1,
@@ -1204,29 +1180,36 @@ class AdminHandler(
                 '#F8BF74',
             )
 
-            story_node_dicts = [
+            story_node_dicts: List[DummyStoryNodeDict] = [
                 {
                     'exp_id': '6',
                     'title': 'What are the place values?',
                     'description': 'Jaime learns the place value of each digit '
                     'in a big number.',
+                    'acquired_skill_ids': [skill_id_1],
                 },
                 {
                     'exp_id': '25',
                     'title': 'Finding the value of a number',
                     'description': 'Jaime understands the value of his '
                     'arcade score.',
+                    'acquired_skill_ids': [skill_id_2],
                 },
                 {
                     'exp_id': '13',
                     'title': 'Comparing Numbers',
                     'description': 'Jaime learns if a number is smaller or '
                     'greater than another number.',
+                    'acquired_skill_ids': [skill_id_3],
                 },
             ]
 
             def generate_dummy_story_nodes(
-                node_id: int, exp_id: str, title: str, description: str
+                node_id: int,
+                exp_id: str,
+                title: str,
+                description: str,
+                acquired_skill_ids: List[str],
             ) -> None:
                 """Generates and connects sequential story nodes.
 
@@ -1235,6 +1218,8 @@ class AdminHandler(
                     exp_id: str. The exploration id.
                     title: str. The title of the story node.
                     description: str. The description of the story node.
+                    acquired_skill_ids: list(str). The skill ids acquired by
+                        the story node.
                 """
                 assert self.user_id is not None
                 story.add_node(
@@ -1245,6 +1230,10 @@ class AdminHandler(
                 )
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id
+                )
+                story.update_node_acquired_skill_ids(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    acquired_skill_ids,
                 )
 
                 if node_id != len(story_node_dicts):
@@ -1438,7 +1427,6 @@ class AdminHandler(
                 'Elvish, language of "Lord of the Rings',
                 'The Science of Superheroes',
             ]
-            exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
@@ -1451,13 +1439,9 @@ class AdminHandler(
                 )
                 exp_services.save_new_exploration(self.user_id, exploration)
                 if i <= num_dummy_exps_to_publish - 1:
-                    exploration_ids_to_publish.append(new_exploration_id)
                     rights_manager.publish_exploration(
                         self.user, new_exploration_id
                     )
-            exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish
-            )
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
@@ -1585,7 +1569,6 @@ class AdminHandler(
                 story = story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
-            exploration_ids_to_publish = []
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)
 
@@ -1600,7 +1583,6 @@ class AdminHandler(
                 exploration_dict['category'] = category
                 exploration = exp_domain.Exploration.from_dict(exploration_dict)
                 exp_services.save_new_exploration(self.user_id, exploration)
-                exploration_ids_to_publish.append(new_exploration_id)
                 rights_manager.publish_exploration(
                     self.user, new_exploration_id
                 )
@@ -1610,9 +1592,6 @@ class AdminHandler(
                     'description': 'Description',
                 }
                 story_node_dicts.append(story_node_dict)
-            exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish
-            )
 
             # Ensure the story has at least one arc before adding nodes.
             if not initial_dummy_opportunites_generation:
@@ -1790,7 +1769,6 @@ class AdminHandler(
             # Generates translation opportunities for the
             # Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            exp_ids_in_story = exploration_ids_to_publish
             opportunity_services.add_new_exploration_opportunities(
                 story_id, exp_ids_in_story
             )
@@ -2678,8 +2656,6 @@ class AdminHandler(
 
                 exp_ids_to_publish.append(new_exp_id)
                 rights_manager.publish_exploration(self.user, new_exp_id)
-
-            exp_services.index_explorations_given_ids(exp_ids_to_publish)
 
             raw_image = b''
             with open(

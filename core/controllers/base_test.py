@@ -72,9 +72,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
                 '"Loading | Oppia"',
-                base.load_template(
-                    'oppia-root.mainpage.html', template_is_aot_compiled=False
-                ),
+                base.load_template('oppia-root.mainpage.html'),
             )
 
 
@@ -303,18 +301,22 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'must-revalidate, no-cache, no-store',
         )
 
-    def test_root_redirect_rules_for_deleted_user_prod_mode(self) -> None:
+    def test_redirect_rules_for_deleted_user_prod_mode(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=302
+            )
             self.assertIn(
                 'pending-account-deletion', response.headers['location']
             )
 
-    def test_root_redirect_rules_for_deleted_user_dev_mode(self) -> None:
+    def test_redirect_rules_for_deleted_user_dev_mode(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             self.login(self.DELETED_USER_EMAIL)
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=302
+            )
             self.assertIn(
                 'pending-account-deletion', response.headers['location']
             )
@@ -404,7 +406,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             auth_domain.UserDisabledError,
         )
         with get_auth_claims_from_request_swap:
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=302
+            )
             self.assertIn(
                 'pending-account-deletion', response.headers['location']
             )
@@ -553,12 +557,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 )
             )
 
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=302
+            )
 
         self.assertEqual(call_counter.times_called, 1)
         self.assertEqual(
             response.location,
-            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
+            'http://localhost/login?return_url='
+            'http%3A%2F%2Flocalhost%2Fcommunity-library',
         )
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(
@@ -581,13 +588,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 )
             )
 
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=302
+            )
 
         self.assert_matches_regexps(logs, ['User session is invalid!'])
         self.assertEqual(call_counter.times_called, 1)
         self.assertEqual(
             response.location,
-            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
+            'http://localhost/login?return_url='
+            'http%3A%2F%2Flocalhost%2Fcommunity-library',
         )
 
     def test_signup_attempt_on_wrong_page_fails(self) -> None:
@@ -611,7 +621,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                     ),
                 )
             )
-            response = self.get_html_response('/', expected_status_int=200)
+            response = self.get_html_response(
+                '/community-library', expected_status_int=200
+            )
             self.assertIn(
                 b'<oppia-root></oppia-root>',
                 response.body,
@@ -621,7 +633,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             logs,
             [
                 'Cannot find user auth_id with email %s on '
-                'page http://localhost/' % self.NEW_USER_EMAIL
+                'page http://localhost/community-library' % self.NEW_USER_EMAIL
             ],
         )
         self.assertEqual(call_counter.times_called, 1)
@@ -639,7 +651,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 self.capture_logging(min_level=logging.ERROR)
             )
             with swap_auth_claim:
-                self.get_html_response('/')
+                self.get_html_response('/community-library')
 
         self.assert_matches_regexps(
             logs, ['No email address was found for the user.']
@@ -677,7 +689,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 )
             )
             self.get_custom_response(
-                '/',
+                '/community-library',
                 expected_content_type='text/plain',
                 params=None,
                 expected_status_int=500,

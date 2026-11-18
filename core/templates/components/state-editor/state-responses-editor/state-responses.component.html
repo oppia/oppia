@@ -36,7 +36,7 @@
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
               <span class="oppia-rule-sort-handle" *ngIf="answerGroups?.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
-                <span *ngIf="editabilityService.isEditable()" class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                <span *ngIf="isEditable" class="fas fa-grip-vertical draggable-icon-indicator"></span>
               </span>
 
               <div class="oppia-rule-header-warning-placement e2e-test-response-self-loop-warning" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
@@ -75,12 +75,12 @@
                                                (onSaveAnswerGroupRules)="saveActiveAnswerGroupRules($event)"
                                                (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                                (onSaveTaggedMisconception)="saveTaggedMisconception($event)"
-                                               [isEditable]="editabilityService.isEditable()"
+                                               [isEditable]="isEditable"
                                                [displayFeedback]="!isLinearWithNoFeedback(answerGroup.outcome)"
                                                [addState]="addState">
                     </oppia-answer-group-editor>
                   </div>
-                  <div *ngIf="editabilityService.isEditable()">
+                  <div *ngIf="isEditable">
                     <button type="button"
                             class="btn btn-danger oppia-delete-response e2e-test-delete-response"
                             (click)="deleteAnswerGroup($event, index)">
@@ -113,8 +113,8 @@
                  (keydown.enter)="changeActiveAnswerGroupIndex(answerGroups.length)"
                  class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab"
                  [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
-                <oppia-response-header [index]="index"
-                                       [isActive]="index === activeAnswerGroupIndex"
+                <oppia-response-header [index]="answerGroups.length"
+                                       [isActive]="activeAnswerGroupIndex === answerGroups.length"
                                        [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                        [shortSummary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                        [outcome]="defaultOutcome"
@@ -131,7 +131,7 @@
                                                [rules]="answerGroups[activeAnswerGroupIndex]?.rules"
                                                [outcome]="defaultOutcome"
                                                [taggedSkillMisconceptionId]="answerGroups[activeAnswerGroupIndex]?.taggedSkillMisconceptionId"
-                                               [isEditable]="editabilityService.isEditable()"
+                                               [isEditable]="isEditable"
                                                [suppressWarnings]="shouldHideDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
                                                [addState]="addState"
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div class="oppia-add-response-button-container">
-          <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && editabilityService.isEditable()">
+          <div *ngIf="isEditableOutsideTutorialMode && !isCurrentInteractionLinear() && isEditable">
             <button type="button"
                     class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal"
                     (click)="openAddAnswerGroupModal()">
@@ -158,16 +158,16 @@
         </div>
         <div *ngIf="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span *ngIf="!isCurrentInteractionTrivial()" [hidden]="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
-            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
+            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="solicitAnswerDetailsDisplayed" [disabled]="!isEditable">
             <label for="label-target-solicit-answer-details-checkbox" class="form-label">Solicit Answer Details</label>
           </span>
         </div>
-        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length) || (tagMisconceptionsFeatureFlagIsEnabled && answerGroups && answerGroups.length > 0 && getUnaddressedMisconceptionNames().length !== 0)" class="misconception-parent-card">
+        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames().length) || (tagMisconceptionsFeatureFlagIsEnabled && answerGroups && answerGroups.length > 0 && getUnaddressedMisconceptionNames().length !== 0)" class="misconception-parent-card">
           <h3>Misconceptions</h3>
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
-          <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
+          <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames().length">
             <h4 class="ps-3">Compulsory</h4>
-            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill)"
+            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames()"
                class="misconception-list-item">
               {{misconceptionName}}
             </p>
@@ -185,7 +185,7 @@
                       <span class="ps-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
                     </div>
                     <div class="small text-muted">
-                      {{ getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId()) }}
+                      {{ getOptionalSkillMisconceptionStatus(skillWithMisconceptions.key + '-' + misconception.getId()) }}
                     </div>
                   </div>
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
@@ -202,7 +202,7 @@
                         Mark as "Not Applicable"
                     </div>
                   </div>
-                  <div *ngIf="editabilityService.isEditable()"
+                  <div *ngIf="isEditable"
                        (click)="setActiveEditOption(skillWithMisconceptions.key + '-' + misconception.getId())"
                        class="fas fa-ellipsis-v optional-misconception-options-button"
                        [ngClass]="{'d-none': getOptionalSkillMisconceptionStatus(skillWithMisconceptions.key + '-' + misconception.getId()) === 'Assigned'}">

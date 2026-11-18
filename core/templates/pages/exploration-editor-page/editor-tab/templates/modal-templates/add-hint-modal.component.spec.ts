@@ -119,5 +119,9 @@ describe('Add Hint Modal Component', () => {
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);
+
+    component.updateLocalHint(null);
+
+    expect(component.tmpHint).toEqual('');
   });
 });

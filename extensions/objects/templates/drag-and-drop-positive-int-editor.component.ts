@@ -52,4 +52,10 @@ export class DragAndDropPositiveIntEditorComponent implements OnInit {
     this.value = +selectedRank;
     this.valueChanged.emit(this.value);
   }
+
+  // The select change event emits an Event object, so the chosen value is read
+  // from the select element before delegating to selection.
+  onSelectionChange(e: Event): void {
+    this.selection((e.target as HTMLSelectElement).value);
+  }
 }

@@ -38,11 +38,9 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
-import {SearchService} from 'services/search.service';
 import {UserService} from 'services/user.service';
 import {LibraryPageConstants} from './library-page.constants';
 import {
-  ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
@@ -91,12 +89,9 @@ export class LibraryPageComponent {
   // has not selected any active group index.
   activeGroupIndex!: number | null;
   preferredLanguageCodesLoaded: boolean = false;
-  activityList!: ActivityDict[];
   bannerImageFilename!: string;
   bannerImageFileUrl!: string;
   currentPath!: string;
-  groupName!: string;
-  groupHeaderI18nId!: string;
   libraryGroups!: SummaryDict[];
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
@@ -117,7 +112,6 @@ export class LibraryPageComponent {
     private keyboardShortcutService: KeyboardShortcutService,
     private libraryPageBackendApiService: LibraryPageBackendApiService,
     private loaderService: LoaderService,
-    private searchService: SearchService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
@@ -283,19 +277,6 @@ export class LibraryPageComponent {
   showFullResultsPage(categories: string[], fullResultsUrl: string): void {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
-    } else {
-      let selectedCategories: Record<string, boolean> = {};
-      for (let i = 0; i < categories.length; i++) {
-        selectedCategories[categories[i]] = true;
-      }
-
-      let targetSearchQueryUrl = this.searchService.getSearchUrlQueryString(
-        '',
-        selectedCategories,
-        {}
-      );
-      this.windowRef.nativeWindow.location.href =
-        '/search/find?q=' + targetSearchQueryUrl;
     }
   }
 
@@ -318,16 +299,8 @@ export class LibraryPageComponent {
   }
 
   setPageTitle(): void {
-    let titleKey = 'I18N_LIBRARY_PAGE_TITLE';
-    if (
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH
-    ) {
-      titleKey = 'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE';
-    }
-
     this.pageTitleService.setDocumentTitle(
-      this.translateService.instant(titleKey)
+      this.translateService.instant('I18N_LIBRARY_PAGE_TITLE')
     );
   }
 
@@ -388,11 +361,8 @@ export class LibraryPageComponent {
     this.i18nLanguageCodeSubscription =
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         // The tiles show exploration metadata in the site language, so the
-        // data is fetched again when the learner changes that language. In
-        // search mode the tiles come from the search bar's own query instead.
-        if (this.pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
-          this.loadLibraryData();
-        }
+        // data is fetched again when the learner changes that language.
+        this.loadLibraryData();
       });
 
     this.resizeSubscription = this.windowDimensionsService
@@ -408,119 +378,97 @@ export class LibraryPageComponent {
   loadLibraryData(): void {
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
 
-    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
-      let pathnameArray =
-        this.windowRef.nativeWindow.location.pathname.split('/');
-      this.groupName = pathnameArray[2];
+    this.libraryPageBackendApiService
+      .fetchLibraryIndexDataAsync()
+      .then(response => {
+        this.libraryGroups = response.activity_summary_dicts_by_category;
+        this.userService.getUserInfoAsync().then(userInfo => {
+          this.activitiesOwned = {explorations: {}, collections: {}};
+          if (userInfo.isLoggedIn()) {
+            this.libraryPageBackendApiService
+              .fetchCreatorDashboardDataAsync()
+              .then(response => {
+                this.libraryGroups.forEach(libraryGroup => {
+                  let activitySummaryDicts =
+                    libraryGroup.activity_summary_dicts;
 
-      this.libraryPageBackendApiService
-        .fetchLibraryGroupDataAsync(this.groupName)
-        .then(response => {
-          this.activityList = response.activity_list;
-          this.groupHeaderI18nId = response.header_i18n_id;
-          if (!this.preferredLanguageCodesLoaded) {
-            this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-              response.preferred_language_codes
-            );
-            this.preferredLanguageCodesLoaded = true;
-          }
-          this.loaderService.hideLoadingScreen();
-          this.initCarousels();
-        });
-    } else {
-      this.libraryPageBackendApiService
-        .fetchLibraryIndexDataAsync()
-        .then(response => {
-          this.libraryGroups = response.activity_summary_dicts_by_category;
-          this.userService.getUserInfoAsync().then(userInfo => {
-            this.activitiesOwned = {explorations: {}, collections: {}};
-            if (userInfo.isLoggedIn()) {
-              this.libraryPageBackendApiService
-                .fetchCreatorDashboardDataAsync()
-                .then(response => {
-                  this.libraryGroups.forEach(libraryGroup => {
-                    let activitySummaryDicts =
-                      libraryGroup.activity_summary_dicts;
+                  let ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                  let ACTIVITY_TYPE_COLLECTION = 'collection';
 
-                    let ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                    let ACTIVITY_TYPE_COLLECTION = 'collection';
-
-                    activitySummaryDicts.forEach(activitySummaryDict => {
-                      if (
-                        activitySummaryDict.activity_type ===
-                        ACTIVITY_TYPE_EXPLORATION
-                      ) {
-                        this.activitiesOwned.explorations[
-                          activitySummaryDict.id
-                        ] = false;
-                      } else if (
-                        activitySummaryDict.activity_type ===
-                        ACTIVITY_TYPE_COLLECTION
-                      ) {
-                        this.activitiesOwned.collections[
-                          activitySummaryDict.id
-                        ] = false;
-                      } else {
-                        this.loggerService.error(
-                          'INVALID ACTIVITY TYPE: Activity' +
-                            '(id: ' +
-                            activitySummaryDict.id +
-                            ', name: ' +
-                            activitySummaryDict.title +
-                            ', type: ' +
-                            activitySummaryDict.activity_type +
-                            ') has an invalid activity type, which could ' +
-                            'not be recorded as an exploration or a ' +
-                            'collection.'
-                        );
-                      }
-                    });
-
-                    response.explorations_list.forEach(ownedExplorations => {
-                      this.activitiesOwned.explorations[ownedExplorations.id] =
-                        true;
-                    });
-
-                    response.collections_list.forEach(ownedCollections => {
-                      this.activitiesOwned.collections[ownedCollections.id] =
-                        true;
-                    });
+                  activitySummaryDicts.forEach(activitySummaryDict => {
+                    if (
+                      activitySummaryDict.activity_type ===
+                      ACTIVITY_TYPE_EXPLORATION
+                    ) {
+                      this.activitiesOwned.explorations[
+                        activitySummaryDict.id
+                      ] = false;
+                    } else if (
+                      activitySummaryDict.activity_type ===
+                      ACTIVITY_TYPE_COLLECTION
+                    ) {
+                      this.activitiesOwned.collections[activitySummaryDict.id] =
+                        false;
+                    } else {
+                      this.loggerService.error(
+                        'INVALID ACTIVITY TYPE: Activity' +
+                          '(id: ' +
+                          activitySummaryDict.id +
+                          ', name: ' +
+                          activitySummaryDict.title +
+                          ', type: ' +
+                          activitySummaryDict.activity_type +
+                          ') has an invalid activity type, which could ' +
+                          'not be recorded as an exploration or a ' +
+                          'collection.'
+                      );
+                    }
                   });
-                  this.loaderService.hideLoadingScreen();
-                  this.initCarousels();
+
+                  response.explorations_list.forEach(ownedExplorations => {
+                    this.activitiesOwned.explorations[ownedExplorations.id] =
+                      true;
+                  });
+
+                  response.collections_list.forEach(ownedCollections => {
+                    this.activitiesOwned.collections[ownedCollections.id] =
+                      true;
+                  });
                 });
-            } else {
-              this.loaderService.hideLoadingScreen();
-              this.initCarousels();
-            }
-          });
-
-          if (!this.preferredLanguageCodesLoaded) {
-            this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-              response.preferred_language_codes
-            );
-            this.preferredLanguageCodesLoaded = true;
-          }
-
-          // The following initializes the tracker to have all
-          // elements flush left.
-          // Transforms the group names into translation ids.
-          this.leftmostCardIndices = [];
-          for (let i = 0; i < this.libraryGroups.length; i++) {
-            this.leftmostCardIndices.push(0);
-          }
-          // The following initializes the array so that every group
-          // (in mobile view) loads in with a limit on the number of cards
-          // displayed, and with the button text being "See More".
-          this.mobileLibraryGroupsProperties = [];
-          for (let i = 0; i < this.libraryGroups.length; i++) {
-            this.mobileLibraryGroupsProperties.push({
-              inCollapsedState: true,
-              buttonText: 'See More',
-            });
+                this.loaderService.hideLoadingScreen();
+                this.initCarousels();
+              });
+          } else {
+            this.loaderService.hideLoadingScreen();
+            this.initCarousels();
           }
         });
-    }
+
+        if (!this.preferredLanguageCodesLoaded) {
+          this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+            response.preferred_language_codes
+          );
+          this.preferredLanguageCodesLoaded = true;
+        }
+
+        // The following initializes the tracker to have all
+        // elements flush left.
+        // Transforms the group names into translation ids.
+        this.leftmostCardIndices = [];
+        for (let i = 0; i < this.libraryGroups.length; i++) {
+          this.leftmostCardIndices.push(0);
+        }
+        // The following initializes the array so that every group
+        // (in mobile view) loads in with a limit on the number of cards
+        // displayed, and with the button text being "See More".
+        this.mobileLibraryGroupsProperties = [];
+        for (let i = 0; i < this.libraryGroups.length; i++) {
+          this.mobileLibraryGroupsProperties.push({
+            inCollapsedState: true,
+            buttonText: 'See More',
+          });
+        }
+      });
   }
 
   moveClassroomCarouselToPreviousSlide(): void {

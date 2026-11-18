@@ -453,30 +453,4 @@ describe('Learner Group Backend API Service', () => {
     expect(successHandler).toHaveBeenCalledWith(true);
     expect(failHandler).not.toHaveBeenCalled();
   }));
-
-  it('should check if learner group feature is enabled correctly', fakeAsync(() => {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    const LEARNER_GROUP_FEATURE_STATUS_GET_URL =
-      '/learner_groups_feature_status_handler';
-    const sampleLearnerGroupFeatureStatus = {
-      feature_is_enabled: true,
-    };
-
-    learnerGroupBackendApiService
-      .isLearnerGroupFeatureEnabledAsync()
-      .then(successHandler, failHandler);
-
-    var req = httpTestingController.expectOne(
-      LEARNER_GROUP_FEATURE_STATUS_GET_URL
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleLearnerGroupFeatureStatus);
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(true);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
 });

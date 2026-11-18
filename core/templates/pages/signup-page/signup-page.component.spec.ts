@@ -103,7 +103,6 @@ describe('Sign up page component', () => {
   });
 
   it('should intialize', fakeAsync(() => {
-    const canSendEmails = true;
     const hasAgreedToLatestTerms = true;
     const hasEverRegistered = true;
     const username = 'test_user';
@@ -116,7 +115,6 @@ describe('Sign up page component', () => {
       'fetchSignupPageDataAsync'
     ).and.returnValue(
       Promise.resolve({
-        server_can_send_emails: canSendEmails,
         has_agreed_to_latest_terms: hasAgreedToLatestTerms,
         has_ever_registered: hasEverRegistered,
         username: username,
@@ -140,16 +138,18 @@ describe('Sign up page component', () => {
     componentInstance.hasAgreedToLatestTerms = true;
     componentInstance.hasUsername = true;
     componentInstance.warningI18nCode = '';
-    expect(componentInstance.isFormValid()).toBeTrue();
+    expect(componentInstance.isFormValid()).toBe(true);
   });
 
   it('should confirm license explanation modal', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve(),
     } as NgbModalRef);
-    componentInstance.showLicenseExplanationModal({
-      target: {innerText: 'here'},
+    const licenseClickEvent = new Event('click');
+    Object.defineProperty(licenseClickEvent, 'target', {
+      value: {innerText: 'here'},
     });
+    componentInstance.showLicenseExplanationModal(licenseClickEvent);
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
@@ -157,9 +157,11 @@ describe('Sign up page component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject(),
     } as NgbModalRef);
-    componentInstance.showLicenseExplanationModal({
-      target: {innerText: 'here'},
+    const licenseClickEvent = new Event('click');
+    Object.defineProperty(licenseClickEvent, 'target', {
+      value: {innerText: 'here'},
     });
+    componentInstance.showLicenseExplanationModal(licenseClickEvent);
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
@@ -167,7 +169,11 @@ describe('Sign up page component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject(),
     } as NgbModalRef);
-    componentInstance.showLicenseExplanationModal({target: {innerText: ''}});
+    const licenseClickEvent = new Event('click');
+    Object.defineProperty(licenseClickEvent, 'target', {
+      value: {innerText: ''},
+    });
+    componentInstance.showLicenseExplanationModal(licenseClickEvent);
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
@@ -201,8 +207,8 @@ describe('Sign up page component', () => {
     componentInstance.warningI18nCode = '';
     componentInstance.onUsernameInputFormBlur('');
     tick();
-    expect(componentInstance.blurredAtLeastOnce).toBeTrue();
-    expect(componentInstance.usernameCheckIsInProgress).toBeFalse();
+    expect(componentInstance.blurredAtLeastOnce).toBe(true);
+    expect(componentInstance.usernameCheckIsInProgress).toBe(false);
     expect(componentInstance.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_TAKEN'
     );
@@ -277,12 +283,11 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'yes');
     tick();
-    expect(componentInstance.showEmailSignupLink).toBeTrue();
-    expect(componentInstance.submissionInProcess).toBeFalse();
+    expect(componentInstance.showEmailSignupLink).toBe(true);
+    expect(componentInstance.submissionInProcess).toBe(false);
   }));
 
   it('should not submit when receive emails not enabled', () => {
@@ -296,7 +301,6 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', null);
     expect(componentInstance.emailPreferencesWarningText).toEqual(
@@ -315,7 +319,6 @@ describe('Sign up page component', () => {
     );
     spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'no');
     tick();
@@ -344,7 +347,6 @@ describe('Sign up page component', () => {
       };
 
       componentInstance.hasUsername = false;
-      componentInstance.showEmailPreferencesForm = true;
 
       componentInstance.submitPrerequisitesForm(
         sentRequestParams.agreed_to_terms,
@@ -364,7 +366,6 @@ describe('Sign up page component', () => {
       return_url: 'creator-dashboard',
     });
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     expect(() => {
       componentInstance.submitPrerequisitesForm(true, 'username', 'not_valid');
@@ -382,13 +383,12 @@ describe('Sign up page component', () => {
     );
     spyOn(componentInstance, 'showRegistrationSessionExpiredModal');
     componentInstance.hasUsername = false;
-    componentInstance.showEmailPreferencesForm = true;
 
     componentInstance.submitPrerequisitesForm(true, 'username', 'no');
     tick();
     expect(
       componentInstance.showRegistrationSessionExpiredModal
     ).toHaveBeenCalled();
-    expect(componentInstance.submissionInProcess).toBeFalse();
+    expect(componentInstance.submissionInProcess).toBe(false);
   }));
 });

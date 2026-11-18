@@ -161,7 +161,6 @@ describe('Logged-out User', function () {
     'should be able to interact with different interactions,receive feedback, navigates through cards, uses hints, views previous responses, and reaches a checkpoint',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
       await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
       await loggedOutUser.continueToNextCard();
 

@@ -128,6 +128,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     });
   }
 
+  // A translation can be a string or a list of strings depending on the data
+  // format. The RTE output display only accepts a string, so a list of strings
+  // is rendered as an empty string (it is rendered separately as a list).
+  getTranslationString(translation: string | string[]): string {
+    return typeof translation === 'string' ? translation : '';
+  }
+
   confirm(): void {
     for (let language in this.contentTranslations) {
       if (this.languageIsCheckedStatusDict[language] === true) {

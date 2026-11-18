@@ -37,6 +37,7 @@ import {StudyGuide} from 'domain/topic/study-guide.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
 
@@ -82,7 +83,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   maxCharsInSubtopicTitle!: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   SUBTOPIC_PAGE_SCHEMA!: {
-    type: string;
+    type: 'html';
     ui_config: {
       rte_component_config_id: string;
       rows: number;
@@ -304,6 +305,12 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  onHtmlDataChange(event: SchemaDefaultValue): void {
+    // The rich-text editor may emit non-string values (e.g. null) in some
+    // edge cases, so non-string values are reset to the empty string.
+    this.htmlData = typeof event === 'string' ? event : '';
+  }
+
   cancelHtmlDataChange(): void {
     this.htmlData = this.htmlDataBeforeUpdate;
     this.updateHtmlData();
@@ -411,7 +418,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       );
   }
 
-  deleteSection(index: number, evt: string): void {
+  deleteSection(index: number): void {
     this.ngbModal
       .open(DeleteStudyGuideSectionComponent, {
         backdrop: 'static',

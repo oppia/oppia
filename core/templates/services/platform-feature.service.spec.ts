@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for PlatformFeatureService.
  */
 
-import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -24,24 +24,18 @@ import {
   PlatformFeatureService,
   platformFeatureInitFactory,
 } from 'services/platform-feature.service';
-import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
-import {
-  FeatureNames,
-  FeatureStatusSummary,
-} from 'domain/feature-flag/feature-status-summary.model';
+import {FeatureNames} from 'domain/feature-flag/feature-status-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 
 describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
-  let apiService: FeatureFlagBackendApiService;
   let platformFeatureService: PlatformFeatureService;
   let urlService: UrlService;
 
-  let mockSessionStore: (obj: object) => void;
-  let mockCookie: (cookieStr: string) => void;
+  let mockFeatureFlagsInHtml: (flags: Record<string, boolean>) => void;
   let mockPathName: (pathName: string) => void;
 
-  let apiSpy: jasmine.Spy;
+  const FEATURE_FLAGS_ELEMENT_ID = 'oppia-feature-flags';
 
   // These properties are static, which are not automatically cleared after
   // each test, so we need to manually clear the state of
@@ -60,6 +54,24 @@ describe('PlatformFeatureService', () => {
     // PlatformFeatureService is a singleton service.
     // @ts-ignore
     PlatformFeatureService.initializationPromise = null;
+    PlatformFeatureService._isSkipped = false;
+  };
+
+  // Resets the static summary and initialization promise so that a subsequent
+  // TestBed.inject call triggers a fresh initialization. The @ts-ignore
+  // directives are placed here (rather than at each call site) so that the
+  // suppression rationale is documented exactly once.
+  const forceReinitialization = () => {
+    // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
+    // ." We need to suppress this error because of the need to manually reset
+    // the singleton state between tests.
+    // @ts-ignore
+    PlatformFeatureService.featureStatusSummary = null;
+    // This throws "Type 'null' is not assignable to type 'Promise<void>'." We
+    // need to suppress this error because of the need to manually reset the
+    // singleton state between tests.
+    // @ts-ignore
+    PlatformFeatureService.initializationPromise = null;
   };
 
   beforeEach(() => {
@@ -68,14 +80,13 @@ describe('PlatformFeatureService', () => {
     });
 
     windowRef = TestBed.inject(WindowRef);
-    apiService = TestBed.inject(FeatureFlagBackendApiService);
     urlService = TestBed.inject(UrlService);
 
     clearStaticProperties();
 
     const store: Record<string, string> = {};
     let cookie = '';
-    let userAgent = '';
+    let featureFlagsJson = JSON.stringify({});
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       sessionStorage: {
         getItem: (key: string) => store[key] || null,
@@ -86,109 +97,83 @@ describe('PlatformFeatureService', () => {
         get cookie() {
           return cookie;
         },
+        getElementById: (id: string) =>
+          id === FEATURE_FLAGS_ELEMENT_ID
+            ? {
+                textContent: featureFlagsJson,
+              }
+            : null,
       },
       navigator: {
         get userAgent() {
-          return userAgent;
+          return '';
         },
       },
     } as unknown as Window);
-    mockSessionStore = (obj: object) => {
-      Object.assign(store, obj);
-    };
-    mockCookie = (cookieStr: string) => (cookie = cookieStr);
 
     let pathName = '/';
     spyOn(urlService, 'getPathname').and.callFake(() => pathName);
     mockPathName = path => (pathName = path);
 
-    apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
-      FeatureStatusSummary.createFromBackendDict({
-        [FeatureNames.DummyFeatureFlagForE2ETests]: true,
-      })
-    );
+    mockFeatureFlagsInHtml = (flags: Record<string, boolean>) => {
+      featureFlagsJson = JSON.stringify(flags);
+    };
+
+    mockFeatureFlagsInHtml({
+      [FeatureNames.DummyFeatureFlagForE2ETests]: true,
+    });
   });
 
   describe('.initialize', () => {
-    it('should load from server when storage is clean.', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
-      platformFeatureService.initialize().then(successHandler, failHandler);
-
-      flushMicrotasks();
-
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-      expect(platformFeatureService.isInitializedWithError).toBeFalse();
-    }));
-
-    it('should load from server if saved results have expired.', fakeAsync(() => {
-      const sessionId = 'session_id';
-      mockCookie(`session=${sessionId}`);
-      mockSessionStore({
-        SAVED_FEATURE_FLAGS: JSON.stringify({
-          sessionId: sessionId,
-          timestamp: Date.now(),
-          featureStatusSummary: {
-            [FeatureNames.DummyFeatureFlagForE2ETests]: true,
-          },
-        }),
-      });
-
-      // Ticks 13 hrs, as stored results are valid for 12 hrs, ths results
-      // should have expired.
-      tick(13 * 3600 * 1000);
+    it('should read feature flags from the injected HTML.', fakeAsync(() => {
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+      ).toBeTrue();
       expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
-    it(
-      "should load from server if the stored features don't match with" +
-        ' feature list',
-      fakeAsync(() => {
-        const sessionId = 'session_id';
-        mockCookie(`session=${sessionId}`);
-        mockSessionStore({
-          SAVED_FEATURE_FLAGS: JSON.stringify({
-            sessionId: sessionId,
-            timestamp: Date.now(),
-            featureStatusSummary: {},
-          }),
-        });
+    it('should initialize only once for multiple calls to .initialize.', fakeAsync(() => {
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
+      platformFeatureService.initialize();
+      platformFeatureService.initialize();
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-        expect(platformFeatureService.isInitializedWithError).toBeFalse();
-      })
-    );
+      expect(
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+      ).toBeTrue();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
+    }));
 
-    it(
-      'should request only once if there are more than one call to ' +
-        '.initialize.',
-      fakeAsync(() => {
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
+    it('should disable all features when the injected data is invalid.', fakeAsync(() => {
+      // Make the injected JSON invalid.
+      spyOn(windowRef.nativeWindow.document, 'getElementById').and.returnValue({
+        textContent: 'not valid json',
+      } as unknown as HTMLElement);
 
-        platformFeatureService.initialize();
-        platformFeatureService.initialize();
+      forceReinitialization();
 
-        flushMicrotasks();
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
-        expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
-        expect(platformFeatureService.isInitializedWithError).toBeFalse();
-      })
-    );
+      flushMicrotasks();
 
-    it('should disable all features when loading fails.', fakeAsync(() => {
-      apiSpy.and.throwError('mock error');
+      expect(
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+      ).toBeFalse();
+      expect(platformFeatureService.isInitializedWithError).toBeTrue();
+    }));
+
+    it('should disable all features when the injected element is missing.', fakeAsync(() => {
+      spyOn(windowRef.nativeWindow.document, 'getElementById').and.returnValue(
+        null
+      );
+
+      forceReinitialization();
 
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
@@ -207,8 +192,10 @@ describe('PlatformFeatureService', () => {
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
       expect(platformFeatureService.isSkipped).toBeTrue();
+      expect(
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+      ).toBeFalse();
     }));
   });
 
@@ -226,6 +213,11 @@ describe('PlatformFeatureService', () => {
 
     it('should throw error when accessed before initialization.', fakeAsync(() => {
       platformFeatureService = TestBed.inject(PlatformFeatureService);
+      // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
+      // ." We need to suppress this error because we want to clear the static
+      // summary to simulate an uninitialized state for this test.
+      // @ts-ignore
+      PlatformFeatureService.featureStatusSummary = null;
       expect(
         () =>
           platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
@@ -235,7 +227,7 @@ describe('PlatformFeatureService', () => {
 
   describe('platformFeatureInitFactory', () => {
     let factoryFn = (service: PlatformFeatureService) => {
-      return async (): Promise<void> => service.initialize();
+      return (): Promise<void> => service.initialize();
     };
 
     beforeEach(() => {

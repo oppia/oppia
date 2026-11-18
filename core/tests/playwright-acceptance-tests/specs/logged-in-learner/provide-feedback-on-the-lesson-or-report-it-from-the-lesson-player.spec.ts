@@ -109,9 +109,7 @@ test.describe('Logged-In Learner', function () {
 
   test('should be able to report the lesson from the sidebar', async function () {
     // Navigate to a lesson.
-    await loggedInLearner.navigateToCommunityLibraryPage();
-    await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
-    await loggedInLearner.playLessonFromSearchResults('Algebra Basics');
+    await loggedInLearner.playExplorationAsLoggedInUser(explorationId);
     await loggedInLearner.continueToNextCardAsLoggedOutUser();
 
     // Report Exploration.

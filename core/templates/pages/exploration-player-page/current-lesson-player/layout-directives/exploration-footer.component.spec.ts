@@ -283,6 +283,7 @@ describe('ExplorationFooterComponent', () => {
       ).and.resolveTo({
         summaries: [
           {
+            activity_type: 'exploration',
             category: 'Coding',
             community_owned: true,
             thumbnail_bg_color: '#a33f40',
@@ -302,7 +303,15 @@ describe('ExplorationFooterComponent', () => {
             },
             status: 'public',
             language_code: 'en',
+            last_updated_msec: 0,
             objective: 'Solve problem 1 on the Project Euler site',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
             thumbnail_icon_url: '/subjects/Lightbulb.svg',
             id: 'exp1',
           },

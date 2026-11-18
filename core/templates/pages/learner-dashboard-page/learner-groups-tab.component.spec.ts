@@ -138,12 +138,6 @@ describe('Learner groups tab Component', () => {
     expect(component.windowIsNarrow).toBeFalse();
   });
 
-  it('should switch the tab to Learner Groups', () => {
-    const setActiveSection = spyOn(component.setActiveSection, 'emit');
-    component.changeActiveSection();
-    expect(setActiveSection).toHaveBeenCalled();
-  });
-
   it('should get url of the learner group page', () => {
     const learnerGroupUrl = urlInterpolationService.interpolateUrl(
       '/learner-group/<groupId>',

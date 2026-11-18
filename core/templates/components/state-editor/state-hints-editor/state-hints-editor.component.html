@@ -25,29 +25,29 @@
         </div>
         <div class="state-hints-content-container oppia-mobile-collapsible-card-content" *ngIf="hintCardIsShown">
           <div class="oppia-add-hint-button-container">
-            <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
+            <div *ngIf="isEditableOutsideTutorialMode && isEditable">
               <button type="button"
                       aria-label="Add hint"
                       class="btn btn-primary oppia-add-hint-button e2e-test-oppia-add-hint-button"
                       (click)="openAddHintModal()"
-                      [disabled]="stateHintsService.displayed.length >= 5">
+                      [disabled]="displayedHints.length >= 5">
                 {{getHintButtonText()}}
               </button>
             </div>
           </div>
-          <div *ngIf="stateHintsService.displayed.length > 0">
+          <div *ngIf="displayedHints.length > 0">
             <div cdkDropList
                  (cdkDropListDropped)="drop($event)"
                  class="oppia-option-list-hint nav-stacked nav-pills">
-              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
+              <div [cdkDragDisabled]="activeHintIndex === index ? true : false"
                    cdkDrag
-                   *ngFor="let hint of stateHintsService.displayed; let index = index"
-                   ngClass="{'active': stateHintsService.getActiveHintIndex() === index}"
+                   *ngFor="let hint of displayedHints; let index = index"
+                   ngClass="{'active': activeHintIndex === index}"
                    class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
                 <span class="oppia-hint-sort-handle"
-                      *ngIf="stateHintsService.displayed.length > 1"
+                      *ngIf="displayedHints.length > 1"
                       (mousedown)="changeActiveHintIndex(null)">
-                  <picture *ngIf="editabilityService.isEditable()">
+                  <picture *ngIf="isEditable">
                     <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
                     <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
                     <img [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
@@ -57,18 +57,18 @@
                    tabindex="0"
                    (keydown.enter)="changeActiveHintIndex(index)"
                    class="oppia-rule-tab e2e-test-hint-tab"
-                   ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
+                   ngClass="{'oppia-rule-tab-active': activeHintIndex === index}">
                   <oppia-response-header class="oppia-response-header-center e2e-test-current-hint-box"
                                          [defaultOutcome]="false"
                                          [index]="index"
                                          [summary]="getHintSummary(hint)"
                                          [shortSummary]="getHintSummary(hint)"
-                                         [isActive]="index === stateHintsService.getActiveHintIndex()"
+                                         [isActive]="index === activeHintIndex"
                                          (delete)="deleteHint($event)">
                   </oppia-response-header>
                 </a>
 
-                <div *ngIf="stateHintsService.getActiveHintIndex() === index">
+                <div *ngIf="activeHintIndex === index">
                   <div class="oppia-editor-card-section e2e-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"

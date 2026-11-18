@@ -72,6 +72,7 @@ import {
   CollectionEditor,
   CollectionEditorFactory,
 } from '../user/collection-editor';
+import {TechTeamLeadFactory} from '../user/tech-team-lead';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -95,6 +96,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
   [ROLES.COLLECTION_EDITOR]: CollectionEditorFactory,
+  [ROLES.TECH_TEAM_LEAD]: TechTeamLeadFactory,
 } as const;
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
@@ -309,14 +311,15 @@ export class UserFactory {
       PracticeQuestionReviewerFactory(),
       VoiceoverSubmitterFactory(),
       CollectionEditorFactory(),
+      TechTeamLeadFactory(),
     ]);
 
     user.username = username;
     user.email = email;
 
     await user.openBrowser();
-    await user.signUpNewUser(username, email);
     activeUsers.push(user);
+    await user.signUpNewUser(username, email);
 
     return (await UserFactory.assignRolesToUser(
       user,
@@ -365,10 +368,10 @@ export class UserFactory {
   static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
     let user = new LoggedOutUser();
     await user.openBrowser();
+    activeUsers.push(user);
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
     await user.clickOnElementWithSelector(cookieBannerAcceptButton);
-    activeUsers.push(user);
     return user;
   };
   /**

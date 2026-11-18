@@ -18,6 +18,7 @@
 
 import {Component, HostListener} from '@angular/core';
 import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
+import {AugmentedSkillSummary} from 'domain/skill/augmented-skill-summary.model';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {
@@ -31,8 +32,11 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
+  ETopicNewSortingOptions,
   ETopicPublishedOptions,
+  ETopicSortOptions,
   ETopicStatusOptions,
+  SkillStatusOptions,
   TopicsAndSkillsDashboardPageConstants,
 } from './topics-and-skills-dashboard-page.constants';
 import {TopicsAndSkillsDashboardPageService} from './topics-and-skills-dashboard-page.service';
@@ -62,7 +66,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   untriagedSkillSummaries: SkillSummary[] = [];
   totalUntriagedSkillSummaries: SkillSummary[] = [];
   mergeableSkillSummaries: SkillSummary[] = [];
-  skillSummaries: SkillSummary[] = [];
+  // The skills dashboard backend returns AugmentedSkillSummary objects, and
+  // skills-list expects them, so the summaries are typed accordingly.
+  skillSummaries: AugmentedSkillSummary[] = [];
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -99,7 +105,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   sortOptions: string[] = [];
   statusOptions: (ETopicPublishedOptions | ETopicStatusOptions)[] = [];
   displayedTopicSummaries: CreatorTopicSummary[] = [];
-  displayedSkillSummaries: SkillSummary[] = [];
+  displayedSkillSummaries: AugmentedSkillSummary[] = [];
   skillStatusOptions: string[] = [];
   windowWidth: number = window.innerWidth;
   constructor(
@@ -317,6 +323,29 @@ export class TopicsAndSkillsDashboardPageComponent {
     ) {
       this.goToPageNumber(this.pageNumber + 1);
     }
+  }
+
+  onStatusFilterChanged(status: string): void {
+    // The filtered-choices-field dropdown emits plain display strings. The
+    // status options passed to the dropdown are exactly the status enum
+    // values (topic statuses on the topics tab, skill statuses on the skills
+    // tab), so the cast preserves the value while satisfying the filter
+    // model's typed status field.
+    this.filterObject.status = status as
+      | ETopicPublishedOptions
+      | ETopicStatusOptions
+      | SkillStatusOptions;
+    this.applyFilters();
+  }
+
+  onSortFilterChanged(sort: string): void {
+    // The sort options passed to the dropdown are exactly the enum values, so
+    // the emitted value is one of the sort enums and the cast preserves the
+    // value while satisfying the filter model's typed sort field.
+    this.filterObject.sort = sort as
+      | ETopicSortOptions
+      | ETopicNewSortingOptions;
+    this.applyFilters();
   }
 
   applyFilters(): void {

@@ -35,7 +35,6 @@ from core.platform.datastore import (
     cloud_datastore_services as datastore_services,
 )
 from core.platform.email import dev_mode_email_services as email_services
-from core.platform.search import elastic_search_services as search_services
 from core.platform.secrets import cloud_secrets_services as secrets_services
 from core.platform.speech_synthesis import (
     dev_mode_speech_synthesis_services as speech_synthesis_services,
@@ -118,7 +117,6 @@ __all__ = [
     'platform_taskqueue_services',
     'question_models',
     'recommendations_models',
-    'search_services',
     'secrets_services',
     'skill_models',
     'stats_models',

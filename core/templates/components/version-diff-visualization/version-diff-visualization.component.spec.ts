@@ -59,7 +59,10 @@ describe('Version Diff Visualization Component', () => {
     component.diffData = {
       v1InitStateId: 0,
       v2InitStateId: 1,
-      links: [],
+      links: [
+        {source: 1, target: 2, linkProperty: 'changed'},
+        {source: 2, target: 3, linkProperty: 'added'},
+      ],
       finalStateIds: ['C', 'D'],
       nodes: {
         1: {
@@ -125,11 +128,24 @@ describe('Version Diff Visualization Component', () => {
       5: '#1E90FF',
       6: 'beige',
     });
-    expect(component.v1InitStateId).toEqual(0);
+    expect(component.v1InitStateId).toEqual('0');
     expect(component.diffGraphData).toEqual({
       nodes: {1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F'},
-      links: [],
-      initStateId: 1,
+      links: [
+        {
+          source: '1',
+          target: '2',
+          linkProperty: 'changed',
+          connectsDestIfStuck: false,
+        },
+        {
+          source: '2',
+          target: '3',
+          linkProperty: 'added',
+          connectsDestIfStuck: false,
+        },
+      ],
+      initStateId: '1',
       finalStateIds: ['C', 'D'],
     });
     expect(component.legendGraph).toEqual({
@@ -146,26 +162,31 @@ describe('Version Diff Visualization Component', () => {
           source: 'Added',
           target: 'Deleted',
           linkProperty: 'hidden',
+          connectsDestIfStuck: false,
         },
         {
           source: 'Deleted',
           target: 'Changed',
           linkProperty: 'hidden',
+          connectsDestIfStuck: false,
         },
         {
           source: 'Changed',
           target: 'Unchanged',
           linkProperty: 'hidden',
+          connectsDestIfStuck: false,
         },
         {
           source: 'Unchanged',
           target: 'Renamed',
           linkProperty: 'hidden',
+          connectsDestIfStuck: false,
         },
         {
           source: 'Renamed',
           target: 'Changed/renamed',
           linkProperty: 'hidden',
+          connectsDestIfStuck: false,
         },
       ],
       initStateId: 'Changed/renamed',

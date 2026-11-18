@@ -49,15 +49,15 @@ SIMILARITY_SCORE_THRESHOLD: Final = 3.0
 
 
 class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
-    """Job that indexes the explorations in Elastic Search."""
+    """Job that computes recommendations for all explorations."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        the Elastic Search.
+        computing exploration recommendations.
 
         Returns:
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            the Elastic Search.
+            computing exploration recommendations.
         """
 
         exp_summary_objects = (

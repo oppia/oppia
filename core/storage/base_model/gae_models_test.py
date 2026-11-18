@@ -1513,3 +1513,59 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             [feedback_model.id for feedback_model in feedback_models],
             ['feedback_1', 'feedback_2'],
         )
+
+
+class BaseFeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test BaseFeatureFlagConfigModel class."""
+
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeatureFlagConfigModel.get_deletion_policy()
+
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeatureFlagConfigModel.get_model_association_to_user()
+
+
+class BasePlatformParameterConfigModelTests(test_utils.GenericTestBase):
+    """Test BasePlatformParameterConfigModel class."""
+
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BasePlatformParameterConfigModel.get_deletion_policy()
+
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BasePlatformParameterConfigModel.get_model_association_to_user()

@@ -30,7 +30,7 @@ link before completing the signup process, they will be logged out.
                   translate="I18N_SIGNUP_USERNAME_EXPLANATION">
             </span>
             <div class="oppia-warning-text-container">
-              <p class="oppia-warning-text"
+              <p class="oppia-warning-text e2e-test-username-warning"
                  aria-live="assertive"
                  tabindex="0"
                  *ngIf="warningI18nCode"
@@ -41,7 +41,7 @@ link before completing the signup process, they will be logged out.
           </div>
         </div>
 
-        <div *ngIf="showEmailPreferencesForm" class="mb-3 row">
+        <div class="mb-3 row">
           <label for="canReceiveEmailUpdates"
                  class="col-lg-3 col-md-3 col-sm-3 form-label"
                  translate="I18N_SIGNUP_EMAIL_PREFERENCES">
@@ -50,6 +50,7 @@ link before completing the signup process, they will be logged out.
             <div class="radio">
               <label class="form-label">
                 <input type="radio"
+                       class="e2e-test-email-preferences-radio-yes"
                        [(ngModel)]="canReceiveEmailUpdates"
                        [ngModelOptions]="{standalone: true}"
                        value="yes"
@@ -59,6 +60,7 @@ link before completing the signup process, they will be logged out.
               </label>
               <label class="form-label">
                 <input type="radio"
+                       class="e2e-test-email-preferences-radio-no"
                        [(ngModel)]="canReceiveEmailUpdates"
                        [ngModelOptions]="{standalone: true}"
                        value="no"

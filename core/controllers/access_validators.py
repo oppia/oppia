@@ -32,7 +32,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -310,8 +310,11 @@ class ManageOwnAccountValidationHandler(
         pass
 
 
+# Here we use type Any because the decoded JSON payload contains a list of
+# strings, which BaseHandler's typed dictionary requires 'Any' to represent
+# accurately since other fields are strings.
 class PracticeSessionAccessValidationPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], Dict[str, Any]]
 ):
     """Validates access to practice session page."""
 
@@ -971,26 +974,6 @@ class StoryEditorAccessValidationHandlerPage(
         Args:
             unused_story_id: str. The unused story ID.
         """
-        pass
-
-
-class ReviewTestsPageAccessValidationHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Validates access to review tests page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
         pass
 
 

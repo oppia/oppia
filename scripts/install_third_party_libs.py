@@ -38,8 +38,8 @@ import tarfile
 
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
+    install_python_prod_dependencies,
 )
-from scripts import install_python_prod_dependencies
 
 from typing import Final
 
@@ -445,40 +445,6 @@ def install_redis_cli() -> None:
         print('Redis-cli installed successfully.')
 
 
-def install_elasticsearch_dev_server() -> None:
-    """This installs a local ElasticSearch server to the oppia_tools
-    directory to be used by development servers and backend tests.
-    """
-    try:
-        subprocess.call(
-            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            # Set the minimum heap size to 100 MB and maximum to 500 MB.
-            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'},
-        )
-        print('ElasticSearch is already installed.')
-        return
-    except OSError:
-        print('Installing ElasticSearch...')
-
-    if common.is_mac_os() or common.is_linux_os():
-        download_and_untar_files(
-            'https://artifacts.elastic.co/downloads/elasticsearch/'
-            + 'elasticsearch-%s-%s-x86_64.tar.gz'
-            % (common.ELASTICSEARCH_VERSION, common.OS_NAME.lower()),
-            common.OPPIA_TOOLS_DIR,
-            'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-            'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-        )
-
-    else:
-        raise Exception('Unrecognized or unsupported operating system.')
-
-    print('ElasticSearch installed successfully.')
-
-
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
@@ -488,8 +454,10 @@ def main() -> None:
     install_python_dev_dependencies.main(['--assert_compiled'])
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
-    from . import pre_commit_hook  # pylint: disable=wrong-import-position
-    from . import pre_push_hook  # pylint: disable=wrong-import-position
+    from . import (
+        pre_commit_hook,  # pylint: disable=wrong-import-position
+        pre_push_hook,  # pylint: disable=wrong-import-position
+    )
 
     if common.is_windows_os():
         raise Exception(
@@ -509,7 +477,6 @@ def main() -> None:
     install_playwright_node()
     install_yarn()
     install_redis_cli()
-    install_elasticsearch_dev_server()
 
     # Install pre-commit and pre-push scripts.
     common.print_each_string_after_two_new_lines(

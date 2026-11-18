@@ -1432,10 +1432,6 @@ describe('Conversation skin component', () => {
         skillDescriptions: [],
         questionCount: 0,
         questionsSortedByDifficulty: false,
-        questionPlayerMode: {
-          modeType: 'PASS_FAIL',
-          passCutoff: 0.75,
-        },
       };
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
@@ -1689,7 +1685,6 @@ describe('Conversation skin component', () => {
       'recordChapterCompletionAsync'
     ).and.returnValue(
       Promise.resolve({
-        readyForReviewTest: true,
         nextNodeId: '',
         summaries: [],
       })
@@ -1874,10 +1869,6 @@ describe('Conversation skin component', () => {
       skillDescriptions: [],
       questionCount: 0,
       questionsSortedByDifficulty: false,
-      questionPlayerMode: {
-        modeType: 'PASS_FAIL',
-        passCutoff: 0.75,
-      },
     };
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -2455,7 +2446,7 @@ describe('Conversation skin component', () => {
       // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
       getRedirectSpy.and.returnValue(false);
       getHasInteractedSpy.and.returnValue(true);
-      componentInstance._editorPreviewMode = false;
+      componentInstance.editorPreviewMode = false;
       const mockStateCard = jasmine.createSpyObj('StateCard', ['isTerminal']);
       mockStateCard.isTerminal.and.returnValue(false);
       getDisplayedCardSpy.and.returnValue(mockStateCard);
@@ -2465,11 +2456,11 @@ describe('Conversation skin component', () => {
       expect(recordEventSpy).toHaveBeenCalled();
 
       // Case 3: Editor preview mode -> should return false.
-      componentInstance._editorPreviewMode = true;
+      componentInstance.editorPreviewMode = true;
       expect(capturedCallback()).toBe(false);
 
       // Case 4: Terminal state -> should return false.
-      componentInstance._editorPreviewMode = false;
+      componentInstance.editorPreviewMode = false;
       mockStateCard.isTerminal.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
 

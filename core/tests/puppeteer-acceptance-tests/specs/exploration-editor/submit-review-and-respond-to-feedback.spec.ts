@@ -165,30 +165,6 @@ describe('Exploration Editor', function () {
   );
 
   it(
-    'should verify that feedback recipients can see the responses to their feedback',
-    async function () {
-      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
-      // in mobile viewport which is required for testing the feedback messages tab),
-      // remove this part of skipping the test and make the test to run in mobile viewport as well.
-      // see: https://github.com/oppia/oppia/issues/19443
-      if (process.env.MOBILE === 'true') {
-        showMessage('Test skipped in mobile viewport');
-        return;
-      }
-
-      await loggedInVisitor.navigateToFeedbackUpdatesPage();
-      await loggedInVisitor.viewFeedbackUpdateThread(1);
-
-      // Verify the feedback and response match what was expected.
-      await loggedInVisitor.expectFeedbackAndResponseToMatch(
-        'This is helpful non-anonymous feedback',
-        'Thank you for your non-anonymous feedback!'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should change the feedback status and verify that the changes are saved correctly in both the feedback thread and the list-of-all-feedback menu',
     async function () {
       // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback

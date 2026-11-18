@@ -523,6 +523,24 @@ describe('Exploration editor page component', () => {
       expect(focusedElement.tabIndex).toBe(-1);
     });
 
+    it('should render the desktop editor tab as a button', () => {
+      const editorTab = fixture.nativeElement.querySelector(
+        '.e2e-test-main-tab'
+      ) as HTMLButtonElement;
+
+      expect(editorTab.tagName).toBe('BUTTON');
+      expect(editorTab.type).toBe('button');
+      expect(editorTab.hasAttribute('href')).toBe(false);
+      expect(editorTab.getAttribute('aria-label')).toBe(
+        'Exploration Editor Button'
+      );
+
+      const navigateToMainTabSpy = spyOn(rs, 'navigateToMainTab');
+      editorTab.click();
+
+      expect(navigateToMainTabSpy).toHaveBeenCalled();
+    });
+
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
@@ -665,9 +683,9 @@ describe('Exploration editor page component', () => {
 
     it('should generate the aria label correctly', () => {
       const mockWarnings = [
-        {message: 'Warning 1'},
-        {message: 'Warning 2'},
-        {message: 'Warning 3'},
+        {type: 'critical', message: 'Warning 1'},
+        {type: 'non-critical', message: 'Warning 2'},
+        {type: 'non-critical', message: 'Warning 3'},
       ];
 
       spyOn(component, 'getWarnings').and.returnValue(mockWarnings);

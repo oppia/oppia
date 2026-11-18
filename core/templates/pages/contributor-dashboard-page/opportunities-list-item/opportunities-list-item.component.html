@@ -3,7 +3,7 @@
        *ngIf="progressBarRequired">
     <div class="oppia-opportunities-progress-bar">
       <div [hidden]="opportunityDataIsLoading"
-           *ngIf="!translationProgressBar"
+           *ngIf="!translationProgressBar && !skillProgressBar"
            class="progress">
         <div class="progress-bar bg-success"
              role="progressbar"
@@ -36,6 +36,34 @@
              aria-label="Progress Bar"
              [ngStyle]="untranslatedProgressStyle"
              ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
+             container="body"
+             placement="bottom">
+        </div>
+      </div>
+      <div [hidden]="opportunityDataIsLoading"
+           *ngIf="skillProgressBar"
+           class="progress">
+        <div class="progress-bar bg-success"
+             role="progressbar"
+             aria-hidden="true"
+             [ngStyle]="translatedProgressStyle"
+             ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} questions accepted"
+             container="body"
+             placement="bottom">
+        </div>
+        <div class="progress-bar bg-light-green"
+             role="progressbar"
+             aria-hidden="true"
+             [ngStyle]="inReviewProgressStyle"
+             ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} questions awaiting review"
+             container="body"
+             placement="bottom">
+        </div>
+        <div class="progress-bar bg-light"
+             role="progressbar"
+             aria-label="Progress Bar"
+             [ngStyle]="untranslatedProgressStyle"
+             ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} questions available for suggestion"
              container="body"
              placement="bottom">
         </div>
