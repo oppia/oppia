@@ -34,10 +34,12 @@ If this PR involves any of the following changes, it can cause release regressio
 - Any changes to datastore queries, since this may require new indexes to be built.
 - Core infrastructure, cron job adjustments, or third-party API changes.
 
-Because the develop branch must always be releasable, these changes must be thoroughly tested on the Oppia backup server prior to merging. Please follow [these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production) and link your testing/job request doc below.
+Because the develop branch must always be releasable, these changes must be thoroughly tested on the Oppia backup server prior to merging. Please follow [these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production) and link your testing/job request doc in the text for the first checkbox below. Ask the server admin to tick the boxes once they have confirmed that the changes are safe.
 
-If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this entire section.
+If your PR does NOT affect production data, schemas, datastore queries, indexes, or infrastructure, please delete this entire section (including the heading and the checkboxes below).
 -->
+
+(To be filled in by a server admin)
 
 - [ ] **Backup Server Testing Completed:** [Link to your testing doc / job request spreadsheet]
 - [ ] **Release Safety Verified:** Confirmed that merging this PR will not cause regressions or break deployments due to missing indexes, unapplied migrations, or service deprecations.
