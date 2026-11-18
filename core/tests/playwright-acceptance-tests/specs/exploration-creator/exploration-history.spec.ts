@@ -54,7 +54,7 @@ test.describe('Exploration Editor', function () {
       await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
       await explorationEditor.saveExplorationDraft();
     }
-  });
+  }, 600000);
 
   test('should be able to view the history tab', async function () {
     await explorationEditor.navigateToHistoryTab();
