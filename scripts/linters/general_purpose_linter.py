@@ -927,6 +927,30 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    def check_yarn_lock_updated_with_package_json(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that yarn.lock is updated when package.json is changed."""
+        name = 'Yarn lock update'
+
+        normalized_filepaths = {
+            filepath.replace('\\', '/') for filepath in self.all_filepaths
+        }
+
+        package_json_changed = 'package.json' in normalized_filepaths
+        yarn_lock_changed = 'yarn.lock' in normalized_filepaths
+
+        error_messages = []
+        if package_json_changed and not yarn_lock_changed:
+            error_messages.append(
+                'package.json was changed, but yarn.lock was not. Please update '
+                'yarn.lock whenever package.json is changed.'
+            )
+
+        return concurrent_task_utils.TaskResult(
+            name, bool(error_messages), error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -952,6 +976,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             self.check_disallowed_flags(),
             self.check_rte_component_config_ids(),
             self.check_modal_component_patterns(),
+            self.check_yarn_lock_updated_with_package_json(),
         ]
         return task_results
 
