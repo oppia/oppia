@@ -163,7 +163,7 @@
                                        [value]="blogPostData.tags"
                                        *ngFor="let tag of defaultTagsList"
                                        multiple="true"
-                                       class="mx-2 my-2 tag">
+                                       class="tag">
                 <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
                                    (change)="onTagChange(tag)"
                                    [value]="tag"
@@ -253,7 +253,7 @@
                                    [value]="blogPostData.tags"
                                    *ngFor="let tag of defaultTagsList"
                                    multiple="true"
-                                   class="mx-2 my-2 tag">
+                                   class="tag">
             <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
                                (change)="onTagChange(tag)"
                                [value]="tag"
