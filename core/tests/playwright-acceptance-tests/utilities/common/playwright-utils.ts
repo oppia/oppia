@@ -436,6 +436,17 @@ export class BaseUser {
     return this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
   }
 
+  /** Checks whether the mathematical on-screen keyboard is open. */
+  async isOnScreenKeyboardVisible(): Promise<boolean> {
+    return this.page.locator('.e2e-test-osk-container').isVisible();
+  }
+
+  /** Dismisses the mathematical keyboard before interacting with modal controls. */
+  async hideOSK(): Promise<void> {
+    await this.page.locator('.e2e-test-osk-hide-button').click();
+    await expect(this.page.locator('.e2e-test-osk-container')).toBeHidden();
+  }
+
   /**
    * This function returns the current viewport of the page.
    */
