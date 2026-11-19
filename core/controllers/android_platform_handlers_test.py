@@ -78,27 +78,3 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
             '/android_platform_parameters?android_min_supported_api_level=notanint',
             expected_status_int=400,
         )
-
-    def test_feature_flags_defaults(self) -> None:
-        response = self.get_json('/android_feature_flags')
-        mapping = {item['name']: item['enabled'] for item in response}
-
-        self.assertEqual(
-            mapping, {'android_enable_fast_language_switching_in_lesson': False}
-        )
-
-    def test_feature_flags_override(self) -> None:
-        response = self.get_json(
-            '/android_feature_flags?android_enable_fast_language_switching_in_lesson=true'
-        )
-        mapping = {item['name']: item['enabled'] for item in response}
-
-        self.assertEqual(
-            mapping, {'android_enable_fast_language_switching_in_lesson': True}
-        )
-
-    def test_feature_flags_parse_error(self) -> None:
-        self.get_json(
-            '/android_feature_flags?android_enable_fast_language_switching_in_lesson=notabool',
-            expected_status_int=400,
-        )

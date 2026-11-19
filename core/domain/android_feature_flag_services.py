@@ -62,7 +62,12 @@ def _parse_app_version_name(
         )
 
     app_version = match.group(1)
-    flavor = match.group(2) or match.group(3)
+    flavor = match.group(2)
+    if flavor is None:
+        version_suffix = app_version_name[len(app_version) + 1 :]
+        suffix_parts = version_suffix.split('-')
+        if suffix_parts[0].startswith('rc') and len(suffix_parts) > 1:
+            flavor = suffix_parts[1]
     if (
         flavor is None
         or flavor
