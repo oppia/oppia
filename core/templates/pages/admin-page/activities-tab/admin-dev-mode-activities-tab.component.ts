@@ -34,6 +34,8 @@ import {Story} from 'domain/story/story.model';
   styleUrls: ['./admin-dev-mode-activities-tab.component.css'],
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
+  readonly MAX_TOTAL_DUMMY_EXPLORATIONS: number = 500;
+  readonly DUMMY_EXPLORATION_BATCH_SIZE: number = 25;
   @Output() setStatusMessage = new EventEmitter<string>();
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[] = [];
@@ -157,10 +159,15 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   generateDummyExplorations(): void {
-    // Add max limit validation.
-    if (this.numDummyExpsToGenerate > 500) {
+    if (this.numDummyExpsToGenerate <= 0) {
+      this.setStatusMessage.emit('Generate count must be greater than 0.');
+      return;
+    }
+
+    if (this.numDummyExpsToGenerate > this.MAX_TOTAL_DUMMY_EXPLORATIONS) {
       this.setStatusMessage.emit(
-        'Cannot generate more than 500 dummy explorations at once. ' +
+        'Cannot generate more than ' +
+          `${this.MAX_TOTAL_DUMMY_EXPLORATIONS} dummy explorations at once. ` +
           `Requested: ${this.numDummyExpsToGenerate}. ` +
           'Please try generating explorations in smaller batches.'
       );
@@ -178,7 +185,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    const BATCH_SIZE = 25;
     let totalToGenerate = this.numDummyExpsToGenerate;
     let totalToPublish = this.numDummyExpsToPublish;
 
@@ -196,7 +202,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       }
 
       let currentBatchGenerate = Math.min(
-        BATCH_SIZE,
+        this.DUMMY_EXPLORATION_BATCH_SIZE,
         totalToGenerate - generatedSoFar
       );
       let currentBatchPublish = Math.max(
@@ -220,6 +226,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
             processNextBatch();
           },
           errorResponse => {
+            this.getDataAsync();
             this.setStatusMessage.emit('Server error: ' + errorResponse);
             this.adminTaskManagerService.finishTask();
           }

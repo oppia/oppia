@@ -364,6 +364,33 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateDummyExploration', () => {
+    it('should not generate dummy exploration if generate count is less than or equal to zero', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      );
+
+      component.numDummyExpsToGenerate = 0;
+      component.numDummyExpsToPublish = 0;
+
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Generate count must be greater than 0.'
+      );
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+
+      component.numDummyExpsToGenerate = -5;
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Generate count must be greater than 0.'
+      );
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
     it('should not generate dummy exploration if more than 500 explorations are requested', () => {
       let adminBackendSpy = spyOn(
         adminBackendApiService,
@@ -403,6 +430,31 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy.calls.argsFor(1)).toEqual([25, 5]);
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
         'Dummy explorations generated successfully.'
+      );
+    }));
+
+    it('should stop and finish task if a batch fails', fakeAsync(() => {
+      component.numDummyExpsToPublish = 30;
+      component.numDummyExpsToGenerate = 50;
+
+      let adminBackendSpy = spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      ).and.returnValues(
+        Promise.resolve(),
+        Promise.reject('Internal Server Error')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      let finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask');
+
+      component.generateDummyExplorations();
+      tick();
+
+      expect(adminBackendSpy).toHaveBeenCalledTimes(2);
+      expect(adminDataService.getDataAsync).toHaveBeenCalled();
+      expect(finishTaskSpy).toHaveBeenCalled();
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Server error: Internal Server Error'
       );
     }));
 
