@@ -659,6 +659,52 @@ class ReviewableOpportunitiesHandlerV2(
         return filtered_opportunities
 
 
+def can_user_view_auto_translations(user_id: Optional[str]) -> bool:
+    """Returns whether the given user should be shown the stored automatic
+    translations of contents on the Contributor Dashboard.
+
+    Args:
+        user_id: str|None. The ID of the user, or None if the user is not
+            logged in.
+
+    Returns:
+        bool. Whether the user can view automatic translations.
+    """
+    return (
+        user_id is not None
+        and feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            user_id,
+        )
+        and translation_services.is_automatic_translation_enabled()
+    )
+
+
+def get_auto_translations_for_contents(
+    entity_translation: translation_domain.EntityTranslation,
+    content_ids: List[str],
+) -> Dict[str, str]:
+    """Returns the stored automatic translations of the given contents.
+
+    Args:
+        entity_translation: EntityTranslation. The translations of the entity
+            in the requested language.
+        content_ids: list(str). The IDs of the contents.
+
+    Returns:
+        dict(str, str). A dict mapping the IDs of the contents that have an
+        automatic translation to that translation.
+    """
+    auto_translations = {}
+    for content_id in content_ids:
+        auto_translation = entity_translation.auto_translations.get(content_id)
+        if auto_translation is not None and isinstance(
+            auto_translation.content_value, str
+        ):
+            auto_translations[content_id] = auto_translation.content_value
+    return auto_translations
+
+
 class TranslatableContentsHandlerV2NormalizedRequestDict(TypedDict):
     """Dict representation of TranslatableContentsHandlerV2's
     normalized_request dictionary.
@@ -775,6 +821,7 @@ class TranslatableContentsHandlerV2(
                     content_id_to_grouping_key[content_id] = state_name
 
         translatable_contents = []
+        translatable_content_ids: List[str] = []
         for content in contents_which_need_translation.values():
             # Skip list-format content if the user does not have reviewer
             # rights for the selected language. Translating list contents
@@ -805,10 +852,17 @@ class TranslatableContentsHandlerV2(
             }
 
             translatable_contents.append(content_dict)
+            translatable_content_ids.append(content.content_id)
 
+        auto_translations: Dict[str, str] = {}
+        if can_user_view_auto_translations(self.user_id):
+            auto_translations = get_auto_translations_for_contents(
+                entity_translations, translatable_content_ids
+            )
         self.values = {
             'version': domain_object.version,
             'translatable_contents': translatable_contents,
+            'auto_translations': auto_translations,
         }
         self.render_json(self.values)
 
@@ -944,11 +998,29 @@ class TranslatableTextHandler(
                 exp_id, language_code
             ),
         )
+        auto_translations: Dict[str, str] = {}
+        if can_user_view_auto_translations(self.user_id):
+            auto_translations = get_auto_translations_for_contents(
+                translation_fetchers.get_entity_translation(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exp_id,
+                    exp.version,
+                    language_code,
+                ),
+                [
+                    content_id
+                    for content_id_mapping in (
+                        state_names_to_not_in_review_content_id_mapping.values()
+                    )
+                    for content_id in content_id_mapping
+                ],
+            )
         self.values = {
             'state_names_to_content_id_mapping': (
                 state_names_to_not_in_review_content_id_mapping
             ),
             'version': exp.version,
+            'auto_translations': auto_translations,
         }
 
         self.render_json(self.values)

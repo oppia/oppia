@@ -24,13 +24,22 @@ import logging
 from core import feconf, utils
 from core.domain import (
     email_manager,
+    exp_domain,
+    exp_services,
     machine_translation_services,
+    taskqueue_services,
+    translation_domain,
+    translation_fetchers,
     translation_services,
 )
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional
+from typing import Dict, Final, Optional, Tuple
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import translation_models
 
 (translation_models,) = models.Registry.import_models(
     [models.Names.TRANSLATION]
@@ -361,4 +370,410 @@ class MachineTranslationServicesWrapperTests(test_utils.GenericTestBase):
                 {'id': 'azure', 'display_name': 'Azure'},
                 {'id': 'gcp', 'display_name': 'Google Cloud'},
             ],
+        )
+
+
+class AutoTranslationGenerationTests(test_utils.GenericTestBase):
+    """Tests for the background generation of automatic translations."""
+
+    EXP_ID: Final = 'exp_id'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        # The exploration has two HTML contents that need a translation:
+        # content_0 (in the first state) and content_3 (in the end state).
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID,
+            self.owner_id,
+            end_state_name='End',
+            content_html='<p>Content</p>',
+        )
+        self.mapping_swap = self.swap(
+            translation_services,
+            'get_machine_translation_provider_mapping',
+            lambda: {'hi': 'gcp', 'ar': '', 'en': 'gcp'},
+        )
+        self.translate_swap = self.swap(
+            machine_translation_services,
+            'generate_and_cache_translation',
+            lambda source_language_code, target_language_code, source_text: (
+                '%s in %s' % (source_text, target_language_code),
+                'gcp',
+            ),
+        )
+
+    def _get_entity_translation(
+        self, version: int = 1
+    ) -> translation_domain.EntityTranslation:
+        """Returns the Hindi translations of the given exploration version.
+
+        Args:
+            version: int. The version of the exploration.
+
+        Returns:
+            EntityTranslation. The Hindi translations of the exploration.
+        """
+        return translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            version,
+            'hi',
+        )
+
+    def _update_first_state_content(self, html: str) -> None:
+        """Updates the content of the first state of the exploration.
+
+        Args:
+            html: str. The new content.
+        """
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': self.exploration.init_state_name,
+                        'new_value': {'content_id': 'content_0', 'html': html},
+                    }
+                )
+            ],
+            'Update content.',
+        )
+
+    def test_content_ids_needing_auto_translation(self) -> None:
+        entity_translation = self._get_entity_translation()
+
+        self.assertEqual(
+            machine_translation_services.get_content_ids_needing_auto_translation(
+                self.exploration, entity_translation
+            ),
+            ['content_0', 'content_3'],
+        )
+
+    def test_contents_with_translations_do_not_need_auto_translation(
+        self,
+    ) -> None:
+        entity_translation = self._get_entity_translation()
+        entity_translation.add_translation(
+            'content_0',
+            '<p>Manual</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+        entity_translation.add_auto_translation(
+            'content_3',
+            '<p>Auto</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+
+        self.assertEqual(
+            machine_translation_services.get_content_ids_needing_auto_translation(
+                self.exploration, entity_translation
+            ),
+            [],
+        )
+
+        entity_translation.mark_translations_needs_update(['content_0'])
+        self.assertEqual(
+            machine_translation_services.get_content_ids_needing_auto_translation(
+                self.exploration, entity_translation
+            ),
+            ['content_0'],
+        )
+
+    def test_no_tasks_are_deferred_if_automatic_translation_is_disabled(
+        self,
+    ) -> None:
+        translation_services.update_automatic_translation_status(False)
+
+        with self.mapping_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_exploration(
+                self.EXP_ID
+            )
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_AUTO_TRANSLATION_GENERATION
+            ),
+            0,
+        )
+        self.assertEqual(
+            logs,
+            [
+                'Automatic translation is disabled, so no automatic '
+                'translations were generated for exploration exp_id.'
+            ],
+        )
+
+    def test_batch_tasks_are_deferred_for_languages_with_providers(
+        self,
+    ) -> None:
+        translation_services.update_automatic_translation_status(True)
+        batch_size_swap = self.swap(
+            machine_translation_services, 'AUTO_TRANSLATION_BATCH_SIZE', 1
+        )
+
+        with self.mapping_swap, batch_size_swap:
+            machine_translation_services.generate_auto_translations_for_exploration(
+                self.EXP_ID
+            )
+
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_AUTO_TRANSLATION_GENERATION
+        )
+        task_args = []
+        for task in tasks:
+            # Ruling out the possibility of None for mypy type checking.
+            assert task.payload is not None
+            task_args.append(list(task.payload['args']))
+        # Arabic has no provider and English is the language of the
+        # exploration, so only Hindi translations are generated.
+        self.assertEqual(
+            task_args,
+            [
+                [self.EXP_ID, 1, 'hi', ['content_0']],
+                [self.EXP_ID, 1, 'hi', ['content_3']],
+            ],
+        )
+
+    def test_no_batch_tasks_are_deferred_for_translated_contents(
+        self,
+    ) -> None:
+        translation_services.update_automatic_translation_status(True)
+        entity_translation = self._get_entity_translation()
+        entity_translation.add_translation(
+            'content_0',
+            '<p>Manual</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+        entity_translation.add_auto_translation(
+            'content_3',
+            '<p>Auto</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            self.EXP_ID,
+            1,
+            'hi',
+            entity_translation.to_stored_translations_dict(),
+        ).put()
+
+        with self.mapping_swap:
+            machine_translation_services.generate_auto_translations_for_exploration(
+                self.EXP_ID
+            )
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_AUTO_TRANSLATION_GENERATION
+            ),
+            0,
+        )
+
+    def test_deferred_tasks_store_auto_translations(self) -> None:
+        translation_services.update_automatic_translation_status(True)
+
+        with self.mapping_swap, self.translate_swap:
+            machine_translation_services.generate_auto_translations_for_exploration(
+                self.EXP_ID
+            )
+            self.process_and_flush_pending_tasks()
+
+        entity_translation = self._get_entity_translation()
+        self.assertEqual(entity_translation.translations, {})
+        self.assertEqual(
+            {
+                content_id: translation.content_value
+                for content_id, translation in (
+                    entity_translation.auto_translations.items()
+                )
+            },
+            {
+                'content_0': '<p>Content</p> in hi',
+                'content_3': '<p>Content</p> in hi',
+            },
+        )
+
+    def test_batch_logs_failures_and_stores_other_translations(self) -> None:
+        def mock_generate_and_cache_translation(
+            unused_source_language_code: str,
+            unused_target_language_code: str,
+            source_text: str,
+        ) -> Optional[Tuple[str, str]]:
+            """Fails to translate everything except the end state content.
+
+            Returns:
+                tuple(str, str). The translation and the source it came from.
+
+            Raises:
+                Exception. The source text is not the end state content.
+            """
+            if source_text != '<p>End</p>':
+                raise Exception('Provider error')
+            return (
+                '<p>Translated end</p>',
+                machine_translation_services.TRANSLATION_SOURCE_CACHE,
+            )
+
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'End',
+                        'new_value': {
+                            'content_id': 'content_3',
+                            'html': '<p>End</p>',
+                        },
+                    }
+                )
+            ],
+            'Update end content.',
+        )
+        translate_swap = self.swap(
+            machine_translation_services,
+            'generate_and_cache_translation',
+            mock_generate_and_cache_translation,
+        )
+
+        with translate_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 2, 'hi', ['content_0', 'content_3']
+            )
+
+        self.assertEqual(
+            logs,
+            [
+                'Failed to generate the automatic translation of content '
+                'content_0 of exploration exp_id in hi: Provider error',
+                'Automatic translations for exploration exp_id in hi: 1 saved '
+                '(1 from the cache), 1 failed.',
+            ],
+        )
+        self.assertEqual(
+            list(self._get_entity_translation(2).auto_translations.keys()),
+            ['content_3'],
+        )
+
+    def test_batch_stops_if_language_has_no_provider(self) -> None:
+        no_provider_swap = self.swap(
+            machine_translation_services,
+            'generate_and_cache_translation',
+            lambda source_language_code, target_language_code, source_text: (
+                None
+            ),
+        )
+
+        with no_provider_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 1, 'hi', ['content_0', 'content_3']
+            )
+
+        self.assertEqual(
+            logs,
+            [
+                'No translation provider is configured for hi, so no '
+                'automatic translations were generated for exploration exp_id.',
+                'Automatic translations for exploration exp_id in hi: 0 saved '
+                '(0 from the cache), 0 failed.',
+            ],
+        )
+        self.assertEqual(self._get_entity_translation().auto_translations, {})
+
+    def test_batch_skips_unknown_and_changed_contents(self) -> None:
+        self._update_first_state_content('<p>Updated content</p>')
+
+        with self.translate_swap:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 1, 'hi', ['content_0', 'content_3', 'invalid_id']
+            )
+
+        # content_0 changed after the task was enqueued, so its translation
+        # is out of date and is not stored. invalid_id is not a content of
+        # the exploration, so it is skipped.
+        self.assertEqual(
+            list(self._get_entity_translation(2).auto_translations.keys()),
+            ['content_3'],
+        )
+
+    def test_batch_stores_nothing_if_all_contents_changed(self) -> None:
+        self._update_first_state_content('<p>Updated content</p>')
+
+        with self.translate_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 1, 'hi', ['content_0']
+            )
+
+        self.assertEqual(self._get_entity_translation(2).auto_translations, {})
+        self.assertEqual(
+            logs,
+            [
+                'Automatic translations for exploration exp_id in hi: 0 saved '
+                '(0 from the cache), 0 failed.'
+            ],
+        )
+
+    def test_batch_does_not_replace_existing_auto_translations(self) -> None:
+        entity_translation = self._get_entity_translation()
+        entity_translation.add_auto_translation(
+            'content_0',
+            '<p>Existing</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            self.EXP_ID,
+            1,
+            'hi',
+            entity_translation.to_stored_translations_dict(),
+        ).put()
+
+        with self.translate_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 1, 'hi', ['content_0']
+            )
+
+        self.assertEqual(
+            self._get_entity_translation()
+            .auto_translations['content_0']
+            .content_value,
+            '<p>Existing</p>',
+        )
+        self.assertEqual(
+            logs,
+            [
+                'Automatic translations for exploration exp_id in hi: 0 saved '
+                '(0 from the cache), 0 failed.'
+            ],
+        )
+
+    def test_batch_does_not_store_translations_that_are_too_large(
+        self,
+    ) -> None:
+        size_swap = self.swap(
+            machine_translation_services,
+            'MAX_STORED_TRANSLATIONS_SIZE_IN_BYTES',
+            10,
+        )
+
+        with self.translate_swap, size_swap, self.capture_logging() as logs:
+            machine_translation_services.generate_auto_translations_for_batch(
+                self.EXP_ID, 1, 'hi', ['content_0']
+            )
+
+        self.assertEqual(self._get_entity_translation().auto_translations, {})
+        self.assertEqual(len(logs), 2)
+        self.assertIn(
+            'The automatic translations of exploration exp_id in hi were not '
+            'stored',
+            logs[0],
         )

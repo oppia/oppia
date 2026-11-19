@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, Final, List, TypedDict, Union
+from typing import Callable, Dict, Final, List, Optional, TypedDict, Union
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1827,27 +1827,36 @@ class TranslatableEntityType(enum.Enum):
     CLASSROOM = 'classroom'
 
 
-class _TranslatedContentDictRequired(TypedDict):
-    """Required fields for the TranslatedContent dictionary."""
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
 
     content_value: ContentValueType
     needs_update: bool
     content_format: str
 
 
-class TranslatedContentDict(_TranslatedContentDictRequired, total=False):
-    """Dictionary representing TranslatedContent object.
-
-    The optional 'data_source' field records whether the translation was
-    produced by an AI auto-generation feature ('auto') or submitted manually
-    by a human contributor ('manual').  Rows stored before this field was
-    introduced default to 'manual' when read back.
+class TranslationType(enum.Enum):
+    """Represents all possible translation types. Manual translations are the
+    ones approved by a human reviewer, and automatic translations are machine
+    generated drafts that are only shown to translators.
     """
 
-    # Indicates whether this translation was produced automatically ('auto')
-    # or by a human contributor ('manual'). Absent values should be treated
-    # as 'manual' for backward compatibility.
-    data_source: str
+    AUTO = 'auto'
+    MANUAL = 'manual'
+
+
+# The format in which EntityTranslationsModel stores translations. Each content
+# ID maps to a dict keyed by TranslationType values, whose values are the
+# corresponding translations (or None, if there is no such translation).
+StoredTranslationsDict = Dict[str, Dict[str, Optional[TranslatedContentDict]]]
+
+# The type of a value in the translations field of an EntityTranslationsModel.
+# It is either a dict keyed by TranslationType values, or a single (manual)
+# TranslatedContentDict, which is how translations were stored before
+# automatic translations were introduced.
+StoredTranslationValueType = Union[
+    Dict[str, Optional[TranslatedContentDict]], TranslatedContentDict
+]
 
 
 class VoiceoverRegenerationState(enum.Enum):
@@ -1911,6 +1920,12 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     ),
     'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS': (
         'regenerate_voiceovers_for_batch_contents'
+    ),
+    'FUNCTION_ID_GENERATE_AUTO_TRANSLATIONS_FOR_EXPLORATION': (
+        'generate_auto_translations_for_exploration'
+    ),
+    'FUNCTION_ID_GENERATE_AUTO_TRANSLATIONS_FOR_BATCH': (
+        'generate_auto_translations_for_batch'
     ),
 }
 

@@ -22,7 +22,7 @@ import logging
 
 from core import feconf
 from core.domain import state_domain, translation_domain
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
@@ -133,7 +133,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                         entity_translation.entity_id,
                         entity_translation.entity_version,
                         entity_translation.language_code,
-                        entity_translation.to_dict()['translations'],
+                        entity_translation.to_stored_translations_dict(),
                     )
                 )
             translation_model.update_timestamps()
@@ -206,5 +206,105 @@ class AuditEntityTranslationsModelGenerationOneOffJob(
     EntityTranslationsModelGenerationOneOffJob
 ):
     """Audit EntityTranslationsModelGenerationOneOffJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+
+class GroupEntityTranslationsByTypeJob(base_jobs.JobBase):
+    """Moves the translations of EntityTranslationsModels that still use the
+    older format (content ID -> translation) under the 'manual' key of the
+    current format (content ID -> {'manual': ..., 'auto': ...}).
+
+    Models that already use the current format are skipped, so the job can
+    safely be run again if it fails halfway.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    @staticmethod
+    def _uses_older_format(
+        entity_translation_model: translation_models.EntityTranslationsModel,
+    ) -> bool:
+        """Checks whether any translation of the given model is stored in the
+        older format.
+
+        Args:
+            entity_translation_model: EntityTranslationsModel. The model to
+                check.
+
+        Returns:
+            bool. Whether any translation of the model is stored in the older
+            format.
+        """
+        return any(
+            'content_value' in stored_value
+            for stored_value in entity_translation_model.translations.values()
+        )
+
+    @staticmethod
+    def _group_translations_by_type(
+        entity_translation_model: translation_models.EntityTranslationsModel,
+    ) -> translation_models.EntityTranslationsModel:
+        """Returns a copy of the given model whose translations are grouped by
+        translation type.
+
+        Args:
+            entity_translation_model: EntityTranslationsModel. The model to
+                migrate.
+
+        Returns:
+            EntityTranslationsModel. The migrated copy of the model.
+        """
+        migrated_model = job_utils.clone_model(
+            entity_translation_model,
+            translations=(
+                translation_domain.convert_to_stored_translations_dict(
+                    entity_translation_model.translations
+                )
+            ),
+        )
+        migrated_model.update_timestamps()
+        return migrated_model
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from migrating the
+        EntityTranslationsModels that use the older format.
+
+        Returns:
+            PCollection. A PCollection of results from the migration.
+        """
+        migrated_models = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Keep models that use the older format'
+            >> beam.Filter(self._uses_older_format)
+            | 'Group translations by type'
+            >> beam.Map(self._group_translations_by_type)
+        )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                migrated_models
+                | 'Put migrated models into the datastore' >> ndb_io.PutModels()
+            )
+
+        return (
+            migrated_models
+            | 'Count migrated models'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'MIGRATED ENTITY TRANSLATIONS MODELS'
+            )
+        )
+
+
+class AuditGroupEntityTranslationsByTypeJob(GroupEntityTranslationsByTypeJob):
+    """Audits GroupEntityTranslationsByTypeJob by counting the models that
+    would be migrated, without changing the datastore.
+    """
 
     DATASTORE_UPDATES_ALLOWED = False

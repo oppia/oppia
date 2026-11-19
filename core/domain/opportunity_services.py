@@ -313,6 +313,42 @@ def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
         )
 
 
+def is_background_auto_translation_generation_enabled() -> bool:
+    """Returns whether automatic translations should be generated in the
+    background for curated explorations.
+
+    Returns:
+        bool. Whether both the feature flag and the admin setting for
+        automatic translations are turned on.
+    """
+    return (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_AUTO_TRANSLATION_GENERATION.value,
+            None,
+        )
+        and translation_services.is_automatic_translation_enabled()
+    )
+
+
+def generate_auto_translations_async_for_exploration(exp_id: str) -> None:
+    """Triggers the asynchronous generation of automatic translations for
+    the given curated exploration, if this is enabled.
+
+    Args:
+        exp_id: str. The ID of the exploration for which automatic
+            translations should be generated.
+    """
+    if not is_background_auto_translation_generation_enabled():
+        return
+    taskqueue_services.defer(
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_GENERATE_AUTO_TRANSLATIONS_FOR_EXPLORATION'
+        ],
+        taskqueue_services.QUEUE_NAME_AUTO_TRANSLATION_GENERATION,
+        exp_id,
+    )
+
+
 def _compute_incomplete_translation_languages(
     complete_translation_languages: List[str],
 ) -> List[str]:
@@ -890,6 +926,7 @@ def _create_exploration_opportunities(
             create_exp_opportunity_summary(topic, story, exploration)
         )
         generate_voiceovers_async_for_exp_linked_to_topic(exploration.id)
+        generate_auto_translations_async_for_exploration(exploration.id)
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list
     )

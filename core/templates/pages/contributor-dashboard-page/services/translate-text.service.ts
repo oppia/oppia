@@ -80,6 +80,7 @@ export class TranslateTextService {
   activeStateName: string | null = null;
   activeContentText: string | string[] | null = null;
   activeContentStatus: Status = 'pending';
+  activeTranslatableTexts: TranslatableTexts | null = null;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService,
@@ -215,9 +216,11 @@ export class TranslateTextService {
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.activeEntityType = entityType;
+    this.activeTranslatableTexts = null;
     this.translateTextBackendApiService
       .getTranslatableTextsAsync(expId, languageCode, entityType)
       .then(async (translatableTexts: TranslatableTexts) => {
+        this.activeTranslatableTexts = translatableTexts;
         this.stateWiseContents = translatableTexts.stateWiseContents;
         this.activeExpVersion = translatableTexts.explorationVersion;
         const stateNames = await this.getStateNamesInLessonOrder(
@@ -258,6 +261,15 @@ export class TranslateTextService {
         }
         successCallback();
       });
+  }
+
+  getAutoTranslationForActiveContent(): string | null {
+    if (this.activeTranslatableTexts === null || !this.activeContentId) {
+      return null;
+    }
+    return this.activeTranslatableTexts.getAutoTranslation(
+      this.activeContentId
+    );
   }
 
   getActiveIndex(): number {

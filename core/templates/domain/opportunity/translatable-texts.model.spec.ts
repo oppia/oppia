@@ -167,4 +167,49 @@ describe('Translatable Texts model', () => {
     );
     expect(translatableTexts.explorationVersion).toBe('2');
   });
+
+  it('should return null if a content has no automatic translation', () => {
+    expect(sampleTranslatableTexts.getAutoTranslation('1')).toBeNull();
+  });
+
+  it('should get automatic translations from the backend dict', () => {
+    const translatableTexts = TranslatableTexts.createFromBackendDict({
+      state_names_to_content_id_mapping: {
+        state1: {
+          1: getTranslatableItem('text1'),
+        },
+      },
+      version: '1',
+      auto_translations: {1: 'automatic text1'},
+    });
+
+    expect(translatableTexts.getAutoTranslation('1')).toBe('automatic text1');
+    expect(translatableTexts.getAutoTranslation('2')).toBeNull();
+  });
+
+  it('should get automatic translations from the V2 backend dict', () => {
+    const translatableTexts = TranslatableTexts.createFromBackendDictV2({
+      translatable_contents: [
+        {
+          content_id: '1',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text1',
+        },
+      ],
+      version: '2',
+      auto_translations: {1: 'automatic text1'},
+    });
+
+    expect(translatableTexts.getAutoTranslation('1')).toBe('automatic text1');
+  });
+
+  it('should not have automatic translations if V2 dict has none', () => {
+    const translatableTexts = TranslatableTexts.createFromBackendDictV2({
+      translatable_contents: [],
+      version: '2',
+    });
+
+    expect(translatableTexts.getAutoTranslation('1')).toBeNull();
+  });
 });

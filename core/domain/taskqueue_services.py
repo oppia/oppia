@@ -49,6 +49,8 @@ QUEUE_NAME_ONE_OFF_JOBS: Final = 'one-off-jobs'
 QUEUE_NAME_STATS: Final = 'stats'
 # Taskqueue for regenerating automatic voiceovers using cloud services.
 QUEUE_NAME_VOICEOVER_REGENERATION: Final = 'voiceover-regeneration'
+# Taskqueue for generating automatic translations using cloud services.
+QUEUE_NAME_AUTO_TRANSLATION_GENERATION: Final = 'auto-translation-generation'
 
 # The maximum number of retries allowed for a cloud task. This results in a
 # total of 3 attempts to execute the task, including the first attempt.
