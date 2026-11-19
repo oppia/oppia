@@ -21,9 +21,8 @@ from __future__ import annotations
 import enum
 
 from core import feconf, utils
-from core.domain import caching_services
+from core.domain import caching_services, web_platform_parameter_list
 from core.domain import web_platform_parameter_domain as parameter_domain
-from core.domain import web_platform_parameter_list
 from core.domain import web_platform_parameter_registry as registry
 from core.storage.config import gae_models as config_models
 from core.tests import test_utils

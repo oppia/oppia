@@ -30,7 +30,7 @@ from core.domain import (
     web_platform_parameter_list,
     web_platform_parameter_services,
 )
-from core.domain import platform_parameter_registry as registry
+from core.domain import web_platform_parameter_registry as registry
 
 from typing import Dict, TypedDict
 

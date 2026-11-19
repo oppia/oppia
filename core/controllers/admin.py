@@ -64,6 +64,7 @@ from core.domain import (
     user_services,
     voiceover_services,
     web_platform_parameter_list,
+    wipeout_service,
 )
 from core.domain import web_platform_parameter_domain as parameter_domain
 from core.domain import web_platform_parameter_registry as registry
