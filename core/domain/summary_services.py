@@ -659,86 +659,83 @@ def get_displayable_exp_summary_dicts(
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
-        if exploration_summary:
-            translated_values: Dict[str, str] = {}
-            translated_metadata_fields: List[str] = []
-            tags = list(exploration_summary.tags)
+        translated_values: Dict[str, str] = {}
+        translated_metadata_fields: List[str] = []
+        tags = list(exploration_summary.tags)
 
-            entity_translation = entity_translations_map.get(
-                exploration_summary.id
-            )
-            if entity_translation is not None:
-                for (
-                    field_name,
-                    content_id,
-                ) in EXPLORATION_SUMMARY_FIELD_TO_CONTENT_ID.items():
-                    translated_value = _get_up_to_date_translation(
-                        entity_translation, content_id
-                    )
-                    if translated_value is not None:
-                        translated_values[field_name] = translated_value
-                        translated_metadata_fields.append(field_name)
+        entity_translation = entity_translations_map.get(exploration_summary.id)
+        if entity_translation is not None:
+            for (
+                field_name,
+                content_id,
+            ) in EXPLORATION_SUMMARY_FIELD_TO_CONTENT_ID.items():
+                translated_value = _get_up_to_date_translation(
+                    entity_translation, content_id
+                )
+                if translated_value is not None:
+                    translated_values[field_name] = translated_value
+                    translated_metadata_fields.append(field_name)
 
-                # Tag content IDs are index based, matching how they are
-                # generated in Exploration.get_translatable_contents_collection.
-                for tag_idx, _ in enumerate(exploration_summary.tags):
-                    translated_tag = _get_up_to_date_translation(
-                        entity_translation,
-                        f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{tag_idx}',
-                    )
-                    if translated_tag is not None:
-                        tags[tag_idx] = translated_tag
-                if tags != exploration_summary.tags:
-                    translated_metadata_fields.append(
-                        EXPLORATION_SUMMARY_TAGS_FIELD
-                    )
+            # Tag content IDs are index based, matching how they are
+            # generated in Exploration.get_translatable_contents_collection.
+            for tag_idx, _ in enumerate(exploration_summary.tags):
+                translated_tag = _get_up_to_date_translation(
+                    entity_translation,
+                    f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{tag_idx}',
+                )
+                if translated_tag is not None:
+                    tags[tag_idx] = translated_tag
+            if tags != exploration_summary.tags:
+                translated_metadata_fields.append(
+                    EXPLORATION_SUMMARY_TAGS_FIELD
+                )
 
-            summary_dict: DisplayableExplorationSummaryDict = {
-                'id': exploration_summary.id,
-                'title': translated_values.get(
-                    EXPLORATION_SUMMARY_TITLE_FIELD, exploration_summary.title
-                ),
-                'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
-                'category': translated_values.get(
-                    EXPLORATION_SUMMARY_CATEGORY_FIELD,
-                    exploration_summary.category,
-                ),
-                'created_on_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_created_on
-                ),
-                'objective': translated_values.get(
-                    EXPLORATION_SUMMARY_OBJECTIVE_FIELD,
-                    exploration_summary.objective,
-                ),
-                'language_code': exploration_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_last_updated
-                ),
-                'human_readable_contributors_summary': (
-                    get_human_readable_contributors_summary(
-                        exploration_summary.contributors_summary
-                    )
-                ),
-                'status': exploration_summary.status,
-                'ratings': exploration_summary.ratings,
-                'community_owned': exploration_summary.community_owned,
-                'tags': tags,
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    exploration_summary.category
-                ),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exploration_summary.category
-                ),
-                'num_views': view_counts[ind],
-                'visited_checkpoints_count': 0,
-                'total_checkpoints_count': 0,
-                # Clients fall back to their own hardcoded translation bundles
-                # for the fields that are not listed here, so the list has to
-                # say which values actually came back translated.
-                'translated_metadata_fields': translated_metadata_fields,
-            }
+        summary_dict: DisplayableExplorationSummaryDict = {
+            'id': exploration_summary.id,
+            'title': translated_values.get(
+                EXPLORATION_SUMMARY_TITLE_FIELD, exploration_summary.title
+            ),
+            'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
+            'category': translated_values.get(
+                EXPLORATION_SUMMARY_CATEGORY_FIELD,
+                exploration_summary.category,
+            ),
+            'created_on_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_created_on
+            ),
+            'objective': translated_values.get(
+                EXPLORATION_SUMMARY_OBJECTIVE_FIELD,
+                exploration_summary.objective,
+            ),
+            'language_code': exploration_summary.language_code,
+            'last_updated_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_last_updated
+            ),
+            'human_readable_contributors_summary': (
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary
+                )
+            ),
+            'status': exploration_summary.status,
+            'ratings': exploration_summary.ratings,
+            'community_owned': exploration_summary.community_owned,
+            'tags': tags,
+            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                exploration_summary.category
+            ),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                exploration_summary.category
+            ),
+            'num_views': view_counts[ind],
+            'visited_checkpoints_count': 0,
+            'total_checkpoints_count': 0,
+            # Clients fall back to their own hardcoded translation bundles
+            # for the fields that are not listed here, so the list has to
+            # say which values actually came back translated.
+            'translated_metadata_fields': translated_metadata_fields,
+        }
 
-            displayable_exp_summaries.append(summary_dict)
+        displayable_exp_summaries.append(summary_dict)
 
     return displayable_exp_summaries
 
