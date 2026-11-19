@@ -52,6 +52,10 @@ import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skill
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {of, throwError} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 class MockNgbModal {
   open() {
@@ -1032,5 +1036,126 @@ describe('Topic editor tab directive', () => {
     expect(
       topicEditorStateService.updateExistenceOfTopicUrlFragment
     ).not.toHaveBeenCalled();
+  });
+
+  describe('thumbnail image uploader', () => {
+    let assetsBackendApiService: AssetsBackendApiService;
+    let alertsService: AlertsService;
+    let imageData: ImageUploaderData;
+
+    beforeEach(() => {
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      alertsService = TestBed.inject(AlertsService);
+      imageData = {
+        filename: 'img_new.svg',
+        bg_color: '#C6DCDA',
+        image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
+      };
+    });
+
+    it('should initialize the image uploader parameters from the topic', () => {
+      expect(component.imageUploaderParameters).toEqual({
+        disabled: !component.topicRights.canEditTopic(),
+        maxImageSizeInKB: 100,
+        imageName: 'Thumbnail',
+        orientation: 'landscape',
+        bgColor: component.allowedBgColors[0],
+        allowedBgColors: [...component.allowedBgColors],
+        allowedImageFormats: ['svg'],
+        aspectRatio: '4:3',
+        filename: topic.getThumbnailFilename(),
+        previewTitle: 'New Name',
+        previewDescriptionBgColor: '#2F6687',
+        previewFooter: '2 Lessons',
+      });
+    });
+
+    it('should use the thumbnail bg color of the topic when it is set', () => {
+      spyOn(topic, 'getThumbnailBgColor').and.returnValue('#FFFFFF');
+
+      component.initEditor();
+
+      expect(component.imageUploaderParameters.bgColor).toEqual('#FFFFFF');
+    });
+
+    it('should update the preview title when the topic name is updated', () => {
+      spyOn(topicUpdateService, 'setTopicName');
+      spyOn(topicEditorStateService, 'updateExistenceOfTopicName');
+
+      component.updateTopicName('Different Name');
+
+      expect(component.imageUploaderParameters.previewTitle).toEqual(
+        'Different Name'
+      );
+    });
+
+    it('should upload the thumbnail and update the topic on image save', fakeAsync(() => {
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      ).and.returnValue(of({filename: 'img_new.svg'}));
+      const updateFilenameSpy = spyOn(
+        component,
+        'updateTopicThumbnailFilename'
+      );
+      const updateBgColorSpy = spyOn(component, 'updateTopicThumbnailBgColor');
+
+      component.onImageSave(imageData);
+      tick();
+
+      expect(postThumbnailFileSpy).toHaveBeenCalledWith(
+        imageData.image_data,
+        'img_new.svg',
+        'topic',
+        'dkfn32sxssasd'
+      );
+      expect(updateFilenameSpy).toHaveBeenCalledWith('img_new.svg');
+      expect(updateBgColorSpy).toHaveBeenCalledWith('#C6DCDA');
+    }));
+
+    it('should show a warning and not update the topic if the upload fails', fakeAsync(() => {
+      spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+        throwError('Upload failed')
+      );
+      const addWarningSpy = spyOn(alertsService, 'addWarning');
+      const updateFilenameSpy = spyOn(
+        component,
+        'updateTopicThumbnailFilename'
+      );
+
+      component.onImageSave(imageData);
+      tick();
+
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Could not upload the thumbnail.'
+      );
+      expect(updateFilenameSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not upload the thumbnail if the entity type is missing', () => {
+      const pageContextService = TestBed.inject(PageContextService);
+      spyOn(pageContextService, 'getEntityType').and.returnValue(undefined);
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+
+      component.onImageSave(imageData);
+
+      expect(postThumbnailFileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not upload the thumbnail if the entity id is missing', () => {
+      const pageContextService = TestBed.inject(PageContextService);
+      spyOn(pageContextService, 'getEntityId').and.returnValue('');
+      const postThumbnailFileSpy = spyOn(
+        assetsBackendApiService,
+        'postThumbnailFile'
+      );
+
+      component.onImageSave(imageData);
+
+      expect(postThumbnailFileSpy).not.toHaveBeenCalled();
+    });
   });
 });

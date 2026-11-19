@@ -792,6 +792,11 @@ export class TopicManager extends BaseUser {
 
     await this.clickOnElementWithSelector(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
+    // The image uploader modal opens with the current thumbnail already
+    // loaded, so it has to be reset before a new file can be uploaded.
+    if (await this.isElementVisible(resetChapterThumbnailButton, true, 5000)) {
+      await this.clickOnElementWithSelector(resetChapterThumbnailButton);
+    }
     await this.uploadFile(thumbnail);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOnElementWithSelector(uploadPhotoButton);
