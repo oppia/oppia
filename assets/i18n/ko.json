@@ -1053,7 +1053,6 @@
   "I18N_MULTIPLE_LESSONS": "수업",
   "I18N_NEW_HINT_TITLE": "힌트 <[hintIndex]>",
   "I18N_NEXT_LESSON": "다음 수업",
-  "I18N_NO": "아니오",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "일치하는 사용자 이름이 없습니다.",
   "I18N_ONE_SUBSCRIBER_TEXT": "당신에게 1명의 구독자가 있습니다.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "파트너십",
@@ -1741,6 +1740,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "의미 있는 프로젝트",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "여러분의 작업은 전 세계 소외된 학생들이 무료 고품질 교육에 접근하도록 직접 돕습니다.",
   "I18N_WARNING_MODAL_DESCRIPTION": "전체 해답을 표시합니다. 확실한가요?",
-  "I18N_WARNING_MODAL_TITLE": "경고!",
-  "I18N_YES": "예"
+  "I18N_WARNING_MODAL_TITLE": "경고!"
 }

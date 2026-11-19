@@ -976,7 +976,6 @@
   "I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "Entre nas salas de aula da Oppia e explore materiais educacionais selecionados por nossa equipe com sua jornada de aprendizado em mente!",
   "I18N_MULTIPLE_LESSONS": "Lições",
   "I18N_NEXT_LESSON": "Próxima lição",
-  "I18N_NO": "Não",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Não foram encontrados resultados para o nome de usuário correspondente.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Você tem 1 subscrito.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Parcerias",
@@ -1616,6 +1615,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Projetos significativos",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Seu trabalho ajuda diretamente estudantes carentes em todo o mundo a terem acesso à educação gratuita e de alta qualidade.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Isso mostrará a solução completa. Tem certeza?",
-  "I18N_WARNING_MODAL_TITLE": "Aviso!",
-  "I18N_YES": "Sim"
+  "I18N_WARNING_MODAL_TITLE": "Aviso!"
 }

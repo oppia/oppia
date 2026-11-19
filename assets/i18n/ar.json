@@ -1023,7 +1023,6 @@
   "I18N_MULTIPLE_LESSONS": "الدروس",
   "I18N_NEW_HINT_TITLE": "تلميح <[hintIndex]>",
   "I18N_NEXT_LESSON": "الدرس التالي",
-  "I18N_NO": "لا",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "لم يتم العثور على نتائج مطابقة لاسم المستخدم.",
   "I18N_ONE_SUBSCRIBER_TEXT": "لديك مشترك واحد.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "شراكات",
@@ -1692,6 +1691,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "مشاريع هادفة",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "يساعد عملك الطلاب المحرومين في جميع أنحاء العالم بشكل مباشر في الحصول على تعليم مجاني عالي الجودة.",
   "I18N_WARNING_MODAL_DESCRIPTION": "هذا سيظهر الحل. هل أنت متأكد ؟",
-  "I18N_WARNING_MODAL_TITLE": "تحذير!",
-  "I18N_YES": "نعم"
+  "I18N_WARNING_MODAL_TITLE": "تحذير!"
 }

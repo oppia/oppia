@@ -1049,7 +1049,6 @@
   "I18N_MULTIPLE_LESSONS": "पाठहरू",
   "I18N_NEW_HINT_TITLE": "सङ्केत <[hintIndex]>",
   "I18N_NEXT_LESSON": "अर्को पाठ",
-  "I18N_NO": "होइन",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "मिल्दो प्रयोगकर्ता नामको लागि कुनै परिणाम फेला परेन।",
   "I18N_ONE_SUBSCRIBER_TEXT": "तपाईंको १ जना सदस्य हुनुहुन्छ।",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "साझेदारी",
@@ -1737,6 +1736,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "अर्थपूर्ण परियोजनाहरू",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "तपाईंको कामले विश्वभरका पहुँचभन्दा बाहिर रहेका विद्यार्थीहरूलाई नि:शुल्क, उच्च-गुणस्तरीय शिक्षामा पहुँच प्राप्त गर्न प्रत्यक्ष रूपमा मद्दत गर्दछ।",
   "I18N_WARNING_MODAL_DESCRIPTION": "यसले पूर्ण समाधान देखाउनेछ। के तपाईं पक्का हुनुहुन्छ?",
-  "I18N_WARNING_MODAL_TITLE": "चेतावनी!",
-  "I18N_YES": "हो"
+  "I18N_WARNING_MODAL_TITLE": "चेतावनी!"
 }

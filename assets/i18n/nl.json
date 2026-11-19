@@ -1111,7 +1111,6 @@
   "I18N_MULTIPLE_LESSONS": "Lessen",
   "I18N_NEW_HINT_TITLE": "Tip <[hintIndex]>",
   "I18N_NEXT_LESSON": "Volgende les",
-  "I18N_NO": "Nee",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Er zijn geen resultaten gevonden voor deze gebruikersnaam.",
   "I18N_ONE_SUBSCRIBER_TEXT": "Je hebt één abonnee.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerschappen",
@@ -1819,6 +1818,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Betekenisvolle projecten",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Uw werk draagt er direct aan bij dat kansarme studenten wereldwijd toegang krijgen tot gratis, kwalitatief hoogwaardig onderwijs.",
   "I18N_WARNING_MODAL_DESCRIPTION": "Hiermee krijg je de volledige oplossing te zien. Weet je het zeker?",
-  "I18N_WARNING_MODAL_TITLE": "Waarschuwing!",
-  "I18N_YES": "Ja"
+  "I18N_WARNING_MODAL_TITLE": "Waarschuwing!"
 }

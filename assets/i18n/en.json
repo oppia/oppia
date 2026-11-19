@@ -1151,7 +1151,6 @@
   "I18N_MY_SUGGESTION_SUBMITTED_ON": "Submitted on:",
   "I18N_NEW_HINT_TITLE": "Hint <[hintIndex]>",
   "I18N_NEXT_LESSON": "Next Lesson",
-  "I18N_NO": "No",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "No results found for matching username.",
   "I18N_ONE_SUBSCRIBER_TEXT": "You have 1 subscriber.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerships",
@@ -1900,6 +1899,5 @@
   "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
   "I18N_WARNING_MODAL_TITLE": "Warning!",
   "I18N_WARNING_PLAIN_TEXT_MATH_EXPRESSION": "This content contains plain-text math expressions. Consider using<br class=\"d-none d-md-inline\"> the <strong>Math Formula (x²)</strong> component to ensure correct rendering across all languages.",
-  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "<strong>Warning:</strong> Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using<br class=\"d-none d-md-inline\"> the <strong>Math Formula (x²)</strong> tool from the editor toolbar above.",
-  "I18N_YES": "Yes"
+  "I18N_WARNING_TRANSLATOR_PLAIN_TEXT_MATH_EXPRESSION": "<strong>Warning:</strong> Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using<br class=\"d-none d-md-inline\"> the <strong>Math Formula (x²)</strong> tool from the editor toolbar above."
 }

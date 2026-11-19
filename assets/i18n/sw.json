@@ -777,7 +777,6 @@
   "I18N_MODAL_CONTINUE_BUTTON": "Endelea",
   "I18N_MULTIPLE_LESSONS": "Masomo",
   "I18N_NEXT_LESSON": "Somo Linalofuata",
-  "I18N_NO": "Hapana",
   "I18N_ONE_SUBSCRIBER_TEXT": "Una mchangiaji 1.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Ushirikiano",
   "I18N_PARTNERSHIPS_PAGE_TITLE": "Ushirikiano | Oppia",
@@ -1159,6 +1158,5 @@
   "I18N_VOLUNTEER_PAGE_BREADCRUMB": "Ujitolee",
   "I18N_VOLUNTEER_PAGE_TITLE": "Ujitolee | Oppia",
   "I18N_WARNING_MODAL_DESCRIPTION": "Hii itaonyesha suluhisho kamili. Una uhakika?",
-  "I18N_WARNING_MODAL_TITLE": "Onyo!",
-  "I18N_YES": "Ndiyo"
+  "I18N_WARNING_MODAL_TITLE": "Onyo!"
 }

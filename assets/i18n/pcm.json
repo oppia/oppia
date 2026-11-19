@@ -1004,7 +1004,6 @@
   "I18N_MULTIPLE_LESSONS": "Lesins",
   "I18N_NEW_HINT_TITLE": "Hint <[hintIndex]>",
   "I18N_NEXT_LESSON": "Next Lesson",
-  "I18N_NO": "No",
   "I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "No results found for matching username.",
   "I18N_ONE_SUBSCRIBER_TEXT": "You get 1 subscriber.",
   "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerships",
@@ -1669,6 +1668,5 @@
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3": "Projects wey matter",
   "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Di work wey you dey do dey straight help student dem wey dem no dey help well well for di whole world to fit see free-free, better learning.",
   "I18N_WARNING_MODAL_DESCRIPTION": "This go show the full solution.You dey sure?",
-  "I18N_WARNING_MODAL_TITLE": "Warning!",
-  "I18N_YES": "Yes"
+  "I18N_WARNING_MODAL_TITLE": "Warning!"
 }

@@ -162,7 +162,6 @@
   "I18N_LICENSE_PAGE_LICENSE_HEADING": "רישיון",
   "I18N_MODAL_CANCEL_BUTTON": "ביטול",
   "I18N_MODAL_CONTINUE_BUTTON": "המשך",
-  "I18N_NO": "לא",
   "I18N_ONE_SUBSCRIBER_TEXT": "יש לך מינוי אחד.",
   "I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "חשבון שיימחק",
   "I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1": "חשבונך מתוזמן למחיקה והוא יימחק תוך 24 שעות בערך. {{GENDER:|תקבל|תקבלי}} הודעה בדוא\"ל כשהמחיקה תושלם.",
@@ -253,6 +252,5 @@
   "I18N_TOPNAV_LIBRARY_TEXT": "ספרייה",
   "I18N_VIEW_ALL_TOPICS": "צפה בכל נושאי ה-<[classroomName]>",
   "I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2": "כישורי כתיבה, מחקר והוראה",
-  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "תוכנה",
-  "I18N_YES": "כן"
+  "I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "תוכנה"
 }

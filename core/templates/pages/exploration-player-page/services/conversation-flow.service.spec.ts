@@ -770,7 +770,6 @@ describe('Conversation flow service', () => {
       explorationEngineService
     );
     spyOn(explorationEngineService, 'recordNewCardAdded');
-    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(
       conversationFlowService,
@@ -821,6 +820,10 @@ describe('Conversation flow service', () => {
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(2);
     spyOn(playerTranscriptService, 'getCard');
+    spyOn(
+      conversationFlowService,
+      'isSupplementalCardNonempty'
+    ).and.returnValue(false);
     spyOn(cardAnimationService, 'canWindowShowTwoCards').and.returnValue(false);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(cardAnimationService, 'animateToOneCard');
