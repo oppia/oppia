@@ -307,6 +307,10 @@ describe('Practice Question Submitter', function () {
       'Wrong Answer. Please try again'
     );
     await questionSubmitter.addHintToState('Select the correct option.');
+    await questionSubmitter.addItemSelectionSolutionToState(
+      ['Correct Option 1', 'Correct Option 2'],
+      'Select both correct options.'
+    );
     await questionSubmitter.submitQuestionSuggestion();
 
     // Multiple Choice Interaction.
