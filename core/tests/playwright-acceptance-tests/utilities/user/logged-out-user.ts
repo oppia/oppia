@@ -753,13 +753,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Alias for continueToNextCardAsLoggedOutUser matching Puppeteer API.
-   */
-  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
-    await this.continueToNextCardAsLoggedOutUser(skipVerification);
-  }
-
-  /**
    * Continue to next practice question
    */
   async continueToNextPracticeQuestion(): Promise<void> {
@@ -4122,35 +4115,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} shortcut - The keyboard shortcut to press.
    */
   async simulateKeyboardShortcut(shortcut: string): Promise<void> {
-    const keys = shortcut.split('+');
-    for (const key of keys) {
-      await this.page.keyboard.down(key);
-    }
-    for (const key of keys) {
-      await this.page.keyboard.up(key);
-    }
-
-    try {
-      await this.page.waitForLoadState('networkidle', {timeout: 5000});
-    } catch {
-      // Navigation might not happen for all shortcuts, which is expected.
-    }
-  }
-
-  /**
-   * Verifies that the current page URL includes the expected page pathname.
-   * @param {string} expectedPage - The expected page pathname (e.g., 'get started').
-   */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
-    await this.page.waitForFunction(
-      (expected: string) => {
-        return window.location.href.toLowerCase().includes(expected.toLowerCase());
-      },
-      expectedPageInUrl,
-      {timeout: 10000}
-    );
+    await this.page.keyboard.press(shortcut);
   }
 
   /**

@@ -43,12 +43,21 @@ export class NavigationUtils {
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.userInstance.waitForStaticAssetsToLoad();
-    const url = this.userInstance.page.url();
-
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.toLowerCase().includes(expectedPageInUrl.toLowerCase())) {
+    try {
+      await this.userInstance.page.waitForFunction(
+        (expected: string) => {
+          return window.location.href
+            .toLowerCase()
+            .includes(expected.toLowerCase());
+        },
+        expectedPageInUrl,
+        {timeout: 10000}
+      );
+    } catch {
+      const url = this.userInstance.page.url();
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );

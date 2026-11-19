@@ -92,27 +92,27 @@ test.describe('Logged-out User', function () {
     test.setTimeout(DEFAULT_SPEC_TIMEOUT_MSECS);
     // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
-    await loggedOutUser.expectToBeOnPage('get started');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('get started');
 
     // Navigate to the About page using the ‘Ctrl+4’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
-    await loggedOutUser.expectToBeOnPage('about');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('about');
 
-    // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
+    // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page with preferences return_url) using the ‘Ctrl+5’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
-    await loggedOutUser.expectToBeOnPage('login');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('preferences');
 
-    // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
+    // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page with learner-dashboard return_url) using the ‘Ctrl+2’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
-    await loggedOutUser.expectToBeOnPage('login');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('learner-dashboard');
 
-    // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
+    // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page with creator-dashboard return_url) using the ‘Ctrl+3’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
-    await loggedOutUser.expectToBeOnPage('login');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('creator-dashboard');
 
     // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
     await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
-    await loggedOutUser.expectToBeOnPage('community library');
+    await loggedOutUser.expectToBeOnPageAsLoggedOutUser('community library');
 
     // Skips to the main content.
     await loggedOutUser.verifyFocusAfterShortcut('s');
@@ -122,13 +122,13 @@ test.describe('Logged-out User', function () {
     // Skips to the main content.
     await loggedOutUser.verifyFocusAfterShortcut('s');
 
-    await loggedOutUser.continueToNextCard();
+    await loggedOutUser.continueToNextCardAsLoggedOutUser();
 
     // Expects the focus to be on the back button in lesson player.
-    await loggedOutUser.verifyFocusAfterShortcut('j');
+    await loggedOutUser.verifyFocusAfterShortcut('k');
 
     // Expects the focus to be on the continue or next button in lesson player.
-    await loggedOutUser.verifyFocusAfterShortcut('k');
+    await loggedOutUser.verifyFocusAfterShortcut('j');
   });
 
   test.afterAll(async function () {
